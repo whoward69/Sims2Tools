@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<textlists>
+  <textlist>
+    <value>0x0081</value>
+    <name>Adult Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x0082</value>
+    <name>Child Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x0083</value>
+    <name>Social Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x0084</value>
+    <name>Loco Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x0085</value>
+    <name>Model Names</name>
+  </textlist>
+  <textlist>
+    <value>0x0086</value>
+    <name>Object Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x0087</value>
+    <name>Mesh Names</name>
+  </textlist>
+  <textlist>
+    <value>0x0088</value>
+    <name>Material Names</name>
+  </textlist>
+  <textlist>
+    <value>0x0089</value>
+    <name>Toddler Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x008A</value>
+    <name>Teen Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x008B</value>
+    <name>Elder Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x008C</value>
+    <name>Cat Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x008D</value>
+    <name>Dog Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x008E</value>
+    <name>Light Names</name>
+  </textlist>
+  <textlist>
+    <value>0x008F</value>
+    <name>Effect Names</name>
+  </textlist>
+  <textlist>
+    <value>0x0090</value>
+    <name>Bone Names</name>
+  </textlist>
+  <textlist>
+    <value>0x0091</value>
+    <name>Baby Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x0092</value>
+    <name>Reach Anims</name>
+  </textlist>
+  <textlist>
+    <value>0x0093</value>
+    <name>Job Titles</name>
+  </textlist>
+  <textlist>
+    <value>0x0094</value>
+    <name>Sound Names</name>
+  </textlist>
+  <textlist>
+    <value>0x012D</value>
+    <name>Dialog Strings</name>
+  </textlist>
+  <textlist>
+    <value>0x012E</value>
+    <name>Action Strings</name>
+  </textlist>
+  <textlist>
+    <value>0x012F</value>
+    <name>CT Strings</name>
+  </textlist>
+</textlists>

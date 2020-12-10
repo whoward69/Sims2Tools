@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<primitives>
+  <primitive>
+    <value>0x00</value>
+    <name>Sleep</name>
+  </primitive>
+  <primitive>
+    <value>0x01</value>
+    <name>Generic Sims Call</name>
+  </primitive>
+  <primitive>
+    <value>0x02</value>
+    <name>Expression</name>
+  </primitive>
+  <primitive>
+    <value>0x03</value>
+    <name>Find Best Interaction</name>
+  </primitive>
+  <primitive>
+    <value>0x07</value>
+    <name>Refresh</name>
+  </primitive>
+  <primitive>
+    <value>0x08</value>
+    <name>Random Number</name>
+  </primitive>
+  <primitive>
+    <value>0x0A</value>
+    <name>Tutorial</name>
+  </primitive>
+  <primitive>
+    <value>0x0B</value>
+    <name>Distance</name>
+  </primitive>
+  <primitive>
+    <value>0x0C</value>
+    <name>Direction</name>
+  </primitive>
+  <primitive>
+    <value>0x0D</value>
+    <name>Push Interaction</name>
+  </primitive>
+  <primitive>
+    <value>0x0E</value>
+    <name>Find Best Object For Function</name>
+  </primitive>
+  <primitive>
+    <value>0x0F</value>
+    <name>Break Point</name>
+  </primitive>
+  <primitive>
+    <value>0x10</value>
+    <name>Find Location For</name>
+  </primitive>
+  <primitive>
+    <value>0x11</value>
+    <name>Idle For Input</name>
+  </primitive>
+  <primitive>
+    <value>0x12</value>
+    <name>Remove Object Instance</name>
+  </primitive>
+  <primitive>
+    <value>0x13</value>
+    <name>Make New Character</name>
+  </primitive>
+  <primitive>
+    <value>0x14</value>
+    <name>Run Functional Tree</name>
+  </primitive>
+  <primitive>
+    <value>0x16</value>
+    <name>Turn Body</name>
+  </primitive>
+  <primitive>
+    <value>0x17</value>
+    <name>Play/Stop Sound Event</name>
+  </primitive>
+  <primitive>
+    <value>0x19</value>
+    <name>Alter Budget</name>
+  </primitive>
+  <primitive>
+    <value>0x1A</value>
+    <name>Relationship</name>
+  </primitive>
+  <primitive>
+    <value>0x1B</value>
+    <name>Go To Relative Position</name>
+  </primitive>
+  <primitive>
+    <value>0x1C</value>
+    <name>Run Tree By Name</name>
+  </primitive>
+  <primitive>
+    <value>0x1D</value>
+    <name>Set Motive Change</name>
+  </primitive>
+  <primitive>
+    <value>0x1E</value>
+    <name>Gosub Action</name>
+  </primitive>
+  <primitive>
+    <value>0x1F</value>
+    <name>Set To Next</name>
+  </primitive>
+  <primitive>
+    <value>0x20</value>
+    <name>Test Object Type</name>
+  </primitive>
+  <primitive>
+    <value>0x21</value>
+    <name>Find 5 Worst Motives</name>
+  </primitive>
+  <primitive>
+    <value>0x22</value>
+    <name>UI Effect</name>
+  </primitive>
+  <primitive>
+    <value>0x23</value>
+    <name>Camera Control</name>
+  </primitive>
+  <primitive>
+    <value>0x24</value>
+    <name>Dialogue</name>
+  </primitive>
+  <primitive>
+    <value>0x25</value>
+    <name>Test Sim Interacting With</name>
+  </primitive>
+  <primitive>
+    <value>0x2A</value>
+    <name>Create New Object Instance</name>
+  </primitive>
+  <primitive>
+    <value>0x2D</value>
+    <name>Go To Routing Slot</name>
+  </primitive>
+  <primitive>
+    <value>0x2E</value>
+    <name>Snap</name>
+  </primitive>
+  <primitive>
+    <value>0x30</value>
+    <name>Stop ALL Sounds</name>
+  </primitive>
+  <primitive>
+    <value>0x31</value>
+    <name>Notify The Stack Object Out Of Idle</name>
+  </primitive>
+  <primitive>
+    <value>0x32</value>
+    <name>Add/Change The Action String</name>
+  </primitive>
+  <primitive>
+    <value>0x33</value>
+    <name>Manage Inventory</name>
+  </primitive>
+  <primitive>
+    <value>0x69</value>
+    <name>Animate Object</name>
+  </primitive>
+  <primitive>
+    <value>0x6A</value>
+    <name>Animate Sim</name>
+  </primitive>
+  <primitive>
+    <value>0x6B</value>
+    <name>Animate Overlay</name>
+  </primitive>
+  <primitive>
+    <value>0x6D</value>
+    <name>Change Material</name>
+  </primitive>
+  <primitive>
+    <value>0x6E</value>
+    <name>Look AT</name>
+  </primitive>
+  <primitive>
+    <value>0x6F</value>
+    <name>Change Light</name>
+  </primitive>
+  <primitive>
+    <value>0x70</value>
+    <name>Effect Stop/Start</name>
+  </primitive>
+  <primitive>
+    <value>0x71</value>
+    <name>Snap Into</name>
+  </primitive>
+  <primitive>
+    <value>0x72</value>
+    <name>Assign Locomotion Animations</name>
+  </primitive>
+  <primitive>
+    <value>0x73</value>
+    <name>Debug</name>
+  </primitive>
+  <primitive>
+    <value>0x74</value>
+    <name>Reach/Put</name>
+  </primitive>
+  <primitive>
+    <value>0x75</value>
+    <name>Age</name>
+  </primitive>
+  <primitive>
+    <value>0x76</value>
+    <name>Array Operation</name>
+  </primitive>
+  <primitive>
+    <value>0x77</value>
+    <name>Message</name>
+  </primitive>
+  <primitive>
+    <value>0x78</value>
+    <name>Ray Trace</name>
+  </primitive>
+  <primitive>
+    <value>0x79</value>
+    <name>Change Outfit</name>
+  </primitive>
+  <primitive>
+    <value>0x7A</value>
+    <name>On Timer</name>
+  </primitive>
+  <primitive>
+    <value>0x7B</value>
+    <name>Cinematic</name>
+  </primitive>
+  <primitive>
+    <value>0x7C</value>
+    <name>Want Satisfy</name>
+  </primitive>
+  <primitive>
+    <value>0x7D</value>
+    <name>Follow Sim</name>
+  </primitive>
+  <primitive>
+    <value>0x7E</value>
+    <name>Lua</name>
+  </primitive>
+</primitives>

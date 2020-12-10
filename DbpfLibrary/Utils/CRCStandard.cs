@@ -1,0 +1,31 @@
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+namespace Classless.Hasher
+{
+    public enum CRCStandard
+    {
+        CRC8,
+        CRC8_REVERSED,
+        CRC16,
+        CRC16_REVERSED,
+        CRC16_CCITT,
+        CRC16_CCITT_REVERSED,
+        CRC24,
+        CRC32,
+        CRC32_REVERSED,
+        CRC16_ARC,
+        CRC16_ZMODEM,
+        CRC32_JAMCRC,
+        CRC32_BZIP2
+    }
+}

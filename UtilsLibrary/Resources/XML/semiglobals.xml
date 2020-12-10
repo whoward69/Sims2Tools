@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<semiglobals>
+  <semiglobal>
+    <value>7F18E0F0</value>
+    <name>Painting</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F7234D0</value>
+    <name>Table Dining</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F8F4EB6</value>
+    <name>Job Data</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F01EC29</value>
+    <name>Person</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F6B7BD0</value>
+    <name>Tree</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FD178FF</value>
+    <name>Table End</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FF941DF</value>
+    <name>Emitter</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F575EBF</value>
+    <name>Memory</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FE6EE0D</value>
+    <name>Accessory</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F7FA83D</value>
+    <name>Idle</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FC9DC08</value>
+    <name>Pinball Machine</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F4F06CA</value>
+    <name>Stereo</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F60C397</value>
+    <name>Lamp</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F759586</value>
+    <name>Water Plant</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FE10572</value>
+    <name>Shopping Rack</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FD90EDB</value>
+    <name>Social</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F8B4A08</value>
+    <name>Sofa Social</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FAF5F74</value>
+    <name>Aspiration Cool Shades</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FD0DEBA</value>
+    <name>Door Globals New</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F4437F2</value>
+    <name>Bed</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FBD3903</value>
+    <name>Phone Call</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FF616D0</value>
+    <name>Window</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F84A9F4</value>
+    <name>Mirror</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F48CA31</value>
+    <name>Plant</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FE69E23</value>
+    <name>Tub And Shower</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FFEA664</value>
+    <name>Telescope</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F12A804</value>
+    <name>Counter</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F0B61F3</value>
+    <name>Chair</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F85C391</value>
+    <name>Table Coffee</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F7BA762</value>
+    <name>Reaction</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F7638B3</value>
+    <name>Sink</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FDFFE55</value>
+    <name>Dining</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F3C9675</value>
+    <name>Food</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F0136DC</value>
+    <name>Lot Transition</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FA815EA</value>
+    <name>Desk</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FB208FA</value>
+    <name>Phone</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F2B6F4B</value>
+    <name>Rug</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F8834C8</value>
+    <name>Food Dish</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F8EC725</value>
+    <name>Connected Column</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F449F3B</value>
+    <name>Music</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FCE2168</value>
+    <name>Harvestable</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F327BCE</value>
+    <name>Book Case</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F4EA230</value>
+    <name>Car</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FAB30B7</value>
+    <name>Table Tea</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F033984</value>
+    <name>Stove</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FAE06B0</value>
+    <name>Sofa</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FB8B012</value>
+    <name>Litter Box</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FE6B74C</value>
+    <name>Elevator</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FA3FCFE</value>
+    <name>Trash</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F16556B</value>
+    <name>Toilet</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F4BF0DB</value>
+    <name>Jungle Gym</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F383346</value>
+    <name>Garden</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F0B2AE7</value>
+    <name>Video Game CD</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F8A5209</value>
+    <name>Flower</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FDB80FC</value>
+    <name>Stuffed Animal</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F62606D</value>
+    <name>Weather</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F675EF2</value>
+    <name>Social Marker</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FE64A8D</value>
+    <name>Book</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F9EE20D</value>
+    <name>Controller Group</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FD2752D</value>
+    <name>Sign</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F67FE05</value>
+    <name>Bar</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F3B9D51</value>
+    <name>Curtain</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F3A03A4</value>
+    <name>Mail Box</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FDC2970</value>
+    <name>Display</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F92832C</value>
+    <name>Television</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F376D8B</value>
+    <name>Easel</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FD0A90D</value>
+    <name>Cake</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FD05A1E</value>
+    <name>Pet Bed</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FE3E694</value>
+    <name>Food Stand</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F7D730B</value>
+    <name>Toaster Oven</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F1CEB97</value>
+    <name>Snowball Fight</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FDE81DC</value>
+    <name>Cash Register</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FFD4F2D</value>
+    <name>Fireplace</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F67DD1B</value>
+    <name>Pet</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FE49F9B</value>
+    <name>Pool</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F9AB517</value>
+    <name>Exercisemachine</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F92C7E1</value>
+    <name>Driveway</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F293E85</value>
+    <name>Puddle Global</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F0C60C8</value>
+    <name>Stairs Straight</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F74C118</value>
+    <name>Arcade</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F0AB421</value>
+    <name>Date Reward</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F25E399</value>
+    <name>Effect Holder</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FC6FC76</value>
+    <name>urtain</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FB01AF3</value>
+    <name>Clock Alarm</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F48AF7A</value>
+    <name>Clothing Booth</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F83411E</value>
+    <name>High Chair</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FE69D2A</value>
+    <name>Television Channel</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F1BFB16</value>
+    <name>Big Rink</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F681D60</value>
+    <name>Pool Table</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F347DAB</value>
+    <name>Food Container</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F553580</value>
+    <name>Personality</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F20C1E4</value>
+    <name>Magazine</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FB22737</value>
+    <name>Witch</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FE1FE8A</value>
+    <name>Toy Jack In The Box</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F117CD9</value>
+    <name>Stair Modular</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F067AA0</value>
+    <name>Crafting</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F17E3A4</value>
+    <name>Major</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F6662D5</value>
+    <name>ight</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FEC2140</value>
+    <name>Roach</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F9CE3AF</value>
+    <name>juicer</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FC758D8</value>
+    <name>Potion</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F020C14</value>
+    <name>Pet Food Dish</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F1A9ECC</value>
+    <name>Shrub</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F491269</value>
+    <name>Orchard Tree</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F38B8A7</value>
+    <name>Urn Stone</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F2FEFCC</value>
+    <name>Coffee Machine</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F23B01B</value>
+    <name>Food Processor</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F61CD20</value>
+    <name>Video Game</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F1059B4</value>
+    <name>Toasting Set</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FA1DF44</value>
+    <name>Chess Global</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F9BFA55</value>
+    <name>Robot</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F05E901</value>
+    <name>Toy Water Wiggle Sprinkler</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FEF86EB</value>
+    <name>Toy Kite</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F6E333B</value>
+    <name>Dishwasher</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F6AB593</value>
+    <name>Snow Man</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F63E3F2</value>
+    <name>Tutorial Scripting</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F9A5330</value>
+    <name>Fridge</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FE1C9FB</value>
+    <name>Microwave</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FC6E1D8</value>
+    <name>Ceiling Fan</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FD3AF67</value>
+    <name>Thought</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FA083E3</value>
+    <name>Display Pet</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F8C5BAC</value>
+    <name>Hotel Desk</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FEABABA</value>
+    <name>Hottub</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F281D4B</value>
+    <name>Auto Sprinkler</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F7A8450</value>
+    <name>Career Fingerprint</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FC80134</value>
+    <name>Soccer Net Global</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FDDAB2B</value>
+    <name>Contained Pet</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F277790</value>
+    <name>Toy Box</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F8FA50E</value>
+    <name>Aspirations Hat</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F496A24</value>
+    <name>Dance</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F9A625F</value>
+    <name>Aquarium</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F8C6EDA</value>
+    <name>Career Candy Factory</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F6E998E</value>
+    <name>Grandfather Clock</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F514EE5</value>
+    <name>Table Massage</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FCFF92E</value>
+    <name>Flamingo</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F723E9D</value>
+    <name>Vanity</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F9A5831</value>
+    <name>Video Game Controller</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FD18CCD</value>
+    <name>Climate</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F890CAC</value>
+    <name>Crib</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F130D8A</value>
+    <name>Bouncy Toddler Object</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F5A0600</value>
+    <name>Photo Booth</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FBE051B</value>
+    <name>Job Data School</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FDA22BB</value>
+    <name>Stove Grill</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F119F0A</value>
+    <name>Toybox Toys</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F39D7FB</value>
+    <name>Toy Xylophone</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F56BB72</value>
+    <name>Car Globals New</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F026EBD</value>
+    <name>Dartboard Global</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F441294</value>
+    <name>Computer</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F28EEB6</value>
+    <name>Toy Language</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F011198</value>
+    <name>Rink</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F3B5482</value>
+    <name>Stairs Spiral</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F2BBA62</value>
+    <name>Helipad</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FF9DF6B</value>
+    <name>Buffet</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FA6640C</value>
+    <name>Remote Control Car</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F074B38</value>
+    <name>Conversation Personality</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F07B054</value>
+    <name>Walk Sign</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F084A90</value>
+    <name>Dirt Pile</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FACC12B</value>
+    <name>Trigger Handler Global</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F5BB15F</value>
+    <name>Route Behavior</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F71C68E</value>
+    <name>Poker Table</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F545E8D</value>
+    <name>Doll House</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7F38969E</value>
+    <name>Keg</name>
+  </semiglobal>
+  <semiglobal>
+    <value>7FEB25E9</value>
+    <name>Wishing Well</name>
+  </semiglobal>
+  <semiglobal>
+    <value>0x7F9D74A7</value>
+    <name>Orangutan</name>
+  </semiglobal>
+  <semiglobal>
+    <value>0x7F9176E2</value>
+    <name>Pet Agility</name>
+  </semiglobal>
+</semiglobals>
