@@ -37,7 +37,7 @@ The [Hack Conflict Detection Utility](http://www.leefish.nl/mybb/showthread.php?
 1. it doesn't consider STR#, OBJD, OBJf or other resources
 1. it can't be told which folder to start in
 1. it can't be told to ignore known conflicts (eg all the InTeenimater flavour paks)
-1. it reports conflicts at the resource (BHAV, BCON and STR#) level and not at the package level (most users can't do anything about resource level conflicts so it's enough to know that "InTeenimater_FlavorPak_BackToSchool.package" conflicts with "InTeenimater_B.package" without listing the eleven resources that conflict)
+1. it reports conflicts at the resource (BHAV, BCON and STR#) level and not at the package level (it's usually enough to know that "InTeenimater_FlavorPak_BackToSchool.package" conflicts with "InTeenimater_B.package" without giving the eleven resources that conflict)
 	  
 The HCDU Plus application is my attempt to remedy these.
 
