@@ -17,6 +17,20 @@ using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
+using Sims2Tools.DBPF.SceneGraph.BINX;
+using Sims2Tools.DBPF.SceneGraph.CRES;
+using Sims2Tools.DBPF.SceneGraph.GMDC;
+using Sims2Tools.DBPF.SceneGraph.GMND;
+using Sims2Tools.DBPF.SceneGraph.GZPS;
+using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.LAMB;
+using Sims2Tools.DBPF.SceneGraph.LDIR;
+using Sims2Tools.DBPF.SceneGraph.LPNT;
+using Sims2Tools.DBPF.SceneGraph.LSPT;
+using Sims2Tools.DBPF.SceneGraph.MMAT;
+using Sims2Tools.DBPF.SceneGraph.SHPE;
+using Sims2Tools.DBPF.SceneGraph.TXMT;
+using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
@@ -256,6 +270,63 @@ namespace Sims2Tools.DBPF
             else if (entry.TypeID == Vers.TYPE)
             {
                 res = new Vers(entry, this.GetIoBuffer(entry));
+            }
+            // SceneGraph resources
+            else if (entry.TypeID == Binx.TYPE)
+            {
+                res = new Binx(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Cres.TYPE)
+            {
+                res = new Cres(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Gmdc.TYPE)
+            {
+                res = new Gmdc(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Gmnd.TYPE)
+            {
+                res = new Gmnd(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Gzps.TYPE)
+            {
+                res = new Gzps(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Idr.TYPE)
+            {
+                res = new Idr(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Lamb.TYPE)
+            {
+                res = new Lamb(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Ldir.TYPE)
+            {
+                res = new Ldir(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Lpnt.TYPE)
+            {
+                res = new Lpnt(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Lspt.TYPE)
+            {
+                res = new Lspt(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Mmat.TYPE)
+            {
+                res = new Mmat(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Shpe.TYPE)
+            {
+                res = new Shpe(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Txmt.TYPE)
+            {
+                res = new Txmt(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Txtr.TYPE)
+            {
+                res = new Txtr(entry, this.GetIoBuffer(entry));
             }
 
             return res;
