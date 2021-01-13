@@ -87,7 +87,6 @@ namespace Sims2Tools
             this.Name = "Sims2ToolsProgressDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Progress";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.OnLoad);
             this.ResumeLayout(false);
 

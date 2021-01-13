@@ -1,27 +1,32 @@
-﻿using Sims2Tools.DBPF.Utils;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.Utils;
 using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF
 {
-    abstract public class DBPFResource
+    abstract public class DBPFResource : DBPFKey
     {
-        private readonly DBPFEntry entry;
         public byte[] filename = new byte[64];
 
-        internal DBPFResource(DBPFEntry entry)
+        internal DBPFResource(DBPFEntry entry) : base(entry)
         {
-            this.entry = entry;
         }
 
         public string FileName
         {
             get => Helper.ToString(this.filename);
-        }
-
-        public uint Group
-        {
-            get => this.entry.GroupID;
         }
 
         public abstract void AddXml(XmlElement parent);
@@ -55,9 +60,9 @@ namespace Sims2Tools.DBPF
 
         private void AddAttributes(XmlElement parent)
         {
-            parent.SetAttribute("group", Helper.Hex8PrefixString(entry.GroupID));
-            parent.SetAttribute("instance", Helper.Hex8PrefixString(entry.InstanceID));
-            if (entry.InstanceID2 != 0) parent.SetAttribute("instanceHi", Helper.Hex8PrefixString(entry.InstanceID2));
+            parent.SetAttribute("group", Helper.Hex8PrefixString(GroupID));
+            parent.SetAttribute("instance", Helper.Hex8PrefixString(InstanceID));
+            if (InstanceID2 != 0) parent.SetAttribute("instanceHi", Helper.Hex8PrefixString(InstanceID2));
             parent.SetAttribute("name", FileName);
         }
     }

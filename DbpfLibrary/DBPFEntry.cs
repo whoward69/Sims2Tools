@@ -12,15 +12,14 @@
 
 namespace Sims2Tools.DBPF
 {
-    public class DBPFEntry
+    public class DBPFEntry : DBPFKey
     {
-        public uint TypeID;
-        public uint GroupID;
-        public uint InstanceID;
-        public uint InstanceID2;
-
         public uint FileOffset;
         public uint FileSize;
         public uint uncompressedSize = 0;
+
+        public DBPFEntry(uint typeID, uint groupID, uint instanceID, uint instanceID2) : base(typeID, groupID, instanceID, instanceID2)
+        {
+        }
     }
 }

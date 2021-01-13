@@ -32,6 +32,7 @@ namespace Sims2Tools.DBPF.CPF
         public MetaData.DataTypes Datatype
         {
             get => dt;
+            set { dt = value; }
         }
 
         public string Name
@@ -42,6 +43,7 @@ namespace Sims2Tools.DBPF.CPF
         public Byte[] Value
         {
             get => val;
+            set { val = value; }
         }
 
         public string StringValue
@@ -68,6 +70,12 @@ namespace Sims2Tools.DBPF.CPF
                             return "";
                         }
                 }
+            }
+
+            set
+            {
+                dt = Data.MetaData.DataTypes.dtString;
+                val = Helper.ToBytes(value, 0);
             }
         }
 
@@ -102,6 +110,16 @@ namespace Sims2Tools.DBPF.CPF
                         }
                 }
             }
+
+            set
+            {
+                dt = Data.MetaData.DataTypes.dtUInteger;
+                System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
+                bw.Write(value);
+                System.IO.BinaryReader br = new System.IO.BinaryReader(bw.BaseStream);
+                br.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+                val = br.ReadBytes((int)br.BaseStream.Length);
+            }
         }
 
         public int IntegerValue
@@ -135,6 +153,16 @@ namespace Sims2Tools.DBPF.CPF
                         }
                 }
             }
+
+            set
+            {
+                dt = Data.MetaData.DataTypes.dtInteger;
+                System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
+                bw.Write(value);
+                System.IO.BinaryReader br = new System.IO.BinaryReader(bw.BaseStream);
+                br.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+                val = br.ReadBytes((int)br.BaseStream.Length);
+            }
         }
 
         public Single SingleValue
@@ -167,6 +195,16 @@ namespace Sims2Tools.DBPF.CPF
                             return 0;
                         }
                 }
+            }
+
+            set
+            {
+                dt = Data.MetaData.DataTypes.dtSingle;
+                System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
+                bw.Write(value);
+                System.IO.BinaryReader br = new System.IO.BinaryReader(bw.BaseStream);
+                br.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+                val = br.ReadBytes((int)br.BaseStream.Length);
             }
         }
 
@@ -206,6 +244,15 @@ namespace Sims2Tools.DBPF.CPF
                             return false;
                         }
                 }
+            }
+            set
+            {
+                dt = Data.MetaData.DataTypes.dtBoolean;
+                System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
+                bw.Write(value);
+                System.IO.BinaryReader br = new System.IO.BinaryReader(bw.BaseStream);
+                br.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+                val = br.ReadBytes((int)br.BaseStream.Length);
             }
         }
 

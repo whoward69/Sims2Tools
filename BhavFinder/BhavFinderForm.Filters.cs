@@ -125,7 +125,7 @@ namespace BhavFinder
 
                     foreach (Instruction inst in bhav.Instructions)
                     {
-                        if (InstFilter.IsWanted(bhav.Group, inst))
+                        if (InstFilter.IsWanted(bhav.GroupID, inst))
                         {
                             return true;
                         }
@@ -167,7 +167,7 @@ namespace BhavFinder
 
             public override Boolean Wanted(Bhav bhav)
             {
-                return (bhav.Group == group);
+                return (bhav.GroupID == group);
             }
         }
 
@@ -183,7 +183,7 @@ namespace BhavFinder
 
             public override Boolean Wanted(Bhav bhav)
             {
-                return (GameData.semiglobalsByGroupID.TryGetValue(bhav.Group, out uint semigroup) && (semigroup == semiglobals));
+                return (GameData.semiglobalsByGroupID.TryGetValue(bhav.GroupID, out uint semigroup) && (semigroup == semiglobals));
             }
         }
 

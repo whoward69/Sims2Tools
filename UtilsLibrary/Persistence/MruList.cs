@@ -98,29 +98,41 @@ namespace Sims2Tools.Utils.Persistence
 
         public void AddFile(string file_name)
         {
-            RemoveFileInfo(file_name);
-            FileInfos.Insert(0, new FileInfo(file_name));
-            if (FileInfos.Count > NumFiles) FileInfos.RemoveAt(NumFiles);
+            if (file_name.Length > 0)
+            {
+                if (file_name.EndsWith(@"\"))
+                    file_name = file_name.Substring(0, file_name.Length - 1);
 
-            ShowFiles();
-            SaveFiles();
+                RemoveFileInfo(file_name);
+                FileInfos.Insert(0, new FileInfo(file_name));
+                if (FileInfos.Count > NumFiles) FileInfos.RemoveAt(NumFiles);
+
+                ShowFiles();
+                SaveFiles();
+            }
         }
 
         private void RemoveFileInfo(string file_name)
         {
-            for (int i = FileInfos.Count - 1; i >= 0; i--)
+            if (file_name.Length > 0)
             {
-                if (FileInfos[i].FullName == file_name)
-                    FileInfos.RemoveAt(i);
+                for (int i = FileInfos.Count - 1; i >= 0; i--)
+                {
+                    if (FileInfos[i].FullName == file_name)
+                        FileInfos.RemoveAt(i);
+                }
             }
         }
 
         public void RemoveFile(string file_name)
         {
-            RemoveFileInfo(file_name);
+            if (file_name.Length > 0)
+            {
+                RemoveFileInfo(file_name);
 
-            ShowFiles();
-            SaveFiles();
+                ShowFiles();
+                SaveFiles();
+            }
         }
 
         private void File_Click(object sender, EventArgs e)

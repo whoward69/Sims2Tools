@@ -27,8 +27,8 @@ namespace Sims2Tools
 
         private void OnConfigLoad(object sender, EventArgs e)
         {
-            textSims2Path.Text = (String)RegistryTools.GetSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2PathKey, "");
-            textSimPEPath.Text = (String)RegistryTools.GetSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.SimPePathKey, "");
+            textSims2Path.Text = Sims2ToolsLib.Sims2Path;
+            textSimPEPath.Text = Sims2ToolsLib.SimPePath;
         }
 
         private void OnSelectSim2PathClicked(object sender, EventArgs e)
@@ -53,11 +53,11 @@ namespace Sims2Tools
 
         private void OnConfigOkClicked(object sender, EventArgs e)
         {
-            String oldSims2Path = RegistryTools.GetSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2PathKey, "") as String;
-            String oldSimPePath = RegistryTools.GetSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.SimPePathKey, "") as String;
+            String oldSims2Path = Sims2ToolsLib.Sims2Path;
+            String oldSimPePath = Sims2ToolsLib.SimPePath;
 
-            RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2PathKey, textSims2Path.Text);
-            RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.SimPePathKey, textSimPEPath.Text);
+            Sims2ToolsLib.Sims2Path = textSims2Path.Text;
+            Sims2ToolsLib.SimPePath = textSimPEPath.Text;
 
             this.Close();
 

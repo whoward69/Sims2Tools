@@ -49,8 +49,6 @@ namespace Sims2Tools.DBPF
         private Dictionary<int, DBPFEntry> m_EntryByFullID = new Dictionary<int, DBPFEntry>();
         private readonly Dictionary<uint, List<DBPFEntry>> m_EntriesByType = new Dictionary<uint, List<DBPFEntry>>();
 
-        private IoBuffer Io;
-
         public DBPFFile(string file)
         {
             var stream = File.OpenRead(file);
@@ -63,8 +61,7 @@ namespace Sims2Tools.DBPF
             m_EntryByFullID = new Dictionary<int, DBPFEntry>();
 
             var io = IoBuffer.FromStream(stream, ByteOrder.LITTLE_ENDIAN);
-            m_Reader = io;
-            this.Io = io;
+            this.m_Reader = io;
 
             var magic = io.ReadCString(4);
             if (magic != "DBPF")
@@ -116,17 +113,16 @@ namespace Sims2Tools.DBPF
             io.Seek(SeekOrigin.Begin, indexOffset);
             for (int i = 0; i < NumEntries; i++)
             {
-                var entry = new DBPFEntry
-                {
-                    TypeID = io.ReadUInt32(),
-                    GroupID = io.ReadUInt32(),
-                    InstanceID = io.ReadUInt32()
-                };
+                uint typeID = io.ReadUInt32();
+                uint groupID = io.ReadUInt32();
+                uint instanceID = io.ReadUInt32();
+                uint instanceID2 = (IndexMinorVersion >= 2) ? io.ReadUInt32() : 0x0000;
 
-                if (IndexMinorVersion >= 2)
-                    entry.InstanceID2 = io.ReadUInt32();
-                entry.FileOffset = io.ReadUInt32();
-                entry.FileSize = io.ReadUInt32();
+                var entry = new DBPFEntry(typeID, groupID, instanceID, instanceID2)
+                {
+                    FileOffset = io.ReadUInt32(),
+                    FileSize = io.ReadUInt32()
+                };
 
                 var id = Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID);
                 var fullID = Hash.TGIRHash(entry.InstanceID, entry.InstanceID2, entry.TypeID, entry.GroupID);
@@ -265,9 +261,14 @@ namespace Sims2Tools.DBPF
             return res;
         }
 
+        public void Close()
+        {
+            m_Reader.Close();
+        }
+
         public void Dispose()
         {
-            Io.Dispose();
+            m_Reader.Dispose();
         }
     }
 }

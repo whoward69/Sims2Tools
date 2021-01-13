@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Utils;
 using System;
 
 namespace Sims2Tools.DBPF.CPF
@@ -41,6 +42,44 @@ namespace Sims2Tools.DBPF.CPF
                 items[i] = new CpfItem();
                 items[i].Unserialize(reader);
             }
+        }
+
+        public void AddItem(CpfItem item)
+        {
+            AddItem(item, true);
+        }
+
+        public void AddItem(CpfItem item, bool duplicate)
+        {
+            if (item != null)
+            {
+                CpfItem ex = null;
+                if (!duplicate) ex = this.GetItem(item.Name);
+                if (ex != null)
+                {
+                    ex.Datatype = item.Datatype;
+                    ex.Value = item.Value;
+                }
+                else
+                {
+                    items = (CpfItem[])Helper.Add(items, item);
+                }
+            }
+        }
+
+        public CpfItem GetItem(string name)
+        {
+            foreach (CpfItem item in this.items)
+                if (item.Name == name) return item;
+
+            return null;
+        }
+
+        public CpfItem GetSaveItem(string name)
+        {
+            CpfItem res = GetItem(name);
+            if (res == null) return new CpfItem();
+            else return res;
         }
 
         public void Dispose()

@@ -19,7 +19,7 @@ namespace HcduPlus
         public static String AppName = "HCDU Plus";
 
         public static int AppVersionMajor = 1;
-        public static int AppVersionMinor = 0;
+        public static int AppVersionMinor = 2;
         public static String AppVersionType = "b"; // a - alpha, b - beta, r - release
 
         public static String AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";

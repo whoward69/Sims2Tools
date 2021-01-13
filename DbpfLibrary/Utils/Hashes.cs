@@ -11,12 +11,14 @@
  */
 
 using Classless.Hasher;
+using System;
 
 namespace Sims2Tools.DBPF.Utils
 {
     public class Hashes
     {
         static readonly CRC crc24 = new CRC(CRCParameters.GetParameters(CRCStandard.CRC24));
+        static readonly CRC crc32 = new CRC(new Classless.Hasher.CRCParameters(32, 0x04C11DB7, 0xffffffff, 0, false));
 
         public static ulong ToLong(byte[] input)
         {
@@ -36,6 +38,61 @@ namespace Sims2Tools.DBPF.Utils
             byte[] rt = crc24.ComputeHash(Helper.ToBytes(name, 0));
 
             return (uint)(ToLong(rt) | 0x7F000000);
+        }
+
+        public static uint InstanceHash(string filename)
+        {
+            filename = filename.Trim().ToLower();
+            byte[] rt = crc24.ComputeHash(Helper.ToBytes(filename, 0));
+
+            return (uint)(ToLong(rt) | 0xff000000);
+        }
+
+        public static uint SubTypeHash(string filename)
+        {
+            filename = filename.Trim().ToLower();
+            byte[] rt = crc32.ComputeHash(Helper.ToBytes(filename, 0));
+
+            return (uint)ToLong(rt);
+        }
+
+        public static string StripHashFromName(string filename)
+        {
+            if (filename == null) return "";
+
+            if (filename.IndexOf("#") == 0)
+            {
+                if (filename.IndexOf("!") >= 1)
+                {
+                    string[] part = filename.Split("!".ToCharArray(), 2);
+                    return part[1];
+                }
+            }
+
+            return filename;
+        }
+
+        public static uint GetHashGroupFromName(string filename, uint defgroup)
+        {
+            if (filename.IndexOf("#") == 0)
+            {
+                if (filename.IndexOf("!") >= 1)
+                {
+                    string[] part = filename.Split("!".ToCharArray(), 2);
+
+                    string hash = part[0].Replace("#", "").Replace("!", "");
+                    try
+                    {
+                        return Convert.ToUInt32(hash, 16);
+                    }
+                    catch (Exception)
+                    {
+                        return defgroup;
+                    }
+                }
+            }
+
+            return defgroup;
         }
     }
 }

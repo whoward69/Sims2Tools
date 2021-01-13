@@ -93,5 +93,20 @@ namespace Sims2Tools.DBPF.Utils
 
             return ret;
         }
+
+        public static Array Add(Array source, object item, System.Type elementType)
+        {
+
+            Array a = Array.CreateInstance(elementType, source.Length + 1);
+            source.CopyTo(a, 0);
+            a.SetValue(item, a.Length - 1);
+            return a;
+        }
+
+        public static Array Add(Array source, object item)
+        {
+
+            return Add(source, item, item.GetType());
+        }
     }
 }

@@ -40,34 +40,55 @@ namespace Sims2Tools.DBPF
 
         public static uint INSTANCE_OBJD_DEFAULT = 0x41A7;
 
-        private static readonly Dictionary<uint, String> TypeNames = new Dictionary<uint, string>();
+        private static readonly Dictionary<uint, String> ModTypeNames = new Dictionary<uint, string>();
+        private static readonly Dictionary<uint, String> AllTypeNames = new Dictionary<uint, string>();
 
         static DBPFData()
         {
-            TypeNames.Add(Bcon.TYPE, Bcon.NAME);
-            TypeNames.Add(Bhav.TYPE, Bhav.NAME);
-            TypeNames.Add(Ctss.TYPE, Ctss.NAME);
-            TypeNames.Add(Glob.TYPE, Glob.NAME);
-            TypeNames.Add(Objd.TYPE, Objd.NAME);
-            TypeNames.Add(Objf.TYPE, Objf.NAME);
-            TypeNames.Add(Str.TYPE, Str.NAME);
-            TypeNames.Add(Tprp.TYPE, Tprp.NAME);
-            TypeNames.Add(Trcn.TYPE, Trcn.NAME);
-            TypeNames.Add(Ttab.TYPE, Ttab.NAME);
-            TypeNames.Add(Ttas.TYPE, Ttas.NAME);
-            TypeNames.Add(Vers.TYPE, Vers.NAME);
+            ModTypeNames.Add(Bcon.TYPE, Bcon.NAME);
+            ModTypeNames.Add(Bhav.TYPE, Bhav.NAME);
+            ModTypeNames.Add(Ctss.TYPE, Ctss.NAME);
+            ModTypeNames.Add(Glob.TYPE, Glob.NAME);
+            ModTypeNames.Add(Objd.TYPE, Objd.NAME);
+            ModTypeNames.Add(Objf.TYPE, Objf.NAME);
+            ModTypeNames.Add(Str.TYPE, Str.NAME);
+            ModTypeNames.Add(Tprp.TYPE, Tprp.NAME);
+            ModTypeNames.Add(Trcn.TYPE, Trcn.NAME);
+            ModTypeNames.Add(Ttab.TYPE, Ttab.NAME);
+            ModTypeNames.Add(Ttas.TYPE, Ttas.NAME);
+            ModTypeNames.Add(Vers.TYPE, Vers.NAME);
+
+            foreach (KeyValuePair<uint, String> kvPair in ModTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
         }
 
-        public static Dictionary<uint, String>.KeyCollection Types
+        public static Dictionary<uint, String>.KeyCollection AllTypes
         {
-            get => TypeNames.Keys;
+            get => AllTypeNames.Keys;
+        }
+
+        public static Dictionary<uint, String>.KeyCollection ModTypes
+        {
+            get => ModTypeNames.Keys;
         }
 
         public static String TypeName(uint type)
         {
-            TypeNames.TryGetValue(type, out string typeName);
+            AllTypeNames.TryGetValue(type, out string typeName);
 
             return typeName;
+        }
+
+        public static uint TypeID(String name)
+        {
+            foreach(KeyValuePair<uint, String> kvPair in AllTypeNames)
+            {
+                if (kvPair.Value.Equals(name.ToUpper()))
+                {
+                    return kvPair.Key;
+                }
+            }
+
+            return 0x00000000;
         }
     }
 }

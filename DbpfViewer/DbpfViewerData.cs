@@ -1,5 +1,5 @@
 ﻿/*
- * DBPF Test - a utility for testing the DBPF Library
+ * DBPF Viewer - a utility for testing the DBPF Library
  *
  * William Howard - 2020
  *
@@ -8,7 +8,7 @@
 
 using System.Data;
 
-namespace Sims2Tools.DBPF
+namespace DbpfViewer
 {
     [System.ComponentModel.DesignerCategory("")]
     class DbpfViewerData : DataTable

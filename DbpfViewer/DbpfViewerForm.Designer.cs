@@ -1,12 +1,12 @@
 ﻿/*
- * DBPF Test - a utility for testing the DBPF Library
+ * DBPF Viewer - a utility for testing the DBPF Library
  *
  * William Howard - 2020
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-namespace Sims2Tools.DBPF
+namespace DbpfViewer
 {
     partial class DbpfViewerForm
     {

@@ -89,7 +89,7 @@ namespace Sims2Tools
             semiglobalsByGroupID.Clear();
             globalObjectsByGroupID.Clear();
 
-            String sims2Path = RegistryTools.GetSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2PathKey, "") as String;
+            String sims2Path = Sims2ToolsLib.Sims2Path;
 
             if (sims2Path.Length > 0)
             {
@@ -112,7 +112,7 @@ namespace Sims2Tools
                 catch (Exception)
 #endif
                 {
-                    RegistryTools.DeleteSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2PathKey);
+                    Sims2ToolsLib.Sims2Path = null;
 
                     MessageBox.Show("Unable to open/read 'objects.package' (from '" + sims2Path + "')", "Error!", MessageBoxButtons.OK);
 #if DEBUG

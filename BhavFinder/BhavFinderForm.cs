@@ -443,7 +443,7 @@ namespace BhavFinder
                         Match m = HexInstanceRegex.Match(comboUsingSTR.Text);
                         uint instance = Convert.ToUInt32(m.Groups[2].ToString(), 16);
 
-                        String sims2Path = RegistryTools.GetSetting(BhavFinderApp.RegistryKey, Sims2Tools.Sims2ToolsLib.Sims2PathKey, "") as String;
+                        String sims2Path = Sims2ToolsLib.Sims2Path;
                         if (sims2Path.Length > 0)
                         {
                             strLookupByIndexGlobal = BuildStrLookupTable(sims2Path + GameData.objectsSubPath, instance, regex);

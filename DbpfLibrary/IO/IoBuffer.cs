@@ -25,14 +25,14 @@ namespace Sims2Tools.DBPF.IO
 
     public class IoBuffer : IDisposable
     {
-        public readonly Stream Stream;
-        private readonly BinaryReader Reader;
-        public ByteOrder ByteOrder = ByteOrder.BIG_ENDIAN;
+        public readonly Stream m_stream;
+        private readonly BinaryReader m_reader;
+        public ByteOrder m_byteOrder = ByteOrder.BIG_ENDIAN;
 
         public IoBuffer(Stream stream)
         {
-            this.Stream = stream;
-            this.Reader = new BinaryReader(stream);
+            this.m_stream = stream;
+            this.m_reader = new BinaryReader(stream);
         }
 
         public static IoBuffer FromStream(Stream stream)
@@ -43,44 +43,49 @@ namespace Sims2Tools.DBPF.IO
         public static IoBuffer FromStream(Stream stream, ByteOrder order)
         {
             var item = FromStream(stream);
-            item.ByteOrder = order;
+            item.m_byteOrder = order;
             return item;
+        }
+
+        public void Close()
+        {
+            m_reader.Close();
         }
 
         public long Length
         {
-            get => Reader.BaseStream.Length;
+            get => m_reader.BaseStream.Length;
         }
 
         public long Position
         {
-            get => Reader.BaseStream.Position;
+            get => m_reader.BaseStream.Position;
         }
 
         public void Skip(long numBytes)
         {
-            Reader.BaseStream.Seek(numBytes, SeekOrigin.Current);
+            m_reader.BaseStream.Seek(numBytes, SeekOrigin.Current);
         }
 
         public void Seek(SeekOrigin origin, long offset)
         {
-            Reader.BaseStream.Seek(offset, origin);
+            m_reader.BaseStream.Seek(offset, origin);
         }
 
         public byte ReadByte()
         {
-            return Reader.ReadByte();
+            return m_reader.ReadByte();
         }
 
         public byte[] ReadBytes(int num)
         {
-            return Reader.ReadBytes(num);
+            return m_reader.ReadBytes(num);
         }
 
         public ushort ReadUInt16()
         {
-            var value = Reader.ReadUInt16();
-            if (ByteOrder == ByteOrder.BIG_ENDIAN)
+            var value = m_reader.ReadUInt16();
+            if (m_byteOrder == ByteOrder.BIG_ENDIAN)
             {
                 value = Endian.SwapUInt16(value);
             }
@@ -102,8 +107,8 @@ namespace Sims2Tools.DBPF.IO
 
         public short ReadInt16()
         {
-            var value = Reader.ReadInt16();
-            if (ByteOrder == ByteOrder.BIG_ENDIAN)
+            var value = m_reader.ReadInt16();
+            if (m_byteOrder == ByteOrder.BIG_ENDIAN)
             {
                 value = Endian.SwapInt16(value);
             }
@@ -113,8 +118,8 @@ namespace Sims2Tools.DBPF.IO
 
         public int ReadInt32()
         {
-            var value = Reader.ReadInt32();
-            if (ByteOrder == ByteOrder.BIG_ENDIAN)
+            var value = m_reader.ReadInt32();
+            if (m_byteOrder == ByteOrder.BIG_ENDIAN)
             {
                 value = Endian.SwapInt32(value);
             }
@@ -123,8 +128,8 @@ namespace Sims2Tools.DBPF.IO
 
         public uint ReadUInt32()
         {
-            var value = Reader.ReadUInt32();
-            if (ByteOrder == ByteOrder.BIG_ENDIAN)
+            var value = m_reader.ReadUInt32();
+            if (m_byteOrder == ByteOrder.BIG_ENDIAN)
             {
                 value = Endian.SwapUInt32(value);
             }
@@ -133,20 +138,25 @@ namespace Sims2Tools.DBPF.IO
 
         public float ReadSingle()
         {
-            return Reader.ReadSingle();
+            return m_reader.ReadSingle();
         }
 
         public string ReadPChar()
         {
 
-            char b = Reader.ReadChar();
+            char b = m_reader.ReadChar();
             string s = "";
-            while (b != 0 && Reader.BaseStream.Position <= Reader.BaseStream.Length)
+            while (b != 0 && m_reader.BaseStream.Position <= m_reader.BaseStream.Length)
             {
                 s += b;
-                b = Reader.ReadChar();
+                b = m_reader.ReadChar();
             }
             return s;
+        }
+
+        public string ReadString()
+        {
+            return m_reader.ReadString();
         }
 
         public string ReadCString(int num)
@@ -156,7 +166,7 @@ namespace Sims2Tools.DBPF.IO
 
         public string ReadCString(int num, bool trimNull)
         {
-            var result = ASCIIEncoding.ASCII.GetString(Reader.ReadBytes(num));
+            var result = ASCIIEncoding.ASCII.GetString(m_reader.ReadBytes(num));
             if (trimNull)
             {
                 var io = result.IndexOf('\0');

@@ -138,6 +138,7 @@ namespace Sims2Tools
             this.Name = "Sims2ToolsConfigDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configuration";
+            this.TopMost = true;
             this.Load += new System.EventHandler(this.OnConfigLoad);
             this.ResumeLayout(false);
             this.PerformLayout();
