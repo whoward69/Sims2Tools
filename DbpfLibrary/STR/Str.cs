@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -21,7 +21,7 @@ namespace Sims2Tools.DBPF.STR
     public class Str : DBPFResource
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public const uint TYPE = 0x53545223;
+        public static readonly TypeTypeID TYPE = (TypeTypeID)0x53545223;
         public const string NAME = "STR";
 
         MetaData.FormatCode format;
@@ -30,7 +30,7 @@ namespace Sims2Tools.DBPF.STR
 
         public Str(DBPFEntry entry, IoBuffer reader) : base(entry)
         {
-            Unserialize(reader);
+            Unserialize(reader, entry.FileSize);
         }
 
         public StrLanguageList Languages
@@ -60,12 +60,12 @@ namespace Sims2Tools.DBPF.STR
             return items;
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(IoBuffer reader, uint length)
         {
             lines = new Hashtable();
-            if (reader.Length <= 0x40) return;
+            if (length <= 0x40) return;
 
-            filename = reader.ReadBytes(0x40);
+            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
 
             format = (MetaData.FormatCode)reader.ReadUInt16();
             if (format != MetaData.FormatCode.normal) return;
@@ -82,7 +82,7 @@ namespace Sims2Tools.DBPF.STR
             AddXmlItems(CreateResElement(parent, NAME));
         }
 
-        internal void AddXmlItems(XmlElement parent)
+        protected void AddXmlItems(XmlElement parent)
         {
             foreach (StrLanguage strlng in Languages)
             {

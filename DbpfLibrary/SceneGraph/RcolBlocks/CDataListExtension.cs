@@ -1,13 +1,24 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
-using System.Collections;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
-    public class CDataListExtension : AbstractRcolBlock, IScenegraphBlock
+    public class CDataListExtension : AbstractRcolBlock
     {
-        public static uint TYPE = 0x6A836D56;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0x6A836D56;
         public static String NAME = "cDataListExtension";
 
         #region Attributes
@@ -22,49 +33,22 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
 
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public CDataListExtension(Rcol parent) : base(parent)
         {
             ext = new Extension(null);
             version = 0x01;
-            BlockID = 0x6a836d56;
+            BlockID = TYPE;
         }
 
-        #region IRcolBlock Member
-
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(IoBuffer reader)
         {
             version = reader.ReadUInt32();
-            string fldsc = reader.ReadString();
-            uint myid = reader.ReadUInt32();
+            /*string fldsc =*/
+            reader.ReadString();
+            TypeBlockID myid = reader.ReadBlockId();
 
             ext.Unserialize(reader, version);
             ext.BlockID = myid;
-        }
-
-        #endregion
-
-        public void ReferencedItems(Hashtable refmap, uint parentgroup)
-        {
-            if (this.Extension.VarName.Trim().ToLower() == "tsmaterialsmeshname")
-            {
-                ArrayList list = new ArrayList();
-                foreach (ExtensionItem ei in this.Extension.Items)
-                {
-                    string name = ei.String.Trim();
-                    if (!name.ToLower().EndsWith("_cres")) name += "_cres";
-
-                    list.Add(ScenegraphHelper.BuildPfd(name, ScenegraphHelper.CRES, parentgroup));
-                }
-
-                refmap["tsMaterialsMeshName"] = list;
-            }
         }
 
         public override void Dispose()

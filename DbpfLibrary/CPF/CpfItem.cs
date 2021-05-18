@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -20,12 +20,12 @@ namespace Sims2Tools.DBPF.CPF
     public class CpfItem : IDisposable
     {
         MetaData.DataTypes dt;
-        byte[] name;
+        String name;
         byte[] val;
 
         public CpfItem()
         {
-            name = new byte[0];
+            name = "";
             val = new byte[0];
         }
 
@@ -37,7 +37,8 @@ namespace Sims2Tools.DBPF.CPF
 
         public string Name
         {
-            get => Helper.ToString(name);
+            get => name;
+            set { name = value; }
         }
 
         public Byte[] Value
@@ -351,7 +352,7 @@ namespace Sims2Tools.DBPF.CPF
             dt = (MetaData.DataTypes)reader.ReadUInt32();
 
             int namelength = reader.ReadInt32();
-            name = reader.ReadBytes(namelength);
+            name = Helper.ToString(reader.ReadBytes(namelength));
 
             int valuelength;
             switch (dt)
@@ -377,7 +378,7 @@ namespace Sims2Tools.DBPF.CPF
 
         public override string ToString()
         {
-            string ret = Name + " (" + dt.ToString() + ") = ";
+            string ret = $"{Name} ({dt}) = ";
 
             switch (this.Datatype)
             {
@@ -401,7 +402,6 @@ namespace Sims2Tools.DBPF.CPF
         {
             this.val = new byte[0];
             this.val = null;
-            this.name = new byte[0];
             this.name = null;
         }
     }

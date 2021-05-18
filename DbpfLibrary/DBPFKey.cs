@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -17,32 +17,32 @@ namespace Sims2Tools.DBPF
 {
     public interface IDBPFKey
     {
-        uint TypeID { get; }
-        uint GroupID { get; }
-        uint InstanceID2 { get; }
-        uint InstanceID { get; }
+        TypeTypeID TypeID { get; }
+        TypeGroupID GroupID { get; }
+        TypeResourceID ResourceID { get; }
+        TypeInstanceID InstanceID { get; }
 
         int TGIHash { get; }
         int TGIRHash { get; }
     }
 
-    public class DBPFKey : IDBPFKey, IEquatable<DBPFKey>
+    public class DBPFKey : IDBPFKey, IEquatable<DBPFKey>, IComparable<DBPFKey>
     {
-        private readonly uint typeID;
-        private readonly uint groupID;
-        private readonly uint instanceID2;
-        private readonly uint instanceID;
+        private readonly TypeTypeID typeID;
+        private readonly TypeGroupID groupID;
+        private readonly TypeResourceID resourceID;
+        private readonly TypeInstanceID instanceID;
 
         private int tgiHash = 0;
         private int tgirHash = 0;
 
-        public uint TypeID => typeID;
+        public TypeTypeID TypeID => typeID;
 
-        public uint GroupID => groupID;
+        public TypeGroupID GroupID => groupID;
 
-        public uint InstanceID2 => instanceID2;
+        public TypeResourceID ResourceID => resourceID;
 
-        public uint InstanceID => instanceID;
+        public TypeInstanceID InstanceID => instanceID;
 
         public int TGIHash
         {
@@ -60,21 +60,21 @@ namespace Sims2Tools.DBPF
             get
             {
                 if (tgirHash == 0)
-                    tgirHash = Hash.TGIRHash(InstanceID, InstanceID2, TypeID, GroupID);
+                    tgirHash = Hash.TGIRHash(InstanceID, ResourceID, TypeID, GroupID);
 
                 return tgirHash;
             }
         }
 
-        public DBPFKey(uint typeID, uint groupID, uint instanceID, uint instanceID2)
+        public DBPFKey(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID)
         {
             this.typeID = typeID;
             this.groupID = groupID;
-            this.instanceID2 = instanceID2;
+            this.resourceID = resourceID;
             this.instanceID = instanceID;
         }
 
-        public DBPFKey(IDBPFKey key) : this(key.TypeID, key.GroupID, key.InstanceID, key.InstanceID2)
+        public DBPFKey(IDBPFKey key) : this(key.TypeID, key.GroupID, key.InstanceID, key.ResourceID)
         {
         }
 
@@ -84,25 +84,49 @@ namespace Sims2Tools.DBPF
 
             return (this.TypeID == other.TypeID &&
                     this.GroupID == other.GroupID &&
-                    this.InstanceID2 == other.InstanceID2 &&
+                    this.ResourceID == other.ResourceID &&
                     this.InstanceID == other.InstanceID);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj == null || !(obj is DBPFKey)) return false;
+        public override bool Equals(object other) => (other is DBPFKey key) && Equals(key);
 
-            return Equals(obj as DBPFKey);
+        public override int GetHashCode() => TGIRHash;
+
+        public int CompareTo(DBPFKey other) => this.TGIRHash.CompareTo(other.TGIRHash);
+
+        public override string ToString() => $"{DBPFData.TypeName(TypeID)}-{GroupID}-{ResourceID}-{InstanceID}";
+    }
+
+    public interface IDBPFNamedKey : IDBPFKey
+    {
+        String FileName { get; set; }
+    }
+
+    public abstract class DBPFNamedKey : DBPFKey, IDBPFNamedKey
+    {
+        private String fileName;
+
+        public virtual String FileName
+        {
+            get => fileName;
+            set => fileName = value;
         }
 
-        public override int GetHashCode()
+        public DBPFNamedKey(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID, String fileName) : base(typeID, groupID, instanceID, resourceID)
         {
-            return TGIRHash;
+            this.fileName = fileName;
         }
 
+        public DBPFNamedKey(IDBPFKey key, String fileName) : this(key.TypeID, key.GroupID, key.InstanceID, key.ResourceID, fileName)
+        {
+        }
+
+        public DBPFNamedKey(IDBPFNamedKey namedKey) : this(namedKey, namedKey.FileName)
+        {
+        }
         public override string ToString()
         {
-            return $"{DBPFData.TypeName(TypeID)}-{Helper.Hex8PrefixString(GroupID)}-{Helper.Hex8PrefixString(InstanceID2)}-{Helper.Hex8PrefixString(InstanceID)}";
+            return $"{base.ToString()} '{FileName}'";
         }
     }
 }

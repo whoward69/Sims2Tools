@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -10,28 +10,20 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.Utils;
 using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF
 {
-    abstract public class DBPFResource : DBPFKey
+    abstract public class DBPFResource : DBPFNamedKey
     {
-        public byte[] filename = new byte[64];
-
-        internal DBPFResource(DBPFEntry entry) : base(entry)
+        protected DBPFResource(DBPFEntry entry) : base(entry, "")
         {
-        }
-
-        public string FileName
-        {
-            get => Helper.ToString(this.filename);
         }
 
         public abstract void AddXml(XmlElement parent);
 
-        internal XmlElement CreateResElement(XmlElement parent, String name)
+        protected XmlElement CreateResElement(XmlElement parent, String name)
         {
             XmlElement element = parent.OwnerDocument.CreateElement(name.ToLower());
             parent.AppendChild(element);
@@ -40,7 +32,7 @@ namespace Sims2Tools.DBPF
             return element;
         }
 
-        internal XmlElement CreateElement(XmlElement parent, String name)
+        protected XmlElement CreateElement(XmlElement parent, String name)
         {
             XmlElement element = parent.OwnerDocument.CreateElement(name);
             parent.AppendChild(element);
@@ -48,7 +40,7 @@ namespace Sims2Tools.DBPF
             return element;
         }
 
-        internal XmlElement CreateTextElement(XmlElement parent, String name, String text)
+        protected XmlElement CreateTextElement(XmlElement parent, String name, String text)
         {
             XmlElement element = CreateElement(parent, name);
 
@@ -58,11 +50,16 @@ namespace Sims2Tools.DBPF
             return element;
         }
 
+        protected void CreateComment(XmlElement parent, String msg)
+        {
+            parent.AppendChild(parent.OwnerDocument.CreateComment(msg));
+        }
+
         private void AddAttributes(XmlElement parent)
         {
-            parent.SetAttribute("group", Helper.Hex8PrefixString(GroupID));
-            parent.SetAttribute("instance", Helper.Hex8PrefixString(InstanceID));
-            if (InstanceID2 != 0) parent.SetAttribute("instanceHi", Helper.Hex8PrefixString(InstanceID2));
+            parent.SetAttribute("groupId", GroupID.ToString());
+            parent.SetAttribute("instanceId", InstanceID.ToString());
+            if (ResourceID != (TypeResourceID)0x00000000) parent.SetAttribute("resourceId", ResourceID.ToString());
             parent.SetAttribute("name", FileName);
         }
     }

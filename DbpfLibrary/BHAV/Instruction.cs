@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -17,6 +17,10 @@ namespace Sims2Tools.DBPF.BHAV
 {
     public class Instruction
     {
+        public const ushort TARGET_ERROR = 0xFFFC;
+        public const ushort TARGET_TRUE  = 0xFFFD;
+        public const ushort TARGET_FALSE = 0xFFFE;
+
         private readonly ushort format; // Owning BHAV format
 
         private ushort opcode;

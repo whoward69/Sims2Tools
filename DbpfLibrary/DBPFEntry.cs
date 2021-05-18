@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -14,11 +14,36 @@ namespace Sims2Tools.DBPF
 {
     public class DBPFEntry : DBPFKey
     {
-        public uint FileOffset;
-        public uint FileSize;
-        public uint uncompressedSize = 0;
+        private uint fileOffset;
+        private uint fileSize;
+        private uint dataSize;
 
-        public DBPFEntry(uint typeID, uint groupID, uint instanceID, uint instanceID2) : base(typeID, groupID, instanceID, instanceID2)
+        private uint uncompressedSize = 0;
+
+        public uint FileOffset
+        {
+            get { return fileOffset; }
+            set { fileOffset = value; }
+        }
+
+        public uint FileSize
+        {
+            get { return fileSize; }
+            set { dataSize = fileSize = value; }
+        }
+
+        public uint DataSize
+        {
+            get { return dataSize; }
+        }
+
+        public uint UncompressedSize
+        {
+            get { return uncompressedSize; }
+            set { dataSize = uncompressedSize = value; }
+        }
+
+        public DBPFEntry(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID) : base(typeID, groupID, instanceID, resourceID)
         {
         }
     }

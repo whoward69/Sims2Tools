@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -19,7 +19,7 @@ namespace Sims2Tools.DBPF.TTAS
     public class Ttas : Str
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public new const uint TYPE = 0x54544173;
+        public static readonly new TypeTypeID TYPE = (TypeTypeID)0x54544173;
         public new const string NAME = "TTAs";
 
         public Ttas(DBPFEntry entry, IoBuffer reader) : base(entry, reader)

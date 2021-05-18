@@ -1,18 +1,19 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.Cache;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.OBJD;
-using Sims2Tools.DBPF.Utils;
-using Sims2Tools.Utils.Persistence;
+using Sims2Tools.Dialogs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -20,36 +21,88 @@ namespace Sims2Tools
 {
     public class GameData
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         static public String objectsSubPath = @"\TSData\Res\Objects\objects.package";
 
-        static public SortedDictionary<String, String> primitivesByOpCode = new SortedDictionary<string, string>();
+        static public String base3dPath = @"\TSData\Res\Sims3D";
+        static public String ep3dPath = @"\TSData\Res\3D";
+        static public String sp3dPath = @"\TSData\Res\3D";
 
-        static public SortedDictionary<String, String> textlistsByInstance = new SortedDictionary<string, string>();
+        static public SortedDictionary<String, String> primitivesByOpCode;
 
-        static public SortedDictionary<String, String> semiGlobalsByName = new SortedDictionary<string, string>();
-        static public SortedDictionary<String, String> semiGlobalsByGroup = new SortedDictionary<string, string>();
+        static public SortedDictionary<String, String> textlistsByInstance;
 
-        static public SortedDictionary<String, String> globalObjectsByGroupID = new SortedDictionary<string, string>();
-        static public SortedDictionary<uint, uint> semiglobalsByGroupID = new SortedDictionary<uint, uint>();
+        static public SortedDictionary<String, String> semiGlobalsByName;
+        static public SortedDictionary<String, String> semiGlobalsByGroup;
+
+        static public SortedDictionary<String, String> globalObjectsByGroupID;
+        static public SortedDictionary<TypeGroupID, TypeGroupID> semiglobalsByGroupID;
 
         static GameData()
         {
-            ParseXml("Resources/XML/primitives.xml", "primitive", primitivesByOpCode);
-            ParseXml("Resources/XML/textlists.xml", "textlist", textlistsByInstance);
-            ParseXml("Resources/XML/semiglobals.xml", "semiglobal", semiGlobalsByName, semiGlobalsByGroup);
+            logger.Info($"Loading GameData");
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
 
+            if (!GameDataCache.Deserialize(out primitivesByOpCode, "primitivesByOpCode"))
+            {
+                ParseXml("Resources/XML/primitives.xml", "primitive", primitivesByOpCode);
 #if DEBUG
-            Console.WriteLine("Loaded " + primitivesByOpCode.Count + " primitives");
-            Console.WriteLine("Loaded " + textlistsByInstance.Count + " textlists");
-            Console.WriteLine("Loaded " + semiGlobalsByName.Count + " semiglobals");
+                logger.Info($"Loaded {primitivesByOpCode.Count} primitives from XML");
 #endif
+                GameDataCache.Serialize(primitivesByOpCode, "primitivesByOpCode");
+#if DEBUG
+            }
+            else
+            {
+                logger.Info($"Loaded {primitivesByOpCode.Count} primitives from cache");
+#endif
+            }
+
+            if (!GameDataCache.Deserialize(out textlistsByInstance, "textlistsByInstance"))
+            {
+                ParseXml("Resources/XML/textlists.xml", "textlist", textlistsByInstance);
+#if DEBUG
+                logger.Info($"Loaded {textlistsByInstance.Count} textlists from XML");
+#endif
+                GameDataCache.Serialize(textlistsByInstance, "textlistsByInstance");
+#if DEBUG
+            }
+            else
+            {
+                logger.Info($"Loaded {textlistsByInstance.Count} textlists from cache");
+#endif
+            }
+
+            if (!(GameDataCache.Deserialize(out semiGlobalsByName, "semiGlobalsByName") && GameDataCache.Deserialize(out semiGlobalsByGroup, "semiGlobalsByGroup")))
+            {
+                semiGlobalsByName = new SortedDictionary<string, string>();
+                semiGlobalsByGroup = new SortedDictionary<string, string>();
+
+                ParseXml("Resources/XML/semiglobals.xml", "semiglobal", semiGlobalsByName, semiGlobalsByGroup);
+#if DEBUG
+                logger.Info($"Loaded {semiGlobalsByName.Count} semiglobals from XML");
+#endif
+                GameDataCache.Serialize(semiGlobalsByName, "semiGlobalsByName");
+                GameDataCache.Serialize(semiGlobalsByGroup, "semiGlobalsByGroup");
+#if DEBUG
+            }
+            else
+            {
+                logger.Info($"Loaded {semiGlobalsByName.Count} semiglobals from cache");
+#endif
+            }
 
             UpdateGlobalObjects();
+
+            stopwatch.Stop();
+            logger.Info($"Loaded GameData in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        static public String GroupName(uint group, SortedDictionary<String, String> localObjectsByGroupID = null)
+        static public String GroupName(TypeGroupID group, SortedDictionary<String, String> localObjectsByGroupID = null)
         {
-            String groupId = Helper.Hex8String(group);
+            String groupId = group.Hex8String();
             String groupName;
 
             if (group == DBPFData.GROUP_GLOBALS)
@@ -78,7 +131,7 @@ namespace Sims2Tools
             }
             else
             {
-                groupName = "0x" + groupId;
+                groupName = group.ToString();
             }
 
             return groupName;
@@ -86,45 +139,63 @@ namespace Sims2Tools
 
         static public void UpdateGlobalObjects()
         {
-            semiglobalsByGroupID.Clear();
-            globalObjectsByGroupID.Clear();
-
             String sims2Path = Sims2ToolsLib.Sims2Path;
 
             if (sims2Path.Length > 0)
             {
-                try
-                {
-                    DBPFFile package = new DBPFFile(sims2Path + objectsSubPath);
+                GameDataCache.Validate(sims2Path + objectsSubPath);
 
-                    List<DBPFEntry> globs = package.GetEntriesByType(Glob.TYPE);
-                    foreach (var entry in globs)
+                if (!(GameDataCache.Deserialize(out semiglobalsByGroupID, "semiglobalsByGroupID") && GameDataCache.Deserialize(out globalObjectsByGroupID, "globalObjectsByGroupID")))
+                {
+                    semiglobalsByGroupID = new SortedDictionary<TypeGroupID, TypeGroupID>();
+                    globalObjectsByGroupID = new SortedDictionary<string, string>();
+
+                    try
                     {
-                        Glob glob = new Glob(entry, package.GetIoBuffer(entry));
-                        semiglobalsByGroupID.Add(entry.GroupID, glob.SemiGlobalGroup);
+                        using (DBPFFile package = new DBPFFile(sims2Path + objectsSubPath))
+                        {
+                            List<DBPFEntry> globs = package.GetEntriesByType(Glob.TYPE);
+                            foreach (var entry in globs)
+                            {
+                                Glob glob = new Glob(entry, package.GetIoBuffer(entry));
+                                semiglobalsByGroupID.Add(entry.GroupID, glob.SemiGlobalGroup);
+                            }
+
+                            BuildObjectsTable(package, globalObjectsByGroupID);
+
+                            package.Close();
+                        }
+                    }
+#if DEBUG
+                    catch (Exception ex)
+#else
+                    catch (Exception)
+#endif
+                    {
+                        Sims2ToolsLib.Sims2Path = null;
+
+                        MsgBox.Show($"Unable to open/read 'objects.package' (from '{sims2Path}')", "Error!", MessageBoxButtons.OK);
+#if DEBUG
+                        logger.Error(ex.Message);
+#endif
                     }
 
-                    BuildObjectsTable(package, globalObjectsByGroupID);
+#if DEBUG
+                    logger.Info($"Loaded {globalObjectsByGroupID.Count} game objects from 'objects.package'");
+                    logger.Info($"Loaded {semiglobalsByGroupID.Count} semi-global references from 'objects.package'");
+#endif
+                    GameDataCache.Serialize(globalObjectsByGroupID, "globalObjectsByGroupID");
+                    GameDataCache.Serialize(semiglobalsByGroupID, "semiglobalsByGroupID");
+#if DEBUG
                 }
-#if DEBUG
-                catch (Exception ex)
-#else
-                catch (Exception)
-#endif
+                else
                 {
-                    Sims2ToolsLib.Sims2Path = null;
-
-                    MessageBox.Show("Unable to open/read 'objects.package' (from '" + sims2Path + "')", "Error!", MessageBoxButtons.OK);
-#if DEBUG
-                    Console.WriteLine(ex.Message);
+                    logger.Info($"Loaded {globalObjectsByGroupID.Count} game objects from cache");
+                    logger.Info($"Loaded {semiglobalsByGroupID.Count} semi-global references from cache");
 #endif
+
                 }
             }
-
-#if DEBUG
-            Console.WriteLine("Loaded " + globalObjectsByGroupID.Count + " game objects");
-            Console.WriteLine("Loaded " + semiglobalsByGroupID.Count + " semi-global references");
-#endif
         }
 
         static public void BuildObjectsTable(DBPFFile package, SortedDictionary<String, String> objectsByGroupID)
@@ -135,7 +206,7 @@ namespace Sims2Tools
             {
                 // if (entry.GroupID != DBPFData.GROUP_LOCAL)
                 {
-                    String group = Helper.Hex8String(entry.GroupID);
+                    String group = entry.GroupID.Hex8String();
                     String filename = package.GetFilenameByEntry(entry);
 
                     if (objectsByGroupID.ContainsKey(group))

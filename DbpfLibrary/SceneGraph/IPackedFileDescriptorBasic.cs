@@ -1,4 +1,14 @@
-﻿using System;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
 
 namespace Sims2Tools.DBPF.SceneGraph
 {
@@ -28,7 +38,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// <summary>
         /// Returns the Type of the referenced File
         /// </summary>
-        UInt32 Type
+        TypeTypeID Type
         {
             get;
         }
@@ -36,7 +46,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// <summary>
         /// Returns the Group the referenced file is assigned to
         /// </summary>
-        UInt32 Group
+        TypeGroupID Group
         {
             get;
         }
@@ -46,26 +56,16 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// <summary>
         /// Returns the Instance Data
         /// </summary>
-        UInt32 Instance
+        TypeInstanceID Instance
         {
             get;
         }
-
-        /// <summary>
-        /// Returns the Long Instance
-        /// </summary>
-        /// <remarks>Combination of SubType and Instance</remarks>
-        UInt64 LongInstance
-        {
-            get;
-        }
-
 
         /// <summary>
         /// Returns an yet unknown Type
         /// </summary>		
         /// <remarks>Only in Version 1.1 of package Files</remarks>
-        UInt32 SubType
+        TypeResourceID SubType
         {
             get;
         }
@@ -76,20 +76,5 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// <param name="obj"></param>
         /// <returns></returns>
         bool Equals(object obj);
-
-        /// <summary>
-        /// Same <see cref="Equals"/>, except this Version is also checking the Offset
-        /// </summary>
-        /// <param name="obj">The Object to compare to</param>
-        /// <returns>true if the TGI Values are the same</returns>
-        bool SameAs(object obj);
-
-        /// <summary>
-        /// additional Data
-        /// </summary>
-        object Tag
-        {
-            get;
-        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -78,7 +78,6 @@ namespace Sims2Tools
             // lblSimPEPath
             // 
             this.lblSimPEPath.AutoSize = true;
-            this.lblSimPEPath.Enabled = false;
             this.lblSimPEPath.Location = new System.Drawing.Point(10, 56);
             this.lblSimPEPath.Name = "lblSimPEPath";
             this.lblSimPEPath.Size = new System.Drawing.Size(111, 15);
@@ -87,7 +86,6 @@ namespace Sims2Tools
             // 
             // textSimPEPath
             // 
-            this.textSimPEPath.Enabled = false;
             this.textSimPEPath.Location = new System.Drawing.Point(127, 53);
             this.textSimPEPath.Name = "textSimPEPath";
             this.textSimPEPath.Size = new System.Drawing.Size(530, 21);
@@ -95,7 +93,6 @@ namespace Sims2Tools
             // 
             // btnSimPESelect
             // 
-            this.btnSimPESelect.Enabled = false;
             this.btnSimPESelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSimPESelect.Location = new System.Drawing.Point(665, 48);
             this.btnSimPESelect.Name = "btnSimPESelect";
@@ -138,7 +135,6 @@ namespace Sims2Tools
             this.Name = "Sims2ToolsConfigDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configuration";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.OnConfigLoad);
             this.ResumeLayout(false);
             this.PerformLayout();

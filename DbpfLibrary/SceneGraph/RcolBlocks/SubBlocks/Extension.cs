@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.Geometry;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.Utils;
@@ -107,6 +119,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         /// <param name="reader">The Stream that contains the FileData</param>
         public void Unserialize(IoBuffer reader)
         {
+            long errPos = reader.Position;
             typecode = (ItemTypes)reader.ReadByte();
             varname = reader.ReadString();
 
@@ -155,7 +168,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                     }
                 default:
                     {
-                        throw new Exception("Unknown Extension Item 0x" + Helper.Hex2String((byte)typecode) + "\n\nPosition: 0x" + Helper.Hex8String((uint)reader.Position));
+                        throw new Exception("Unknown Extension Item " + Helper.Hex2PrefixString((byte)typecode) + "\n\nPosition: " + Helper.Hex8PrefixString((uint)errPos));
                     }
             }
         }
@@ -194,7 +207,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return items; }
         }
 
-        readonly byte[] data;
+        // readonly byte[] data = new byte[0];
 
         //int unknown1;
         //int unknown2;
@@ -209,7 +222,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             items = new ExtensionItem[0];
             version = 0x03;
             typecode = 0x07;
-            data = new byte[0];
             varname = "";
         }
 
@@ -242,9 +254,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 if ((typecode <= 0x03) && ver == 4) sz = 31;
 
                 items = new ExtensionItem[1];
-                ExtensionItem ei = new ExtensionItem();
-                ei.Typecode = ExtensionItem.ItemTypes.Binary;
-                ei.Data = reader.ReadBytes(sz);
+                ExtensionItem ei = new ExtensionItem
+                {
+                    Typecode = ExtensionItem.ItemTypes.Binary,
+                    Data = reader.ReadBytes(sz)
+                };
                 items[0] = ei;
             }
             else

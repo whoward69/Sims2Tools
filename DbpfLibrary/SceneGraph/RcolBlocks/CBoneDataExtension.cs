@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -6,7 +18,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CBoneDataExtension : AbstractRcolBlock
     {
-        public static uint TYPE = 0xE9075BC5;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0xE9075BC5;
         public static String NAME = "cBoneDataExtension";
 
         #region Attributes
@@ -28,7 +40,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             ext = new Extension(null);
             version = 0x01;
-            BlockID = 0xe9075bc5;
+            BlockID = TYPE;
         }
 
         #region IRcolBlock Member
@@ -40,8 +52,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public override void Unserialize(IoBuffer reader)
         {
             version = reader.ReadUInt32();
-            string fldsc = reader.ReadString();
-            uint myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            TypeBlockID myid = reader.ReadBlockId();
 
             ext.Unserialize(reader, version);
             ext.BlockID = myid;

@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -19,7 +19,7 @@ namespace Sims2Tools.DBPF.GLOB
     public class Glob : DBPFResource
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public const uint TYPE = 0x474C4F42;
+        public static readonly TypeTypeID TYPE = (TypeTypeID)0x474C4F42;
         public const string NAME = "GLOB";
 
         byte[] semiglobal = new byte[0];
@@ -29,7 +29,7 @@ namespace Sims2Tools.DBPF.GLOB
             get => Helper.ToString(semiglobal);
         }
 
-        public uint SemiGlobalGroup
+        public TypeGroupID SemiGlobalGroup
         {
             get => Hashes.GroupHash(SemiGlobalName);
         }
@@ -41,7 +41,8 @@ namespace Sims2Tools.DBPF.GLOB
 
         protected void Unserialize(IoBuffer reader)
         {
-            filename = reader.ReadBytes(0x40);
+            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
+
             byte len = reader.ReadByte();
             semiglobal = reader.ReadBytes(len);
         }
@@ -49,7 +50,7 @@ namespace Sims2Tools.DBPF.GLOB
         public override void AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
-            CreateTextElement(element, "semigroup", Helper.Hex8PrefixString(SemiGlobalGroup));
+            CreateTextElement(element, "semigroup", SemiGlobalGroup.ToString());
             CreateTextElement(element, "seminame", SemiGlobalName);
         }
     }

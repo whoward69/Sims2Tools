@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -18,6 +18,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.SceneGraph.BINX;
+using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
@@ -31,6 +32,11 @@ using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
+using Sims2Tools.DBPF.SceneGraph.XFCH;
+using Sims2Tools.DBPF.SceneGraph.XHTN;
+using Sims2Tools.DBPF.SceneGraph.XMOL;
+using Sims2Tools.DBPF.SceneGraph.XSTN;
+using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
@@ -61,7 +67,7 @@ namespace Sims2Tools.DBPF
 
         private readonly Dictionary<int, DBPFEntry> m_EntryByID = new Dictionary<int, DBPFEntry>();
         private Dictionary<int, DBPFEntry> m_EntryByFullID = new Dictionary<int, DBPFEntry>();
-        private readonly Dictionary<uint, List<DBPFEntry>> m_EntriesByType = new Dictionary<uint, List<DBPFEntry>>();
+        private readonly Dictionary<TypeTypeID, List<DBPFEntry>> m_EntriesByType = new Dictionary<TypeTypeID, List<DBPFEntry>>();
 
         public DBPFFile(string file)
         {
@@ -127,19 +133,19 @@ namespace Sims2Tools.DBPF
             io.Seek(SeekOrigin.Begin, indexOffset);
             for (int i = 0; i < NumEntries; i++)
             {
-                uint typeID = io.ReadUInt32();
-                uint groupID = io.ReadUInt32();
-                uint instanceID = io.ReadUInt32();
-                uint instanceID2 = (IndexMinorVersion >= 2) ? io.ReadUInt32() : 0x0000;
+                TypeTypeID typeID = io.ReadTypeId();
+                TypeGroupID groupID = io.ReadGroupId();
+                TypeInstanceID instanceID = io.ReadInstanceId();
+                TypeResourceID resourceID = (IndexMinorVersion >= 2) ? io.ReadResourceId() : (TypeResourceID)0x00000000;
 
-                var entry = new DBPFEntry(typeID, groupID, instanceID, instanceID2)
+                var entry = new DBPFEntry(typeID, groupID, instanceID, resourceID)
                 {
                     FileOffset = io.ReadUInt32(),
                     FileSize = io.ReadUInt32()
                 };
 
                 var id = Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID);
-                var fullID = Hash.TGIRHash(entry.InstanceID, entry.InstanceID2, entry.TypeID, entry.GroupID);
+                var fullID = Hash.TGIRHash(entry.InstanceID, entry.ResourceID, entry.TypeID, entry.GroupID);
 
                 m_EntryByID[id] = entry;
                 m_EntryByFullID[fullID] = entry;
@@ -149,7 +155,7 @@ namespace Sims2Tools.DBPF
                 m_EntriesByType[entry.TypeID].Add(entry);
             }
 
-            var dirEntry = GetItemByFullID(Hash.TGIRHash(0x286B1F03, 0x00000000, 0xE86B1EEF, 0xE86B1EEF));
+            var dirEntry = GetItemByFullID(Hash.TGIRHash((TypeInstanceID)0x286B1F03, (TypeResourceID)0x00000000, (TypeTypeID)0xE86B1EEF, (TypeGroupID)0xE86B1EEF));
             if (dirEntry != null)
             {
                 DIRFile.Read(this, dirEntry);
@@ -158,7 +164,7 @@ namespace Sims2Tools.DBPF
 
         public IoBuffer GetIoBuffer(DBPFEntry entry)
         {
-            if (entry.uncompressedSize != 0)
+            if (entry.UncompressedSize != 0)
             {
                 byte[] data = GetItem(entry);
 
@@ -173,9 +179,9 @@ namespace Sims2Tools.DBPF
         {
             m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
 
-            if (entry.uncompressedSize != 0)
+            if (entry.UncompressedSize != 0)
             {
-                return DIREntry.Decompress(m_Reader.ReadBytes((int)entry.FileSize), entry.uncompressedSize);
+                return DIREntry.Decompress(m_Reader.ReadBytes((int)entry.FileSize), entry.UncompressedSize);
             }
 
             return m_Reader.ReadBytes((int)entry.FileSize);
@@ -197,7 +203,7 @@ namespace Sims2Tools.DBPF
                 return null;
         }
 
-        public List<DBPFEntry> GetEntriesByType(uint Type)
+        public List<DBPFEntry> GetEntriesByType(TypeTypeID Type)
         {
 
             var result = new List<DBPFEntry>();
@@ -216,11 +222,13 @@ namespace Sims2Tools.DBPF
 
         public String GetFilenameByEntry(DBPFEntry entry)
         {
-            return Helper.ToString(this.GetIoBuffer(entry).ReadBytes(0x40));
+            return Helper.ToString(this.GetIoBuffer(entry).ReadBytes(Math.Min((int)entry.FileSize, 0x40)));
         }
 
         public DBPFResource GetResourceByEntry(DBPFEntry entry)
         {
+            if (entry == null) return null;
+
             DBPFResource res = null;
 
             if (entry.TypeID == Bcon.TYPE)
@@ -276,6 +284,10 @@ namespace Sims2Tools.DBPF
             {
                 res = new Binx(entry, this.GetIoBuffer(entry));
             }
+            else if (entry.TypeID == Coll.TYPE)
+            {
+                res = new Coll(entry, this.GetIoBuffer(entry));
+            }
             else if (entry.TypeID == Cres.TYPE)
             {
                 res = new Cres(entry, this.GetIoBuffer(entry));
@@ -327,6 +339,26 @@ namespace Sims2Tools.DBPF
             else if (entry.TypeID == Txtr.TYPE)
             {
                 res = new Txtr(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Xfch.TYPE)
+            {
+                res = new Xfch(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Xmol.TYPE)
+            {
+                res = new Xmol(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Xhtn.TYPE)
+            {
+                res = new Xhtn(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Xstn.TYPE)
+            {
+                res = new Xstn(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Xtol.TYPE)
+            {
+                res = new Xtol(entry, this.GetIoBuffer(entry));
             }
 
             return res;

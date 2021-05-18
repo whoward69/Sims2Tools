@@ -4,11 +4,12 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.Dialogs;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,8 @@ namespace HcduPlus
     [System.ComponentModel.DesignerCategory("")]
     public class KnownConflicts : DataTable
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly String KnownRegistryKey = HcduPlusApp.RegistryKey + @"\KnownConflicts";
 
         private readonly DataColumn colRegexEarlier = new DataColumn("Loads Earlier", typeof(string));
@@ -114,8 +117,8 @@ namespace HcduPlus
             {
                 for (int i = 0; i < count; i++)
                 {
-                    if (RegistryTools.GetSetting(KnownRegistryKey, "Earlier" + i.ToString(), null) is String reA &&
-                        RegistryTools.GetSetting(KnownRegistryKey, "Later" + i.ToString(), null) is String reB)
+                    if (RegistryTools.GetSetting(KnownRegistryKey, $"Earlier{i}", null) is String reA &&
+                        RegistryTools.GetSetting(KnownRegistryKey, $"Later{i}", null) is String reB)
                     {
                         Add(reA, reB);
                     }
@@ -130,8 +133,8 @@ namespace HcduPlus
             // Delete the saved entries.
             for (int i = 0; i < count; i++)
             {
-                RegistryTools.DeleteSetting(KnownRegistryKey, "Earlier" + i.ToString());
-                RegistryTools.DeleteSetting(KnownRegistryKey, "Later" + i.ToString());
+                RegistryTools.DeleteSetting(KnownRegistryKey, $"Earlier{i}");
+                RegistryTools.DeleteSetting(KnownRegistryKey, $"Later{i}");
             }
 
             // Save the current entries.
@@ -140,8 +143,8 @@ namespace HcduPlus
 
             foreach (ConflictRegexPair reKnown in reKnownConflicts)
             {
-                RegistryTools.SaveSetting(KnownRegistryKey, "Earlier" + count.ToString(), reKnown.RegexA.ToString());
-                RegistryTools.SaveSetting(KnownRegistryKey, "Later" + count.ToString(), reKnown.RegexB.ToString());
+                RegistryTools.SaveSetting(KnownRegistryKey, $"Earlier{count}", reKnown.RegexA.ToString());
+                RegistryTools.SaveSetting(KnownRegistryKey, $"Later{count}", reKnown.RegexB.ToString());
 
                 ++count;
             }
@@ -184,9 +187,9 @@ namespace HcduPlus
             catch (Exception)
 #endif
             {
-                MessageBox.Show("An error occured while reading default conflicts", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show("An error occured while reading default conflicts", "Error!", MessageBoxButtons.OK);
 #if DEBUG
-                Console.WriteLine(e.Message);
+                logger.Error(e.Message);
 #endif
             }
         }

@@ -1,14 +1,27 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
-using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.RCOL
 {
     public abstract class Rcol : SgResource, IDisposable
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly static Dictionary<String, Type> BlockClasses = new Dictionary<String, Type>();
 
         static Rcol()
@@ -58,7 +71,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
         /// <summary>
         /// Filename of the First Block (or an empty string)
         /// </summary>
-        public new string FileName
+        public override string FileName
         {
             get
             {
@@ -78,26 +91,26 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             Unserialize(reader);
         }
 
-        internal IRcolBlock ReadBlock(uint id, IoBuffer reader)
+        internal IRcolBlock ReadBlock(TypeBlockID id, IoBuffer reader)
         {
-            long pos = reader.Position;
+            long errPos = reader.Position;
             string s = reader.ReadString();
             BlockClasses.TryGetValue(s, out Type tp);
             if (tp == null)
             {
-                Console.WriteLine("Unknown embedded RCOL Block Name at Offset=0x" + Helper.Hex4String((uint)pos));
-                Console.WriteLine("RCOL Block Name: " + s);
+                logger.Error($"Unknown embedded RCOL Block Name at Offset={Helper.Hex4PrefixString((uint)errPos)}");
+                logger.Info($"RCOL Block Name: {s}");
 
                 return null;
             }
 
-            pos = reader.Position;
-            uint myid = reader.ReadUInt32();
-            if (myid == 0xffffffff) return null;
+            errPos = reader.Position;
+            TypeBlockID myid = reader.ReadBlockId();
+            if (myid == (TypeBlockID)0xFFFFFFFF) return null;
             if (id != myid)
             {
-                Console.WriteLine("Unexpected embedded RCOL Block ID at Offset=0x" + Helper.Hex4String((uint)pos));
-                Console.WriteLine("Read: 0x" + Helper.Hex4String(myid) + "; Expected: 0x" + Helper.Hex4String(id));
+                logger.Error($"Unexpected embedded RCOL Block ID at Offset={Helper.Hex4PrefixString((uint)errPos)}");
+                logger.Info($"Read: {myid}; Expected: {id}");
 
                 return null;
             }
@@ -121,25 +134,23 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                 {
                     PackedFileDescriptor pfd = new PackedFileDescriptor
                     {
-                        Group = reader.ReadUInt32(),
-                        Instance = reader.ReadUInt32(),
-                        SubType = (count == 0xffff0001) ? reader.ReadUInt32() : 0,
-                        Type = reader.ReadUInt32()
+                        Group = reader.ReadGroupId(),
+                        Instance = reader.ReadInstanceId(),
+                        SubType = (count == 0xffff0001) ? reader.ReadResourceId() : (TypeResourceID)0x00000000,
+                        Type = reader.ReadTypeId()
                     };
 
                     reffiles[i] = pfd;
                 }
 
-                uint nn = reader.ReadUInt32();
-                index = new uint[nn];
+                index = new uint[reader.ReadUInt32()];
                 blocks = new IRcolBlock[index.Length];
                 for (int i = 0; i < index.Length; i++) index[i] = reader.ReadUInt32();
 
 
                 for (int i = 0; i < index.Length; i++)
                 {
-                    uint id = index[i];
-                    IRcolBlock wrp = ReadBlock(id, reader);
+                    IRcolBlock wrp = ReadBlock((TypeBlockID)index[i], reader);
                     if (wrp == null) break;
                     blocks[i] = wrp;
                 }

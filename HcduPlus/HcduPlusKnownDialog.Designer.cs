@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -51,6 +51,9 @@ namespace HcduPlus
             // gridKnownConflicts
             // 
             this.gridKnownConflicts.AllowUserToResizeRows = false;
+            this.gridKnownConflicts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gridKnownConflicts.BackgroundColor = System.Drawing.SystemColors.Window;
             this.gridKnownConflicts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridKnownConflicts.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -80,6 +83,7 @@ namespace HcduPlus
             // 
             // btnKnownCancel
             // 
+            this.btnKnownCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnKnownCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnKnownCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnKnownCancel.Location = new System.Drawing.Point(371, 309);
@@ -91,6 +95,7 @@ namespace HcduPlus
             // 
             // btnKnownOk
             // 
+            this.btnKnownOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnKnownOk.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnKnownOk.Enabled = false;
             this.btnKnownOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));

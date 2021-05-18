@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -35,8 +35,10 @@ namespace Sims2Tools.DBPF.TTAB
         private float memoryitermult;
         private uint objecttype;
         private uint modeltableid;
+        /*
         private TtabItemMotiveTable humanGroups;
         private TtabItemMotiveTable animalGroups;
+        */
 
         public ushort Action
         {
@@ -108,6 +110,7 @@ namespace Sims2Tools.DBPF.TTAB
             get => this.modeltableid;
         }
 
+        /*
         public TtabItemMotiveTable HumanMotives
         {
             get => this.humanGroups;
@@ -117,6 +120,7 @@ namespace Sims2Tools.DBPF.TTAB
         {
             get => this.animalGroups;
         }
+        */
 
         public TtabItem(uint format, IoBuffer reader)
         {
@@ -135,8 +139,10 @@ namespace Sims2Tools.DBPF.TTAB
           16
                 };
 
+            /*
             this.humanGroups = new TtabItemMotiveTable(format, this.counts, TtabItemMotiveTableType.Human, null);
             this.animalGroups = new TtabItemMotiveTable(format, null, TtabItemMotiveTableType.Animal, null);
+            */
 
             this.Unserialize(reader);
         }
@@ -181,10 +187,12 @@ namespace Sims2Tools.DBPF.TTAB
                 }
             }
 
+            /*
             this.humanGroups = new TtabItemMotiveTable(format, this.counts, TtabItemMotiveTableType.Human, reader);
             if (this.format < 84U)
                 return;
             this.animalGroups = new TtabItemMotiveTable(format, null, TtabItemMotiveTableType.Animal, reader);
+            */
         }
 
         public XmlElement AddXml(XmlElement parent)
@@ -208,8 +216,10 @@ namespace Sims2Tools.DBPF.TTAB
             element.SetAttribute("modelTableId", Helper.Hex8PrefixString(ModelTableID));
             element.SetAttribute("memoryIterativeMultiplier", MemoryIterativeMultiplier.ToString());
 
+            /*
             HumanMotives.AddXml(element);
             AnimalMotives.AddXml(element);
+            */
 
             return element;
         }

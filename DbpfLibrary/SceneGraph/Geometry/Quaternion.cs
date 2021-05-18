@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using System;
 using System.Collections;
 
@@ -276,16 +288,11 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             double l = Length;
             if (l != 0)
             {
-                X = X / l;
-                Y = Y / l;
-                Z = Z / l;
-                W = W / l;
+                X /= l;
+                Y /= l;
+                Z /= l;
+                W /= l;
             }
-        }
-
-        bool IsNear(double val, double near, double delta)
-        {
-            return (Math.Abs(Math.Abs(val) - near) < delta);
         }
 
         protected double MakeRobustAngle(double rad)
@@ -428,9 +435,11 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         public Vector3f GetEulerAnglesYXZ()
         {
             Matrixd m = this.Matrix;
-            Vector3f v = new Vector3f(0, 0, 0);
+            Vector3f v = new Vector3f(0, 0, 0)
+            {
+                X = Math.Asin(-Clip1(m[1, 2]))
+            };
 
-            v.X = Math.Asin(-Clip1(m[1, 2]));
             if (v.X < Math.PI / 2.0)
             {
                 if (v.X > Math.PI / -2.0)
@@ -462,9 +471,11 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         public Vector3f GetEulerAnglesZXY()
         {
             Matrixd m = this.Matrix;
-            Vector3f v = new Vector3f(0, 0, 0);
+            Vector3f v = new Vector3f(0, 0, 0)
+            {
+                X = Math.Asin(m[2, 1])
+            };
 
-            v.X = Math.Asin(m[2, 1]);
             if (v.X < Math.PI / 2.0)
             {
                 if (v.X > Math.PI / -2.0)
@@ -496,9 +507,11 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         public Vector3f GetEulerAnglesZYX()
         {
             Matrixd m = this.Matrix;
-            Vector3f v = new Vector3f(0, 0, 0);
+            Vector3f v = new Vector3f(0, 0, 0)
+            {
+                Y = Math.Asin(-m[2, 0])
+            };
 
-            v.Y = Math.Asin(-m[2, 0]);
             if (v.Y < Math.PI / 2.0)
             {
                 if (v.Y > Math.PI / -2.0)
@@ -559,7 +572,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             Quaternion ret = Quaternion.FromImaginaryReal(x, y, z, w);
             ret.MakeRobust();
             ret.MakeUnitQuaternion();
-            //Console.WriteLine(ret.Length+" "+ret);
             return ret;
         }
 
@@ -611,24 +623,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         {
             return new Quaternion(QuaternionParameterType.ImaginaryReal, x, y, z, w);
         }
-
-        /// <summary>
-        /// Makes sure that the passed Radius has only one Pi cycle. Result is in Intervall [-Pi; +PI]
-        /// </summary>
-        /// <param name="rad"></param>
-        /// <returns></returns>
-        double NormalizeRad(double rad)
-        {
-            while (rad > Math.PI) rad -= 2 * Math.PI;
-            while (rad < -Math.PI) rad += 2 * Math.PI;
-
-            return rad;
-        }
-
-
-
-
-
 
 
         public string ToLinedString()
@@ -703,7 +697,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
                 double sx = Math.Pow(X, 2);
                 double sy = Math.Pow(Y, 2);
                 double sz = Math.Pow(Z, 2);
-                double sw = Math.Pow(W, 2);
+                // double sw = Math.Pow(W, 2);
                 m[0, 0] = 1 - 2 * (sy + sz); m[0, 1] = 2 * (X * Y - W * Z); m[0, 2] = 2 * (X * Z + W * Y); m[0, 3] = 0;
                 m[1, 0] = 2 * (X * Y + W * Z); m[1, 1] = 1 - 2 * (sx + sz); m[1, 2] = 2 * (Y * Z - W * X); m[1, 3] = 0;
                 m[2, 0] = 2 * (X * Z - W * Y); m[2, 1] = 2 * (Y * Z + W * X); m[2, 2] = 1 - 2 * (sx + sy); m[2, 3] = 0;

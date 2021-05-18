@@ -1,7 +1,7 @@
 /*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -19,22 +19,24 @@ namespace Sims2Tools.DBPF.Utils
     {
         public static string Hex8String(uint input)
         {
-            return input.ToString("X8");
+            String s = input.ToString("X8");
+            return s.Substring(s.Length - 8, 8);
         }
 
         public static string Hex8PrefixString(uint input)
         {
-            return "0x" + Hex8String(input);
+            return $"0x{Hex8String(input)}";
         }
 
         public static string Hex4String(uint input)
         {
-            return input.ToString("X4");
+            String s = input.ToString("X4");
+            return s.Substring(s.Length - 4, 4);
         }
 
         public static string Hex4PrefixString(uint input)
         {
-            return "0x" + Hex4String(input);
+            return $"0x{Hex4String(input)}";
         }
         public static string Hex4PrefixString(int input)
         {
@@ -48,7 +50,8 @@ namespace Sims2Tools.DBPF.Utils
 
         public static string Hex2String(byte input)
         {
-            return input.ToString("X2");
+            String s = input.ToString("X2");
+            return s.Substring(s.Length - 2, 2);
         }
 
         public static string Hex2PrefixString(uint input)
@@ -58,7 +61,7 @@ namespace Sims2Tools.DBPF.Utils
 
         public static string Hex2PrefixString(byte input)
         {
-            return "0x" + Hex2String(input);
+            return $"0x{Hex2String(input)}";
         }
 
         public static string ToString(byte[] data)

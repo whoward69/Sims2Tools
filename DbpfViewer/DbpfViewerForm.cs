@@ -1,7 +1,7 @@
 ﻿/*
  * DBPF Viewer - a utility for testing the DBPF Library
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -22,13 +22,14 @@ using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.VERS;
+using Sims2Tools.Dialogs;
 using Sims2Tools.Utils.Persistence;
+using Sims2Tools.Updates;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
-using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
@@ -37,13 +38,15 @@ namespace DbpfViewer
 {
     public partial class DbpfViewerForm : Form
     {
-        private DBPFFile package = null;
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private String packageFile = null;
         private readonly SortedDictionary<String, String> localObjectsByGroupID = new SortedDictionary<string, string>();
 
         private MruList MyMruList;
+        private Updater MyUpdater;
 
-        private readonly HashSet<uint> enabledResources = new HashSet<uint>();
+        private readonly HashSet<TypeTypeID> enabledResources = new HashSet<TypeTypeID>();
 
         private readonly DbpfViewerData dbpfData = new DbpfViewerData();
 
@@ -60,7 +63,7 @@ namespace DbpfViewer
             RegistryTools.LoadAppSettings(DbpfViewerApp.RegistryKey, DbpfViewerApp.AppVersionMajor, DbpfViewerApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(DbpfViewerApp.RegistryKey, this);
 
-            MyMruList = new MruList(DbpfViewerApp.RegistryKey, menuItemRecentPackages, 8);
+            MyMruList = new MruList(DbpfViewerApp.RegistryKey, menuItemRecentPackages, Properties.Settings.Default.MruSize);
             MyMruList.FileSelected += MyMruList_FileSelected;
 
             menuItemBcon.Checked = ((int)RegistryTools.GetSetting(DbpfViewerApp.RegistryKey + @"\Resources", Bcon.NAME, 1) != 0); OnBconClicked(menuItemBcon, null);
@@ -75,6 +78,9 @@ namespace DbpfViewer
             menuItemTtab.Checked = ((int)RegistryTools.GetSetting(DbpfViewerApp.RegistryKey + @"\Resources", Ttab.NAME, 0) != 0); OnTtabClicked(menuItemTtab, null);
             menuItemTtas.Checked = ((int)RegistryTools.GetSetting(DbpfViewerApp.RegistryKey + @"\Resources", Ttas.NAME, 0) != 0); OnTtasClicked(menuItemTtas, null);
             menuItemVers.Checked = ((int)RegistryTools.GetSetting(DbpfViewerApp.RegistryKey + @"\Resources", Vers.NAME, 0) != 0); OnVersClicked(menuItemVers, null);
+
+            MyUpdater = new Updater(DbpfViewerApp.RegistryKey, menuHelp);
+            MyUpdater.CheckForUpdates();
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
@@ -85,8 +91,8 @@ namespace DbpfViewer
 
         private void OnFileOpening(object sender, EventArgs e)
         {
-            menuItemSaveXmlToClipboard.Enabled = (package != null);
-            menuItemSaveXmlAs.Enabled = (package != null);
+            menuItemSaveXmlToClipboard.Enabled = (packageFile != null);
+            menuItemSaveXmlAs.Enabled = (packageFile != null);
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -135,7 +141,7 @@ namespace DbpfViewer
             doc.InsertBefore(xmlDeclaration, root);
 
             DateTime now = DateTime.Now;
-            doc.AppendChild(doc.CreateComment(now.ToShortDateString() + " " + now.ToShortTimeString()));
+            doc.AppendChild(doc.CreateComment($"{now.ToShortDateString()} {now.ToShortTimeString()}"));
 
             XmlElement eleDbpf = doc.CreateElement(string.Empty, "dbpf", string.Empty);
             doc.AppendChild(eleDbpf);
@@ -148,9 +154,9 @@ namespace DbpfViewer
 
             if (result == DialogResult.Abort)
             {
-                MessageBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
 #if DEBUG
-                Console.WriteLine(progressDialog.Result.Error.Message);
+                logger.Error(progressDialog.Result.Error.Message);
 #endif
             }
             else
@@ -357,6 +363,7 @@ namespace DbpfViewer
 
         private void OnSelectClicked(object sender, EventArgs e)
         {
+            selectFileDialog.FileName = "*.package";
             if (selectFileDialog.ShowDialog() == DialogResult.OK)
             {
                 DoWork_FillGrid(selectFileDialog.FileName);
@@ -367,7 +374,7 @@ namespace DbpfViewer
         {
             this.packageFile = packageFile;
 
-            this.Text = DbpfViewerApp.AppName + " - " + (new FileInfo(packageFile)).Name;
+            this.Text = $"{DbpfViewerApp.AppName} - {(new FileInfo(packageFile)).Name}";
             menuItemSelectPackage.Enabled = false;
 
             dbpfData.Clear();
@@ -384,9 +391,9 @@ namespace DbpfViewer
             {
                 MyMruList.RemoveFile(packageFile);
 
-                MessageBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
 #if DEBUG
-                Console.WriteLine(progressDialog.Result.Error.Message);
+                logger.Error(progressDialog.Result.Error.Message);
 #endif
             }
             else
@@ -402,72 +409,89 @@ namespace DbpfViewer
             }
         }
 
-        private void DoAsyncWork_FillGrid(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        private void DoAsyncWork_FillGrid(Sims2ToolsProgressDialog sender, DoWorkEventArgs args)
         {
-            object myArgument = e.Argument; // As passed to the Sims2ToolsProgressDialog constructor
+            // object myArgument = args.Argument; // As passed to the Sims2ToolsProgressDialog constructor
 
             sender.VisualMode = ProgressBarDisplayMode.CustomText;
             sender.SetProgress(0, "Loading Objects");
 
-            package = new DBPFFile(packageFile);
-
-            localObjectsByGroupID.Clear();
-
             try
             {
-                GameData.BuildObjectsTable(package, localObjectsByGroupID);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-#if DEBUG
-            Thread.Sleep(500);
-#endif
-
-            sender.VisualMode = ProgressBarDisplayMode.Percentage;
-
-            uint total = package.NumEntries;
-            uint done = 0;
-            uint found = 0;
-
-            foreach (uint type in DBPFData.ModTypes)
-            {
-                if (enabledResources.Contains(type))
+                using (DBPFFile package = new DBPFFile(packageFile))
                 {
-                    List<DBPFEntry> resources = package.GetEntriesByType(type);
+                    localObjectsByGroupID.Clear();
 
-                    foreach (var entry in resources)
+                    try
                     {
-                        if (sender.CancellationPending)
+                        GameData.BuildObjectsTable(package, localObjectsByGroupID);
+                    }
+#if DEBUG
+                    catch (Exception ex)
+#else
+                     catch (Exception)
+#endif
+                    {
+#if DEBUG
+                        logger.Error(ex.Message);
+#endif
+                    }
+
+                    sender.VisualMode = ProgressBarDisplayMode.Percentage;
+
+                    uint total = package.NumEntries;
+                    uint done = 0;
+                    uint found = 0;
+
+                    foreach (TypeTypeID type in DBPFData.ModTypes)
+                    {
+                        if (enabledResources.Contains(type))
                         {
-                            e.Cancel = true;
-                            return;
-                        }
+                            List<DBPFEntry> resources = package.GetEntriesByType(type);
 
-                        DBPFResource resource = package.GetResourceByEntry(entry);
+                            foreach (var entry in resources)
+                            {
+                                if (sender.CancellationPending)
+                                {
+                                    args.Cancel = true;
+                                    return;
+                                }
 
-                        if (resource != null)
-                        {
-                            DataRow row = dbpfData.NewRow();
-                            row["Type"] = DBPFData.TypeName(type);
-                            row["Group"] = GameData.GroupName(entry.GroupID, localObjectsByGroupID);
-                            row["Instance"] = Helper.Hex4PrefixString(entry.InstanceID);
-                            row["Name"] = resource.FileName;
+                                DBPFResource resource = package.GetResourceByEntry(entry);
 
-                            row["Hash"] = Hash.TGIRHash(entry.InstanceID, entry.InstanceID2, entry.TypeID, entry.GroupID);
+                                if (resource != null)
+                                {
+                                    DataRow row = dbpfData.NewRow();
+                                    row["Type"] = DBPFData.TypeName(type);
+                                    row["Group"] = GameData.GroupName(entry.GroupID, localObjectsByGroupID);
+                                    row["Instance"] = entry.InstanceID.ToShortString();
+                                    row["Name"] = resource.FileName;
 
-                            sender.SetData(row);
-                            sender.SetProgress((int)((++done / (float)total) * 100.0));
+                                    row["Hash"] = Hash.TGIRHash(entry.InstanceID, entry.ResourceID, entry.TypeID, entry.GroupID);
 
-                            ++found;
+                                    sender.SetData(row);
+                                    sender.SetProgress((int)((++done / (float)total) * 100.0));
+
+                                    ++found;
+                                }
+                            }
                         }
                     }
+
+                    package.Close();
+
+                    args.Result = found;
                 }
             }
+            catch (Exception e)
+            {
+                logger.Error(e.Message);
 
-            e.Result = found;
+                if (MsgBox.Show($"An error occured while processing\n{packageFile}\n\nReason: {e.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                {
+                    throw e;
+                }
+            }
         }
 
         private void DoAsyncWork_FillGrid_Data(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
@@ -482,37 +506,54 @@ namespace DbpfViewer
             dbpfData.Append(e.Argument as DataRow);
         }
 
-        private void DoAsyncWork_GetXml(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        private void DoAsyncWork_GetXml(Sims2ToolsProgressDialog sender, DoWorkEventArgs args)
         {
-            XmlElement eleDbpf = e.Argument as XmlElement;
+            XmlElement eleDbpf = args.Argument as XmlElement;
 
             sender.VisualMode = ProgressBarDisplayMode.Percentage;
 
-            uint total = package.NumEntries;
-            uint done = 0;
-
-            foreach (uint type in DBPFData.ModTypes)
+            try
             {
-                if (enabledResources.Contains(type))
+                using (DBPFFile package = new DBPFFile(packageFile))
                 {
-                    List<DBPFEntry> resources = package.GetEntriesByType(type);
+                    uint total = package.NumEntries;
+                    uint done = 0;
 
-                    foreach (var entry in resources)
+                    foreach (TypeTypeID type in DBPFData.ModTypes)
                     {
-                        if (sender.CancellationPending)
+                        if (enabledResources.Contains(type))
                         {
-                            e.Cancel = true;
-                            return;
-                        }
+                            List<DBPFEntry> resources = package.GetEntriesByType(type);
 
-                        DBPFResource resource = package.GetResourceByEntry(entry);
+                            foreach (var entry in resources)
+                            {
+                                if (sender.CancellationPending)
+                                {
+                                    args.Cancel = true;
+                                    return;
+                                }
 
-                        if (resource != null)
-                        {
-                            resource.AddXml(eleDbpf);
-                            sender.SetProgress((int)((++done / (float)total) * 100.0));
+                                DBPFResource resource = package.GetResourceByEntry(entry);
+
+                                if (resource != null)
+                                {
+                                    resource.AddXml(eleDbpf);
+                                    sender.SetProgress((int)((++done / (float)total) * 100.0));
+                                }
+                            }
                         }
                     }
+
+                    package.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                logger.Error(e.Message);
+
+                if (MsgBox.Show($"An error occured while processing\n{packageFile}\n\nReason: {e.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                {
+                    throw e;
                 }
             }
         }

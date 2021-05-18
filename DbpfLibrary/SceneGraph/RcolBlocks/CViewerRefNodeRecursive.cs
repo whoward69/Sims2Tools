@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -6,7 +18,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CViewerRefNodeRecursive : AbstractRcolBlock
     {
-        public static uint TYPE = 0x0C152B8E;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0x0C152B8E;
         public static String NAME = "cViewerRefNodeRecursive";
 
         #region Attributes
@@ -75,7 +87,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown5 = new byte[64];
 
             version = 0x01;
-            BlockID = 0x0c152b8e;
+            BlockID = TYPE;
         }
 
         #region IRcolBlock Member
@@ -88,23 +100,23 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             version = reader.ReadUInt32();
 
-            string name = reader.ReadString();
-            uint myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            TypeBlockID myid = reader.ReadBlockId();
             vrnb.Unserialize(reader);
             vrnb.BlockID = myid;
 
-            name = reader.ReadString();
-            myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            myid = reader.ReadBlockId();
             rn.Unserialize(reader);
             rn.BlockID = myid;
 
-            name = reader.ReadString();
-            myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            myid = reader.ReadBlockId();
             bn.Unserialize(reader);
             bn.BlockID = myid;
 
-            name = reader.ReadString();
-            myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            myid = reader.ReadBlockId();
             tn.Unserialize(reader);
             tn.BlockID = myid;
 

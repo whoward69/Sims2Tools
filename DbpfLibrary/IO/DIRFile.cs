@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -24,14 +24,12 @@ namespace Sims2Tools.DBPF.IO
 
             while (stream.Position < file.Length)
             {
-                var TypeID = reader.ReadUInt32();
-                var GroupID = reader.ReadUInt32();
-                var InstanceID = reader.ReadUInt32();
-                uint InstanceID2 = 0x00000000;
-                if (package.IndexMinorVersion >= 2)
-                    InstanceID2 = reader.ReadUInt32();
-                var idEntry2 = Hash.TGIRHash(InstanceID, InstanceID2, TypeID, GroupID);
-                package.GetEntryByFullID(idEntry2).uncompressedSize = reader.ReadUInt32();
+                TypeTypeID TypeID = reader.ReadTypeId();
+                TypeGroupID GroupID = reader.ReadGroupId();
+                TypeInstanceID InstanceID = reader.ReadInstanceId();
+                TypeResourceID ResourceID = (package.IndexMinorVersion >= 2) ? reader.ReadResourceId() : (TypeResourceID)0x00000000;
+
+                package.GetEntryByFullID(Hash.TGIRHash(InstanceID, ResourceID, TypeID, GroupID)).UncompressedSize = reader.ReadUInt32();
             }
 
             reader.Dispose();

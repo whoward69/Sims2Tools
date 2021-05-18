@@ -4,13 +4,12 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
 using Sims2Tools.DBPF;
-using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 
@@ -18,12 +17,12 @@ namespace HcduPlus
 {
     public class ConflictDetail
     {
-        public uint Type { get; }
-        public uint Group { get; }
-        public uint Instance { get; }
+        public TypeTypeID Type { get; }
+        public TypeGroupID Group { get; }
+        public TypeInstanceID Instance { get; }
         public String Name { get; }
 
-        public ConflictDetail(uint type, uint group, uint instance, String name)
+        public ConflictDetail(TypeTypeID type, TypeGroupID group, TypeInstanceID instance, String name)
         {
             Type = type;
             Group = group;
@@ -47,7 +46,7 @@ namespace HcduPlus
             this.Details = new List<ConflictDetail>();
         }
 
-        public void AddTGI(uint type, uint group, uint instance, String name)
+        public void AddTGI(TypeTypeID type, TypeGroupID group, TypeInstanceID instance, String name)
         {
             Details.Add(new ConflictDetail(type, group, instance, name));
         }
@@ -58,7 +57,7 @@ namespace HcduPlus
 
             foreach (ConflictDetail detail in Details)
             {
-                s += "\n" + prefix + DBPFData.TypeName(detail.Type) + ": 0x" + Helper.Hex4String(detail.Instance) + " - " + detail.Name + " (0x" + Helper.Hex8String(detail.Group) + ")";
+                s += $"\n{prefix}{DBPFData.TypeName(detail.Type)}: {detail.Instance.ToShortString()} - {detail.Name} ({detail.Group})";
             }
 
             return s.Substring(1);
@@ -66,7 +65,7 @@ namespace HcduPlus
 
         public override string ToString()
         {
-            return PackageA + " --> " + PackageB + "\n" + DetailText("\t");
+            return $"{PackageA} --> {PackageB}\n{DetailText("\t")}";
         }
 
         public override int GetHashCode()

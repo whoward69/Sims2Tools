@@ -1,9 +1,20 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
-using System.Collections;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
@@ -143,8 +154,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override string ToString()
         {
-            string name = "0x" + Helper.Hex4String((uint)unknown1) + " - 0x" + Helper.Hex4String(unknown2);
-            if ((parent.Version == 0x07) || (parent.Version == 0x06)) return name + " - 0x" + Helper.Hex4String((uint)unknown3) + " - 0x" + Helper.Hex4String(unknown4);
+            string name = Helper.Hex4PrefixString((uint)unknown1) + " - " + Helper.Hex4PrefixString(unknown2);
+            if ((parent.Version == 0x07) || (parent.Version == 0x06)) return name + " - " + Helper.Hex4PrefixString((uint)unknown3) + " - " + Helper.Hex4PrefixString(unknown4);
             else return name + ": " + filename;
         }
 
@@ -157,9 +168,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     /// The wrapper is used to (un)serialize the Data of a file into it's Attributes. So Basically it reads 
     /// a BinaryStream and translates the data into some userdefine Attributes.
     /// </remarks>
-    public class CShape : AbstractRcolBlock, IScenegraphBlock
+    public class CShape : AbstractRcolBlock
     {
-        public static uint TYPE = 0xFC6EB1F7;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0xFC6EB1F7;
         public static String NAME = "cShape";
 
         #region Attributes
@@ -198,14 +209,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return refnode; }
         }
         #endregion
-        /*public Rcol Parent 
-		{
-			get { return parent; }
-		}*/
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public CShape(Rcol parent) : base(parent)
         {
             sgres = new SGResource(null);
@@ -215,29 +219,23 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown = new uint[0];
             items = new ShapeItem[0];
             parts = new ShapePart[0];
-            BlockID = 0xFC6EB1F7;
+            BlockID = TYPE;
         }
 
-        #region IRcolBlock Member
-
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(IoBuffer reader)
         {
             version = reader.ReadUInt32();
-            string s = reader.ReadString();
+            reader.ReadString();
 
-            sgres.BlockID = reader.ReadUInt32();
+            sgres.BlockID = reader.ReadBlockId();
             sgres.Unserialize(reader);
 
-            s = reader.ReadString();
-            refnode.BlockID = reader.ReadUInt32();
+            reader.ReadString();
+            refnode.BlockID = reader.ReadBlockId();
             refnode.Unserialize(reader);
 
-            s = reader.ReadString();
-            ogn.BlockID = reader.ReadUInt32();
+            reader.ReadString();
+            ogn.BlockID = reader.ReadBlockId();
             ogn.Unserialize(reader);
 
             if (version != 0x06) unknown = new uint[reader.ReadUInt32()];
@@ -258,29 +256,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 parts[i].Unserialize(reader);
             }
         }
-
-        #endregion
-
-        #region IScenegraphItem Member
-
-        public void ReferencedItems(Hashtable refmap, uint parentgroup)
-        {
-            ArrayList list = new ArrayList();
-            foreach (ShapePart part in Parts)
-            {
-                list.Add(ScenegraphHelper.BuildPfd(part.FileName.Trim() + "_txmt", ScenegraphHelper.TXMT, parentgroup));
-            }
-            refmap["Subsets"] = list;
-
-            list = new ArrayList();
-            foreach (ShapeItem item in Items)
-            {
-                list.Add(ScenegraphHelper.BuildPfd(item.FileName.Trim(), ScenegraphHelper.GMND, parentgroup));
-            }
-            refmap["Models"] = list;
-        }
-
-        #endregion
 
         public override void Dispose()
         {

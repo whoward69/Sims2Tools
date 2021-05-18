@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -25,9 +25,11 @@ namespace Sims2Tools.DBPF.IO
 
     public class IoBuffer : IDisposable
     {
-        public readonly Stream m_stream;
+        private readonly Stream m_stream;
         private readonly BinaryReader m_reader;
         public ByteOrder m_byteOrder = ByteOrder.BIG_ENDIAN;
+
+        public Stream MyStream => m_stream;
 
         public IoBuffer(Stream stream)
         {
@@ -71,6 +73,8 @@ namespace Sims2Tools.DBPF.IO
         {
             m_reader.BaseStream.Seek(offset, origin);
         }
+
+        #region ReadXyz
 
         public byte ReadByte()
         {
@@ -126,6 +130,15 @@ namespace Sims2Tools.DBPF.IO
             return value;
         }
 
+        public TypeGUID ReadGuid() => (TypeGUID)ReadUInt32();
+
+        public TypeTypeID ReadTypeId() => (TypeTypeID)ReadUInt32();
+        public TypeGroupID ReadGroupId() => (TypeGroupID)ReadUInt32();
+        public TypeInstanceID ReadInstanceId() => (TypeInstanceID)ReadUInt32();
+        public TypeResourceID ReadResourceId() => (TypeResourceID)ReadUInt32();
+
+        public TypeBlockID ReadBlockId() => (TypeBlockID)ReadUInt32();
+
         public uint ReadUInt32()
         {
             var value = m_reader.ReadUInt32();
@@ -178,6 +191,8 @@ namespace Sims2Tools.DBPF.IO
 
             return result;
         }
+
+        #endregion
 
         public void Dispose()
         {

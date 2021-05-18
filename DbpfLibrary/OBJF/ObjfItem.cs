@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -34,7 +34,7 @@ namespace Sims2Tools.DBPF.OBJF
             this.Unserialize(reader);
         }
 
-        internal void Unserialize(IoBuffer reader)
+        protected void Unserialize(IoBuffer reader)
         {
             this.guard = reader.ReadUInt16();
             this.action = reader.ReadUInt16();

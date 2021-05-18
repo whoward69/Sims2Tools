@@ -1,8 +1,19 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
-using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 
@@ -11,7 +22,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
     public class Txmt : Rcol
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public const uint TYPE = 0x49596978;
+        public static readonly TypeTypeID TYPE = (TypeTypeID)0x49596978;
         public const String NAME = "TXMT";
 
         public Txmt(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
@@ -20,6 +31,8 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 
         public override SgResourceList SgNeededResources()
         {
+            String[] propKeys = { "stdMatBaseTextureName", "stdMatNormalMapTextureName", "stdMatEnvCubeTextureName" };
+
             SgResourceList needed = new SgResourceList();
 
             foreach (IRcolBlock block in Blocks)
@@ -29,13 +42,32 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
                     CMaterialDefinition cMaterialDefinition = block as CMaterialDefinition;
                     HashSet<String> seen = new HashSet<String>();
 
-                    foreach (MaterialDefinitionProperty prop in cMaterialDefinition.Properties)
+                    foreach (String propKey in propKeys)
                     {
-                        if (prop.Name.Equals("stdMatBaseTextureName"))
-                        {
-                            seen.Add(prop.Value);
+                        MaterialDefinitionProperty prop = cMaterialDefinition.GetProperty(propKey);
 
-                            needed.Add(Txtr.TYPE, prop.Value);
+                        if (prop != null && prop.Value != null && prop.Value.Length > 0)
+                        {
+                            if (!seen.Contains(prop.Value))
+                            {
+                                seen.Add(prop.Value);
+                                needed.Add(Txtr.TYPE, prop.Value);
+                            }
+                        }
+                    }
+
+                    int textures = cMaterialDefinition.GetProperty("numTexturesToComposite") != null ? Convert.ToInt32(cMaterialDefinition.GetProperty("numTexturesToComposite").Value) : 0;
+                    for (int i = 0; i < textures; ++i)
+                    {
+                        MaterialDefinitionProperty prop = cMaterialDefinition.GetProperty($"baseTexture{i}");
+
+                        if (prop != null && prop.Value != null && prop.Value.Length > 0)
+                        {
+                            if (!seen.Contains(prop.Value))
+                            {
+                                seen.Add(prop.Value);
+                                needed.Add(Txtr.TYPE, prop.Value);
+                            }
                         }
                     }
 
@@ -43,6 +75,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
                     {
                         if (!seen.Contains(listing))
                         {
+                            seen.Add(listing);
                             needed.Add(Txtr.TYPE, listing);
                         }
                     }

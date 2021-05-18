@@ -1,7 +1,7 @@
 ﻿/*
  * DBPF Viewer - a utility for testing the DBPF Library
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -46,6 +46,7 @@ namespace DbpfViewer
             this.menuItemSaveXmlAs = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuResources = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBcon = new System.Windows.Forms.ToolStripMenuItem();
@@ -98,6 +99,7 @@ namespace DbpfViewer
             this.menuItemSaveXmlAs,
             this.menuItemSeparator2,
             this.menuItemConfiguration,
+            this.toolStripSeparator1,
             this.menuItemExit});
             this.menuFile.Name = "menuFile";
             this.menuFile.Size = new System.Drawing.Size(37, 20);
@@ -151,6 +153,11 @@ namespace DbpfViewer
             this.menuItemConfiguration.Size = new System.Drawing.Size(235, 22);
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigurationClicked);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(232, 6);
             // 
             // menuItemExit
             // 
@@ -288,8 +295,8 @@ namespace DbpfViewer
             // 
             this.menuItemAbout.Name = "menuItemAbout";
             this.menuItemAbout.ShortcutKeys = System.Windows.Forms.Keys.F1;
-            this.menuItemAbout.Size = new System.Drawing.Size(126, 22);
-            this.menuItemAbout.Text = "About";
+            this.menuItemAbout.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAbout.Text = "&About";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
             // 
             // menuItemSeparator3
@@ -303,6 +310,9 @@ namespace DbpfViewer
             this.gridResources.AllowUserToDeleteRows = false;
             this.gridResources.AllowUserToOrderColumns = true;
             this.gridResources.AllowUserToResizeRows = false;
+            this.gridResources.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gridResources.BackgroundColor = System.Drawing.SystemColors.Window;
             this.gridResources.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridResources.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -312,7 +322,6 @@ namespace DbpfViewer
             this.colName,
             this.colHash});
             this.gridResources.Location = new System.Drawing.Point(14, 31);
-            this.gridResources.MultiSelect = false;
             this.gridResources.Name = "gridResources";
             this.gridResources.ReadOnly = true;
             this.gridResources.RowHeadersVisible = false;
@@ -378,7 +387,6 @@ namespace DbpfViewer
             this.Controls.Add(this.gridResources);
             this.Controls.Add(this.menuMain);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
             this.MaximizeBox = false;
@@ -430,5 +438,6 @@ namespace DbpfViewer
         private System.Windows.Forms.ToolStripMenuItem menuItemTtab;
         private System.Windows.Forms.ToolStripMenuItem menuItemTtas;
         private System.Windows.Forms.ToolStripMenuItem menuItemVers;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }

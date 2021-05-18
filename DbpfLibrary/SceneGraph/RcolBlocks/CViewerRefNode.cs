@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -6,7 +18,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CViewerRefNode : AbstractRcolBlock
     {
-        public static uint TYPE = 0x7BA3838C;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0x7BA3838C;
         public static String NAME = "cViewerRefNode";
 
         #region Attributes
@@ -53,7 +65,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown2 = new byte[0xA0];
 
             version = 0x0c;
-            BlockID = 0x7BA3838C;
+            BlockID = TYPE;
         }
 
         #region IRcolBlock Member
@@ -66,23 +78,23 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             version = reader.ReadUInt32();
 
-            string name = reader.ReadString();
-            uint myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            TypeBlockID myid = reader.ReadBlockId();
             vrnb.Unserialize(reader);
             vrnb.BlockID = myid;
 
-            name = reader.ReadString();
-            myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            myid = reader.ReadBlockId();
             rn.Unserialize(reader);
             rn.BlockID = myid;
 
-            name = reader.ReadString();
-            myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            myid = reader.ReadBlockId();
             bn.Unserialize(reader);
             bn.BlockID = myid;
 
-            name = reader.ReadString();
-            myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            myid = reader.ReadBlockId();
             tn.Unserialize(reader);
             tn.BlockID = myid;
 
@@ -114,7 +126,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public ViewerRefNodeBase(Rcol parent) : base(parent)
         {
             version = 0x5;
-            BlockID = 0;
+            BlockID = TypeBlockID.NULL;
         }
 
         #region IRcolBlock Member

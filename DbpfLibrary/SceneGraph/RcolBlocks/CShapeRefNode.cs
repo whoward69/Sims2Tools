@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.Utils;
 using System;
@@ -58,7 +70,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override string ToString()
         {
-            return "0x" + Helper.Hex4String((uint)unknown1) + ": " + Name;
+            return Helper.Hex4PrefixString((uint)unknown1) + ": " + Name;
         }
 
     }
@@ -68,7 +80,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     /// </summary>
     public class CShapeRefNode : AbstractCresChildren
     {
-        public static uint TYPE = 0x65245517;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0x65245517;
         public static String NAME = "cShapeRefNode";
         readonly RenderableNode rn;
         readonly BoundedNode bn;
@@ -157,7 +169,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown5 = 0x10;
             unknown6 = -1;
             name = "Practical";
-            BlockID = 0x65245517;
+            BlockID = TYPE;
         }
 
         #region IRcolBlock Member
@@ -170,18 +182,18 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             version = reader.ReadUInt32();
 
-            string name = reader.ReadString();
-            uint myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            TypeBlockID myid = reader.ReadBlockId();
             rn.Unserialize(reader);
             rn.BlockID = myid;
 
-            name = reader.ReadString();
-            myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            myid = reader.ReadBlockId();
             bn.Unserialize(reader);
             bn.BlockID = myid;
 
-            name = reader.ReadString();
-            myid = reader.ReadUInt32();
+            _ = reader.ReadString();
+            myid = reader.ReadBlockId();
             tn.Unserialize(reader);
             tn.BlockID = myid;
 
@@ -202,11 +214,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             itemsb = new ShapeRefNodeItem_B[reader.ReadUInt32()];
             for (int i = 0; i < itemsb.Length; i++)
             {
-                itemsb[i] = new ShapeRefNodeItem_B();
-                itemsb[i].Unknown1 = reader.ReadInt32();
+                itemsb[i] = new ShapeRefNodeItem_B
+                {
+                    Unknown1 = reader.ReadInt32()
+                };
             }
 
-            int len = 0;
             if (version == 0x15)
             {
                 for (int i = 0; i < itemsb.Length; i++)
@@ -215,8 +228,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 }
             }
 
-            len = reader.ReadInt32();
-            data = reader.ReadBytes(len);
+            data = reader.ReadBytes(reader.ReadInt32());
             unknown6 = reader.ReadInt32();
         }
 

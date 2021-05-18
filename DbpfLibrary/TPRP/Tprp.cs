@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -20,7 +20,7 @@ namespace Sims2Tools.DBPF.TPRP
     public class Tprp : DBPFResource
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public const uint TYPE = 0x54505250;
+        public static readonly TypeTypeID TYPE = (TypeTypeID)0x54505250;
         public const string NAME = "TPRP";
 
         private uint[] header;
@@ -42,7 +42,9 @@ namespace Sims2Tools.DBPF.TPRP
         protected void Unserialize(IoBuffer reader)
         {
             this.duff = false;
-            this.filename = reader.ReadBytes(0x40);
+
+            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
+
             this.header = new uint[3];
             this.header[0] = reader.ReadUInt32();
             this.header[1] = reader.ReadUInt32();

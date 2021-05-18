@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -13,13 +25,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     /// </remarks>
     public class CImageData : AbstractRcolBlock, /* IScenegraphBlock, */ System.IDisposable
     {
-        public static uint TYPE = 0x1C4A276C;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0x1C4A276C;
         public static String NAME = "cImageData";
 
         public CImageData(Rcol parent) : base(parent)
         {
             sgres = new SGResource(null);
-            BlockID = 0x1c4a276c;
+            BlockID = TYPE;
             this.version = 0x09;
         }
 
@@ -32,9 +44,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public override void Unserialize(IoBuffer reader)
         {
             version = reader.ReadUInt32();
-            string s = reader.ReadString();
+            _ = reader.ReadString();
 
-            sgres.BlockID = reader.ReadUInt32();
+            sgres.BlockID = reader.ReadBlockId();
             sgres.Unserialize(reader);
         }
 

@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -20,7 +20,7 @@ namespace Sims2Tools.DBPF.TRCN
     public class Trcn : DBPFResource
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public const uint TYPE = 0x5452434E;
+        public static readonly TypeTypeID TYPE = (TypeTypeID)0x5452434E;
         public const string NAME = "TRCN";
 
         private uint[] header;
@@ -41,9 +41,10 @@ namespace Sims2Tools.DBPF.TRCN
 
         protected void Unserialize(IoBuffer reader)
         {
-            this.filename = reader.ReadBytes(0x40);
-
             this.duff = false;
+
+            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
+
             this.items = new List<TrcnItem>();
             this.header = new uint[3];
             this.header[0] = reader.ReadUInt32();

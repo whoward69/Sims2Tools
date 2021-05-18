@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -20,7 +20,7 @@ namespace BhavFinder
 {
     public partial class BhavFinderForm
     {
-        private BhavFilter GetFilters(Dictionary<int, HashSet<uint>> strLookupByIndexLocal, Dictionary<int, HashSet<uint>> strLookupByIndexGlobal)
+        private BhavFilter GetFilters(Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal, Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal)
         {
             BhavFilter filter = new TrueFilter();
 
@@ -30,20 +30,42 @@ namespace BhavFinder
 
                 if (m.Success)
                 {
-                    filter = new GroupFilter(Convert.ToUInt32(m.Value, 16));
+                    filter = new GroupFilter((TypeGroupID)Convert.ToUInt32(m.Value, 16));
                 }
             }
 
             if (comboOpCode.Text.Length > 0)
             {
-                Match m = HexOpCodeRegex.Match(comboOpCode.Text);
-
-                if (m.Success)
+                uint opcodeFrom = 0xffff;
+                uint opcodeTo = 0xffff;
+                
+                if (comboOpCode.Text.IndexOf(":") == -1)
                 {
-                    uint opcode = Convert.ToUInt32(m.Value, 16);
+                    Match m = HexOpCodeRegex.Match(comboOpCode.Text);
+
+                    if (m.Success)
+                    {
+                        opcodeFrom = opcodeTo = Convert.ToUInt32(m.Value, 16);
+                    }
+                }
+                else
+                {
+                    Match mFrom = HexOpCodeRegex.Match(comboOpCode.Text.Substring(0, comboOpCode.Text.IndexOf(":")));
+                    Match mTo = HexOpCodeRegex.Match(comboOpCode.Text.Substring(comboOpCode.Text.IndexOf(":") + 1));
+
+                    if (mFrom.Success && mTo.Success)
+                    {
+                        opcodeFrom = Convert.ToUInt32(mFrom.Value, 16);
+                        opcodeTo = Convert.ToUInt32(mTo.Value, 16);
+                    }
+                }
+
+
+                if (opcodeFrom != 0xffff && opcodeTo != 0xffff)
+                {
                     int version = -1;
 
-                    if (opcode > 0x2000)
+                    if (opcodeFrom > 0x2000)
                     {
                         if (comboOpCodeInGroup.Text.Length > 0)
                         {
@@ -51,7 +73,7 @@ namespace BhavFinder
 
                             if (g.Success)
                             {
-                                filter = new SemiGlobalsFilter(Convert.ToUInt32(g.Value, 16), filter);
+                                filter = new SemiGlobalsFilter((TypeGroupID)Convert.ToUInt32(g.Value, 16), filter);
                             }
                         }
                     }
@@ -66,7 +88,7 @@ namespace BhavFinder
                         }
                     }
 
-                    filter.InstFilter = new OpCodeFilter(opcode, version);
+                    filter.InstFilter = new OpCodeFilter(opcodeFrom, opcodeTo, version);
                 }
             }
 
@@ -140,9 +162,9 @@ namespace BhavFinder
         {
             public InstructionFilter InnerFilter { get; set; } = null;
 
-            public abstract Boolean Wanted(uint group, Instruction inst);
+            public abstract Boolean Wanted(TypeGroupID group, Instruction inst);
 
-            public Boolean IsWanted(uint group, Instruction inst)
+            public Boolean IsWanted(TypeGroupID group, Instruction inst)
             {
                 return ((InnerFilter == null || InnerFilter.IsWanted(group, inst)) && Wanted(group, inst));
             }
@@ -158,9 +180,9 @@ namespace BhavFinder
 
         private class GroupFilter : BhavFilter
         {
-            readonly uint group;
+            readonly TypeGroupID group;
 
-            public GroupFilter(uint group)
+            public GroupFilter(TypeGroupID group)
             {
                 this.group = group;
             }
@@ -173,9 +195,9 @@ namespace BhavFinder
 
         private class SemiGlobalsFilter : BhavFilter
         {
-            readonly uint semiglobals;
+            readonly TypeGroupID semiglobals;
 
-            public SemiGlobalsFilter(uint semiglobals, BhavFilter innerFilter)
+            public SemiGlobalsFilter(TypeGroupID semiglobals, BhavFilter innerFilter)
             {
                 this.semiglobals = semiglobals;
                 this.InnerFilter = innerFilter;
@@ -183,24 +205,26 @@ namespace BhavFinder
 
             public override Boolean Wanted(Bhav bhav)
             {
-                return (GameData.semiglobalsByGroupID.TryGetValue(bhav.GroupID, out uint semigroup) && (semigroup == semiglobals));
+                return (GameData.semiglobalsByGroupID.TryGetValue(bhav.GroupID, out TypeGroupID semigroup) && (semigroup == semiglobals));
             }
         }
 
         private class OpCodeFilter : InstructionFilter
         {
-            readonly uint opcode;
+            readonly uint opcodeFrom;
+            readonly uint opcodeTo;
             readonly int version = -1;
 
-            public OpCodeFilter(uint opcode, int version)
+            public OpCodeFilter(uint opcodeFrom, uint opcodeTo, int version)
             {
-                this.opcode = opcode;
+                this.opcodeFrom = opcodeFrom;
+                this.opcodeTo = opcodeTo;
                 this.version = version;
             }
 
-            public override Boolean Wanted(uint group, Instruction inst)
+            public override Boolean Wanted(TypeGroupID group, Instruction inst)
             {
-                return (inst.OpCode == opcode && (version == -1 || inst.NodeVersion == version));
+                return (inst.OpCode >= opcodeFrom && inst.OpCode <= opcodeTo && (version == -1 || inst.NodeVersion == version));
             }
         }
 
@@ -217,7 +241,7 @@ namespace BhavFinder
                 this.mask = mask;
             }
 
-            public override Boolean Wanted(uint group, Instruction inst)
+            public override Boolean Wanted(TypeGroupID group, Instruction inst)
             {
                 return ((inst.Operands[operand] & mask) == value);
             }
@@ -226,27 +250,27 @@ namespace BhavFinder
         private class StrIndexFilter : InstructionFilter
         {
             private readonly int operand;
-            private readonly Dictionary<int, HashSet<uint>> strLookupByIndexLocal;
-            private readonly Dictionary<int, HashSet<uint>> strLookupByIndexGlobal;
+            private readonly Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal;
+            private readonly Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal;
 
-            public StrIndexFilter(int operand, Dictionary<int, HashSet<uint>> strLookupByIndexLocal, Dictionary<int, HashSet<uint>> strLookupByIndexGlobal)
+            public StrIndexFilter(int operand, Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal, Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal)
             {
                 this.operand = operand;
                 this.strLookupByIndexLocal = strLookupByIndexLocal;
                 this.strLookupByIndexGlobal = strLookupByIndexGlobal;
             }
 
-            public override Boolean Wanted(uint group, Instruction inst)
+            public override Boolean Wanted(TypeGroupID group, Instruction inst)
             {
                 int index = inst.Operands[operand];
 
-                if (strLookupByIndexLocal != null && strLookupByIndexLocal.TryGetValue(index, out HashSet<uint> groups))
+                if (strLookupByIndexLocal != null && strLookupByIndexLocal.TryGetValue(index, out HashSet<TypeGroupID> groups))
                 {
                     // The group this BHAV is in?
                     if (groups.Contains(group)) return true;
 
                     // The semiglobals group this BHAV references?
-                    if (GameData.semiglobalsByGroupID.TryGetValue(group, out uint semigroup) && groups.Contains(semigroup)) return true;
+                    if (GameData.semiglobalsByGroupID.TryGetValue(group, out TypeGroupID semigroup) && groups.Contains(semigroup)) return true;
                 }
 
                 if (strLookupByIndexGlobal != null && strLookupByIndexGlobal.TryGetValue(index, out groups))
@@ -258,7 +282,7 @@ namespace BhavFinder
                     if (groups.Contains(DBPFData.GROUP_GLOBALS)) return true;
 
                     // The semiglobals group this BHAV references?
-                    if (GameData.semiglobalsByGroupID.TryGetValue(group, out uint semigroup) && groups.Contains(semigroup)) return true;
+                    if (GameData.semiglobalsByGroupID.TryGetValue(group, out TypeGroupID semigroup) && groups.Contains(semigroup)) return true;
                 }
 
                 return false;

@@ -1,7 +1,7 @@
 /*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -32,28 +32,28 @@ namespace Sims2Tools.DBPF.Utils
             return ret;
         }
 
-        public static uint GroupHash(string name)
+        public static TypeGroupID GroupHash(string name)
         {
             name = name.Trim().ToLower();
             byte[] rt = crc24.ComputeHash(Helper.ToBytes(name, 0));
 
-            return (uint)(ToLong(rt) | 0x7F000000);
+            return (TypeGroupID)(ToLong(rt) | 0x7F000000);
         }
 
-        public static uint InstanceHash(string filename)
+        public static TypeInstanceID InstanceHash(string filename)
         {
             filename = filename.Trim().ToLower();
             byte[] rt = crc24.ComputeHash(Helper.ToBytes(filename, 0));
 
-            return (uint)(ToLong(rt) | 0xff000000);
+            return (TypeInstanceID)(ToLong(rt) | 0xff000000);
         }
 
-        public static uint SubTypeHash(string filename)
+        public static TypeResourceID SubTypeHash(string filename)
         {
             filename = filename.Trim().ToLower();
             byte[] rt = crc32.ComputeHash(Helper.ToBytes(filename, 0));
 
-            return (uint)ToLong(rt);
+            return (TypeResourceID)ToLong(rt);
         }
 
         public static string StripHashFromName(string filename)
@@ -72,7 +72,7 @@ namespace Sims2Tools.DBPF.Utils
             return filename;
         }
 
-        public static uint GetHashGroupFromName(string filename, uint defgroup)
+        public static TypeGroupID GetHashGroupFromName(string filename, TypeGroupID defgroup)
         {
             if (filename.IndexOf("#") == 0)
             {
@@ -83,7 +83,7 @@ namespace Sims2Tools.DBPF.Utils
                     string hash = part[0].Replace("#", "").Replace("!", "");
                     try
                     {
-                        return Convert.ToUInt32(hash, 16);
+                        return (TypeGroupID)Convert.ToUInt32(hash, 16);
                     }
                     catch (Exception)
                     {

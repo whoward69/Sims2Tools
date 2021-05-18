@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -13,11 +13,17 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml;
 
 namespace Sims2Tools.DBPF.CPF
 {
     public abstract class Cpf : DBPFResource, IDisposable
     {
+        private static readonly byte[] SIGNATURE = { 0xE0, 0x50, 0xE7, 0xCB, 0x02, 0x00 };
+
         private CpfItem[] items;
 
         public CpfItem[] Items
@@ -32,16 +38,95 @@ namespace Sims2Tools.DBPF.CPF
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        internal void Unserialize(IoBuffer reader)
         {
-            reader.ReadBytes(0x06);
-            items = new CpfItem[reader.ReadUInt32()];
+            long pos = reader.Position;
 
-            for (int i = 0; i < items.Length; i++)
+            byte[] id = reader.ReadBytes(0x06);
+
+            if (Enumerable.SequenceEqual(id, SIGNATURE))
             {
-                items[i] = new CpfItem();
-                items[i].Unserialize(reader);
+                items = new CpfItem[reader.ReadUInt32()];
+
+                for (int i = 0; i < items.Length; i++)
+                {
+                    items[i] = new CpfItem();
+                    items[i].Unserialize(reader);
+                }
             }
+            else
+            {
+                reader.Seek(SeekOrigin.Begin, pos);
+
+                UnserializeXml(reader);
+            }
+        }
+
+        protected void UnserializeXml(IoBuffer reader)
+        {
+            StreamReader sr = new StreamReader(reader.MyStream);
+            StringReader strr = new StringReader(sr.ReadToEnd().Replace("& ", "&amp; "));
+
+            XmlDocument xmlfile = new XmlDocument();
+            xmlfile.Load(strr);
+
+            XmlNodeList XMLData = xmlfile.GetElementsByTagName("cGZPropertySetString");
+            List<CpfItem> list = new List<CpfItem>();
+
+            for (int i = 0; i < XMLData.Count; i++)
+            {
+                XmlNode node = XMLData.Item(i);
+
+                foreach (XmlNode subnode in node)
+                {
+                    CpfItem item = new CpfItem();
+
+                    if (subnode.LocalName.Trim().ToLower() == "anyuint32")
+                    {
+                        item.Datatype = Data.MetaData.DataTypes.dtUInteger;
+                        if (subnode.InnerText.IndexOf("-") != -1) item.UIntegerValue = (uint)Convert.ToInt32(subnode.InnerText);
+                        else if (subnode.InnerText.IndexOf("0x") == -1) item.UIntegerValue = Convert.ToUInt32(subnode.InnerText);
+                        else item.UIntegerValue = Convert.ToUInt32(subnode.InnerText, 16);
+                    }
+                    else if ((subnode.LocalName.Trim().ToLower() == "anyint32") || (subnode.LocalName.Trim().ToLower() == "anysint32"))
+                    {
+                        item.Datatype = Data.MetaData.DataTypes.dtInteger;
+                        if (subnode.InnerText.IndexOf("0x") == -1) item.IntegerValue = Convert.ToInt32(subnode.InnerText);
+                        else item.IntegerValue = Convert.ToInt32(subnode.InnerText, 16);
+                    }
+                    else if (subnode.LocalName.Trim().ToLower() == "anystring")
+                    {
+                        item.Datatype = Data.MetaData.DataTypes.dtString;
+                        item.StringValue = subnode.InnerText;
+                    }
+                    else if (subnode.LocalName.Trim().ToLower() == "anyfloat32")
+                    {
+                        item.Datatype = Data.MetaData.DataTypes.dtSingle;
+                        item.SingleValue = Convert.ToSingle(subnode.InnerText, System.Globalization.CultureInfo.InvariantCulture);
+                    }
+                    else if (subnode.LocalName.Trim().ToLower() == "anyboolean")
+                    {
+                        item.Datatype = Data.MetaData.DataTypes.dtBoolean;
+                        if (subnode.InnerText.Trim().ToLower() == "true") item.BooleanValue = true;
+                        else if (subnode.InnerText.Trim().ToLower() == "false") item.BooleanValue = false;
+                        else item.BooleanValue = (Convert.ToInt32(subnode.InnerText) != 0);
+                    }
+                    else if (subnode.LocalName.Trim().ToLower() == "#comment")
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        item.Name = subnode.Attributes["key"].Value;
+                        list.Add(item);
+                    }
+                    catch { }
+                }
+            }
+
+            items = new CpfItem[list.Count];
+            list.CopyTo(items);
         }
 
         public void AddItem(CpfItem item)

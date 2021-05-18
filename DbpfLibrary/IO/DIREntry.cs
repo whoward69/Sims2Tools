@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -16,10 +16,10 @@ namespace Sims2Tools.DBPF.IO
 {
     public class DIREntry
     {
-        public uint TypeID;
-        public uint GroupID;
-        public uint InstanceID;
-        public uint InstanceID2;
+        public TypeTypeID TypeID;
+        public TypeGroupID GroupID;
+        public TypeInstanceID InstanceID;
+        public TypeResourceID ResourceID;
 
         public uint UncompressedFileSize;
 

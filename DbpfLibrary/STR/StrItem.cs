@@ -1,7 +1,7 @@
 /*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -12,7 +12,6 @@
 
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.IO;
-using Sims2Tools.DBPF.Utils;
 using System.Collections;
 
 namespace Sims2Tools.DBPF.STR
@@ -38,7 +37,7 @@ namespace Sims2Tools.DBPF.STR
 
         public override string ToString()
         {
-            return Helper.Hex2PrefixString(lid) + " - " + this.Name;
+            return "{Helper.Hex2PrefixString(lid)} - {this.Name}";
         }
 
         public static implicit operator StrLanguage(byte val)
@@ -136,7 +135,7 @@ namespace Sims2Tools.DBPF.STR
 
         public override string ToString()
         {
-            return Helper.Hex4PrefixString((uint)index) + " - " + this.Title;
+            return "{Helper.Hex4PrefixString((uint)index)} - {this.Title}";
         }
 
     }

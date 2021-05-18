@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -20,7 +20,7 @@ namespace Sims2Tools.DBPF.VERS
     public class Vers : Cpf
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public const uint TYPE = 0xEBFEE342;
+        public static readonly TypeTypeID TYPE = (TypeTypeID)0xEBFEE342;
         public const string NAME = "VERS";
 
         public Vers(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
@@ -35,8 +35,8 @@ namespace Sims2Tools.DBPF.VERS
             {
                 XmlElement ele = CreateTextElement(element, "item", item.StringValue);
                 ele.SetAttribute("name", item.Name);
-                ele.SetAttribute("typeid", Helper.Hex8PrefixString((uint)item.Datatype));
-                ele.SetAttribute("typename", item.Datatype.ToString());
+                ele.SetAttribute("datatypeId", Helper.Hex8PrefixString((uint)item.Datatype));
+                ele.SetAttribute("datatypeName", item.Datatype.ToString());
             }
         }
     }

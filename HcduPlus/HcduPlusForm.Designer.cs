@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -58,11 +58,28 @@ namespace HcduPlus
             this.menuItemSaveAs = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemKnownConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuResources = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemBcon = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemBhav = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCtss = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemGlob = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemObjd = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemObjf = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemStr = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemTprp = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemTrcn = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemTtab = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemTtas = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemVers = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemInternalConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemHomeCrafterConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemKnownConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTipGridByPackage = new System.Windows.Forms.ToolTip(this.components);
             this.hcduWorker = new System.ComponentModel.BackgroundWorker();
             this.lblModsPath = new System.Windows.Forms.Label();
@@ -89,19 +106,8 @@ namespace HcduPlus
             this.btnSelectScanPath = new System.Windows.Forms.Button();
             this.textScanPath = new System.Windows.Forms.TextBox();
             this.lblScanPath = new System.Windows.Forms.Label();
-            this.menuResources = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemBcon = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemBhav = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemCtss = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemGlob = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemObjd = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemObjf = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemStr = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemTprp = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemTrcn = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemTtab = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemTtas = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemVers = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemGuidConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuMain.SuspendLayout();
             this.tabConflicts.SuspendLayout();
             this.tabByPackage.SuspendLayout();
@@ -116,7 +122,8 @@ namespace HcduPlus
             this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
             this.menuHelp,
-            this.menuResources});
+            this.menuResources,
+            this.menuConflicts});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -136,7 +143,6 @@ namespace HcduPlus
             this.menuItemSaveAs,
             this.menuItemSeparator3,
             this.menuItemConfiguration,
-            this.menuItemKnownConflicts,
             this.toolStripSeparator1,
             this.menuItemExit});
             this.menuFile.Name = "menuFile";
@@ -205,14 +211,6 @@ namespace HcduPlus
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigClicked);
             // 
-            // menuItemKnownConflicts
-            // 
-            this.menuItemKnownConflicts.Name = "menuItemKnownConflicts";
-            this.menuItemKnownConflicts.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.K)));
-            this.menuItemKnownConflicts.Size = new System.Drawing.Size(230, 22);
-            this.menuItemKnownConflicts.Text = "&Known Conflicts...";
-            this.menuItemKnownConflicts.Click += new System.EventHandler(this.OnKnownConflictsClicked);
-            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -242,292 +240,6 @@ namespace HcduPlus
             this.menuItemAbout.Size = new System.Drawing.Size(135, 22);
             this.menuItemAbout.Text = "About...";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
-            // 
-            // hcduWorker
-            // 
-            this.hcduWorker.WorkerReportsProgress = true;
-            this.hcduWorker.WorkerSupportsCancellation = true;
-            this.hcduWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.HcduWorker_DoWork);
-            this.hcduWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.HcduWorker_Progress);
-            this.hcduWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.HcduWorker_Completed);
-            // 
-            // lblModsPath
-            // 
-            this.lblModsPath.AutoSize = true;
-            this.lblModsPath.Location = new System.Drawing.Point(10, 41);
-            this.lblModsPath.Name = "lblModsPath";
-            this.lblModsPath.Size = new System.Drawing.Size(110, 15);
-            this.lblModsPath.TabIndex = 1;
-            this.lblModsPath.Text = "Downloads Folder:";
-            // 
-            // textModsPath
-            // 
-            this.textModsPath.Location = new System.Drawing.Point(126, 38);
-            this.textModsPath.Name = "textModsPath";
-            this.textModsPath.Size = new System.Drawing.Size(643, 21);
-            this.textModsPath.TabIndex = 2;
-            this.textModsPath.TabStop = false;
-            this.textModsPath.WordWrap = false;
-            this.textModsPath.TextChanged += new System.EventHandler(this.OnPathsChanged);
-            // 
-            // btnSelectModsPath
-            // 
-            this.btnSelectModsPath.Location = new System.Drawing.Point(775, 33);
-            this.btnSelectModsPath.Name = "btnSelectModsPath";
-            this.btnSelectModsPath.Size = new System.Drawing.Size(143, 30);
-            this.btnSelectModsPath.TabIndex = 3;
-            this.btnSelectModsPath.Text = "&Downloads Folder...";
-            this.btnSelectModsPath.UseVisualStyleBackColor = true;
-            this.btnSelectModsPath.Click += new System.EventHandler(this.OnSelectModsClicked);
-            // 
-            // lblProgress
-            // 
-            this.lblProgress.AutoSize = true;
-            this.lblProgress.Location = new System.Drawing.Point(10, 121);
-            this.lblProgress.Name = "lblProgress";
-            this.lblProgress.Size = new System.Drawing.Size(59, 15);
-            this.lblProgress.TabIndex = 4;
-            this.lblProgress.Text = "Progress:";
-            this.lblProgress.Visible = false;
-            // 
-            // progressBar
-            // 
-            this.progressBar.Location = new System.Drawing.Point(75, 117);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(694, 23);
-            this.progressBar.TabIndex = 5;
-            this.progressBar.Visible = false;
-            // 
-            // btnGO
-            // 
-            this.btnGO.Enabled = false;
-            this.btnGO.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnGO.Location = new System.Drawing.Point(775, 113);
-            this.btnGO.Name = "btnGO";
-            this.btnGO.Size = new System.Drawing.Size(143, 30);
-            this.btnGO.TabIndex = 6;
-            this.btnGO.Text = "S&CAN";
-            this.btnGO.UseVisualStyleBackColor = true;
-            this.btnGO.Click += new System.EventHandler(this.OnGoClicked);
-            // 
-            // tabConflicts
-            // 
-            this.tabConflicts.Alignment = System.Windows.Forms.TabAlignment.Bottom;
-            this.tabConflicts.Controls.Add(this.tabByPackage);
-            this.tabConflicts.Controls.Add(this.tabByResource);
-            this.tabConflicts.Location = new System.Drawing.Point(12, 149);
-            this.tabConflicts.Name = "tabConflicts";
-            this.tabConflicts.SelectedIndex = 0;
-            this.tabConflicts.Size = new System.Drawing.Size(910, 411);
-            this.tabConflicts.TabIndex = 7;
-            // 
-            // tabByPackage
-            // 
-            this.tabByPackage.Controls.Add(this.gridByPackage);
-            this.tabByPackage.Location = new System.Drawing.Point(4, 4);
-            this.tabByPackage.Name = "tabByPackage";
-            this.tabByPackage.Padding = new System.Windows.Forms.Padding(3);
-            this.tabByPackage.Size = new System.Drawing.Size(902, 383);
-            this.tabByPackage.TabIndex = 0;
-            this.tabByPackage.Text = "By Package";
-            this.tabByPackage.UseVisualStyleBackColor = true;
-            // 
-            // gridByPackage
-            // 
-            this.gridByPackage.AllowUserToAddRows = false;
-            this.gridByPackage.AllowUserToDeleteRows = false;
-            this.gridByPackage.AllowUserToResizeRows = false;
-            this.gridByPackage.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByPackage.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.gridByPackage.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridByPackage.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.colHcduPackageA,
-            this.colHcduPackageB});
-            this.gridByPackage.ContextMenuStrip = this.menuContextGrid;
-            this.gridByPackage.Location = new System.Drawing.Point(0, 0);
-            this.gridByPackage.MultiSelect = false;
-            this.gridByPackage.Name = "gridByPackage";
-            this.gridByPackage.ReadOnly = true;
-            this.gridByPackage.RowHeadersVisible = false;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByPackage.RowsDefaultCellStyle = dataGridViewCellStyle2;
-            this.gridByPackage.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridByPackage.ShowCellErrors = false;
-            this.gridByPackage.ShowEditingIcon = false;
-            this.gridByPackage.Size = new System.Drawing.Size(898, 377);
-            this.gridByPackage.TabIndex = 0;
-            this.gridByPackage.TabStop = false;
-            this.gridByPackage.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
-            this.gridByPackage.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
-            // 
-            // colHcduPackageA
-            // 
-            this.colHcduPackageA.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colHcduPackageA.DataPropertyName = "Loads Earlier";
-            this.colHcduPackageA.HeaderText = "Loads Earlier";
-            this.colHcduPackageA.Name = "colHcduPackageA";
-            this.colHcduPackageA.ReadOnly = true;
-            this.colHcduPackageA.Width = 105;
-            // 
-            // colHcduPackageB
-            // 
-            this.colHcduPackageB.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colHcduPackageB.DataPropertyName = "Loads Later";
-            this.colHcduPackageB.HeaderText = "Loads Later";
-            this.colHcduPackageB.Name = "colHcduPackageB";
-            this.colHcduPackageB.ReadOnly = true;
-            // 
-            // menuContextGrid
-            // 
-            this.menuContextGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemAddAsKnownConflict});
-            this.menuContextGrid.Name = "menuContextGrid";
-            this.menuContextGrid.Size = new System.Drawing.Size(198, 26);
-            this.menuContextGrid.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
-            this.menuContextGrid.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
-            // 
-            // menuItemAddAsKnownConflict
-            // 
-            this.menuItemAddAsKnownConflict.Name = "menuItemAddAsKnownConflict";
-            this.menuItemAddAsKnownConflict.Size = new System.Drawing.Size(197, 22);
-            this.menuItemAddAsKnownConflict.Text = "Add As Known Conflict";
-            this.menuItemAddAsKnownConflict.Click += new System.EventHandler(this.OnAddAsKnownConflictClicked);
-            // 
-            // tabByResource
-            // 
-            this.tabByResource.Controls.Add(this.gridByResource);
-            this.tabByResource.Location = new System.Drawing.Point(4, 4);
-            this.tabByResource.Name = "tabByResource";
-            this.tabByResource.Padding = new System.Windows.Forms.Padding(3);
-            this.tabByResource.Size = new System.Drawing.Size(902, 383);
-            this.tabByResource.TabIndex = 1;
-            this.tabByResource.Text = "By Resource";
-            this.tabByResource.UseVisualStyleBackColor = true;
-            // 
-            // gridByResource
-            // 
-            this.gridByResource.AllowUserToAddRows = false;
-            this.gridByResource.AllowUserToDeleteRows = false;
-            this.gridByResource.AllowUserToOrderColumns = true;
-            this.gridByResource.AllowUserToResizeRows = false;
-            this.gridByResource.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByResource.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this.gridByResource.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridByResource.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.colHcduType,
-            this.colHcduGroup,
-            this.colHcduInstance,
-            this.colHcduName,
-            this.colHcduPackages});
-            this.gridByResource.Location = new System.Drawing.Point(0, 0);
-            this.gridByResource.MultiSelect = false;
-            this.gridByResource.Name = "gridByResource";
-            this.gridByResource.ReadOnly = true;
-            this.gridByResource.RowHeadersVisible = false;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByResource.RowsDefaultCellStyle = dataGridViewCellStyle4;
-            this.gridByResource.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridByResource.ShowCellErrors = false;
-            this.gridByResource.ShowEditingIcon = false;
-            this.gridByResource.Size = new System.Drawing.Size(898, 377);
-            this.gridByResource.TabIndex = 0;
-            this.gridByResource.TabStop = false;
-            this.gridByResource.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
-            // 
-            // colHcduType
-            // 
-            this.colHcduType.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colHcduType.DataPropertyName = "Type";
-            this.colHcduType.HeaderText = "Type";
-            this.colHcduType.Name = "colHcduType";
-            this.colHcduType.ReadOnly = true;
-            this.colHcduType.Width = 58;
-            // 
-            // colHcduGroup
-            // 
-            this.colHcduGroup.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colHcduGroup.DataPropertyName = "Group";
-            this.colHcduGroup.HeaderText = "Group";
-            this.colHcduGroup.Name = "colHcduGroup";
-            this.colHcduGroup.ReadOnly = true;
-            this.colHcduGroup.Width = 66;
-            // 
-            // colHcduInstance
-            // 
-            this.colHcduInstance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colHcduInstance.DataPropertyName = "Instance";
-            this.colHcduInstance.HeaderText = "Instance";
-            this.colHcduInstance.Name = "colHcduInstance";
-            this.colHcduInstance.ReadOnly = true;
-            this.colHcduInstance.Width = 78;
-            // 
-            // colHcduName
-            // 
-            this.colHcduName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colHcduName.DataPropertyName = "Name";
-            this.colHcduName.HeaderText = "Name";
-            this.colHcduName.Name = "colHcduName";
-            this.colHcduName.ReadOnly = true;
-            this.colHcduName.Width = 66;
-            // 
-            // colHcduPackages
-            // 
-            this.colHcduPackages.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colHcduPackages.DataPropertyName = "Packages";
-            this.colHcduPackages.HeaderText = "Packages";
-            this.colHcduPackages.Name = "colHcduPackages";
-            this.colHcduPackages.ReadOnly = true;
-            // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.DefaultExt = "txt";
-            this.saveFileDialog.Filter = "Normal text file|*.txt|All files|*.*";
-            this.saveFileDialog.Title = "Save As";
-            // 
-            // btnSelectScanPath
-            // 
-            this.btnSelectScanPath.Location = new System.Drawing.Point(775, 68);
-            this.btnSelectScanPath.Name = "btnSelectScanPath";
-            this.btnSelectScanPath.Size = new System.Drawing.Size(143, 30);
-            this.btnSelectScanPath.TabIndex = 10;
-            this.btnSelectScanPath.Text = "&Scan Folder...";
-            this.btnSelectScanPath.UseVisualStyleBackColor = true;
-            this.btnSelectScanPath.Click += new System.EventHandler(this.OnSelectScanPathClicked);
-            // 
-            // textScanPath
-            // 
-            this.textScanPath.Location = new System.Drawing.Point(126, 73);
-            this.textScanPath.Name = "textScanPath";
-            this.textScanPath.Size = new System.Drawing.Size(643, 21);
-            this.textScanPath.TabIndex = 9;
-            this.textScanPath.TabStop = false;
-            this.textScanPath.WordWrap = false;
-            this.textScanPath.TextChanged += new System.EventHandler(this.OnPathsChanged);
-            // 
-            // lblScanPath
-            // 
-            this.lblScanPath.AutoSize = true;
-            this.lblScanPath.Location = new System.Drawing.Point(10, 76);
-            this.lblScanPath.Name = "lblScanPath";
-            this.lblScanPath.Size = new System.Drawing.Size(76, 15);
-            this.lblScanPath.TabIndex = 8;
-            this.lblScanPath.Text = "Scan Folder:";
             // 
             // menuResources
             // 
@@ -644,6 +356,368 @@ namespace HcduPlus
             this.menuItemVers.Text = "Vers";
             this.menuItemVers.Click += new System.EventHandler(this.OnVersClicked);
             // 
+            // menuConflicts
+            // 
+            this.menuConflicts.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemGuidConflicts,
+            this.toolStripSeparator2,
+            this.menuItemInternalConflicts,
+            this.menuItemHomeCrafterConflicts,
+            this.toolStripSeparator3,
+            this.menuItemKnownConflicts});
+            this.menuConflicts.Name = "menuConflicts";
+            this.menuConflicts.Size = new System.Drawing.Size(66, 20);
+            this.menuConflicts.Text = "&Conflicts";
+            // 
+            // menuItemInternalConflicts
+            // 
+            this.menuItemInternalConflicts.Checked = true;
+            this.menuItemInternalConflicts.CheckOnClick = true;
+            this.menuItemInternalConflicts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.menuItemInternalConflicts.Name = "menuItemInternalConflicts";
+            this.menuItemInternalConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemInternalConflicts.Text = "Ignore Internal Conflicts";
+            // 
+            // menuItemHomeCrafterConflicts
+            // 
+            this.menuItemHomeCrafterConflicts.Checked = true;
+            this.menuItemHomeCrafterConflicts.CheckOnClick = true;
+            this.menuItemHomeCrafterConflicts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.menuItemHomeCrafterConflicts.Name = "menuItemHomeCrafterConflicts";
+            this.menuItemHomeCrafterConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemHomeCrafterConflicts.Text = "Ignore HomeCrafter Conflicts";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(227, 6);
+            // 
+            // menuItemKnownConflicts
+            // 
+            this.menuItemKnownConflicts.Name = "menuItemKnownConflicts";
+            this.menuItemKnownConflicts.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.K)));
+            this.menuItemKnownConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemKnownConflicts.Text = "&Known Conflicts...";
+            this.menuItemKnownConflicts.Click += new System.EventHandler(this.OnKnownConflictsClicked);
+            // 
+            // hcduWorker
+            // 
+            this.hcduWorker.WorkerReportsProgress = true;
+            this.hcduWorker.WorkerSupportsCancellation = true;
+            this.hcduWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.HcduWorker_DoWork);
+            this.hcduWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.HcduWorker_Progress);
+            this.hcduWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.HcduWorker_Completed);
+            // 
+            // lblModsPath
+            // 
+            this.lblModsPath.AutoSize = true;
+            this.lblModsPath.Location = new System.Drawing.Point(10, 41);
+            this.lblModsPath.Name = "lblModsPath";
+            this.lblModsPath.Size = new System.Drawing.Size(110, 15);
+            this.lblModsPath.TabIndex = 1;
+            this.lblModsPath.Text = "Downloads Folder:";
+            // 
+            // textModsPath
+            // 
+            this.textModsPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textModsPath.Location = new System.Drawing.Point(126, 38);
+            this.textModsPath.Name = "textModsPath";
+            this.textModsPath.Size = new System.Drawing.Size(643, 21);
+            this.textModsPath.TabIndex = 2;
+            this.textModsPath.TabStop = false;
+            this.textModsPath.WordWrap = false;
+            this.textModsPath.TextChanged += new System.EventHandler(this.OnPathsChanged);
+            // 
+            // btnSelectModsPath
+            // 
+            this.btnSelectModsPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelectModsPath.Location = new System.Drawing.Point(775, 33);
+            this.btnSelectModsPath.Name = "btnSelectModsPath";
+            this.btnSelectModsPath.Size = new System.Drawing.Size(143, 30);
+            this.btnSelectModsPath.TabIndex = 3;
+            this.btnSelectModsPath.Text = "&Downloads Folder...";
+            this.btnSelectModsPath.UseVisualStyleBackColor = true;
+            this.btnSelectModsPath.Click += new System.EventHandler(this.OnSelectModsClicked);
+            // 
+            // lblProgress
+            // 
+            this.lblProgress.AutoSize = true;
+            this.lblProgress.Location = new System.Drawing.Point(10, 121);
+            this.lblProgress.Name = "lblProgress";
+            this.lblProgress.Size = new System.Drawing.Size(59, 15);
+            this.lblProgress.TabIndex = 4;
+            this.lblProgress.Text = "Progress:";
+            this.lblProgress.Visible = false;
+            // 
+            // progressBar
+            // 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(75, 117);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(694, 23);
+            this.progressBar.TabIndex = 5;
+            this.progressBar.Visible = false;
+            // 
+            // btnGO
+            // 
+            this.btnGO.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnGO.Enabled = false;
+            this.btnGO.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnGO.Location = new System.Drawing.Point(775, 113);
+            this.btnGO.Name = "btnGO";
+            this.btnGO.Size = new System.Drawing.Size(143, 30);
+            this.btnGO.TabIndex = 6;
+            this.btnGO.Text = "S&CAN";
+            this.btnGO.UseVisualStyleBackColor = true;
+            this.btnGO.Click += new System.EventHandler(this.OnGoClicked);
+            // 
+            // tabConflicts
+            // 
+            this.tabConflicts.Alignment = System.Windows.Forms.TabAlignment.Bottom;
+            this.tabConflicts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabConflicts.Controls.Add(this.tabByPackage);
+            this.tabConflicts.Controls.Add(this.tabByResource);
+            this.tabConflicts.Location = new System.Drawing.Point(12, 149);
+            this.tabConflicts.Name = "tabConflicts";
+            this.tabConflicts.SelectedIndex = 0;
+            this.tabConflicts.Size = new System.Drawing.Size(910, 411);
+            this.tabConflicts.TabIndex = 7;
+            // 
+            // tabByPackage
+            // 
+            this.tabByPackage.Controls.Add(this.gridByPackage);
+            this.tabByPackage.Location = new System.Drawing.Point(4, 4);
+            this.tabByPackage.Name = "tabByPackage";
+            this.tabByPackage.Padding = new System.Windows.Forms.Padding(3);
+            this.tabByPackage.Size = new System.Drawing.Size(902, 383);
+            this.tabByPackage.TabIndex = 0;
+            this.tabByPackage.Text = "By Package";
+            this.tabByPackage.UseVisualStyleBackColor = true;
+            // 
+            // gridByPackage
+            // 
+            this.gridByPackage.AllowUserToAddRows = false;
+            this.gridByPackage.AllowUserToDeleteRows = false;
+            this.gridByPackage.AllowUserToResizeRows = false;
+            this.gridByPackage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gridByPackage.BackgroundColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByPackage.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.gridByPackage.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridByPackage.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colHcduPackageA,
+            this.colHcduPackageB});
+            this.gridByPackage.ContextMenuStrip = this.menuContextGrid;
+            this.gridByPackage.Location = new System.Drawing.Point(0, 0);
+            this.gridByPackage.MultiSelect = false;
+            this.gridByPackage.Name = "gridByPackage";
+            this.gridByPackage.ReadOnly = true;
+            this.gridByPackage.RowHeadersVisible = false;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByPackage.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            this.gridByPackage.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.gridByPackage.ShowCellErrors = false;
+            this.gridByPackage.ShowEditingIcon = false;
+            this.gridByPackage.Size = new System.Drawing.Size(898, 377);
+            this.gridByPackage.TabIndex = 0;
+            this.gridByPackage.TabStop = false;
+            this.gridByPackage.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
+            this.gridByPackage.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
+            // 
+            // colHcduPackageA
+            // 
+            this.colHcduPackageA.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colHcduPackageA.DataPropertyName = "Loads Earlier";
+            this.colHcduPackageA.HeaderText = "Loads Earlier";
+            this.colHcduPackageA.Name = "colHcduPackageA";
+            this.colHcduPackageA.ReadOnly = true;
+            this.colHcduPackageA.Width = 105;
+            // 
+            // colHcduPackageB
+            // 
+            this.colHcduPackageB.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colHcduPackageB.DataPropertyName = "Loads Later";
+            this.colHcduPackageB.HeaderText = "Loads Later";
+            this.colHcduPackageB.Name = "colHcduPackageB";
+            this.colHcduPackageB.ReadOnly = true;
+            // 
+            // menuContextGrid
+            // 
+            this.menuContextGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAddAsKnownConflict});
+            this.menuContextGrid.Name = "menuContextGrid";
+            this.menuContextGrid.Size = new System.Drawing.Size(198, 26);
+            this.menuContextGrid.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
+            this.menuContextGrid.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
+            // 
+            // menuItemAddAsKnownConflict
+            // 
+            this.menuItemAddAsKnownConflict.Name = "menuItemAddAsKnownConflict";
+            this.menuItemAddAsKnownConflict.Size = new System.Drawing.Size(197, 22);
+            this.menuItemAddAsKnownConflict.Text = "Add As Known Conflict";
+            this.menuItemAddAsKnownConflict.Click += new System.EventHandler(this.OnAddAsKnownConflictClicked);
+            // 
+            // tabByResource
+            // 
+            this.tabByResource.Controls.Add(this.gridByResource);
+            this.tabByResource.Location = new System.Drawing.Point(4, 4);
+            this.tabByResource.Name = "tabByResource";
+            this.tabByResource.Padding = new System.Windows.Forms.Padding(3);
+            this.tabByResource.Size = new System.Drawing.Size(902, 383);
+            this.tabByResource.TabIndex = 1;
+            this.tabByResource.Text = "By Resource";
+            this.tabByResource.UseVisualStyleBackColor = true;
+            // 
+            // gridByResource
+            // 
+            this.gridByResource.AllowUserToAddRows = false;
+            this.gridByResource.AllowUserToDeleteRows = false;
+            this.gridByResource.AllowUserToOrderColumns = true;
+            this.gridByResource.AllowUserToResizeRows = false;
+            this.gridByResource.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gridByResource.BackgroundColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByResource.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            this.gridByResource.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridByResource.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colHcduType,
+            this.colHcduGroup,
+            this.colHcduInstance,
+            this.colHcduName,
+            this.colHcduPackages});
+            this.gridByResource.Location = new System.Drawing.Point(0, 0);
+            this.gridByResource.MultiSelect = false;
+            this.gridByResource.Name = "gridByResource";
+            this.gridByResource.ReadOnly = true;
+            this.gridByResource.RowHeadersVisible = false;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByResource.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            this.gridByResource.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.gridByResource.ShowCellErrors = false;
+            this.gridByResource.ShowEditingIcon = false;
+            this.gridByResource.Size = new System.Drawing.Size(898, 377);
+            this.gridByResource.TabIndex = 0;
+            this.gridByResource.TabStop = false;
+            this.gridByResource.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
+            // 
+            // colHcduType
+            // 
+            this.colHcduType.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colHcduType.DataPropertyName = "Type";
+            this.colHcduType.HeaderText = "Type";
+            this.colHcduType.Name = "colHcduType";
+            this.colHcduType.ReadOnly = true;
+            this.colHcduType.Width = 58;
+            // 
+            // colHcduGroup
+            // 
+            this.colHcduGroup.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colHcduGroup.DataPropertyName = "Group";
+            this.colHcduGroup.HeaderText = "Group";
+            this.colHcduGroup.Name = "colHcduGroup";
+            this.colHcduGroup.ReadOnly = true;
+            this.colHcduGroup.Width = 66;
+            // 
+            // colHcduInstance
+            // 
+            this.colHcduInstance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colHcduInstance.DataPropertyName = "Instance";
+            this.colHcduInstance.HeaderText = "Instance";
+            this.colHcduInstance.Name = "colHcduInstance";
+            this.colHcduInstance.ReadOnly = true;
+            this.colHcduInstance.Width = 78;
+            // 
+            // colHcduName
+            // 
+            this.colHcduName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colHcduName.DataPropertyName = "Name";
+            this.colHcduName.HeaderText = "Name";
+            this.colHcduName.Name = "colHcduName";
+            this.colHcduName.ReadOnly = true;
+            this.colHcduName.Width = 66;
+            // 
+            // colHcduPackages
+            // 
+            this.colHcduPackages.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colHcduPackages.DataPropertyName = "Packages";
+            this.colHcduPackages.HeaderText = "Packages";
+            this.colHcduPackages.Name = "colHcduPackages";
+            this.colHcduPackages.ReadOnly = true;
+            // 
+            // saveFileDialog
+            // 
+            this.saveFileDialog.DefaultExt = "txt";
+            this.saveFileDialog.Filter = "Normal text file|*.txt|All files|*.*";
+            this.saveFileDialog.Title = "Save As";
+            // 
+            // btnSelectScanPath
+            // 
+            this.btnSelectScanPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelectScanPath.Location = new System.Drawing.Point(775, 68);
+            this.btnSelectScanPath.Name = "btnSelectScanPath";
+            this.btnSelectScanPath.Size = new System.Drawing.Size(143, 30);
+            this.btnSelectScanPath.TabIndex = 10;
+            this.btnSelectScanPath.Text = "&Scan Folder...";
+            this.btnSelectScanPath.UseVisualStyleBackColor = true;
+            this.btnSelectScanPath.Click += new System.EventHandler(this.OnSelectScanPathClicked);
+            // 
+            // textScanPath
+            // 
+            this.textScanPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textScanPath.Location = new System.Drawing.Point(126, 73);
+            this.textScanPath.Name = "textScanPath";
+            this.textScanPath.Size = new System.Drawing.Size(643, 21);
+            this.textScanPath.TabIndex = 9;
+            this.textScanPath.TabStop = false;
+            this.textScanPath.WordWrap = false;
+            this.textScanPath.TextChanged += new System.EventHandler(this.OnPathsChanged);
+            // 
+            // lblScanPath
+            // 
+            this.lblScanPath.AutoSize = true;
+            this.lblScanPath.Location = new System.Drawing.Point(10, 76);
+            this.lblScanPath.Name = "lblScanPath";
+            this.lblScanPath.Size = new System.Drawing.Size(76, 15);
+            this.lblScanPath.TabIndex = 8;
+            this.lblScanPath.Text = "Scan Folder:";
+            // 
+            // menuItemGuidConflicts
+            // 
+            this.menuItemGuidConflicts.Checked = true;
+            this.menuItemGuidConflicts.CheckOnClick = true;
+            this.menuItemGuidConflicts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.menuItemGuidConflicts.Name = "menuItemGuidConflicts";
+            this.menuItemGuidConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemGuidConflicts.Text = "Check For GUID Conflicts";
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(227, 6);
+            // 
             // HcduPlusForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -661,10 +735,10 @@ namespace HcduPlus
             this.Controls.Add(this.lblModsPath);
             this.Controls.Add(this.menuMain);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
             this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(800, 500);
             this.Name = "HcduPlusForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
             this.Load += new System.EventHandler(this.OnLoad);
@@ -709,7 +783,6 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemSaveToClipboard;
         private System.Windows.Forms.ToolStripMenuItem menuItemSaveAs;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator2;
-        private System.Windows.Forms.ToolStripMenuItem menuItemKnownConflicts;
         private System.Windows.Forms.ToolStripMenuItem menuItemConfiguration;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuItemExit;
@@ -739,6 +812,13 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemTtab;
         private System.Windows.Forms.ToolStripMenuItem menuItemTtas;
         private System.Windows.Forms.ToolStripMenuItem menuItemVers;
+        private System.Windows.Forms.ToolStripMenuItem menuConflicts;
+        private System.Windows.Forms.ToolStripMenuItem menuItemInternalConflicts;
+        private System.Windows.Forms.ToolStripMenuItem menuItemKnownConflicts;
+        private System.Windows.Forms.ToolStripMenuItem menuItemHomeCrafterConflicts;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem menuItemGuidConflicts;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
     }
 }
 

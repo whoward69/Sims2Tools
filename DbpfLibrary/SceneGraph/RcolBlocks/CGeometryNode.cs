@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -6,7 +18,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CGeometryNode : AbstractRcolBlock
     {
-        public static uint TYPE = 0x7BA3838C;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0x7BA3838C;
         public static String NAME = "cGeometryNode";
 
         #region Attributes
@@ -61,7 +73,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             this.sgres = new SGResource(null);
 
             version = 0x0c;
-            BlockID = 0x7BA3838C;
+            BlockID = TYPE;
 
             data = new IRcolBlock[0];
         }
@@ -76,13 +88,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             version = reader.ReadUInt32();
 
-            string name = reader.ReadString();
-            uint myid = reader.ReadUInt32();
+            reader.ReadString();
+            TypeBlockID myid = reader.ReadBlockId();
             ogn.Unserialize(reader);
             ogn.BlockID = myid;
 
-            name = reader.ReadString();
-            myid = reader.ReadUInt32();
+            reader.ReadString();
+            myid = reader.ReadBlockId();
             sgres.Unserialize(reader);
             sgres.BlockID = myid;
 
@@ -101,7 +113,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             data = new IRcolBlock[count];
             for (int i = 0; i < count; i++)
             {
-                uint id = reader.ReadUInt32();
+                TypeBlockID id = reader.ReadBlockId();
                 data[i] = Parent.ReadBlock(id, reader);
                 if (data[i] == null) break;
             }

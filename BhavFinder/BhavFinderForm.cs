@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -15,12 +15,15 @@ using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
+using Sims2Tools.Dialogs;
+using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -28,9 +31,12 @@ namespace BhavFinder
 {
     public partial class BhavFinderForm : Form
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly SortedDictionary<String, String> localObjectsByGroupID = new SortedDictionary<string, string>();
 
         private MruList MyMruList;
+        private Updater MyUpdater;
 
         private readonly TextBox[] operands = new TextBox[16];
         private readonly TextBox[] masks = new TextBox[16];
@@ -41,7 +47,7 @@ namespace BhavFinder
         private readonly Regex HexOpCodeRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)");
         private readonly Regex HexInstanceRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)");
 
-        private readonly BhavFinderData bhavData = new BhavFinderData();
+        private readonly BhavFinderData bhavFoundData = new BhavFinderData();
 
         public BhavFinderForm()
         {
@@ -86,18 +92,19 @@ namespace BhavFinder
 
             ResetMasks();
 
-            gridBhavs.DataSource = bhavData;
+            gridFoundBhavs.DataSource = bhavFoundData;
+            this.gridFoundBhavs.Columns["colBhavPackage"].Visible = false;
 
             this.comboBhavInGroup.Items.Add("");
-            this.comboBhavInGroup.Items.Add(Helper.Hex8PrefixString(DBPFData.GROUP_LOCAL) + " " + DBPFData.NAME_LOCAL);
-            this.comboBhavInGroup.Items.Add(Helper.Hex8PrefixString(DBPFData.GROUP_GLOBALS) + " " + DBPFData.NAME_GLOBALS);
-            this.comboBhavInGroup.Items.Add(Helper.Hex8PrefixString(DBPFData.GROUP_BEHAVIOR) + " " + DBPFData.NAME_BEHAVIOR);
+            this.comboBhavInGroup.Items.Add($"{DBPFData.GROUP_LOCAL} {DBPFData.NAME_LOCAL}");
+            this.comboBhavInGroup.Items.Add($"{DBPFData.GROUP_GLOBALS} {DBPFData.NAME_GLOBALS}");
+            this.comboBhavInGroup.Items.Add($"{DBPFData.GROUP_BEHAVIOR} {DBPFData.NAME_BEHAVIOR}");
 
             this.comboOpCodeInGroup.Items.Add("");
 
             foreach (KeyValuePair<String, String> kvp in GameData.semiGlobalsByName)
             {
-                String group = "0x" + kvp.Value.ToUpper() + " " + kvp.Key;
+                String group = $"0x{kvp.Value.ToUpper()} {kvp.Key}";
 
                 this.comboBhavInGroup.Items.Add(group);
                 this.comboOpCodeInGroup.Items.Add(group);
@@ -106,13 +113,13 @@ namespace BhavFinder
             this.comboOpCode.Items.Add("");
             foreach (KeyValuePair<String, String> kvp in GameData.primitivesByOpCode)
             {
-                this.comboOpCode.Items.Add(kvp.Key + " " + kvp.Value);
+                this.comboOpCode.Items.Add($"{kvp.Key} {kvp.Value}");
             }
 
             this.comboUsingSTR.Items.Add("");
             foreach (KeyValuePair<String, String> kvp in GameData.textlistsByInstance)
             {
-                this.comboUsingSTR.Items.Add(kvp.Key + " " + kvp.Value);
+                this.comboUsingSTR.Items.Add($"{kvp.Key} {kvp.Value}");
             }
         }
 
@@ -138,13 +145,48 @@ namespace BhavFinder
 
         private void UpdateForm()
         {
-            btnGO.Enabled = (textFilePath.Text.Length > 0 && comboOpCode.Text.Length > 0);
-            bhavData.Clear();
+            bool opCodeOK = false;
+
+            if (comboOpCode.Text.Length > 0)
+            {
+                if (comboOpCode.Text.IndexOf(":") != -1)
+                {
+                    String opCodeFrom = comboOpCode.Text.Substring(0, comboOpCode.Text.IndexOf(":"));
+                    String opCodeTo = comboOpCode.Text.Substring(comboOpCode.Text.IndexOf(":") + 1);
+
+                    Match mFrom = HexOpCodeRegex.Match(opCodeFrom);
+                    Match mTo = HexOpCodeRegex.Match(opCodeTo);
+
+                    if (mFrom.Success && mTo.Success)
+                    {
+                        uint from = Convert.ToUInt32(mFrom.Groups[2].Value, 16);
+                        uint to = Convert.ToUInt32(mTo.Groups[2].Value, 16);
+
+                        opCodeOK = (to > from);
+                    }
+                }
+                else
+                {
+                    opCodeOK = true;
+                }
+            }
+
+            bool filePathOk = false;
+
+            if (opCodeOK && textFilePath.Text.Length > 0)
+            {
+                filePathOk = (Directory.Exists(textFilePath.Text) || File.Exists(textFilePath.Text));
+            }
+
+            btnGO.Enabled = (filePathOk && opCodeOK);
+            bhavFoundData.Clear();
             lblProgress.Visible = false;
         }
 
         private void OnFilePathChanged(object sender, EventArgs e)
         {
+            this.gridFoundBhavs.Columns["colBhavPackage"].Visible = Directory.Exists(textFilePath.Text);
+
             UpdateForm();
         }
 
@@ -167,7 +209,7 @@ namespace BhavFinder
                 }
                 else
                 {
-                    toolTipOperands.SetToolTip(tb, "Decimal: " + Convert.ToUInt32(tb.Text, 16));
+                    toolTipOperands.SetToolTip(tb, $"Decimal: {Convert.ToUInt32(tb.Text, 16)}");
                 }
             }
             else
@@ -196,9 +238,9 @@ namespace BhavFinder
                 else
                 {
                     String binStr = Convert.ToString(Convert.ToUInt32(tb.Text, 16), 2);
-                    binStr = "0000000" + binStr;
+                    binStr = $"0000000{binStr}";
                     binStr = binStr.Substring(binStr.Length - 8, 8);
-                    toolTipOperands.SetToolTip(tb, "Binary: " + binStr.Substring(0, 4) + " " + binStr.Substring(4, 4));
+                    toolTipOperands.SetToolTip(tb, $"Binary: {binStr.Substring(0, 4)} {binStr.Substring(4, 4)}");
                 }
             }
             else
@@ -219,6 +261,48 @@ namespace BhavFinder
                 e.KeyChar = 'x';
 
                 if (((Control)sender).Text.Equals("0"))
+                {
+                    return;
+                }
+            }
+
+            if (!(
+                    Char.IsControl(e.KeyChar) ||
+                    (e.KeyChar >= '0' && e.KeyChar <= '9') ||
+                    (e.KeyChar >= 'A' && e.KeyChar <= 'F')
+                ))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void OnKeyPress_HexRangeOnly(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar >= 'a' && e.KeyChar <= 'f')
+            {
+                e.KeyChar = (char)(e.KeyChar - 'a' + 'A');
+            }
+
+            if (e.KeyChar == 'X' || e.KeyChar == 'x')
+            {
+                e.KeyChar = 'x';
+
+                String text = ((Control)sender).Text;
+
+                if (text.Equals("0"))
+                {
+                    return;
+                }
+
+                if (text.IndexOf(":") != -1 && text.Substring(text.IndexOf(":") + 1).Equals("0"))
+                {
+                    return;
+                }
+            }
+
+            if (e.KeyChar == ':')
+            {
+                if (((Control)sender).Text.IndexOf(":") == -1)
                 {
                     return;
                 }
@@ -270,16 +354,41 @@ namespace BhavFinder
 
             if (cb.Text.Length > 0)
             {
-                Match m = HexOpCodeRegex.Match(cb.Text);
-                if (m.Success)
+                if (cb.Text.IndexOf(":") != -1)
                 {
-                    lblOpCodeInGroup.Visible = comboOpCodeInGroup.Visible = (Convert.ToUInt32(m.Groups[2].Value, 16) >= 0x2000);
+                    String opCodeFrom = cb.Text.Substring(0, cb.Text.IndexOf(":"));
+                    String opCodeTo = cb.Text.Substring(cb.Text.IndexOf(":") + 1);
+
+                    Match mFrom = HexOpCodeRegex.Match(opCodeFrom);
+                    Match mTo = HexOpCodeRegex.Match(opCodeTo);
+
+                    if (mFrom.Success && (mTo.Success || opCodeTo.Length == 0))
+                    {
+                        uint from = Convert.ToUInt32(mFrom.Groups[2].Value, 16);
+                        uint to = (opCodeTo.Length == 0) ? 0 : Convert.ToUInt32(mTo.Groups[2].Value, 16);
+
+                        lblOpCodeInGroup.Visible = comboOpCodeInGroup.Visible = ((to > from) && (from >= 0x2000));
+                    }
+                    else
+                    {
+                        cb.Text = "";
+
+                        lblOpCodeInGroup.Visible = comboOpCodeInGroup.Visible = false;
+                    }
                 }
                 else
                 {
-                    cb.Text = "";
+                    Match m = HexOpCodeRegex.Match(cb.Text);
+                    if (m.Success)
+                    {
+                        lblOpCodeInGroup.Visible = comboOpCodeInGroup.Visible = (Convert.ToUInt32(m.Groups[2].Value, 16) >= 0x2000);
+                    }
+                    else
+                    {
+                        cb.Text = "";
 
-                    lblOpCodeInGroup.Visible = comboOpCodeInGroup.Visible = false;
+                        lblOpCodeInGroup.Visible = comboOpCodeInGroup.Visible = false;
+                    }
                 }
             }
             else
@@ -352,37 +461,46 @@ namespace BhavFinder
             checkShowNames.Checked = bool.Parse(RegistryTools.GetSetting(BhavFinderApp.RegistryKey, checkShowNames.Name, checkShowNames.Checked.ToString()).ToString());
             OnSwitchGroupChanged(checkShowNames, null);
 
-            MyMruList = new MruList(BhavFinderApp.RegistryKey, menuItemRecentPackages, 8);
+            MyMruList = new MruList(BhavFinderApp.RegistryKey, menuItemRecentPackages, Properties.Settings.Default.MruSize);
             MyMruList.FileSelected += MyMruList_FileSelected;
 
             UpdateForm();
+
+            MyUpdater = new Updater(BhavFinderApp.RegistryKey, menuHelp);
+            MyUpdater.CheckForUpdates();
         }
 
         private void UpdateLocalObjects()
         {
             localObjectsByGroupID.Clear();
 
-            try
+            if (File.Exists(textFilePath.Text))
             {
-                DBPFFile package = new DBPFFile(textFilePath.Text);
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(textFilePath.Text))
+                    {
+                        GameData.BuildObjectsTable(package, localObjectsByGroupID);
 
-                GameData.BuildObjectsTable(package, localObjectsByGroupID);
-            }
+                        package.Close();
+                    }
+                }
 #if DEBUG
-            catch (Exception ex)
+                catch (Exception ex)
 #else
             catch (Exception)
 #endif
-            {
-                MessageBox.Show("Unable to open/read '" + textFilePath.Text + "'", "Error!", MessageBoxButtons.OK);
+                {
+                    MsgBox.Show($"Unable to open/read '{textFilePath.Text}'", "Error!", MessageBoxButtons.OK);
 #if DEBUG
-                Console.WriteLine(ex.Message);
+                    logger.Error(ex.Message);
 #endif
-            }
+                }
 
 #if DEBUG
-            Console.WriteLine("Loaded " + localObjectsByGroupID.Count + " local objects");
+                logger.Info($"Loaded {localObjectsByGroupID.Count} local objects");
 #endif
+            }
         }
 
         private void MyMruList_FileSelected(String package)
@@ -399,8 +517,8 @@ namespace BhavFinder
 
         private void OnSwitchGroupChanged(object sender, EventArgs e)
         {
-            this.gridBhavs.Columns["colBhavGroupInstance"].Visible = !checkShowNames.Checked;
-            this.gridBhavs.Columns["colBhavGroupName"].Visible = checkShowNames.Checked;
+            this.gridFoundBhavs.Columns["colBhavGroupInstance"].Visible = !checkShowNames.Checked;
+            this.gridFoundBhavs.Columns["colBhavGroupName"].Visible = checkShowNames.Checked;
         }
 
         private void OnGoClicked(object sender, EventArgs e)
@@ -415,13 +533,13 @@ namespace BhavFinder
             }
             else
             {
-                Dictionary<int, HashSet<uint>> strLookupByIndexLocal = null;
-                Dictionary<int, HashSet<uint>> strLookupByIndexGlobal = null;
+                Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal = null;
+                Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal = null;
 
                 UpdateLocalObjects();
 
                 // This is the Search action
-                bhavData.Clear();
+                bhavFoundData.Clear();
                 btnGO.Text = "Cancel";
 
                 lblProgress.Text = "Progress:";
@@ -441,7 +559,7 @@ namespace BhavFinder
                         Regex regex = new Regex(textUsingRegex.Text);
                         int operand = Convert.ToInt32(comboUsingOperand.Text, 10);
                         Match m = HexInstanceRegex.Match(comboUsingSTR.Text);
-                        uint instance = Convert.ToUInt32(m.Groups[2].ToString(), 16);
+                        TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(m.Groups[2].ToString(), 16);
 
                         String sims2Path = Sims2ToolsLib.Sims2Path;
                         if (sims2Path.Length > 0)
@@ -449,7 +567,10 @@ namespace BhavFinder
                             strLookupByIndexGlobal = BuildStrLookupTable(sims2Path + GameData.objectsSubPath, instance, regex);
                         }
 
-                        strLookupByIndexLocal = BuildStrLookupTable(textFilePath.Text, instance, regex);
+                        if (File.Exists(textFilePath.Text))
+                        {
+                            strLookupByIndexLocal = BuildStrLookupTable(textFilePath.Text, instance, regex);
+                        }
                     }
 #if DEBUG
                     catch (Exception ex)
@@ -457,9 +578,9 @@ namespace BhavFinder
                     catch (Exception)
 #endif
                     {
-                        MessageBox.Show("Unable to build STR# lookup tables", "Error!", MessageBoxButtons.OK);
+                        MsgBox.Show("Unable to build STR# lookup tables", "Error!", MessageBoxButtons.OK);
 #if DEBUG
-                        Console.WriteLine(ex.Message);
+                        logger.Error(ex.Message);
 #endif
                     }
                 }
@@ -470,52 +591,83 @@ namespace BhavFinder
             }
         }
 
-        private void BhavFinderWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        private void BhavFinderWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
             BhavFilter filter = e.Argument as BhavFilter;
 
-            DBPFFile package = new DBPFFile(textFilePath.Text);
-
-            List<DBPFEntry> bhavs = package.GetEntriesByType(Bhav.TYPE);
-            int done = 0;
             int found = 0;
 
-            foreach (var entry in bhavs)
+            if (Directory.Exists(textFilePath.Text))
             {
-                if (worker.CancellationPending == true)
+                List<String> packageFiles = new List<String>(Directory.GetFiles(textFilePath.Text, "*.package", SearchOption.AllDirectories));
+
+                int done = 0;
+
+                foreach (String packageFile in packageFiles)
                 {
-                    e.Cancel = true;
-                    break;
+                    found = ProcessPackage(worker, e, packageFile, filter, found, false);
+
+                    int percentComplete = (int)((++done / (float)packageFiles.Count) * 100.0);
+                    worker.ReportProgress(percentComplete, null);
                 }
-                else
-                {
-                    Bhav bhav = new Bhav(entry, package.GetIoBuffer(entry));
-
-                    int percentComplete = (int)((++done / (float)bhavs.Count) * 100.0);
-
-                    if (filter.IsWanted(bhav))
-                    {
-                        DataRow row = bhavData.NewRow();
-                        row["Instance"] = Helper.Hex4PrefixString(entry.InstanceID);
-                        row["Name"] = bhav.FileName;
-                        row["GroupInstance"] = Helper.Hex8PrefixString(entry.GroupID);
-                        row["GroupName"] = GameData.GroupName(entry.GroupID, localObjectsByGroupID);
-
-                        worker.ReportProgress(percentComplete, row);
-#if DEBUG
-                        if (bhavs.Count < 30) System.Threading.Thread.Sleep(300);
-#endif
-                        ++found;
-                    }
-                    else
-                    {
-                        worker.ReportProgress(percentComplete, null);
-                    }
-                }
+            }
+            else
+            {
+                found = ProcessPackage(worker, e, textFilePath.Text, filter, found, true);
             }
 
             e.Result = found;
+        }
+
+        private int ProcessPackage(BackgroundWorker worker, DoWorkEventArgs e, String packagePath, BhavFilter filter, int found, bool reportPercent)
+        {
+            FileInfo fi = new FileInfo(packagePath);
+
+            using (DBPFFile package = new DBPFFile(packagePath))
+            {
+                List<DBPFEntry> bhavs = package.GetEntriesByType(Bhav.TYPE);
+                int done = 0;
+
+                foreach (var entry in bhavs)
+                {
+                    if (worker.CancellationPending == true)
+                    {
+                        e.Cancel = true;
+                        break;
+                    }
+                    else
+                    {
+                        Bhav bhav = new Bhav(entry, package.GetIoBuffer(entry));
+
+                        int percentComplete = (int)((++done / (float)bhavs.Count) * 100.0);
+
+                        if (filter.IsWanted(bhav))
+                        {
+                            DataRow row = bhavFoundData.NewRow();
+                            row["Package"] = fi.Name;
+                            row["Instance"] = entry.InstanceID.ToShortString();
+                            row["Name"] = bhav.FileName;
+                            row["GroupInstance"] = entry.GroupID.ToString();
+                            row["GroupName"] = GameData.GroupName(entry.GroupID, localObjectsByGroupID);
+
+                            worker.ReportProgress((reportPercent) ? percentComplete : 0, row);
+#if DEBUG
+                            if (reportPercent && bhavs.Count < 30) System.Threading.Thread.Sleep(300);
+#endif
+                            ++found;
+                        }
+                        else
+                        {
+                            if (reportPercent) worker.ReportProgress(percentComplete, null);
+                        }
+                    }
+                }
+
+                package.Close();
+            }
+
+            return found;
         }
 
         private void BhavFinderWorker_Progress(object sender, System.ComponentModel.ProgressChangedEventArgs e)
@@ -527,7 +679,7 @@ namespace BhavFinder
 
             if (e.UserState != null)
             {
-                bhavData.Append(e.UserState as DataRow);
+                bhavFoundData.Append(e.UserState as DataRow);
             }
         }
 
@@ -541,9 +693,9 @@ namespace BhavFinder
                 MyMruList.RemoveFile(textFilePath.Text);
                 textFilePath.Text = "";
 
-                MessageBox.Show("An error occured while searching", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show("An error occured while searching", "Error!", MessageBoxButtons.OK);
 #if DEBUG
-                Console.WriteLine(e.Error.Message);
+                logger.Error(e.Error.Message);
 #endif
             }
             else
@@ -555,7 +707,7 @@ namespace BhavFinder
                 }
                 else
                 {
-                    lblProgress.Text = "Total: " + Convert.ToInt32(e.Result);
+                    lblProgress.Text = $"Total: {Convert.ToInt32(e.Result)}";
                     lblProgress.Visible = true;
                 }
             }
@@ -563,34 +715,37 @@ namespace BhavFinder
             btnGO.Text = "FIND &BHAVs";
         }
 
-        private Dictionary<int, HashSet<uint>> BuildStrLookupTable(String packagePath, uint instanceID, Regex regex)
+        private Dictionary<int, HashSet<TypeGroupID>> BuildStrLookupTable(String packagePath, TypeInstanceID instanceID, Regex regex)
         {
-            Dictionary<int, HashSet<uint>> lookup = new Dictionary<int, HashSet<uint>>();
+            Dictionary<int, HashSet<TypeGroupID>> lookup = new Dictionary<int, HashSet<TypeGroupID>>();
 
-            DBPFFile package = new DBPFFile(packagePath);
-
-            foreach (var entry in package.GetEntriesByType(Str.TYPE))
+            using (DBPFFile package = new DBPFFile(packagePath))
             {
-                if (entry.InstanceID == instanceID)
+                foreach (var entry in package.GetEntriesByType(Str.TYPE))
                 {
-                    Str str = new Str(entry, package.GetIoBuffer(entry));
-                    StrItemList entries = str.LanguageItems(MetaData.Languages.English);
-
-                    for (int i = 0; i < entries.Length; ++i)
+                    if (entry.InstanceID == instanceID)
                     {
-                        if (regex.IsMatch(entries[i].Title))
+                        Str str = new Str(entry, package.GetIoBuffer(entry));
+                        StrItemList entries = str.LanguageItems(MetaData.Languages.English);
+
+                        for (int i = 0; i < entries.Length; ++i)
                         {
-
-                            if (!lookup.TryGetValue(i, out HashSet<uint> groups))
+                            if (regex.IsMatch(entries[i].Title))
                             {
-                                groups = new HashSet<uint>();
-                                lookup.Add(i, groups);
-                            }
 
-                            groups.Add(entry.GroupID);
+                                if (!lookup.TryGetValue(i, out HashSet<TypeGroupID> groups))
+                                {
+                                    groups = new HashSet<TypeGroupID>();
+                                    lookup.Add(i, groups);
+                                }
+
+                                groups.Add(entry.GroupID);
+                            }
                         }
                     }
                 }
+
+                package.Close();
             }
 
             return lookup;
@@ -633,11 +788,11 @@ namespace BhavFinder
                 {
                     Match m = HexGUIDRegex.Match(Clipboard.GetText(TextDataFormat.Text));
 
-                    UInt32 GUID = Convert.ToUInt32(m.Groups[2].Value, 16);
+                    TypeGUID GUID = (TypeGUID)Convert.ToUInt32(m.Groups[2].Value, 16);
 
                     for (int i = 0; i < 4; ++i)
                     {
-                        operands[index++].Text = Helper.Hex2String((byte)(GUID % 256));
+                        operands[index++].Text = Helper.Hex2String(GUID % 256);
                         GUID /= 256;
                     }
                 }

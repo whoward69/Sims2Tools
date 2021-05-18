@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -90,7 +102,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
 
         /// <summary>
-        /// This Method supports the Internal process of creating a Clone
+        /// This Method supports the protected process of creating a Clone
         /// </summary>
         /// <param name="dest">The object that should receive the copied Data</param>
         protected void Clone(GmdcElementValueBase dest)
@@ -109,17 +121,18 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
-            if (obj is GmdcElementValueBase)
+
+            if (obj is GmdcElementValueBase g)
             {
-                float epsilon = float.Epsilon * 10;
-                GmdcElementValueBase g = (GmdcElementValueBase)obj;
                 if (g.data.Length != data.Length) return false;
+                float epsilon = float.Epsilon * 10;
 
                 for (int i = 0; i < data.Length; i++)
                     if (Math.Abs(g.data[i] - data[i]) > epsilon) return false;
 
                 return true;
             }
+
             return base.Equals(obj);
         }
 

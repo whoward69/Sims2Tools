@@ -1,14 +1,24 @@
-﻿using System;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
 
 namespace Sims2Tools.DBPF.SceneGraph
 {
     public class PackedFileDescriptorSimple : IPackedFileDescriptorSimple
     {
-        public PackedFileDescriptorSimple() : this(0, 0, 0, 0)
+        public PackedFileDescriptorSimple() : this((TypeTypeID)0x00000000, (TypeGroupID)0x00000000, (TypeResourceID)0x00000000, (TypeInstanceID)0x00000000)
         {
         }
 
-        public PackedFileDescriptorSimple(uint type, uint grp, uint ihi, uint ilo)
+        public PackedFileDescriptorSimple(TypeTypeID type, TypeGroupID grp, TypeResourceID ihi, TypeInstanceID ilo)
         {
             this.type = type;
             this.group = grp;
@@ -19,12 +29,12 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// <summary>
         /// Type of the referenced File
         /// </summary>
-        internal UInt32 type;
+        protected TypeTypeID type;
 
         /// <summary>
         /// Returns/Sets the Type of the referenced File
         /// </summary>
-        public UInt32 Type
+        public TypeTypeID Type
         {
             get
             {
@@ -35,7 +45,6 @@ namespace Sims2Tools.DBPF.SceneGraph
                 if (type != value)
                 {
                     type = value;
-                    DescriptionChangedFkt();
                 }
             }
         }
@@ -43,12 +52,12 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// <summary>
         /// Group the referenced file is assigned to
         /// </summary>
-        internal UInt32 group;
+        protected TypeGroupID group;
 
         /// <summary>
         /// Returns/Sets the Group the referenced file is assigned to
         /// </summary>
-        public UInt32 Group
+        public TypeGroupID Group
         {
             get
             {
@@ -59,7 +68,6 @@ namespace Sims2Tools.DBPF.SceneGraph
                 if (group != value)
                 {
                     group = value;
-                    DescriptionChangedFkt();
                 }
             }
         }
@@ -69,12 +77,12 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// <summary>
         /// Instance Data
         /// </summary>
-        internal UInt32 instance;
+        protected TypeInstanceID instance;
 
         /// <summary>
         /// Returns or sets the Instance Data
         /// </summary>
-        public UInt32 Instance
+        public TypeInstanceID Instance
         {
             get
             {
@@ -85,7 +93,6 @@ namespace Sims2Tools.DBPF.SceneGraph
                 if (instance != value)
                 {
                     instance = value;
-                    DescriptionChangedFkt();
                 }
             }
         }
@@ -96,13 +103,13 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// An yet unknown Type
         /// </summary>
         /// <remarks>Only in Version 1.1 of package Files</remarks>
-        internal UInt32 subtype;
+        protected TypeResourceID subtype;
 
         /// <summary>
         /// Returns/Sets an yet unknown Type
         /// </summary>		
         /// <remarks>Only in Version 1.1 of package Files</remarks>
-        public UInt32 SubType
+        public TypeResourceID SubType
         {
             get
             {
@@ -113,7 +120,6 @@ namespace Sims2Tools.DBPF.SceneGraph
                 if (subtype != value)
                 {
                     subtype = value;
-                    DescriptionChangedFkt();
                 }
             }
         }
@@ -134,13 +140,15 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// <returns>The Cloned Object</returns>
         public IPackedFileDescriptor Clone()
         {
-            PackedFileDescriptor pfd = new PackedFileDescriptor();
-            pfd.group = group;
-            pfd.instance = instance;
-            pfd.offset = offset;
-            pfd.size = size;
-            pfd.subtype = subtype;
-            pfd.type = type;
+            PackedFileDescriptor pfd = new PackedFileDescriptor
+            {
+                group = group,
+                instance = instance,
+                offset = offset,
+                size = size,
+                subtype = subtype,
+                type = type
+            };
 
             return pfd;
         }
@@ -150,7 +158,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// </summary>
         public PackedFileDescriptor()
         {
-            subtype = 0;
+            subtype = (TypeResourceID)0x00000000;
             offset = 0;
             size = 0;
         }
@@ -170,7 +178,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// <summary>
         /// Location of the File within the Package
         /// </summary>
-        internal uint offset;
+        protected uint offset;
 
         /// <summary>
         /// Returns the Location of the File within the Package
@@ -189,60 +197,8 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// <summary>
         /// Size of the compressed File
         /// </summary>		
-        internal int size;
+        protected int size;
 
-
-
-
-        /// <summary>
-        /// Returns the Long Instance
-        /// </summary>
-        /// <remarks>Combination of SubType and Instance</remarks>
-        public UInt64 LongInstance
-        {
-            get
-            {
-                ulong ret = instance;
-                ret = (((ulong)subtype << 32) & 0xffffffff00000000) | ret;
-                return ret;
-            }
-
-            set
-            {
-                uint ninstance = (uint)(value & 0xffffffff);
-                uint nsubtype = (uint)((value >> 32) & 0xffffffff);
-                if ((ninstance != instance || nsubtype != subtype))
-                {
-                    instance = ninstance;
-                    subtype = nsubtype;
-                    DescriptionChangedFkt();
-                }
-            }
-        }
-
-        #region Compare Methods
-        /// <summary>
-        /// Same Equals, except this Version is also checking the Offset
-        /// </summary>
-        /// <param name="obj">The Object to compare to</param>
-        /// <returns>true if the TGI Values are the same</returns>
-        public bool SameAs(object obj)
-        {
-            if (obj == null) return false;
-
-            // Check for null values and compare run-time types.
-            if (((typeof(IPackedFileDescriptor) != obj.GetType().GetInterface("IPackedFileDescriptor")) && (GetType() != obj.GetType())))
-                return false;
-
-            IPackedFileDescriptor pfd = (IPackedFileDescriptor)obj;
-            return ((Type == pfd.Type) && (LongInstance == pfd.LongInstance) && (Group == pfd.Group) && (Offset == pfd.Offset));
-        }
-
-        /// <summary>
-        /// Allow compare with IPackedFileWrapper and IPackedFileDescriptor Objects
-        /// </summary>
-        /// <param name="obj">The Object to compare to</param>
-        /// <returns>true if the TGI Values are the same</returns>
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -252,53 +208,12 @@ namespace Sims2Tools.DBPF.SceneGraph
                 return false;
 
             IPackedFileDescriptor pfd = (IPackedFileDescriptor)obj;
-            return ((Type == pfd.Type) && (LongInstance == pfd.LongInstance) && (Group == pfd.Group));
+            return (Type == pfd.Type && Group == pfd.Group && Instance == pfd.Instance && SubType == pfd.SubType);
         }
 
         public override int GetHashCode()
         {
             return base.GetHashCode();
-        }
-
-
-        /*public static bool operator ==(PackedFileDescriptor x, IPackedFileDescriptor y) 
-		{
-			if (x==null) return (y==null);
-			return x.Equals(y);
-		}
-
-		public static bool operator !=(PackedFileDescriptor x, IPackedFileDescriptor y) 
-		{
-			if (x==null) return (y!=null);
-			return !x.Equals(y);
-		}*/
-
-        /*public static bool operator ==(PackedFileDescriptor x, IPackedFileWrapper y) 
-		{
-			return x.Equals(y);
-		}
-
-		public static bool operator !=(PackedFileDescriptor x, IPackedFileWrapper y) 
-		{
-			return !x.Equals(y);
-		}*/
-        #endregion
-
-        object tag;
-        public object Tag
-        {
-            get { return tag; }
-            set { tag = value; }
-        }
-
-        internal void LoadFromStream(IPackageHeader header, System.IO.BinaryReader reader)
-        {
-            this.type = reader.ReadUInt32();
-            this.group = reader.ReadUInt32();
-            this.instance = reader.ReadUInt32();
-            if ((header.IsVersion0101) && (header.Index.ItemSize >= 24)) this.subtype = reader.ReadUInt32();
-            this.offset = reader.ReadUInt32();
-            this.size = reader.ReadInt32();
         }
 
         public void Dispose()

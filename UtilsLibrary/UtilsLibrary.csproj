@@ -37,6 +37,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomMarshalers" />
+    <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.4.0, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft-WindowsAPICodePack-Core.1.1.4\lib\net472\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
@@ -46,7 +49,9 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -61,12 +66,15 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\GameDataCache.cs" />
     <Compile Include="Controls\TextProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\TextProgressBar.Designer.cs">
       <DependentUpon>TextProgressBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\MsgBox.cs" />
+    <Compile Include="SimpeData.cs" />
     <Compile Include="GameData.cs" />
     <Compile Include="Dialogs\Sims2ToolsAboutDialog.cs">
       <SubType>Form</SubType>
@@ -90,6 +98,11 @@
     <Compile Include="Dialogs\Sims2ToolsProgressDialog.Designer.cs">
       <DependentUpon>Sims2ToolsProgressDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Updates\Updater.cs" />
+    <Compile Include="Win32\CBTHook.cs" />
+    <Compile Include="Win32\Win32API.cs" />
+    <Compile Include="Win32\WindowsHook.cs" />
+    <Compile Include="Win32\WndProcRetHook.cs" />
     <EmbeddedResource Include="Dialogs\Sims2ToolsAboutDialog.resx">
       <DependentUpon>Sims2ToolsAboutDialog.cs</DependentUpon>
     </EmbeddedResource>

@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -26,7 +26,7 @@ namespace Sims2Tools.DBPF.TPRP
 
         public TprpItem(IoBuffer reader) => this.Unserialize(reader);
 
-        internal void Unserialize(IoBuffer reader) => this.label = Helper.ToString(reader.ReadBytes(reader.ReadByte()));
+        protected void Unserialize(IoBuffer reader) => this.label = Helper.ToString(reader.ReadBytes(reader.ReadByte()));
 
         public override string ToString() => this.label;
 

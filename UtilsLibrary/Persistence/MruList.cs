@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from http://csharphelper.com/blog/2018/06/build-an-mru-list-in-c/
  *
@@ -53,7 +53,7 @@ namespace Sims2Tools.Utils.Persistence
         {
             for (int i = 0; i < NumFiles; i++)
             {
-                string file_name = (string)RegistryTools.GetSetting(AppRegKey, "FilePath" + i.ToString(), "");
+                string file_name = (string)RegistryTools.GetSetting(AppRegKey, $"FilePath{i}", "");
                 if (file_name != "")
                 {
                     FileInfos.Add(new FileInfo(file_name));
@@ -85,13 +85,13 @@ namespace Sims2Tools.Utils.Persistence
         {
             for (int i = 0; i < NumFiles; i++)
             {
-                RegistryTools.DeleteSetting(AppRegKey, "FilePath" + i.ToString());
+                RegistryTools.DeleteSetting(AppRegKey, $"FilePath{i}");
             }
 
             int index = 0;
             foreach (FileInfo file_info in FileInfos)
             {
-                RegistryTools.SaveSetting(AppRegKey, "FilePath" + index.ToString(), file_info.FullName);
+                RegistryTools.SaveSetting(AppRegKey, $"FilePath{index}", file_info.FullName);
                 index++;
             }
         }

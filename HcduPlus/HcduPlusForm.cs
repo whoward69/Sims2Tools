@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -25,6 +25,8 @@ using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.VERS;
+using Sims2Tools.Dialogs;
+using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
@@ -38,15 +40,18 @@ namespace HcduPlus
 {
     public partial class HcduPlusForm : Form
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly HcduPlusDataByPackage dataByPackage = new HcduPlusDataByPackage();
         private readonly HcduPlusDataByResource dataByResource = new HcduPlusDataByResource();
 
         private MruList MyMruList;
+        private Updater MyUpdater;
 
         private readonly SortedSet<ConflictPair> allCurrentConflicts = new SortedSet<ConflictPair>();
         private readonly KnownConflicts knownConflicts = new KnownConflicts();
 
-        private readonly HashSet<uint> enabledResources = new HashSet<uint>();
+        private readonly HashSet<TypeTypeID> enabledResources = new HashSet<TypeTypeID>();
 
         public HcduPlusForm()
         {
@@ -68,10 +73,12 @@ namespace HcduPlus
             allCurrentConflicts.Clear();
 
             Dictionary<int, String> modsNamesByTGI = new Dictionary<int, String>();
-            Dictionary<uint, Dictionary<uint, Dictionary<uint, List<String>>>> modsSeenResources = new Dictionary<uint, Dictionary<uint, Dictionary<uint, List<String>>>>();
+            Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>> modsSeenResources = new Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>>();
+            Dictionary<TypeGUID, List<String>> modsSeenGuids = new Dictionary<TypeGUID, List<String>>();
 
             Dictionary<int, String> scanNamesByTGI = new Dictionary<int, String>();
-            Dictionary<uint, Dictionary<uint, Dictionary<uint, List<String>>>> scanSeenResources = new Dictionary<uint, Dictionary<uint, Dictionary<uint, List<String>>>>();
+            Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>> scanSeenResources = new Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>>();
+            Dictionary<TypeGUID, List<String>> scanSeenGuids = new Dictionary<TypeGUID, List<String>>();
 
             String modsFolder = textModsPath.Text;
             String scanFolder = textScanPath.Text;
@@ -85,13 +92,25 @@ namespace HcduPlus
             List<String> modsFiles = new List<String>();
             List<String> scanFiles = new List<String>();
 
-            if (modsFolder.Length > 0 && (new DirectoryInfo(modsFolder)).Exists) {
-                modsFiles = new List<String>(Directory.GetFiles(modsFolder, "*.package", SearchOption.AllDirectories));
+            if (modsFolder.Length > 0)
+            {
+                if (Directory.Exists(modsFolder))
+                {
+                    modsFiles = new List<String>(Directory.GetFiles(modsFolder, "*.package", SearchOption.AllDirectories));
+                }
+                else
+                {
+                    MsgBox.Show("The selected Downloads directory does not exist!", "Invalid Directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
 
-            if ((new DirectoryInfo(scanFolder)).Exists)
+            if (Directory.Exists(scanFolder))
             {
                 scanFiles = new List<String>(Directory.GetFiles(scanFolder, "*.package", SearchOption.AllDirectories));
+            }
+            else
+            {
+                MsgBox.Show("The selected Scan directory does not exist!", "Invalid Directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             foreach (String file in scanFiles)
@@ -104,29 +123,29 @@ namespace HcduPlus
 
             if (scanFiles.Count > 0)
             {
-                if (modsFiles.Count > 0) done = ProcessFolder(worker, e, modsFolder, modsFiles, @"~\", total, done, modsSeenResources, modsNamesByTGI);
-                done = ProcessFolder(worker, e, scanFolder, scanFiles, "", total, done, scanSeenResources, scanNamesByTGI);
+                if (modsFiles.Count > 0) done = ProcessFolder(worker, e, modsFolder, modsFiles, @"~\", total, done, modsSeenResources, modsNamesByTGI, modsSeenGuids);
+                done = ProcessFolder(worker, e, scanFolder, scanFiles, "", total, done, scanSeenResources, scanNamesByTGI, scanSeenGuids);
             }
 
 #if DEBUG
-            Console.WriteLine("Processed " + done + " mods");
+            logger.Debug($"Processed {done} mods");
 #endif
 
-            foreach (uint type in scanSeenResources.Keys)
+            foreach (TypeTypeID type in scanSeenResources.Keys)
             {
-                if (scanSeenResources.TryGetValue(type, out Dictionary<uint, Dictionary<uint, List<string>>> scanGroupResources))
+                if (scanSeenResources.TryGetValue(type, out Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<string>>> scanGroupResources))
                 {
-                    modsSeenResources.TryGetValue(type, out Dictionary<uint, Dictionary<uint, List<string>>> modsGroupResources);
-                    if (modsGroupResources == null) modsGroupResources = new Dictionary<uint, Dictionary<uint, List<string>>>();
+                    modsSeenResources.TryGetValue(type, out Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<string>>> modsGroupResources);
+                    if (modsGroupResources == null) modsGroupResources = new Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<string>>>();
 
-                    foreach (uint group in scanGroupResources.Keys)
+                    foreach (TypeGroupID group in scanGroupResources.Keys)
                     {
-                        if (scanGroupResources.TryGetValue(group, out Dictionary<uint, List<string>> scanInstanceResources))
+                        if (scanGroupResources.TryGetValue(group, out Dictionary<TypeInstanceID, List<string>> scanInstanceResources))
                         {
-                            modsGroupResources.TryGetValue(group, out Dictionary<uint, List<string>> modsInstanceResources);
-                            if (modsInstanceResources == null) modsInstanceResources = new Dictionary<uint, List<string>>();
+                            modsGroupResources.TryGetValue(group, out Dictionary<TypeInstanceID, List<string>> modsInstanceResources);
+                            if (modsInstanceResources == null) modsInstanceResources = new Dictionary<TypeInstanceID, List<string>>();
 
-                            foreach (uint instance in scanInstanceResources.Keys)
+                            foreach (TypeInstanceID instance in scanInstanceResources.Keys)
                             {
                                 if (scanInstanceResources.TryGetValue(instance, out List<string> scanPackages))
                                 {
@@ -140,22 +159,80 @@ namespace HcduPlus
                                     {
                                         for (int i = 0; i < scanPackages.Count - 1; ++i)
                                         {
-                                            ConflictPair cpNew = new ConflictPair(scanPackages[i], scanPackages[i + 1]);
-
-                                            if (!knownConflicts.IsKnown(cpNew))
+                                            // A conflict of "STR: 0x007B" can be ignored, as this is HomeCrafter details
+                                            if (!(type == Str.TYPE && instance == (TypeInstanceID) 0x007B && menuItemHomeCrafterConflicts.Checked))
                                             {
-                                                if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
+                                                // Ignore internal conflicts?
+                                                if (!(scanPackages[i].Equals(scanPackages[i + 1]) && menuItemInternalConflicts.Checked))
                                                 {
-                                                    allCurrentConflicts.Add(cpNew);
-                                                    cpData = cpNew;
+                                                    ConflictPair cpNew = new ConflictPair(scanPackages[i], scanPackages[i + 1]);
 
-                                                    worker.ReportProgress((int)((done / total) * 100.0), cpNew);
+                                                    // Ignore known conflicts
+                                                    if (!knownConflicts.IsKnown(cpNew))
+                                                    {
+                                                        if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
+                                                        {
+                                                            allCurrentConflicts.Add(cpNew);
+                                                            cpData = cpNew;
+
+                                                            worker.ReportProgress((int)((done / total) * 100.0), cpNew);
+                                                        }
+
+                                                        scanNamesByTGI.TryGetValue(Hash.TGIHash(instance, type, group), out string name);
+                                                        cpData.AddTGI(type, group, instance, name);
+                                                    }
                                                 }
-
-                                                scanNamesByTGI.TryGetValue(Hash.TGIHash(instance, type, group), out string name);
-                                                cpData.AddTGI(type, group, instance, name);
                                             }
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (menuItemGuidConflicts.Checked)
+            {
+                foreach (TypeGUID guid in scanSeenGuids.Keys)
+                {
+                    if (scanSeenGuids.TryGetValue(guid, out List<string> scanPackages))
+                    {
+                        modsSeenGuids.TryGetValue(guid, out List<string> modsPackages);
+                        if (modsPackages != null)
+                        {
+                            scanPackages.Insert(0, modsPackages[modsPackages.Count - 1]);
+                        }
+
+                        if (scanPackages.Count > 1)
+                        {
+                            for (int i = 0; i < scanPackages.Count - 1; ++i)
+                            {
+                                // These have a prefix of "##0xGGGGGGGG-0xIIIIIIII!"
+                                String thisScanPackage = scanPackages[i].Substring(24);
+                                String nextScanPackage = scanPackages[i + 1].Substring(24);
+
+                                // Ignore internal conflicts?
+                                if (!(thisScanPackage.Equals(nextScanPackage) && menuItemInternalConflicts.Checked))
+                                {
+                                    ConflictPair cpNew = new ConflictPair(thisScanPackage, nextScanPackage);
+
+                                    // Ignore known conflicts
+                                    if (!knownConflicts.IsKnown(cpNew))
+                                    {
+                                        if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
+                                        {
+                                            allCurrentConflicts.Add(cpNew);
+                                            cpData = cpNew;
+
+                                            worker.ReportProgress((int)((done / total) * 100.0), cpNew);
+                                        }
+
+                                        TypeGroupID group = (TypeGroupID)Convert.ToUInt32(scanPackages[i].Substring(4, 8), 16);
+                                        TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(scanPackages[i].Substring(15, 8), 16);
+
+                                        scanNamesByTGI.TryGetValue(Hash.TGIHash(instance, Objd.TYPE, group), out string name);
+                                        cpData.AddTGI(Objd.TYPE, group, instance, name);
                                     }
                                 }
                             }
@@ -167,61 +244,126 @@ namespace HcduPlus
             e.Result = allCurrentConflicts.Count;
         }
 
-        private int ProcessFolder(BackgroundWorker worker, System.ComponentModel.DoWorkEventArgs e, 
-            String folder, List<String> files, String prefix, float total, int done, 
-            Dictionary<uint, Dictionary<uint, Dictionary<uint, List<String>>>> seenResources, Dictionary<int, String> namesByTGI)
+        private int ProcessFolder(BackgroundWorker worker, System.ComponentModel.DoWorkEventArgs args,
+            String folder, List<String> files, String prefix, float total, int done,
+            Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>> seenResources, 
+            Dictionary<int, String> namesByTGI,
+            Dictionary<TypeGUID, List<String>> seenGuids)
         {
             foreach (String file in files)
             {
                 if (worker.CancellationPending == true)
                 {
-                    e.Cancel = true;
+                    args.Cancel = true;
                     break;
                 }
                 else
                 {
-                    DBPFFile package = new DBPFFile(file);
-
-                    foreach (uint type in DBPFData.ModTypes)
+                    try
                     {
-                        if (enabledResources.Contains(type))
+                        using (DBPFFile package = new DBPFFile(file))
                         {
-                            if (!seenResources.TryGetValue(type, out Dictionary<uint, Dictionary<uint, List<string>>> groupResources))
+                            foreach (TypeTypeID type in DBPFData.ModTypes)
                             {
-                                groupResources = new Dictionary<uint, Dictionary<uint, List<String>>>();
-                                seenResources.Add(type, groupResources);
-                            }
-
-                            foreach (DBPFEntry entry in package.GetEntriesByType(type))
-                            {
-                                if (entry.GroupID != DBPFData.GROUP_LOCAL)
+                                if (enabledResources.Contains(type))
                                 {
-                                    if (!groupResources.TryGetValue(entry.GroupID, out Dictionary<uint, List<string>> instanceResources))
+                                    if (!seenResources.TryGetValue(type, out Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<string>>> groupResources))
                                     {
-                                        instanceResources = new Dictionary<uint, List<String>>();
-                                        groupResources.Add(entry.GroupID, instanceResources);
+                                        groupResources = new Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>();
+                                        seenResources.Add(type, groupResources);
                                     }
 
-                                    if (!instanceResources.TryGetValue(entry.InstanceID, out List<string> packages))
+                                    foreach (DBPFEntry entry in package.GetEntriesByType(type))
                                     {
-                                        packages = new List<String>();
-                                        instanceResources.Add(entry.InstanceID, packages);
-                                    }
+                                        if (type == Objd.TYPE && menuItemGuidConflicts.Checked)
+                                        {
+                                            Objd objd = (Objd)package.GetResourceByEntry(entry);
 
-                                    String p = prefix + file.Substring(folder.Length + 1);
-                                    packages.Add(p);
+                                            if (!seenGuids.TryGetValue(objd.Guid, out List<string> packages))
+                                            {
+                                                packages = new List<String>();
+                                                seenGuids.Add(objd.Guid, packages);
+                                            }
 
-                                    int tgi = Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID);
-                                    if (!namesByTGI.ContainsKey(tgi))
-                                    {
-                                        namesByTGI.Add(tgi, package.GetFilenameByEntry(entry));
+                                            String p = $"##{entry.GroupID}-{entry.InstanceID}!{prefix}{file.Substring(folder.Length + 1)}";
+                                            packages.Add(p);
+
+                                            int tgi = Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID);
+                                            if (!namesByTGI.ContainsKey(tgi))
+                                            {
+                                                namesByTGI.Add(tgi, package.GetFilenameByEntry(entry));
+                                            }
+                                            else
+                                            {
+                                                if (namesByTGI.TryGetValue(tgi, out string name))
+                                                {
+                                                    if (!name.Equals(package.GetFilenameByEntry(entry)))
+                                                    {
+                                                        namesByTGI.Remove(tgi);
+                                                        namesByTGI.Add(tgi, "{multiple}");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    namesByTGI.Remove(tgi);
+                                                    namesByTGI.Add(tgi, "{unknown}");
+                                                }
+                                            }
+                                        }
+
+                                        if (entry.GroupID != DBPFData.GROUP_LOCAL)
+                                        {
+                                            if (!groupResources.TryGetValue(entry.GroupID, out Dictionary<TypeInstanceID, List<string>> instanceResources))
+                                            {
+                                                instanceResources = new Dictionary<TypeInstanceID, List<String>>();
+                                                groupResources.Add(entry.GroupID, instanceResources);
+                                            }
+
+                                            if (!instanceResources.TryGetValue(entry.InstanceID, out List<string> packages))
+                                            {
+                                                packages = new List<String>();
+                                                instanceResources.Add(entry.InstanceID, packages);
+                                            }
+
+                                            String p = prefix + file.Substring(folder.Length + 1);
+                                            packages.Add(p);
+
+                                            int tgi = Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID);
+                                            if (!namesByTGI.ContainsKey(tgi))
+                                            {
+                                                namesByTGI.Add(tgi, package.GetFilenameByEntry(entry));
+                                            }
+                                        }
                                     }
                                 }
                             }
+
+                            package.Close();
                         }
                     }
+                    catch (Exception e)
+                    {
+						logger.Error(e.Message);
+						
+                        String partialPath = file.Substring(folder.Length + 1);
+                        int pos = partialPath.LastIndexOf(@"\");
 
-                    package.Close();
+                        String fileDetails;
+
+                        if (pos == -1)
+                        {
+                            fileDetails = $"{partialPath}";
+                        }
+                        else
+                        {
+                            fileDetails = $"{partialPath.Substring(pos + 1)}\nin folder\n{partialPath.Substring(0, pos)}";
+                        }
+
+                        if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {e.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error,  MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
+                        {
+                            throw e;
+                        }
+                    }
 
                     worker.ReportProgress((int)((++done / total) * 100.0), null);
                 }
@@ -253,9 +395,9 @@ namespace HcduPlus
                 MyMruList.RemoveFile(textScanPath.Text);
                 textScanPath.Text = "";
 
-                MessageBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
 #if DEBUG
-                Console.WriteLine(e.Error.Message);
+                logger.Error(e.Error.Message);
 #endif
             }
             else
@@ -269,7 +411,7 @@ namespace HcduPlus
                 }
                 else
                 {
-                    lblProgress.Text = "Total: " + Convert.ToInt32(e.Result);
+                    lblProgress.Text = $"Total: {Convert.ToInt32(e.Result)}";
                     lblProgress.Visible = true;
 
                     foreach (ConflictPair cp in allCurrentConflicts)
@@ -324,7 +466,7 @@ namespace HcduPlus
 
             knownConflicts.LoadRegexs();
 
-            MyMruList = new MruList(HcduPlusApp.RegistryKey, menuItemRecentFolders, 4);
+            MyMruList = new MruList(HcduPlusApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize);
             MyMruList.FileSelected += MyMruList_FileSelected;
 
             menuItemBcon.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Bcon.NAME, 1) != 0); OnBconClicked(menuItemBcon, null);
@@ -339,6 +481,13 @@ namespace HcduPlus
             menuItemTtab.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttab.NAME, 1) != 0); OnTtabClicked(menuItemTtab, null);
             menuItemTtas.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttas.NAME, 1) != 0); OnTtasClicked(menuItemTtas, null);
             menuItemVers.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Vers.NAME, 0) != 0); OnVersClicked(menuItemVers, null);
+
+            menuItemGuidConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, 1) != 0);
+            menuItemInternalConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, 1) != 0);
+            menuItemHomeCrafterConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, 1) != 0);
+
+            MyUpdater = new Updater(HcduPlusApp.RegistryKey, menuHelp);
+            MyUpdater.CheckForUpdates();
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -354,6 +503,9 @@ namespace HcduPlus
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey, textScanPath.Name, textScanPath.Text);
 
             knownConflicts.SaveRegexs();
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, menuItemGuidConflicts.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, menuItemInternalConflicts.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, menuItemHomeCrafterConflicts.Checked ? 1 : 0);
         }
 
         private void OnSelectModsClicked(object sender, EventArgs e)
@@ -486,14 +638,14 @@ namespace HcduPlus
         {
             String text = "";
 
-            text += "Mods conflict report for '" + textModsPath.Text + "'";
+            text += $"Mods conflict report for '{textModsPath.Text}'";
 
             DateTime now = DateTime.Now;
-            text += " at " + now.ToShortDateString() + " " + now.ToShortTimeString();
+            text += $" at {now.ToShortDateString()} {now.ToShortTimeString()}";
 
             foreach (ConflictPair cp in allCurrentConflicts)
             {
-                text += "\n\n" + cp.ToString();
+                text += $"\n\n{cp}";
             }
 
             Clipboard.SetText(text);
@@ -507,10 +659,10 @@ namespace HcduPlus
             {
                 StreamWriter writer = new StreamWriter(saveFileDialog.OpenFile());
 
-                writer.Write("Mods conflict report for '" + textModsPath.Text + "'");
+                writer.Write($"Mods conflict report for '{textModsPath.Text}'");
 
                 DateTime now = DateTime.Now;
-                writer.WriteLine(" at " + now.ToShortDateString() + " " + now.ToShortTimeString());
+                writer.WriteLine($" at {now.ToShortDateString()} {now.ToShortTimeString()}");
 
                 foreach (ConflictPair cp in allCurrentConflicts)
                 {

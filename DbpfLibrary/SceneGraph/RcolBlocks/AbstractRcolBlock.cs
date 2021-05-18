@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -27,7 +39,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         public AbstractRcolBlock()
         {
             sgres = null;
-            blockid = 0;
+            blockid = TypeBlockID.NULL;
             version = 0;
         }
 
@@ -35,7 +47,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         {
             this.parent = parent;
             sgres = null;
-            blockid = 0;
+            blockid = TypeBlockID.NULL;
             version = 0;
         }
 
@@ -54,21 +66,21 @@ namespace Sims2Tools.DBPF.SceneGraph
             return irb;
         }
 
-        public static IRcolBlock Create(Type type, Rcol parent, uint id)
+        public static IRcolBlock Create(Type type, Rcol parent, TypeBlockID id)
         {
             IRcolBlock irb = Create(type, parent);
             irb.BlockID = id;
             return irb;
         }
 
-        public IRcolBlock Create(uint id)
+        public IRcolBlock Create(TypeBlockID id)
         {
             return Create(this.GetType(), this.parent, id);
         }
 
-        uint blockid;
+        TypeBlockID blockid;
 
-        public uint BlockID
+        public TypeBlockID BlockID
         {
             get { return blockid; }
             set { blockid = value; }
@@ -99,64 +111,6 @@ namespace Sims2Tools.DBPF.SceneGraph
                 return sgres.FileName + " (" + this.BlockName + ")";
             }
         }
-
-        /* TODO - get working
-		public Rcol FindReferencingParent(uint type)
-		{
-			SimPe.Interfaces.Scenegraph.IScenegraphFileIndex nfi = FileTable.FileIndex.AddNewChild();
-			nfi.AddIndexFromPackage(this.Parent.Package);
-			Rcol rcol = FindReferencingParent_NoLoad(type);
-			FileTable.FileIndex.RemoveChild(nfi);
-			nfi.Clear();
-
-			if (rcol == null && !FileTable.FileIndex.Loaded)
-			{
-				FileTable.FileIndex.Load();
-				rcol = FindReferencingParent_NoLoad(type);
-			}
-
-			return rcol;
-		}
-		*/
-
-        /* TODO - get working
-		public Rcol FindReferencingParent_NoLoad(uint type)
-		{
-			Interfaces.Scenegraph.IScenegraphFileIndexItem[] items = FileTable.FileIndex.FindFile(type, true);
-			try
-			{
-				foreach (Interfaces.Scenegraph.IScenegraphFileIndexItem item in items)
-				{
-					Rcol r = new GenericRcol(null, false);
-
-					//try to open the File in the same package, not in the FileTable Package!
-					if (item.Package.SaveFileName.Trim().ToLower() == parent.Package.SaveFileName.Trim().ToLower())
-						r.ProcessData(parent.Package.FindFile(item.FileDescriptor), parent.Package);
-					else
-						r.ProcessData(item);
-
-					foreach (Interfaces.Files.IPackedFileDescriptor pfd in r.ReferencedFiles)
-					{
-						if (
-							pfd.Type == this.Parent.FileDescriptor.Type &&
-							(pfd.Group == this.Parent.FileDescriptor.Group || (pfd.Group == Data.MetaData.GLOBAL_GROUP && Parent.FileDescriptor.Group == Data.MetaData.LOCAL_GROUP)) &&
-							pfd.SubType == this.Parent.FileDescriptor.SubType &&
-							pfd.Instance == this.Parent.FileDescriptor.Instance
-							)
-						{
-							return r;
-						}
-					}
-				}
-			}
-			catch (Exception)
-            {
-
-            }
-
-			return null;
-		}
-		*/
 
         public abstract void Dispose();
     }

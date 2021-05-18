@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System;
@@ -8,7 +20,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     public class CDirectionalLight : AbstractRcolBlock
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public const uint TYPE = 0xC9C81BA3;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0xC9C81BA3;
         public const String NAME = "cDirectionalLight";
 
         #region Attributes
@@ -94,7 +106,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public CDirectionalLight(Rcol parent) : base(parent)
         {
             version = 1;
-            BlockID = 0xC9C81BA3;
+            BlockID = TYPE;
 
             slb = new StandardLightBase(null);
             sgres = new SGResource(null);
@@ -116,23 +128,23 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             version = reader.ReadUInt32();
 
             slb.BlockName = reader.ReadString();
-            slb.BlockID = reader.ReadUInt32();
+            slb.BlockID = reader.ReadBlockId();
             slb.Unserialize(reader);
 
             sgres.BlockName = reader.ReadString();
-            sgres.BlockID = reader.ReadUInt32();
+            sgres.BlockID = reader.ReadBlockId();
             sgres.Unserialize(reader);
 
             lt.BlockName = reader.ReadString();
-            lt.BlockID = reader.ReadUInt32();
+            lt.BlockID = reader.ReadBlockId();
             lt.Unserialize(reader);
 
             rn.BlockName = reader.ReadString();
-            rn.BlockID = reader.ReadUInt32();
+            rn.BlockID = reader.ReadBlockId();
             rn.Unserialize(reader);
 
             ogn.BlockName = reader.ReadString();
-            ogn.BlockID = reader.ReadUInt32();
+            ogn.BlockID = reader.ReadBlockId();
             ogn.Unserialize(reader);
 
             unknown2 = reader.ReadString();

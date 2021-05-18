@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.Geometry;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.Utils;
@@ -56,7 +68,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override string ToString()
         {
-            return "0x" + Helper.Hex4String(unknown1) + " 0x" + Helper.Hex4String((uint)unknown2);
+            return Helper.Hex4PrefixString(unknown1) + Helper.Hex4PrefixString((uint)unknown2);
         }
     }
 
@@ -65,7 +77,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     /// </summary>
     public class CTransformNode : AbstractCresChildren
     {
-        public static uint TYPE = 0x65246462;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0x65246462;
         public static String NAME = "cTransformNode";
 
         /// <summary>
@@ -172,7 +184,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             trans = new VectorTransformation(VectorTransformation.TransformOrder.TranslateRotate);
 
             version = 0x07;
-            BlockID = 0x65246462;
+            BlockID = TYPE;
 
             unknown = NO_JOINT;
         }
@@ -211,12 +223,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             version = reader.ReadUInt32();
 
             string name = reader.ReadString();
-            uint myid = reader.ReadUInt32();
+            TypeBlockID myid = reader.ReadBlockId();
             ctn.Unserialize(reader);
             ctn.BlockID = myid;
 
             name = reader.ReadString();
-            myid = reader.ReadUInt32();
+            myid = reader.ReadBlockId();
             ogn.Unserialize(reader);
             ogn.BlockID = myid;
 
@@ -270,8 +282,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 }
             }
 
-            TransformNodeItem tni = new TransformNodeItem();
-            tni.ChildNode = index;
+            TransformNodeItem tni = new TransformNodeItem
+            {
+                ChildNode = index
+            };
             items.Add(tni);
             return false;
         }

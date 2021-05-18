@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.Geometry;
 using System;
 using System.Collections;
@@ -8,6 +20,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class GmdcJoint : GmdcLinkBlock
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Attributes	
         /// <summary>
         /// Number of Vertices stored in this SubSet
@@ -73,7 +87,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    logger.Error(ex.Message);
                 }
             }
         }
@@ -115,8 +129,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             //TransformNode tn = AssignedTransformNode(index);
 
             //Get the Transformation Hirarchy
-            VectorTransformations t = new VectorTransformations();
-            t.Add(parent.Model.Transformations[index]);
+            VectorTransformations t = new VectorTransformations
+            {
+                parent.Model.Transformations[index]
+            };
             /*
 			while (index>=0) 
 			{
@@ -190,7 +206,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                                 for (int k = 0; k < 3; k++)
                                 {
                                     int nr = l.GetRealIndex(vindex, g.Faces[f + k]);
-                                    int face_index = -1;
+                                    int face_index;
 
                                     //this Vertex was empty and is now needed, 
                                     //so add it to the available List

@@ -1,12 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <conflicts>
-  <!-- Ignore InTeen flavor paks overriding the base behaviour -->-->
+  <!-- Ignore Store packages -->
+  <conflict>
+    <earlier>-[Ss][Tt][Oo][Rr][Ee]\.package</earlier>
+    <later>-[Ss][Tt][Oo][Rr][Ee]\.package</later>
+  </conflict>
+
+  <!-- Ignore InTeen flavor paks overriding the base behaviour -->
   <conflict>
     <earlier>InTeenimater_[A-F]\.package</earlier>
     <later>InTeenimater_FlavorPak_.*\.package</later>
   </conflict>
   
-  <!-- Ignore anything flagged as InTeen specific overriding InTeen behaviour -->-->
+  <!-- Ignore anything flagged as InTeen specific overriding InTeen behaviour -->
   <conflict>
     <earlier>InTeenimater_[A-F]\.package</earlier>
     <later>_InTeen\.package</later>

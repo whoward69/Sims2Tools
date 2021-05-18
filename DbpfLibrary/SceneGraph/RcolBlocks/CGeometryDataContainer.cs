@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.IO;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System;
@@ -7,7 +19,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CGeometryDataContainer : AbstractRcolBlock
     {
-        public static uint TYPE = 0xAC4F8687;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0xAC4F8687;
         public static String NAME = "cGeometryDataContainer";
 
         #region Attributes
@@ -71,7 +83,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             sgres = new SGResource(null);
 
             version = 0x04;
-            BlockID = 0xAC4F8687;
+            BlockID = TYPE;
 
             elements = new GmdcElements();
             links = new GmdcLinks();
@@ -88,8 +100,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             version = reader.ReadUInt32();
 
-            /* string name = */ reader.ReadString();
-            uint myid = reader.ReadUInt32();
+            /* string name = */
+            reader.ReadString();
+            TypeBlockID myid = reader.ReadBlockId();
             sgres.Unserialize(reader);
             sgres.BlockID = myid;
 
@@ -102,7 +115,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 return;
             }
 
-            // TODO - do we need the stuff below?
             /*
             int count = reader.ReadInt32();
             elements.Clear();

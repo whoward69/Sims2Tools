@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -20,7 +20,7 @@ namespace Sims2Tools.DBPF.BHAV
     public class Bhav : DBPFResource
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public const uint TYPE = 0x42484156;
+        public static readonly TypeTypeID TYPE = (TypeTypeID)0x42484156;
         public const string NAME = "BHAV";
 
         private readonly BhavHeader header;
@@ -40,7 +40,7 @@ namespace Sims2Tools.DBPF.BHAV
 
         protected void Unserialize(IoBuffer reader)
         {
-            this.filename = reader.ReadBytes(0x40);
+            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
 
             this.header.Unserialize(reader);
             this.items = new List<Instruction>();
@@ -66,14 +66,32 @@ namespace Sims2Tools.DBPF.BHAV
                 XmlElement inst = CreateElement(element, "instruction");
                 inst.SetAttribute("nodeVersion", Helper.Hex4PrefixString(item.NodeVersion));
                 inst.SetAttribute("opCode", Helper.Hex4PrefixString(item.OpCode));
-                inst.SetAttribute("trueTarget", Helper.Hex4PrefixString(item.TrueTarget));
-                inst.SetAttribute("falseTarget", Helper.Hex4PrefixString(item.FalseTarget));
+                inst.SetAttribute("trueTarget", GetTarget(i, item.TrueTarget));
+                inst.SetAttribute("falseTarget", GetTarget(i, item.FalseTarget));
+                // inst.SetAttribute("trueTarget", Helper.Hex4PrefixString(item.TrueTarget));
+                // inst.SetAttribute("falseTarget", Helper.Hex4PrefixString(item.FalseTarget));
 
                 XmlElement ops = CreateElement(inst, "operands");
                 for (int j = 0; j < 16; j++)
                 {
-                    ops.SetAttribute("operand" + j.ToString(), Helper.Hex2PrefixString(item.Operands[j]));
+                    ops.SetAttribute($"operand{j}", Helper.Hex2PrefixString(item.Operands[j]));
                 }
+            }
+        }
+
+        private string GetTarget(int inst, ushort target)
+        {
+            switch (target)
+            {
+                case Instruction.TARGET_ERROR:
+                    return "Error";
+                case Instruction.TARGET_TRUE:
+                    return "True";
+                case Instruction.TARGET_FALSE:
+                    return "False";
+                default:
+                    int delta = target - inst;
+                    return $"{delta.ToString("+#;-#;0")}";
             }
         }
     }

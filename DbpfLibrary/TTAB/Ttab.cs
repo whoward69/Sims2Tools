@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -22,7 +22,7 @@ namespace Sims2Tools.DBPF.TTAB
     public class Ttab : DBPFResource
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public const uint TYPE = 0x54544142;
+        public static readonly TypeTypeID TYPE = (TypeTypeID)0x54544142;
         public const string NAME = "TTAB";
 
         private uint[] header;
@@ -43,14 +43,14 @@ namespace Sims2Tools.DBPF.TTAB
         // See - https://modthesims.info/wiki.php?title=54544142
         protected void Unserialize(IoBuffer reader)
         {
-            this.filename = reader.ReadBytes(0x40);
+            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
 
             this.header = new uint[3];
             this.header[0] = reader.ReadUInt32();
             this.header[1] = reader.ReadUInt32();
             this.header[2] = reader.ReadUInt32();
             if (this.header[0] != 0xFFFFFFFF)
-                throw new Exception("Unexpected data in TTAB header.  Read 0x" + Helper.Hex8String(this.header[0]) + ".  Expected 0xFFFFFFFF.");
+                throw new Exception($"Unexpected data in TTAB header.  Read {Helper.Hex8PrefixString(this.header[0])}.  Expected 0xFFFFFFFF.");
 
             ushort num = reader.ReadUInt16();
             while (this.items.Count < num)

@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020
+ * William Howard - 2020-2021
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.IO;
@@ -18,41 +19,54 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.OBJD
 {
-    public class Objd : DBPFResource, IDisposable
+    public class Objd : DBPFResource, ISgResource, IDisposable
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public const uint TYPE = 0x4F424A44;
+        public static readonly TypeTypeID TYPE = (TypeTypeID)0x4F424A44;
         public const String NAME = "OBJD";
 
         private ushort type;
 
-        private uint guid, proxyguid, originalguid;
+        private TypeGUID guid;
+        private TypeGUID proxyguid;
+        private TypeGUID originalguid;
 
         private ushort[] data = null;
 
+        private readonly String sgHash;
+        private readonly String sgName;
+
         public Objd(DBPFEntry entry, IoBuffer reader) : base(entry)
         {
-            Unserialize(reader);
+            Unserialize(reader, entry.DataSize);
+
+            sgHash = SgHelper.SgHash(this);
+            sgName = SgHelper.SgName(this);
         }
 
-        public uint Type
+        public ushort Type
         {
             get => this.type;
         }
 
-        public uint Guid
+        public TypeGUID Guid
         {
             get => this.guid;
         }
 
-        public uint OriginalGuid
+        public TypeGUID OriginalGuid
         {
             get => this.originalguid;
         }
 
-        public uint ProxyGuid
+        public TypeGUID ProxyGuid
         {
             get => this.proxyguid;
+        }
+
+        public bool RawDataValid(int index)
+        {
+            return (data != null && index < data.Length);
         }
 
         public ushort RawData(int index)
@@ -70,42 +84,43 @@ namespace Sims2Tools.DBPF.OBJD
             get => data.Length;
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(IoBuffer reader, uint length)
         {
-            filename = reader.ReadBytes(0x40);
+            long startPos = reader.Position;
 
-            long pos = reader.Position;
-            if (reader.Length >= 0x54)
+            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
+
+            if (length >= 0x54)
             {
-                reader.Seek(SeekOrigin.Begin, 0x52);
+                reader.Seek(SeekOrigin.Begin, startPos + 0x52);
                 type = reader.ReadUInt16();
             }
             else type = 0;
 
-            if (reader.Length >= 0x60)
+            if (length >= 0x60)
             {
-                reader.Seek(SeekOrigin.Begin, 0x5C);
-                guid = reader.ReadUInt32();
+                reader.Seek(SeekOrigin.Begin, startPos + 0x5C);
+                guid = reader.ReadGuid();
             }
-            else guid = 0;
+            else guid = (TypeGUID)0x00000000;
 
-            if (reader.Length >= 0x7E)
+            if (length >= 0x7E)
             {
-                reader.Seek(System.IO.SeekOrigin.Begin, 0x7A);
-                proxyguid = reader.ReadUInt32();
+                reader.Seek(SeekOrigin.Begin, startPos + 0x7A);
+                proxyguid = reader.ReadGuid();
             }
-            else proxyguid = 0;
+            else proxyguid = (TypeGUID)0x00000000;
 
-            if (reader.Length >= 0xD0)
+            if (length >= 0xD0)
             {
-                reader.Seek(System.IO.SeekOrigin.Begin, 0xCC);
-                originalguid = reader.ReadUInt32();
+                reader.Seek(SeekOrigin.Begin, startPos + 0xCC);
+                originalguid = reader.ReadGuid();
             }
-            else originalguid = 0;
+            else originalguid = (TypeGUID)0x00000000;
 
-            reader.Seek(System.IO.SeekOrigin.Begin, pos);
+            reader.Seek(SeekOrigin.Begin, startPos + 0x40);
 
-            data = reader.ReadUInt16s((int)((reader.Length - reader.Position)) / 2);
+            data = reader.ReadUInt16s((int)((length - 0x40)) / 2);
         }
 
         public void Dispose()
@@ -117,9 +132,9 @@ namespace Sims2Tools.DBPF.OBJD
         {
             XmlElement element = CreateResElement(parent, NAME);
             element.SetAttribute("type", Helper.Hex4PrefixString(Type));
-            element.SetAttribute("guid", Helper.Hex8PrefixString(Guid));
-            element.SetAttribute("originalGuid", Helper.Hex8PrefixString(OriginalGuid));
-            element.SetAttribute("proxyGuid", Helper.Hex8PrefixString(ProxyGuid));
+            element.SetAttribute("guid", Guid.ToString());
+            element.SetAttribute("originalGuid", OriginalGuid.ToString());
+            element.SetAttribute("proxyGuid", ProxyGuid.ToString());
 
             element.AppendChild(parent.OwnerDocument.CreateComment("Non-zero values only"));
             for (int i = 0; i < RawDataLength; ++i)
@@ -129,6 +144,15 @@ namespace Sims2Tools.DBPF.OBJD
                     CreateTextElement(element, "data", Helper.Hex4PrefixString(RawData(i))).SetAttribute("index", Helper.Hex4PrefixString(i));
                 }
             }
+        }
+
+        public string SgHash => sgHash;
+
+        public string SgName => sgName;
+
+        public SgResourceList SgNeededResources()
+        {
+            return new SgResourceList();
         }
     }
 }
