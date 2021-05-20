@@ -5,6 +5,8 @@ The Sims2Tools Project consists of two libraries and three applications
 * DBPF Viewer Application
 * BHAV Finder Application
 * HCDU Plus Application
+* SG Checker Application
+* What Cused This Application
 
 ## DBPF Library
 The DBPF Library is a set of classes for reading "The Sims 2" DBPF (.package) files.  It can extract both uncompressed and compressed [resources](https://modthesims.info/wiki.php?title=List_of_Sims_2_Formats_by_Name) of types BCON, BHAV, CTSS, GLOB, OBJD, OBJf, STR#, TPRP, TRCN, TTAB, TTAs and VERS - ie all the ones of use to coding modders.
@@ -42,3 +44,11 @@ The [Hack Conflict Detection Utility](http://www.leefish.nl/mybb/showthread.php?
 The [HCDU Plus](https://www.picknmixmods.com/Sims2/Notes/HcduPlus/HcduPlus.html) application is my attempt to remedy these.
 
 ![HCDU Plus App](https://www.picknmixmods.com/Sims2/Notes/HcduPlus/HcduPlus01.jpg)
+
+## SG Checker Application
+The [SG Checker](https://www.picknmixmods.com/Sims2/Notes/SgChecker/SgChecker.html) application was primarily written to answer two questions
+1. which "things" are missing meshes and/or textures (so not appearing correctly in game)?
+1. which mesh packages are duplicates?
+
+## What Caused This Application
+The [HCDU Plus](https://www.picknmixmods.com/Sims2/Notes/WhatCausedThis/WhatCausedThis.html) application reads an object error log file, extracts some information from it and then looks in every mod in your Downloads folder to see if it can identify the suspect mod(s).
