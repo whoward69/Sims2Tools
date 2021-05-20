@@ -1,5 +1,5 @@
 # Sims2Tools
-The Sims2Tools Project consists of two libraries and three applications
+The Sims2Tools Project consists of two libraries and five applications
 * DBFF Library
 * Utils Library
 * DBPF Viewer Application
@@ -51,4 +51,6 @@ The [SG Checker](https://www.picknmixmods.com/Sims2/Notes/SgChecker/SgChecker.ht
 1. which mesh packages are duplicates?
 
 ## What Caused This Application
-The [HCDU Plus](https://www.picknmixmods.com/Sims2/Notes/WhatCausedThis/WhatCausedThis.html) application reads an object error log file, extracts some information from it and then looks in every mod in your Downloads folder to see if it can identify the suspect mod(s).
+The [What Caused This](https://www.picknmixmods.com/Sims2/Notes/WhatCausedThis/WhatCausedThis.html) application reads an object error log file, extracts some information from it and then looks in every mod in your Downloads folder to see if it can identify the suspect mod(s).
+
+![What Caused This App](https://www.picknmixmods.com/Sims2/Notes/WhatCausedThis/WhatCausedThis07.jpg)
