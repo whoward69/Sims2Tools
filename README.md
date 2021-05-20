@@ -6,7 +6,7 @@ The Sims2Tools Project consists of two libraries and five applications
 * BHAV Finder Application
 * HCDU Plus Application
 * SG Checker Application
-* What Cused This Application
+* What Caused This Application
 
 ## DBPF Library
 The DBPF Library is a set of classes for reading "The Sims 2" DBPF (.package) files.  It can extract both uncompressed and compressed [resources](https://modthesims.info/wiki.php?title=List_of_Sims_2_Formats_by_Name) of types BCON, BHAV, CTSS, GLOB, OBJD, OBJf, STR#, TPRP, TRCN, TTAB, TTAs and VERS - ie all the ones of use to coding modders.
