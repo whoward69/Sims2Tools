@@ -78,6 +78,8 @@ namespace HcduPlus
             this.menuConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemInternalConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemHomeCrafterConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemStoreVersionConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCastawaysConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemKnownConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTipGridByPackage = new System.Windows.Forms.ToolTip(this.components);
@@ -363,6 +365,8 @@ namespace HcduPlus
             this.toolStripSeparator2,
             this.menuItemInternalConflicts,
             this.menuItemHomeCrafterConflicts,
+            this.menuItemStoreVersionConflicts,
+            this.menuItemCastawaysConflicts,
             this.toolStripSeparator3,
             this.menuItemKnownConflicts});
             this.menuConflicts.Name = "menuConflicts";
@@ -386,6 +390,24 @@ namespace HcduPlus
             this.menuItemHomeCrafterConflicts.Name = "menuItemHomeCrafterConflicts";
             this.menuItemHomeCrafterConflicts.Size = new System.Drawing.Size(230, 22);
             this.menuItemHomeCrafterConflicts.Text = "Ignore HomeCrafter Conflicts";
+            // 
+            // menuItemStoreVersionConflicts
+            // 
+            this.menuItemStoreVersionConflicts.Checked = true;
+            this.menuItemStoreVersionConflicts.CheckOnClick = true;
+            this.menuItemStoreVersionConflicts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.menuItemStoreVersionConflicts.Name = "menuItemStoreVersionConflicts";
+            this.menuItemStoreVersionConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemStoreVersionConflicts.Text = "Ignore Store Version Conflicts";
+            // 
+            // menuItemCastawaysConflicts
+            // 
+            this.menuItemCastawaysConflicts.Checked = true;
+            this.menuItemCastawaysConflicts.CheckOnClick = true;
+            this.menuItemCastawaysConflicts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.menuItemCastawaysConflicts.Name = "menuItemCastawaysConflicts";
+            this.menuItemCastawaysConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemCastawaysConflicts.Text = "Ignore Castaways Conflicts";
             // 
             // toolStripSeparator2
             // 
@@ -816,6 +838,8 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemInternalConflicts;
         private System.Windows.Forms.ToolStripMenuItem menuItemKnownConflicts;
         private System.Windows.Forms.ToolStripMenuItem menuItemHomeCrafterConflicts;
+        private System.Windows.Forms.ToolStripMenuItem menuItemStoreVersionConflicts;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCastawaysConflicts;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem menuItemGuidConflicts;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;

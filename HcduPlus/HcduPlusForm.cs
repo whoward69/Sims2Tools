@@ -159,8 +159,14 @@ namespace HcduPlus
                                     {
                                         for (int i = 0; i < scanPackages.Count - 1; ++i)
                                         {
-                                            // A conflict of "STR: 0x007B" can be ignored, as this is HomeCrafter details
-                                            if (!(type == Str.TYPE && instance == (TypeInstanceID) 0x007B && menuItemHomeCrafterConflicts.Checked))
+                                            if (!(
+                                                // Ignore HomeCrafter string conflicts?
+                                                (type == Str.TYPE && instance == (TypeInstanceID)0x0000007B && menuItemHomeCrafterConflicts.Checked) ||
+                                                // Ignore Store Version string conflicts?
+                                                (type == Str.TYPE && instance == (TypeInstanceID)0xFF648785 && menuItemStoreVersionConflicts.Checked) ||
+                                                //
+                                                (type == Str.TYPE && instance == (TypeInstanceID)0x00000001 && group == (TypeGroupID)0x7FC078F3 && menuItemCastawaysConflicts.Checked)
+                                                ))
                                             {
                                                 // Ignore internal conflicts?
                                                 if (!(scanPackages[i].Equals(scanPackages[i + 1]) && menuItemInternalConflicts.Checked))
@@ -485,6 +491,8 @@ namespace HcduPlus
             menuItemGuidConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, 1) != 0);
             menuItemInternalConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, 1) != 0);
             menuItemHomeCrafterConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, 1) != 0);
+            menuItemStoreVersionConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, 1) != 0);
+            menuItemCastawaysConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemCastawaysConflicts.Name, 1) != 0);
 
             MyUpdater = new Updater(HcduPlusApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
@@ -506,6 +514,8 @@ namespace HcduPlus
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, menuItemGuidConflicts.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, menuItemInternalConflicts.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, menuItemHomeCrafterConflicts.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, menuItemStoreVersionConflicts.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemCastawaysConflicts.Name, menuItemCastawaysConflicts.Checked ? 1 : 0);
         }
 
         private void OnSelectModsClicked(object sender, EventArgs e)
@@ -638,7 +648,7 @@ namespace HcduPlus
         {
             String text = "";
 
-            text += $"Mods conflict report for '{textModsPath.Text}'";
+            text += $"Mods conflict report for '{textScanPath.Text}'";
 
             DateTime now = DateTime.Now;
             text += $" at {now.ToShortDateString()} {now.ToShortTimeString()}";
@@ -659,7 +669,7 @@ namespace HcduPlus
             {
                 StreamWriter writer = new StreamWriter(saveFileDialog.OpenFile());
 
-                writer.Write($"Mods conflict report for '{textModsPath.Text}'");
+                writer.Write($"Mods conflict report for '{textScanPath.Text}'");
 
                 DateTime now = DateTime.Now;
                 writer.WriteLine($" at {now.ToShortDateString()} {now.ToShortTimeString()}");
