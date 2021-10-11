@@ -251,7 +251,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             Matrixd result = m1;
 
             for (int i = 0; i < val; i++)
-                result = result * m1;
+                result *= m1;
 
             return result;
         }
@@ -341,7 +341,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             return Adjoint() / Determinant();
         }
 
-        #region Overrides
         /// <summary>
         /// Return a String describing the Matrix
         /// </summary>
@@ -386,7 +385,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
 
             return true;
         }
-        #endregion
+
 
 
         /// <summary>
@@ -469,7 +468,9 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
                 return d;
             }
 
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             Matrixd tempMtx = new Matrixd(this.Rows - 1, this.Columns - 1);
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
 
             //find the determinent with respect to the first row
             for (int j = 0; j < this.Columns; j++)
@@ -496,7 +497,9 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             if (this.Rows < 2 || this.Columns < 2)
                 throw new GeometryException("Adjoint matrix is not available. (" + ToString() + ")");
 
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             Matrixd tempMtx = new Matrixd(this.Rows - 1, this.Columns - 1);
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
             Matrixd adjMtx = new Matrixd(this.Columns, this.Rows);
 
             for (int i = 0; i < this.Rows; i++)
@@ -525,13 +528,12 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             if (this.Rows < 2 || this.Columns < 2)
                 throw new GeometryException("Minor not available. (" + ToString() + ")");
 
-            int i, j = 0;
-
             Matrixd minom2 = new Matrixd(this.Rows - 1, this.Columns - 1);
 
             //find the minor with respect to the first element
             for (int k = 0; k < minom2.Rows; k++)
             {
+                int i;
                 if (k >= row)
                     i = k + 1;
                 else
@@ -539,6 +541,8 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
 
                 for (int l = 0; l < minom2.Columns; l++)
                 {
+                    int j;
+
                     if (l >= column)
                         j = l + 1;
                     else
@@ -606,7 +610,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             }
         }
 
-        #region Static Function
         /// <summary>
         /// Create  Translation Matrixd
         /// </summary>
@@ -729,7 +732,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             return m;
         }
 
-        #endregion
+
 
         public string ToString(bool full)
         {

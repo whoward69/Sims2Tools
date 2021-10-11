@@ -252,7 +252,7 @@ namespace HcduPlus
 
         private int ProcessFolder(BackgroundWorker worker, System.ComponentModel.DoWorkEventArgs args,
             String folder, List<String> files, String prefix, float total, int done,
-            Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>> seenResources, 
+            Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>> seenResources,
             Dictionary<int, String> namesByTGI,
             Dictionary<TypeGUID, List<String>> seenGuids)
         {
@@ -349,8 +349,8 @@ namespace HcduPlus
                     }
                     catch (Exception e)
                     {
-						logger.Error(e.Message);
-						
+                        logger.Error(e.Message);
+
                         String partialPath = file.Substring(folder.Length + 1);
                         int pos = partialPath.LastIndexOf(@"\");
 
@@ -365,7 +365,7 @@ namespace HcduPlus
                             fileDetails = $"{partialPath.Substring(pos + 1)}\nin folder\n{partialPath.Substring(0, pos)}";
                         }
 
-                        if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {e.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error,  MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
+                        if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {e.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
                         {
                             throw e;
                         }

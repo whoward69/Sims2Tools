@@ -12,6 +12,8 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
+using System;
+using System.Collections;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.TTAB
@@ -22,7 +24,6 @@ namespace Sims2Tools.DBPF.TTAB
         Animal,
     }
 
-    /*
     public class TtabItemMotiveTable : ICollection, IEnumerable
     {
         private readonly uint format; // Owning TTAB format
@@ -79,7 +80,6 @@ namespace Sims2Tools.DBPF.TTAB
             }
         }
 
-        #region ICollection
         public int Count => this.items.Count;
 
         public bool IsSynchronized => this.items.IsSynchronized;
@@ -87,11 +87,9 @@ namespace Sims2Tools.DBPF.TTAB
         public object SyncRoot => this.items.SyncRoot;
 
         public void CopyTo(Array a, int i) => this.items.CopyTo(a, i);
-        #endregion
 
-        #region IEnumerable
         public IEnumerator GetEnumerator() => this.items.GetEnumerator();
-        #endregion
+
 
         private class TtabItemMotiveGroupArrayList : ArrayList
         {
@@ -106,9 +104,7 @@ namespace Sims2Tools.DBPF.TTAB
             }
         }
     }
-    */
 
-    /*
     public class TtabItemMotiveGroup : ICollection, IEnumerable
     {
         private readonly uint format; // Owning TTAB format
@@ -179,18 +175,16 @@ namespace Sims2Tools.DBPF.TTAB
             }
         }
 
-        #region ICollection
         public int Count => this.items.Count;
 
         public bool IsSynchronized => this.items.IsSynchronized;
 
         public object SyncRoot => this.items.SyncRoot;
         public void CopyTo(Array a, int i) => this.items.CopyTo(a, i);
-        #endregion
 
-        #region IEnumerable
+
         public IEnumerator GetEnumerator() => this.items.GetEnumerator();
-        #endregion
+
 
         private class TtabItemMotiveItemArrayList : ArrayList
         {
@@ -205,7 +199,6 @@ namespace Sims2Tools.DBPF.TTAB
             }
         }
     }
-    */
 
     public abstract class TtabItemMotiveItem
     {
@@ -265,7 +258,6 @@ namespace Sims2Tools.DBPF.TTAB
         }
     }
 
-    /*
     public class TtabItemAnimalMotiveItem : TtabItemMotiveItem, ICollection, IEnumerable
     {
         private TtabItemAnimalMotiveItem.TtabItemSingleMotiveItemArrayList items;
@@ -302,7 +294,6 @@ namespace Sims2Tools.DBPF.TTAB
             }
         }
 
-        #region ICollection
         public int Count => this.items.Count;
 
         public bool IsSynchronized => this.items.IsSynchronized;
@@ -310,11 +301,9 @@ namespace Sims2Tools.DBPF.TTAB
         public object SyncRoot => this.items.SyncRoot;
 
         public void CopyTo(Array a, int i) => this.items.CopyTo(a, i);
-        #endregion
 
-        #region IEnumerable
         public IEnumerator GetEnumerator() => this.items.GetEnumerator();
-        #endregion
+
 
         private class TtabItemSingleMotiveItemArrayList : ArrayList
         {
@@ -329,5 +318,4 @@ namespace Sims2Tools.DBPF.TTAB
             }
         }
     }
-    */
 }

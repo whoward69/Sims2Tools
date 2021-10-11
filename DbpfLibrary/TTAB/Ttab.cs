@@ -59,7 +59,7 @@ namespace Sims2Tools.DBPF.TTAB
             //this.footer = reader.ReadBytes((int)(reader.Length - reader.Position));
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
             element.SetAttribute("format", Helper.Hex8PrefixString(Format));
@@ -68,6 +68,8 @@ namespace Sims2Tools.DBPF.TTAB
             {
                 items[i].AddXml(element).SetAttribute("index", Helper.Hex2PrefixString((byte)i));
             }
+
+            return element;
         }
     }
 }

@@ -30,6 +30,11 @@ namespace Sims2Tools.DBPF.STR
             get => lid;
         }
 
+        public MetaData.Languages Lid
+        {
+            get => (MetaData.Languages)lid;
+        }
+
         public string Name
         {
             get => ((MetaData.Languages)lid).ToString();
@@ -105,6 +110,11 @@ namespace Sims2Tools.DBPF.STR
             this.lid = new StrLanguage(lid);
             this.title = title;
             this.desc = desc;
+        }
+
+        public int Index
+        {
+            get => index;
         }
 
         public StrLanguage Language

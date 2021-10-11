@@ -28,10 +28,13 @@ namespace Sims2Tools.DBPF.NREF
             this.FileName = Helper.ToString(reader.ReadBytes((int)entry.FileSize));
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
+
             CreateTextElement(element, "name", FileName);
+
+            return element;
         }
     }
 }

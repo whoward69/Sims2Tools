@@ -26,9 +26,13 @@ namespace Sims2Tools.DBPF.TTAS
         {
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
-            AddXmlItems(CreateResElement(parent, NAME));
+            XmlElement element = CreateResElement(parent, NAME);
+
+            AddXmlItems(element);
+
+            return element;
         }
     }
 }

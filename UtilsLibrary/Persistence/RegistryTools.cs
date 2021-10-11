@@ -3,8 +3,6 @@
  *
  * William Howard - 2020-2021
  *
- * Parts of this code derived from http://csharphelper.com/blog/2018/06/build-an-mru-list-in-c/
- *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 

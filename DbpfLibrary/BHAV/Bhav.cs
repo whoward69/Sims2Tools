@@ -48,7 +48,7 @@ namespace Sims2Tools.DBPF.BHAV
                 this.items.Add(new Instruction(reader, header.Format));
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
             element.SetAttribute("format", Helper.Hex4PrefixString(Header.Format));
@@ -77,6 +77,8 @@ namespace Sims2Tools.DBPF.BHAV
                     ops.SetAttribute($"operand{j}", Helper.Hex2PrefixString(item.Operands[j]));
                 }
             }
+
+            return element;
         }
 
         private string GetTarget(int inst, ushort target)
@@ -91,7 +93,7 @@ namespace Sims2Tools.DBPF.BHAV
                     return "False";
                 default:
                     int delta = target - inst;
-                    return $"{delta.ToString("+#;-#;0")}";
+                    return $"{delta:+#;-#;0}";
             }
         }
     }

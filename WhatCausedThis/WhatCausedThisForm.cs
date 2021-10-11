@@ -169,7 +169,7 @@ namespace WhatCausedThis
 #if DEBUG
                         logger.Error(e.Message);
 #endif
-						
+
                         String partialPath = file.Substring(folder.Length + 1);
                         int pos = partialPath.LastIndexOf(@"\");
 

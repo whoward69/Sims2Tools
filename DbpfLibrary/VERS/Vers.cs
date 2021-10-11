@@ -27,7 +27,7 @@ namespace Sims2Tools.DBPF.VERS
         {
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
 
@@ -38,6 +38,8 @@ namespace Sims2Tools.DBPF.VERS
                 ele.SetAttribute("datatypeId", Helper.Hex8PrefixString((uint)item.Datatype));
                 ele.SetAttribute("datatypeName", item.Datatype.ToString());
             }
+
+            return element;
         }
     }
 }

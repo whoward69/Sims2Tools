@@ -18,10 +18,30 @@ namespace Sims2Tools
 
         static SimpeData()
         {
-            ParseXreg($"{Sims2ToolsLib.SimPePath}/Data/simpe.xreg", "Settings", pathSettings);
+            try
+            {
+                ParseXreg($"{Sims2ToolsLib.SimPePath}/Data/simpe.xreg", "Settings", pathSettings);
+            }
+            catch (Exception)
+            {
+                pathSettings.Add("Sims2Path", Properties.Settings.Default.Properties["Sims2Path"].DefaultValue as String);
 
-            // TODO - if there's no simpe.xreg file, read the values from Settings.settings
-            // String ep1Pathj = Properties.Settings.Default.Properties["Sims2EP1Path"].DefaultValue as String;
+                for (int i = 1; i <= 9; i++)
+                {
+                    pathSettings.Add($"Sims2EP{i}Path", Properties.Settings.Default.Properties[$"Sims2EP{i}Path"].DefaultValue as String);
+                }
+
+                for (int i = 1; i <= 8; i++)
+                {
+                    if (i == 3) continue;
+
+                    pathSettings.Add($"Sims2SP{i}Path", Properties.Settings.Default.Properties[$"Sims2SP{i}Path"].DefaultValue as String);
+                }
+
+                // This is where SimPe stores the SP3 path - go figure!
+                pathSettings.Add("Sims2SCPath", Properties.Settings.Default.Properties["Sims2SCPath"].DefaultValue as String);
+            }
+
         }
 
         public static String PathSetting(String key)
@@ -33,31 +53,34 @@ namespace Sims2Tools
 
         private static void ParseXreg(String xml, String section, SortedDictionary<String, String> settings)
         {
-            XmlReader reader = XmlReader.Create(xml);
-
-            bool inSettings = false;
-
-            reader.MoveToContent();
-            while (reader.Read())
+            using (XmlReader reader = XmlReader.Create(xml))
             {
-                if (reader.NodeType == XmlNodeType.Element)
+                bool inSettings = false;
+
+                reader.MoveToContent();
+                while (reader.Read())
                 {
-                    if (reader.Name.Equals("key") && reader.GetAttribute("name").Equals(section))
+                    if (reader.NodeType == XmlNodeType.Element)
                     {
-                        inSettings = true;
+                        if (reader.Name.Equals("key") && reader.GetAttribute("name").Equals(section))
+                        {
+                            inSettings = true;
+                        }
+                        else if (inSettings && reader.Name.Equals("string"))
+                        {
+                            String key = reader.GetAttribute("name");
+                            reader.Read();
+                            String value = reader.Value;
+                            settings.Add(key, value);
+                        }
                     }
-                    else if (inSettings && reader.Name.Equals("string"))
+                    else if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Equals("key"))
                     {
-                        String key = reader.GetAttribute("name");
-                        reader.Read();
-                        String value = reader.Value;
-                        settings.Add(key, value);
+                        inSettings = false;
                     }
                 }
-                else if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Equals("key"))
-                {
-                    inSettings = false;
-                }
+
+                reader.Close();
             }
         }
     }

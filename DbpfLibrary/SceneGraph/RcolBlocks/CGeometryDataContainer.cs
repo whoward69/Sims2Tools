@@ -22,7 +22,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xAC4F8687;
         public static String NAME = "cGeometryDataContainer";
 
-        #region Attributes
+
 
         GmdcElements elements;
         /// <summary>
@@ -73,7 +73,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return joints; }
             set { joints = value; }
         }
-        #endregion
+
 
         /// <summary>
         /// Constructor
@@ -93,8 +93,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             joints = new GmdcJoints();
         }
-
-        #region IRcolBlock Member
 
         public override void Unserialize(IoBuffer reader)
         {
@@ -156,7 +154,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             */
         }
 
-        #endregion
+
 
         public override void Dispose()
         {

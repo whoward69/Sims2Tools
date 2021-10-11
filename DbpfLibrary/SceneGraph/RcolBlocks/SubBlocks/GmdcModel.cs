@@ -81,7 +81,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
     /// </summary>
     public class GmdcModel : GmdcLinkBlock
     {
-        #region Attributes
+
         VectorTransformations transforms;
         /// <summary>
         /// Set of Transformations
@@ -111,7 +111,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             get { return subset; }
             set { subset = value; }
         }
-        #endregion
+
 
         /// <summary>
         /// Constructor
@@ -180,8 +180,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                 this.BoundingMesh.Items.Add(g.Faces[i] + offset);
         }
     }
-
-    #region Container	
 
     /// <summary>
     /// Typesave ArrayList for GmdcModel Objects
@@ -348,5 +346,5 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             return list;
         }
     }
-    #endregion
+
 }

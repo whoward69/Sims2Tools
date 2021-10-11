@@ -20,7 +20,7 @@ namespace Sims2Tools.DBPF.IO
         public static void Read(DBPFFile package, byte[] file)
         {
             var stream = new MemoryStream(file);
-            var reader = IoBuffer.FromStream(stream, ByteOrder.LITTLE_ENDIAN);
+            var reader = IoBuffer.FromStream(stream);
 
             while (stream.Position < file.Length)
             {
@@ -29,7 +29,7 @@ namespace Sims2Tools.DBPF.IO
                 TypeInstanceID InstanceID = reader.ReadInstanceId();
                 TypeResourceID ResourceID = (package.IndexMinorVersion >= 2) ? reader.ReadResourceId() : (TypeResourceID)0x00000000;
 
-                package.GetEntryByFullID(Hash.TGIRHash(InstanceID, ResourceID, TypeID, GroupID)).UncompressedSize = reader.ReadUInt32();
+                package.GetEntryByTGIR(Hash.TGIRHash(InstanceID, ResourceID, TypeID, GroupID)).UncompressedSize = reader.ReadUInt32();
             }
 
             reader.Dispose();

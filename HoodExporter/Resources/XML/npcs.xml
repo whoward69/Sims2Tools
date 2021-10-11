@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<npcs>
+  <!-- Standard Maxis NPCs -->
+  <npc>
+    <value>0x724CD298</value>
+    <name>Ideal Plantsim</name>
+  </npc>
+  <npc>
+    <value>0x51BFB2CD</value>
+    <name>Stinky Skunk</name>
+  </npc>
+  <npc>
+    <value>0x0F67E576</value>
+    <name>Mrs CrumpleBottom</name>
+  </npc>
+  <npc>
+    <value>0x745B11D1</value>
+    <name>Rod Humble</name>
+  </npc>
+  <npc>
+    <value>0x341FB0E2</value>
+    <name>Genie Midlock</name>
+  </npc>
+  <npc>
+    <value>0xB38590EB</value>
+    <name>Witch Doctor</name>
+  </npc>
+  <npc>
+    <value>0x13269F2D</value>
+    <name>Bigfoot</name>
+  </npc>
+  <npc>
+    <value>0x4D9530C6</value>
+    <name>Therapist</name>
+  </npc>
+  <npc>
+    <value>0x84EC24A8</value>
+    <name>Grim Reaper</name>
+  </npc>
+  <npc>
+    <value>0x2E17B9FC</value>
+    <name>Pollination Technician</name>
+  </npc>
+  <npc>
+    <value>0x2D7EB2DC</value>
+    <name>Hula Zombie</name>
+  </npc>
+  <npc>
+    <value>0xF51A5E5B</value>
+    <name>Spectral Assistant</name>
+  </npc>
+  <npc>
+    <value>0xD55EF625</value>
+    <name>Dany Cat</name>
+  </npc>
+  <npc>
+    <value>0x7040237A</value>
+    <name>Toddler New Year</name>
+  </npc>
+  <npc>
+    <value>0xF03AE97B</value>
+    <name>Father</name>
+  </npc>
+  <npc>
+    <value>0xF036D5C3</value>
+    <name>Santa Claus</name>
+  </npc>
+
+  <!-- Modder Ideal Plantsims -->
+  <npc>
+    <value>0x005AC901</value>
+    <name>Ideal Plantsim #1</name>
+  </npc>
+  <npc>
+    <value>0x005AC902</value>
+    <name>Ideal Plantsim #2</name>
+  </npc>
+  <npc>
+    <value>0x005AC903</value>
+    <name>Ideal Plantsim #3</name>
+  </npc>
+  <npc>
+    <value>0x005AC904</value>
+    <name>Ideal Plantsim #4</name>
+  </npc>
+  <npc>
+    <value>0x0064C511</value>
+    <name>Primrose Plantsim</name>
+  </npc>
+  <npc>
+    <value>0x0064C512</value>
+    <name>Chrysanthemum Plantsim</name>
+  </npc>
+  <npc>
+    <value>0x0064C513</value>
+    <name>Linden Plantsim</name>
+  </npc>
+  <npc>
+    <value>0x0064C514</value>
+    <name>Sequoia Plantsim</name>
+  </npc>
+
+  <!-- Modder Polination Techs -->
+  <npc>
+    <value>0x0059E000</value>
+    <name>PT 031 Tarek</name>
+  </npc>
+  <npc>
+    <value>0x0059E001</value>
+    <name>PT 047 Zienyk</name>
+  </npc>
+  <npc>
+    <value>0x0059E002</value>
+    <name>PT 084 Xena</name>
+  </npc>
+  <npc>
+    <value>0x0059E003</value>
+    <name>PT 117 Brequ</name>
+  </npc>
+</npcs>

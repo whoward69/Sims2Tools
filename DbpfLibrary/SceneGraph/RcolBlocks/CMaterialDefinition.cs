@@ -21,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x49596978;
         public static String NAME = "cMaterialDefinition";
 
-        #region Attributes
+
 
 
         string fldsc;
@@ -51,7 +51,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return listing; }
             set { listing = value; }
         }
-        #endregion
+
 
 
 
@@ -78,8 +78,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             return null;
         }
-
-        #region IRcolBlock Member
 
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
@@ -125,7 +123,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             }
         }
 
-        #endregion
+
 
         public override void Dispose()
         {
@@ -134,7 +132,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
     public class MaterialDefinitionProperty
     {
-        #region Attributes
+
         string name;
         string val;
 
@@ -149,7 +147,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return val; }
             set { val = value; }
         }
-        #endregion
+
 
         public MaterialDefinitionProperty()
         {

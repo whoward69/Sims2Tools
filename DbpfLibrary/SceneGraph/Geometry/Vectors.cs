@@ -464,7 +464,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
 			return new Ambertation.Geometry.Vector3(v.X, v.Y, v.Z);
 		}*/
 
-        #region Skankyboy Extension
         public Vector3f(string[] datarr)
         {
             this.X = double.Parse(datarr[0]);
@@ -491,7 +490,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         {
             return X.ToString("N6") + " " + Y.ToString("N6") + " " + Z.ToString("N6");
         }
-        #endregion
+
 
         public static new Vector3f Zero
         {
@@ -682,7 +681,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         }
     }
 
-    #region Container	
     /// <summary>
     /// Typesave ArrayList for Vector3i Objects
     /// </summary>
@@ -1014,5 +1012,5 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             return list;
         }
     }
-    #endregion
+
 }

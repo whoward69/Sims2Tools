@@ -18,7 +18,7 @@ namespace Sims2Tools.DBPF.BHAV
     public class Instruction
     {
         public const ushort TARGET_ERROR = 0xFFFC;
-        public const ushort TARGET_TRUE  = 0xFFFD;
+        public const ushort TARGET_TRUE = 0xFFFD;
         public const ushort TARGET_FALSE = 0xFFFE;
 
         private readonly ushort format; // Owning BHAV format

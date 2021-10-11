@@ -35,8 +35,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             this.version = 0x09;
         }
 
-        #region IRcolBlock Member
-
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
@@ -50,7 +48,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             sgres.Unserialize(reader);
         }
 
-        #endregion
+
 
         /// <summary>
         /// Will try to load all Lifo References in the MipMpas in all Blocks

@@ -183,7 +183,7 @@ namespace SgChecker
                                                 if (type == Objd.TYPE)
                                                 {
                                                     // Resolve the needed STR# now, while we have the associated DBPFFile to hand
-                                                    if (package.GetResourceByEntry(package.GetEntryByFullID(Hash.TGIRHash((TypeInstanceID)0x0085, (TypeResourceID)0x0000, Str.TYPE, res.GroupID))) is Str strRes)
+                                                    if (package.GetResourceByEntry(package.GetEntryByTGIR(Hash.TGIRHash((TypeInstanceID)0x0085, (TypeResourceID)0x0000, Str.TYPE, res.GroupID))) is Str strRes)
                                                     {
                                                         String cres = (res as Objd).RawDataValid(0x0048) ? strRes.LanguageItems(MetaData.Languages.English)[(res as Objd).RawData(0x0048)].Title : null;
 

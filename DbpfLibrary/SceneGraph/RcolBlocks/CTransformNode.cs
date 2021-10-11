@@ -85,7 +85,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         /// Node is not directly linked to a joint
         /// </summary>
         public const int NO_JOINT = 0x7fffffff;
-        #region Attributes
+
 
         CompositionTreeNode ctn;
         ObjectGraphNode ogn;
@@ -169,7 +169,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return unknown; }
             set { unknown = value; }
         }
-        #endregion
+
 
         /// <summary>
         /// Constructor
@@ -189,7 +189,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown = NO_JOINT;
         }
 
-        #region AbstractCresChildren Member
         public override string GetName()
         {
             return ogn.FileName;
@@ -209,10 +208,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 return l;
             }
         }
-
-        #endregion
-
-        #region IRcolBlock Member
 
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
@@ -253,7 +248,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown = reader.ReadInt32();
         }
 
-        #endregion
+
 
         /// <summary>
         /// You can use this to setop the Controls on a TabPage befor it is dispplayed
@@ -299,7 +294,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
     }
 
-    #region Container
     /// <summary>
     /// Typesave ArrayList for TransformNodeItem Objects
     /// </summary>
@@ -384,5 +378,5 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
 
     }
-    #endregion
+
 }

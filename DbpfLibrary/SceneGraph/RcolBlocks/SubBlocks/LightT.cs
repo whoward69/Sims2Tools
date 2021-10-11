@@ -17,9 +17,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class LightT : StandardLightBase, System.IDisposable
     {
-        #region Attributes
 
-        #endregion
+
+
 
 
         /// <summary>
@@ -33,8 +33,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             sgres = new SGResource(null);
         }
 
-        #region IRcolBlock Member
-
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
@@ -47,7 +45,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             sgres.BlockID = reader.ReadBlockId();
             sgres.Unserialize(reader);
         }
-        #endregion
+
 
         public override void Dispose()
         {

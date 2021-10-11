@@ -50,7 +50,7 @@ namespace Sims2Tools.DBPF.OBJF
                 this.items.Add(new ObjfItem(reader));
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
 
@@ -65,6 +65,8 @@ namespace Sims2Tools.DBPF.OBJF
                     ele.SetAttribute("action", Helper.Hex4PrefixString(items[i].Action));
                 }
             }
+
+            return element;
         }
     }
 }

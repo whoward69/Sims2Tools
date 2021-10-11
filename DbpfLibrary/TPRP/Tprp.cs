@@ -85,7 +85,7 @@ namespace Sims2Tools.DBPF.TPRP
             }
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
             element.SetAttribute("params", ParamCount.ToString());
@@ -106,6 +106,8 @@ namespace Sims2Tools.DBPF.TPRP
                 XmlElement ele = CreateTextElement(element, "local", item.Label);
                 ele.SetAttribute("index", Helper.Hex4PrefixString(i));
             }
+
+            return element;
         }
     }
 }

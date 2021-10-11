@@ -47,11 +47,14 @@ namespace Sims2Tools.DBPF.GLOB
             semiglobal = reader.ReadBytes(len);
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
+
             CreateTextElement(element, "semigroup", SemiGlobalGroup.ToString());
             CreateTextElement(element, "seminame", SemiGlobalName);
+
+            return element;
         }
     }
 }

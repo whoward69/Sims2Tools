@@ -173,7 +173,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xFC6EB1F7;
         public static String NAME = "cShape";
 
-        #region Attributes
+
         uint[] unknown;
         public uint[] Unknwon
         {
@@ -208,7 +208,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             get { return refnode; }
         }
-        #endregion
+
 
         public CShape(Rcol parent) : base(parent)
         {

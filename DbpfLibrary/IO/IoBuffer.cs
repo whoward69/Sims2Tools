@@ -27,11 +27,12 @@ namespace Sims2Tools.DBPF.IO
     {
         private readonly Stream m_stream;
         private readonly BinaryReader m_reader;
-        public ByteOrder m_byteOrder = ByteOrder.BIG_ENDIAN;
+        private long m_length;
+        private ByteOrder m_byteOrder = ByteOrder.BIG_ENDIAN;
 
         public Stream MyStream => m_stream;
 
-        public IoBuffer(Stream stream)
+        private IoBuffer(Stream stream)
         {
             this.m_stream = stream;
             this.m_reader = new BinaryReader(stream);
@@ -39,14 +40,23 @@ namespace Sims2Tools.DBPF.IO
 
         public static IoBuffer FromStream(Stream stream)
         {
-            return new IoBuffer(stream);
+            return FromStream(stream, stream.Length);
         }
 
-        public static IoBuffer FromStream(Stream stream, ByteOrder order)
+        public static IoBuffer FromStream(Stream stream, long length)
         {
-            var item = FromStream(stream);
-            item.m_byteOrder = order;
-            return item;
+            return FromStream(stream, length, ByteOrder.LITTLE_ENDIAN);
+        }
+
+        public static IoBuffer FromStream(Stream stream, long length, ByteOrder order)
+        {
+            IoBuffer buffer = new IoBuffer(stream)
+            {
+                m_length = length,
+                m_byteOrder = order
+            };
+
+            return buffer;
         }
 
         public void Close()
@@ -56,7 +66,7 @@ namespace Sims2Tools.DBPF.IO
 
         public long Length
         {
-            get => m_reader.BaseStream.Length;
+            get => m_length;
         }
 
         public long Position
@@ -145,6 +155,16 @@ namespace Sims2Tools.DBPF.IO
             if (m_byteOrder == ByteOrder.BIG_ENDIAN)
             {
                 value = Endian.SwapUInt32(value);
+            }
+            return value;
+        }
+
+        public ulong ReadUInt64()
+        {
+            var value = m_reader.ReadUInt64();
+            if (m_byteOrder == ByteOrder.BIG_ENDIAN)
+            {
+                value = Endian.SwapUInt64(value);
             }
             return value;
         }

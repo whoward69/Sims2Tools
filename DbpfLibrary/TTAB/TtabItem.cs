@@ -35,10 +35,8 @@ namespace Sims2Tools.DBPF.TTAB
         private float memoryitermult;
         private uint objecttype;
         private uint modeltableid;
-        /*
         private TtabItemMotiveTable humanGroups;
         private TtabItemMotiveTable animalGroups;
-        */
 
         public ushort Action
         {
@@ -110,7 +108,6 @@ namespace Sims2Tools.DBPF.TTAB
             get => this.modeltableid;
         }
 
-        /*
         public TtabItemMotiveTable HumanMotives
         {
             get => this.humanGroups;
@@ -120,7 +117,6 @@ namespace Sims2Tools.DBPF.TTAB
         {
             get => this.animalGroups;
         }
-        */
 
         public TtabItem(uint format, IoBuffer reader)
         {
@@ -128,21 +124,12 @@ namespace Sims2Tools.DBPF.TTAB
             if (format < 68U)
                 this.counts = new int[1] { 16 };
             else if (format < 84U)
-                this.counts = new int[7]
-                {
-          16,
-          16,
-          16,
-          16,
-          16,
-          16,
-          16
-                };
+                this.counts = new int[7] { 16, 16, 16, 16, 16, 16, 16 };
+            else
+                this.counts = null;
 
-            /*
             this.humanGroups = new TtabItemMotiveTable(format, this.counts, TtabItemMotiveTableType.Human, null);
             this.animalGroups = new TtabItemMotiveTable(format, null, TtabItemMotiveTableType.Animal, null);
-            */
 
             this.Unserialize(reader);
         }
@@ -187,12 +174,12 @@ namespace Sims2Tools.DBPF.TTAB
                 }
             }
 
-            /*
             this.humanGroups = new TtabItemMotiveTable(format, this.counts, TtabItemMotiveTableType.Human, reader);
-            if (this.format < 84U)
-                return;
-            this.animalGroups = new TtabItemMotiveTable(format, null, TtabItemMotiveTableType.Animal, reader);
-            */
+
+            if (this.format >= 84U)
+            {
+                this.animalGroups = new TtabItemMotiveTable(format, null, TtabItemMotiveTableType.Animal, reader);
+            }
         }
 
         public XmlElement AddXml(XmlElement parent)

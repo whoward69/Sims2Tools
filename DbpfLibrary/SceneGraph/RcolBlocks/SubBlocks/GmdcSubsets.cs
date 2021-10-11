@@ -22,7 +22,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        #region Attributes	
         /// <summary>
         /// Number of Vertices stored in this SubSet
         /// </summary>
@@ -50,7 +49,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             get { return items; }
             set { items = value; }
         }
-        #endregion
+
 
         /// <summary>
         /// Constructor
@@ -230,7 +229,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
     }
 
-    #region Container
     /// <summary>
     /// Typesave ArrayList for GmdcJoint Objects
     /// </summary>
@@ -313,5 +311,5 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             return list;
         }
     }
-    #endregion
+
 }

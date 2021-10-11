@@ -14,7 +14,20 @@ using Sims2Tools.DBPF.BCON;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
+using Sims2Tools.DBPF.Images.IMG;
+using Sims2Tools.DBPF.Images.JPG;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Neighbourhood.BNFO;
+using Sims2Tools.DBPF.Neighbourhood.FAMI;
+using Sims2Tools.DBPF.Neighbourhood.FAMT;
+using Sims2Tools.DBPF.Neighbourhood.IDNO;
+using Sims2Tools.DBPF.Neighbourhood.LTXT;
+using Sims2Tools.DBPF.Neighbourhood.NGBH;
+using Sims2Tools.DBPF.Neighbourhood.SDNA;
+using Sims2Tools.DBPF.Neighbourhood.SDSC;
+using Sims2Tools.DBPF.Neighbourhood.SREL;
+using Sims2Tools.DBPF.Neighbourhood.SWAF;
+using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.SceneGraph.BINX;
@@ -37,6 +50,7 @@ using Sims2Tools.DBPF.SceneGraph.XHTN;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XSTN;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
+using Sims2Tools.DBPF.SLOT;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
@@ -80,7 +94,7 @@ namespace Sims2Tools.DBPF
         {
             m_EntryByFullID = new Dictionary<int, DBPFEntry>();
 
-            var io = IoBuffer.FromStream(stream, ByteOrder.LITTLE_ENDIAN);
+            var io = IoBuffer.FromStream(stream);
             this.m_Reader = io;
 
             var magic = io.ReadCString(4);
@@ -155,7 +169,7 @@ namespace Sims2Tools.DBPF
                 m_EntriesByType[entry.TypeID].Add(entry);
             }
 
-            var dirEntry = GetItemByFullID(Hash.TGIRHash((TypeInstanceID)0x286B1F03, (TypeResourceID)0x00000000, (TypeTypeID)0xE86B1EEF, (TypeGroupID)0xE86B1EEF));
+            var dirEntry = GetItemByTGIR(Hash.TGIRHash((TypeInstanceID)0x286B1F03, (TypeResourceID)0x00000000, (TypeTypeID)0xE86B1EEF, (TypeGroupID)0xE86B1EEF));
             if (dirEntry != null)
             {
                 DIRFile.Read(this, dirEntry);
@@ -168,11 +182,14 @@ namespace Sims2Tools.DBPF
             {
                 byte[] data = GetItem(entry);
 
-                return IoBuffer.FromStream(new MemoryStream(data), ByteOrder.LITTLE_ENDIAN);
+                return IoBuffer.FromStream(new MemoryStream(data));
             }
+            else
+            {
+                m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
 
-            m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
-            return m_Reader;
+                return IoBuffer.FromStream(m_Reader.MyStream, entry.FileSize);
+            }
         }
 
         public byte[] GetItem(DBPFEntry entry)
@@ -187,7 +204,7 @@ namespace Sims2Tools.DBPF
             return m_Reader.ReadBytes((int)entry.FileSize);
         }
 
-        public byte[] GetItemByFullID(int tgir)
+        public byte[] GetItemByTGIR(int tgir)
         {
             if (m_EntryByFullID.ContainsKey(tgir))
                 return GetItem(m_EntryByFullID[tgir]);
@@ -195,7 +212,7 @@ namespace Sims2Tools.DBPF
                 return null;
         }
 
-        public DBPFEntry GetEntryByFullID(int tgir)
+        public DBPFEntry GetEntryByTGIR(int tgir)
         {
             if (m_EntryByFullID.ContainsKey(tgir))
                 return m_EntryByFullID[tgir];
@@ -255,6 +272,14 @@ namespace Sims2Tools.DBPF
             {
                 res = new Objf(entry, this.GetIoBuffer(entry));
             }
+            else if (entry.TypeID == Nref.TYPE)
+            {
+                res = new Nref(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Slot.TYPE)
+            {
+                res = new Slot(entry, this.GetIoBuffer(entry));
+            }
             else if (entry.TypeID == Str.TYPE)
             {
                 res = new Str(entry, this.GetIoBuffer(entry));
@@ -279,7 +304,63 @@ namespace Sims2Tools.DBPF
             {
                 res = new Vers(entry, this.GetIoBuffer(entry));
             }
+            //
+            // Image resources
+            //
+            else if (entry.TypeID == Img.TYPE)
+            {
+                res = new Img(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Jpg.TYPE)
+            {
+                res = new Jpg(entry, this.GetIoBuffer(entry));
+            }
+            //
+            // Neighbourhood resources
+            //
+            else if (entry.TypeID == Bnfo.TYPE)
+            {
+                res = new Bnfo(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Fami.TYPE)
+            {
+                res = new Fami(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Famt.TYPE)
+            {
+                res = new Famt(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Idno.TYPE)
+            {
+                res = new Idno(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Ltxt.TYPE)
+            {
+                res = new Ltxt(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Ngbh.TYPE)
+            {
+                res = new Ngbh(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Sdna.TYPE)
+            {
+                res = new Sdna(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Sdsc.TYPE)
+            {
+                res = new Sdsc(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Srel.TYPE)
+            {
+                res = new Srel(entry, this.GetIoBuffer(entry));
+            }
+            else if (entry.TypeID == Swaf.TYPE)
+            {
+                res = new Swaf(entry, this.GetIoBuffer(entry));
+            }
+            //
             // SceneGraph resources
+            //
             else if (entry.TypeID == Binx.TYPE)
             {
                 res = new Binx(entry, this.GetIoBuffer(entry));

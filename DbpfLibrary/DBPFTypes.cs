@@ -1,4 +1,16 @@
-﻿using Sims2Tools.DBPF.Utils;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
+ * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
+ * Parts of this code may have been decompiled with the JetBrains decompiler
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF.Utils;
 using System;
 
 namespace Sims2Tools.DBPF
@@ -45,6 +57,7 @@ namespace Sims2Tools.DBPF
         public override String ToString() => Helper.Hex8PrefixString(id);
         public String ToShortString() => Helper.Hex4PrefixString(id);
         public String Hex8String() => Helper.Hex8String(id);
+        public String IntString() => Helper.IntString(id);
     }
 
     public readonly struct TypeGroupID : IComparable<TypeGroupID>
@@ -66,6 +79,7 @@ namespace Sims2Tools.DBPF
         public override String ToString() => Helper.Hex8PrefixString(id);
         public String ToShortString() => Helper.Hex4PrefixString(id);
         public String Hex8String() => Helper.Hex8String(id);
+        public String IntString() => Helper.IntString(id);
     }
 
     public readonly struct TypeInstanceID : IComparable<TypeInstanceID>
@@ -87,6 +101,9 @@ namespace Sims2Tools.DBPF
         public override String ToString() => Helper.Hex8PrefixString(id);
         public String ToShortString() => Helper.Hex4PrefixString(id);
         public String Hex8String() => Helper.Hex8String(id);
+        public String IntString() => Helper.IntString(id);
+
+        public int AsInt() => (int)id;
     }
 
     public readonly struct TypeResourceID : IComparable<TypeResourceID>
@@ -108,6 +125,7 @@ namespace Sims2Tools.DBPF
         public override String ToString() => Helper.Hex8PrefixString(id);
         public String ToShortString() => Helper.Hex4PrefixString(id);
         public String Hex8String() => Helper.Hex8String(id);
+        public String IntString() => Helper.IntString(id);
     }
 
     /*

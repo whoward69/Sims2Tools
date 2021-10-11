@@ -17,6 +17,23 @@ namespace Sims2Tools.DBPF.Utils
 {
     public static class Helper
     {
+        public static string IntString(uint input)
+        {
+            return input.ToString("D");
+        }
+
+        public static string Binary8String(uint input)
+        {
+            String binStr = $"0000000{Convert.ToString(input, 2)}";
+            return binStr.Substring(binStr.Length - 8, 8);
+        }
+
+        public static string Binary16String(uint input)
+        {
+            String binStr = $"000000000000000{Convert.ToString(input, 2)}";
+            return binStr.Substring(binStr.Length - 16, 16);
+        }
+
         public static string Hex8String(uint input)
         {
             String s = input.ToString("X8");

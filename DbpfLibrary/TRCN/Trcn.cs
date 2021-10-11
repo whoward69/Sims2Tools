@@ -71,7 +71,7 @@ namespace Sims2Tools.DBPF.TRCN
             }
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
 
@@ -79,6 +79,8 @@ namespace Sims2Tools.DBPF.TRCN
             {
                 CreateTextElement(element, "item", items[i].ConstName).SetAttribute("index", Helper.Hex4PrefixString(i));
             }
+
+            return element;
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Sims2Tools.DBPF.BCON
             }
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
             element.SetAttribute("flag", Flag.ToString().ToLower());
@@ -61,6 +61,8 @@ namespace Sims2Tools.DBPF.BCON
                 XmlElement ele = CreateTextElement(element, "item", Helper.Hex4PrefixString(items[i]));
                 ele.SetAttribute("index", Helper.Hex4PrefixString(i));
             }
+
+            return element;
         }
     }
 }

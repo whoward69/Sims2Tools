@@ -22,7 +22,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x253D2018;
         public static String NAME = "cLightRefNode";
 
-        #region Attributes
+
 
         readonly RenderableNode rn;
         readonly BoundedNode bn;
@@ -50,7 +50,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             //set { unknown2 = value; }
         }
 
-        #endregion
+
 
 
         /// <summary>
@@ -69,7 +69,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown2 = new byte[13];
         }
 
-        #region AbstractCresChildren Member
         public override string GetName()
         {
             return tn.ObjectGraphNode.FileName;
@@ -85,10 +84,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 return tn.ChildBlocks;
             }
         }
-
-        #endregion
-
-        #region IRcolBlock Member
 
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
@@ -123,7 +118,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown2 = reader.ReadBytes(13);
         }
 
-        #endregion
+
 
         public override void Dispose()
         {

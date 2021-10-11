@@ -1,7 +1,14 @@
-﻿using Sims2Tools.Dialogs;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.Dialogs;
 using Sims2Tools.Utils.Persistence;
 using System;
-using System.Net;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -107,7 +114,7 @@ namespace Sims2Tools.Updates
 
         private void OnUpdateFrequency(object sender, EventArgs e)
         {
-            RegistryTools.SetUpdateCheckFrequency(AppRegKey, (int) (sender as ToolStripMenuItem).Tag);
+            RegistryTools.SetUpdateCheckFrequency(AppRegKey, (int)(sender as ToolStripMenuItem).Tag);
         }
 
         private void OnUpdateNow(object sender, EventArgs e)
@@ -123,7 +130,7 @@ namespace Sims2Tools.Updates
             }
         }
 
-        private  void CheckForUpdatesNow()
+        private void CheckForUpdatesNow()
         {
             try
             {
@@ -146,7 +153,8 @@ namespace Sims2Tools.Updates
                             int minorCurrent = (int)RegistryTools.GetSetting(AppRegKey, "VersionMinor", 0);
 
                             if ((majorLatest > majorCurrent) ||
-                                (majorLatest == majorCurrent && minorLatest > minorCurrent)) {
+                                (majorLatest == majorCurrent && minorLatest > minorCurrent))
+                            {
                                 if (MsgBox.Show($"A later version of this utility is available.\n\nCurrent version {majorCurrent}.{minorCurrent}, latest version {majorLatest}.{minorLatest}", "Update Available", MessageBoxButtons.OK) == DialogResult.OK)
                                 {
                                     RegistryTools.SetNextUpdateCheck(AppRegKey);

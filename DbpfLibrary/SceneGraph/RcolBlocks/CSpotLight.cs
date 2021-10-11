@@ -22,7 +22,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly new TypeBlockID TYPE = (TypeBlockID)0xC9C81BAD;
         public new const String NAME = "cSpotLight";
 
-        #region Attributes
+
         float unknown10;
         public float Val8
         {
@@ -37,7 +37,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             set { unknown11 = value; }
         }
 
-        #endregion
+
 
         /// <summary>
         /// Constructor

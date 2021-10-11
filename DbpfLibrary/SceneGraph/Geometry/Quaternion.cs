@@ -726,7 +726,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         }
     }
 
-    #region Container
     /// <summary>
     /// Typesave ArrayList for Quaternion Objects
     /// </summary>
@@ -810,5 +809,5 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         }
 
     }
-    #endregion
+
 }

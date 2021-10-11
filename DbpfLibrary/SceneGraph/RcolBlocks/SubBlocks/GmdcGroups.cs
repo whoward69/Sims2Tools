@@ -39,7 +39,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
     /// </summary>
     public class GmdcGroup : GmdcLinkBlock
     {
-        #region Attributes
+
 
         PrimitiveType unknown1;
         /// <summary>
@@ -114,7 +114,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             get { return items2; }
             set { items2 = value; }
         }
-        #endregion
+
 
         /// <summary>
         /// Constructor
@@ -166,7 +166,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                 foreach (int i in Faces) if (!refs.ContainsKey(i)) refs[i] = 1;
                 int ret = refs.Count;
                 refs.Clear();
-                refs = null;
                 return ret;
             }
         }
@@ -217,10 +216,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                     {
                         GmdcElementValueBase vb = Link.GetValue(nr, i);
                         Vector4f v;
+#pragma warning disable IDE0038 // Use pattern matching
                         if (vb is GmdcElementValueOneInt)
+#pragma warning restore IDE0038 // Use pattern matching
                         {
-                            GmdcElementValueOneInt oi = (GmdcElementValueOneInt)vb;
-                            byte[] data = oi.Bytes;
+                            byte[] data = ((GmdcElementValueOneInt)vb).Bytes;
+
                             if (data.Length == 4) v = new Vector4f(data[0], data[1], data[2], data[3]);
                             else if (data.Length == 3) v = new Vector4f(data[0], data[1], data[2]);
                             else if (data.Length == 2) v = new Vector4f(data[0], data[1], 0);
@@ -296,8 +297,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
                 if (i % 3 == 0)
                 {
-                    v = new Vector3i();
-                    v.X = Faces[i];
+                    v = new Vector3i
+                    {
+                        X = Faces[i]
+                    };
                 }
                 else if (i % 3 == 2)
                 {
@@ -322,7 +325,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
     }
 
-    #region Container
     /// <summary>
     /// Typesave ArrayList for GmdcGroup Objects
     /// </summary>
@@ -405,5 +407,5 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             return list;
         }
     }
-    #endregion
+
 }

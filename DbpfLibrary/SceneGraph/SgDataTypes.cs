@@ -141,9 +141,11 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public abstract SgResourceList SgNeededResources();
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             CreateComment(parent, $"{SgHash} - '{SgName}'");
+
+            return null;
         }
     }
 
@@ -177,9 +179,11 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public abstract SgResourceList SgNeededResources();
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             CreateComment(parent, $"{SgHash} - '{SgName}'");
+
+            return null;
         }
     }
 

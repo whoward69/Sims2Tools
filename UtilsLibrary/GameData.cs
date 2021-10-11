@@ -29,6 +29,8 @@ namespace Sims2Tools
         static public String ep3dPath = @"\TSData\Res\3D";
         static public String sp3dPath = @"\TSData\Res\3D";
 
+        static public SortedDictionary<String, String> languagesByCode;
+
         static public SortedDictionary<String, String> primitivesByOpCode;
 
         static public SortedDictionary<String, String> textlistsByInstance;
@@ -44,6 +46,21 @@ namespace Sims2Tools
             logger.Info($"Loading GameData");
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+
+            if (!GameDataCache.Deserialize(out languagesByCode, "languagesByCode"))
+            {
+                ParseXml("Resources/XML/languages.xml", "language", languagesByCode);
+#if DEBUG
+                logger.Info($"Loaded {languagesByCode.Count} languages from XML");
+#endif
+                GameDataCache.Serialize(languagesByCode, "languagesByCode");
+#if DEBUG
+            }
+            else
+            {
+                logger.Info($"Loaded {languagesByCode.Count} languages from cache");
+#endif
+            }
 
             if (!GameDataCache.Deserialize(out primitivesByOpCode, "primitivesByOpCode"))
             {

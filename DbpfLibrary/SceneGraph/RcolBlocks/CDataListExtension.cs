@@ -21,14 +21,14 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x6A836D56;
         public static String NAME = "cDataListExtension";
 
-        #region Attributes
+
         readonly Extension ext;
         public Extension Extension
         {
             get { return ext; }
         }
 
-        #endregion
+
 
 
 

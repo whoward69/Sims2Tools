@@ -21,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x7BA3838C;
         public static String NAME = "cGeometryNode";
 
-        #region Attributes
+
         ObjectGraphNode ogn;
 
         public ObjectGraphNode ObjectGraphNode
@@ -61,7 +61,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return data; }
             set { data = value; }
         }
-        #endregion
+
 
 
         /// <summary>
@@ -77,8 +77,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             data = new IRcolBlock[0];
         }
-
-        #region IRcolBlock Member
 
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
@@ -119,7 +117,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             }
         }
 
-        #endregion
+
 
 
         public override void Dispose()

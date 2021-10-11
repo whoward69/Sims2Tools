@@ -34,7 +34,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             TranslateRotate = 1
         };
 
-        #region Attributes
+
         TransformOrder o;
         /// <summary>
         /// Returns / Sets the current Order
@@ -63,7 +63,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             get { return quat; }
             set { quat = value; }
         }
-        #endregion
+
 
         /// <summary>
         /// Create a new Instance
@@ -154,9 +154,11 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         /// <returns></returns>
         public VectorTransformation Clone()
         {
-            VectorTransformation v = new VectorTransformation(this.Order);
-            v.Rotation = Rotation.Clone();
-            v.Translation = Translation.Clone();
+            VectorTransformation v = new VectorTransformation(this.Order)
+            {
+                Rotation = Rotation.Clone(),
+                Translation = Translation.Clone()
+            };
 
             return v;
         }
@@ -171,7 +173,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
 #endif
     }
 
-    #region container
     /// <summary>
     /// Typesave ArrayList for VectorTransformation Objects
     /// </summary>
@@ -254,5 +255,5 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             return list;
         }
     }
-    #endregion
+
 }

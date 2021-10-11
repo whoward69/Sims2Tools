@@ -32,7 +32,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             Binary = 0x09
         }
 
-        #region Attributes
+
         ItemTypes typecode;
         public ItemTypes Typecode
         {
@@ -100,7 +100,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             set { data = value; }
         }
 
-        #endregion
+
 
         public ExtensionItem()
         {
@@ -183,7 +183,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     /// </remarks>
     public class Extension : AbstractRcolBlock
     {
-        #region Attributes
+
 
         byte typecode;
         public byte TypeCode
@@ -211,7 +211,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         //int unknown1;
         //int unknown2;
-        #endregion
+
 
 
         /// <summary>
@@ -224,8 +224,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             typecode = 0x07;
             varname = "";
         }
-
-        #region IRcolBlock Member
 
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
@@ -275,7 +273,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         }
 
-        #endregion
+
 
         /// <summary>
         /// You can use this to setop the Controls on a TabPage befor it is dispplayed

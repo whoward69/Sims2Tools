@@ -16,12 +16,12 @@ namespace Sims2Tools.DBPF.Utils
     {
         public static short SwapInt16(short v)
         {
-            return (short)(((v & 0xFF) << 8) | ((v >> 8) & 0xFF));
+            return (short)(((v & 0xFF) << 0x08) | ((v >> 0x08) & 0xFF));
         }
 
         public static ushort SwapUInt16(ushort v)
         {
-            return (ushort)(((v & 0xFF) << 8) | ((v >> 8) & 0xFF));
+            return (ushort)(((v & 0xFF) << 0x08) | ((v >> 0x08) & 0xFF));
         }
 
         public static int SwapInt32(int v)
@@ -34,6 +34,12 @@ namespace Sims2Tools.DBPF.Utils
         {
             return (uint)(((SwapUInt16((ushort)v) & 0xFFFF) << 0x10) |
                            (SwapUInt16((ushort)(v >> 0x10)) & 0xFFFF));
+        }
+
+        public static ulong SwapUInt64(ulong v)
+        {
+            return ((SwapUInt32((uint)v) & 0xFFFFFFFF) << 0x20) |
+                           (SwapUInt32((uint)(v >> 0x20)) & 0xFFFFFFFF);
         }
     }
 }

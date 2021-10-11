@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xC9C81BA3;
         public const String NAME = "cDirectionalLight";
 
-        #region Attributes
+
 
         StandardLightBase slb;
         public StandardLightBase StandardLightBase
@@ -97,7 +97,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
 
 
-        #endregion
+
 
 
         /// <summary>
@@ -116,8 +116,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             unknown2 = "";
         }
-
-        #region IRcolBlock Member
 
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
@@ -154,7 +152,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             green = reader.ReadSingle();
             blue = reader.ReadSingle();
         }
-        #endregion
+
 
         public override void Dispose()
         {

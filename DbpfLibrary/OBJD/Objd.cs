@@ -128,7 +128,7 @@ namespace Sims2Tools.DBPF.OBJD
             data = null;
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
             element.SetAttribute("type", Helper.Hex4PrefixString(Type));
@@ -144,6 +144,8 @@ namespace Sims2Tools.DBPF.OBJD
                     CreateTextElement(element, "data", Helper.Hex4PrefixString(RawData(i))).SetAttribute("index", Helper.Hex4PrefixString(i));
                 }
             }
+
+            return element;
         }
 
         public string SgHash => sgHash;

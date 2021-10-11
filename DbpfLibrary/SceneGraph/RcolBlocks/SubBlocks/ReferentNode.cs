@@ -17,9 +17,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class ReferentNode : AbstractRcolBlock
     {
-        #region Attributes
 
-        #endregion
+
+
         /*public Rcol Parent 
 		{
 			get { return parent; }
@@ -32,8 +32,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         {
         }
 
-        #region IRcolBlock Member
-
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
@@ -43,7 +41,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             version = reader.ReadUInt32();
         }
 
-        #endregion
+
 
         public override void Dispose()
         {

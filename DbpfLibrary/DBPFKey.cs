@@ -36,6 +36,8 @@ namespace Sims2Tools.DBPF
         private int tgiHash = 0;
         private int tgirHash = 0;
 
+        private String tgirString = null;
+
         public TypeTypeID TypeID => typeID;
 
         public TypeGroupID GroupID => groupID;
@@ -66,6 +68,17 @@ namespace Sims2Tools.DBPF
             }
         }
 
+        public String TGIRString
+        {
+            get
+            {
+                if (tgirString == null)
+                    tgirString = $"{DBPFData.TypeName(TypeID)}-{GroupID}-{ResourceID}-{InstanceID}";
+
+                return tgirString;
+            }
+        }
+
         public DBPFKey(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID)
         {
             this.typeID = typeID;
@@ -92,7 +105,7 @@ namespace Sims2Tools.DBPF
 
         public override int GetHashCode() => TGIRHash;
 
-        public int CompareTo(DBPFKey other) => this.TGIRHash.CompareTo(other.TGIRHash);
+        public int CompareTo(DBPFKey other) => this.TGIRString.CompareTo(other.TGIRString);
 
         public override string ToString() => $"{DBPFData.TypeName(TypeID)}-{GroupID}-{ResourceID}-{InstanceID}";
     }

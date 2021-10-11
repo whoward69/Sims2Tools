@@ -21,13 +21,29 @@ namespace Sims2Tools.DBPF
         {
         }
 
-        public abstract void AddXml(XmlElement parent);
+        public abstract XmlElement AddXml(XmlElement parent);
 
         protected XmlElement CreateResElement(XmlElement parent, String name)
         {
             XmlElement element = parent.OwnerDocument.CreateElement(name.ToLower());
             parent.AppendChild(element);
+
             AddAttributes(element);
+
+            return element;
+        }
+
+        protected XmlElement CreateInstElement(XmlElement parent, String name)
+        {
+            return CreateInstElement(parent, name, "instanceId");
+        }
+
+        protected XmlElement CreateInstElement(XmlElement parent, String name, String attrName)
+        {
+            XmlElement element = parent.OwnerDocument.CreateElement(name.ToLower());
+            parent.AppendChild(element);
+
+            element.SetAttribute(attrName, InstanceID.ToString());
 
             return element;
         }
@@ -45,6 +61,21 @@ namespace Sims2Tools.DBPF
             XmlElement element = CreateElement(parent, name);
 
             XmlNode textnode = element.OwnerDocument.CreateTextNode(text);
+            element.AppendChild(textnode);
+
+            return element;
+        }
+
+        protected XmlElement CreateCDataElement(XmlElement parent, String name, Byte[] data)
+        {
+            return CreateCDataElement(parent, name, Convert.ToBase64String(data, Base64FormattingOptions.InsertLineBreaks));
+        }
+
+        protected XmlElement CreateCDataElement(XmlElement parent, String name, String text)
+        {
+            XmlElement element = CreateElement(parent, name);
+
+            XmlNode textnode = element.OwnerDocument.CreateCDataSection(text);
             element.AppendChild(textnode);
 
             return element;

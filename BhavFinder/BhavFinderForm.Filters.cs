@@ -38,7 +38,7 @@ namespace BhavFinder
             {
                 uint opcodeFrom = 0xffff;
                 uint opcodeTo = 0xffff;
-                
+
                 if (comboOpCode.Text.IndexOf(":") == -1)
                 {
                     Match m = HexOpCodeRegex.Match(comboOpCode.Text);

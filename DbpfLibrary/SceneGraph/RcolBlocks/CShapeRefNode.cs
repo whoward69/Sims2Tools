@@ -172,8 +172,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             BlockID = TYPE;
         }
 
-        #region IRcolBlock Member
-
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
@@ -232,9 +230,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown6 = reader.ReadInt32();
         }
 
-        #endregion
-
-        #region AbstractCresChildren Member
         public override string GetName()
         {
             return tn.ObjectGraphNode.FileName;
@@ -251,7 +246,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             }
         }
 
-        #endregion
+
 
         public override string ToString()
         {

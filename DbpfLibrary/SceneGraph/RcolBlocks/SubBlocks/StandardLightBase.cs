@@ -26,8 +26,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             BlockID = TypeBlockID.NULL;
         }
 
-        #region IRcolBlock Member
-
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
@@ -37,7 +35,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             version = reader.ReadUInt32();
         }
 
-        #endregion
+
 
         public override void Dispose()
         {

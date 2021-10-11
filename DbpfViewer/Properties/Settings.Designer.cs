@@ -34,5 +34,17 @@ namespace DbpfViewer.Properties {
                 this["MruSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MistyRose")]
+        public string SaveRawHighlight {
+            get {
+                return ((string)(this["SaveRawHighlight"]));
+            }
+            set {
+                this["SaveRawHighlight"] = value;
+            }
+        }
     }
 }

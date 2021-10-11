@@ -14,6 +14,9 @@ using Sims2Tools.DBPF.BCON;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
+using Sims2Tools.DBPF.Images.IMG;
+using Sims2Tools.DBPF.Images.JPG;
+using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.SceneGraph.BINX;
@@ -36,6 +39,7 @@ using Sims2Tools.DBPF.SceneGraph.XHTN;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XSTN;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
+using Sims2Tools.DBPF.SLOT;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
@@ -62,7 +66,10 @@ namespace Sims2Tools.DBPF
 
         public static TypeInstanceID INSTANCE_OBJD_DEFAULT = (TypeInstanceID)0x41A7;
 
+        public static TypeGUID GUID_NULL = (TypeGUID)0x00000000;
+
         private static readonly Dictionary<TypeTypeID, String> ModTypeNames = new Dictionary<TypeTypeID, string>();
+        private static readonly Dictionary<TypeTypeID, String> ImgTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, String> SgTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, String> AllTypeNames = new Dictionary<TypeTypeID, string>();
 
@@ -74,12 +81,17 @@ namespace Sims2Tools.DBPF
             ModTypeNames.Add(Glob.TYPE, Glob.NAME);
             ModTypeNames.Add(Objd.TYPE, Objd.NAME);
             ModTypeNames.Add(Objf.TYPE, Objf.NAME);
+            ModTypeNames.Add(Nref.TYPE, Nref.NAME);
+            ModTypeNames.Add(Slot.TYPE, Slot.NAME);
             ModTypeNames.Add(Str.TYPE, Str.NAME);
             ModTypeNames.Add(Tprp.TYPE, Tprp.NAME);
             ModTypeNames.Add(Trcn.TYPE, Trcn.NAME);
             ModTypeNames.Add(Ttab.TYPE, Ttab.NAME);
             ModTypeNames.Add(Ttas.TYPE, Ttas.NAME);
             ModTypeNames.Add(Vers.TYPE, Vers.NAME);
+
+            ImgTypeNames.Add(Img.TYPE, Img.NAME);
+            ImgTypeNames.Add(Jpg.TYPE, Jpg.NAME);
 
             // SgTypeNames.Add(Anim.TYPE, Anim.NAME);
             SgTypeNames.Add(Binx.TYPE, Binx.NAME);
@@ -106,6 +118,7 @@ namespace Sims2Tools.DBPF
             SgTypeNames.Add(Xtol.TYPE, Xtol.NAME);
 
             foreach (KeyValuePair<TypeTypeID, String> kvPair in ModTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
+            foreach (KeyValuePair<TypeTypeID, String> kvPair in ImgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, String> kvPair in SgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
         }
 
@@ -117,6 +130,11 @@ namespace Sims2Tools.DBPF
         public static Dictionary<TypeTypeID, String>.KeyCollection ModTypes
         {
             get => ModTypeNames.Keys;
+        }
+
+        public static Dictionary<TypeTypeID, String>.KeyCollection ImgTypes
+        {
+            get => ImgTypeNames.Keys;
         }
 
         public static Dictionary<TypeTypeID, String>.KeyCollection SgTypes
@@ -134,6 +152,21 @@ namespace Sims2Tools.DBPF
         public static bool IsKnownType(TypeTypeID type)
         {
             return AllTypeNames.ContainsKey(type);
+        }
+
+        public static bool IsKnownModType(TypeTypeID type)
+        {
+            return ModTypeNames.ContainsKey(type);
+        }
+
+        public static bool IsKnownImgType(TypeTypeID type)
+        {
+            return ImgTypeNames.ContainsKey(type);
+        }
+
+        public static bool IsKnownSgType(TypeTypeID type)
+        {
+            return SgTypeNames.ContainsKey(type);
         }
 
         public static TypeTypeID TypeID(String name)

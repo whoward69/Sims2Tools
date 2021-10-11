@@ -21,16 +21,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xE9075BC5;
         public static String NAME = "cBoneDataExtension";
 
-        #region Attributes
+
         readonly Extension ext;
         public Extension Extension
         {
             get { return ext; }
         }
-
-        #endregion
-
-
 
 
         /// <summary>
@@ -42,8 +38,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             version = 0x01;
             BlockID = TYPE;
         }
-
-        #region IRcolBlock Member
 
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
@@ -59,7 +53,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             ext.BlockID = myid;
         }
 
-        #endregion
+
 
         public override void Dispose()
         {

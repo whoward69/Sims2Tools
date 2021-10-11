@@ -346,7 +346,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
     /// </summary>
     public class GmdcElement : GmdcLinkBlock
     {
-        #region Attributes
+
 
         int number;
         /// <summary>
@@ -421,7 +421,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             get { return items; }
             set { items = value; }
         }
-        #endregion
+
 
         /// <summary>
         /// Constructor
@@ -492,7 +492,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
     }
 
-    #region Container
     /// <summary>
     /// Typesave ArrayList for GmdcElementValueBase Objects
     /// </summary>
@@ -658,5 +657,5 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             return list;
         }
     }
-    #endregion
+
 }

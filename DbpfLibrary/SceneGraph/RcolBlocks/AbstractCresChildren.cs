@@ -99,16 +99,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get;
         }
 
-        #region IEnumerable Member
-
         public IEnumerator GetEnumerator()
         {
             return this;
         }
-
-        #endregion
-
-        #region IEnumerator Member
 
         int pos;
         public void Reset()
@@ -131,6 +125,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             return (pos < this.ChildBlocks.Count);
         }
 
-        #endregion
+
     }
 }

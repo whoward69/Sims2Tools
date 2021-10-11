@@ -1,11 +1,16 @@
-﻿using Sims2Tools.DBPF;
+﻿/*
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2021
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools.DBPF;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sims2Tools.Cache
 {
@@ -50,7 +55,8 @@ namespace Sims2Tools.Cache
                 try
                 {
                     File.Delete($"{cacheBase}/{cacheName}.bin");
-                } catch (Exception) {}
+                }
+                catch (Exception) { }
 
                 return false;
             }

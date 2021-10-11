@@ -24,13 +24,21 @@ namespace Sims2Tools.DBPF.STR
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x53545223;
         public const string NAME = "STR";
 
+        MetaData.Languages onlyLid = MetaData.Languages.Unknown;
+
         MetaData.FormatCode format;
 
         Hashtable lines;
 
         public Str(DBPFEntry entry, IoBuffer reader) : base(entry)
         {
-            Unserialize(reader, entry.FileSize);
+            Unserialize(reader /*, entry.FileSize*/);
+        }
+
+        public MetaData.Languages PrefLid
+        {
+            get => onlyLid;
+            set => onlyLid = value;
         }
 
         public StrLanguageList Languages
@@ -60,10 +68,11 @@ namespace Sims2Tools.DBPF.STR
             return items;
         }
 
-        protected void Unserialize(IoBuffer reader, uint length)
+        protected void Unserialize(IoBuffer reader /*, uint length*/)
         {
             lines = new Hashtable();
-            if (length <= 0x40) return;
+            // Why? Some resources have a declared length less than the actual amount of data in them!
+            // if (length <= 0x40) return;
 
             this.FileName = Helper.ToString(reader.ReadBytes(0x40));
 
@@ -77,31 +86,66 @@ namespace Sims2Tools.DBPF.STR
             }
         }
 
-        public override void AddXml(XmlElement parent)
+        public override XmlElement AddXml(XmlElement parent)
         {
-            AddXmlItems(CreateResElement(parent, NAME));
+            XmlElement element = CreateResElement(parent, NAME);
+
+            AddXmlItems(element);
+
+            return element;
         }
 
         protected void AddXmlItems(XmlElement parent)
         {
-            foreach (StrLanguage strlng in Languages)
+            if (onlyLid == MetaData.Languages.Unknown)
             {
-                XmlElement lang = CreateElement(parent, "language");
-                lang.SetAttribute("id", Helper.Hex2PrefixString(strlng.Id));
-                if (strlng.Name != strlng.Id.ToString()) lang.SetAttribute("name", strlng.Name);
-
-                StrItemList stritems = LanguageItems(strlng);
-
-                for (int i = 0; i < stritems.Count; ++i)
+                foreach (StrLanguage strlng in Languages)
                 {
-                    StrToken stritem = stritems[i];
-
-                    XmlElement ele = CreateElement(lang, "item");
-                    ele.SetAttribute("index", Helper.Hex4PrefixString(i));
-
-                    CreateTextElement(ele, "text", stritem.Title);
-                    CreateTextElement(ele, "desc", stritem.Description);
+                    AddXmlLang(parent, strlng);
                 }
+            }
+            else
+            {
+                StrLanguage deflng = null;
+
+                foreach (StrLanguage strlng in Languages)
+                {
+                    if (strlng.Lid == onlyLid)
+                    {
+                        AddXmlLang(parent, strlng);
+                        return;
+                    }
+
+                    if (strlng.Lid == MetaData.Languages.English)
+                    {
+                        deflng = strlng;
+                    }
+                }
+
+                if (deflng != null)
+                {
+                    AddXmlLang(parent, deflng);
+                }
+            }
+        }
+
+        private void AddXmlLang(XmlElement parent, StrLanguage strlng)
+        {
+            XmlElement lang = CreateElement(parent, "language");
+            lang.SetAttribute("id", Helper.Hex2PrefixString(strlng.Id));
+            if (strlng.Name != strlng.Id.ToString()) lang.SetAttribute("name", strlng.Name);
+
+            StrItemList stritems = LanguageItems(strlng);
+
+            for (int i = 0; i < stritems.Count; ++i)
+            {
+                StrToken stritem = stritems[i];
+
+                XmlElement ele = CreateElement(lang, "item");
+                ele.SetAttribute("index", Helper.Hex4PrefixString(i));
+
+                CreateCDataElement(ele, "text", stritem.Title);
+                CreateCDataElement(ele, "desc", stritem.Description);
             }
         }
     }

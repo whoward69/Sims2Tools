@@ -237,9 +237,7 @@ namespace BhavFinder
                 }
                 else
                 {
-                    String binStr = Convert.ToString(Convert.ToUInt32(tb.Text, 16), 2);
-                    binStr = $"0000000{binStr}";
-                    binStr = binStr.Substring(binStr.Length - 8, 8);
+                    String binStr = Helper.Binary8String(Convert.ToUInt32(tb.Text, 16));
                     toolTipOperands.SetToolTip(tb, $"Binary: {binStr.Substring(0, 4)} {binStr.Substring(4, 4)}");
                 }
             }

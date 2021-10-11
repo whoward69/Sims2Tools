@@ -21,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x0C152B8E;
         public static String NAME = "cViewerRefNodeRecursive";
 
-        #region Attributes
+
         readonly ViewerRefNodeBase vrnb;
         readonly RenderableNode rn;
         readonly BoundedNode bn;
@@ -69,7 +69,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             set { unknown5 = value; }
         }
 
-        #endregion
+
 
 
         /// <summary>
@@ -89,8 +89,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             version = 0x01;
             BlockID = TYPE;
         }
-
-        #region IRcolBlock Member
 
         /// <summary>
         /// Unserializes a BinaryStream into the Attributes of this Instance
@@ -130,7 +128,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown5 = reader.ReadBytes(64);
         }
 
-        #endregion
+
 
         public override void Dispose()
         {

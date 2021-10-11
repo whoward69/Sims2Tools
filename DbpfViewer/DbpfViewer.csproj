@@ -95,7 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DbpfLibrary\DbpfLibrary.csproj">
-      <Project>{306e0f14-dfae-4cf3-a408-f16468c07d93}</Project>
+      <Project>{fbecabcd-0403-4b7e-9992-01562a62db83}</Project>
       <Name>DbpfLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\UtilsLibrary\UtilsLibrary.csproj">
