@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<labels>
+  <label><value>0</value><name>Sitting?</name></label>
+  <label><value>1</value><name>Money Amount over Head</name></label>
+  <label><value>2</value><name>Personality Nice</name></label>
+  <label><value>3</value><name>Personality  Active</name></label>
+  <label><value>4</value><name>kEP1 - Current Grade</name></label>
+  <label><value>5</value><name>Personality Playful</name></label>
+  <label><value>6</value><name>Personality Outgoing</name></label>
+  <label><value>7</value><name>Personality Neat</name></label>
+  <label><value>8</value><name>Current Outfit</name></label>
+  <label><value>9</value><name>Cleaning Skill</name></label>
+  <label><value>10</value><name>Cooking Skill</name></label>
+  <label><value>11</value><name>Charisma Skill</name></label>
+  <label><value>12</value><name>Mechanical Skill</name></label>
+  <label><value>13</value><name>reserved for future skill(was Gardening Skill )</name></label>
+  <label><value>14</value><name>Partner Neighbor ID</name></label>
+  <label><value>15</value><name>Creativity Skill</name></label>
+  <label><value>16</value><name>reserved for future skill(was Literacy Skill )</name></label>
+  <label><value>17</value><name>Body Skill</name></label>
+  <label><value>18</value><name>Logic Skill</name></label>
+  <label><value>19</value><name>Group Talk State Flags</name></label>
+  <label><value>20</value><name>Body Temp</name></label>
+  <label><value>21</value><name>ci: Current Interaction Index</name></label>
+  <label><value>22</value><name>Gender Pref - Male</name></label>
+  <label><value>23</value><name>Gender Pref - Female</name></label>
+  <label><value>24</value><name>Job Data</name></label>
+  <label><value>25</value><name>Interaction Data Field #1</name></label>
+  <label><value>26</value><name>ci: Sub Queue Interaction Count</name></label>
+  <label><value>27</value><name>tick counter</name></label>
+  <label><value>28</value><name>Interaction Data Field #2</name></label>
+  <label><value>29</value><name>Motives Static?</name></label>
+  <label><value>30</value><name>Censorship Flags</name></label>
+  <label><value>31</value><name>neighbor id</name></label>
+  <label><value>32</value><name>Person Type</name></label>
+  <label><value>33</value><name>Priority</name></label>
+  <label><value>34</value><name>Greet Status</name></label>
+  <label><value>35</value><name>visitor schedule</name></label>
+  <label><value>36</value><name>autonomy level</name></label>
+  <label><value>37</value><name>route slot</name></label>
+  <label><value>38</value><name>route multi slot index</name></label>
+  <label><value>39</value><name>route status</name></label>
+  <label><value>40</value><name>route goal</name></label>
+  <label><value>41</value><name>Look At Object ID</name></label>
+  <label><value>42</value><name>Look At Slot ID</name></label>
+  <label><value>43</value><name>Look At State</name></label>
+  <label><value>44</value><name>Look At Time Remaining</name></label>
+  <label><value>45</value><name>cn: Next Queued Interaction Index</name></label>
+  <label><value>46</value><name>Aspiration</name></label>
+  <label><value>47</value><name>Original Neat Personality Type</name></label>
+  <label><value>48</value><name>Original Nice Personality</name></label>
+  <label><value>49</value><name>Original Active Personality</name></label>
+  <label><value>50</value><name>Original Outgoing Personality</name></label>
+  <label><value>51</value><name>Original Playful Personality</name></label>
+  <label><value>52</value><name>Sim UI Icon Flags</name></label>
+  <label><value>53</value><name>FindBestAction result Interaction Object ID</name></label>
+  <label><value>54</value><name>Memory Score</name></label>
+  <label><value>55</value><name>route start slot</name></label>
+  <label><value>56</value><name>School Grade</name></label>
+  <label><value>57</value><name>Job Promotion Level</name></label>
+  <label><value>58</value><name>Person Age</name></label>
+  <label><value>59</value><name>Social Menu Obj ID</name></label>
+  <label><value>60</value><name>skin color (not Used)</name></label>
+  <label><value>61</value><name>family number</name></label>
+  <label><value>62</value><name>route result</name></label>
+  <label><value>63</value><name>job performance</name></label>
+  <label><value>64</value><name>Is Swimming?</name></label>
+  <label><value>65</value><name>Gender(0=male/1=female)</name></label>
+  <label><value>66</value><name>private</name></label>
+  <label><value>67</value><name>lingering house number</name></label>
+  <label><value>68</value><name>Ghost Flags (Routing Behavior)</name></label>
+  <label><value>69</value><name>PTO</name></label>
+  <label><value>70</value><name>zodiac</name></label>
+  <label><value>71</value><name>non-interruptible</name></label>
+  <label><value>72</value><name>cn: Next Queued Interaction Continuation?</name></label>
+  <label><value>73</value><name>footprint extension</name></label>
+  <label><value>74</value><name>Render Display Flags</name></label>
+  <label><value>75</value><name>ci: Sub Queue Master Interaction Object ID</name></label>
+  <label><value>76</value><name>ci: Sub Queue Master Interaction Index</name></label>
+  <label><value>77</value><name>cn: Next Sub Queue Interaction Index</name></label>
+  <label><value>78</value><name>cn: Next Sub Queue Interaction Object ID</name></label>
+  <label><value>79</value><name>cn: Next Queued Interaction Object ID</name></label>
+  <label><value>80</value><name>ci: Current Interaction Object ID</name></label>
+  <label><value>81</value><name>Body Flags</name></label>
+  <label><value>82</value><name>Fatness [0-1000]</name></label>
+  <label><value>83</value><name>kEP1 - Current GPA</name></label>
+  <label><value>84</value><name>PersonData Flags 1</name></label>
+  <label><value>85</value><name>Personality Amorous</name></label>
+  <label><value>86</value><name>Naughty Outfit</name></label>
+  <label><value>87</value><name>Nipple Ring Flags</name></label>
+  <label><value>88</value><name>Voice Type</name></label>
+  <label><value>89</value><name>Job Object GUID1</name></label>
+  <label><value>90</value><name>Job Object GUID2</name></label>
+  <label><value>91</value><name>Age Days Left</name></label>
+  <label><value>92</value><name>Days in Previous Age</name></label>
+  <label><value>93</value><name>Decay Hunger per Day</name></label>
+  <label><value>94</value><name>Decay Comfort per Day</name></label>
+  <label><value>95</value><name>Decay Bladder per Day</name></label>
+  <label><value>96</value><name>Decay Energy per Day</name></label>
+  <label><value>97</value><name>Decay Hygiene per Day</name></label>
+  <label><value>98</value><name>Decay Amorous per Day</name></label>
+  <label><value>99</value><name>Decay Social per Day</name></label>
+  <label><value>100</value><name>Decay Shopping per Day</name></label>
+  <label><value>101</value><name>Decay Fun per Day</name></label>
+  <label><value>102</value><name>ci: Current Running Interaction Index</name></label>
+  <label><value>103</value><name>ci: Current Running Object ID</name></label>
+  <label><value>104</value><name>Motive - Power</name></label>
+  <label><value>105</value><name>Work Outfit Index</name></label>
+  <label><value>106</value><name>Decay Scratch-Chew per Day</name></label>
+  <label><value>107</value><name>School Object GUID 1</name></label>
+  <label><value>108</value><name>School Object GUID 2</name></label>
+  <label><value>109</value><name>ci: Current Interaction GUID</name></label>
+  <label><value>110</value><name>Interactions Linked Deleted</name></label>
+  <label><value>111</value><name>Energy / Sunshine Motive</name></label>
+  <label><value>112</value><name>LocoWeight 0</name></label>
+  <label><value>113</value><name>LocoWeight 1</name></label>
+  <label><value>114</value><name>LocoPersonalityIndex</name></label>
+  <label><value>115</value><name>LocoPersonalityWeight</name></label>
+  <label><value>116</value><name>LocoMoodIndex</name></label>
+  <label><value>117</value><name>LocoMoodWeight</name></label>
+  <label><value>118</value><name>Motives Not Included in Mood</name></label>
+  <label><value>119</value><name>Outfit Source GUID1</name></label>
+  <label><value>120</value><name>Outfit Source GUID2</name></label>
+  <label><value>121</value><name>Environment Score Override</name></label>
+  <label><value>122</value><name>Fitness Preference</name></label>
+  <label><value>123</value><name>Pension</name></label>
+  <label><value>124</value><name>i: Politics</name></label>
+  <label><value>125</value><name>i: Money</name></label>
+  <label><value>126</value><name>i: Environment</name></label>
+  <label><value>127</value><name>i: Crime</name></label>
+  <label><value>128</value><name>i: Entertainment</name></label>
+  <label><value>129</value><name>i: Culture</name></label>
+  <label><value>130</value><name>i: Food</name></label>
+  <label><value>131</value><name>i: Health</name></label>
+  <label><value>132</value><name>i: Fashion</name></label>
+  <label><value>133</value><name>i: Sports</name></label>
+  <label><value>134</value><name>i: Paranormal</name></label>
+  <label><value>135</value><name>i: Travel</name></label>
+  <label><value>136</value><name>i: Work</name></label>
+  <label><value>137</value><name>i: Weather</name></label>
+  <label><value>138</value><name>i: Animals</name></label>
+  <label><value>139</value><name>i: School</name></label>
+  <label><value>140</value><name>i: Toys</name></label>
+  <label><value>141</value><name>i: Sci-Fi</name></label>
+  <label><value>142</value><name>i: Unused</name></label>
+  <label><value>143</value><name>Pubic Hair Flags</name></label>
+  <label><value>144</value><name>Allocated Neighborhood</name></label>
+  <label><value>145</value><name>PersonData Flags 3</name></label>
+  <label><value>146</value><name>Bodyshape</name></label>
+  <label><value>147</value><name>Intoxicated Level</name></label>
+  <label><value>148</value><name>Cult Flags</name></label>
+  <label><value>149</value><name>Religions Available</name></label>
+  <label><value>150</value><name>Love/Hate of God</name></label>
+  <label><value>151</value><name>Faith in God</name></label>
+  <label><value>152</value><name>Religion Number</name></label>
+  <label><value>153</value><name>Religion Flags</name></label>
+  <label><value>154</value><name>Unselectable Sim</name></label>
+  <label><value>155</value><name>NPC Type</name></label>
+  <label><value>156</value><name>Age Duration</name></label>
+  <label><value>157</value><name>ci: Sub Queue Interaction Object ID</name></label>
+  <label><value>158</value><name>Selection Flags</name></label>
+  <label><value>159</value><name>PersonData Flags 2</name></label>
+  <label><value>160</value><name>Aspiration Score</name></label>
+  <label><value>161</value><name>Aspiration Reward Points Spent (/10)</name></label>
+  <label><value>162</value><name>Aspiration Score Raw (/10)</name></label>
+  <label><value>163</value><name>Mood Booster</name></label>
+  <label><value>164</value><name>Current Interaction Joinable</name></label>
+  <label><value>165</value><name>Unlinked?</name></label>
+  <label><value>166</value><name>Interaction Autonomous</name></label>
+  <label><value>167</value><name>Retired Job GUID1</name></label>
+  <label><value>168</value><name>Retired Job GUID2</name></label>
+  <label><value>169</value><name>Retired Job Level</name></label>
+  <label><value>170</value><name>kEP1 - College Major GUID#1</name></label>
+  <label><value>171</value><name>kEP1 - College Major GUID#2</name></label>
+  <label><value>172</value><name>kEP1 - Time Left In Grading Period</name></label>
+  <label><value>173</value><name>kEP1 - Semester Info Flags</name></label>
+  <label><value>174</value><name>kEP1 - College Semester</name></label>
+  <label><value>175</value><name>kEP1 - Young Adult( 0=no, 1=yes )</name></label>
+  <label><value>176</value><name>kEP1 - Influence Bar Level</name></label>
+  <label><value>177</value><name>kEP1 - Influence Minimum</name></label>
+  <label><value>178</value><name>kEP1 - Influence Score</name></label>
+  <label><value>179</value><name>route start slot owner ID</name></label>
+  <label><value>180</value><name>Attraction Traits 1</name></label>
+  <label><value>181</value><name>Attraction Traits 2</name></label>
+  <label><value>182</value><name>Attraction Turn Ons 1</name></label>
+  <label><value>183</value><name>Attraction Turn Ons 2</name></label>
+  <label><value>184</value><name>Attraction Turn Offs 1</name></label>
+  <label><value>185</value><name>Attraction Turn Offs 2</name></label>
+  <label><value>186</value><name>Species</name></label>
+  <label><value>187</value><name>Countdown Timer ID</name></label>
+  <label><value>188</value><name>Perfume Duration</name></label>
+  <label><value>189</value><name>Date Timer</name></label>
+  <label><value>190</value><name>Date Score</name></label>
+  <label><value>191</value><name>Date Unclock Count</name></label>
+  <label><value>192</value><name>Love Potion Duration</name></label>
+  <label><value>193</value><name>Aspiration Score Lock</name></label>
+  <label><value>194</value><name>Date Neighbor ID</name></label>
+  <label><value>195</value><name>Ownable Lot Job - Lot ID</name></label>
+  <label><value>196</value><name>Ownable Lot Job - Salary</name></label>
+  <label><value>197</value><name>Ownable Lot Job - Flags</name></label>
+  <label><value>198</value><name>Ownable Lot Job - Assignment ID</name></label>
+  <label><value>199</value><name>Pet Trait Flags</name></label>
+  <label><value>200</value><name>Time Left On Vacation</name></label>
+  <label><value>201</value><name>Attraction Turn Ons 3 (EP6)</name></label>
+  <label><value>202</value><name>Attraction Turn Offs 3 (EP6)</name></label>
+  <label><value>203</value><name>Attraction Traits 3 (EP6)</name></label>
+  <label><value>204</value><name>HobbyEnthusiasm1-Cuisine</name></label>
+  <label><value>205</value><name>HobbyEnthusiasm2-Arts</name></label>
+  <label><value>206</value><name>HobbyEnthusiasm3-FilmLit</name></label>
+  <label><value>207</value><name>HobbyEnthusiasm4-Sport</name></label>
+  <label><value>208</value><name>HobbyEnthusiasm5-Games</name></label>
+  <label><value>209</value><name>HobbyEnthusiasm6-Nature</name></label>
+  <label><value>210</value><name>HobbyEnthusiasm7-Tinkering</name></label>
+  <label><value>211</value><name>HobbyEnthusiasm8-Fitness</name></label>
+  <label><value>212</value><name>HobbyEnthusiasm9-Science</name></label>
+  <label><value>213</value><name>HobbyEnthusiasm10-Music</name></label>
+  <label><value>214</value><name>HobbyEnthusiasm11-Unused</name></label>
+  <label><value>215</value><name>HobbyPredestined</name></label>
+  <label><value>216</value><name>LongTermAspiration</name></label>
+  <label><value>217</value><name>LTAUnlockPoints</name></label>
+  <label><value>218</value><name>LTAUnlocksSpent</name></label>
+  <label><value>219</value><name>HungerDecayModifier</name></label>
+  <label><value>220</value><name>ComfortDecayModifier</name></label>
+  <label><value>221</value><name>BladderDecayModifier</name></label>
+  <label><value>222</value><name>EnergyDecayModifier</name></label>
+  <label><value>223</value><name>HygieneDecayModifier</name></label>
+  <label><value>224</value><name>FunDecayModifier</name></label>
+  <label><value>225</value><name>SocialPublicDecayModifier</name></label>
+  <label><value>226</value><name>BugCollection</name></label>
+  <label><value>227</value><name>BugCollection2</name></label>
+  <label><value>228</value><name>Reputation</name></label>
+  <label><value>229</value><name>Probability to appear</name></label>
+  <label><value>230</value><name>Title - post name</name></label>
+</labels>

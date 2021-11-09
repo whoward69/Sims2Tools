@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tokens>
+  <token>
+    <value>0x0089AD0A</value>
+    <name>Memory - Abortion</name>
+  </token>
+  <token>
+    <value>0x0089AD19</value>
+    <name>Accessory - PayBook</name>
+  </token>
+  <token>
+    <value>0x0089AD20</value>
+    <name>Shared Parenting - Card</name>
+  </token>
+  <token>
+    <value>0x0089AD2C</value>
+    <name>Pregnancy Test Kit - Token</name>
+  </token>
+  <token>
+    <value>0x0089AD30</value>
+    <name>Blood Anti-Donor - Card</name>
+  </token>
+  <token>
+    <value>0x0089AD32</value>
+    <name>Token - Info Card</name>
+  </token>
+  <token>
+    <value>0x0089AD37</value>
+    <name>Memory - Having a Baby</name>
+  </token>
+  <token>
+    <value>0x0089AD3A</value>
+    <name>Optional Pay Bonus - Card</name>
+  </token>
+  <token>
+    <value>0x0089AD41</value>
+    <name>Token - Auto-Pacifier</name>
+  </token>
+  <token>
+    <value>0x0089AD42</value>
+    <name>Token - School Minibus</name>
+  </token>
+  <token>
+    <value>0x0089AD48</value>
+    <name>Object - Bug Swaps Jar</name>
+  </token>
+  <token>
+    <value>0x0089AD4A</value>
+    <name>Token - Clothing Racks</name>
+  </token>
+  <token>
+    <value>0x0089AD9B</value>
+    <name>Memory - Career - Top - PopStar</name>
+  </token>
+  <token>
+    <value>0x0089AD9C</value>
+    <name>Driving Licence - Card</name>
+  </token>
+  <token>
+    <value>0x008F6D14</value>
+    <name>Coaster - Token - Details</name>
+  </token>
+  <token>
+    <value>0xEC191A1B</value>
+    <name>Accessory - Cock</name>
+  </token>
+  <token>
+    <value>0xEC191A23</value>
+    <name>CBOY - Token</name>
+  </token>
+</tokens>

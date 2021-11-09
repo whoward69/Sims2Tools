@@ -18,7 +18,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace HcduPlus
+namespace HcduPlus.Conflict
 {
     public class ConflictRegexPair
     {
@@ -181,16 +181,12 @@ namespace HcduPlus
                     }
                 }
             }
-#if DEBUG
-            catch (Exception e)
-#else
-            catch (Exception)
-#endif
+            catch (Exception ex)
             {
+                logger.Error(ex.Message);
+                logger.Info(ex.StackTrace);
+
                 MsgBox.Show("An error occured while reading default conflicts", "Error!", MessageBoxButtons.OK);
-#if DEBUG
-                logger.Error(e.Message);
-#endif
             }
         }
     }

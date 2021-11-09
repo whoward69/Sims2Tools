@@ -98,7 +98,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             }
         }
 
-        public List<NgbhItem> FindTokensByGuid(uint guid)
+        public List<NgbhItem> FindTokensByGuid(TypeGUID guid)
         {
             List<NgbhItem> items = new List<NgbhItem>();
 

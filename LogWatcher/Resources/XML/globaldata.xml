@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<labels>
+  <label><value>0</value><name>Hour</name></label>
+  <label><value>1</value><name>Day of Month</name></label>
+  <label><value>2</value><name>Zoom Level(S/M/L)</name></label>
+  <label><value>3</value><name>Selected Person ID</name></label>
+  <label><value>4</value><name>Time Of Day</name></label>
+  <label><value>5</value><name>Minute</name></label>
+  <label><value>6</value><name>Second</name></label>
+  <label><value>7</value><name>Month</name></label>
+  <label><value>8</value><name>Year</name></label>
+  <label><value>9</value><name>Current Family</name></label>
+  <label><value>10</value><name>Current House</name></label>
+  <label><value>11</value><name>Unused</name></label>
+  <label><value>12</value><name>Last GZ Button ID</name></label>
+  <label><value>13</value><name>Budget Mod 10000</name></label>
+  <label><value>14</value><name>Budget Div 10000</name></label>
+  <label><value>15</value><name>Current Language</name></label>
+  <label><value>16</value><name>Speed</name></label>
+  <label><value>17</value><name>Paused</name></label>
+  <label><value>18</value><name>Held Sim Speed</name></label>
+  <label><value>19</value><name>Mode</name></label>
+  <label><value>20</value><name>Game Edition Flags 1</name></label>
+  <label><value>21</value><name>Inhibit Move In</name></label>
+  <label><value>22</value><name>Lot Has House</name></label>
+  <label><value>23</value><name>Lot Size</name></label>
+  <label><value>24</value><name>Current SKU</name></label>
+  <label><value>25</value><name>Debug flags</name></label>
+  <label><value>26</value><name>Tutorial State</name></label>
+  <label><value>27</value><name>Indoor Tiles</name></label>
+  <label><value>28</value><name>Days Running</name></label>
+  <label><value>29</value><name>Maximum Day Number</name></label>
+  <label><value>30</value><name>Free Will</name></label>
+  <label><value>31</value><name>House radio station</name></label>
+  <label><value>32</value><name>Interrupt On</name></label>
+  <label><value>33</value><name>Demo Flags</name></label>
+  <label><value>34</value><name>Day Of Week</name></label>
+  <label><value>35</value><name>Parental Control (non zero = on)</name></label>
+  <label><value>36</value><name>Current Interaction GUID</name></label>
+  <label><value>37</value><name>Utility Available Flags</name></label>
+  <label><value>38</value><name>Utility Bill - Energy</name></label>
+  <label><value>39</value><name>Utility Bill - Water</name></label>
+  <label><value>40</value><name>Current Neighborhood ID</name></label>
+  <label><value>41</value><name>Lot Zoning</name></label>
+  <label><value>42</value><name>Allow Aging</name></label>
+  <label><value>43</value><name>Last Neighborhood ID</name></label>
+  <label><value>44</value><name>Lot Entry Method</name></label>
+  <label><value>45</value><name>Cinematic Camera off/on</name></label>
+  <label><value>46</value><name>Lot Value Div 1000</name></label>
+  <label><value>47</value><name>Lot Value Mod 1000</name></label>
+  <label><value>48</value><name>Objects Value Div 1000</name></label>
+  <label><value>49</value><name>Object Value Mod 1000</name></label>
+  <label><value>50</value><name>Max Visitors</name></label>
+  <label><value>51</value><name>Object Error Flags</name></label>
+  <label><value>52</value><name>Camera Busy</name></label>
+  <label><value>53</value><name>Instant Write Once Flags</name></label>
+  <label><value>54</value><name>Neighborhood type</name></label>
+  <label><value>55</value><name>Unused</name></label>
+  <label><value>56</value><name>Puppy/Kitten aging disabled?</name></label>
+  <label><value>57</value><name>Bug Jar Time Decay</name></label>
+  <label><value>58</value><name>Game Edition Flags 2</name></label>
+  <label><value>59</value><name>Lot Class</name></label>
+</labels>

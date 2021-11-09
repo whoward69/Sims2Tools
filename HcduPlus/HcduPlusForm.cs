@@ -9,6 +9,8 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using HcduPlus.Conflict;
+using HcduPlus.DataStore;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.DBPF;
@@ -53,6 +55,8 @@ namespace HcduPlus
 
         private readonly HashSet<TypeTypeID> enabledResources = new HashSet<TypeTypeID>();
 
+        private readonly bool megaMindMode = false;
+
         public HcduPlusForm()
         {
             InitializeComponent();
@@ -72,13 +76,22 @@ namespace HcduPlus
             BackgroundWorker worker = sender as BackgroundWorker;
             allCurrentConflicts.Clear();
 
-            Dictionary<int, String> modsNamesByTGI = new Dictionary<int, String>();
-            Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>> modsSeenResources = new Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>>();
-            Dictionary<TypeGUID, List<String>> modsSeenGuids = new Dictionary<TypeGUID, List<String>>();
+            IDataStore modsDataStore;
+            IDataStore scanDataStore;
 
-            Dictionary<int, String> scanNamesByTGI = new Dictionary<int, String>();
-            Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>> scanSeenResources = new Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>>();
-            Dictionary<TypeGUID, List<String>> scanSeenGuids = new Dictionary<TypeGUID, List<String>>();
+            if (megaMindMode)
+            {
+                throw new NotImplementedException();
+                /*
+                modsDataStore = new SqlDataStore("mods");
+                scanDataStore = new SqlDataStore("scan");
+                */
+            }
+            else
+            {
+                modsDataStore = new MemoryDataStore();
+                scanDataStore = new MemoryDataStore();
+            }
 
             String modsFolder = textModsPath.Text;
             String scanFolder = textScanPath.Text;
@@ -113,9 +126,9 @@ namespace HcduPlus
                 MsgBox.Show("The selected Scan directory does not exist!", "Invalid Directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
-            foreach (String file in scanFiles)
+            foreach (String scanFile in scanFiles)
             {
-                if (modsFiles.Contains(file)) modsFiles.Remove(file);
+                if (modsFiles.Contains(scanFile)) modsFiles.Remove(scanFile);
             }
 
             float total = modsFiles.Count + scanFiles.Count;
@@ -123,33 +136,26 @@ namespace HcduPlus
 
             if (scanFiles.Count > 0)
             {
-                if (modsFiles.Count > 0) done = ProcessFolder(worker, e, modsFolder, modsFiles, @"~\", total, done, modsSeenResources, modsNamesByTGI, modsSeenGuids);
-                done = ProcessFolder(worker, e, scanFolder, scanFiles, "", total, done, scanSeenResources, scanNamesByTGI, scanSeenGuids);
+                if (modsFiles.Count > 0) done = ProcessFolder(worker, e, modsFolder, modsFiles, @"~\", total, done, modsDataStore);
+                done = ProcessFolder(worker, e, scanFolder, scanFiles, "", total, done, scanDataStore);
             }
 
 #if DEBUG
             logger.Debug($"Processed {done} mods");
 #endif
 
-            foreach (TypeTypeID type in scanSeenResources.Keys)
+            foreach (TypeTypeID typeId in scanDataStore.SeenResourcesGetTypes())
             {
-                if (scanSeenResources.TryGetValue(type, out Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<string>>> scanGroupResources))
                 {
-                    modsSeenResources.TryGetValue(type, out Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<string>>> modsGroupResources);
-                    if (modsGroupResources == null) modsGroupResources = new Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<string>>>();
-
-                    foreach (TypeGroupID group in scanGroupResources.Keys)
+                    foreach (TypeGroupID groupId in scanDataStore.SeenResourcesGetGroupsForType(typeId))
                     {
-                        if (scanGroupResources.TryGetValue(group, out Dictionary<TypeInstanceID, List<string>> scanInstanceResources))
                         {
-                            modsGroupResources.TryGetValue(group, out Dictionary<TypeInstanceID, List<string>> modsInstanceResources);
-                            if (modsInstanceResources == null) modsInstanceResources = new Dictionary<TypeInstanceID, List<string>>();
-
-                            foreach (TypeInstanceID instance in scanInstanceResources.Keys)
+                            foreach (TypeInstanceID instanceId in scanDataStore.SeenResourcesGetInstancesForTypeAndGroup(typeId, groupId))
                             {
-                                if (scanInstanceResources.TryGetValue(instance, out List<string> scanPackages))
+                                List<String> scanPackages = scanDataStore.SeenResourcesGetPackages(typeId, groupId, instanceId);
+                                if (scanPackages != null)
                                 {
-                                    modsInstanceResources.TryGetValue(instance, out List<string> modsPackages);
+                                    List<String> modsPackages = modsDataStore.SeenResourcesGetPackages(typeId, groupId, instanceId);
                                     if (modsPackages != null)
                                     {
                                         scanPackages.Insert(0, modsPackages[modsPackages.Count - 1]);
@@ -159,13 +165,14 @@ namespace HcduPlus
                                     {
                                         for (int i = 0; i < scanPackages.Count - 1; ++i)
                                         {
+                                            // TODO - It would be better not to store these in the first place!
                                             if (!(
                                                 // Ignore HomeCrafter string conflicts?
-                                                (type == Str.TYPE && instance == (TypeInstanceID)0x0000007B && menuItemHomeCrafterConflicts.Checked) ||
+                                                (typeId == Str.TYPE && instanceId == (TypeInstanceID)0x0000007B && menuItemHomeCrafterConflicts.Checked) ||
                                                 // Ignore Store Version string conflicts?
-                                                (type == Str.TYPE && instance == (TypeInstanceID)0xFF648785 && menuItemStoreVersionConflicts.Checked) ||
+                                                (typeId == Str.TYPE && instanceId == (TypeInstanceID)0xFF648785 && menuItemStoreVersionConflicts.Checked) ||
                                                 //
-                                                (type == Str.TYPE && instance == (TypeInstanceID)0x00000001 && group == (TypeGroupID)0x7FC078F3 && menuItemCastawaysConflicts.Checked)
+                                                (typeId == Str.TYPE && instanceId == (TypeInstanceID)0x00000001 && groupId == (TypeGroupID)0x7FC078F3 && menuItemCastawaysConflicts.Checked)
                                                 ))
                                             {
                                                 // Ignore internal conflicts?
@@ -184,8 +191,7 @@ namespace HcduPlus
                                                             worker.ReportProgress((int)((done / total) * 100.0), cpNew);
                                                         }
 
-                                                        scanNamesByTGI.TryGetValue(Hash.TGIHash(instance, type, group), out string name);
-                                                        cpData.AddTGI(type, group, instance, name);
+                                                        cpData.AddTGI(typeId, groupId, instanceId, scanDataStore.NamesByTgiGet(Hash.TGIHash(instanceId, typeId, groupId)));
                                                     }
                                                 }
                                             }
@@ -200,11 +206,12 @@ namespace HcduPlus
 
             if (menuItemGuidConflicts.Checked)
             {
-                foreach (TypeGUID guid in scanSeenGuids.Keys)
+                foreach (TypeGUID guid in scanDataStore.SeenGuidsGetGuids())
                 {
-                    if (scanSeenGuids.TryGetValue(guid, out List<string> scanPackages))
+                    List<String> scanPackages = scanDataStore.SeenGuidsGetPackages(guid);
+                    if (scanPackages != null)
                     {
-                        modsSeenGuids.TryGetValue(guid, out List<string> modsPackages);
+                        List<String> modsPackages = modsDataStore.SeenGuidsGetPackages(guid);
                         if (modsPackages != null)
                         {
                             scanPackages.Insert(0, modsPackages[modsPackages.Count - 1]);
@@ -237,8 +244,7 @@ namespace HcduPlus
                                         TypeGroupID group = (TypeGroupID)Convert.ToUInt32(scanPackages[i].Substring(4, 8), 16);
                                         TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(scanPackages[i].Substring(15, 8), 16);
 
-                                        scanNamesByTGI.TryGetValue(Hash.TGIHash(instance, Objd.TYPE, group), out string name);
-                                        cpData.AddTGI(Objd.TYPE, group, instance, name);
+                                        cpData.AddTGI(Objd.TYPE, group, instance, scanDataStore.NamesByTgiGet(Hash.TGIHash(instance, Objd.TYPE, group)));
                                     }
                                 }
                             }
@@ -251,12 +257,12 @@ namespace HcduPlus
         }
 
         private int ProcessFolder(BackgroundWorker worker, System.ComponentModel.DoWorkEventArgs args,
-            String folder, List<String> files, String prefix, float total, int done,
-            Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>> seenResources,
-            Dictionary<int, String> namesByTGI,
-            Dictionary<TypeGUID, List<String>> seenGuids)
+            String folder, List<String> files, String prefix, float total, int done, IDataStore dataStore)
         {
-            foreach (String file in files)
+            dataStore.SetFiles(folder, files);
+            dataStore.SetPrefix(prefix);
+
+            for (int fileIndex = 0; fileIndex < files.Count; ++fileIndex)
             {
                 if (worker.CancellationPending == true)
                 {
@@ -267,77 +273,30 @@ namespace HcduPlus
                 {
                     try
                     {
-                        using (DBPFFile package = new DBPFFile(file))
+                        using (DBPFFile package = new DBPFFile(files[fileIndex]))
                         {
                             foreach (TypeTypeID type in DBPFData.ModTypes)
                             {
                                 if (enabledResources.Contains(type))
                                 {
-                                    if (!seenResources.TryGetValue(type, out Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<string>>> groupResources))
-                                    {
-                                        groupResources = new Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>();
-                                        seenResources.Add(type, groupResources);
-                                    }
-
                                     foreach (DBPFEntry entry in package.GetEntriesByType(type))
                                     {
                                         if (type == Objd.TYPE && menuItemGuidConflicts.Checked)
                                         {
                                             Objd objd = (Objd)package.GetResourceByEntry(entry);
 
-                                            if (!seenGuids.TryGetValue(objd.Guid, out List<string> packages))
-                                            {
-                                                packages = new List<String>();
-                                                seenGuids.Add(objd.Guid, packages);
-                                            }
+                                            dataStore.SeenGuidsAdd(objd.Guid, entry, fileIndex);
 
-                                            String p = $"##{entry.GroupID}-{entry.InstanceID}!{prefix}{file.Substring(folder.Length + 1)}";
-                                            packages.Add(p);
-
-                                            int tgi = Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID);
-                                            if (!namesByTGI.ContainsKey(tgi))
-                                            {
-                                                namesByTGI.Add(tgi, package.GetFilenameByEntry(entry));
-                                            }
-                                            else
-                                            {
-                                                if (namesByTGI.TryGetValue(tgi, out string name))
-                                                {
-                                                    if (!name.Equals(package.GetFilenameByEntry(entry)))
-                                                    {
-                                                        namesByTGI.Remove(tgi);
-                                                        namesByTGI.Add(tgi, "{multiple}");
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    namesByTGI.Remove(tgi);
-                                                    namesByTGI.Add(tgi, "{unknown}");
-                                                }
-                                            }
+                                            dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
                                         }
 
                                         if (entry.GroupID != DBPFData.GROUP_LOCAL)
                                         {
-                                            if (!groupResources.TryGetValue(entry.GroupID, out Dictionary<TypeInstanceID, List<string>> instanceResources))
-                                            {
-                                                instanceResources = new Dictionary<TypeInstanceID, List<String>>();
-                                                groupResources.Add(entry.GroupID, instanceResources);
-                                            }
+                                            dataStore.SeenResourcesAdd(entry, fileIndex);
 
-                                            if (!instanceResources.TryGetValue(entry.InstanceID, out List<string> packages))
+                                            if (!dataStore.NamesByTgiContains(entry))
                                             {
-                                                packages = new List<String>();
-                                                instanceResources.Add(entry.InstanceID, packages);
-                                            }
-
-                                            String p = prefix + file.Substring(folder.Length + 1);
-                                            packages.Add(p);
-
-                                            int tgi = Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID);
-                                            if (!namesByTGI.ContainsKey(tgi))
-                                            {
-                                                namesByTGI.Add(tgi, package.GetFilenameByEntry(entry));
+                                                dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
                                             }
                                         }
                                     }
@@ -347,11 +306,12 @@ namespace HcduPlus
                             package.Close();
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        logger.Error(e.Message);
+                        logger.Error(ex.Message);
+                        logger.Info(ex.StackTrace);
 
-                        String partialPath = file.Substring(folder.Length + 1);
+                        String partialPath = files[fileIndex].Substring(folder.Length + 1);
                         int pos = partialPath.LastIndexOf(@"\");
 
                         String fileDetails;
@@ -365,9 +325,9 @@ namespace HcduPlus
                             fileDetails = $"{partialPath.Substring(pos + 1)}\nin folder\n{partialPath.Substring(0, pos)}";
                         }
 
-                        if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {e.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
+                        if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {ex.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
                         {
-                            throw e;
+                            throw ex;
                         }
                     }
 
@@ -401,10 +361,10 @@ namespace HcduPlus
                 MyMruList.RemoveFile(textScanPath.Text);
                 textScanPath.Text = "";
 
-                MsgBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
-#if DEBUG
                 logger.Error(e.Error.Message);
-#endif
+                logger.Info(e.Error.StackTrace);
+
+                MsgBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
             }
             else
             {

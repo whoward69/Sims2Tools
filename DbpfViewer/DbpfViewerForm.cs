@@ -170,10 +170,10 @@ namespace DbpfViewer
 
             if (result == DialogResult.Abort)
             {
-                MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
-#if DEBUG
                 logger.Error(progressDialog.Result.Error.Message);
-#endif
+                logger.Info(progressDialog.Result.Error.StackTrace);
+
+                MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
             }
             else
             {
@@ -471,10 +471,10 @@ namespace DbpfViewer
             {
                 MyMruList.RemoveFile(packageFile);
 
-                MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
-#if DEBUG
                 logger.Error(progressDialog.Result.Error.Message);
-#endif
+                logger.Info(progressDialog.Result.Error.StackTrace);
+
+                MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
             }
             else
             {
@@ -504,17 +504,12 @@ namespace DbpfViewer
 
                     try
                     {
-                        GameData.BuildObjectsTable(package, localObjectsByGroupID);
+                        GameData.BuildObjectsTable(package, localObjectsByGroupID, null);
                     }
-#if DEBUG
                     catch (Exception ex)
-#else
-                     catch (Exception)
-#endif
                     {
-#if DEBUG
                         logger.Error(ex.Message);
-#endif
+                        logger.Info(ex.StackTrace);
                     }
 
                     sender.VisualMode = ProgressBarDisplayMode.Percentage;
@@ -563,13 +558,14 @@ namespace DbpfViewer
                     args.Result = found;
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.Error(e.Message);
+                logger.Error(ex.Message);
+                logger.Info(ex.StackTrace);
 
-                if (MsgBox.Show($"An error occured while processing\n{packageFile}\n\nReason: {e.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                if (MsgBox.Show($"An error occured while processing\n{packageFile}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
                 {
-                    throw e;
+                    throw ex;
                 }
             }
         }
@@ -640,13 +636,14 @@ namespace DbpfViewer
                     package.Close();
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.Error(e.Message);
+                logger.Error(ex.Message);
+                logger.Info(ex.StackTrace);
 
-                if (MsgBox.Show($"An error occured while processing\n{packageFile}\n\nReason: {e.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                if (MsgBox.Show($"An error occured while processing\n{packageFile}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
                 {
-                    throw e;
+                    throw ex;
                 }
             }
         }

@@ -13,7 +13,7 @@ using Sims2Tools.DBPF;
 using System;
 using System.Collections.Generic;
 
-namespace HcduPlus
+namespace HcduPlus.Conflict
 {
     public class ConflictDetail
     {

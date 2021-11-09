@@ -36,42 +36,46 @@ namespace LogWatcher
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogWatcherForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemReloadLog = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemSelectLog = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemRecentLogs = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemCloseTab = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCloseTabAndDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOpenAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOpenRecent = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemAutoOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAutoClose = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAutoUpdate = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.treeView1 = new System.Windows.Forms.TreeView();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.logDirWatcher = new System.IO.FileSystemWatcher();
+            this.menuContextTab = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.closeDeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
-            this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.logDirWatcher)).BeginInit();
+            this.menuContextTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
             // 
             this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
-            this.menuHelp});
+            this.menuHelp,
+            this.menuOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -82,68 +86,78 @@ namespace LogWatcher
             // menuFile
             // 
             this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemReloadLog,
-            this.menuItemSeparator1,
             this.menuItemSelectLog,
             this.menuItemRecentLogs,
             this.menuItemSeparator2,
             this.menuItemConfiguration,
             this.toolStripSeparator1,
+            this.menuItemCloseTab,
+            this.menuItemCloseTabAndDelete,
+            this.toolStripSeparator2,
             this.menuItemExit});
             this.menuFile.Name = "menuFile";
             this.menuFile.Size = new System.Drawing.Size(37, 20);
             this.menuFile.Text = "&File";
             this.menuFile.DropDownOpening += new System.EventHandler(this.OnFileOpening);
             // 
-            // menuItemReloadLog
-            // 
-            this.menuItemReloadLog.Name = "menuItemReloadLog";
-            this.menuItemReloadLog.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.menuItemReloadLog.Size = new System.Drawing.Size(180, 22);
-            this.menuItemReloadLog.Text = "&Reload Log";
-            this.menuItemReloadLog.Click += new System.EventHandler(this.OnReloadClicked);
-            // 
-            // menuItemSeparator1
-            // 
-            this.menuItemSeparator1.Name = "menuItemSeparator1";
-            this.menuItemSeparator1.Size = new System.Drawing.Size(177, 6);
-            // 
             // menuItemSelectLog
             // 
             this.menuItemSelectLog.Name = "menuItemSelectLog";
             this.menuItemSelectLog.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.menuItemSelectLog.Size = new System.Drawing.Size(180, 22);
-            this.menuItemSelectLog.Text = "&Select Log...";
+            this.menuItemSelectLog.Size = new System.Drawing.Size(251, 22);
+            this.menuItemSelectLog.Text = "&Select Log(s)...";
             this.menuItemSelectLog.Click += new System.EventHandler(this.OnSelectClicked);
             // 
             // menuItemRecentLogs
             // 
             this.menuItemRecentLogs.Name = "menuItemRecentLogs";
-            this.menuItemRecentLogs.Size = new System.Drawing.Size(180, 22);
+            this.menuItemRecentLogs.Size = new System.Drawing.Size(251, 22);
             this.menuItemRecentLogs.Text = "Recent Logs...";
             // 
             // menuItemSeparator2
             // 
             this.menuItemSeparator2.Name = "menuItemSeparator2";
-            this.menuItemSeparator2.Size = new System.Drawing.Size(177, 6);
+            this.menuItemSeparator2.Size = new System.Drawing.Size(248, 6);
             // 
             // menuItemConfiguration
             // 
             this.menuItemConfiguration.Name = "menuItemConfiguration";
-            this.menuItemConfiguration.Size = new System.Drawing.Size(180, 22);
+            this.menuItemConfiguration.Size = new System.Drawing.Size(251, 22);
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigurationClicked);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(248, 6);
+            // 
+            // menuItemCloseTab
+            // 
+            this.menuItemCloseTab.Name = "menuItemCloseTab";
+            this.menuItemCloseTab.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
+            this.menuItemCloseTab.Size = new System.Drawing.Size(251, 22);
+            this.menuItemCloseTab.Text = "&Close Tab";
+            this.menuItemCloseTab.Click += new System.EventHandler(this.OnCloseTab);
+            // 
+            // menuItemCloseTabAndDelete
+            // 
+            this.menuItemCloseTabAndDelete.Name = "menuItemCloseTabAndDelete";
+            this.menuItemCloseTabAndDelete.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.F4)));
+            this.menuItemCloseTabAndDelete.Size = new System.Drawing.Size(251, 22);
+            this.menuItemCloseTabAndDelete.Text = "Close Tab && &Delete";
+            this.menuItemCloseTabAndDelete.Click += new System.EventHandler(this.OnCloseTabAndDelete);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(248, 6);
             // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
             this.menuItemExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.menuItemExit.Size = new System.Drawing.Size(180, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(251, 22);
             this.menuItemExit.Text = "E&xit";
             this.menuItemExit.Click += new System.EventHandler(this.OnExitClicked);
             // 
@@ -164,79 +178,127 @@ namespace LogWatcher
             this.menuItemAbout.Text = "&About";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
             // 
+            // menuOptions
+            // 
+            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemOpenAll,
+            this.menuItemOpenRecent,
+            this.toolStripSeparator3,
+            this.menuItemAutoOpen,
+            this.menuItemAutoClose,
+            this.menuItemAutoUpdate});
+            this.menuOptions.Name = "menuOptions";
+            this.menuOptions.Size = new System.Drawing.Size(61, 20);
+            this.menuOptions.Text = "&Options";
+            // 
+            // menuItemOpenAll
+            // 
+            this.menuItemOpenAll.CheckOnClick = true;
+            this.menuItemOpenAll.Name = "menuItemOpenAll";
+            this.menuItemOpenAll.Size = new System.Drawing.Size(212, 22);
+            this.menuItemOpenAll.Text = "Open &All Logs At Start";
+            this.menuItemOpenAll.Click += new System.EventHandler(this.OnOpenAllClicked);
+            // 
+            // menuItemOpenRecent
+            // 
+            this.menuItemOpenRecent.CheckOnClick = true;
+            this.menuItemOpenRecent.Name = "menuItemOpenRecent";
+            this.menuItemOpenRecent.Size = new System.Drawing.Size(212, 22);
+            this.menuItemOpenRecent.Text = "Open &Recent Logs At Start";
+            this.menuItemOpenRecent.Click += new System.EventHandler(this.OnOpenRecentClicked);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(209, 6);
+            // 
+            // menuItemAutoOpen
+            // 
+            this.menuItemAutoOpen.CheckOnClick = true;
+            this.menuItemAutoOpen.Name = "menuItemAutoOpen";
+            this.menuItemAutoOpen.Size = new System.Drawing.Size(212, 22);
+            this.menuItemAutoOpen.Text = "Auto-&Open New Logs";
+            this.menuItemAutoOpen.Click += new System.EventHandler(this.OnAutoOpenClicked);
+            // 
+            // menuItemAutoClose
+            // 
+            this.menuItemAutoClose.CheckOnClick = true;
+            this.menuItemAutoClose.Name = "menuItemAutoClose";
+            this.menuItemAutoClose.Size = new System.Drawing.Size(212, 22);
+            this.menuItemAutoClose.Text = "Auto-&Close Logs";
+            this.menuItemAutoClose.Click += new System.EventHandler(this.OnAutoCloseClicked);
+            // 
+            // menuItemAutoUpdate
+            // 
+            this.menuItemAutoUpdate.CheckOnClick = true;
+            this.menuItemAutoUpdate.Name = "menuItemAutoUpdate";
+            this.menuItemAutoUpdate.Size = new System.Drawing.Size(212, 22);
+            this.menuItemAutoUpdate.Text = "Auto-&Update Logs";
+            this.menuItemAutoUpdate.Click += new System.EventHandler(this.OnAutoUpdateClicked);
+            // 
             // menuItemSeparator4
             // 
             this.menuItemSeparator4.Name = "menuItemSeparator4";
             this.menuItemSeparator4.Size = new System.Drawing.Size(232, 6);
             // 
-            // tabControl1
+            // selectFileDialog
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Location = new System.Drawing.Point(0, 27);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(933, 491);
-            this.tabControl1.TabIndex = 1;
+            this.selectFileDialog.Multiselect = true;
             // 
-            // tabPage1
+            // tabControl
             // 
-            this.tabPage1.Controls.Add(this.splitContainer1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 24);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(925, 463);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Object Error Log";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabControl.AllowDrop = true;
+            this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl.Location = new System.Drawing.Point(0, 24);
+            this.tabControl.Name = "tabControl";
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(933, 495);
+            this.tabControl.TabIndex = 1;
+            this.tabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.OnTabChanged);
+            this.tabControl.DragDrop += new System.Windows.Forms.DragEventHandler(this.LogWatcher_DragDrop);
+            this.tabControl.DragEnter += new System.Windows.Forms.DragEventHandler(this.LogWatcher_DragEnter);
+            this.tabControl.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnTabControlMouseClick);
             // 
-            // splitContainer1
+            // logDirWatcher
             // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(3, 3);
-            this.splitContainer1.Name = "splitContainer1";
+            this.logDirWatcher.EnableRaisingEvents = true;
+            this.logDirWatcher.Filter = "ObjectError_*.txt";
+            this.logDirWatcher.SynchronizingObject = this;
+            this.logDirWatcher.Changed += new System.IO.FileSystemEventHandler(this.OnLogFileChanged);
+            this.logDirWatcher.Created += new System.IO.FileSystemEventHandler(this.OnLogFileCreated);
+            this.logDirWatcher.Deleted += new System.IO.FileSystemEventHandler(this.OnLogFileDeleted);
+            this.logDirWatcher.Renamed += new System.IO.RenamedEventHandler(this.OnLogFileRenamed);
             // 
-            // splitContainer1.Panel1
+            // menuContextTab
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.treeView1);
+            this.menuContextTab.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.closeToolStripMenuItem,
+            this.closeDeleteToolStripMenuItem});
+            this.menuContextTab.Name = "menuContextTab";
+            this.menuContextTab.Size = new System.Drawing.Size(181, 70);
+            this.menuContextTab.Text = "Tab Options";
+            this.menuContextTab.Opening += new System.ComponentModel.CancelEventHandler(this.OnTabContextMenuOpening);
             // 
-            // splitContainer1.Panel2
+            // closeToolStripMenuItem
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.panel1);
-            this.splitContainer1.Size = new System.Drawing.Size(919, 457);
-            this.splitContainer1.SplitterDistance = 306;
-            this.splitContainer1.TabIndex = 0;
+            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.closeToolStripMenuItem.Text = "&Close";
+            this.closeToolStripMenuItem.Click += new System.EventHandler(this.OnCloseTab);
             // 
-            // treeView1
+            // closeDeleteToolStripMenuItem
             // 
-            this.treeView1.Location = new System.Drawing.Point(5, 3);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(298, 451);
-            this.treeView1.TabIndex = 0;
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this.textBox1);
-            this.panel1.Location = new System.Drawing.Point(3, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(603, 453);
-            this.panel1.TabIndex = 0;
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(3, 3);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(597, 447);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.WordWrap = false;
+            this.closeDeleteToolStripMenuItem.Name = "closeDeleteToolStripMenuItem";
+            this.closeDeleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.closeDeleteToolStripMenuItem.Text = "Close && &Delete";
+            this.closeDeleteToolStripMenuItem.Click += new System.EventHandler(this.OnCloseTabAndDelete);
             // 
             // LogWatcherForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(933, 519);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.tabControl);
             this.Controls.Add(this.menuMain);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -248,14 +310,8 @@ namespace LogWatcher
             this.Load += new System.EventHandler(this.OnLoad);
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
-            this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.logDirWatcher)).EndInit();
+            this.menuContextTab.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -265,8 +321,6 @@ namespace LogWatcher
 
         private System.Windows.Forms.MenuStrip menuMain;
         private System.Windows.Forms.ToolStripMenuItem menuFile;
-        private System.Windows.Forms.ToolStripMenuItem menuItemReloadLog;
-        private System.Windows.Forms.ToolStripSeparator menuItemSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemSelectLog;
         private System.Windows.Forms.ToolStripMenuItem menuItemRecentLogs;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator2;
@@ -277,11 +331,20 @@ namespace LogWatcher
         private System.Windows.Forms.ToolStripMenuItem menuItemAbout;
         private System.Windows.Forms.OpenFileDialog selectFileDialog;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.TreeView treeView1;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TabControl tabControl;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCloseTab;
+        private System.Windows.Forms.ToolStripMenuItem menuOptions;
+        private System.Windows.Forms.ToolStripMenuItem menuItemOpenAll;
+        private System.Windows.Forms.ToolStripMenuItem menuItemOpenRecent;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCloseTabAndDelete;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.IO.FileSystemWatcher logDirWatcher;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAutoOpen;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAutoUpdate;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAutoClose;
+        private System.Windows.Forms.ContextMenuStrip menuContextTab;
+        private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem closeDeleteToolStripMenuItem;
     }
 }

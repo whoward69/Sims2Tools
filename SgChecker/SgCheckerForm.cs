@@ -220,9 +220,10 @@ namespace SgChecker
                                     package.Close();
                                 }
                             }
-                            catch (Exception e)
+                            catch (Exception ex)
                             {
-                                logger.Error(e.Message);
+                                logger.Error(ex.Message);
+                                logger.Info(ex.StackTrace);
 
                                 String partialPath = scanFile.Substring(scanFolder.Length + 1);
                                 int pos = partialPath.LastIndexOf(@"\");
@@ -238,9 +239,9 @@ namespace SgChecker
                                     fileDetails = $"{partialPath.Substring(pos + 1)}\nin folder\n{partialPath.Substring(0, pos)}";
                                 }
 
-                                if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {e.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
+                                if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {ex.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
                                 {
-                                    throw e;
+                                    throw ex;
                                 }
                             }
                         }
@@ -318,9 +319,10 @@ namespace SgChecker
                                         package.Close();
                                     }
                                 }
-                                catch (Exception e)
+                                catch (Exception ex)
                                 {
-                                    logger.Error(e.Message);
+                                    logger.Error(ex.Message);
+                                    logger.Info(ex.StackTrace);
 
                                     String partialPath = modsFile.Substring(modsFolder.Length + 1);
                                     int pos = partialPath.LastIndexOf(@"\");
@@ -336,9 +338,9 @@ namespace SgChecker
                                         fileDetails = $"{partialPath.Substring(pos + 1)}\nin folder\n{partialPath.Substring(0, pos)}";
                                     }
 
-                                    if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {e.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
+                                    if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {ex.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
                                     {
-                                        throw e;
+                                        throw ex;
                                     }
                                 }
                             }
@@ -422,9 +424,10 @@ namespace SgChecker
                                                 package.Close();
                                             }
                                         }
-                                        catch (Exception e)
+                                        catch (Exception ex)
                                         {
-                                            logger.Error(e.Message);
+                                            logger.Error(ex.Message);
+                                            logger.Info(ex.StackTrace);
 
                                             String partialPath = file.Substring(gameFolder.Length + 1);
                                             int pos = partialPath.LastIndexOf(@"\");
@@ -440,9 +443,9 @@ namespace SgChecker
                                                 fileDetails = $"{partialPath.Substring(pos + 1)}\nin folder\n{partialPath.Substring(0, pos)}";
                                             }
 
-                                            if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {e.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
+                                            if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {ex.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
                                             {
-                                                throw e;
+                                                throw ex;
                                             }
                                         }
                                     }
@@ -501,8 +504,10 @@ namespace SgChecker
                 MyMruList.RemoveFile(textScanPath.Text);
                 textScanPath.Text = "";
 
-                MsgBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
                 logger.Error(e.Error.Message);
+                logger.Info(e.Error.StackTrace);
+
+                MsgBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
             }
             else
             {

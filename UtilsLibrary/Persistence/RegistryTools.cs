@@ -8,6 +8,8 @@
 
 using Microsoft.Win32;
 using System;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Sims2Tools.Utils.Persistence
@@ -83,11 +85,14 @@ namespace Sims2Tools.Utils.Persistence
 
         public static void LoadFormSettings(string AppRegKey, Form frm)
         {
-            frm.SetBounds(
-                (int)GetSetting(AppRegKey, "FormLeft", frm.Left),
-                (int)GetSetting(AppRegKey, "FormTop", frm.Top),
-                (int)GetSetting(AppRegKey, "FormWidth", frm.Width),
-                (int)GetSetting(AppRegKey, "FormHeight", frm.Height));
+            Rectangle formArea = new Rectangle((int)GetSetting(AppRegKey, "FormLeft", frm.Left), (int)GetSetting(AppRegKey, "FormTop", frm.Top),
+                                               (int)GetSetting(AppRegKey, "FormWidth", frm.Width), (int)GetSetting(AppRegKey, "FormHeight", frm.Height));
+
+            if (Screen.AllScreens.Any(s => s.WorkingArea.IntersectsWith(formArea)))
+            {
+                frm.SetBounds(formArea.Left, formArea.Top, formArea.Width, formArea.Height);
+            }
+
             frm.WindowState = (FormWindowState)GetSetting(AppRegKey, "FormWindowState", frm.WindowState);
         }
 
@@ -110,6 +115,16 @@ namespace Sims2Tools.Utils.Persistence
                 SaveSetting(AppRegKey, "FormWidth", frm.RestoreBounds.Width);
                 SaveSetting(AppRegKey, "FormHeight", frm.RestoreBounds.Height);
             }
+        }
+
+        public static bool IsSet(string AppRegKey, string Key)
+        {
+            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("Software", true);
+
+            RegistryKey sub_key = reg_key.OpenSubKey(AppRegKey);
+            if (sub_key == null) return false;
+
+            return (sub_key.GetValue(Key) != null);
         }
 
         public static object GetSetting(string AppRegKey, string Key, object DefaultValue)

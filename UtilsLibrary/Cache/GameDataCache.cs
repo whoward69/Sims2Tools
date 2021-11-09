@@ -47,7 +47,11 @@ namespace Sims2Tools.Cache
         {
             try
             {
-                new BinaryFormatter().Serialize(File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Create), data);
+                using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Create))
+                {
+                    new BinaryFormatter().Serialize(fs, data);
+                }
+
                 return true;
             }
             catch (Exception)
@@ -66,7 +70,11 @@ namespace Sims2Tools.Cache
         {
             try
             {
-                data = (SortedDictionary<String, String>)new BinaryFormatter().Deserialize(File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Open));
+                using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Open))
+                {
+                    data = (SortedDictionary<String, String>)new BinaryFormatter().Deserialize(fs);
+                }
+
                 return true;
             }
             catch (Exception)
@@ -86,7 +94,11 @@ namespace Sims2Tools.Cache
         {
             try
             {
-                new BinaryFormatter().Serialize(File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Create), data);
+                using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Create))
+                {
+                    new BinaryFormatter().Serialize(fs, data);
+                }
+
                 return true;
             }
             catch (Exception)
@@ -105,7 +117,11 @@ namespace Sims2Tools.Cache
         {
             try
             {
-                data = (SortedDictionary<TypeGroupID, TypeGroupID>)new BinaryFormatter().Deserialize(File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Open));
+                using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Open))
+                {
+                    data = (SortedDictionary<TypeGroupID, TypeGroupID>)new BinaryFormatter().Deserialize(fs);
+                }
+
                 return true;
             }
             catch (Exception)
@@ -117,6 +133,53 @@ namespace Sims2Tools.Cache
                 catch (Exception) { }
 
                 data = new SortedDictionary<TypeGroupID, TypeGroupID>();
+                return false;
+            }
+        }
+
+        public static bool Serialize(Dictionary<TypeGUID, String> data, String cacheName)
+        {
+            try
+            {
+                using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Create))
+                {
+                    new BinaryFormatter().Serialize(fs, data);
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    File.Delete($"{cacheBase}/{cacheName}.bin");
+                }
+                catch (Exception) { }
+
+                return false;
+            }
+        }
+
+        public static bool Deserialize(out Dictionary<TypeGUID, String> data, String cacheName)
+        {
+            try
+            {
+                using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Open))
+                {
+                    data = (Dictionary<TypeGUID, String>)new BinaryFormatter().Deserialize(fs);
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    File.Delete($"{cacheBase}/{cacheName}.bin");
+                }
+                catch (Exception) { }
+
+                data = new Dictionary<TypeGUID, String>();
                 return false;
             }
         }

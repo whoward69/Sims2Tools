@@ -87,6 +87,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                 catch (Exception ex)
                 {
                     logger.Error(ex.Message);
+                    logger.Info(ex.StackTrace);
                 }
             }
         }

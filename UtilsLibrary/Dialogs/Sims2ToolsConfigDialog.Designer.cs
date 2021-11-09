@@ -46,6 +46,9 @@ namespace Sims2Tools
             this.textSimPEPath = new System.Windows.Forms.TextBox();
             this.btnSimPESelect = new System.Windows.Forms.Button();
             this.btnConfigOK = new System.Windows.Forms.Button();
+            this.lblSimsHomePath = new System.Windows.Forms.Label();
+            this.textSims2HomePath = new System.Windows.Forms.TextBox();
+            this.btnSimsHomeSelect = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblSims2Path
@@ -78,7 +81,7 @@ namespace Sims2Tools
             // lblSimPEPath
             // 
             this.lblSimPEPath.AutoSize = true;
-            this.lblSimPEPath.Location = new System.Drawing.Point(10, 56);
+            this.lblSimPEPath.Location = new System.Drawing.Point(10, 92);
             this.lblSimPEPath.Name = "lblSimPEPath";
             this.lblSimPEPath.Size = new System.Drawing.Size(111, 15);
             this.lblSimPEPath.TabIndex = 0;
@@ -86,7 +89,7 @@ namespace Sims2Tools
             // 
             // textSimPEPath
             // 
-            this.textSimPEPath.Location = new System.Drawing.Point(127, 53);
+            this.textSimPEPath.Location = new System.Drawing.Point(127, 89);
             this.textSimPEPath.Name = "textSimPEPath";
             this.textSimPEPath.Size = new System.Drawing.Size(530, 21);
             this.textSimPEPath.TabIndex = 3;
@@ -94,7 +97,7 @@ namespace Sims2Tools
             // btnSimPESelect
             // 
             this.btnSimPESelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSimPESelect.Location = new System.Drawing.Point(665, 48);
+            this.btnSimPESelect.Location = new System.Drawing.Point(665, 84);
             this.btnSimPESelect.Name = "btnSimPESelect";
             this.btnSimPESelect.Size = new System.Drawing.Size(143, 30);
             this.btnSimPESelect.TabIndex = 4;
@@ -106,7 +109,7 @@ namespace Sims2Tools
             // 
             this.btnConfigOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnConfigOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnConfigOK.Location = new System.Drawing.Point(665, 85);
+            this.btnConfigOK.Location = new System.Drawing.Point(665, 127);
             this.btnConfigOK.Name = "btnConfigOK";
             this.btnConfigOK.Size = new System.Drawing.Size(143, 30);
             this.btnConfigOK.TabIndex = 5;
@@ -114,12 +117,39 @@ namespace Sims2Tools
             this.btnConfigOK.UseVisualStyleBackColor = true;
             this.btnConfigOK.Click += new System.EventHandler(this.OnConfigOkClicked);
             // 
+            // lblSimsHomePath
+            // 
+            this.lblSimsHomePath.AutoSize = true;
+            this.lblSimsHomePath.Location = new System.Drawing.Point(10, 56);
+            this.lblSimsHomePath.Name = "lblSimsHomePath";
+            this.lblSimsHomePath.Size = new System.Drawing.Size(113, 15);
+            this.lblSimsHomePath.TabIndex = 6;
+            this.lblSimsHomePath.Text = "Sims 2 Home Path:";
+            // 
+            // textSims2HomePath
+            // 
+            this.textSims2HomePath.Location = new System.Drawing.Point(127, 53);
+            this.textSims2HomePath.Name = "textSims2HomePath";
+            this.textSims2HomePath.Size = new System.Drawing.Size(530, 21);
+            this.textSims2HomePath.TabIndex = 7;
+            // 
+            // btnSimsHomeSelect
+            // 
+            this.btnSimsHomeSelect.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSimsHomeSelect.Location = new System.Drawing.Point(665, 48);
+            this.btnSimsHomeSelect.Name = "btnSimsHomeSelect";
+            this.btnSimsHomeSelect.Size = new System.Drawing.Size(143, 30);
+            this.btnSimsHomeSelect.TabIndex = 8;
+            this.btnSimsHomeSelect.Text = "Select Home Path...";
+            this.btnSimsHomeSelect.UseVisualStyleBackColor = true;
+            this.btnSimsHomeSelect.Click += new System.EventHandler(this.OnSelectSim2HomePathClicked);
+            // 
             // Sims2ToolsConfigDialog
             // 
             this.AcceptButton = this.btnConfigOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(820, 125);
+            this.ClientSize = new System.Drawing.Size(820, 169);
             this.Controls.Add(this.lblSims2Path);
             this.Controls.Add(this.textSims2Path);
             this.Controls.Add(this.btnSims2Select);
@@ -127,6 +157,9 @@ namespace Sims2Tools
             this.Controls.Add(this.textSimPEPath);
             this.Controls.Add(this.btnSimPESelect);
             this.Controls.Add(this.btnConfigOK);
+            this.Controls.Add(this.lblSimsHomePath);
+            this.Controls.Add(this.textSims2HomePath);
+            this.Controls.Add(this.btnSimsHomeSelect);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -151,5 +184,8 @@ namespace Sims2Tools
         private System.Windows.Forms.Button btnSimPESelect;
         private System.Windows.Forms.Button btnConfigOK;
         private CommonOpenFileDialog selectPathDialog;
+        private System.Windows.Forms.Label lblSimsHomePath;
+        private System.Windows.Forms.TextBox textSims2HomePath;
+        private System.Windows.Forms.Button btnSimsHomeSelect;
     }
 }

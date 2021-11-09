@@ -55,7 +55,8 @@ namespace Sims2Tools.DBPF.Images.IMG
 
                             // TODO - may need to try TgaLoader stuff here
 
-                            logger.Info(ex.Message);
+                            logger.Error(ex.Message);
+                            logger.Info(ex.StackTrace);
                         }
                     }
                 }

@@ -18,6 +18,7 @@ namespace Sims2Tools
 
         public static String RegistryKey = @"WHoward\Sims2Tools";
         private static readonly String Sims2PathKey = "Sims2Path";
+        private static readonly String Sims2HomePathKey = "Sims2HomePath";
         private static readonly String SimPePathKey = "SimPePath";
 
         private static readonly String SimPeKey = @"Ambertation\SimPe\Settings";
@@ -40,6 +41,35 @@ namespace Sims2Tools
                 else
                 {
                     RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2PathKey, value);
+                }
+
+                GameDataCache.Invalidate();
+            }
+        }
+
+        public static bool IsSims2HomePathSet
+        {
+            get => RegistryTools.IsSet(RegistryKey, Sims2ToolsLib.Sims2HomePathKey);
+        }
+
+        public static String Sims2HomePath
+        {
+            get
+            {
+                String path = RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.Sims2HomePathKey, "") as String;
+
+                // Better to do this here rather than in the setter as a user can edit the registry directly
+                return path.EndsWith(@"\") ? path.Substring(0, path.Length - 1) : path;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    RegistryTools.DeleteSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2HomePathKey);
+                }
+                else
+                {
+                    RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2HomePathKey, value);
                 }
 
                 GameDataCache.Invalidate();

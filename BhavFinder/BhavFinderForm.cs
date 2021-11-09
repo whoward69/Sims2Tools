@@ -478,21 +478,17 @@ namespace BhavFinder
                 {
                     using (DBPFFile package = new DBPFFile(textFilePath.Text))
                     {
-                        GameData.BuildObjectsTable(package, localObjectsByGroupID);
+                        GameData.BuildObjectsTable(package, localObjectsByGroupID, null);
 
                         package.Close();
                     }
                 }
-#if DEBUG
                 catch (Exception ex)
-#else
-            catch (Exception)
-#endif
                 {
-                    MsgBox.Show($"Unable to open/read '{textFilePath.Text}'", "Error!", MessageBoxButtons.OK);
-#if DEBUG
                     logger.Error(ex.Message);
-#endif
+                    logger.Info(ex.StackTrace);
+
+                    MsgBox.Show($"Unable to open/read '{textFilePath.Text}'", "Error!", MessageBoxButtons.OK);
                 }
 
 #if DEBUG
@@ -570,16 +566,12 @@ namespace BhavFinder
                             strLookupByIndexLocal = BuildStrLookupTable(textFilePath.Text, instance, regex);
                         }
                     }
-#if DEBUG
                     catch (Exception ex)
-#else
-                    catch (Exception)
-#endif
                     {
-                        MsgBox.Show("Unable to build STR# lookup tables", "Error!", MessageBoxButtons.OK);
-#if DEBUG
                         logger.Error(ex.Message);
-#endif
+                        logger.Info(ex.StackTrace);
+
+                        MsgBox.Show("Unable to build STR# lookup tables", "Error!", MessageBoxButtons.OK);
                     }
                 }
 
@@ -691,10 +683,10 @@ namespace BhavFinder
                 MyMruList.RemoveFile(textFilePath.Text);
                 textFilePath.Text = "";
 
-                MsgBox.Show("An error occured while searching", "Error!", MessageBoxButtons.OK);
-#if DEBUG
                 logger.Error(e.Error.Message);
-#endif
+                logger.Info(e.Error.StackTrace);
+
+                MsgBox.Show("An error occured while searching", "Error!", MessageBoxButtons.OK);
             }
             else
             {

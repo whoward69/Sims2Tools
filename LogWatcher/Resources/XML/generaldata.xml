@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<labels>
+  <label><value>0</value><name>graphic</name></label>
+  <label><value>1</value><name>direction</name></label>
+  <label><value>2</value><name>container id</name></label>
+  <label><value>3</value><name>slot number</name></label>
+  <label><value>4</value><name>allowed height flags</name></label>
+  <label><value>5</value><name>wall adjacency flags</name></label>
+  <label><value>6</value><name>Stop Base Interaction</name></label>
+  <label><value>7</value><name>Niceness Score</name></label>
+  <label><value>8</value><name>flags</name></label>
+  <label><value>9</value><name>footprint index</name></label>
+  <label><value>10</value><name>route penalty</name></label>
+  <label><value>11</value><name>object id</name></label>
+  <label><value>12</value><name>target id</name></label>
+  <label><value>13</value><name>wall placement flags</name></label>
+  <label><value>14</value><name>Maintain Level</name></label>
+  <label><value>15</value><name>Repair Level</name></label>
+  <label><value>16</value><name>light source</name></label>
+  <label><value>17</value><name>walk style</name></label>
+  <label><value>18</value><name>sim age</name></label>
+  <label><value>19</value><name>lead tile object ID</name></label>
+  <label><value>20</value><name>tree table entry</name></label>
+  <label><value>21</value><name>birth minute</name></label>
+  <label><value>22</value><name>Door route blocker flags</name></label>
+  <label><value>23</value><name>rotation notches</name></label>
+  <label><value>24</value><name>birth hour</name></label>
+  <label><value>25</value><name>lockout count</name></label>
+  <label><value>26</value><name>Sitting Value</name></label>
+  <label><value>27</value><name>weight</name></label>
+  <label><value>28</value><name>support strength</name></label>
+  <label><value>29</value><name>room</name></label>
+  <label><value>30</value><name>room placement</name></label>
+  <label><value>31</value><name>prep value</name></label>
+  <label><value>32</value><name>cook value</name></label>
+  <label><value>33</value><name>surface value</name></label>
+  <label><value>34</value><name>Hidden Flags</name></label>
+  <label><value>35</value><name>temperature</name></label>
+  <label><value>36</value><name>dispose value</name></label>
+  <label><value>37</value><name>wash dish value</name></label>
+  <label><value>38</value><name>eating surface value</name></label>
+  <label><value>39</value><name>dirty level</name></label>
+  <label><value>40</value><name>flag field 2</name></label>
+  <label><value>41</value><name>current value</name></label>
+  <label><value>42</value><name>placement flags</name></label>
+  <label><value>43</value><name>movement flags</name></label>
+  <label><value>44</value><name>maximum grade</name></label>
+  <label><value>45</value><name>birth year</name></label>
+  <label><value>46</value><name>birth month</name></label>
+  <label><value>47</value><name>birth day</name></label>
+  <label><value>48</value><name>age in months</name></label>
+  <label><value>49</value><name>Trash Units</name></label>
+  <label><value>50</value><name>hide interaction</name></label>
+  <label><value>51</value><name>lighting contribution (0..100)</name></label>
+  <label><value>52</value><name>primitive result</name></label>
+  <label><value>53</value><name>portal penalty</name></label>
+  <label><value>54</value><name>primitive result id</name></label>
+  <label><value>55</value><name>Target Slot Count</name></label>
+  <label><value>56</value><name>disabled</name></label>
+  <label><value>57</value><name>Render Alpha (maximum)</name></label>
+  <label><value>58</value><name>object version</name></label>
+  <label><value>59</value><name>category</name></label>
+  <label><value>60</value><name>simulate on pause</name></label>
+  <label><value>61</value><name>serving surface value</name></label>
+  <label><value>62</value><name>use count</name></label>
+  <label><value>63</value><name>exclusive placement flags</name></label>
+  <label><value>64</value><name>gardening value</name></label>
+  <label><value>65</value><name>wash hands value</name></label>
+  <label><value>66</value><name>function score</name></label>
+  <label><value>67</value><name>slot count</name></label>
+  <label><value>68</value><name>Shadow Type</name></label>
+  <label><value>69</value><name>wall cutout flags</name></label>
+  <label><value>70</value><name>Vehicle Speed</name></label>
+  <label><value>71</value><name>Render Flags</name></label>
+  <label><value>72</value><name>Render Alpha</name></label>
+  <label><value>73</value><name>Render Red</name></label>
+  <label><value>74</value><name>Render Green</name></label>
+  <label><value>75</value><name>Render Blue</name></label>
+  <label><value>76</value><name>Water Utility Usage Per Hour</name></label>
+  <label><value>77</value><name>Energy Utility Usage  Per Hour</name></label>
+  <label><value>78</value><name>Look At Score</name></label>
+  <label><value>79</value><name>SemiAttribute Count</name></label>
+  <label><value>80</value><name>Object Link Forward</name></label>
+  <label><value>81</value><name>Object Link Backward</name></label>
+  <label><value>82</value><name>Placement Flags 2</name></label>
+  <label><value>83</value><name>DaysTillBreak</name></label>
+  <label><value>84</value><name>Flammibility</name></label>
+  <label><value>85</value><name>Hurry Speed</name></label>
+  <label><value>86</value><name>Crapness Score</name></label>
+  <label><value>87</value><name>Disable All Interactions</name></label>
+  <label><value>88</value><name>Portal Link 1 From Slot ID</name></label>
+  <label><value>89</value><name>Portal Link 1 To Slot ID</name></label>
+  <label><value>90</value><name>Portal Link 1 To Object ID</name></label>
+  <label><value>91</value><name>Portal Link 1 To Object GUID Lower Word</name></label>
+  <label><value>92</value><name>Portal Link 1 To Object GUID Upper Word</name></label>
+  <label><value>93</value><name>Portal Link 2 From Slot ID</name></label>
+  <label><value>94</value><name>Portal Link 2 To Slot ID</name></label>
+  <label><value>95</value><name>Portal Link 2 To Object ID</name></label>
+  <label><value>96</value><name>Portal Link 2 To Object GUID Lower Word</name></label>
+  <label><value>97</value><name>Portal Link 2 To Object GUID Upper Word</name></label>
+  <label><value>98</value><name>flags field 3</name></label>
+  <label><value>99</value><name>Gift From Neighbor ID</name></label>
+  <label><value>100</value><name>Gift To Neighbor ID</name></label>
+  <label><value>101</value><name>UI Icon Flags</name></label>
+  <label><value>102</value><name>Last Tick Rendered</name></label>
+  <label><value>103</value><name>Invisible wall placement flags</name></label>
+  <label><value>104</value><name>Interaction UI Priority</name></label>
+  <label><value>105</value><name>Wholesale Purchase Cost</name></label>
+  <label><value>106</value><name>For Sale Flags</name></label>
+  <label><value>107</value><name>Tree Table Override Data</name></label>
+  <label><value>108</value><name>Anim Offset X</name></label>
+  <label><value>109</value><name>Anim Offset Y</name></label>
+  <label><value>110</value><name>Anim Offset Z</name></label>
+  <label><value>111</value><name>Anim Offset Z Rotation</name></label>
+  <label><value>112</value><name>Pet Awareness Value</name></label>
+  <label><value>113</value><name>Ignore Apt Restriction Grab</name></label>
+</labels>

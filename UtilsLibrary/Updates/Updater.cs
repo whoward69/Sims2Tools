@@ -16,9 +16,7 @@ namespace Sims2Tools.Updates
 {
     public class Updater
     {
-#if DEBUG
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-#endif
 
         private readonly string AppRegKey;
 
@@ -166,15 +164,10 @@ namespace Sims2Tools.Updates
                     }
                 }
             }
-#if DEBUG
             catch (Exception ex)
-#else
-                catch (Exception)
-#endif
             {
-#if DEBUG
                 logger.Error(ex.Message);
-#endif
+                logger.Info(ex.StackTrace);
             }
         }
     }

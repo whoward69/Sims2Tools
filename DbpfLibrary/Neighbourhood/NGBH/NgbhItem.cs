@@ -50,9 +50,9 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             get { return invnr; }
         }
 
-        public uint Guid
+        public TypeGUID Guid
         {
-            get { return guid; }
+            get { return (TypeGUID)guid; }
         }
 
         public NgbhItemFlags Flags
@@ -147,7 +147,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             XmlElement element = parent.OwnerDocument.CreateElement("item");
             parent.AppendChild(element);
 
-            element.SetAttribute("guid", Helper.Hex8PrefixString(Guid));
+            element.SetAttribute("guid", Guid.ToString());
             element.SetAttribute("flags", Helper.Hex4PrefixString(flags));
             element.SetAttribute("flags2", Helper.Hex4PrefixString(flags2));
             element.SetAttribute("invNumber", InventoryNumber.ToString());

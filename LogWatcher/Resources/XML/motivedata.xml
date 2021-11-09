@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<labels>
+  <label><value>0</value><name>Shopping</name></label>
+  <label><value>1</value><name>Scratch/Chew</name></label>
+  <label><value>2</value><name>Unused</name></label>
+  <label><value>3</value><name>Mood</name></label>
+  <label><value>4</value><name>Mood+Mem</name></label>
+  <label><value>5</value><name>Energy</name></label>
+  <label><value>6</value><name>Comfort</name></label>
+  <label><value>7</value><name>Hunger</name></label>
+  <label><value>8</value><name>Water / Hygiene</name></label>
+  <label><value>9</value><name>Bladder</name></label>
+  <label><value>10</value><name>Unused</name></label>
+  <label><value>11</value><name>Sleep state</name></label>
+  <label><value>12</value><name>Amorous</name></label>
+  <label><value>13</value><name>Environment</name></label>
+  <label><value>14</value><name>Social</name></label>
+  <label><value>15</value><name>Fun</name></label>
+</labels>

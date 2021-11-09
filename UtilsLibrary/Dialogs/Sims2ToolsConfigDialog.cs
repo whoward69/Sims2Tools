@@ -8,6 +8,7 @@
 
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Sims2Tools
@@ -27,6 +28,25 @@ namespace Sims2Tools
         private void OnConfigLoad(object sender, EventArgs e)
         {
             textSims2Path.Text = Sims2ToolsLib.Sims2Path;
+
+            if (Sims2ToolsLib.IsSims2HomePathSet)
+            {
+                textSims2HomePath.Text = Sims2ToolsLib.Sims2HomePath;
+            }
+            else
+            {
+                String homePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EA Games\\";
+
+                if (Directory.Exists($"{homePath}The Sims™ 2 Ultimate Collection"))
+                {
+                    textSims2HomePath.Text = $"{homePath}The Sims™ 2 Ultimate Collection";
+                }
+                else if (Directory.Exists($"{homePath}The Sims 2"))
+                {
+                    textSims2HomePath.Text = $"{homePath}The Sims 2";
+                }
+            }
+
             textSimPEPath.Text = Sims2ToolsLib.SimPePath;
         }
 
@@ -37,6 +57,16 @@ namespace Sims2Tools
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 textSims2Path.Text = selectPathDialog.FileName;
+            }
+        }
+
+        private void OnSelectSim2HomePathClicked(object sender, EventArgs e)
+        {
+            selectPathDialog.InitialDirectory = textSims2HomePath.Text;
+
+            if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                textSims2HomePath.Text = selectPathDialog.FileName;
             }
         }
 
@@ -53,18 +83,21 @@ namespace Sims2Tools
         private void OnConfigOkClicked(object sender, EventArgs e)
         {
             String oldSims2Path = Sims2ToolsLib.Sims2Path;
+            String oldSims2HomePath = Sims2ToolsLib.Sims2HomePath;
             String oldSimPePath = Sims2ToolsLib.SimPePath;
 
             Sims2ToolsLib.Sims2Path = textSims2Path.Text;
+            Sims2ToolsLib.Sims2HomePath = textSims2HomePath.Text;
             Sims2ToolsLib.SimPePath = textSimPEPath.Text;
 
-            this.Close();
-
             // As updating the global objects is a long process, it's worth checking that one of these actually changed
-            if (!(textSims2Path.Text.Equals(oldSims2Path) && textSimPEPath.Text.Equals(oldSimPePath)))
+            if (!(textSims2Path.Text.Equals(oldSims2Path) && textSims2HomePath.Text.Equals(oldSims2HomePath) && textSimPEPath.Text.Equals(oldSimPePath)))
             {
+                btnConfigOK.Enabled = false;
                 GameData.UpdateGlobalObjects();
             }
+
+            this.Close();
         }
 
         protected override bool ProcessDialogKey(Keys keyData)

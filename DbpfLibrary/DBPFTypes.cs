@@ -18,7 +18,7 @@ namespace Sims2Tools.DBPF
     /*
      * Data type for strong typing of GUIDs
      */
-    public readonly struct TypeGUID
+    public readonly struct TypeGUID : IComparable<TypeGUID>
     {
         private readonly uint guid;
 
@@ -32,7 +32,17 @@ namespace Sims2Tools.DBPF
         public static uint operator %(TypeGUID lhs, int rhs) => (uint)(lhs.guid % rhs);
         public static TypeGUID operator /(TypeGUID lhs, int rhs) => new TypeGUID((uint)(lhs.guid / rhs));
 
+        public static bool operator ==(TypeGUID lhs, TypeGUID rhs) => (lhs.guid == rhs.guid);
+        public static bool operator !=(TypeGUID lhs, TypeGUID rhs) => (lhs.guid != rhs.guid);
+        public bool Equals(TypeGUID other) => (this.guid == other.guid);
+        public override bool Equals(object obj) => (obj is TypeGUID typeId) && Equals(typeId);
+        public override int GetHashCode() => base.GetHashCode();
+
+        public int CompareTo(TypeGUID other) => this.guid.CompareTo(other.guid);
+
         public override String ToString() => Helper.Hex8PrefixString(guid);
+
+        public int AsInt() => (int)guid;
     }
 
     /*
@@ -58,6 +68,8 @@ namespace Sims2Tools.DBPF
         public String ToShortString() => Helper.Hex4PrefixString(id);
         public String Hex8String() => Helper.Hex8String(id);
         public String IntString() => Helper.IntString(id);
+
+        public int AsInt() => (int)id;
     }
 
     public readonly struct TypeGroupID : IComparable<TypeGroupID>
@@ -80,6 +92,8 @@ namespace Sims2Tools.DBPF
         public String ToShortString() => Helper.Hex4PrefixString(id);
         public String Hex8String() => Helper.Hex8String(id);
         public String IntString() => Helper.IntString(id);
+
+        public int AsInt() => (int)id;
     }
 
     public readonly struct TypeInstanceID : IComparable<TypeInstanceID>

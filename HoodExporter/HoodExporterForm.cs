@@ -70,6 +70,8 @@ namespace HoodExporter
         private readonly List<TypeTypeID> downtownTypes = new List<TypeTypeID>();
         private readonly List<TypeTypeID> vacationTypes = new List<TypeTypeID>();
 
+        private readonly List<TokenData> tokenDataList = new List<TokenData>();
+
         private SimDataCache simCache;
 
         private String xsltPath = "";
@@ -144,6 +146,7 @@ namespace HoodExporter
             }
 
             ParseXml("Resources/XML/npcs.xml", "npc", npcsByGuid);
+            ParseTokens("Resources/XML/tokens.xml", tokenDataList);
 
             foreach (String xslt in Directory.GetFiles("Resources/XSL"))
             {
@@ -184,7 +187,7 @@ namespace HoodExporter
                     if (reader.Name.Equals("value"))
                     {
                         reader.Read();
-                        value = (TypeGUID) UInt32.Parse(reader.Value.Substring(2), NumberStyles.HexNumber);
+                        value = (TypeGUID)UInt32.Parse(reader.Value.Substring(2), NumberStyles.HexNumber);
                     }
                     else if (reader.Name.Equals("name"))
                     {
@@ -199,6 +202,39 @@ namespace HoodExporter
             }
         }
 
+        private void ParseTokens(String xml, List<TokenData> tokenList)
+        {
+            XmlReader reader = XmlReader.Create(xml);
+
+            reader.MoveToContent();
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    if (reader.Name.Equals("token"))
+                    {
+                        String strGuid = reader.GetAttribute("guid");
+                        String strProp = reader.GetAttribute("property");
+                        String strEle = reader.GetAttribute("element");
+                        String strAttr = reader.GetAttribute("attribute");
+
+                        if (strGuid != null && strProp != null && strEle != null && strAttr != null)
+                        {
+                            if (strGuid.StartsWith("0x")) strGuid = strGuid.Substring(2);
+
+                            try
+                            {
+                                TypeGUID guid = (TypeGUID)UInt32.Parse(strGuid, NumberStyles.HexNumber);
+                                int prop = Int16.Parse(strProp, NumberStyles.Integer);
+
+                                tokenList.Add(new TokenData(guid, prop, strEle, strAttr));
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                }
+            }
+        }
 
         private void HoodWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs args)
         {
@@ -280,11 +316,12 @@ namespace HoodExporter
                 }
             }
 #if !DEBUG
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.Error(e.Message);
+                logger.Error(ex.Message);
+                logger.Info(ex.StackTrace);
 
-                if (MsgBox.Show($"An error occured while processing\n{hoodDirPath}\n\nReason: {e.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                if (MsgBox.Show($"An error occured while processing\n{hoodDirPath}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
                 {
                     args.Cancel = true;
                     return;
@@ -380,7 +417,7 @@ namespace HoodExporter
                             if (resource is Ngbh ngbh)
                             {
                                 element = ngbh.AddXml(parent, menuItemLots.Checked, menuItemFamilies.Checked, menuItemSims.Checked);
-                                simCache.AddTokens(ngbh);
+                                simCache.AddTokens(ngbh, tokenDataList);
                             }
                             else
                             {
@@ -446,7 +483,54 @@ namespace HoodExporter
                                     }
                                 }
 
-                                // TODO - badges (if cached)
+                                TokenDataCache simTokenCache = simDataById.TokenCache;
+                                foreach (TokenData tokenData in tokenDataList)
+                                {
+                                    uint tokenValue = simTokenCache.GetValue(tokenData);
+
+                                    XmlElement tokenElementParent = element;
+                                    String tokenElementName = tokenData.ElementName;
+                                    while (tokenElementName.Contains("/"))
+                                    {
+                                        String interElementName = tokenElementName.Substring(0, tokenElementName.IndexOf("/"));
+                                        XmlElement interElement = null;
+                                        foreach (XmlElement child in tokenElementParent.ChildNodes)
+                                        {
+                                            if (child.Name.Equals(interElementName))
+                                            {
+                                                interElement = child;
+                                                break;
+                                            }
+                                        }
+
+                                        if (interElement == null)
+                                        {
+                                            interElement = tokenElementParent.OwnerDocument.CreateElement(interElementName);
+                                            tokenElementParent.AppendChild(interElement);
+                                        }
+
+                                        tokenElementParent = interElement;
+                                        tokenElementName = tokenElementName.Substring(tokenElementName.IndexOf("/") + 1);
+                                    }
+
+                                    XmlElement tokenElement = null;
+                                    foreach (XmlElement child in tokenElementParent.ChildNodes)
+                                    {
+                                        if (child.Name.Equals(tokenElementName))
+                                        {
+                                            tokenElement = child;
+                                            break;
+                                        }
+                                    }
+
+                                    if (tokenElement == null)
+                                    {
+                                        tokenElement = tokenElementParent.OwnerDocument.CreateElement(tokenElementName);
+                                        tokenElementParent.AppendChild(tokenElement);
+                                    }
+
+                                    tokenElement.SetAttribute(tokenData.AttributeName, tokenValue.ToString());
+                                }
 
                                 if (isRufio)
                                 {
@@ -782,10 +866,10 @@ namespace HoodExporter
                 MyMruList.RemoveFile(textHoodPath.Text);
                 textHoodPath.Text = "";
 
-                MsgBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
-#if DEBUG
                 logger.Error(e.Error.Message);
-#endif
+                logger.Info(e.Error.StackTrace);
+
+                MsgBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
             }
             else
             {

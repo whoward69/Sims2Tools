@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tokens>
+  <token guid="0x4DDF0E12" property="2" element="base/toddler" attribute="walkSkill"/>
+  <token guid="0x4DDF0E12" property="3" element="base/toddler" attribute="talkSkill"/>
+  <token guid="0x4DDF0E12" property="4" element="base/toddler" attribute="pottySkill"/>
+  <token guid="0x4DDF0E12" property="5" element="base/toddler" attribute="canWalk"/>
+  <token guid="0x4DDF0E12" property="6" element="base/toddler" attribute="canTalk"/>
+  <token guid="0x4DDF0E12" property="7" element="base/toddler" attribute="pottyTrained"/>
+  <token guid="0x4DDF0E12" property="8" element="base/toddler" attribute="rhymeSkill"/>
+
+  <token guid="0x4D8B0CC3" property="2" element="hiddenCounts" attribute="masterpiecesPainted"/>
+  <token guid="0x4D8B0CC3" property="6" element="hiddenCounts" attribute="novelsWritten"/>
+  <token guid="0x4D8B0CC3" property="7" element="hiddenCounts" attribute="abductions"/>
+  <token guid="0x4D8B0CC3" property="8" element="hiddenCounts" attribute="grilledCheeseEaten"/>
+
+  <token guid="0x4D8B0CC3" property="3" element="hiddenSkills" attribute="meditation"/>
+  <token guid="0x4D8B0CC3" property="4" element="hiddenSkills" attribute="study"/>
+  <token guid="0x4D8B0CC3" property="5" element="hiddenSkills" attribute="pool"/>
+  <token guid="0x0DA265F4" property="1" element="hiddenSkills" attribute="dance"/>
+
+  <token guid="0x505FDC28" property="1" element="badges" attribute="cashRegister"/>
+  <token guid="0x705FDC8F" property="1" element="badges" attribute="cosmetology"/>
+  <token guid="0x12297157" property="1" element="badges" attribute="fishing"/>
+  <token guid="0x905FDBB5" property="1" element="badges" attribute="flowerArranging"/>
+  <token guid="0x1215A8C1" property="1" element="badges" attribute="gardening"/>
+  <token guid="0xF3D9B8DA" property="1" element="badges" attribute="pottery"/>
+  <token guid="0x505FDBC6" property="1" element="badges" attribute="robotery"/>
+  <token guid="0xB05FDC1B" property="1" element="badges" attribute="sales"/>
+  <token guid="0x305FDC9F" property="1" element="badges" attribute="security"/>
+  <token guid="0xD3DB2A27" property="1" element="badges" attribute="sewing"/>
+  <token guid="0x105FDC52" property="1" element="badges" attribute="stocking"/>
+  <token guid="0xD05FDB91" property="1" element="badges" attribute="toyMaking"/>
+  
+  <token guid="0x94D80DBA" property="1" element="studies" attribute="angerManagement"/>
+  <token guid="0x34D358B7" property="1" element="studies" attribute="coupleCounseling"/>
+  <token guid="0x54D80DD3" property="1" element="studies" attribute="physiology"/>
+  <token guid="0x74D80DA8" property="1" element="studies" attribute="firePrevention"/>
+  <token guid="0x54D80DC6" property="1" element="studies" attribute="lifelongHappiness"/>
+  <token guid="0xF4150B1F" property="1" element="studies" attribute="parenting"/>
+</tokens>

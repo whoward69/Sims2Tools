@@ -46,5 +46,17 @@ namespace HcduPlus.Properties {
                 this["MruSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("HcduPlus")]
+        public string DbFile {
+            get {
+                return ((string)(this["DbFile"]));
+            }
+            set {
+                this["DbFile"] = value;
+            }
+        }
     }
 }

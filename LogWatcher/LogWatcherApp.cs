@@ -16,11 +16,17 @@ namespace LogWatcher
     {
         public static String AppName = "Log Watcher";
 
-        public static int AppVersionMajor = 0;
+        public static int AppVersionMajor = 1;
         public static int AppVersionMinor = 1;
-        public static String AppVersionType = "a"; // a - alpha, b - beta, r - release
+        public static String AppVersionType = "b"; // a - alpha, b - beta, r - release
 
-        public static String AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
+#if DEBUG
+        public static String AppVersionBuild = " (debug)";
+#else
+        public static String AppVersionBuild = "";
+#endif
+
+        public static String AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}{AppVersionBuild}";
 
         public static String RegistryKey = Sims2ToolsLib.RegistryKey + @"\LogWatcher";
 

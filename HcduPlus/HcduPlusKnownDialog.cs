@@ -9,6 +9,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using HcduPlus.Conflict;
 using System;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;

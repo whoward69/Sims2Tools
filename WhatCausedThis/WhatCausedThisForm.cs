@@ -30,9 +30,7 @@ namespace WhatCausedThis
 {
     public partial class WhatCausedThisForm : Form
     {
-#if DEBUG
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-#endif
 
         private readonly WhatCausedThisData dataByPackage = new WhatCausedThisData();
 
@@ -76,9 +74,6 @@ namespace WhatCausedThis
             }
 
             float total = modsFiles.Count;
-#if DEBUG
-            int done = 0;
-#endif
             int found = 0;
 
             if (modsFiles.Count > 0)
@@ -104,10 +99,6 @@ namespace WhatCausedThis
 
                 found = ProcessMods(worker, e, modsFolder, modsFiles, total, groupID, groupName, bhavID, bhavName, node);
             }
-
-#if DEBUG
-            logger.Debug($"Processed {done} mods");
-#endif
 
             e.Result = found;
         }
@@ -164,11 +155,10 @@ namespace WhatCausedThis
                             package.Close();
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-#if DEBUG
-                        logger.Error(e.Message);
-#endif
+                        logger.Error(ex.Message);
+                        logger.Info(ex.StackTrace);
 
                         String partialPath = file.Substring(folder.Length + 1);
                         int pos = partialPath.LastIndexOf(@"\");
@@ -184,9 +174,9 @@ namespace WhatCausedThis
                             fileDetails = $"{partialPath.Substring(pos + 1)}\nin folder\n{partialPath.Substring(0, pos)}";
                         }
 
-                        if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {e.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
+                        if (MsgBox.Show($"An error occured while processing\n{fileDetails}\n\nReason: {ex.Message}\n\nPress 'OK' to ignore this file or 'Cancel' to stop.", "Error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
                         {
-                            throw e;
+                            throw ex;
                         }
                     }
 
@@ -276,10 +266,10 @@ namespace WhatCausedThis
 
             if (e.Error != null)
             {
-                MsgBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
-#if DEBUG
                 logger.Error(e.Error.Message);
-#endif
+                logger.Info(e.Error.StackTrace);
+
+                MsgBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
             }
             else
             {

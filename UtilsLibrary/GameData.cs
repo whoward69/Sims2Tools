@@ -39,6 +39,7 @@ namespace Sims2Tools
         static public SortedDictionary<String, String> semiGlobalsByGroup;
 
         static public SortedDictionary<String, String> globalObjectsByGroupID;
+        static public Dictionary<TypeGUID, String> globalObjectsByGUID;
         static public SortedDictionary<TypeGroupID, TypeGroupID> semiglobalsByGroupID;
 
         static GameData()
@@ -47,71 +48,79 @@ namespace Sims2Tools
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            if (!GameDataCache.Deserialize(out languagesByCode, "languagesByCode"))
+            try
             {
-                ParseXml("Resources/XML/languages.xml", "language", languagesByCode);
+                if (!GameDataCache.Deserialize(out languagesByCode, "languagesByCode"))
+                {
+                    ParseXml("Resources/XML/languages.xml", "language", languagesByCode);
 #if DEBUG
-                logger.Info($"Loaded {languagesByCode.Count} languages from XML");
+                    logger.Info($"Loaded {languagesByCode.Count} languages from XML");
 #endif
-                GameDataCache.Serialize(languagesByCode, "languagesByCode");
+                    GameDataCache.Serialize(languagesByCode, "languagesByCode");
 #if DEBUG
-            }
-            else
-            {
-                logger.Info($"Loaded {languagesByCode.Count} languages from cache");
+                }
+                else
+                {
+                    logger.Info($"Loaded {languagesByCode.Count} languages from cache");
 #endif
-            }
+                }
 
-            if (!GameDataCache.Deserialize(out primitivesByOpCode, "primitivesByOpCode"))
-            {
-                ParseXml("Resources/XML/primitives.xml", "primitive", primitivesByOpCode);
+                if (!GameDataCache.Deserialize(out primitivesByOpCode, "primitivesByOpCode"))
+                {
+                    ParseXml("Resources/XML/primitives.xml", "primitive", primitivesByOpCode);
 #if DEBUG
-                logger.Info($"Loaded {primitivesByOpCode.Count} primitives from XML");
+                    logger.Info($"Loaded {primitivesByOpCode.Count} primitives from XML");
 #endif
-                GameDataCache.Serialize(primitivesByOpCode, "primitivesByOpCode");
+                    GameDataCache.Serialize(primitivesByOpCode, "primitivesByOpCode");
 #if DEBUG
-            }
-            else
-            {
-                logger.Info($"Loaded {primitivesByOpCode.Count} primitives from cache");
+                }
+                else
+                {
+                    logger.Info($"Loaded {primitivesByOpCode.Count} primitives from cache");
 #endif
-            }
+                }
 
-            if (!GameDataCache.Deserialize(out textlistsByInstance, "textlistsByInstance"))
-            {
-                ParseXml("Resources/XML/textlists.xml", "textlist", textlistsByInstance);
+                if (!GameDataCache.Deserialize(out textlistsByInstance, "textlistsByInstance"))
+                {
+                    ParseXml("Resources/XML/textlists.xml", "textlist", textlistsByInstance);
 #if DEBUG
-                logger.Info($"Loaded {textlistsByInstance.Count} textlists from XML");
+                    logger.Info($"Loaded {textlistsByInstance.Count} textlists from XML");
 #endif
-                GameDataCache.Serialize(textlistsByInstance, "textlistsByInstance");
+                    GameDataCache.Serialize(textlistsByInstance, "textlistsByInstance");
 #if DEBUG
-            }
-            else
-            {
-                logger.Info($"Loaded {textlistsByInstance.Count} textlists from cache");
+                }
+                else
+                {
+                    logger.Info($"Loaded {textlistsByInstance.Count} textlists from cache");
 #endif
-            }
+                }
 
-            if (!(GameDataCache.Deserialize(out semiGlobalsByName, "semiGlobalsByName") && GameDataCache.Deserialize(out semiGlobalsByGroup, "semiGlobalsByGroup")))
-            {
-                semiGlobalsByName = new SortedDictionary<string, string>();
-                semiGlobalsByGroup = new SortedDictionary<string, string>();
+                if (!(GameDataCache.Deserialize(out semiGlobalsByName, "semiGlobalsByName") && GameDataCache.Deserialize(out semiGlobalsByGroup, "semiGlobalsByGroup")))
+                {
+                    semiGlobalsByName = new SortedDictionary<string, string>();
+                    semiGlobalsByGroup = new SortedDictionary<string, string>();
 
-                ParseXml("Resources/XML/semiglobals.xml", "semiglobal", semiGlobalsByName, semiGlobalsByGroup);
+                    ParseXml("Resources/XML/semiglobals.xml", "semiglobal", semiGlobalsByName, semiGlobalsByGroup);
 #if DEBUG
-                logger.Info($"Loaded {semiGlobalsByName.Count} semiglobals from XML");
+                    logger.Info($"Loaded {semiGlobalsByName.Count} semiglobals from XML");
 #endif
-                GameDataCache.Serialize(semiGlobalsByName, "semiGlobalsByName");
-                GameDataCache.Serialize(semiGlobalsByGroup, "semiGlobalsByGroup");
+                    GameDataCache.Serialize(semiGlobalsByName, "semiGlobalsByName");
+                    GameDataCache.Serialize(semiGlobalsByGroup, "semiGlobalsByGroup");
 #if DEBUG
-            }
-            else
-            {
-                logger.Info($"Loaded {semiGlobalsByName.Count} semiglobals from cache");
+                }
+                else
+                {
+                    logger.Info($"Loaded {semiGlobalsByName.Count} semiglobals from cache");
 #endif
-            }
+                }
 
-            UpdateGlobalObjects();
+                UpdateGlobalObjects();
+            }
+            catch (Exception ex)
+            {
+                logger.Warn($"Loading GameData threw {ex.Message}");
+                logger.Info(ex.StackTrace);
+            }
 
             stopwatch.Stop();
             logger.Info($"Loaded GameData in {stopwatch.ElapsedMilliseconds}ms");
@@ -162,10 +171,11 @@ namespace Sims2Tools
             {
                 GameDataCache.Validate(sims2Path + objectsSubPath);
 
-                if (!(GameDataCache.Deserialize(out semiglobalsByGroupID, "semiglobalsByGroupID") && GameDataCache.Deserialize(out globalObjectsByGroupID, "globalObjectsByGroupID")))
+                if (!(GameDataCache.Deserialize(out semiglobalsByGroupID, "semiglobalsByGroupID") && GameDataCache.Deserialize(out globalObjectsByGroupID, "globalObjectsByGroupID") && GameDataCache.Deserialize(out globalObjectsByGUID, "globalObjectsByGUID")))
                 {
                     semiglobalsByGroupID = new SortedDictionary<TypeGroupID, TypeGroupID>();
                     globalObjectsByGroupID = new SortedDictionary<string, string>();
+                    globalObjectsByGUID = new Dictionary<TypeGUID, string>();
 
                     try
                     {
@@ -178,23 +188,19 @@ namespace Sims2Tools
                                 semiglobalsByGroupID.Add(entry.GroupID, glob.SemiGlobalGroup);
                             }
 
-                            BuildObjectsTable(package, globalObjectsByGroupID);
+                            BuildObjectsTable(package, globalObjectsByGroupID, globalObjectsByGUID);
 
                             package.Close();
                         }
                     }
-#if DEBUG
                     catch (Exception ex)
-#else
-                    catch (Exception)
-#endif
                     {
                         Sims2ToolsLib.Sims2Path = null;
 
-                        MsgBox.Show($"Unable to open/read 'objects.package' (from '{sims2Path}')", "Error!", MessageBoxButtons.OK);
-#if DEBUG
                         logger.Error(ex.Message);
-#endif
+                        logger.Info(ex.StackTrace);
+
+                        MsgBox.Show($"Unable to open/read 'objects.package' (from '{sims2Path}')", "Error!", MessageBoxButtons.OK);
                     }
 
 #if DEBUG
@@ -202,6 +208,7 @@ namespace Sims2Tools
                     logger.Info($"Loaded {semiglobalsByGroupID.Count} semi-global references from 'objects.package'");
 #endif
                     GameDataCache.Serialize(globalObjectsByGroupID, "globalObjectsByGroupID");
+                    GameDataCache.Serialize(globalObjectsByGUID, "globalObjectsByGUID");
                     GameDataCache.Serialize(semiglobalsByGroupID, "semiglobalsByGroupID");
 #if DEBUG
                 }
@@ -210,12 +217,17 @@ namespace Sims2Tools
                     logger.Info($"Loaded {globalObjectsByGroupID.Count} game objects from cache");
                     logger.Info($"Loaded {semiglobalsByGroupID.Count} semi-global references from cache");
 #endif
-
                 }
+            }
+            else
+            {
+                semiglobalsByGroupID = new SortedDictionary<TypeGroupID, TypeGroupID>();
+                globalObjectsByGroupID = new SortedDictionary<string, string>();
+                globalObjectsByGUID = new Dictionary<TypeGUID, string>();
             }
         }
 
-        static public void BuildObjectsTable(DBPFFile package, SortedDictionary<String, String> objectsByGroupID)
+        static public void BuildObjectsTable(DBPFFile package, SortedDictionary<String, String> objectsByGroupID, Dictionary<TypeGUID, String> objectsByGUID)
         {
             objectsByGroupID.Clear();
 
@@ -237,6 +249,16 @@ namespace Sims2Tools
                     else
                     {
                         objectsByGroupID.Add(group, filename);
+                    }
+
+                    if (objectsByGUID != null)
+                    {
+                        try
+                        {
+                            Objd objd = (Objd)package.GetResourceByEntry(entry);
+                            objectsByGUID.Add(objd.Guid, filename);
+                        }
+                        catch (Exception) { }
                     }
                 }
             }

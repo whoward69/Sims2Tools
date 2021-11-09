@@ -22,7 +22,13 @@ namespace WhatCausedThis
         public static int AppVersionMinor = 4;
         public static String AppVersionType = "b"; // a - alpha, b - beta, r - release
 
-        public static String AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
+#if DEBUG
+        public static String AppVersionBuild = " (debug)";
+#else
+        public static String AppVersionBuild = "";
+#endif
+
+        public static String AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}{AppVersionBuild}";
 
         public static String RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\WhatCausedThis";
 
