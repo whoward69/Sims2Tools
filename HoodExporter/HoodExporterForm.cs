@@ -96,6 +96,8 @@ namespace HoodExporter
 
         public HoodExporterForm()
         {
+            logger.Info(HoodExporterApp.AppProduct);
+
             InitializeComponent();
             this.Text = HoodExporterApp.AppName;
 

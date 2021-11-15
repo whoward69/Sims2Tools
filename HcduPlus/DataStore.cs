@@ -196,13 +196,13 @@ namespace HcduPlus.DataStore
 
         public override List<String> SeenGuidsGetPackages(TypeGUID guid)
         {
-            if (seenGuids.TryGetValue(guid, out List<KeyIndexPair> yys))
+            if (seenGuids.TryGetValue(guid, out List<KeyIndexPair> pairs))
             {
-                List<String> packages = new List<String>(yys.Count);
+                List<String> packages = new List<String>(pairs.Count);
 
-                foreach (KeyIndexPair yy in yys)
+                foreach (KeyIndexPair pair in pairs)
                 {
-                    String packageName = $"##{yy.Key.GroupID}-{yy.Key.InstanceID}!{prefix}{files[yy.FileIndex].Substring(folder.Length + 1)}";
+                    String packageName = $"##{pair.Key.GroupID}-{pair.Key.InstanceID}!{prefix}{files[pair.FileIndex].Substring(folder.Length + 1)}";
                     packages.Add(packageName);
                 }
 

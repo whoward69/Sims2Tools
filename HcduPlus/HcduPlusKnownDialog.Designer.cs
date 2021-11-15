@@ -61,6 +61,7 @@ namespace HcduPlus
             this.colLoadsLater});
             this.gridKnownConflicts.Location = new System.Drawing.Point(12, 12);
             this.gridKnownConflicts.Name = "gridKnownConflicts";
+            this.gridKnownConflicts.RowHeadersVisible = false;
             this.gridKnownConflicts.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridKnownConflicts.Size = new System.Drawing.Size(651, 291);
             this.gridKnownConflicts.TabIndex = 0;

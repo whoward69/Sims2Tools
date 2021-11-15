@@ -50,12 +50,36 @@ namespace LogWatcher.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Blue")]
-        public string InvGuidColour {
+        public string GameTokensColour {
             get {
-                return ((string)(this["InvGuidColour"]));
+                return ((string)(this["GameTokensColour"]));
             }
             set {
-                this["InvGuidColour"] = value;
+                this["GameTokensColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DeepPink")]
+        public string KnownTokensColour {
+            get {
+                return ((string)(this["KnownTokensColour"]));
+            }
+            set {
+                this["KnownTokensColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("OrangeRed")]
+        public string CustomTokensColour {
+            get {
+                return ((string)(this["CustomTokensColour"]));
+            }
+            set {
+                this["CustomTokensColour"] = value;
             }
         }
     }

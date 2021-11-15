@@ -20,6 +20,11 @@ namespace HcduPlus
     {
         private readonly KnownConflicts data;
 
+        // TODO - add a right-click menu with Delete
+        // TODO - add a "Copy" button
+        // TODO - add a "Reset" button
+        // TODO - add an export/import to xml feature for conflicts
+
         public HcduPlusKnownDialog()
         {
             InitializeComponent();

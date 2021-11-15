@@ -51,6 +51,8 @@ namespace BhavFinder
 
         public BhavFinderForm()
         {
+            logger.Info(BhavFinderApp.AppProduct);
+
             InitializeComponent();
             this.Text = BhavFinderApp.AppName;
 

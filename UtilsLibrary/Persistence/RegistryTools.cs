@@ -75,6 +75,9 @@ namespace Sims2Tools.Utils.Persistence
                 DeleteSetting(AppRegKey, "FormWidth");
                 DeleteSetting(AppRegKey, "FormHeight");
             }
+
+            // We need to do this here so the Updater has the correct info to work from
+            SaveAppSettings(AppRegKey, versionMajor, versionMinor);
         }
 
         public static void SaveAppSettings(string AppRegKey, int versionMajor, int versionMinor)

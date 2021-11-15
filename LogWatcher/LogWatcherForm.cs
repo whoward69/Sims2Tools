@@ -17,11 +17,9 @@ using System.Windows.Forms;
 
 namespace LogWatcher
 {
-    public partial class LogWatcherForm : Form
+    public partial class LogWatcherForm : Form, ISearcher
     {
-#pragma warning disable IDE0052 // Remove unread private members
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-#pragma warning restore IDE0052 // Remove unread private members
 
         private MruList MyMruList;
         private Updater MyUpdater;
@@ -30,6 +28,8 @@ namespace LogWatcher
 
         public LogWatcherForm()
         {
+            logger.Info(LogWatcherApp.AppProduct);
+
             InitializeComponent();
             this.Text = LogWatcherApp.AppName;
         }
@@ -43,9 +43,6 @@ namespace LogWatcher
 
             MyMruList = new MruList(LogWatcherApp.RegistryKey, menuItemRecentLogs, Properties.Settings.Default.MruSize);
             MyMruList.FileSelected += MyMruList_FileSelected;
-
-            MyUpdater = new Updater(LogWatcherApp.RegistryKey, menuHelp);
-            MyUpdater.CheckForUpdates();
 
             String optOpenAtStart = (String)RegistryTools.GetSetting(LogWatcherApp.RegistryKey + @"\Options", "OpenAtStart", "None");
             menuItemOpenAll.Checked = (optOpenAtStart.Equals("All"));
@@ -73,6 +70,9 @@ namespace LogWatcher
                 logDirWatcher.Path = logsDir;
                 logDirWatcher.EnableRaisingEvents = true;
             }
+
+            MyUpdater = new Updater(LogWatcherApp.RegistryKey, menuHelp);
+            MyUpdater.CheckForUpdates();
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
@@ -140,7 +140,7 @@ namespace LogWatcher
                 }
             }
 
-            tabControl.Controls.Add(new LogTab(logFilePath));
+            tabControl.Controls.Add(new LogTab(this, logFilePath));
             tabControl.SelectedIndex = tabControl.TabCount - 1;
         }
 
@@ -339,6 +339,56 @@ namespace LogWatcher
             }
 
             e.Cancel = true;
+        }
+
+        private static bool searchStarted = false;
+        private void OnSearchTextClicked(object sender, EventArgs e)
+        {
+            if (!searchStarted)
+            {
+                textSearchTerm.Text = "";
+                textSearchTerm.ForeColor = System.Drawing.SystemColors.ControlText;
+
+                searchStarted = true;
+            }
+        }
+
+        private void OnSearchTextChanged(object sender, EventArgs e)
+        {
+            if (searchStarted)
+            {
+                if (tabControl.SelectedTab is LogTab logTab)
+                {
+                    logTab.FindFirst(textSearchTerm.Text);
+                }
+            }
+        }
+
+        void ISearcher.Reset(bool enabled)
+        {
+            searchStarted = false;
+
+            textSearchTerm.Text = "Search";
+            textSearchTerm.ForeColor = System.Drawing.SystemColors.InactiveCaption;
+
+            textSearchTerm.Enabled = enabled;
+            textSearchTerm.Visible = enabled;
+        }
+
+        private void OnF3Key(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F3)
+            {
+                if (searchStarted)
+                {
+                    if (tabControl.SelectedTab is LogTab logTab)
+                    {
+                        logTab.FindNext(textSearchTerm.Text);
+                    }
+                }
+
+                e.Handled = true;
+            }
         }
     }
 }

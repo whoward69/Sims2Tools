@@ -75,6 +75,8 @@ namespace SgChecker
 
         public SgCheckerForm()
         {
+            logger.Info(SgCheckerApp.AppProduct);
+
             InitializeComponent();
             this.Text = SgCheckerApp.AppName;
 

@@ -63,6 +63,8 @@ namespace LogWatcher.Controls
             }
         }
 
+        private ISearcher searcher;
+
         private String logFilePath;
         private String tabName;
 
@@ -78,6 +80,12 @@ namespace LogWatcher.Controls
 
                 Reload();
             }
+        }
+
+        public ISearcher Searcher
+        {
+            get => searcher;
+            set => searcher = value;
         }
 
         public void Reload()
@@ -148,9 +156,12 @@ namespace LogWatcher.Controls
 
         private void PopulateSectionView(XmlNode nodeData)
         {
+            textBox.HideSelection = true;
             textBox.Visible = false;
             gridLotObjects.Visible = false;
             gridAttributes.Visible = false;
+
+            searcher.Reset(false);
 
             if (nodeData.ChildNodes.Count > 0)
             {
@@ -235,12 +246,19 @@ namespace LogWatcher.Controls
                     {
                         if (addNL) textBox.AppendText(Environment.NewLine);
 
-                        if (child.Name.Equals("tokenGuid"))
+                        String colour = child.GetAttribute("colour");
+                        if (colour != null && !colour.Equals(""))
                         {
-                            Color was = textBox.SelectionColor;
-                            textBox.SelectionColor = Color.FromName(Properties.Settings.Default.InvGuidColour);
+                            Color wasColour = textBox.SelectionColor;
+
+                            try
+                            {
+                                textBox.SelectionColor = Color.FromName(colour);
+                            }
+                            catch (Exception) { }
                             textBox.AppendText(child.InnerText);
-                            textBox.SelectionColor = was;
+
+                            textBox.SelectionColor = wasColour;
                         }
                         else
                         {
@@ -250,7 +268,9 @@ namespace LogWatcher.Controls
                         addNL = true;
                     }
 
+                    textBox.SelectionStart = 0;
                     textBox.Visible = true;
+                    searcher.Reset(true);
                 }
             }
             else
@@ -273,8 +293,9 @@ namespace LogWatcher.Controls
             }
             catch (Exception) { }
 
-            return "";
+            return null;
         }
+
         private Object GetNumAttr(XmlElement element, String attrName)
         {
             try
@@ -288,7 +309,20 @@ namespace LogWatcher.Controls
             }
             catch (Exception) { }
 
-            return "";
+            return null;
+        }
+
+        private int lastSearchPos;
+
+        public void FindFirst(String text)
+        {
+            textBox.HideSelection = false;
+            lastSearchPos = textBox.Find(text);
+        }
+
+        public void FindNext(String text)
+        {
+            lastSearchPos = textBox.Find(text, lastSearchPos + 1, RichTextBoxFinds.None);
         }
     }
 }

@@ -12,18 +12,15 @@
 
 using System;
 
-namespace Sims2Tools.DBPF.IO
+namespace Sims2Tools.DBPF.Utils
 {
-    public class DIREntry
+    public class Decompressor
     {
-        public TypeTypeID TypeID;
-        public TypeGroupID GroupID;
-        public TypeInstanceID InstanceID;
-        public TypeResourceID ResourceID;
+        public const int HEADER_SIZE = 9;
+        public const byte HEADER_SIGNATURE_HI = 0xFB;
+        public const byte HEADER_SIGNATURE_LO = 0x10;
 
-        public uint UncompressedFileSize;
-
-        public static void ArrayCopy2(byte[] Src, int SrcPos, ref byte[] Dest, int DestPos, long Length)
+        private static void ArrayCopy2(byte[] Src, int SrcPos, ref byte[] Dest, int DestPos, long Length)
         {
             if (Dest.Length < DestPos + Length)
             {
@@ -36,9 +33,9 @@ namespace Sims2Tools.DBPF.IO
                 Dest[DestPos + i] = Src[SrcPos + i];
         }
 
-        public static void OffsetCopy(ref byte[] array, int srcPos, int destPos, long length)
+        private static void OffsetCopy(ref byte[] array, int offset, int destPos, long length)
         {
-            srcPos = destPos - srcPos;
+            int srcPos = destPos - offset;
 
             if (array.Length < destPos + length)
             {
@@ -56,13 +53,13 @@ namespace Sims2Tools.DBPF.IO
         // See also https://modthesims.info/wiki.php?title=DBPF/Compression
         public static byte[] Decompress(byte[] Data, uint UncompressedFileSize)
         {
-
-            if (Data.Length > 6) // Why 6 if we set pos to 9 below?
+            // Check that this is actually compressed data, as some apps leave incorrect entries in the CLST resource
+            if (Data.Length > HEADER_SIZE && Data[4] == HEADER_SIGNATURE_LO && Data[5] == HEADER_SIGNATURE_HI)
             {
                 byte[] DecompressedData = new byte[(int)UncompressedFileSize];
                 int DataPos = 0;
 
-                int Pos = 9; // What is this magic?
+                int Pos = HEADER_SIZE;
                 long Control1 = 0;
 
                 while (Control1 != 0xFC && Pos < Data.Length)

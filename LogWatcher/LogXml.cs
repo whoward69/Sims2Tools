@@ -19,11 +19,12 @@ namespace LogWatcher
 {
     public class LogXml
     {
+        private static readonly Dictionary<TypeGUID, String> knownTokens = new Dictionary<TypeGUID, string>();
         private static readonly Dictionary<TypeGUID, String> customTokens = new Dictionary<TypeGUID, string>();
 
         static LogXml()
         {
-            ParseXml("Resources/XML/knowntokens.xml", "token", customTokens);
+            ParseXml("Resources/XML/knowntokens.xml", "token", knownTokens);
             ParseXml("Resources/XML/customtokens.xml", "token", customTokens);
         }
 
@@ -363,6 +364,7 @@ namespace LogWatcher
                         else
                         {
                             String eleType = "line";
+                            String colour = null;
 
                             if (inArray && reArrayEntry.IsMatch(line))
                             {
@@ -375,13 +377,20 @@ namespace LogWatcher
                                 TypeGUID guid = (TypeGUID)(uint)Int32.Parse(line.Substring(11));
                                 line = guid.ToString();
 
-                                if (GameData.globalObjectsByGUID.ContainsKey(guid))
-                                {
-                                    line += " : " + GameData.globalObjectsByGUID[guid];
-                                }
-                                else if (customTokens.ContainsKey(guid))
+                                if (customTokens.ContainsKey(guid))
                                 {
                                     line += " : " + customTokens[guid];
+                                    colour = Properties.Settings.Default.CustomTokensColour;
+                                }
+                                else if (knownTokens.ContainsKey(guid))
+                                {
+                                    line += " : " + knownTokens[guid];
+                                    colour = Properties.Settings.Default.KnownTokensColour;
+                                }
+                                else if (GameData.globalObjectsByGUID.ContainsKey(guid))
+                                {
+                                    line += " : " + GameData.globalObjectsByGUID[guid];
+                                    colour = Properties.Settings.Default.GameTokensColour;
                                 }
                             }
                             else if (reTokenCounted.IsMatch(line) || reTokenSingular.IsMatch(line))
@@ -392,6 +401,8 @@ namespace LogWatcher
                             XmlElement logLine = logDoc.CreateElement(eleType);
                             logLine.AppendChild(logDoc.CreateTextNode(line));
                             owner.AppendChild(logLine);
+
+                            if (colour != null) logLine.SetAttribute("colour", colour);
                         }
 
                         if (line.StartsWith("Iterations:"))

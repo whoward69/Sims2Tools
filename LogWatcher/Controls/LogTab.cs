@@ -4,19 +4,24 @@ using System.Windows.Forms;
 namespace LogWatcher.Controls
 {
     [System.ComponentModel.DesignerCategory("")]
-    public class LogTab : TabPage
+    public class LogTab : TabPage, ISearcher
     {
         private readonly LogViewer logViewer;
         private readonly String logFilePath;
 
+        private readonly ISearcher searcher;
+
         public String LogFilePath => logFilePath;
 
-        public LogTab(String logFilePath)
+        public LogTab(ISearcher searcher, String logFilePath)
         {
+            this.searcher = searcher;
             this.logFilePath = logFilePath;
 
-            logViewer = new LogViewer
+            logViewer = new LogViewer()
             {
+                Searcher = searcher,
+
                 Dock = System.Windows.Forms.DockStyle.Fill,
                 Location = new System.Drawing.Point(3, 3),
                 Size = new System.Drawing.Size(919, 461),
@@ -38,6 +43,21 @@ namespace LogWatcher.Controls
         public void Reload()
         {
             logViewer.Reload();
+        }
+
+        public void FindFirst(String text)
+        {
+            logViewer.FindFirst(text);
+        }
+
+        public void FindNext(String text)
+        {
+            logViewer.FindNext(text);
+        }
+
+        void ISearcher.Reset(bool enabled)
+        {
+            searcher.Reset(enabled);
         }
     }
 }

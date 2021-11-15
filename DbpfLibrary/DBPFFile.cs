@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.BCON;
 using Sims2Tools.DBPF.BHAV;
+using Sims2Tools.DBPF.CLST;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.Images.IMG;
@@ -67,8 +68,9 @@ namespace Sims2Tools.DBPF
     // See also - https://modthesims.info/wiki.php?title=DBPF/Source_Code and https://modthesims.info/wiki.php?title=DBPF
     public class DBPFFile : IDisposable
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public string fname = "";
-        public DIRFile DIR = null;
 
         public int DateCreated;
         public int DateModified;
@@ -169,10 +171,30 @@ namespace Sims2Tools.DBPF
                 m_EntriesByType[entry.TypeID].Add(entry);
             }
 
-            var dirEntry = GetItemByTGIR(Hash.TGIRHash((TypeInstanceID)0x286B1F03, (TypeResourceID)0x00000000, (TypeTypeID)0xE86B1EEF, (TypeGroupID)0xE86B1EEF));
+            byte[] dirEntry = GetItemByTGIR(Hash.TGIRHash(Clst.INSTANCE, DBPFData.RESOURCE_NULL, Clst.TYPE, Clst.GROUP));
             if (dirEntry != null)
             {
-                DIRFile.Read(this, dirEntry);
+                ReadClst(dirEntry);
+            }
+        }
+
+        private void ReadClst(byte[] dirEntry)
+        {
+            using (MemoryStream ms = new MemoryStream(dirEntry))
+            {
+                using (IoBuffer reader = IoBuffer.FromStream(ms))
+                {
+                    while (ms.Position < dirEntry.Length)
+                    {
+                        TypeTypeID TypeID = reader.ReadTypeId();
+                        TypeGroupID GroupID = reader.ReadGroupId();
+                        TypeInstanceID InstanceID = reader.ReadInstanceId();
+                        TypeResourceID ResourceID = (IndexMinorVersion >= 2) ? reader.ReadResourceId() : DBPFData.RESOURCE_NULL;
+
+                        // Just because there is an entry in the CLST resource does NOT mean the data is compressed! But we'll let the decompressor take care of it.
+                        GetEntryByTGIR(Hash.TGIRHash(InstanceID, ResourceID, TypeID, GroupID)).UncompressedSize = reader.ReadUInt32();
+                    }
+                }
             }
         }
 
@@ -198,7 +220,17 @@ namespace Sims2Tools.DBPF
 
             if (entry.UncompressedSize != 0)
             {
-                return DIREntry.Decompress(m_Reader.ReadBytes((int)entry.FileSize), entry.UncompressedSize);
+                try
+                {
+                    return Decompressor.Decompress(m_Reader.ReadBytes((int)entry.FileSize), entry.UncompressedSize);
+                }
+                catch (Exception)
+                {
+                    // This is a fall-back that should never happen as the decompressor does the necessary checks
+                    logger.Warn($"Failed to decompress {entry}");
+
+                    m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
+                }
             }
 
             return m_Reader.ReadBytes((int)entry.FileSize);

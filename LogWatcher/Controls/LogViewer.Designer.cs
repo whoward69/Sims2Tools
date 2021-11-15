@@ -93,12 +93,11 @@ namespace LogWatcher.Controls
             // 
             this.textBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox.Location = new System.Drawing.Point(0, 0);
-            this.textBox.Multiline = true;
             this.textBox.Name = "textBox";
             this.textBox.ReadOnly = true;
-            this.textBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Both;
             this.textBox.Size = new System.Drawing.Size(419, 448);
             this.textBox.TabIndex = 0;
+            this.textBox.Text = "";
             this.textBox.WordWrap = false;
             // 
             // gridLotObjects
@@ -215,7 +214,6 @@ namespace LogWatcher.Controls
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
             this.panelMultiView.ResumeLayout(false);
-            this.panelMultiView.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridLotObjects)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridAttributes)).EndInit();
             this.ResumeLayout(false);

@@ -67,6 +67,8 @@ namespace Sims2Tools.DBPF
         public static TypeInstanceID INSTANCE_OBJD_DEFAULT = (TypeInstanceID)0x41A7;
         public static TypeInstanceID INSTANCE_NULL = (TypeInstanceID)0x00000000;
 
+        public static TypeResourceID RESOURCE_NULL = (TypeResourceID)0x00000000;
+
         public static TypeGUID GUID_NULL = (TypeGUID)0x00000000;
 
         private static readonly Dictionary<TypeTypeID, String> ModTypeNames = new Dictionary<TypeTypeID, string>();

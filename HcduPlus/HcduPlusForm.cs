@@ -59,6 +59,8 @@ namespace HcduPlus
 
         public HcduPlusForm()
         {
+            logger.Info(HcduPlusApp.AppProduct);
+
             InitializeComponent();
             this.Text = HcduPlusApp.AppName;
 

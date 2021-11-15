@@ -50,6 +50,8 @@ namespace WhatCausedThis
 
         public WhatCausedThisForm()
         {
+            logger.Info(WhatCausedThisApp.AppProduct);
+
             InitializeComponent();
             this.Text = WhatCausedThisApp.AppName;
 

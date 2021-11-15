@@ -8,8 +8,14 @@
     <Setting Name="RecentHours" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">24</Value>
     </Setting>
-    <Setting Name="InvGuidColour" Type="System.String" Scope="User">
+    <Setting Name="GameTokensColour" Type="System.String" Scope="User">
       <Value Profile="(Default)">Blue</Value>
+    </Setting>
+    <Setting Name="KnownTokensColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">DeepPink</Value>
+    </Setting>
+    <Setting Name="CustomTokensColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">OrangeRed</Value>
     </Setting>
   </Settings>
 </SettingsFile>

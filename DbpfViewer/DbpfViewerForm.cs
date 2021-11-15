@@ -60,6 +60,8 @@ namespace DbpfViewer
 
         public DbpfViewerForm()
         {
+            logger.Info(DbpfViewerApp.AppProduct);
+
             InitializeComponent();
             this.Text = DbpfViewerApp.AppName;
 
