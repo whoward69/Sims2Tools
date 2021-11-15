@@ -25,10 +25,17 @@ namespace HcduPlus.Conflict
         public Regex RegexA { get; }
         public Regex RegexB { get; }
 
+        public bool IsValid { get; }
+
         public ConflictRegexPair(String regexA, String regexB)
         {
-            this.RegexA = new Regex(regexA);
-            this.RegexB = new Regex(regexB);
+            this.IsValid = !(String.IsNullOrWhiteSpace(regexA) || String.IsNullOrWhiteSpace(regexB));
+
+            if (IsValid)
+            {
+                this.RegexA = new Regex(regexA);
+                this.RegexB = new Regex(regexB);
+            }
         }
     }
 
@@ -41,6 +48,7 @@ namespace HcduPlus.Conflict
 
         private readonly DataColumn colRegexEarlier = new DataColumn("Loads Earlier", typeof(string));
         private readonly DataColumn colRegexLater = new DataColumn("Loads Later", typeof(string));
+
         readonly List<ConflictRegexPair> reKnownConflicts = new List<ConflictRegexPair>();
 
         public KnownConflicts()
@@ -83,9 +91,12 @@ namespace HcduPlus.Conflict
         {
             foreach (ConflictRegexPair reKnown in reKnownConflicts)
             {
-                if (reKnown.RegexA.IsMatch(cp.PackageA) && reKnown.RegexB.IsMatch(cp.PackageB))
+                if (reKnown.IsValid)
                 {
-                    return true;
+                    if (reKnown.RegexA.IsMatch(cp.PackageA) && reKnown.RegexB.IsMatch(cp.PackageB))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -102,12 +113,20 @@ namespace HcduPlus.Conflict
             }
         }
 
+        public void ResetRegexs()
+        {
+            LoadRegexs(-1);
+        }
+
         public void LoadRegexs()
+        {
+            LoadRegexs((int)RegistryTools.GetSetting(KnownRegistryKey, "Count", -1));
+        }
+
+        private void LoadRegexs(int count)
         {
             this.Clear();
             reKnownConflicts.Clear();
-
-            int count = (int)RegistryTools.GetSetting(KnownRegistryKey, "Count", -1);
 
             if (count == -1)
             {
@@ -143,10 +162,13 @@ namespace HcduPlus.Conflict
 
             foreach (ConflictRegexPair reKnown in reKnownConflicts)
             {
-                RegistryTools.SaveSetting(KnownRegistryKey, $"Earlier{count}", reKnown.RegexA.ToString());
-                RegistryTools.SaveSetting(KnownRegistryKey, $"Later{count}", reKnown.RegexB.ToString());
+                if (reKnown.IsValid)
+                {
+                    RegistryTools.SaveSetting(KnownRegistryKey, $"Earlier{count}", reKnown.RegexA.ToString());
+                    RegistryTools.SaveSetting(KnownRegistryKey, $"Later{count}", reKnown.RegexB.ToString());
 
-                ++count;
+                    ++count;
+                }
             }
         }
 

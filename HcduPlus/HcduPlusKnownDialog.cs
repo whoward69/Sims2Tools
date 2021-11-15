@@ -11,6 +11,7 @@
 
 using HcduPlus.Conflict;
 using System;
+using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -19,11 +20,6 @@ namespace HcduPlus
     public partial class HcduPlusKnownDialog : Form
     {
         private readonly KnownConflicts data;
-
-        // TODO - add a right-click menu with Delete
-        // TODO - add a "Copy" button
-        // TODO - add a "Reset" button
-        // TODO - add an export/import to xml feature for conflicts
 
         public HcduPlusKnownDialog()
         {
@@ -71,6 +67,53 @@ namespace HcduPlus
         private void OnOkClicked(object sender, EventArgs e)
         {
             data.CommitEdits();
+        }
+
+        private void OnResetClicked(object sender, EventArgs e)
+        {
+            data.ResetRegexs();
+        }
+
+        private DataGridViewCellEventArgs mouseLocation = null;
+        DataGridViewRow highlightRow = null;
+
+        private void OnCellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            mouseLocation = e;
+        }
+
+        private void OnConflictMenuOpening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (mouseLocation == null || mouseLocation.RowIndex == -1)
+            {
+                e.Cancel = true;
+            }
+
+            if (mouseLocation.RowIndex != gridKnownConflicts.SelectedRows[0].Index)
+            {
+                highlightRow = gridKnownConflicts.Rows[mouseLocation.RowIndex];
+                highlightRow.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.AddKnownHighlight); // MistyRose or LightPink
+            }
+            else
+            {
+                highlightRow = null;
+            }
+        }
+
+        private void OnConflictMenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+            if (highlightRow != null)
+            {
+                highlightRow.DefaultCellStyle.BackColor = Color.Empty;
+            }
+        }
+
+        private void OnRemoveKnownConflictClicked(object sender, EventArgs e)
+        {
+            if (mouseLocation.RowIndex >= 0)
+            {
+                gridKnownConflicts.Rows.RemoveAt(mouseLocation.RowIndex);
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
+using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
@@ -277,9 +278,9 @@ namespace HcduPlus
                     {
                         using (DBPFFile package = new DBPFFile(files[fileIndex]))
                         {
-                            foreach (TypeTypeID type in DBPFData.ModTypes)
+                            foreach (TypeTypeID type in enabledResources)
                             {
-                                if (enabledResources.Contains(type))
+                                // if (enabledResources.Contains(type))
                                 {
                                     foreach (DBPFEntry entry in package.GetEntriesByType(type))
                                     {
@@ -441,6 +442,7 @@ namespace HcduPlus
             menuItemBhav.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Bhav.NAME, 1) != 0); OnBhavClicked(menuItemBhav, null);
             menuItemCtss.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ctss.NAME, 0) != 0); OnCtssClicked(menuItemCtss, null);
             menuItemGlob.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Glob.NAME, 1) != 0); OnGlobClicked(menuItemGlob, null);
+            menuItemGzps.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Gzps.NAME, 1) != 0); OnGzpsClicked(menuItemGzps, null);
             menuItemObjd.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objd.NAME, 1) != 0); OnObjdClicked(menuItemObjd, null);
             menuItemObjf.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objf.NAME, 1) != 0); OnObjfClicked(menuItemObjf, null);
             menuItemStr.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Str.NAME, 1) != 0); OnStrClicked(menuItemStr, null);
@@ -691,6 +693,18 @@ namespace HcduPlus
                 enabledResources.Remove(Glob.TYPE);
 
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Glob.NAME, enabled ? 1 : 0);
+        }
+
+        private void OnGzpsClicked(object sender, EventArgs e)
+        {
+            bool enabled = ((ToolStripMenuItem)sender).Checked;
+
+            if (enabled)
+                enabledResources.Add(Gzps.TYPE);
+            else
+                enabledResources.Remove(Gzps.TYPE);
+
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Gzps.NAME, enabled ? 1 : 0);
         }
 
         private void OnObjdClicked(object sender, EventArgs e)

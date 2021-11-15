@@ -67,6 +67,7 @@ namespace HcduPlus
             this.menuItemBhav = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCtss = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGlob = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemGzps = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemObjd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemObjf = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemStr = new System.Windows.Forms.ToolStripMenuItem();
@@ -250,6 +251,7 @@ namespace HcduPlus
             this.menuItemBhav,
             this.menuItemCtss,
             this.menuItemGlob,
+            this.menuItemGzps,
             this.menuItemObjd,
             this.menuItemObjf,
             this.menuItemStr,
@@ -293,6 +295,14 @@ namespace HcduPlus
             this.menuItemGlob.Size = new System.Drawing.Size(180, 22);
             this.menuItemGlob.Text = "Glob";
             this.menuItemGlob.Click += new System.EventHandler(this.OnGlobClicked);
+            // 
+            // menuItemGzps
+            // 
+            this.menuItemGzps.CheckOnClick = true;
+            this.menuItemGzps.Name = "menuItemGzps";
+            this.menuItemGzps.Size = new System.Drawing.Size(180, 22);
+            this.menuItemGzps.Text = "Gzps";
+            this.menuItemGzps.Click += new System.EventHandler(this.OnGzpsClicked);
             // 
             // menuItemObjd
             // 
@@ -826,6 +836,7 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemBhav;
         private System.Windows.Forms.ToolStripMenuItem menuItemCtss;
         private System.Windows.Forms.ToolStripMenuItem menuItemGlob;
+        private System.Windows.Forms.ToolStripMenuItem menuItemGzps;
         private System.Windows.Forms.ToolStripMenuItem menuItemObjd;
         private System.Windows.Forms.ToolStripMenuItem menuItemObjf;
         private System.Windows.Forms.ToolStripMenuItem menuItemStr;
