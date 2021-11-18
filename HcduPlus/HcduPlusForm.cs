@@ -252,6 +252,26 @@ namespace HcduPlus
                                 }
                             }
                         }
+                        else
+                        {
+                            if (GameData.globalObjectsByGUID.ContainsKey(guid))
+                            {
+                                ConflictPair cpNew = new ConflictPair(GameData.globalObjectsByGUID[guid], scanPackages[0].Substring(24));
+
+                                if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
+                                {
+                                    allCurrentConflicts.Add(cpNew);
+                                    cpData = cpNew;
+
+                                    worker.ReportProgress((int)((done / total) * 100.0), cpNew);
+                                }
+
+                                TypeGroupID group = (TypeGroupID)Convert.ToUInt32(scanPackages[0].Substring(4, 8), 16);
+                                TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(scanPackages[0].Substring(15, 8), 16);
+
+                                cpData.AddTGI(Objd.TYPE, group, instance, scanDataStore.NamesByTgiGet(Hash.TGIHash(instance, Objd.TYPE, group)));
+                            }
+                        }
                     }
                 }
             }
@@ -405,7 +425,7 @@ namespace HcduPlus
             }
             else
             {
-                // This is the Search action
+                // This is the Scan action
                 dataByPackage.Clear();
                 dataByResource.Clear();
                 btnGO.Text = "Cancel";
@@ -416,6 +436,16 @@ namespace HcduPlus
                 progressBar.Value = 0;
 
                 tabConflicts.SelectedTab = tabByPackage;
+
+                if (textModsPath.Text.EndsWith(@"\") || textModsPath.Text.EndsWith("/"))
+                {
+                    textModsPath.Text = textModsPath.Text.Substring(0, textModsPath.Text.Length - 1);
+                }
+
+                if (textScanPath.Text.EndsWith(@"\") || textScanPath.Text.EndsWith("/"))
+                {
+                    textScanPath.Text = textScanPath.Text.Substring(0, textScanPath.Text.Length - 1);
+                }
 
                 hcduWorker.RunWorkerAsync();
             }
