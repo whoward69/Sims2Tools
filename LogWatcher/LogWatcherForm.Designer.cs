@@ -59,6 +59,8 @@ namespace LogWatcher
             this.menuItemAutoClose = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAutoUpdate = new System.Windows.Forms.ToolStripMenuItem();
             this.textSearchTerm = new System.Windows.Forms.ToolStripTextBox();
+            this.menuSettings = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemIncPropIndex = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.tabControl = new System.Windows.Forms.TabControl();
@@ -66,6 +68,7 @@ namespace LogWatcher
             this.menuContextTab = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeDeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.textPleaseWait = new System.Windows.Forms.TextBox();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.logDirWatcher)).BeginInit();
             this.menuContextTab.SuspendLayout();
@@ -77,11 +80,12 @@ namespace LogWatcher
             this.menuFile,
             this.menuHelp,
             this.menuOptions,
-            this.textSearchTerm});
+            this.textSearchTerm,
+            this.menuSettings});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
-            this.menuMain.Size = new System.Drawing.Size(933, 27);
+            this.menuMain.Size = new System.Drawing.Size(933, 24);
             this.menuMain.TabIndex = 0;
             this.menuMain.Text = "menuStrip";
             // 
@@ -98,7 +102,7 @@ namespace LogWatcher
             this.toolStripSeparator2,
             this.menuItemExit});
             this.menuFile.Name = "menuFile";
-            this.menuFile.Size = new System.Drawing.Size(37, 23);
+            this.menuFile.Size = new System.Drawing.Size(37, 20);
             this.menuFile.Text = "&File";
             this.menuFile.DropDownOpening += new System.EventHandler(this.OnFileOpening);
             // 
@@ -169,7 +173,7 @@ namespace LogWatcher
             this.menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemAbout});
             this.menuHelp.Name = "menuHelp";
-            this.menuHelp.Size = new System.Drawing.Size(44, 23);
+            this.menuHelp.Size = new System.Drawing.Size(44, 20);
             this.menuHelp.Text = "&Help";
             // 
             // menuItemAbout
@@ -190,7 +194,7 @@ namespace LogWatcher
             this.menuItemAutoClose,
             this.menuItemAutoUpdate});
             this.menuOptions.Name = "menuOptions";
-            this.menuOptions.Size = new System.Drawing.Size(61, 23);
+            this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
             // 
             // menuItemOpenAll
@@ -251,6 +255,22 @@ namespace LogWatcher
             this.textSearchTerm.Click += new System.EventHandler(this.OnSearchTextClicked);
             this.textSearchTerm.TextChanged += new System.EventHandler(this.OnSearchTextChanged);
             // 
+            // menuSettings
+            // 
+            this.menuSettings.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemIncPropIndex});
+            this.menuSettings.Name = "menuSettings";
+            this.menuSettings.Size = new System.Drawing.Size(61, 20);
+            this.menuSettings.Text = "&Settings";
+            // 
+            // menuItemIncPropIndex
+            // 
+            this.menuItemIncPropIndex.CheckOnClick = true;
+            this.menuItemIncPropIndex.Name = "menuItemIncPropIndex";
+            this.menuItemIncPropIndex.Size = new System.Drawing.Size(234, 22);
+            this.menuItemIncPropIndex.Text = "Add 1 To Token Property Index";
+            this.menuItemIncPropIndex.Click += new System.EventHandler(this.OnIncPropIndexClicked);
+            // 
             // menuItemSeparator4
             // 
             this.menuItemSeparator4.Name = "menuItemSeparator4";
@@ -264,10 +284,10 @@ namespace LogWatcher
             // 
             this.tabControl.AllowDrop = true;
             this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl.Location = new System.Drawing.Point(0, 27);
+            this.tabControl.Location = new System.Drawing.Point(0, 24);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(933, 492);
+            this.tabControl.Size = new System.Drawing.Size(933, 495);
             this.tabControl.TabIndex = 1;
             this.tabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.OnTabChanged);
             this.tabControl.DragDrop += new System.Windows.Forms.DragEventHandler(this.LogWatcher_DragDrop);
@@ -308,11 +328,26 @@ namespace LogWatcher
             this.closeDeleteToolStripMenuItem.Text = "Close && &Delete";
             this.closeDeleteToolStripMenuItem.Click += new System.EventHandler(this.OnCloseTabAndDelete);
             // 
+            // textPleaseWait
+            // 
+            this.textPleaseWait.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textPleaseWait.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textPleaseWait.Location = new System.Drawing.Point(7, 246);
+            this.textPleaseWait.Multiline = true;
+            this.textPleaseWait.Name = "textPleaseWait";
+            this.textPleaseWait.ReadOnly = true;
+            this.textPleaseWait.Size = new System.Drawing.Size(914, 37);
+            this.textPleaseWait.TabIndex = 0;
+            this.textPleaseWait.Text = "Please wait, reading game objects";
+            this.textPleaseWait.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.textPleaseWait.WordWrap = false;
+            // 
             // LogWatcherForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(933, 519);
+            this.Controls.Add(this.textPleaseWait);
             this.Controls.Add(this.tabControl);
             this.Controls.Add(this.menuMain);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -364,5 +399,8 @@ namespace LogWatcher
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem closeDeleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripTextBox textSearchTerm;
+        private System.Windows.Forms.ToolStripMenuItem menuSettings;
+        private System.Windows.Forms.ToolStripMenuItem menuItemIncPropIndex;
+        private System.Windows.Forms.TextBox textPleaseWait;
     }
 }

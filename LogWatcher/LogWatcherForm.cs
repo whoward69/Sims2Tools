@@ -39,6 +39,10 @@ namespace LogWatcher
             RegistryTools.LoadAppSettings(LogWatcherApp.RegistryKey, LogWatcherApp.AppVersionMajor, LogWatcherApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(LogWatcherApp.RegistryKey, this);
 
+            textPleaseWait.Visible = true;
+            textPleaseWait.SelectionLength = 0;
+            tabControl.Visible = false;
+
             logsDir = $"{Sims2ToolsLib.Sims2HomePath}\\Logs";
 
             MyMruList = new MruList(LogWatcherApp.RegistryKey, menuItemRecentLogs, Properties.Settings.Default.MruSize);
@@ -51,6 +55,8 @@ namespace LogWatcher
             menuItemAutoOpen.Checked = ((int)RegistryTools.GetSetting(LogWatcherApp.RegistryKey + @"\Options", "AutoOpen", 1) != 0);
             menuItemAutoUpdate.Checked = ((int)RegistryTools.GetSetting(LogWatcherApp.RegistryKey + @"\Options", "AutoUpdate", 1) != 0);
             menuItemAutoClose.Checked = ((int)RegistryTools.GetSetting(LogWatcherApp.RegistryKey + @"\Options", "AutoClose", 0) != 0);
+
+            menuItemIncPropIndex.Checked = ((int)RegistryTools.GetSetting(LogWatcherApp.RegistryKey + @"\Settings", "IncPropIndex", 1) != 0);
 
             if (Directory.Exists(logsDir))
             {
@@ -70,6 +76,9 @@ namespace LogWatcher
                 logDirWatcher.Path = logsDir;
                 logDirWatcher.EnableRaisingEvents = true;
             }
+
+            textPleaseWait.Visible = false;
+            tabControl.Visible = true;
 
             MyUpdater = new Updater(LogWatcherApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
@@ -140,7 +149,7 @@ namespace LogWatcher
                 }
             }
 
-            tabControl.Controls.Add(new LogTab(this, logFilePath));
+            tabControl.Controls.Add(new LogTab(this, logFilePath, menuItemIncPropIndex.Checked));
             tabControl.SelectedIndex = tabControl.TabCount - 1;
         }
 
@@ -315,6 +324,20 @@ namespace LogWatcher
         {
             RegistryTools.SaveSetting(LogWatcherApp.RegistryKey + @"\Options", "AutoClose", menuItemAutoClose.Checked ? 1 : 0);
         }
+
+        private void OnIncPropIndexClicked(object sender, EventArgs e)
+        {
+            RegistryTools.SaveSetting(LogWatcherApp.RegistryKey + @"\Settings", "IncPropIndex", menuItemIncPropIndex.Checked ? 1 : 0);
+
+            foreach (TabPage tabPage in tabControl.TabPages)
+            {
+                if (tabPage is LogTab logTab)
+                {
+                    logTab.IncPropIndex = menuItemIncPropIndex.Checked;
+                }
+            }
+        }
+
 
         private void OnTabControlMouseClick(object sender, MouseEventArgs e)
         {

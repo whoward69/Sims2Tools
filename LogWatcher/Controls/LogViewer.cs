@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -24,6 +25,8 @@ namespace LogWatcher.Controls
         private static readonly Dictionary<int, String> dataGeneral = new Dictionary<int, string>();
         private static readonly Dictionary<int, String> dataPerson = new Dictionary<int, string>();
         private static readonly Dictionary<int, String> dataMotive = new Dictionary<int, string>();
+
+        private readonly Regex reProp = new Regex("Property ([0-9]+)(: -?[0-9]+)");
 
         static LogViewer()
         {
@@ -67,6 +70,19 @@ namespace LogWatcher.Controls
 
         private String logFilePath;
         private String tabName;
+
+        private bool incPropIndex;
+
+        public bool IncPropIndex
+        {
+            get => incPropIndex;
+            set
+            {
+                incPropIndex = value;
+
+                Reload();
+            }
+        }
 
         public String TabName => tabName;
 
@@ -130,7 +146,7 @@ namespace LogWatcher.Controls
         {
             foreach (XmlElement grandchild in child.ChildNodes)
             {
-                if (!grandchild.Name.Equals("line") && !grandchild.Name.Equals("tokenGuid") && !grandchild.Name.Equals("data") && !grandchild.Name.Equals("attr") && !grandchild.Name.Equals("lotobj") && !grandchild.Name.Equals("cheat"))
+                if (!grandchild.Name.Equals("line") && !grandchild.Name.Equals("tokenGuid") && !grandchild.Name.Equals("tokenProp") && !grandchild.Name.Equals("data") && !grandchild.Name.Equals("attr") && !grandchild.Name.Equals("lotobj") && !grandchild.Name.Equals("cheat"))
                 {
                     ProcessNode(node, grandchild);
                 }
@@ -262,7 +278,22 @@ namespace LogWatcher.Controls
                         }
                         else
                         {
-                            textBox.AppendText(child.InnerText);
+                            if (child.Name.Equals("tokenProp"))
+                            {
+                                Match m = reProp.Match(child.InnerText);
+                                int index = Int16.Parse(m.Groups[1].Value);
+
+                                if (incPropIndex)
+                                {
+                                    ++index;
+                                }
+
+                                textBox.AppendText($"\tProperty {index}{m.Groups[2].Value}");
+                            }
+                            else
+                            {
+                                textBox.AppendText(child.InnerText);
+                            }
                         }
 
                         addNL = true;

@@ -77,11 +77,13 @@ namespace HcduPlus
             this.menuItemTtas = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemVers = new System.Windows.Forms.ToolStripMenuItem();
             this.menuConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemGuidConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemInternalConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemHomeCrafterConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemStoreVersionConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCastawaysConflicts = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemKnownConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTipGridByPackage = new System.Windows.Forms.ToolTip(this.components);
             this.hcduWorker = new System.ComponentModel.BackgroundWorker();
@@ -94,23 +96,21 @@ namespace HcduPlus
             this.tabConflicts = new System.Windows.Forms.TabControl();
             this.tabByPackage = new System.Windows.Forms.TabPage();
             this.gridByPackage = new System.Windows.Forms.DataGridView();
-            this.colHcduPackageA = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHcduPackageB = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemAddAsKnownConflict = new System.Windows.Forms.ToolStripMenuItem();
             this.tabByResource = new System.Windows.Forms.TabPage();
             this.gridByResource = new System.Windows.Forms.DataGridView();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.btnSelectScanPath = new System.Windows.Forms.Button();
+            this.textScanPath = new System.Windows.Forms.TextBox();
+            this.lblScanPath = new System.Windows.Forms.Label();
             this.colHcduType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHcduGroup = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHcduInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHcduName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHcduPackages = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.btnSelectScanPath = new System.Windows.Forms.Button();
-            this.textScanPath = new System.Windows.Forms.TextBox();
-            this.lblScanPath = new System.Windows.Forms.Label();
-            this.menuItemGuidConflicts = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.colHcduPackageA = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHcduPackageB = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuMain.SuspendLayout();
             this.tabConflicts.SuspendLayout();
             this.tabByPackage.SuspendLayout();
@@ -268,7 +268,7 @@ namespace HcduPlus
             // 
             this.menuItemBcon.CheckOnClick = true;
             this.menuItemBcon.Name = "menuItemBcon";
-            this.menuItemBcon.Size = new System.Drawing.Size(180, 22);
+            this.menuItemBcon.Size = new System.Drawing.Size(101, 22);
             this.menuItemBcon.Text = "Bcon";
             this.menuItemBcon.Click += new System.EventHandler(this.OnBconClicked);
             // 
@@ -276,7 +276,7 @@ namespace HcduPlus
             // 
             this.menuItemBhav.CheckOnClick = true;
             this.menuItemBhav.Name = "menuItemBhav";
-            this.menuItemBhav.Size = new System.Drawing.Size(180, 22);
+            this.menuItemBhav.Size = new System.Drawing.Size(101, 22);
             this.menuItemBhav.Text = "Bhav";
             this.menuItemBhav.Click += new System.EventHandler(this.OnBhavClicked);
             // 
@@ -284,7 +284,7 @@ namespace HcduPlus
             // 
             this.menuItemCtss.CheckOnClick = true;
             this.menuItemCtss.Name = "menuItemCtss";
-            this.menuItemCtss.Size = new System.Drawing.Size(180, 22);
+            this.menuItemCtss.Size = new System.Drawing.Size(101, 22);
             this.menuItemCtss.Text = "Ctss";
             this.menuItemCtss.Click += new System.EventHandler(this.OnCtssClicked);
             // 
@@ -292,7 +292,7 @@ namespace HcduPlus
             // 
             this.menuItemGlob.CheckOnClick = true;
             this.menuItemGlob.Name = "menuItemGlob";
-            this.menuItemGlob.Size = new System.Drawing.Size(180, 22);
+            this.menuItemGlob.Size = new System.Drawing.Size(101, 22);
             this.menuItemGlob.Text = "Glob";
             this.menuItemGlob.Click += new System.EventHandler(this.OnGlobClicked);
             // 
@@ -300,7 +300,7 @@ namespace HcduPlus
             // 
             this.menuItemGzps.CheckOnClick = true;
             this.menuItemGzps.Name = "menuItemGzps";
-            this.menuItemGzps.Size = new System.Drawing.Size(180, 22);
+            this.menuItemGzps.Size = new System.Drawing.Size(101, 22);
             this.menuItemGzps.Text = "Gzps";
             this.menuItemGzps.Click += new System.EventHandler(this.OnGzpsClicked);
             // 
@@ -308,7 +308,7 @@ namespace HcduPlus
             // 
             this.menuItemObjd.CheckOnClick = true;
             this.menuItemObjd.Name = "menuItemObjd";
-            this.menuItemObjd.Size = new System.Drawing.Size(180, 22);
+            this.menuItemObjd.Size = new System.Drawing.Size(101, 22);
             this.menuItemObjd.Text = "Objd";
             this.menuItemObjd.Click += new System.EventHandler(this.OnObjdClicked);
             // 
@@ -316,7 +316,7 @@ namespace HcduPlus
             // 
             this.menuItemObjf.CheckOnClick = true;
             this.menuItemObjf.Name = "menuItemObjf";
-            this.menuItemObjf.Size = new System.Drawing.Size(180, 22);
+            this.menuItemObjf.Size = new System.Drawing.Size(101, 22);
             this.menuItemObjf.Text = "Objf";
             this.menuItemObjf.Click += new System.EventHandler(this.OnObjfClicked);
             // 
@@ -324,7 +324,7 @@ namespace HcduPlus
             // 
             this.menuItemStr.CheckOnClick = true;
             this.menuItemStr.Name = "menuItemStr";
-            this.menuItemStr.Size = new System.Drawing.Size(180, 22);
+            this.menuItemStr.Size = new System.Drawing.Size(101, 22);
             this.menuItemStr.Text = "Str";
             this.menuItemStr.Click += new System.EventHandler(this.OnStrClicked);
             // 
@@ -332,7 +332,7 @@ namespace HcduPlus
             // 
             this.menuItemTprp.CheckOnClick = true;
             this.menuItemTprp.Name = "menuItemTprp";
-            this.menuItemTprp.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTprp.Size = new System.Drawing.Size(101, 22);
             this.menuItemTprp.Text = "Tprp";
             this.menuItemTprp.Click += new System.EventHandler(this.OnTprpClicked);
             // 
@@ -340,7 +340,7 @@ namespace HcduPlus
             // 
             this.menuItemTrcn.CheckOnClick = true;
             this.menuItemTrcn.Name = "menuItemTrcn";
-            this.menuItemTrcn.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTrcn.Size = new System.Drawing.Size(101, 22);
             this.menuItemTrcn.Text = "Trcn";
             this.menuItemTrcn.Click += new System.EventHandler(this.OnTrcnClicked);
             // 
@@ -348,7 +348,7 @@ namespace HcduPlus
             // 
             this.menuItemTtab.CheckOnClick = true;
             this.menuItemTtab.Name = "menuItemTtab";
-            this.menuItemTtab.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTtab.Size = new System.Drawing.Size(101, 22);
             this.menuItemTtab.Text = "Ttab";
             this.menuItemTtab.Click += new System.EventHandler(this.OnTtabClicked);
             // 
@@ -356,7 +356,7 @@ namespace HcduPlus
             // 
             this.menuItemTtas.CheckOnClick = true;
             this.menuItemTtas.Name = "menuItemTtas";
-            this.menuItemTtas.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTtas.Size = new System.Drawing.Size(101, 22);
             this.menuItemTtas.Text = "Ttas";
             this.menuItemTtas.Click += new System.EventHandler(this.OnTtasClicked);
             // 
@@ -364,7 +364,7 @@ namespace HcduPlus
             // 
             this.menuItemVers.CheckOnClick = true;
             this.menuItemVers.Name = "menuItemVers";
-            this.menuItemVers.Size = new System.Drawing.Size(180, 22);
+            this.menuItemVers.Size = new System.Drawing.Size(101, 22);
             this.menuItemVers.Text = "Vers";
             this.menuItemVers.Click += new System.EventHandler(this.OnVersClicked);
             // 
@@ -382,6 +382,20 @@ namespace HcduPlus
             this.menuConflicts.Name = "menuConflicts";
             this.menuConflicts.Size = new System.Drawing.Size(66, 20);
             this.menuConflicts.Text = "&Conflicts";
+            // 
+            // menuItemGuidConflicts
+            // 
+            this.menuItemGuidConflicts.Checked = true;
+            this.menuItemGuidConflicts.CheckOnClick = true;
+            this.menuItemGuidConflicts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.menuItemGuidConflicts.Name = "menuItemGuidConflicts";
+            this.menuItemGuidConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemGuidConflicts.Text = "Check For GUID Conflicts";
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(227, 6);
             // 
             // menuItemInternalConflicts
             // 
@@ -419,10 +433,10 @@ namespace HcduPlus
             this.menuItemCastawaysConflicts.Size = new System.Drawing.Size(230, 22);
             this.menuItemCastawaysConflicts.Text = "Ignore Castaways Conflicts";
             // 
-            // toolStripSeparator2
+            // toolStripSeparator3
             // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(227, 6);
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(227, 6);
             // 
             // menuItemKnownConflicts
             // 
@@ -569,23 +583,6 @@ namespace HcduPlus
             this.gridByPackage.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridByPackage.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
             // 
-            // colHcduPackageA
-            // 
-            this.colHcduPackageA.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colHcduPackageA.DataPropertyName = "Loads Earlier";
-            this.colHcduPackageA.HeaderText = "Loads Earlier";
-            this.colHcduPackageA.Name = "colHcduPackageA";
-            this.colHcduPackageA.ReadOnly = true;
-            this.colHcduPackageA.Width = 105;
-            // 
-            // colHcduPackageB
-            // 
-            this.colHcduPackageB.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colHcduPackageB.DataPropertyName = "Loads Later";
-            this.colHcduPackageB.HeaderText = "Loads Later";
-            this.colHcduPackageB.Name = "colHcduPackageB";
-            this.colHcduPackageB.ReadOnly = true;
-            // 
             // menuContextGrid
             // 
             this.menuContextGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -654,50 +651,6 @@ namespace HcduPlus
             this.gridByResource.TabStop = false;
             this.gridByResource.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             // 
-            // colHcduType
-            // 
-            this.colHcduType.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colHcduType.DataPropertyName = "Type";
-            this.colHcduType.HeaderText = "Type";
-            this.colHcduType.Name = "colHcduType";
-            this.colHcduType.ReadOnly = true;
-            this.colHcduType.Width = 58;
-            // 
-            // colHcduGroup
-            // 
-            this.colHcduGroup.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colHcduGroup.DataPropertyName = "Group";
-            this.colHcduGroup.HeaderText = "Group";
-            this.colHcduGroup.Name = "colHcduGroup";
-            this.colHcduGroup.ReadOnly = true;
-            this.colHcduGroup.Width = 66;
-            // 
-            // colHcduInstance
-            // 
-            this.colHcduInstance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colHcduInstance.DataPropertyName = "Instance";
-            this.colHcduInstance.HeaderText = "Instance";
-            this.colHcduInstance.Name = "colHcduInstance";
-            this.colHcduInstance.ReadOnly = true;
-            this.colHcduInstance.Width = 78;
-            // 
-            // colHcduName
-            // 
-            this.colHcduName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colHcduName.DataPropertyName = "Name";
-            this.colHcduName.HeaderText = "Name";
-            this.colHcduName.Name = "colHcduName";
-            this.colHcduName.ReadOnly = true;
-            this.colHcduName.Width = 66;
-            // 
-            // colHcduPackages
-            // 
-            this.colHcduPackages.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colHcduPackages.DataPropertyName = "Packages";
-            this.colHcduPackages.HeaderText = "Packages";
-            this.colHcduPackages.Name = "colHcduPackages";
-            this.colHcduPackages.ReadOnly = true;
-            // 
             // saveFileDialog
             // 
             this.saveFileDialog.DefaultExt = "txt";
@@ -736,19 +689,61 @@ namespace HcduPlus
             this.lblScanPath.TabIndex = 8;
             this.lblScanPath.Text = "Scan Folder:";
             // 
-            // menuItemGuidConflicts
+            // colHcduType
             // 
-            this.menuItemGuidConflicts.Checked = true;
-            this.menuItemGuidConflicts.CheckOnClick = true;
-            this.menuItemGuidConflicts.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.menuItemGuidConflicts.Name = "menuItemGuidConflicts";
-            this.menuItemGuidConflicts.Size = new System.Drawing.Size(230, 22);
-            this.menuItemGuidConflicts.Text = "Check For GUID Conflicts";
+            this.colHcduType.DataPropertyName = "Type";
+            this.colHcduType.HeaderText = "Type";
+            this.colHcduType.Name = "colHcduType";
+            this.colHcduType.ReadOnly = true;
+            this.colHcduType.Width = 75;
             // 
-            // toolStripSeparator3
+            // colHcduGroup
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(227, 6);
+            this.colHcduGroup.DataPropertyName = "Group";
+            this.colHcduGroup.HeaderText = "Group";
+            this.colHcduGroup.Name = "colHcduGroup";
+            this.colHcduGroup.ReadOnly = true;
+            this.colHcduGroup.Width = 75;
+            // 
+            // colHcduInstance
+            // 
+            this.colHcduInstance.DataPropertyName = "Instance";
+            this.colHcduInstance.HeaderText = "Instance";
+            this.colHcduInstance.Name = "colHcduInstance";
+            this.colHcduInstance.ReadOnly = true;
+            this.colHcduInstance.Width = 75;
+            // 
+            // colHcduName
+            // 
+            this.colHcduName.DataPropertyName = "Name";
+            this.colHcduName.HeaderText = "Name";
+            this.colHcduName.Name = "colHcduName";
+            this.colHcduName.ReadOnly = true;
+            this.colHcduName.Width = 250;
+            // 
+            // colHcduPackages
+            // 
+            this.colHcduPackages.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colHcduPackages.DataPropertyName = "Packages";
+            this.colHcduPackages.HeaderText = "Packages";
+            this.colHcduPackages.Name = "colHcduPackages";
+            this.colHcduPackages.ReadOnly = true;
+            // 
+            // colHcduPackageA
+            // 
+            this.colHcduPackageA.DataPropertyName = "Loads Earlier";
+            this.colHcduPackageA.HeaderText = "Loads Earlier";
+            this.colHcduPackageA.Name = "colHcduPackageA";
+            this.colHcduPackageA.ReadOnly = true;
+            this.colHcduPackageA.Width = 445;
+            // 
+            // colHcduPackageB
+            // 
+            this.colHcduPackageB.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colHcduPackageB.DataPropertyName = "Loads Later";
+            this.colHcduPackageB.HeaderText = "Loads Later";
+            this.colHcduPackageB.Name = "colHcduPackageB";
+            this.colHcduPackageB.ReadOnly = true;
             // 
             // HcduPlusForm
             // 
@@ -798,15 +793,8 @@ namespace HcduPlus
         private System.Windows.Forms.TabControl tabConflicts;
         private System.Windows.Forms.TabPage tabByPackage;
         private System.Windows.Forms.DataGridView gridByPackage;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackageA;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackageB;
         private System.Windows.Forms.TabPage tabByResource;
         private System.Windows.Forms.DataGridView gridByResource;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduType;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduGroup;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduInstance;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackages;
         private System.Windows.Forms.MenuStrip menuMain;
         private System.Windows.Forms.ToolStripMenuItem menuFile;
         private System.Windows.Forms.ToolStripMenuItem menuItemSelect;
@@ -854,6 +842,13 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem menuItemGuidConflicts;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackageA;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackageB;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduType;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduGroup;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduInstance;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackages;
     }
 }
 
