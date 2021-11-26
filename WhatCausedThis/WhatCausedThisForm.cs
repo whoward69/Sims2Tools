@@ -34,11 +34,14 @@ namespace WhatCausedThis
 
         private readonly WhatCausedThisData dataByPackage = new WhatCausedThisData();
 
+        private readonly Regex reError = new Regex("^Error: (.+)$");
         private readonly Regex reNode = new Regex("^    Node: ([0-9]+)$");
         private readonly Regex reBhav = new Regex("^    Tree: id ([0-9]+) name '([^']+)'");
         private readonly Regex reGroup = new Regex("^    from (.*)$");
 
         private readonly Regex reSemiGlobalsSuffix = new Regex("(_?[Gg]lobals?)$");
+
+        private String errorMsg = "";
 
         private TypeGroupID secGroupID;
         private String secGroupName;
@@ -451,7 +454,13 @@ namespace WhatCausedThis
 
             foreach (String line in textErrorText.Lines)
             {
-                Match m = reNode.Match(line);
+                Match m = reError.Match(line);
+                if (m.Success)
+                {
+                    errorMsg = m.Groups[1].Value;
+                }
+
+                m = reNode.Match(line);
                 if (m.Success)
                 {
                     if (primary)
@@ -557,6 +566,32 @@ namespace WhatCausedThis
                     primary = false;
                 }
             }
+
+            if (errorMsg.Equals("Bad gosub tree number."))
+            {
+                errorMsg = "";
+
+                //   Smarter EP Check http://cyjon.net/node/323
+                //   InTeen Check https://www.picknmixmods.com/Sims2/Downloads/InTeenCheck/InTeenCheck.html
+                //   Money Globals https://www.picknmixmods.com/Sims2/Downloads/MoneyGlobals/MoneyGlobals.html
+                //   Easy Inventory Check https://hexagonal-bipyramid.tumblr.com/post/182541679666/mod-easy-inventory-check
+                //   Easy Lot Check https://fireflowersims.tumblr.com/post/624808683142053888/easy-lot-check
+                String msg = "This error is usually caused by a missing global support file.\n\nTypically one of\n  *Smarter EP Check (http://cyjon.net/node/323)\n  *InTeen Check (https://www.picknmixmods.com/Sims2/Downloads/InTeenCheck/InTeenCheck.html)\n  *Money Globals (https://www.picknmixmods.com/Sims2/Downloads/MoneyGlobals/MoneyGlobals.html)\n  *Easy Inventory Check (https://hexagonal-bipyramid.tumblr.com/post/182541679666/mod-easy-inventory-check)\n  *Easy Lot Check (https://fireflowersims.tumblr.com/post/624808683142053888/easy-lot-check)\n\nProceed?";
+
+                if (MsgBox.Show(this, msg, "Bad Gosub Tree Number", MessageBoxButtons.YesNo, MessageBoxIcon.Stop) == DialogResult.No)
+                {
+                    textBhavGroup.Text = "";
+                    textBhavInstance.Text = "";
+                    textBhavName.Text = "";
+                    textBhavNode.Text = "";
+                    textErrorText.Text = "";
+                    btnGO.Enabled = false;
+
+                    dataByPackage.Clear();
+                    lblProgress.Visible = false;
+                }
+            }
+
         }
     }
 }
