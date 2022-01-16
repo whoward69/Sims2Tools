@@ -10,6 +10,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.Package;
 using System;
 using System.Xml;
 
@@ -17,8 +18,20 @@ namespace Sims2Tools.DBPF
 {
     abstract public class DBPFResource : DBPFNamedKey
     {
+        protected bool isDirty = false;
+
+        public virtual bool IsDirty => isDirty;
+        public void SetClean() => isDirty = false;
+
         protected DBPFResource(DBPFEntry entry) : base(entry, "")
         {
+        }
+
+        public virtual uint FileSize => throw new NotImplementedException();
+
+        public virtual byte[] Serialize()
+        {
+            throw new NotImplementedException();
         }
 
         public abstract XmlElement AddXml(XmlElement parent);

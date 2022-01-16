@@ -11,10 +11,12 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.IO;
+using System.Text;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.OBJD
@@ -25,7 +27,7 @@ namespace Sims2Tools.DBPF.OBJD
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4F424A44;
         public const String NAME = "OBJD";
 
-        private ushort type;
+        private ObjdType type;
 
         private TypeGUID guid;
         private TypeGUID proxyguid;
@@ -36,7 +38,7 @@ namespace Sims2Tools.DBPF.OBJD
         private readonly String sgHash;
         private readonly String sgName;
 
-        public Objd(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Objd(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader, entry.DataSize);
 
@@ -44,32 +46,25 @@ namespace Sims2Tools.DBPF.OBJD
             sgName = SgHelper.SgName(this);
         }
 
-        public ushort Type
-        {
-            get => this.type;
-        }
+        public ObjdType Type => this.type;
 
-        public TypeGUID Guid
-        {
-            get => this.guid;
-        }
+        public TypeGUID Guid => this.guid;
 
-        public TypeGUID OriginalGuid
-        {
-            get => this.originalguid;
-        }
+        public TypeGUID OriginalGuid => this.originalguid;
 
-        public TypeGUID ProxyGuid
-        {
-            get => this.proxyguid;
-        }
+        public TypeGUID ProxyGuid => this.proxyguid;
 
-        public bool RawDataValid(int index)
+        public bool IsRawDataValid(int index)
         {
             return (data != null && index < data.Length);
         }
 
-        public ushort RawData(int index)
+        public ushort GetRawData(ObjdIndex index)
+        {
+            return GetRawData((int)index);
+        }
+
+        public ushort GetRawData(int index)
         {
             if (data != null && index < data.Length)
             {
@@ -79,12 +74,24 @@ namespace Sims2Tools.DBPF.OBJD
             return 0;
         }
 
-        public int RawDataLength
+        public void SetRawData(ObjdIndex index, ushort value)
         {
-            get => data.Length;
+            SetRawData((int)index, value);
         }
 
-        protected void Unserialize(IoBuffer reader, uint length)
+        public void SetRawData(int index, ushort value)
+        {
+            if (index < data.Length && data[index] != value)
+            {
+                data[index] = value;
+
+                isDirty = true;
+            }
+        }
+
+        public int RawDataLength => data.Length;
+
+        protected void Unserialize(DbpfReader reader, uint length)
         {
             long startPos = reader.Position;
 
@@ -93,7 +100,7 @@ namespace Sims2Tools.DBPF.OBJD
             if (length >= 0x54)
             {
                 reader.Seek(SeekOrigin.Begin, startPos + 0x52);
-                type = reader.ReadUInt16();
+                type = (ObjdType)reader.ReadUInt16();
             }
             else type = 0;
 
@@ -123,6 +130,29 @@ namespace Sims2Tools.DBPF.OBJD
             data = reader.ReadUInt16s((int)((length - 0x40)) / 2);
         }
 
+        public override uint FileSize => (uint)(0x40 + 2 * data.Length);
+
+        public override byte[] Serialize()
+        {
+            byte[] rawdata = new byte[FileSize];
+
+            using (MemoryStream ms = new MemoryStream(rawdata))
+            {
+                using (DbpfWriter writer = DbpfWriter.FromStream(ms))
+                {
+                    writer.WriteBytes(Encoding.ASCII.GetBytes(FileName));
+                    writer.Seek(SeekOrigin.Begin, 0x40);
+
+                    foreach (ushort x in data)
+                    {
+                        writer.WriteUInt16(x);
+                    }
+                }
+            }
+
+            return rawdata;
+        }
+
         public void Dispose()
         {
             data = null;
@@ -131,7 +161,7 @@ namespace Sims2Tools.DBPF.OBJD
         public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
-            element.SetAttribute("type", Helper.Hex4PrefixString(Type));
+            element.SetAttribute("type", Helper.Hex4PrefixString((ushort)Type));
             element.SetAttribute("guid", Guid.ToString());
             element.SetAttribute("originalGuid", OriginalGuid.ToString());
             element.SetAttribute("proxyGuid", ProxyGuid.ToString());
@@ -139,9 +169,9 @@ namespace Sims2Tools.DBPF.OBJD
             element.AppendChild(parent.OwnerDocument.CreateComment("Non-zero values only"));
             for (int i = 0; i < RawDataLength; ++i)
             {
-                if (RawData(i) != 0x0000)
+                if (GetRawData(i) != 0x0000)
                 {
-                    CreateTextElement(element, "data", Helper.Hex4PrefixString(RawData(i))).SetAttribute("index", Helper.Hex4PrefixString(i));
+                    CreateTextElement(element, "data", Helper.Hex4PrefixString(GetRawData(i))).SetAttribute("index", Helper.Hex4PrefixString(i));
                 }
             }
 

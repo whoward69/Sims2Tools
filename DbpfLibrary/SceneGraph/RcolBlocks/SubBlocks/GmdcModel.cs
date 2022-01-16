@@ -59,7 +59,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
         /// <param name="reader">The Stream that contains the FileData</param>
-        internal virtual void Unserialize(IoBuffer reader)
+        internal virtual void Unserialize(DbpfReader reader)
         {
             blendname = reader.ReadString();
             elementname = reader.ReadString();
@@ -127,7 +127,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
         /// <param name="reader">The Stream that contains the FileData</param>
-        public void Unserialize(IoBuffer reader)
+        public void Unserialize(DbpfReader reader)
         {
             int count = reader.ReadInt32();
             transforms.Clear();

@@ -94,7 +94,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             joints = new GmdcJoints();
         }
 
-        public override void Unserialize(IoBuffer reader)
+        public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
 

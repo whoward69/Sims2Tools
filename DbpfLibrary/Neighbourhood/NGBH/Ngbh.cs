@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
 using System.Xml;
@@ -42,13 +43,13 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
 
         public List<NgbhInstanceSlot> SimSlots => simSlots;
 
-        public Ngbh(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Ngbh(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
         // See https://modthesims.info/wiki.php?title=NGBH
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             _ = reader.ReadUInt32();
 

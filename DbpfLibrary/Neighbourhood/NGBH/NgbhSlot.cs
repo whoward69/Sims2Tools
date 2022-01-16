@@ -20,7 +20,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
 {
     public class NgbhGlobalSlot : NgbhGenericSlot
     {
-        public NgbhGlobalSlot(Ngbh parent, IoBuffer reader) : base(parent, reader) { }
+        public NgbhGlobalSlot(Ngbh parent, DbpfReader reader) : base(parent, reader) { }
     }
 
     public class NgbhInstanceSlot : NgbhGenericSlot
@@ -28,9 +28,9 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
         protected uint ownerId;
         public uint OwnerId => ownerId;
 
-        public NgbhInstanceSlot(Ngbh parent, IoBuffer reader) : base(parent, reader) { }
+        public NgbhInstanceSlot(Ngbh parent, DbpfReader reader) : base(parent, reader) { }
 
-        internal override void Unserialize(IoBuffer reader)
+        internal override void Unserialize(DbpfReader reader)
         {
             this.ownerId = reader.ReadUInt32();
 
@@ -71,7 +71,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             get { return standardTokens; }
         }
 
-        public NgbhGenericSlot(Ngbh parent, IoBuffer reader)
+        public NgbhGenericSlot(Ngbh parent, DbpfReader reader)
         {
             this.parent = parent;
             this.Version = parent.Version;
@@ -79,7 +79,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             Unserialize(reader);
         }
 
-        internal virtual void Unserialize(IoBuffer reader)
+        internal virtual void Unserialize(DbpfReader reader)
         {
             if ((uint)parent.Version >= (uint)NgbhVersion.Nightlife) version = reader.ReadUInt32();
 

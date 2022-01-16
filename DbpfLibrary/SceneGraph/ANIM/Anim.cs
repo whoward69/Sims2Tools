@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.ANIM
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xFB00791E;
         public const String NAME = "ANIM";
 
-        public Anim(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Anim(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             throw new NotImplementedException();
         }

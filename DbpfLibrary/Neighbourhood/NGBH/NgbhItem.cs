@@ -108,7 +108,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             }
         }
 
-        internal NgbhItem(Ngbh parent, IoBuffer reader)
+        internal NgbhItem(Ngbh parent, DbpfReader reader)
         {
             this.parent = parent;
 
@@ -121,7 +121,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             else return 0;
         }
 
-        internal void Unserialize(IoBuffer reader)
+        internal void Unserialize(DbpfReader reader)
         {
             guid = reader.ReadUInt32();
 

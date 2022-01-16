@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.BINX
@@ -27,7 +28,7 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
             get => "Binary Index";
         }
 
-        public Binx(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Binx(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgIdrIndexes.Add(ObjectIdx);
         }

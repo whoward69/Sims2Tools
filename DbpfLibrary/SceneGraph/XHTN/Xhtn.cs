@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.XHTN
@@ -27,7 +28,7 @@ namespace Sims2Tools.DBPF.SceneGraph.XHTN
             get => Name;
         }
 
-        public Xhtn(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Xhtn(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

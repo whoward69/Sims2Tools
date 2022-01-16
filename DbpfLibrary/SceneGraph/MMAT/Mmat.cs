@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using System;
@@ -23,7 +24,7 @@ namespace Sims2Tools.DBPF.SceneGraph.MMAT
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4C697E5A;
         public const String NAME = "MMAT";
 
-        public Mmat(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Mmat(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

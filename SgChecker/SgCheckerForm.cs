@@ -14,6 +14,7 @@ using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.OBJD;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
@@ -36,7 +37,6 @@ using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XSTN;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.STR;
-using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
@@ -67,7 +67,7 @@ namespace SgChecker
         private readonly TypeTypeID[] sgPriorityTypes = { Idr.TYPE };
         private readonly TypeTypeID[] sgReferenceTypes = { Binx.TYPE, Coll.TYPE, Gzps.TYPE, Xfch.TYPE, Xmol.TYPE, Xhtn.TYPE, Xstn.TYPE, Xtol.TYPE };
         private readonly TypeTypeID[] sgSpecialTypes = { Objd.TYPE, Mmat.TYPE };
-        // TODO - do we care about LIFO entries?
+        // TODO - what about LIFO entries?
         private readonly TypeTypeID[] sgCommonTypes = { Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE };
 
         // Types not reported as duplicates if in group 0xFFFFFFFF
@@ -185,9 +185,9 @@ namespace SgChecker
                                                 if (type == Objd.TYPE)
                                                 {
                                                     // Resolve the needed STR# now, while we have the associated DBPFFile to hand
-                                                    if (package.GetResourceByEntry(package.GetEntryByTGIR(Hash.TGIRHash((TypeInstanceID)0x0085, (TypeResourceID)0x0000, Str.TYPE, res.GroupID))) is Str strRes)
+                                                    if (package.GetResourceByEntry(package.GetEntryByKey(new DBPFKey(Str.TYPE, res.GroupID, (TypeInstanceID)0x0085, (TypeResourceID)0x0000))) is Str strRes)
                                                     {
-                                                        String cres = (res as Objd).RawDataValid(0x0048) ? strRes.LanguageItems(MetaData.Languages.English)[(res as Objd).RawData(0x0048)].Title : null;
+                                                        String cres = (res as Objd).IsRawDataValid(0x0048) ? strRes.LanguageItems(MetaData.Languages.English)[(res as Objd).GetRawData(0x0048)].Title : null;
 
                                                         if (cres != null && cres.Length > 0)
                                                         {

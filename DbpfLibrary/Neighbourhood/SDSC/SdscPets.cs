@@ -91,7 +91,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             get { return pett; }
         }
 
-        internal override void Unserialize(IoBuffer reader)
+        internal override void Unserialize(DbpfReader reader)
         {
             reader.Seek(SeekOrigin.Begin, 0x19A);
             pett = new PetTraits(reader.ReadUInt16());

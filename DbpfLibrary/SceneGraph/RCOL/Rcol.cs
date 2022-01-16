@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
@@ -81,7 +82,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             }
         }
 
-        public Rcol(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Rcol(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             reffiles = new IPackedFileDescriptor[0];
             index = new uint[0];
@@ -91,7 +92,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             Unserialize(reader);
         }
 
-        internal IRcolBlock ReadBlock(TypeBlockID id, IoBuffer reader)
+        internal IRcolBlock ReadBlock(TypeBlockID id, DbpfReader reader)
         {
             long errPos = reader.Position;
             string s = reader.ReadString();
@@ -120,7 +121,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             return wrp;
         }
 
-        public void Unserialize(IoBuffer reader)
+        public void Unserialize(DbpfReader reader)
         {
             duff = false;
 
@@ -128,7 +129,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
             try
             {
-
                 reffiles = new IPackedFileDescriptor[count == 0xffff0001 ? reader.ReadUInt32() : count];
                 for (int i = 0; i < reffiles.Length; i++)
                 {

@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Xml;
 
@@ -23,7 +24,7 @@ namespace Sims2Tools.DBPF.VERS
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xEBFEE342;
         public const string NAME = "VERS";
 
-        public Vers(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Vers(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

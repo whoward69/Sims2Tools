@@ -11,13 +11,14 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 
 namespace Sims2Tools.DBPF.SceneGraph.LGHT
 {
     public abstract class Lght : Rcol
     {
-        public Lght(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Lght(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

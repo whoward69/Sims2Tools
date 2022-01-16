@@ -132,7 +132,7 @@ namespace Sims2Tools.DBPF.STR
             get => desc;
         }
 
-        internal static void Unserialize(IoBuffer reader, Hashtable lines)
+        internal static void Unserialize(DbpfReader reader, Hashtable lines)
         {
             StrLanguage lid = new StrLanguage(reader.ReadByte());
             string title = reader.ReadPChar();
@@ -154,7 +154,7 @@ namespace Sims2Tools.DBPF.STR
     {
         public new StrToken this[int index]
         {
-            get => ((StrToken)base[index]);
+            get => index < base.Count ? ((StrToken)base[index]) : null;
             set => base[index] = value;
         }
 

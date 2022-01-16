@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections;
@@ -50,12 +51,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMT
 
 
 
-        public Famt(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Famt(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             uint id = reader.ReadUInt32();
             if (id != 0x00000001) throw new Exception("Format is not recognized!");

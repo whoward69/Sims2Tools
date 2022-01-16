@@ -54,7 +54,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         }
 
 
-        internal override void Unserialize(IoBuffer reader)
+        internal override void Unserialize(DbpfReader reader)
         {
             reader.Seek(SeekOrigin.Begin, 0x192);
             this.lotid = reader.ReadUInt16();

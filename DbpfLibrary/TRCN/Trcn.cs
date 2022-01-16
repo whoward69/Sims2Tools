@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
 using System.Xml;
@@ -27,7 +28,7 @@ namespace Sims2Tools.DBPF.TRCN
         private bool duff;
         private List<TrcnItem> items;
 
-        public Trcn(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Trcn(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
@@ -39,7 +40,7 @@ namespace Sims2Tools.DBPF.TRCN
 
         public bool TextOnly => this.duff || this.header[1] < 63U || this.header[1] >= 65U && this.header[1] < 70U || this.header[0] != 0x5452434E || this.header[2] != 0U;
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             this.duff = false;
 

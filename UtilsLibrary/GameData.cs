@@ -10,6 +10,7 @@ using Sims2Tools.Cache;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.OBJD;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -184,7 +185,7 @@ namespace Sims2Tools
                             List<DBPFEntry> globs = package.GetEntriesByType(Glob.TYPE);
                             foreach (var entry in globs)
                             {
-                                Glob glob = new Glob(entry, package.GetIoBuffer(entry));
+                                Glob glob = (Glob)package.GetResourceByEntry(entry);
                                 semiglobalsByGroupID.Add(entry.GroupID, glob.SemiGlobalGroup);
                             }
 

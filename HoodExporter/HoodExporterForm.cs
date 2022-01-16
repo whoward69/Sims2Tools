@@ -27,6 +27,7 @@ using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.Neighbourhood.SREL;
 using Sims2Tools.DBPF.Neighbourhood.SWAF;
 using Sims2Tools.DBPF.OBJD;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
@@ -379,7 +380,7 @@ namespace HoodExporter
 
             using (DBPFFile package = new DBPFFile(packagePath))
             {
-                uint total = package.NumEntries;
+                uint total = package.ResourceCount;
                 uint done = 0;
 
                 foreach (TypeTypeID type in types)
@@ -543,7 +544,7 @@ namespace HoodExporter
                                         lifeStage = lifeStage.Substring(0, lifeStage.Length - 4);
 
                                         String suffix = lifeStage.Equals(sdsc.SimBase.LifeSection.ToString()) ? "" : $"_{lifeStage}";
-                                        String newName = Path.Combine(fi.DirectoryName, $"{hoodCode}_{sdsc.InstanceID.AsInt()}{suffix}{fi.Extension}");
+                                        String newName = Path.Combine(fi.DirectoryName, $"{hoodCode}_{sdsc.InstanceID.AsUInt()}{suffix}{fi.Extension}");
                                         if (File.Exists(newName)) File.Delete(newName);
                                         fi.MoveTo(newName);
                                     }
@@ -624,7 +625,7 @@ namespace HoodExporter
                                                 return false;
                                             }
 
-                                            int lifeStage = entry.InstanceID.AsInt();
+                                            int lifeStage = (int)entry.InstanceID.AsUInt();
                                             if (lifeStage >= 0x01 && lifeStage <= 0x40)
                                             {
                                                 Img img = (Img)package.GetResourceByEntry(entry);
@@ -810,7 +811,7 @@ namespace HoodExporter
                             imgs.Add(entry);
                         }
 
-                        uint total = package.NumEntries;
+                        uint total = package.ResourceCount;
                         uint done = 0;
 
                         foreach (DBPFEntry entry in imgs)
@@ -821,7 +822,7 @@ namespace HoodExporter
                             }
 
                             Img img = (Img)package.GetResourceByEntry(entry);
-                            String imageName = isRufio ? $"{hoodCode}_{entry.InstanceID.AsInt()}" : entry.InstanceID.ToString();
+                            String imageName = isRufio ? $"{hoodCode}_{entry.InstanceID.AsUInt()}" : entry.InstanceID.ToString();
 
                             using (Stream stream = new FileStream($"{familiesPath}/{imageName}.{extn}", FileMode.OpenOrCreate, FileAccess.Write))
                             {

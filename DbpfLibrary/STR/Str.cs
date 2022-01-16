@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections;
 using System.Xml;
@@ -30,7 +31,7 @@ namespace Sims2Tools.DBPF.STR
 
         Hashtable lines;
 
-        public Str(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Str(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader /*, entry.FileSize*/);
         }
@@ -68,7 +69,7 @@ namespace Sims2Tools.DBPF.STR
             return items;
         }
 
-        protected void Unserialize(IoBuffer reader /*, uint length*/)
+        protected void Unserialize(DbpfReader reader /*, uint length*/)
         {
             lines = new Hashtable();
             // Why? Some resources have a declared length less than the actual amount of data in them!

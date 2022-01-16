@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LPNT;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
@@ -24,7 +25,7 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xE519C933;
         public const String NAME = "CRES";
 
-        public Cres(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Cres(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

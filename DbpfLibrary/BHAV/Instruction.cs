@@ -70,7 +70,7 @@ namespace Sims2Tools.DBPF.BHAV
 
         public WrappedByteArray Operands => this.operands;
 
-        public Instruction(IoBuffer reader, ushort format)
+        public Instruction(DbpfReader reader, ushort format)
         {
             this.format = format;
 
@@ -96,7 +96,7 @@ namespace Sims2Tools.DBPF.BHAV
             }
         }
 
-        private void Unserialize(IoBuffer reader)
+        private void Unserialize(DbpfReader reader)
         {
             this.opcode = reader.ReadUInt16();
             if (format < 0x8007)

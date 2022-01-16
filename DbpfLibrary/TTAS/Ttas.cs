@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using System.Xml;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.TTAS
         public static readonly new TypeTypeID TYPE = (TypeTypeID)0x54544173;
         public new const string NAME = "TTAs";
 
-        public Ttas(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Ttas(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

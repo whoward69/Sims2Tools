@@ -17,13 +17,7 @@ using System.Text;
 
 namespace Sims2Tools.DBPF.IO
 {
-    public enum ByteOrder
-    {
-        BIG_ENDIAN,
-        LITTLE_ENDIAN
-    }
-
-    public class IoBuffer : IDisposable
+    public class DbpfReader : IDisposable
     {
         private readonly Stream m_stream;
         private readonly BinaryReader m_reader;
@@ -32,25 +26,25 @@ namespace Sims2Tools.DBPF.IO
 
         public Stream MyStream => m_stream;
 
-        private IoBuffer(Stream stream)
+        private DbpfReader(Stream stream)
         {
             this.m_stream = stream;
             this.m_reader = new BinaryReader(stream);
         }
 
-        public static IoBuffer FromStream(Stream stream)
+        public static DbpfReader FromStream(Stream stream)
         {
             return FromStream(stream, stream.Length);
         }
 
-        public static IoBuffer FromStream(Stream stream, long length)
+        public static DbpfReader FromStream(Stream stream, long length)
         {
             return FromStream(stream, length, ByteOrder.LITTLE_ENDIAN);
         }
 
-        public static IoBuffer FromStream(Stream stream, long length, ByteOrder order)
+        public static DbpfReader FromStream(Stream stream, long length, ByteOrder order)
         {
-            IoBuffer buffer = new IoBuffer(stream)
+            DbpfReader buffer = new DbpfReader(stream)
             {
                 m_length = length,
                 m_byteOrder = order
@@ -62,6 +56,7 @@ namespace Sims2Tools.DBPF.IO
         public void Close()
         {
             m_reader.Close();
+            m_stream.Close();
         }
 
         public long Length

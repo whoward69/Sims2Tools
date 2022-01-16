@@ -30,12 +30,12 @@ namespace Sims2Tools.DBPF.TRCN
             get => this.constName;
         }
 
-        public TrcnItem(IoBuffer reader, uint version)
+        public TrcnItem(DbpfReader reader, uint version)
         {
             this.Unserialize(reader, version);
         }
 
-        protected void Unserialize(IoBuffer reader, uint version)
+        protected void Unserialize(DbpfReader reader, uint version)
         {
             /*this.used =*/
             reader.ReadUInt32();

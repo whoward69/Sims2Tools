@@ -72,7 +72,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
         /// <param name="reader">The Stream that contains the FileData</param>
-        public override void Unserialize(IoBuffer reader)
+        public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
 
@@ -131,7 +131,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
         /// <param name="reader">The Stream that contains the FileData</param>
-        public override void Unserialize(IoBuffer reader)
+        public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
         }

@@ -41,7 +41,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         }
 
 
-        internal override void Unserialize(IoBuffer reader)
+        internal override void Unserialize(DbpfReader reader)
         {
             reader.Seek(SeekOrigin.Begin, 0x19C);
             this.daysleft = reader.ReadUInt16();
@@ -49,7 +49,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             valid = true;
         }
 
-        internal void UnserializeMem(IoBuffer reader)
+        internal void UnserializeMem(DbpfReader reader)
         {
             collect = 0;
             if (reader.Position <= reader.Length - 8)

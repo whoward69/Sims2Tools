@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
@@ -62,8 +63,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
             uint family; public uint Family { get { return family; } set { family = value; } }
             uint unknown_2; internal uint Unknown2 { get { return unknown_2; } set { unknown_2 = value; } }
             uint unknown_3; internal uint Unknown3 { get { return unknown_3; } set { unknown_3 = value; } }
-            internal SubLot(IoBuffer reader) { this.Unserialize(reader); }
-            private void Unserialize(IoBuffer reader)
+            internal SubLot(DbpfReader reader) { this.Unserialize(reader); }
+            private void Unserialize(DbpfReader reader)
             {
                 apartmentSublot = reader.ReadUInt32();
                 family = reader.ReadUInt32();
@@ -153,12 +154,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
         public List<uint> Unknown7 { get { return unknown_7; } }
 
 
-        public Ltxt(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Ltxt(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             ver = reader.ReadUInt16();
             subver = reader.ReadUInt16();

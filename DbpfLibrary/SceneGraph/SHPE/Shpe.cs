@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
@@ -25,7 +26,7 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xFC6EB1F7;
         public const String NAME = "SHPE";
 
-        public Shpe(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Shpe(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

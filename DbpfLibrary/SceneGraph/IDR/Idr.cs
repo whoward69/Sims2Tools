@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.IDR
@@ -33,12 +34,12 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
             get { return items; }
         }
 
-        public Idr(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Idr(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             _ = reader.ReadUInt32();
             uint type = reader.ReadUInt32();

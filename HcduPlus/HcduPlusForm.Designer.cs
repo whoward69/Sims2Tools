@@ -70,6 +70,7 @@ namespace HcduPlus
             this.menuItemGzps = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemObjd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemObjf = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSlot = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemStr = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemTprp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemTrcn = new System.Windows.Forms.ToolStripMenuItem();
@@ -254,6 +255,7 @@ namespace HcduPlus
             this.menuItemGzps,
             this.menuItemObjd,
             this.menuItemObjf,
+            this.menuItemSlot,
             this.menuItemStr,
             this.menuItemTprp,
             this.menuItemTrcn,
@@ -319,6 +321,14 @@ namespace HcduPlus
             this.menuItemObjf.Size = new System.Drawing.Size(101, 22);
             this.menuItemObjf.Text = "Objf";
             this.menuItemObjf.Click += new System.EventHandler(this.OnObjfClicked);
+            // 
+            // menuItemSlot
+            // 
+            this.menuItemSlot.CheckOnClick = true;
+            this.menuItemSlot.Name = "menuItemSlot";
+            this.menuItemSlot.Size = new System.Drawing.Size(101, 22);
+            this.menuItemSlot.Text = "Slot";
+            this.menuItemSlot.Click += new System.EventHandler(this.OnSlotClicked);
             // 
             // menuItemStr
             // 
@@ -827,6 +837,7 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemGzps;
         private System.Windows.Forms.ToolStripMenuItem menuItemObjd;
         private System.Windows.Forms.ToolStripMenuItem menuItemObjf;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSlot;
         private System.Windows.Forms.ToolStripMenuItem menuItemStr;
         private System.Windows.Forms.ToolStripMenuItem menuItemTprp;
         private System.Windows.Forms.ToolStripMenuItem menuItemTrcn;

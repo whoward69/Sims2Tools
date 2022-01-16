@@ -86,7 +86,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             set { cleaning = (ushort)Math.Min(1000, (uint)value); }
         }
 
-        internal override void Unserialize(IoBuffer reader)
+        internal override void Unserialize(DbpfReader reader)
         {
             throw new NotImplementedException();
         }

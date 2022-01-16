@@ -82,7 +82,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             set { major = value; }
         }
 
-        internal override void Unserialize(IoBuffer reader)
+        internal override void Unserialize(DbpfReader reader)
         {
             reader.Seek(SeekOrigin.Begin, 0x014);
             effort = reader.ReadUInt16();

@@ -20,9 +20,9 @@ namespace Sims2Tools.DBPF.TPRP
 
         public byte PData => this.pData;
 
-        public void ReadPData(IoBuffer reader) => this.pData = reader.ReadByte();
+        public void ReadPData(DbpfReader reader) => this.pData = reader.ReadByte();
 
-        public TprpParamLabel(IoBuffer reader) : base(reader)
+        public TprpParamLabel(DbpfReader reader) : base(reader)
         {
         }
     }

@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
 using System.Xml;
@@ -27,7 +28,7 @@ namespace Sims2Tools.DBPF.SLOT
 
         private List<SlotItem> items;
 
-        public Slot(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Slot(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
@@ -37,7 +38,7 @@ namespace Sims2Tools.DBPF.SLOT
             get => this.version;
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             this.FileName = Helper.ToString(reader.ReadBytes(0x40));
 

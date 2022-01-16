@@ -16,7 +16,7 @@ namespace Sims2Tools.DBPF.TPRP
 {
     public class TprpLocalLabel : TprpItem
     {
-        public TprpLocalLabel(IoBuffer reader) : base(reader)
+        public TprpLocalLabel(DbpfReader reader) : base(reader)
         {
         }
     }

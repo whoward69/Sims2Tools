@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System;
 using System.Drawing;
 using System.Xml;
@@ -65,12 +66,12 @@ namespace Sims2Tools.DBPF.Images.IMG
             }
         }
 
-        public Img(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Img(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             data = reader.ReadBytes((int)reader.Length);
         }

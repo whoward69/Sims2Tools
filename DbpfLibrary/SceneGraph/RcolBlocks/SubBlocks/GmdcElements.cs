@@ -72,7 +72,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
         /// <param name="reader">The Stream that contains the FileData</param>
-        internal virtual void Unserialize(IoBuffer reader)
+        internal virtual void Unserialize(DbpfReader reader)
         {
             for (int i = 0; i < data.Length; i++) data[i] = reader.ReadSingle();
         }
@@ -321,7 +321,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
 
         int val;
-        internal override void Unserialize(IoBuffer reader)
+        internal override void Unserialize(DbpfReader reader)
         {
             val = reader.ReadInt32();
             Data[0] = val;
@@ -459,7 +459,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
         /// <param name="reader">The Stream that contains the FileData</param>
-        public void Unserialize(IoBuffer reader)
+        public void Unserialize(DbpfReader reader)
         {
             number = reader.ReadInt32();
             uint id = reader.ReadUInt32();

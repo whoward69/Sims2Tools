@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.LIFO
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xED534136;
         public const String NAME = "LIFO";
 
-        public Lifo(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Lifo(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             throw new NotImplementedException();
         }

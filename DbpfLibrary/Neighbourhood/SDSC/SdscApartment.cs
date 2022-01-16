@@ -26,7 +26,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         public short ProbabilityToAppear { get { return probabilityToAppear; } set { probabilityToAppear = value; } }
         public short TitlePostName { get { return titlePostName; } set { titlePostName = value; } }
 
-        internal override void Unserialize(IoBuffer reader)
+        internal override void Unserialize(DbpfReader reader)
         {
             reader.Seek(SeekOrigin.Begin, 0x1D4);
             reputation = reader.ReadInt16();

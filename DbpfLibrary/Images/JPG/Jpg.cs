@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 
 namespace Sims2Tools.DBPF.Images.JPG
 {
@@ -24,6 +25,6 @@ namespace Sims2Tools.DBPF.Images.JPG
         // TODO - what about other image types (see link above) - 0x0C7E9A76, 0x424D505F, 0x4D533EDD
         // TODO - what about other possible image types (see PictureWrapper.cs) - 0xAC2950C1, 0x2C30E040, 0x2C43CBD4, 0x2C488BCA, 0x8C31125E, 0x8C311262, 0xCC30CDF8, 0xCC44B5EC, 0xCC489E46, 0xCC48C51F, 0xEC3126C4
 
-        public Jpg(DBPFEntry entry, IoBuffer reader) : base(entry, reader) { }
+        public Jpg(DBPFEntry entry, DbpfReader reader) : base(entry, reader) { }
     }
 }

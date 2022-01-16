@@ -93,7 +93,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
         /// <param name="reader">The Stream that contains the FileData</param>
-        public virtual void Unserialize(IoBuffer reader)
+        public virtual void Unserialize(DbpfReader reader)
         {
             if (o == TransformOrder.RotateTranslate)
             {

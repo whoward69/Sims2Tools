@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LGHT;
 using System;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.LDIR
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xC9C81BA3; // SimPE has this as 0xC9C81B9B (swapped with the LAMB value)
         public const String NAME = "LDIR";
 
-        public Ldir(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Ldir(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
     }

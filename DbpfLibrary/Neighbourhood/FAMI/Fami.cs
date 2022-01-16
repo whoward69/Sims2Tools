@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Xml;
 
@@ -155,12 +156,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
             get { return subhood; }
         }
 
-        public Fami(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Fami(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             _ = reader.ReadUInt32();
             version = (FamiVersions)reader.ReadUInt32();

@@ -18,6 +18,7 @@ using Sims2Tools.DBPF.Images.JPG;
 using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SLOT;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
@@ -516,7 +517,7 @@ namespace DbpfViewer
 
                     sender.VisualMode = ProgressBarDisplayMode.Percentage;
 
-                    uint total = package.NumEntries;
+                    uint total = package.ResourceCount;
                     uint done = 0;
                     uint found = 0;
 
@@ -594,7 +595,7 @@ namespace DbpfViewer
             {
                 using (DBPFFile package = new DBPFFile(packageFile))
                 {
-                    uint total = package.NumEntries;
+                    uint total = package.ResourceCount;
                     uint done = 0;
 
                     foreach (TypeTypeID type in DBPFData.ModTypes)
@@ -772,6 +773,7 @@ namespace DbpfViewer
             if (mouseLocation == null || mouseLocation.RowIndex == -1)
             {
                 e.Cancel = true;
+                return;
             }
 
             if (mouseLocation.RowIndex != gridResources.SelectedRows[0].Index)
@@ -817,7 +819,7 @@ namespace DbpfViewer
                 using (DBPFFile package = new DBPFFile(packageFile))
                 {
                     DBPFEntry entry = package.GetEntryByTGIR((int)row.Cells[4].Value);
-                    byte[] data = package.GetItem(entry);
+                    byte[] data = package.GetOriginalItemByEntry(entry);
 
                     if (data != null)
                     {

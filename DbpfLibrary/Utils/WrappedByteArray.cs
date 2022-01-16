@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.Utils
             this.array = array;
         }
 
-        public WrappedByteArray(IoBuffer reader, int size)
+        public WrappedByteArray(DbpfReader reader, int size)
         {
             this.array = new byte[16];
             this.Unserialize(reader, size);
@@ -34,7 +34,7 @@ namespace Sims2Tools.DBPF.Utils
             get => this.array[index];
         }
 
-        private void Unserialize(IoBuffer reader, int size)
+        private void Unserialize(DbpfReader reader, int size)
         {
             int i = 0;
 

@@ -45,7 +45,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.BNFO
         {
         }
 
-        internal void Unserialize(IoBuffer reader)
+        internal void Unserialize(DbpfReader reader)
         {
             // WORD: Sim Instance
             siminst = reader.ReadUInt16();

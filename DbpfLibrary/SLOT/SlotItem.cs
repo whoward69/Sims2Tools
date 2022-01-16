@@ -96,7 +96,7 @@ namespace Sims2Tools.DBPF.SLOT
         public short S1 => unknowns1;
         public short S2 => unknowns2;
 
-        internal void Unserialize(IoBuffer reader)
+        internal void Unserialize(DbpfReader reader)
         {
             type = (SlotItemType)reader.ReadUInt16();
 

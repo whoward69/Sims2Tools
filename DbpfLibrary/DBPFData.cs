@@ -12,14 +12,27 @@
 
 using Sims2Tools.DBPF.BCON;
 using Sims2Tools.DBPF.BHAV;
+using Sims2Tools.DBPF.CLST;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.JPG;
+using Sims2Tools.DBPF.Neighbourhood.BNFO;
+using Sims2Tools.DBPF.Neighbourhood.FAMI;
+using Sims2Tools.DBPF.Neighbourhood.FAMT;
+using Sims2Tools.DBPF.Neighbourhood.IDNO;
+using Sims2Tools.DBPF.Neighbourhood.LTXT;
+using Sims2Tools.DBPF.Neighbourhood.NGBH;
+using Sims2Tools.DBPF.Neighbourhood.SDNA;
+using Sims2Tools.DBPF.Neighbourhood.SDSC;
+using Sims2Tools.DBPF.Neighbourhood.SREL;
+using Sims2Tools.DBPF.Neighbourhood.SWAF;
 using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
+using Sims2Tools.DBPF.SceneGraph.ANIM;
 using Sims2Tools.DBPF.SceneGraph.BINX;
+using Sims2Tools.DBPF.SceneGraph.CINE;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
@@ -28,6 +41,7 @@ using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.LAMB;
 using Sims2Tools.DBPF.SceneGraph.LDIR;
+using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.LPNT;
 using Sims2Tools.DBPF.SceneGraph.LSPT;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
@@ -74,6 +88,7 @@ namespace Sims2Tools.DBPF
         private static readonly Dictionary<TypeTypeID, String> ModTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, String> ImgTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, String> SgTypeNames = new Dictionary<TypeTypeID, string>();
+        private static readonly Dictionary<TypeTypeID, String> OtherTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, String> AllTypeNames = new Dictionary<TypeTypeID, string>();
 
         static DBPFData()
@@ -120,9 +135,25 @@ namespace Sims2Tools.DBPF
             SgTypeNames.Add(Xstn.TYPE, Xstn.NAME);
             SgTypeNames.Add(Xtol.TYPE, Xtol.NAME);
 
+            OtherTypeNames.Add(Anim.TYPE, Anim.NAME);
+            OtherTypeNames.Add(Bnfo.TYPE, Bnfo.NAME);
+            OtherTypeNames.Add(Cine.TYPE, Cine.NAME);
+            OtherTypeNames.Add(Clst.TYPE, Clst.NAME);
+            OtherTypeNames.Add(Fami.TYPE, Fami.NAME);
+            OtherTypeNames.Add(Famt.TYPE, Famt.NAME);
+            OtherTypeNames.Add(Idno.TYPE, Idno.NAME);
+            OtherTypeNames.Add(Lifo.TYPE, Lifo.NAME);
+            OtherTypeNames.Add(Ltxt.TYPE, Ltxt.NAME);
+            OtherTypeNames.Add(Ngbh.TYPE, Ngbh.NAME);
+            OtherTypeNames.Add(Sdna.TYPE, Sdna.NAME);
+            OtherTypeNames.Add(Sdsc.TYPE, Sdsc.NAME);
+            OtherTypeNames.Add(Srel.TYPE, Srel.NAME);
+            OtherTypeNames.Add(Swaf.TYPE, Swaf.NAME);
+
             foreach (KeyValuePair<TypeTypeID, String> kvPair in ModTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, String> kvPair in ImgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, String> kvPair in SgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
+            foreach (KeyValuePair<TypeTypeID, String> kvPair in OtherTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
         }
 
         public static Dictionary<TypeTypeID, String>.KeyCollection AllTypes

@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
@@ -31,14 +32,14 @@ namespace Sims2Tools.DBPF.CPF
             get => items;
         }
 
-        public Cpf(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Cpf(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             items = new CpfItem[0];
 
             Unserialize(reader);
         }
 
-        internal void Unserialize(IoBuffer reader)
+        internal void Unserialize(DbpfReader reader)
         {
             long pos = reader.Position;
 
@@ -62,7 +63,7 @@ namespace Sims2Tools.DBPF.CPF
             }
         }
 
-        protected void UnserializeXml(IoBuffer reader)
+        protected void UnserializeXml(DbpfReader reader)
         {
             StreamReader sr = new StreamReader(reader.MyStream);
             StringReader strr = new StringReader(sr.ReadToEnd().Replace("& ", "&amp; "));

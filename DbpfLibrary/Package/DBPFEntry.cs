@@ -10,7 +10,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-namespace Sims2Tools.DBPF
+namespace Sims2Tools.DBPF.Package
 {
     public class DBPFEntry : DBPFKey
     {
@@ -55,6 +55,10 @@ namespace Sims2Tools.DBPF
         }
 
         public DBPFEntry(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID) : base(typeID, groupID, instanceID, resourceID)
+        {
+        }
+
+        public DBPFEntry(IDBPFKey key) : base(key)
         {
         }
     }

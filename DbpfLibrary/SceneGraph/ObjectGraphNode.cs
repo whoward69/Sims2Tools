@@ -40,7 +40,7 @@ namespace Sims2Tools.DBPF.SceneGraph
             set { index = value; }
         }
 
-        public void Unserialize(IoBuffer reader)
+        public void Unserialize(DbpfReader reader)
         {
             enabled = reader.ReadByte();
             depend = reader.ReadByte();
@@ -77,7 +77,7 @@ namespace Sims2Tools.DBPF.SceneGraph
             version = 4;
         }
 
-        public override void Unserialize(IoBuffer reader)
+        public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
 

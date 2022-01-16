@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System;
 using System.Collections.Generic;
 using System.Xml;
@@ -50,12 +51,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.SWAF
         public List<SwafItem> Fears => this[SwafItem.SWAFItemType.Fears];
         private List<SwafItem> this[SwafItem.SWAFItemType value] { get { List<SwafItem> res = new List<SwafItem>(); foreach (SwafItem item in items) if (item.ItemType == value) res.Add(item); return res; } }
 
-        public Swaf(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Swaf(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             uint count;
 

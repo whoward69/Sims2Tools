@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x1C4A276C;
         public const String NAME = "TXTR";
 
-        public Txtr(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Txtr(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

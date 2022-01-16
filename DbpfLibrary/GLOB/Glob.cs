@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Xml;
 
@@ -34,12 +35,12 @@ namespace Sims2Tools.DBPF.GLOB
             get => Hashes.GroupHash(SemiGlobalName);
         }
 
-        public Glob(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Glob(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             this.FileName = Helper.ToString(reader.ReadBytes(0x40));
 

@@ -80,8 +80,13 @@
     <Compile Include="CPF\CpfItem.cs" />
     <Compile Include="CTSS\Ctss.cs" />
     <Compile Include="DBPFData.cs" />
-    <Compile Include="DBPFEntry.cs" />
-    <Compile Include="DBPFFile.cs" />
+    <Compile Include="Package\DBPFEntry.cs" />
+    <Compile Include="OBJD\ObjdType.cs" />
+    <Compile Include="OBJD\ObjdIndex.cs" />
+    <Compile Include="Package\DBPFResourceCache.cs" />
+    <Compile Include="Package\DBPFResourceIndex.cs" />
+    <Compile Include="Package\DBPFHeader.cs" />
+    <Compile Include="Package\DBPFFile.cs" />
     <Compile Include="DBPFKey.cs" />
     <Compile Include="DBPFResource.cs" />
     <Compile Include="DBPFTypes.cs" />
@@ -89,8 +94,10 @@
     <Compile Include="Images\IMG\Img.cs" />
     <Compile Include="Images\JPG\Jpg.cs" />
     <Compile Include="Images\TgaLoader.cs" />
+    <Compile Include="IO\ByteOrder.cs" />
+    <Compile Include="IO\DbpfWriter.cs" />
     <Compile Include="Utils\Decompressor.cs" />
-    <Compile Include="IO\IoBuffer.cs" />
+    <Compile Include="IO\DbpfReader.cs" />
     <Compile Include="Neighbourhood\BNFO\Bnfo.cs" />
     <Compile Include="Neighbourhood\BNFO\BnfoCustomerItem.cs" />
     <Compile Include="Neighbourhood\FAMI\Fami.cs" />

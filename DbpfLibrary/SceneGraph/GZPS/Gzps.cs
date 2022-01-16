@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.GZPS
@@ -27,7 +28,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
             get => Name;
         }
 
-        public Gzps(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Gzps(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgIdrIndexes.AddRange(CresIndexes);
             sgIdrIndexes.AddRange(ShpeIndexes);

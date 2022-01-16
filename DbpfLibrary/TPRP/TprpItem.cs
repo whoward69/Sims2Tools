@@ -24,9 +24,9 @@ namespace Sims2Tools.DBPF.TPRP
             get => this.label;
         }
 
-        public TprpItem(IoBuffer reader) => this.Unserialize(reader);
+        public TprpItem(DbpfReader reader) => this.Unserialize(reader);
 
-        protected void Unserialize(IoBuffer reader) => this.label = Helper.ToString(reader.ReadBytes(reader.ReadByte()));
+        protected void Unserialize(DbpfReader reader) => this.label = Helper.ToString(reader.ReadBytes(reader.ReadByte()));
 
         public override string ToString() => this.label;
 

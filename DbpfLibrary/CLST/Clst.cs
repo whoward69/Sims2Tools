@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System;
 
 namespace Sims2Tools.DBPF.CLST
@@ -24,9 +25,11 @@ namespace Sims2Tools.DBPF.CLST
         public static readonly TypeGroupID GROUP = (TypeGroupID)0xE86B1EEF;
         public static readonly TypeInstanceID INSTANCE = (TypeInstanceID)0x286B1F03;
 
-        public Clst(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Clst(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             throw new NotImplementedException();
         }
+
+        // CLST handling can be found in DBPFResourceIndex.cs
     }
 }

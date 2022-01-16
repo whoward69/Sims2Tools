@@ -29,12 +29,12 @@ namespace Sims2Tools.DBPF.OBJF
             get => this.guard;
         }
 
-        public ObjfItem(IoBuffer reader)
+        public ObjfItem(DbpfReader reader)
         {
             this.Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             this.guard = reader.ReadUInt16();
             this.action = reader.ReadUInt16();

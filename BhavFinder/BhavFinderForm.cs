@@ -13,6 +13,7 @@ using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.Data;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
@@ -630,7 +631,7 @@ namespace BhavFinder
                     }
                     else
                     {
-                        Bhav bhav = new Bhav(entry, package.GetIoBuffer(entry));
+                        Bhav bhav = (Bhav)package.GetResourceByEntry(entry);
 
                         int percentComplete = (int)((++done / (float)bhavs.Count) * 100.0);
 
@@ -717,7 +718,7 @@ namespace BhavFinder
                 {
                     if (entry.InstanceID == instanceID)
                     {
-                        Str str = new Str(entry, package.GetIoBuffer(entry));
+                        Str str = (Str)package.GetResourceByEntry(entry);
                         StrItemList entries = str.LanguageItems(MetaData.Languages.English);
 
                         for (int i = 0; i < entries.Length; ++i)

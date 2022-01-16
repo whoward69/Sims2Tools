@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LGHT;
 using System;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.LPNT
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xC9C81BA9;
         public const String NAME = "LPNT";
 
-        public Lpnt(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Lpnt(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
     }

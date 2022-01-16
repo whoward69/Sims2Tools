@@ -64,7 +64,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         /// Unserializes a BinaryStream into the Attributes of this Instance
         /// </summary>
         /// <param name="reader">The Stream that contains the FileData</param>
-        public void Unserialize(IoBuffer reader)
+        public void Unserialize(DbpfReader reader)
         {
             int vcount = reader.ReadInt32();
 

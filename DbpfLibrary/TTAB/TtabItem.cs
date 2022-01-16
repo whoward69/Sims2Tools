@@ -118,7 +118,7 @@ namespace Sims2Tools.DBPF.TTAB
             get => this.animalGroups;
         }
 
-        public TtabItem(uint format, IoBuffer reader)
+        public TtabItem(uint format, DbpfReader reader)
         {
             this.format = format;
             if (format < 68U)
@@ -134,7 +134,7 @@ namespace Sims2Tools.DBPF.TTAB
             this.Unserialize(reader);
         }
 
-        private void Unserialize(IoBuffer reader)
+        private void Unserialize(DbpfReader reader)
         {
             this.action = reader.ReadUInt16();
             this.guard = reader.ReadUInt16();

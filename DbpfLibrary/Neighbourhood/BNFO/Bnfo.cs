@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -51,12 +52,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.BNFO
 
         List<BnfoCustomerItem> items;
 
-        public Bnfo(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Bnfo(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             ver = reader.ReadUInt32();
             level1 = reader.ReadUInt32();

@@ -65,7 +65,7 @@ namespace Sims2Tools.DBPF.BHAV
             get => this.count;
         }
 
-        public void Unserialize(IoBuffer reader)
+        public void Unserialize(DbpfReader reader)
         {
             this.format = reader.ReadUInt16();
             this.count = reader.ReadUInt16();

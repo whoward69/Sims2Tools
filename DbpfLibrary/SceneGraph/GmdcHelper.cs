@@ -194,7 +194,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// </summary>
         /// <param name="reader"></param>
         /// <returns></returns>
-        protected int ReadValue(IoBuffer reader)
+        protected int ReadValue(DbpfReader reader)
         {
             if (parent.Version == 0x04) return reader.ReadInt16();
             else return reader.ReadInt32();
@@ -216,7 +216,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="items"></param>
-        protected void ReadBlock(IoBuffer reader, List<int> items)
+        protected void ReadBlock(DbpfReader reader, List<int> items)
         {
             int count = reader.ReadInt32();
             items.Clear();

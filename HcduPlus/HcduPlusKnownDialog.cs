@@ -84,9 +84,10 @@ namespace HcduPlus
 
         private void OnConflictMenuOpening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (mouseLocation == null || mouseLocation.RowIndex == -1)
+            if (mouseLocation == null || mouseLocation.RowIndex == -1 || mouseLocation.RowIndex == (gridKnownConflicts.RowCount - 1))
             {
                 e.Cancel = true;
+                return;
             }
 
             if (mouseLocation.RowIndex != gridKnownConflicts.SelectedRows[0].Index)

@@ -14,6 +14,7 @@ using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.NREF;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
@@ -571,12 +572,15 @@ namespace WhatCausedThis
             {
                 errorMsg = "";
 
-                //   Smarter EP Check http://cyjon.net/node/323
-                //   InTeen Check https://www.picknmixmods.com/Sims2/Downloads/InTeenCheck/InTeenCheck.html
-                //   Money Globals https://www.picknmixmods.com/Sims2/Downloads/MoneyGlobals/MoneyGlobals.html
-                //   Easy Inventory Check https://hexagonal-bipyramid.tumblr.com/post/182541679666/mod-easy-inventory-check
-                //   Easy Lot Check https://fireflowersims.tumblr.com/post/624808683142053888/easy-lot-check
-                String msg = "This error is usually caused by a missing global support file.\n\nTypically one of\n  *Smarter EP Check (http://cyjon.net/node/323)\n  *InTeen Check (https://www.picknmixmods.com/Sims2/Downloads/InTeenCheck/InTeenCheck.html)\n  *Money Globals (https://www.picknmixmods.com/Sims2/Downloads/MoneyGlobals/MoneyGlobals.html)\n  *Easy Inventory Check (https://hexagonal-bipyramid.tumblr.com/post/182541679666/mod-easy-inventory-check)\n  *Easy Lot Check (https://fireflowersims.tumblr.com/post/624808683142053888/easy-lot-check)\n\nProceed?";
+                String msg = "This error is usually caused by a missing global support file.\n\nTypically one of\n" +
+                             "  *Smarter EP Check (http://cyjon.net/node/323)\n" +
+                             "  *InTeen Check (https://www.picknmixmods.com/Sims2/Downloads/InTeenCheck/InTeenCheck.html)\n" +
+                             "  *Money Globals (https://www.picknmixmods.com/Sims2/Downloads/MoneyGlobals/MoneyGlobals.html)\n" +
+                             "  *Easy Inventory Check (https://hexagonal-bipyramid.tumblr.com/post/182541679666/mod-easy-inventory-check)\n" +
+                             "  *Easy Lot Check (https://fireflowersims.tumblr.com/post/624808683142053888/easy-lot-check)\n" +
+                             "  *Game Edition (https://modthesims.info/download.php?t=303431)\n" +
+                             "  *Globals Pack (https://modthesims.info/download.php?t=303432)\n" +
+                             "\nProceed?";
 
                 if (MsgBox.Show(this, msg, "Bad Gosub Tree Number", MessageBoxButtons.YesNo, MessageBoxIcon.Stop) == DialogResult.No)
                 {

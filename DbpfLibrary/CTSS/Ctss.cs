@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using System.Xml;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.CTSS
         public static readonly new TypeTypeID TYPE = (TypeTypeID)0x43545353;
         public new const string NAME = "CTSS";
 
-        public Ctss(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Ctss(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

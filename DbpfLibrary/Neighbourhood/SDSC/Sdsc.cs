@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.IO;
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
     {
         protected bool valid = false;
 
-        internal abstract void Unserialize(IoBuffer reader);
+        internal abstract void Unserialize(DbpfReader reader);
 
         protected abstract void AddXml(XmlElement parent);
 
@@ -124,7 +125,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         public SdscApartment Apartment => apartment;
 
 
-        public Sdsc(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Sdsc(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
@@ -155,7 +156,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             }
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
 
             //the formula offset = 0x0a + 2*pid

@@ -347,7 +347,7 @@ namespace Sims2Tools.DBPF.CPF
             }
         }
 
-        internal void Unserialize(IoBuffer reader)
+        internal void Unserialize(DbpfReader reader)
         {
             dt = (MetaData.DataTypes)reader.ReadUInt32();
 

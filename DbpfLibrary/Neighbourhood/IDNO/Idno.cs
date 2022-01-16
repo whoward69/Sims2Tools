@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Xml;
 
@@ -52,12 +53,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.IDNO
         public Seasons Season3 => (Seasons)seasons[2];
         public Seasons Season4 => (Seasons)seasons[3];
 
-        public Idno(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Idno(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
             int namelen = reader.ReadInt32();

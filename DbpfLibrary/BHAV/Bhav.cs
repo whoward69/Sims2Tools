@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
 using System.Xml;
@@ -27,7 +28,7 @@ namespace Sims2Tools.DBPF.BHAV
 
         private List<Instruction> items;
 
-        public Bhav(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Bhav(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             this.header = new BhavHeader();
 
@@ -38,7 +39,7 @@ namespace Sims2Tools.DBPF.BHAV
 
         public List<Instruction> Instructions => this.items;
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             this.FileName = Helper.ToString(reader.ReadBytes(0x40));
 

@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
@@ -173,7 +174,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         public String SgHash => sgHash;
         public String SgName => sgName;
 
-        public SgCpf(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public SgCpf(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgHash = SgHelper.SgHash(this);
             sgName = SgHelper.SgName(this);
@@ -194,7 +195,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         protected readonly SgResourceList sgResourceList = new SgResourceList(1);
         protected readonly List<uint> sgIdrIndexes = new List<uint>(1);
 
-        public SgRefCpf(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public SgRefCpf(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgResourceList.Add(SgHelper.SgHash(Idr.TYPE, this.GroupID, this.ResourceID, this.InstanceID));
         }

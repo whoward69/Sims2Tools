@@ -78,27 +78,27 @@ namespace DbpfViewer
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.gridResources = new System.Windows.Forms.DataGridView();
+            this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colGroup = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHash = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemSaveRawData = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemSaveAsJpeg = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSaveAsPng = new System.Windows.Forms.ToolStripMenuItem();
             this.saveXmlDialog = new System.Windows.Forms.SaveFileDialog();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.panelImage = new System.Windows.Forms.Panel();
             this.pictImage = new System.Windows.Forms.PictureBox();
             this.menuContextImage = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemCopyImage = new System.Windows.Forms.ToolStripMenuItem();
-            this.textXml = new System.Windows.Forms.TextBox();
-            this.saveRawDialog = new System.Windows.Forms.SaveFileDialog();
-            this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colGroup = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHash = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemSaveAsJpeg = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSaveAsPng = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemSaveJpeg = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSavePng = new System.Windows.Forms.ToolStripMenuItem();
+            this.textXml = new System.Windows.Forms.TextBox();
+            this.saveRawDialog = new System.Windows.Forms.SaveFileDialog();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).BeginInit();
             this.menuContextGrid.SuspendLayout();
@@ -457,6 +457,50 @@ namespace DbpfViewer
             this.gridResources.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridResources.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
             // 
+            // colType
+            // 
+            this.colType.DataPropertyName = "Type";
+            this.colType.HeaderText = "Type";
+            this.colType.MinimumWidth = 50;
+            this.colType.Name = "colType";
+            this.colType.ReadOnly = true;
+            this.colType.Width = 50;
+            // 
+            // colGroup
+            // 
+            this.colGroup.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colGroup.DataPropertyName = "Group";
+            this.colGroup.HeaderText = "Group";
+            this.colGroup.MinimumWidth = 100;
+            this.colGroup.Name = "colGroup";
+            this.colGroup.ReadOnly = true;
+            // 
+            // colInstance
+            // 
+            this.colInstance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colInstance.DataPropertyName = "Instance";
+            this.colInstance.HeaderText = "Instance";
+            this.colInstance.MinimumWidth = 65;
+            this.colInstance.Name = "colInstance";
+            this.colInstance.ReadOnly = true;
+            this.colInstance.Width = 78;
+            // 
+            // colName
+            // 
+            this.colName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colName.DataPropertyName = "Name";
+            this.colName.HeaderText = "Name";
+            this.colName.Name = "colName";
+            this.colName.ReadOnly = true;
+            // 
+            // colHash
+            // 
+            this.colHash.DataPropertyName = "Hash";
+            this.colHash.HeaderText = "Hash";
+            this.colHash.Name = "colHash";
+            this.colHash.ReadOnly = true;
+            this.colHash.Visible = false;
+            // 
             // menuContextGrid
             // 
             this.menuContextGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -475,6 +519,25 @@ namespace DbpfViewer
             this.menuItemSaveRawData.Size = new System.Drawing.Size(150, 22);
             this.menuItemSaveRawData.Text = "Save Raw Data";
             this.menuItemSaveRawData.Click += new System.EventHandler(this.OnSaveRawDataClicked);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(147, 6);
+            // 
+            // menuItemSaveAsJpeg
+            // 
+            this.menuItemSaveAsJpeg.Name = "menuItemSaveAsJpeg";
+            this.menuItemSaveAsJpeg.Size = new System.Drawing.Size(150, 22);
+            this.menuItemSaveAsJpeg.Text = "Save As JPEG";
+            this.menuItemSaveAsJpeg.Click += new System.EventHandler(this.OnSaveAsJpegClicked);
+            // 
+            // menuItemSaveAsPng
+            // 
+            this.menuItemSaveAsPng.Name = "menuItemSaveAsPng";
+            this.menuItemSaveAsPng.Size = new System.Drawing.Size(150, 22);
+            this.menuItemSaveAsPng.Text = "Save As PNG";
+            this.menuItemSaveAsPng.Click += new System.EventHandler(this.OnSaveAsPngClicked);
             // 
             // saveXmlDialog
             // 
@@ -535,7 +598,7 @@ namespace DbpfViewer
             this.menuItemSaveJpeg,
             this.menuItemSavePng});
             this.menuContextImage.Name = "menuContextImage";
-            this.menuContextImage.Size = new System.Drawing.Size(209, 98);
+            this.menuContextImage.Size = new System.Drawing.Size(209, 76);
             // 
             // menuItemCopyImage
             // 
@@ -543,84 +606,6 @@ namespace DbpfViewer
             this.menuItemCopyImage.Size = new System.Drawing.Size(208, 22);
             this.menuItemCopyImage.Text = "Copy Image To Clipboard";
             this.menuItemCopyImage.Click += new System.EventHandler(this.OnCopyImageClicked);
-            // 
-            // textXml
-            // 
-            this.textXml.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textXml.Location = new System.Drawing.Point(0, 0);
-            this.textXml.Multiline = true;
-            this.textXml.Name = "textXml";
-            this.textXml.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textXml.Size = new System.Drawing.Size(150, 46);
-            this.textXml.TabIndex = 0;
-            this.textXml.WordWrap = false;
-            // 
-            // saveRawDialog
-            // 
-            this.saveRawDialog.Title = "Save As Raw Data";
-            // 
-            // colType
-            // 
-            this.colType.DataPropertyName = "Type";
-            this.colType.HeaderText = "Type";
-            this.colType.MinimumWidth = 50;
-            this.colType.Name = "colType";
-            this.colType.ReadOnly = true;
-            this.colType.Width = 50;
-            // 
-            // colGroup
-            // 
-            this.colGroup.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colGroup.DataPropertyName = "Group";
-            this.colGroup.HeaderText = "Group";
-            this.colGroup.MinimumWidth = 100;
-            this.colGroup.Name = "colGroup";
-            this.colGroup.ReadOnly = true;
-            // 
-            // colInstance
-            // 
-            this.colInstance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colInstance.DataPropertyName = "Instance";
-            this.colInstance.HeaderText = "Instance";
-            this.colInstance.MinimumWidth = 65;
-            this.colInstance.Name = "colInstance";
-            this.colInstance.ReadOnly = true;
-            this.colInstance.Width = 78;
-            // 
-            // colName
-            // 
-            this.colName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colName.DataPropertyName = "Name";
-            this.colName.HeaderText = "Name";
-            this.colName.Name = "colName";
-            this.colName.ReadOnly = true;
-            // 
-            // colHash
-            // 
-            this.colHash.DataPropertyName = "Hash";
-            this.colHash.HeaderText = "Hash";
-            this.colHash.Name = "colHash";
-            this.colHash.ReadOnly = true;
-            this.colHash.Visible = false;
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(147, 6);
-            // 
-            // menuItemSaveAsJpeg
-            // 
-            this.menuItemSaveAsJpeg.Name = "menuItemSaveAsJpeg";
-            this.menuItemSaveAsJpeg.Size = new System.Drawing.Size(150, 22);
-            this.menuItemSaveAsJpeg.Text = "Save As JPEG";
-            this.menuItemSaveAsJpeg.Click += new System.EventHandler(this.OnSaveAsJpegClicked);
-            // 
-            // menuItemSaveAsPng
-            // 
-            this.menuItemSaveAsPng.Name = "menuItemSaveAsPng";
-            this.menuItemSaveAsPng.Size = new System.Drawing.Size(150, 22);
-            this.menuItemSaveAsPng.Text = "Save As PNG";
-            this.menuItemSaveAsPng.Click += new System.EventHandler(this.OnSaveAsPngClicked);
             // 
             // toolStripSeparator4
             // 
@@ -640,6 +625,21 @@ namespace DbpfViewer
             this.menuItemSavePng.Size = new System.Drawing.Size(208, 22);
             this.menuItemSavePng.Text = "Save As PNG";
             this.menuItemSavePng.Click += new System.EventHandler(this.OnSavePngClicked);
+            // 
+            // textXml
+            // 
+            this.textXml.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textXml.Location = new System.Drawing.Point(0, 0);
+            this.textXml.Multiline = true;
+            this.textXml.Name = "textXml";
+            this.textXml.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textXml.Size = new System.Drawing.Size(150, 46);
+            this.textXml.TabIndex = 0;
+            this.textXml.WordWrap = false;
+            // 
+            // saveRawDialog
+            // 
+            this.saveRawDialog.Title = "Save As Raw Data";
             // 
             // DbpfViewerForm
             // 

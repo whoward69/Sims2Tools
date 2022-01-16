@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LGHT;
 using System;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.LAMB
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xC9C81B9B; // SimPE has this as 0xC9C81BA3 (swapped with the LDIR value)
         public const String NAME = "LAMB";
 
-        public Lamb(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Lamb(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
     }

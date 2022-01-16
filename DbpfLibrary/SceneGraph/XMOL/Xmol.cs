@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.XMOL
@@ -27,7 +28,7 @@ namespace Sims2Tools.DBPF.SceneGraph.XMOL
             get => Name;
         }
 
-        public Xmol(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Xmol(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgIdrIndexes.AddRange(CresIndexes);
             sgIdrIndexes.AddRange(ShpeIndexes);

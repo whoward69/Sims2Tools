@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Xml;
@@ -23,7 +24,7 @@ namespace Sims2Tools.DBPF.NREF
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4E524546;
         public const String NAME = "NREF";
 
-        public Nref(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Nref(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             this.FileName = Helper.ToString(reader.ReadBytes((int)entry.FileSize));
         }

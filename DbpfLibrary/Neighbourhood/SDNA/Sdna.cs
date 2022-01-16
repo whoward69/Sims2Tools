@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SDNA
@@ -33,7 +34,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDNA
             get { return recessive; }
         }
 
-        public Sdna(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Sdna(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             dominant = new SdnaGene(this, 0);
             recessive = new SdnaGene(this, 0x10000000);

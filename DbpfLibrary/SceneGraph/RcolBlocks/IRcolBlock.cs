@@ -16,7 +16,7 @@ namespace Sims2Tools.DBPF.SceneGraph
 {
     public interface IRcolBlock : System.IDisposable
     {
-        void Unserialize(IoBuffer reader);
+        void Unserialize(DbpfReader reader);
 
         IRcolBlock Create(TypeBlockID id);
 

@@ -42,13 +42,13 @@ namespace HcduPlus
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HcduPlusKnownDialog));
             this.gridKnownConflicts = new System.Windows.Forms.DataGridView();
-            this.colLoadsEarlier = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colLoadsLater = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.menuConflictGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuItemRemove = new System.Windows.Forms.ToolStripMenuItem();
             this.btnKnownCancel = new System.Windows.Forms.Button();
             this.btnKnownOk = new System.Windows.Forms.Button();
             this.btnReset = new System.Windows.Forms.Button();
-            this.menuConflictGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.menuItemRemove = new System.Windows.Forms.ToolStripMenuItem();
+            this.colLoadsEarlier = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colLoadsLater = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.gridKnownConflicts)).BeginInit();
             this.menuConflictGrid.SuspendLayout();
             this.SuspendLayout();
@@ -74,20 +74,21 @@ namespace HcduPlus
             this.gridKnownConflicts.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridKnownConflicts.RowValidating += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.OnRowValidating);
             // 
-            // colLoadsEarlier
+            // menuConflictGrid
             // 
-            this.colLoadsEarlier.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colLoadsEarlier.DataPropertyName = "Loads Earlier";
-            this.colLoadsEarlier.HeaderText = "Loads Earlier";
-            this.colLoadsEarlier.Name = "colLoadsEarlier";
-            this.colLoadsEarlier.Width = 105;
+            this.menuConflictGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemRemove});
+            this.menuConflictGrid.Name = "menuConflictGrid";
+            this.menuConflictGrid.Size = new System.Drawing.Size(118, 26);
+            this.menuConflictGrid.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnConflictMenuClosing);
+            this.menuConflictGrid.Opening += new System.ComponentModel.CancelEventHandler(this.OnConflictMenuOpening);
             // 
-            // colLoadsLater
+            // menuItemRemove
             // 
-            this.colLoadsLater.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colLoadsLater.DataPropertyName = "Loads Later";
-            this.colLoadsLater.HeaderText = "Loads Later";
-            this.colLoadsLater.Name = "colLoadsLater";
+            this.menuItemRemove.Name = "menuItemRemove";
+            this.menuItemRemove.Size = new System.Drawing.Size(117, 22);
+            this.menuItemRemove.Text = "Remove";
+            this.menuItemRemove.Click += new System.EventHandler(this.OnRemoveKnownConflictClicked);
             // 
             // btnKnownCancel
             // 
@@ -127,21 +128,20 @@ namespace HcduPlus
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.OnResetClicked);
             // 
-            // menuConflictGrid
+            // colLoadsEarlier
             // 
-            this.menuConflictGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemRemove});
-            this.menuConflictGrid.Name = "menuConflictGrid";
-            this.menuConflictGrid.Size = new System.Drawing.Size(181, 48);
-            this.menuConflictGrid.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnConflictMenuClosing);
-            this.menuConflictGrid.Opening += new System.ComponentModel.CancelEventHandler(this.OnConflictMenuOpening);
+            this.colLoadsEarlier.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colLoadsEarlier.DataPropertyName = "Loads Earlier";
+            this.colLoadsEarlier.HeaderText = "Loads Earlier";
+            this.colLoadsEarlier.Name = "colLoadsEarlier";
+            this.colLoadsEarlier.Width = 105;
             // 
-            // menuItemRemove
+            // colLoadsLater
             // 
-            this.menuItemRemove.Name = "menuItemRemove";
-            this.menuItemRemove.Size = new System.Drawing.Size(180, 22);
-            this.menuItemRemove.Text = "Remove";
-            this.menuItemRemove.Click += new System.EventHandler(this.OnRemoveKnownConflictClicked);
+            this.colLoadsLater.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colLoadsLater.DataPropertyName = "Loads Later";
+            this.colLoadsLater.HeaderText = "Loads Later";
+            this.colLoadsLater.Name = "colLoadsLater";
             // 
             // HcduPlusKnownDialog
             // 
@@ -169,10 +169,10 @@ namespace HcduPlus
         private System.Windows.Forms.DataGridView gridKnownConflicts;
         private System.Windows.Forms.Button btnKnownCancel;
         private System.Windows.Forms.Button btnKnownOk;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsEarlier;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsLater;
         private System.Windows.Forms.Button btnReset;
         private System.Windows.Forms.ContextMenuStrip menuConflictGrid;
         private System.Windows.Forms.ToolStripMenuItem menuItemRemove;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsEarlier;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsLater;
     }
 }

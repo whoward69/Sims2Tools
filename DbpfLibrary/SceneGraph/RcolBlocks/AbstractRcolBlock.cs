@@ -51,7 +51,7 @@ namespace Sims2Tools.DBPF.SceneGraph
             version = 0;
         }
 
-        public abstract void Unserialize(IoBuffer reader);
+        public abstract void Unserialize(DbpfReader reader);
 
         public IRcolBlock Create()
         {

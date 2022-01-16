@@ -42,7 +42,7 @@ namespace Sims2Tools.DBPF.TTAB
             get => this.items[index];
         }
 
-        public TtabItemMotiveTable(uint format, int[] counts, TtabItemMotiveTableType type, IoBuffer reader)
+        public TtabItemMotiveTable(uint format, int[] counts, TtabItemMotiveTableType type, DbpfReader reader)
         {
             this.format = format;
 
@@ -56,7 +56,7 @@ namespace Sims2Tools.DBPF.TTAB
             if (reader != null) Unserialize(reader);
         }
 
-        private void Unserialize(IoBuffer reader)
+        private void Unserialize(DbpfReader reader)
         {
             int length = this.counts == null ? reader.ReadInt32() : this.counts.Length;
             if (this.items.Capacity < length)
@@ -118,7 +118,7 @@ namespace Sims2Tools.DBPF.TTAB
             get => this.items[index];
         }
 
-        public TtabItemMotiveGroup(uint format, int count, TtabItemMotiveTableType type, IoBuffer reader)
+        public TtabItemMotiveGroup(uint format, int count, TtabItemMotiveTableType type, DbpfReader reader)
         {
             this.format = format;
 
@@ -140,7 +140,7 @@ namespace Sims2Tools.DBPF.TTAB
             if (reader != null) this.Unserialize(reader);
         }
 
-        private void Unserialize(IoBuffer reader)
+        private void Unserialize(DbpfReader reader)
         {
             int num = format < 84U ? this.count : reader.ReadInt32();
 
@@ -202,12 +202,12 @@ namespace Sims2Tools.DBPF.TTAB
 
     public abstract class TtabItemMotiveItem
     {
-        public TtabItemMotiveItem(IoBuffer reader)
+        public TtabItemMotiveItem(DbpfReader reader)
         {
             if (reader != null) this.Unserialize(reader);
         }
 
-        protected abstract void Unserialize(IoBuffer reader);
+        protected abstract void Unserialize(DbpfReader reader);
 
         public abstract void AddXml(XmlElement parent, int index);
     }
@@ -236,11 +236,11 @@ namespace Sims2Tools.DBPF.TTAB
             get => this.items[index];
         }
 
-        public TtabItemSingleMotiveItem(IoBuffer reader) : base(reader)
+        public TtabItemSingleMotiveItem(DbpfReader reader) : base(reader)
         {
         }
 
-        protected override void Unserialize(IoBuffer reader)
+        protected override void Unserialize(DbpfReader reader)
         {
             for (int index = 0; index < this.items.Length; ++index)
                 this.items[index] = reader.ReadInt16();
@@ -267,11 +267,11 @@ namespace Sims2Tools.DBPF.TTAB
             get => this.items[index];
         }
 
-        public TtabItemAnimalMotiveItem(IoBuffer reader) : base(reader)
+        public TtabItemAnimalMotiveItem(DbpfReader reader) : base(reader)
         {
         }
 
-        protected override void Unserialize(IoBuffer reader)
+        protected override void Unserialize(DbpfReader reader)
         {
             int length = reader.ReadInt32();
             this.items = new TtabItemAnimalMotiveItem.TtabItemSingleMotiveItemArrayList(new TtabItemSingleMotiveItem[length]);

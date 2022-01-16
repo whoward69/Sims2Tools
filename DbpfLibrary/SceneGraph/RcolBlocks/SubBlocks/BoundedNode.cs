@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             BlockID = TypeBlockID.NULL;
         }
 
-        public override void Unserialize(IoBuffer reader)
+        public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
         }

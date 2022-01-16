@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.XTOL
@@ -27,7 +28,7 @@ namespace Sims2Tools.DBPF.SceneGraph.XTOL
             get => Name;
         }
 
-        public Xtol(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Xtol(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgIdrIndexes.AddRange(TxmtIndexes);
         }

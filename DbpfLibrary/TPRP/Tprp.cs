@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
 using System.Xml;
@@ -30,7 +31,7 @@ namespace Sims2Tools.DBPF.TPRP
         private bool duff;
         private readonly List<TprpItem> items = new List<TprpItem>();
 
-        public Tprp(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Tprp(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
@@ -39,7 +40,7 @@ namespace Sims2Tools.DBPF.TPRP
 
         public int LocalCount => !this.duff ? this.localCount : 0;
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             this.duff = false;
 

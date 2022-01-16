@@ -69,7 +69,7 @@ namespace Sims2Tools.DBPF
         public String Hex8String() => Helper.Hex8String(id);
         public String IntString() => Helper.IntString(id);
 
-        public int AsInt() => (int)id;
+        public uint AsUInt() => id;
     }
 
     public readonly struct TypeGroupID : IComparable<TypeGroupID>
@@ -93,7 +93,7 @@ namespace Sims2Tools.DBPF
         public String Hex8String() => Helper.Hex8String(id);
         public String IntString() => Helper.IntString(id);
 
-        public int AsInt() => (int)id;
+        public uint AsUInt() => id;
     }
 
     public readonly struct TypeInstanceID : IComparable<TypeInstanceID>
@@ -117,7 +117,7 @@ namespace Sims2Tools.DBPF
         public String Hex8String() => Helper.Hex8String(id);
         public String IntString() => Helper.IntString(id);
 
-        public int AsInt() => (int)id;
+        public uint AsUInt() => id;
     }
 
     public readonly struct TypeResourceID : IComparable<TypeResourceID>
@@ -140,6 +140,8 @@ namespace Sims2Tools.DBPF
         public String ToShortString() => Helper.Hex4PrefixString(id);
         public String Hex8String() => Helper.Hex8String(id);
         public String IntString() => Helper.IntString(id);
+
+        public uint AsUInt() => id;
     }
 
     /*

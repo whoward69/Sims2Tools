@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Xml;
@@ -141,12 +142,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.SREL
             else return 0;
         }
 
-        public Srel(DBPFEntry entry, IoBuffer reader) : base(entry)
+        public Srel(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        protected void Unserialize(IoBuffer reader)
+        protected void Unserialize(DbpfReader reader)
         {
             if (reader.Length <= 0) return;
 

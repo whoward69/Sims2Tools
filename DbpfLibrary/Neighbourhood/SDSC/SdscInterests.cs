@@ -163,7 +163,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             set { man = (short)Math.Max(-1000, Math.Min(1000, (int)value)); }
         }
 
-        internal override void Unserialize(IoBuffer reader)
+        internal override void Unserialize(DbpfReader reader)
         {
             throw new NotImplementedException();
         }

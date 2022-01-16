@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xAC4F8687;
         public const String NAME = "GMDC";
 
-        public Gmdc(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Gmdc(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

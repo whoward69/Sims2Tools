@@ -79,14 +79,14 @@ namespace Sims2Tools.DBPF.Neighbourhood.SWAF
             if (!Enum.IsDefined(type.GetType(), type)) throw new ArgumentOutOfRangeException("type");
             this.type = type;
         }
-        internal SwafItem(SWAFItemType type, IoBuffer reader)
+        internal SwafItem(SWAFItemType type, DbpfReader reader)
         {
             if (!Enum.IsDefined(type.GetType(), type)) throw new ArgumentOutOfRangeException("type");
             this.type = type;
             Unserialize(reader);
         }
 
-        private void Unserialize(IoBuffer reader)
+        private void Unserialize(DbpfReader reader)
         {
             SetVersion(reader.ReadUInt32());
             simId = reader.ReadUInt16();

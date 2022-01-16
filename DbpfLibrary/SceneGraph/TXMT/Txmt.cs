@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
@@ -25,7 +26,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x49596978;
         public const String NAME = "TXMT";
 
-        public Txmt(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Txmt(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
 

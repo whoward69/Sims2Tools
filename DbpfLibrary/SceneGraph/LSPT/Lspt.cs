@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LGHT;
 using System;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.LSPT
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xC9C81BAD;
         public const String NAME = "LSPT";
 
-        public Lspt(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Lspt(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
     }

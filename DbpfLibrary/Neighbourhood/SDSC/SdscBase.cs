@@ -259,7 +259,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             set { lifelinescore = (ushort)(Math.Min(short.MaxValue, value / 10)); }
         }
 
-        internal override void Unserialize(IoBuffer reader)
+        internal override void Unserialize(DbpfReader reader)
         {
             throw new NotImplementedException();
         }

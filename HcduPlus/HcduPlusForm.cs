@@ -20,7 +20,9 @@ using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
+using Sims2Tools.DBPF.SLOT;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
@@ -475,6 +477,7 @@ namespace HcduPlus
             menuItemGzps.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Gzps.NAME, 1) != 0); OnGzpsClicked(menuItemGzps, null);
             menuItemObjd.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objd.NAME, 1) != 0); OnObjdClicked(menuItemObjd, null);
             menuItemObjf.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objf.NAME, 1) != 0); OnObjfClicked(menuItemObjf, null);
+            menuItemSlot.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Slot.NAME, 1) != 0); OnSlotClicked(menuItemSlot, null);
             menuItemStr.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Str.NAME, 1) != 0); OnStrClicked(menuItemStr, null);
             menuItemTprp.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Tprp.NAME, 0) != 0); OnTprpClicked(menuItemTprp, null);
             menuItemTrcn.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Trcn.NAME, 0) != 0); OnTrcnClicked(menuItemTrcn, null);
@@ -577,6 +580,7 @@ namespace HcduPlus
             if (mouseLocation == null || mouseLocation.RowIndex == -1)
             {
                 e.Cancel = true;
+                return;
             }
 
             if (mouseLocation.RowIndex != gridByPackage.SelectedRows[0].Index)
@@ -663,7 +667,9 @@ namespace HcduPlus
             {
                 StreamWriter writer = new StreamWriter(saveFileDialog.OpenFile());
 
-                writer.Write($"Mods conflict report for '{textScanPath.Text}'");
+                String scanPath = textScanPath.Text;
+                if (String.IsNullOrWhiteSpace(scanPath)) scanPath = textModsPath.Text;
+                writer.Write($"Mods conflict report for '{scanPath}'");
 
                 DateTime now = DateTime.Now;
                 writer.WriteLine($" at {now.ToShortDateString()} {now.ToShortTimeString()}");
@@ -759,6 +765,18 @@ namespace HcduPlus
                 enabledResources.Remove(Objf.TYPE);
 
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Objf.NAME, enabled ? 1 : 0);
+        }
+
+        private void OnSlotClicked(object sender, EventArgs e)
+        {
+            bool enabled = ((ToolStripMenuItem)sender).Checked;
+
+            if (enabled)
+                enabledResources.Add(Slot.TYPE);
+            else
+                enabledResources.Remove(Slot.TYPE);
+
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Slot.NAME, enabled ? 1 : 0);
         }
 
         private void OnStrClicked(object sender, EventArgs e)

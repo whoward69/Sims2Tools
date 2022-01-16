@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
 
@@ -22,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.CINE
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4D51F042;
         public const String NAME = "CINE";
 
-        public Cine(DBPFEntry entry, IoBuffer reader) : base(entry, reader)
+        public Cine(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             throw new NotImplementedException();
         }
