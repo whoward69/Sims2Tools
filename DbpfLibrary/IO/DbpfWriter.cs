@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -72,6 +72,23 @@ namespace Sims2Tools.DBPF.IO
             m_writer.Write(value);
         }
 
+        public void WriteBytes(byte[] value, int length)
+        {
+            if (value.Length >= length)
+            {
+                m_writer.Write(value, 0, length);
+            }
+            else
+            {
+                m_writer.Write(value);
+
+                for (int i = value.Length; i < length; ++i)
+                {
+                    m_writer.Write((byte)0x00);
+                }
+            }
+        }
+
         public void WriteMagic(char[] value)
         {
             m_writer.Write(value);
@@ -101,6 +118,12 @@ namespace Sims2Tools.DBPF.IO
         public void WriteGroupId(TypeGroupID groupId) => WriteUInt32(groupId.AsUInt());
         public void WriteInstanceId(TypeInstanceID instanceId) => WriteUInt32(instanceId.AsUInt());
         public void WriteResourceId(TypeResourceID resourceId) => WriteUInt32(resourceId.AsUInt());
+
+        public void WriteString(string value)
+        {
+            // Do NOT use m_writer.Write(value); as that writes a length prefixed string
+            m_writer.Write(value.ToCharArray());
+        }
 
         #endregion
 

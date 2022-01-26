@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -10,6 +10,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using System;
 using System.Xml;
@@ -21,7 +22,7 @@ namespace Sims2Tools.DBPF
         protected bool isDirty = false;
 
         public virtual bool IsDirty => isDirty;
-        public void SetClean() => isDirty = false;
+        public virtual void SetClean() => isDirty = false;
 
         protected DBPFResource(DBPFEntry entry) : base(entry, "")
         {
@@ -29,7 +30,7 @@ namespace Sims2Tools.DBPF
 
         public virtual uint FileSize => throw new NotImplementedException();
 
-        public virtual byte[] Serialize()
+        public virtual void Serialize(DbpfWriter writer)
         {
             throw new NotImplementedException();
         }

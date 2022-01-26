@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -38,9 +38,13 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
             get { return this.GetSaveItem("objectidx").UIntegerValue; }
         }
 
+        public uint StringSetIdx
+        {
+            get { return this.GetSaveItem("stringsetidx").UIntegerValue; }
+        }
+
         /* Other known item names for use with this.GetSaveItem(itemName)
          * iconidx (uint) - should reference ???? by TGIR
-         * stringsetidx (uint) - should reference a STR# by TGIR
          * binidx (uint) - should reference a COLL by TGIR
          * creatorid (string)
          * sortindex (int)

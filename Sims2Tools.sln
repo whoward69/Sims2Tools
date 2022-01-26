@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogWatcher", "LogWatcher\Lo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectRelocator", "ObjectRelocator\ObjectRelocator.csproj", "{592AFB75-61A8-40FC-9DED-59DF26F55542}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BsokEditor", "BsokEditor\BsokEditor.csproj", "{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,14 @@ Global
 		{592AFB75-61A8-40FC-9DED-59DF26F55542}.Release|Any CPU.Build.0 = Release|Any CPU
 		{592AFB75-61A8-40FC-9DED-59DF26F55542}.Release|x64.ActiveCfg = Release|Any CPU
 		{592AFB75-61A8-40FC-9DED-59DF26F55542}.Release|x64.Build.0 = Release|Any CPU
+		{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}.Debug|x64.Build.0 = Debug|Any CPU
+		{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}.Release|x64.ActiveCfg = Release|Any CPU
+		{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

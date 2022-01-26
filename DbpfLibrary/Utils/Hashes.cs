@@ -1,7 +1,7 @@
 /*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -12,15 +12,16 @@
 
 using Classless.Hasher;
 using System;
+using System.Text;
 
 namespace Sims2Tools.DBPF.Utils
 {
     public class Hashes
     {
-        static readonly CRC crc24 = new CRC(CRCParameters.GetParameters(CRCStandard.CRC24));
-        static readonly CRC crc32 = new CRC(new Classless.Hasher.CRCParameters(32, 0x04C11DB7, 0xffffffff, 0, false));
+        static private readonly CRC crc24 = new CRC(CRCParameters.GetParameters(CRCStandard.CRC24));
+        static private readonly CRC crc32 = new CRC(new Classless.Hasher.CRCParameters(32, 0x04C11DB7, 0xffffffff, 0, false));
 
-        public static ulong ToLong(byte[] input)
+        public static uint ToUInt(byte[] input)
         {
             ulong ret = 0;
             foreach (byte b in input)
@@ -29,7 +30,7 @@ namespace Sims2Tools.DBPF.Utils
                 ret += b;
             }
 
-            return ret;
+            return (uint)ret;
         }
 
         public static TypeGroupID GroupHash(string name)
@@ -37,7 +38,7 @@ namespace Sims2Tools.DBPF.Utils
             name = name.Trim().ToLower();
             byte[] rt = crc24.ComputeHash(Helper.ToBytes(name, 0));
 
-            return (TypeGroupID)(ToLong(rt) | 0x7F000000);
+            return (TypeGroupID)(ToUInt(rt) | 0x7F000000);
         }
 
         public static TypeInstanceID InstanceHash(string filename)
@@ -45,7 +46,7 @@ namespace Sims2Tools.DBPF.Utils
             filename = filename.Trim().ToLower();
             byte[] rt = crc24.ComputeHash(Helper.ToBytes(filename, 0));
 
-            return (TypeInstanceID)(ToLong(rt) | 0xff000000);
+            return (TypeInstanceID)(ToUInt(rt) | 0xff000000);
         }
 
         public static TypeResourceID SubTypeHash(string filename)
@@ -53,7 +54,17 @@ namespace Sims2Tools.DBPF.Utils
             filename = filename.Trim().ToLower();
             byte[] rt = crc32.ComputeHash(Helper.ToBytes(filename, 0));
 
-            return (TypeResourceID)ToLong(rt);
+            return (TypeResourceID)ToUInt(rt);
+        }
+
+        public static uint ThumbnailHash(TypeGroupID groupId, string cresname)
+        {
+            return ToUInt(crc32.ComputeHash(Encoding.ASCII.GetBytes($"{groupId.AsUInt()}{cresname}".Trim().ToLower())));
+        }
+
+        public static uint ThumbnailHash(string texturename)
+        {
+            return ToUInt(crc32.ComputeHash(Encoding.ASCII.GetBytes(texturename.Trim().ToLower())));
         }
 
         public static string StripHashFromName(string filename)

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("UtilsLibrary")]
-[assembly: AssemblyCopyright("Copyright © 2020-2021")]
+[assembly: AssemblyCopyright("Copyright © 2020-2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

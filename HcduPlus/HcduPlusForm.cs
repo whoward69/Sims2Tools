@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -176,7 +176,7 @@ namespace HcduPlus
                                                 (typeId == Str.TYPE && instanceId == (TypeInstanceID)0x0000007B && menuItemHomeCrafterConflicts.Checked) ||
                                                 // Ignore Store Version string conflicts?
                                                 (typeId == Str.TYPE && instanceId == (TypeInstanceID)0xFF648785 && menuItemStoreVersionConflicts.Checked) ||
-                                                //
+                                                // Ignore Castaways string conflicts?
                                                 (typeId == Str.TYPE && instanceId == (TypeInstanceID)0x00000001 && groupId == (TypeGroupID)0x7FC078F3 && menuItemCastawaysConflicts.Checked)
                                                 ))
                                             {

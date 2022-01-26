@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from http://csharphelper.com/blog/2018/06/build-an-mru-list-in-c/
  *

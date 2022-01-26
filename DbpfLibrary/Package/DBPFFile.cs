@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -16,6 +16,7 @@ using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.JPG;
+using Sims2Tools.DBPF.Images.THUB;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Neighbourhood.BNFO;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
@@ -58,6 +59,10 @@ using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.VERS;
+using Sims2Tools.DBPF.XFLR;
+using Sims2Tools.DBPF.XFNC;
+using Sims2Tools.DBPF.XOBJ;
+using Sims2Tools.DBPF.XROF;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -76,6 +81,8 @@ namespace Sims2Tools.DBPF.Package
         private readonly DBPFResourceCache resourceCache = new DBPFResourceCache();
 
         private DbpfReader m_Reader;
+
+        public string PackagePath => packagePath;
 
         public uint ResourceCount => header.ResourceIndexCount;
 
@@ -117,7 +124,7 @@ namespace Sims2Tools.DBPF.Package
                 {
                     if (resourceCache.IsCached(entry))
                     {
-                        writer.WriteBytes(resourceCache.GetResourceByEntry(entry).Serialize());
+                        resourceCache.GetResourceByEntry(entry).Serialize(writer);
                     }
                     else
                     {
@@ -223,6 +230,16 @@ namespace Sims2Tools.DBPF.Package
             return Helper.ToString(this.GetDbpfReader(entry).ReadBytes(Math.Min((int)entry.FileSize, 0x40)));
         }
 
+        public DBPFResource GetResourceByTGIR(int tgir)
+        {
+            return GetResourceByEntry(GetEntryByTGIR(tgir));
+        }
+
+        public DBPFResource GetResourceByKey(DBPFKey key)
+        {
+            return GetResourceByEntry(GetEntryByKey(key));
+        }
+
         public DBPFResource GetResourceByEntry(DBPFEntry entry)
         {
             if (entry == null) return null;
@@ -290,6 +307,22 @@ namespace Sims2Tools.DBPF.Package
             {
                 res = new Vers(entry, this.GetDbpfReader(entry));
             }
+            else if (entry.TypeID == Xflr.TYPE)
+            {
+                res = new Xflr(entry, this.GetDbpfReader(entry));
+            }
+            else if (entry.TypeID == Xfnc.TYPE)
+            {
+                res = new Xfnc(entry, this.GetDbpfReader(entry));
+            }
+            else if (entry.TypeID == Xobj.TYPE)
+            {
+                res = new Xobj(entry, this.GetDbpfReader(entry));
+            }
+            else if (entry.TypeID == Xrof.TYPE)
+            {
+                res = new Xrof(entry, this.GetDbpfReader(entry));
+            }
             //
             // Image resources
             //
@@ -300,6 +333,24 @@ namespace Sims2Tools.DBPF.Package
             else if (entry.TypeID == Jpg.TYPE)
             {
                 res = new Jpg(entry, this.GetDbpfReader(entry));
+            }
+            else if (entry.TypeID == Thub.TYPE)
+            {
+                res = new Thub(entry, this.GetDbpfReader(entry));
+            }
+            else if (entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Awning] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Chimney] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Dormer] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceArch] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceOrHalfwall] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Floor] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FoundationOrPool] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.ModularStair] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Roof] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Terrain] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Wall])
+            {
+                res = new Thub(entry, this.GetDbpfReader(entry));
             }
             //
             // Neighbourhood resources
@@ -438,6 +489,7 @@ namespace Sims2Tools.DBPF.Package
 
         public void Dispose()
         {
+            Close();
             m_Reader?.Dispose();
         }
     }

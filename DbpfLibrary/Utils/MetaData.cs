@@ -1,7 +1,7 @@
 /*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -26,6 +26,7 @@ namespace Sims2Tools.DBPF.Data
         public enum Languages : byte
         {
             Unknown = 0x00,
+            Default = 0x01,
             English = 0x01,
             English_uk = 0x02,
             French = 0x03,

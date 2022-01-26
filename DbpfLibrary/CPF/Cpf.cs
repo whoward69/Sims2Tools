@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -32,14 +32,39 @@ namespace Sims2Tools.DBPF.CPF
             get => items;
         }
 
+        public override bool IsDirty
+        {
+            get
+            {
+                if (isDirty) return true;
+
+                foreach (CpfItem item in items)
+                {
+                    if (item.IsDirty) return true;
+                }
+
+                return false;
+            }
+        }
+
+        public override void SetClean()
+        {
+            isDirty = false;
+
+            foreach (CpfItem item in items)
+            {
+                item.SetClean();
+            }
+        }
+
         public Cpf(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             items = new CpfItem[0];
 
-            Unserialize(reader);
+            Unserialize(reader, (int)entry.DataSize);
         }
 
-        internal void Unserialize(DbpfReader reader)
+        internal void Unserialize(DbpfReader reader, int len)
         {
             long pos = reader.Position;
 
@@ -59,97 +84,122 @@ namespace Sims2Tools.DBPF.CPF
             {
                 reader.Seek(SeekOrigin.Begin, pos);
 
-                UnserializeXml(reader);
+                UnserializeXml(reader, len);
             }
         }
 
-        protected void UnserializeXml(DbpfReader reader)
+        protected void UnserializeXml(DbpfReader reader, int len)
         {
-            StreamReader sr = new StreamReader(reader.MyStream);
-            StringReader strr = new StringReader(sr.ReadToEnd().Replace("& ", "&amp; "));
-
-            XmlDocument xmlfile = new XmlDocument();
-            xmlfile.Load(strr);
-
-            XmlNodeList XMLData = xmlfile.GetElementsByTagName("cGZPropertySetString");
-            List<CpfItem> list = new List<CpfItem>();
-
-            for (int i = 0; i < XMLData.Count; i++)
+            using (MemoryStream ms = new MemoryStream(reader.ReadBytes(len)))
             {
-                XmlNode node = XMLData.Item(i);
-
-                foreach (XmlNode subnode in node)
+                using (StreamReader sr = new StreamReader(ms))
                 {
-                    CpfItem item = new CpfItem();
+                    using (StringReader strr = new StringReader(sr.ReadToEnd().Replace("& ", "&amp; ")))
+                    {
+                        XmlDocument xmlfile = new XmlDocument();
+                        xmlfile.Load(strr);
 
-                    if (subnode.LocalName.Trim().ToLower() == "anyuint32")
-                    {
-                        item.Datatype = Data.MetaData.DataTypes.dtUInteger;
-                        if (subnode.InnerText.IndexOf("-") != -1) item.UIntegerValue = (uint)Convert.ToInt32(subnode.InnerText);
-                        else if (subnode.InnerText.IndexOf("0x") == -1) item.UIntegerValue = Convert.ToUInt32(subnode.InnerText);
-                        else item.UIntegerValue = Convert.ToUInt32(subnode.InnerText, 16);
-                    }
-                    else if ((subnode.LocalName.Trim().ToLower() == "anyint32") || (subnode.LocalName.Trim().ToLower() == "anysint32"))
-                    {
-                        item.Datatype = Data.MetaData.DataTypes.dtInteger;
-                        if (subnode.InnerText.IndexOf("0x") == -1) item.IntegerValue = Convert.ToInt32(subnode.InnerText);
-                        else item.IntegerValue = Convert.ToInt32(subnode.InnerText, 16);
-                    }
-                    else if (subnode.LocalName.Trim().ToLower() == "anystring")
-                    {
-                        item.Datatype = Data.MetaData.DataTypes.dtString;
-                        item.StringValue = subnode.InnerText;
-                    }
-                    else if (subnode.LocalName.Trim().ToLower() == "anyfloat32")
-                    {
-                        item.Datatype = Data.MetaData.DataTypes.dtSingle;
-                        item.SingleValue = Convert.ToSingle(subnode.InnerText, System.Globalization.CultureInfo.InvariantCulture);
-                    }
-                    else if (subnode.LocalName.Trim().ToLower() == "anyboolean")
-                    {
-                        item.Datatype = Data.MetaData.DataTypes.dtBoolean;
-                        if (subnode.InnerText.Trim().ToLower() == "true") item.BooleanValue = true;
-                        else if (subnode.InnerText.Trim().ToLower() == "false") item.BooleanValue = false;
-                        else item.BooleanValue = (Convert.ToInt32(subnode.InnerText) != 0);
-                    }
-                    else if (subnode.LocalName.Trim().ToLower() == "#comment")
-                    {
-                        continue;
+                        XmlNodeList XMLData = xmlfile.GetElementsByTagName("cGZPropertySetString");
+                        List<CpfItem> list = new List<CpfItem>();
+
+                        for (int i = 0; i < XMLData.Count; i++)
+                        {
+                            XmlNode node = XMLData.Item(i);
+
+                            foreach (XmlNode subnode in node)
+                            {
+                                try
+                                {
+                                    CpfItem item = new CpfItem(subnode.Attributes["key"].Value);
+
+                                    if (subnode.LocalName.Trim().ToLower() == "anyuint32")
+                                    {
+                                        item.DataType = Data.MetaData.DataTypes.dtUInteger;
+                                        if (subnode.InnerText.IndexOf("-") != -1) item.UIntegerValue = (uint)Convert.ToInt32(subnode.InnerText);
+                                        else if (subnode.InnerText.IndexOf("0x") == -1) item.UIntegerValue = Convert.ToUInt32(subnode.InnerText);
+                                        else item.UIntegerValue = Convert.ToUInt32(subnode.InnerText, 16);
+                                    }
+                                    else if ((subnode.LocalName.Trim().ToLower() == "anyint32") || (subnode.LocalName.Trim().ToLower() == "anysint32"))
+                                    {
+                                        item.DataType = Data.MetaData.DataTypes.dtInteger;
+                                        if (subnode.InnerText.IndexOf("0x") == -1) item.IntegerValue = Convert.ToInt32(subnode.InnerText);
+                                        else item.IntegerValue = Convert.ToInt32(subnode.InnerText, 16);
+                                    }
+                                    else if (subnode.LocalName.Trim().ToLower() == "anystring")
+                                    {
+                                        item.DataType = Data.MetaData.DataTypes.dtString;
+                                        item.StringValue = subnode.InnerText;
+                                    }
+                                    else if (subnode.LocalName.Trim().ToLower() == "anyfloat32")
+                                    {
+                                        item.DataType = Data.MetaData.DataTypes.dtSingle;
+                                        item.SingleValue = Convert.ToSingle(subnode.InnerText, System.Globalization.CultureInfo.InvariantCulture);
+                                    }
+                                    else if (subnode.LocalName.Trim().ToLower() == "anyboolean")
+                                    {
+                                        item.DataType = Data.MetaData.DataTypes.dtBoolean;
+                                        if (subnode.InnerText.Trim().ToLower() == "true") item.BooleanValue = true;
+                                        else if (subnode.InnerText.Trim().ToLower() == "false") item.BooleanValue = false;
+                                        else item.BooleanValue = (Convert.ToInt32(subnode.InnerText) != 0);
+                                    }
+                                    else if (subnode.LocalName.Trim().ToLower() == "#comment")
+                                    {
+                                        continue;
+                                    }
+
+                                    item.SetClean();
+                                    list.Add(item);
+                                }
+                                catch { }
+                            }
+                        }
+
+                        items = new CpfItem[list.Count];
+                        list.CopyTo(items);
+
+                        strr.Close();
                     }
 
-                    try
-                    {
-                        item.Name = subnode.Attributes["key"].Value;
-                        list.Add(item);
-                    }
-                    catch { }
+                    sr.Close();
                 }
-            }
 
-            items = new CpfItem[list.Count];
-            list.CopyTo(items);
+                ms.Close();
+            }
+        }
+
+        public override uint FileSize
+        {
+            get
+            {
+                uint size = (uint)SIGNATURE.Length;
+                size += 4; // Count of entries as UInt32
+
+                for (int i = 0; i < items.Length; i++)
+                {
+                    size += items[i].FileSize;
+                }
+
+                return size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteBytes(SIGNATURE);
+
+            writer.WriteUInt32((uint)items.Length);
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                items[i].Serialize(writer);
+            }
         }
 
         public void AddItem(CpfItem item)
         {
-            AddItem(item, true);
-        }
-
-        public void AddItem(CpfItem item, bool duplicate)
-        {
             if (item != null)
             {
-                CpfItem ex = null;
-                if (!duplicate) ex = this.GetItem(item.Name);
-                if (ex != null)
-                {
-                    ex.Datatype = item.Datatype;
-                    ex.Value = item.Value;
-                }
-                else
-                {
-                    items = (CpfItem[])Helper.Add(items, item);
-                }
+                items = (CpfItem[])Helper.Add(items, item);
             }
         }
 
@@ -161,11 +211,27 @@ namespace Sims2Tools.DBPF.CPF
             return null;
         }
 
+        // TODO - do we really need this? Why not use GetItem instead?
         public CpfItem GetSaveItem(string name)
         {
             CpfItem res = GetItem(name);
             if (res == null) return new CpfItem();
             else return res;
+        }
+
+        protected XmlElement AddXml(XmlElement parent, string name)
+        {
+            XmlElement element = CreateResElement(parent, name);
+
+            foreach (CpfItem item in Items)
+            {
+                XmlElement ele = CreateTextElement(element, "item", item.StringValue);
+                ele.SetAttribute("name", item.Name);
+                ele.SetAttribute("datatypeId", Helper.Hex8PrefixString((uint)item.DataType));
+                ele.SetAttribute("datatypeName", item.DataType.ToString());
+            }
+
+            return element;
         }
 
         public void Dispose()

@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -17,6 +17,7 @@ using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.JPG;
+using Sims2Tools.DBPF.Images.THUB;
 using Sims2Tools.DBPF.Neighbourhood.BNFO;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.FAMT;
@@ -60,6 +61,10 @@ using Sims2Tools.DBPF.TRCN;
 using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
 using Sims2Tools.DBPF.VERS;
+using Sims2Tools.DBPF.XFLR;
+using Sims2Tools.DBPF.XFNC;
+using Sims2Tools.DBPF.XOBJ;
+using Sims2Tools.DBPF.XROF;
 using System;
 using System.Collections.Generic;
 
@@ -67,6 +72,8 @@ namespace Sims2Tools.DBPF
 {
     public class DBPFData
     {
+        public static TypeTypeID Type_NULL = (TypeTypeID)0x00000000;
+
         public static TypeGroupID GROUP_GLOBALS = (TypeGroupID)0x7FD46CD0;
         public static String NAME_GLOBALS = "Globals";
 
@@ -110,6 +117,7 @@ namespace Sims2Tools.DBPF
 
             ImgTypeNames.Add(Img.TYPE, Img.NAME);
             ImgTypeNames.Add(Jpg.TYPE, Jpg.NAME);
+            ImgTypeNames.Add(Thub.TYPE, Thub.NAME);
 
             // SgTypeNames.Add(Anim.TYPE, Anim.NAME);
             SgTypeNames.Add(Binx.TYPE, Binx.NAME);
@@ -149,6 +157,10 @@ namespace Sims2Tools.DBPF
             OtherTypeNames.Add(Sdsc.TYPE, Sdsc.NAME);
             OtherTypeNames.Add(Srel.TYPE, Srel.NAME);
             OtherTypeNames.Add(Swaf.TYPE, Swaf.NAME);
+            OtherTypeNames.Add(Xflr.TYPE, Xflr.NAME);
+            OtherTypeNames.Add(Xfnc.TYPE, Xfnc.NAME);
+            OtherTypeNames.Add(Xobj.TYPE, Xobj.NAME);
+            OtherTypeNames.Add(Xrof.TYPE, Xrof.NAME);
 
             foreach (KeyValuePair<TypeTypeID, String> kvPair in ModTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, String> kvPair in ImgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }

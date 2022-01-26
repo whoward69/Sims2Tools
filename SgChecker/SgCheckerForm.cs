@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -185,7 +185,7 @@ namespace SgChecker
                                                 if (type == Objd.TYPE)
                                                 {
                                                     // Resolve the needed STR# now, while we have the associated DBPFFile to hand
-                                                    if (package.GetResourceByEntry(package.GetEntryByKey(new DBPFKey(Str.TYPE, res.GroupID, (TypeInstanceID)0x0085, (TypeResourceID)0x0000))) is Str strRes)
+                                                    if (package.GetResourceByKey(new DBPFKey(Str.TYPE, res.GroupID, (TypeInstanceID)0x0085, (TypeResourceID)0x0000)) is Str strRes)
                                                     {
                                                         String cres = (res as Objd).IsRawDataValid(0x0048) ? strRes.LanguageItems(MetaData.Languages.English)[(res as Objd).GetRawData(0x0048)].Title : null;
 

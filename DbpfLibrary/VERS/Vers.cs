@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -13,7 +13,6 @@
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
-using Sims2Tools.DBPF.Utils;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.VERS
@@ -30,17 +29,7 @@ namespace Sims2Tools.DBPF.VERS
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateResElement(parent, NAME);
-
-            foreach (CpfItem item in Items)
-            {
-                XmlElement ele = CreateTextElement(element, "item", item.StringValue);
-                ele.SetAttribute("name", item.Name);
-                ele.SetAttribute("datatypeId", Helper.Hex8PrefixString((uint)item.Datatype));
-                ele.SetAttribute("datatypeName", item.Datatype.ToString());
-            }
-
-            return element;
+            return AddXml(parent, NAME);
         }
     }
 }

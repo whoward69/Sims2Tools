@@ -1,7 +1,7 @@
 ﻿/*
  * Log Watcher - a utility for monitoring Sims 2 ObjectError logs
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -295,7 +295,6 @@ namespace LogWatcher
                     {
                         if (logTab.LogFilePath.Equals(e.FullPath))
                         {
-                            // TODO - do we reload, open in a new tab, or what?
                             logTab.Reload();
                             tabControl.SelectedTab = logTab;
                             return;

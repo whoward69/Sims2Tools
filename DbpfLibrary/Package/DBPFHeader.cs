@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.Package
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 #pragma warning restore IDE0052 // Remove unread private members
 
-        private int HeaderSize => (minorVersion == 1) ? 96 : 92;
+        private int HeaderSize => (minorVersion >= 1) ? 96 : 92;
 
         // private uint dateCreated, dateModified;
 
@@ -104,7 +104,7 @@ namespace Sims2Tools.DBPF.Package
             /* holeIndexSize*/
             _ = reader.ReadUInt32();
 
-            if (minorVersion == 1)
+            if (minorVersion >= 1)
             {
                 indexMinorVersion = reader.ReadUInt32();
             }
@@ -138,7 +138,7 @@ namespace Sims2Tools.DBPF.Package
             writer.WriteUInt32(0);
             writer.WriteUInt32(0);
 
-            if (minorVersion == 1)
+            if (minorVersion >= 1)
             {
                 writer.WriteUInt32(indexMinorVersion);
             }

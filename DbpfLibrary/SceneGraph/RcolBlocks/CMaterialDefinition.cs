@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -20,9 +20,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x49596978;
         public static String NAME = "cMaterialDefinition";
-
-
-
 
         string fldsc;
         public string FileDescription
@@ -52,12 +49,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             set { listing = value; }
         }
 
-
-
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public CMaterialDefinition(Rcol parent) : base(parent)
         {
             properties = new MaterialDefinitionProperty[0];
@@ -79,25 +70,17 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             return null;
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
-            /*byte len = reader.ReadByte();
-			fldsc = Helper.ToString(reader.ReadBytes(len));*/
+
             fldsc = reader.ReadString();
+
             TypeBlockID myid = reader.ReadBlockId();
             sgres.Unserialize(reader);
             sgres.BlockID = myid;
 
-            /*len = reader.ReadByte();
-			fldsc = Helper.ToString(reader.ReadBytes(len));*/
             fldsc = reader.ReadString();
-            /*len = reader.ReadByte();
-			mattype = Helper.ToString(reader.ReadBytes(len));*/
             mattype = reader.ReadString();
 
             properties = new MaterialDefinitionProperty[reader.ReadUInt32()];
@@ -116,14 +99,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 listing = new String[reader.ReadUInt32()];
                 for (int i = 0; i < listing.Length; i++)
                 {
-                    /*len = reader.ReadByte();
-					listing[i] = Helper.ToString(reader.ReadBytes(len));*/
                     listing[i] = reader.ReadString();
                 }
             }
         }
-
-
 
         public override void Dispose()
         {

@@ -1,7 +1,7 @@
 ﻿/*
- * Object Relocator - a utility for moving objects in the Buy Mode catalogues
+ * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -21,6 +21,8 @@ namespace ObjectRelocator
             this.value = value;
         }
 
+        public string Name => name;
+
         public uint Value => value;
 
         public bool Equals(NamedValue other)
@@ -30,7 +32,12 @@ namespace ObjectRelocator
 
         public override string ToString()
         {
-            return name;
+            if (string.IsNullOrWhiteSpace(name) || name.Length == 1)
+            {
+                return name;
+            }
+
+            return $"{name.Substring(0, 1).ToUpper()}{name.Substring(1)}";
         }
     }
 }

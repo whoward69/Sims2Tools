@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -132,25 +132,14 @@ namespace Sims2Tools.DBPF.OBJD
 
         public override uint FileSize => (uint)(0x40 + 2 * data.Length);
 
-        public override byte[] Serialize()
+        public override void Serialize(DbpfWriter writer)
         {
-            byte[] rawdata = new byte[FileSize];
+            writer.WriteBytes(Encoding.ASCII.GetBytes(FileName), 0x40);
 
-            using (MemoryStream ms = new MemoryStream(rawdata))
+            foreach (ushort x in data)
             {
-                using (DbpfWriter writer = DbpfWriter.FromStream(ms))
-                {
-                    writer.WriteBytes(Encoding.ASCII.GetBytes(FileName));
-                    writer.Seek(SeekOrigin.Begin, 0x40);
-
-                    foreach (ushort x in data)
-                    {
-                        writer.WriteUInt16(x);
-                    }
-                }
+                writer.WriteUInt16(x);
             }
-
-            return rawdata;
         }
 
         public void Dispose()

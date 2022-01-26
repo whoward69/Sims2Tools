@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2021
+ * William Howard - 2020-2022
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -19,29 +19,40 @@ namespace Sims2Tools.DBPF.CPF
 {
     public class CpfItem : IDisposable
     {
-        MetaData.DataTypes dt;
-        String name;
-        byte[] val;
+        private string name;
+
+        private MetaData.DataTypes datatype;
+        private byte[] val;
+
+        private Boolean isDirty = false;
+
+        public bool IsDirty => isDirty;
+        internal void SetClean() => isDirty = false;
 
         public CpfItem()
         {
-            name = "";
+            this.name = "";
             val = new byte[0];
+            isDirty = false;
         }
 
-        public MetaData.DataTypes Datatype
+        public CpfItem(string name) : this()
         {
-            get => dt;
-            set { dt = value; }
+            this.name = name;
         }
 
         public string Name
         {
             get => name;
-            set { name = value; }
         }
 
-        public Byte[] Value
+        public MetaData.DataTypes DataType
+        {
+            get => datatype;
+            internal set { datatype = value; }
+        }
+
+        internal Byte[] Value
         {
             get => val;
             set { val = value; }
@@ -51,7 +62,7 @@ namespace Sims2Tools.DBPF.CPF
         {
             get
             {
-                switch (Datatype)
+                switch (DataType)
                 {
                     case MetaData.DataTypes.dtSingle:
                         {
@@ -75,8 +86,11 @@ namespace Sims2Tools.DBPF.CPF
 
             set
             {
-                dt = Data.MetaData.DataTypes.dtString;
+                if (DataType != MetaData.DataTypes.dtString) throw new ArgumentException();
+
                 val = Helper.ToBytes(value, 0);
+
+                isDirty = true;
             }
         }
 
@@ -84,7 +98,7 @@ namespace Sims2Tools.DBPF.CPF
         {
             get
             {
-                switch (Datatype)
+                switch (DataType)
                 {
                     case MetaData.DataTypes.dtSingle:
                         {
@@ -114,12 +128,17 @@ namespace Sims2Tools.DBPF.CPF
 
             set
             {
-                dt = Data.MetaData.DataTypes.dtUInteger;
+                if (DataType != MetaData.DataTypes.dtUInteger) throw new ArgumentException();
+
                 System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
                 bw.Write(value);
+
                 System.IO.BinaryReader br = new System.IO.BinaryReader(bw.BaseStream);
                 br.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+
                 val = br.ReadBytes((int)br.BaseStream.Length);
+
+                isDirty = true;
             }
         }
 
@@ -127,7 +146,7 @@ namespace Sims2Tools.DBPF.CPF
         {
             get
             {
-                switch (Datatype)
+                switch (DataType)
                 {
                     case MetaData.DataTypes.dtSingle:
                         {
@@ -157,12 +176,17 @@ namespace Sims2Tools.DBPF.CPF
 
             set
             {
-                dt = Data.MetaData.DataTypes.dtInteger;
+                if (DataType != MetaData.DataTypes.dtInteger) throw new ArgumentException();
+
                 System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
                 bw.Write(value);
+
                 System.IO.BinaryReader br = new System.IO.BinaryReader(bw.BaseStream);
                 br.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+
                 val = br.ReadBytes((int)br.BaseStream.Length);
+
+                isDirty = true;
             }
         }
 
@@ -170,7 +194,7 @@ namespace Sims2Tools.DBPF.CPF
         {
             get
             {
-                switch (Datatype)
+                switch (DataType)
                 {
                     case MetaData.DataTypes.dtSingle:
                         {
@@ -200,12 +224,17 @@ namespace Sims2Tools.DBPF.CPF
 
             set
             {
-                dt = Data.MetaData.DataTypes.dtSingle;
+                if (DataType != MetaData.DataTypes.dtSingle) throw new ArgumentException();
+
                 System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
                 bw.Write(value);
+
                 System.IO.BinaryReader br = new System.IO.BinaryReader(bw.BaseStream);
                 br.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+
                 val = br.ReadBytes((int)br.BaseStream.Length);
+
+                isDirty = true;
             }
         }
 
@@ -213,7 +242,7 @@ namespace Sims2Tools.DBPF.CPF
         {
             get
             {
-                switch (Datatype)
+                switch (DataType)
                 {
                     case MetaData.DataTypes.dtSingle:
                         {
@@ -246,14 +275,20 @@ namespace Sims2Tools.DBPF.CPF
                         }
                 }
             }
+
             set
             {
-                dt = Data.MetaData.DataTypes.dtBoolean;
+                if (DataType != MetaData.DataTypes.dtBoolean) throw new ArgumentException();
+
                 System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
                 bw.Write(value);
+
                 System.IO.BinaryReader br = new System.IO.BinaryReader(bw.BaseStream);
                 br.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+
                 val = br.ReadBytes((int)br.BaseStream.Length);
+
+                isDirty = true;
             }
         }
 
@@ -261,7 +296,7 @@ namespace Sims2Tools.DBPF.CPF
         {
             get
             {
-                switch (dt)
+                switch (datatype)
                 {
                     case Data.MetaData.DataTypes.dtUInteger:
                         {
@@ -349,13 +384,13 @@ namespace Sims2Tools.DBPF.CPF
 
         internal void Unserialize(DbpfReader reader)
         {
-            dt = (MetaData.DataTypes)reader.ReadUInt32();
+            datatype = (MetaData.DataTypes)reader.ReadUInt32();
 
             int namelength = reader.ReadInt32();
             name = Helper.ToString(reader.ReadBytes(namelength));
 
             int valuelength;
-            switch (dt)
+            switch (datatype)
             {
                 case (MetaData.DataTypes.dtString):
                     {
@@ -376,11 +411,34 @@ namespace Sims2Tools.DBPF.CPF
             val = reader.ReadBytes(valuelength);
         }
 
+        internal uint FileSize => (uint)(4 + 4 + name.Length + ((datatype == MetaData.DataTypes.dtString) ? 4 : 0) + val.Length);
+
+        internal void Serialize(DbpfWriter writer)
+        {
+            // Store the type
+            writer.WriteUInt32((uint)datatype);
+
+            //Store the Name 
+            writer.WriteUInt32((uint)name.Length);
+            writer.WriteString(name);
+
+            //Store the Value
+            if (datatype == MetaData.DataTypes.dtString)
+            {
+                writer.WriteUInt32((uint)val.Length);
+                writer.WriteBytes(val);
+            }
+            else
+            {
+                writer.WriteBytes(val);
+            }
+        }
+
         public override string ToString()
         {
-            string ret = $"{Name} ({dt}) = ";
+            string ret = $"{Name} ({datatype}) = ";
 
-            switch (this.Datatype)
+            switch (this.DataType)
             {
                 case Data.MetaData.DataTypes.dtUInteger:
                 case Data.MetaData.DataTypes.dtInteger:
