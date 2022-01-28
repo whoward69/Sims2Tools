@@ -164,5 +164,7 @@ namespace Sims2Tools.DBPF
         public override int GetHashCode() => base.GetHashCode();
 
         public override String ToString() => Helper.Hex8PrefixString(id);
+
+        public uint AsUInt() => id;
     }
 }

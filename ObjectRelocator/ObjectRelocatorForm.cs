@@ -77,6 +77,7 @@ namespace ObjectRelocator
             };
 
         private readonly NamedValue[] coveringSubsortItems = {
+                new NamedValue("", 0x0000),
                 new NamedValue("brick", 0x0001),
                 new NamedValue("carpet", 0x0002),
                 new NamedValue("lino", 0x0004),
@@ -1027,10 +1028,7 @@ namespace ObjectRelocator
 
                 if (cpf is Xobj)
                 {
-                    string t = cpf.GetItem("type").StringValue;
-                    string s = cpf.GetItem("subsort").StringValue;
-
-                    return $"{t.Substring(0, 1).ToUpper()}{t.Substring(1)} - {s.Substring(0, 1).ToUpper()}{s.Substring(1)}";
+                    return $"{CapitaliseString(cpf.GetItem("type").StringValue)} - {CapitaliseString(cpf.GetItem("subsort").StringValue)}";
                 }
                 else
                 {
@@ -1043,6 +1041,13 @@ namespace ObjectRelocator
             }
 
             return "";
+        }
+
+        private string CapitaliseString(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s) || s.Length == 1) return s;
+
+            return $"{s.Substring(0, 1).ToUpper()}{s.Substring(1)}";
         }
 
         private string BuildUseString(Objd objd)

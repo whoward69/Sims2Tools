@@ -72,11 +72,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return items; }
         }
 
-
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        // Needed by reflection to create the class
         public CResourceNode(Rcol parent) : base(parent)
         {
             sgres = new SGResource(null);

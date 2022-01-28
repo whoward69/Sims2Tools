@@ -51,11 +51,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
 
 
-
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        // Needed by reflection to create the class
         public CLightRefNode(Rcol parent) : base(parent)
         {
             version = 0xa;

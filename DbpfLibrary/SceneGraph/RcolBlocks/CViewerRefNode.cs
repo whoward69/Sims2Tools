@@ -49,11 +49,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
 
 
-
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        // Needed by reflection to create the class
         public CViewerRefNode(Rcol parent) : base(parent)
         {
             vrnb = new ViewerRefNodeBase(null);

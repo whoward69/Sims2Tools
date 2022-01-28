@@ -16,15 +16,10 @@ namespace Sims2Tools.DBPF.SceneGraph
 {
     public interface IRcolBlock : System.IDisposable
     {
-        void Unserialize(DbpfReader reader);
-
-        IRcolBlock Create(TypeBlockID id);
-
-        IRcolBlock Create();
-
         string BlockName
         {
             get;
+            set;
         }
 
         TypeBlockID BlockID
@@ -37,5 +32,11 @@ namespace Sims2Tools.DBPF.SceneGraph
         {
             get;
         }
+
+        void Unserialize(DbpfReader reader);
+
+        uint FileSize { get; }
+
+        void Serialize(DbpfWriter writer);
     }
 }

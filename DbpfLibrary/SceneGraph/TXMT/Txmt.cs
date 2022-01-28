@@ -26,9 +26,37 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x49596978;
         public const String NAME = "TXMT";
 
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private readonly CMaterialDefinition cMaterialDefinition = null;
+        public CMaterialDefinition MaterialDefinition => cMaterialDefinition;
+
+        public override bool IsDirty => base.IsDirty || (cMaterialDefinition != null && cMaterialDefinition.IsDirty);
+
         public Txmt(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
+            foreach (IRcolBlock block in Blocks)
+            {
+                if (block.BlockID == CMaterialDefinition.TYPE)
+                {
+                    if (cMaterialDefinition == null)
+                    {
+                        cMaterialDefinition = block as CMaterialDefinition;
+                    }
+                    else
+                    {
+                        logger.Debug($"2nd CMaterialDefinition found in {ToString()}");
+                    }
+                    break;
+                }
+            }
         }
+
+        public string GetProperty(string name) => MaterialDefinition.GetProperty(name);
+
+        public void SetProperty(string name, string value) => MaterialDefinition.SetProperty(name, value);
+
+        public bool AddProperty(string name, string value) => MaterialDefinition.AddProperty(name, value);
 
         public override SgResourceList SgNeededResources()
         {
@@ -36,48 +64,48 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 
             SgResourceList needed = new SgResourceList();
 
-            foreach (IRcolBlock block in Blocks)
+            // foreach (IRcolBlock block in Blocks)
             {
-                if (block.BlockID == CMaterialDefinition.TYPE)
+                // if (block.BlockID == CMaterialDefinition.TYPE)
                 {
-                    CMaterialDefinition cMaterialDefinition = block as CMaterialDefinition;
+                    // CMaterialDefinition cMaterialDefinition = block as CMaterialDefinition;
                     HashSet<String> seen = new HashSet<String>();
 
                     foreach (String propKey in propKeys)
                     {
-                        MaterialDefinitionProperty prop = cMaterialDefinition.GetProperty(propKey);
+                        string prop = cMaterialDefinition.GetProperty(propKey);
 
-                        if (prop != null && prop.Value != null && prop.Value.Length > 0)
+                        if (prop != null && prop.Length > 0)
                         {
-                            if (!seen.Contains(prop.Value))
+                            if (!seen.Contains(prop))
                             {
-                                seen.Add(prop.Value);
-                                needed.Add(Txtr.TYPE, prop.Value);
+                                seen.Add(prop);
+                                needed.Add(Txtr.TYPE, prop);
                             }
                         }
                     }
 
-                    int textures = cMaterialDefinition.GetProperty("numTexturesToComposite") != null ? Convert.ToInt32(cMaterialDefinition.GetProperty("numTexturesToComposite").Value) : 0;
+                    int textures = cMaterialDefinition.GetProperty("numTexturesToComposite") != null ? Convert.ToInt32(cMaterialDefinition.GetProperty("numTexturesToComposite")) : 0;
                     for (int i = 0; i < textures; ++i)
                     {
-                        MaterialDefinitionProperty prop = cMaterialDefinition.GetProperty($"baseTexture{i}");
+                        string prop = cMaterialDefinition.GetProperty($"baseTexture{i}");
 
-                        if (prop != null && prop.Value != null && prop.Value.Length > 0)
+                        if (prop != null && prop.Length > 0)
                         {
-                            if (!seen.Contains(prop.Value))
+                            if (!seen.Contains(prop))
                             {
-                                seen.Add(prop.Value);
-                                needed.Add(Txtr.TYPE, prop.Value);
+                                seen.Add(prop);
+                                needed.Add(Txtr.TYPE, prop);
                             }
                         }
                     }
 
-                    foreach (String listing in cMaterialDefinition.Listing)
+                    foreach (String filename in cMaterialDefinition.FileList)
                     {
-                        if (!seen.Contains(listing))
+                        if (!seen.Contains(filename))
                         {
-                            seen.Add(listing);
-                            needed.Add(Txtr.TYPE, listing);
+                            seen.Add(filename);
+                            needed.Add(Txtr.TYPE, filename);
                         }
                     }
                 }

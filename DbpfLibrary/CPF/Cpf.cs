@@ -36,7 +36,7 @@ namespace Sims2Tools.DBPF.CPF
         {
             get
             {
-                if (isDirty) return true;
+                if (base.IsDirty) return true;
 
                 foreach (CpfItem item in items)
                 {
@@ -49,7 +49,7 @@ namespace Sims2Tools.DBPF.CPF
 
         public override void SetClean()
         {
-            isDirty = false;
+            base.SetClean();
 
             foreach (CpfItem item in items)
             {

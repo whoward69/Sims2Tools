@@ -74,10 +74,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             set { joints = value; }
         }
 
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        // Needed by reflection to create the class
         public CGeometryDataContainer(Rcol parent) : base(parent)
         {
             sgres = new SGResource(null);

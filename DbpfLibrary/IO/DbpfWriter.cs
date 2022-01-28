@@ -104,6 +104,8 @@ namespace Sims2Tools.DBPF.IO
             m_writer.Write(value);
         }
 
+        public void WriteBlockId(TypeBlockID value) => WriteUInt32(value.AsUInt());
+
         public void WriteUInt32(uint value)
         {
             if (m_byteOrder == ByteOrder.BIG_ENDIAN)
@@ -121,10 +123,13 @@ namespace Sims2Tools.DBPF.IO
 
         public void WriteString(string value)
         {
-            // Do NOT use m_writer.Write(value); as that writes a length prefixed string
-            m_writer.Write(value.ToCharArray());
+            m_writer.Write(value);
         }
 
+        public void WriteChars(char[] value)
+        {
+            m_writer.Write(value);
+        }
         #endregion
 
         public void Dispose()

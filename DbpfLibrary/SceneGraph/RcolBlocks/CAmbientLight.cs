@@ -21,9 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly new TypeBlockID TYPE = (TypeBlockID)0xC9C81B9B;
         public new const String NAME = "cAmbientLight";
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        // Needed by reflection to create the class
         public CAmbientLight(Rcol parent) : base(parent)
         {
             version = 1;

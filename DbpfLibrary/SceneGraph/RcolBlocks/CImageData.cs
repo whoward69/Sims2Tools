@@ -28,6 +28,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x1C4A276C;
         public static String NAME = "cImageData";
 
+        // Needed by reflection to create the class
         public CImageData(Rcol parent) : base(parent)
         {
             sgres = new SGResource(null);

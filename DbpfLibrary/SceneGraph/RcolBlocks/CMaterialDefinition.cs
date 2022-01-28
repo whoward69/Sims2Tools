@@ -13,6 +13,8 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
@@ -22,84 +24,173 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static String NAME = "cMaterialDefinition";
 
         string fldsc;
-        public string FileDescription
-        {
-            get { return fldsc; }
-            set { fldsc = value; }
-        }
+        public string FileDescription => fldsc;
 
         string mattype;
-        public string MatterialType
-        {
-            get { return mattype; }
-            set { mattype = value; }
-        }
+        public string MatterialType => mattype;
 
-        MaterialDefinitionProperty[] properties;
-        public MaterialDefinitionProperty[] Properties
-        {
-            get { return properties; }
-            set { properties = value; }
-        }
+        private string[] fileList;
+        public ReadOnlyCollection<string> FileList => new ReadOnlyCollection<string>(fileList);
 
-        string[] listing;
-        public string[] Listing
-        {
-            get { return listing; }
-            set { listing = value; }
-        }
+        private readonly List<MaterialDefinitionProperty> properties;
 
-        public CMaterialDefinition(Rcol parent) : base(parent)
-        {
-            properties = new MaterialDefinitionProperty[0];
-            listing = new String[0];
-            sgres = new SGResource(null);
-            BlockID = TYPE;
-            fldsc = "";
-            mattype = "";
-        }
-
-        public MaterialDefinitionProperty GetProperty(string name)
+        public string GetProperty(string name)
         {
             name = name.Trim().ToLower();
             foreach (MaterialDefinitionProperty mdp in properties)
             {
-                if (mdp.Name.Trim().ToLower() == name) return mdp;
+                if (mdp.Name.Trim().ToLower() == name) return mdp.Value;
             }
 
             return null;
+        }
+
+        public void SetProperty(string name, string value)
+        {
+            name = name.Trim().ToLower();
+            foreach (MaterialDefinitionProperty mdp in properties)
+            {
+                if (mdp.Name.Trim().ToLower() == name)
+                {
+                    mdp.Value = value;
+                    break;
+                }
+            }
+        }
+
+        public bool AddProperty(string name, string value)
+        {
+            if (GetProperty(name) != null) return false;
+
+            properties.Add(new MaterialDefinitionProperty(name, value, true));
+
+            return true;
+        }
+
+        public override bool IsDirty
+        {
+            get
+            {
+                foreach (MaterialDefinitionProperty mfd in properties)
+                {
+                    if (mfd.IsDirty) return true;
+                }
+
+                return false;
+            }
+        }
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            foreach (MaterialDefinitionProperty mfd in properties)
+            {
+                mfd.SetClean();
+            }
+        }
+
+        // Needed by reflection to create the class
+        public CMaterialDefinition(Rcol parent) : base(parent)
+        {
+            BlockID = TYPE;
+            sgres = new SGResource(null);
+
+            fldsc = "";
+            mattype = "";
+
+            properties = new List<MaterialDefinitionProperty>();
+            fileList = new String[0];
         }
 
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
 
-            fldsc = reader.ReadString();
+            string blkName = reader.ReadString();
+            TypeBlockID blkId = reader.ReadBlockId();
 
-            TypeBlockID myid = reader.ReadBlockId();
             sgres.Unserialize(reader);
-            sgres.BlockID = myid;
+            sgres.BlockName = blkName;
+            sgres.BlockID = blkId;
 
             fldsc = reader.ReadString();
             mattype = reader.ReadString();
 
-            properties = new MaterialDefinitionProperty[reader.ReadUInt32()];
-            for (int i = 0; i < properties.Length; i++)
+            uint propCount = reader.ReadUInt32();
+            for (int i = 0; i < propCount; i++)
             {
-                properties[i] = new MaterialDefinitionProperty();
-                properties[i].Unserialize(reader);
+                properties.Add(new MaterialDefinitionProperty(reader));
             }
 
             if (version == 8)
             {
-                listing = new String[0];
+                fileList = new String[0];
             }
             else
             {
-                listing = new String[reader.ReadUInt32()];
-                for (int i = 0; i < listing.Length; i++)
+                fileList = new String[reader.ReadUInt32()];
+                for (int i = 0; i < fileList.Length; i++)
                 {
-                    listing[i] = reader.ReadString();
+                    fileList[i] = reader.ReadString();
+                }
+            }
+        }
+
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4;
+
+                size += (sgres.BlockName.Length + 1) + 4 + sgres.FileSize;
+
+                size += (fldsc.Length + 1);
+                size += (mattype.Length + 1);
+
+                size += 4;
+                foreach (MaterialDefinitionProperty mfd in properties)
+                {
+                    size += mfd.FileSize;
+                }
+
+                if (version != 8)
+                {
+                    size += 4;
+                    foreach (string s in fileList)
+                    {
+                        size += (s.Length + 1);
+                    }
+                }
+
+                return (uint)size;
+            }
+        }
+
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(version);
+
+            writer.WriteString(sgres.BlockName);
+            writer.WriteBlockId(sgres.BlockID);
+            sgres.Serialize(writer);
+
+            writer.WriteString(fldsc);
+            writer.WriteString(mattype);
+
+            writer.WriteUInt32((uint)properties.Count);
+            for (int i = 0; i < properties.Count; i++)
+            {
+                properties[i].Serialize(writer);
+            }
+
+            if (version != 8)
+            {
+                writer.WriteUInt32((uint)fileList.Length);
+                for (int i = 0; i < fileList.Length; i++)
+                {
+                    writer.WriteString(fileList[i]);
                 }
             }
         }
@@ -109,36 +200,64 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
     }
 
-    public class MaterialDefinitionProperty
+    internal class MaterialDefinitionProperty : IComparable, IEquatable<MaterialDefinitionProperty>
     {
 
-        string name;
-        string val;
+        private string name;
+        private string value;
 
-        public string Name
+        private bool isDirty = false;
+        internal bool IsDirty => isDirty;
+        internal void SetClean() => isDirty = false;
+
+        internal string Name => name;
+
+        internal string Value
         {
-            get { return name; }
-            set { name = value; }
+            get { return this.value; }
+            set { this.value = value; isDirty = true; }
         }
 
-        public string Value
+        internal MaterialDefinitionProperty(string name, string value, bool isDirty)
         {
-            get { return val; }
-            set { val = value; }
+            this.name = name;
+            this.value = value;
+            this.isDirty = isDirty;
         }
 
 
-        public MaterialDefinitionProperty()
+        internal MaterialDefinitionProperty(DbpfReader reader)
         {
-            name = "";
-            val = "";
+            Unserialize(reader);
         }
 
-        public void Unserialize(DbpfReader reader)
+        private void Unserialize(DbpfReader reader)
         {
-
             name = reader.ReadString();
-            val = reader.ReadString();
+            value = reader.ReadString();
+        }
+
+        internal uint FileSize => (uint)(name.Length + 1 + value.Length + 1);
+
+        internal void Serialize(DbpfWriter writer)
+        {
+            writer.WriteString(name);
+            writer.WriteString(value);
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj is MaterialDefinitionProperty that)
+            {
+                return this.name.CompareTo(that.name);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public bool Equals(MaterialDefinitionProperty that)
+        {
+            return this.name.Equals(that.name);
         }
     }
 }

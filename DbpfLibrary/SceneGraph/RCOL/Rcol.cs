@@ -66,12 +66,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             get { return count; }
         }
 
+        byte[] oversize;
+
         bool duff = false;
         public bool Duff { get { return duff; } }
 
-        /// <summary>
-        /// Filename of the First Block (or an empty string)
-        /// </summary>
         public override string FileName
         {
             get
@@ -84,45 +83,59 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
         public Rcol(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
-            reffiles = new IPackedFileDescriptor[0];
-            index = new uint[0];
-            blocks = new IRcolBlock[0];
-            duff = false;
-
-            Unserialize(reader);
+            Unserialize(reader, entry.DataSize);
         }
 
-        internal IRcolBlock ReadBlock(TypeBlockID id, DbpfReader reader)
+        internal IRcolBlock ReadBlock(TypeBlockID expectedId, DbpfReader reader)
         {
             long errPos = reader.Position;
-            string s = reader.ReadString();
-            BlockClasses.TryGetValue(s, out Type tp);
+            string blockName = reader.ReadString();
+            BlockClasses.TryGetValue(blockName, out Type tp);
             if (tp == null)
             {
                 logger.Error($"Unknown embedded RCOL Block Name at Offset={Helper.Hex4PrefixString((uint)errPos)}");
-                logger.Info($"RCOL Block Name: {s}");
+                logger.Info($"RCOL Block Name: {blockName}");
 
                 return null;
             }
 
             errPos = reader.Position;
-            TypeBlockID myid = reader.ReadBlockId();
-            if (myid == (TypeBlockID)0xFFFFFFFF) return null;
-            if (id != myid)
+            TypeBlockID blockId = reader.ReadBlockId();
+            if (blockId == (TypeBlockID)0xFFFFFFFF) return null;
+            if (expectedId != blockId)
             {
                 logger.Error($"Unexpected embedded RCOL Block ID at Offset={Helper.Hex4PrefixString((uint)errPos)}");
-                logger.Info($"Read: {myid}; Expected: {id}");
+                logger.Info($"Read: {blockId}; Expected: {expectedId}");
 
                 return null;
             }
 
-            IRcolBlock wrp = AbstractRcolBlock.Create(tp, this, myid);
-            wrp.Unserialize(reader);
-            return wrp;
+            IRcolBlock blk = AbstractRcolBlock.Create(tp, this, blockId, blockName);
+            blk.Unserialize(reader);
+            return blk;
         }
 
-        public void Unserialize(DbpfReader reader)
+        internal uint BlockSize(IRcolBlock blk)
         {
+            long size = blk.BlockName.Length + 1 + 4;
+
+            size += blk.FileSize;
+
+            return (uint)size;
+        }
+
+        internal void WriteBlock(IRcolBlock blk, DbpfWriter writer)
+        {
+            writer.WriteString(blk.BlockName);
+            writer.WriteBlockId(blk.BlockID);
+            blk.Serialize(writer);
+        }
+
+
+        public void Unserialize(DbpfReader reader, uint dataSize)
+        {
+            long startPos = reader.Position;
+
             duff = false;
 
             count = reader.ReadUInt32();
@@ -144,24 +157,77 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                 }
 
                 index = new uint[reader.ReadUInt32()];
-                blocks = new IRcolBlock[index.Length];
                 for (int i = 0; i < index.Length; i++) index[i] = reader.ReadUInt32();
 
-
+                blocks = new IRcolBlock[index.Length];
                 for (int i = 0; i < index.Length; i++)
                 {
-                    IRcolBlock wrp = ReadBlock((TypeBlockID)index[i], reader);
-                    if (wrp == null) break;
-                    blocks[i] = wrp;
+                    IRcolBlock blk = ReadBlock((TypeBlockID)index[i], reader);
+                    if (blk == null) break;
+                    blocks[i] = blk;
+                }
+
+                long size = dataSize - (reader.Position - startPos);
+                if (size > 0)
+                {
+                    oversize = reader.ReadBytes((int)size);
+                    logger.Debug($"Reading 'oversize' bytes in RCol '{FileName}' part of {ToString()}");
+                }
+                else
+                {
+                    oversize = new byte[0];
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                logger.Warn(ex.Message);
                 duff = true;
             }
-            finally { }
-
         }
+
+        public override uint FileSize
+        {
+            get
+            {
+                if (duff) return 0;
+
+                long size = 4;
+
+                size += 4 + (reffiles.Length * ((count == 0xffff0001) ? 16 : 12));
+
+                size += 4 + (blocks.Length * 4);
+
+                foreach (IRcolBlock blk in blocks) size += BlockSize(blk);
+
+                size += oversize.Length;
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            if (duff) return;
+
+            writer.WriteUInt32(count == 0xffff0001 ? count : (uint)reffiles.Length);
+
+            writer.WriteUInt32((uint)reffiles.Length);
+            for (int i = 0; i < reffiles.Length; i++)
+            {
+                IPackedFileDescriptor pfd = reffiles[i];
+                writer.WriteGroupId(pfd.Group);
+                writer.WriteInstanceId(pfd.Instance);
+                if (count == 0xffff0001) writer.WriteResourceId(pfd.SubType);
+                writer.WriteTypeId(pfd.Type);
+            }
+
+            writer.WriteUInt32((uint)blocks.Length);
+            foreach (IRcolBlock blk in blocks) writer.WriteBlockId(blk.BlockID);
+            foreach (IRcolBlock blk in blocks) WriteBlock(blk, writer);
+
+            writer.WriteBytes(oversize);
+        }
+
 
         public void Dispose()
         {

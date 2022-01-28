@@ -97,12 +97,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
 
 
-
-
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        // Needed by reflection to create the class
         public CDirectionalLight(Rcol parent) : base(parent)
         {
             version = 1;

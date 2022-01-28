@@ -19,14 +19,15 @@ namespace Sims2Tools.DBPF
 {
     abstract public class DBPFResource : DBPFNamedKey
     {
-        protected bool isDirty = false;
-
-        public virtual bool IsDirty => isDirty;
-        public virtual void SetClean() => isDirty = false;
+        protected bool _isDirty = false;
 
         protected DBPFResource(DBPFEntry entry) : base(entry, "")
         {
         }
+
+        #region Serialize
+        public virtual bool IsDirty => _isDirty;
+        public virtual void SetClean() => _isDirty = false;
 
         public virtual uint FileSize => throw new NotImplementedException();
 
@@ -34,7 +35,10 @@ namespace Sims2Tools.DBPF
         {
             throw new NotImplementedException();
         }
+        #endregion
 
+
+        #region XML Support
         public abstract XmlElement AddXml(XmlElement parent);
 
         protected XmlElement CreateResElement(XmlElement parent, String name)
@@ -107,5 +111,6 @@ namespace Sims2Tools.DBPF
             if (ResourceID != (TypeResourceID)0x00000000) parent.SetAttribute("resourceId", ResourceID.ToString());
             parent.SetAttribute("name", FileName);
         }
+        #endregion
     }
 }

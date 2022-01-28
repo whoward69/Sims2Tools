@@ -85,7 +85,7 @@ namespace Sims2Tools.DBPF.OBJD
             {
                 data[index] = value;
 
-                isDirty = true;
+                _isDirty = true;
             }
         }
 

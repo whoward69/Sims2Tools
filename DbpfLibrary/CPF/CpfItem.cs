@@ -420,7 +420,7 @@ namespace Sims2Tools.DBPF.CPF
 
             //Store the Name 
             writer.WriteUInt32((uint)name.Length);
-            writer.WriteString(name);
+            writer.WriteChars(name.ToCharArray());
 
             //Store the Value
             if (datatype == MetaData.DataTypes.dtString)

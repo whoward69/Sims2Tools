@@ -18,6 +18,11 @@ namespace Sims2Tools.DBPF.SceneGraph
 {
     public abstract class AbstractRcolBlock : IRcolBlock
     {
+        protected bool isDirty = false;
+
+        public virtual bool IsDirty => isDirty;
+        public virtual void SetClean() => isDirty = false;
+
         protected SGResource sgres;
         public SGResource NameResource
         {
@@ -36,6 +41,29 @@ namespace Sims2Tools.DBPF.SceneGraph
             get { return parent; }
         }
 
+        TypeBlockID blockid;
+
+        public TypeBlockID BlockID
+        {
+            get { return blockid; }
+            set { blockid = value; }
+        }
+
+        protected string blockname = null;
+        public virtual string BlockName
+        {
+            get
+            {
+                if (blockname == null)
+                {
+                    throw new ArgumentNullException("BlockName has not been set, check Unserialize method!");
+                }
+
+                return blockname;
+            }
+            set { blockname = value; }
+        }
+
         public AbstractRcolBlock()
         {
             sgres = null;
@@ -51,14 +79,7 @@ namespace Sims2Tools.DBPF.SceneGraph
             version = 0;
         }
 
-        public abstract void Unserialize(DbpfReader reader);
-
-        public IRcolBlock Create()
-        {
-            return Create(this.GetType(), this.parent);
-        }
-
-        public static IRcolBlock Create(Type type, Rcol parent)
+        private static IRcolBlock Create(Type type, Rcol parent)
         {
             object[] args = new object[1];
             args[0] = parent;
@@ -66,38 +87,21 @@ namespace Sims2Tools.DBPF.SceneGraph
             return irb;
         }
 
-        public static IRcolBlock Create(Type type, Rcol parent, TypeBlockID id)
+        public static IRcolBlock Create(Type type, Rcol parent, TypeBlockID id, string name)
         {
             IRcolBlock irb = Create(type, parent);
             irb.BlockID = id;
+            irb.BlockName = name;
             return irb;
         }
 
-        public IRcolBlock Create(TypeBlockID id)
-        {
-            return Create(this.GetType(), this.parent, id);
-        }
+        public abstract void Unserialize(DbpfReader reader);
 
-        TypeBlockID blockid;
+        public virtual uint FileSize => throw new NotImplementedException();
 
-        public TypeBlockID BlockID
+        public virtual void Serialize(DbpfWriter writer)
         {
-            get { return blockid; }
-            set { blockid = value; }
-        }
-
-        protected string blockname;
-        public virtual string BlockName
-        {
-            get
-            {
-                if (blockname == null)
-                {
-                    return "c" + this.GetType().Name;
-                }
-                else return blockname;
-            }
-            set { blockname = value; }
+            throw new NotImplementedException();
         }
 
         public override string ToString()

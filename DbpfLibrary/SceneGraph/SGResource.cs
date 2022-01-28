@@ -38,6 +38,14 @@ namespace Sims2Tools.DBPF.SceneGraph
             flname = reader.ReadString();
         }
 
+        public override uint FileSize => (uint)(4 + flname.Length + 1);
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(version);
+            writer.WriteString(flname);
+        }
+
         public override void Dispose()
         {
         }

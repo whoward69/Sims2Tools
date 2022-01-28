@@ -146,11 +146,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return unknown6; }
         }
 
-
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        // Needed by reflection to create the class
         public CShapeRefNode(Rcol parent) : base(parent)
         {
             rn = new RenderableNode(null);

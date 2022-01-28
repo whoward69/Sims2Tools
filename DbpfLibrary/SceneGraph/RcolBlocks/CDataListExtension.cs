@@ -29,10 +29,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
 
 
-
-
-
-
+        // Needed by reflection to create the class
         public CDataListExtension(Rcol parent) : base(parent)
         {
             ext = new Extension(null);

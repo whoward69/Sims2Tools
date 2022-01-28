@@ -37,11 +37,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             set { unknown9 = value; }
         }
 
-
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        // Needed by reflection to create the class
         public CPointLight(Rcol parent) : base(parent)
         {
             version = 1;

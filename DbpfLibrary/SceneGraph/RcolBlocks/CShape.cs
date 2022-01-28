@@ -210,6 +210,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
 
 
+        // Needed by reflection to create the class
         public CShape(Rcol parent) : base(parent)
         {
             sgres = new SGResource(null);

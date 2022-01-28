@@ -63,10 +63,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
 
 
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        // Needed by reflection to create the class
         public CGeometryNode(Rcol parent) : base(parent)
         {
             ogn = new ObjectGraphNode(null);
