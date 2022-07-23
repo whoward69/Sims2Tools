@@ -26,14 +26,14 @@ namespace Sims2Tools.DBPF.NREF
 
         public Nref(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
-            this.FileName = Helper.ToString(reader.ReadBytes((int)entry.FileSize));
+            this.KeyName = Helper.ToString(reader.ReadBytes((int)entry.FileSize));
         }
 
         public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = CreateResElement(parent, NAME);
 
-            CreateTextElement(element, "name", FileName);
+            CreateTextElement(element, "name", KeyName);
 
             return element;
         }

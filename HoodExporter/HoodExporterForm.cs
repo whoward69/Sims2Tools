@@ -545,7 +545,12 @@ namespace HoodExporter
 
                                         String suffix = lifeStage.Equals(sdsc.SimBase.LifeSection.ToString()) ? "" : $"_{lifeStage}";
                                         String newName = Path.Combine(fi.DirectoryName, $"{hoodCode}_{sdsc.InstanceID.AsUInt()}{suffix}{fi.Extension}");
-                                        if (File.Exists(newName)) File.Delete(newName);
+
+                                        if (File.Exists(newName))
+                                        {
+                                            Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(newName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                                        }
+
                                         fi.MoveTo(newName);
                                     }
                                 }
@@ -599,9 +604,9 @@ namespace HoodExporter
                             Ctss ctss = (Ctss)package.GetResourceByEntry(ctsss[0]);
 
                             StrItemList strs = ctss.LanguageItems(prefLid);
-                            if (strs.Length == 0) strs = ctss.LanguageItems(MetaData.Languages.English);
+                            if (strs.Count == 0) strs = ctss.LanguageItems(MetaData.Languages.English);
 
-                            if (strs.Length >= 2)
+                            if (strs.Count >= 2)
                             {
                                 simCache.Add(objd.Guid, new SimData(objd.Guid, strs[0].Title, strs[2].Title, strs[1].Title, characterFile.Name));
 

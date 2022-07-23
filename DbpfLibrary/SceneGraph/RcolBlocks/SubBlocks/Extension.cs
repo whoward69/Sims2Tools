@@ -100,8 +100,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             set { data = value; }
         }
 
-
-
         public ExtensionItem()
         {
             varname = "";
@@ -113,10 +111,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             str = "";
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public void Unserialize(DbpfReader reader)
         {
             long errPos = reader.Position;
@@ -174,17 +168,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
     }
 
-    /// <summary>
-    /// This is the actual FileWrapper
-    /// </summary>
-    /// <remarks>
-    /// The wrapper is used to (un)serialize the Data of a file into it's Attributes. So Basically it reads 
-    /// a BinaryStream and translates the data into some userdefine Attributes.
-    /// </remarks>
     public class Extension : AbstractRcolBlock
     {
-
-
         byte typecode;
         public byte TypeCode
         {
@@ -207,16 +192,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return items; }
         }
 
-        // readonly byte[] data = new byte[0];
-
-        //int unknown1;
-        //int unknown2;
-
-
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public Extension(Rcol parent) : base(parent)
         {
             items = new ExtensionItem[0];
@@ -225,16 +200,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             varname = "";
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader) { Unserialize(reader, 0); }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public void Unserialize(DbpfReader reader, uint ver)
         {
             version = reader.ReadUInt32();
@@ -273,11 +240,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         }
 
-
-
-        /// <summary>
-        /// You can use this to setop the Controls on a TabPage befor it is dispplayed
-        /// </summary>
         public override void Dispose()
         {
         }

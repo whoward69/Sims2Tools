@@ -640,7 +640,7 @@ namespace BhavFinder
                             DataRow row = bhavFoundData.NewRow();
                             row["Package"] = fi.Name;
                             row["Instance"] = entry.InstanceID.ToShortString();
-                            row["Name"] = bhav.FileName;
+                            row["Name"] = bhav.KeyName;
                             row["GroupInstance"] = entry.GroupID.ToString();
                             row["GroupName"] = GameData.GroupName(entry.GroupID, localObjectsByGroupID);
 
@@ -721,7 +721,7 @@ namespace BhavFinder
                         Str str = (Str)package.GetResourceByEntry(entry);
                         StrItemList entries = str.LanguageItems(MetaData.Languages.English);
 
-                        for (int i = 0; i < entries.Length; ++i)
+                        for (int i = 0; i < entries.Count; ++i)
                         {
                             if (regex.IsMatch(entries[i].Title))
                             {

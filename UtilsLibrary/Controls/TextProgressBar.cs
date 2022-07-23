@@ -108,7 +108,7 @@ namespace Sims2Tools.Controls
 
         private string PercentageStr
         {
-            get => $"{(int)((float)Value - Minimum) / ((float)Maximum - Minimum) * 100 } %";
+            get => $"{(int)((float)Value - Minimum) / ((float)Maximum - Minimum) * 100} %";
         }
 
         private string CurrProgressStr

@@ -95,7 +95,7 @@ namespace Sims2Tools.DBPF.OBJD
         {
             long startPos = reader.Position;
 
-            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
+            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
 
             if (length >= 0x54)
             {
@@ -134,7 +134,7 @@ namespace Sims2Tools.DBPF.OBJD
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteBytes(Encoding.ASCII.GetBytes(FileName), 0x40);
+            writer.WriteBytes(Encoding.ASCII.GetBytes(KeyName), 0x40);
 
             foreach (ushort x in data)
             {

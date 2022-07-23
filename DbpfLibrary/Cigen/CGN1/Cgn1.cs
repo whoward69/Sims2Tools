@@ -37,7 +37,7 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
         {
             foreach (Cgn1Item item in items)
             {
-                if (item.OwnerKey == ownerKey)
+                if (item.OwnerKey.Equals(ownerKey))
                 {
                     return item.ImageKey;
                 }

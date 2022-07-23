@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.XTOL
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x2C1FD8A1;
         public const String NAME = "XTOL";
 
-        public override string FileName
+        public override string KeyName
         {
             get => Name;
         }

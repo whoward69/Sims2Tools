@@ -28,7 +28,7 @@ namespace Sims2Tools.DBPF.SceneGraph.MMAT
         {
         }
 
-        public override string FileName
+        public override string KeyName
         {
             get => Name;
         }

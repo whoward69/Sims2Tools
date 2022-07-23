@@ -40,7 +40,7 @@ namespace Sims2Tools.DBPF.SLOT
 
         protected void Unserialize(DbpfReader reader)
         {
-            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
+            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
 
             _ = reader.ReadUInt32();
             version = reader.ReadUInt32();

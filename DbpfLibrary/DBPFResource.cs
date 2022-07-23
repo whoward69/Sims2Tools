@@ -108,8 +108,8 @@ namespace Sims2Tools.DBPF
         {
             parent.SetAttribute("groupId", GroupID.ToString());
             parent.SetAttribute("instanceId", InstanceID.ToString());
-            if (ResourceID != (TypeResourceID)0x00000000) parent.SetAttribute("resourceId", ResourceID.ToString());
-            parent.SetAttribute("name", FileName);
+            if (ResourceID != DBPFData.RESOURCE_NULL) parent.SetAttribute("resourceId", ResourceID.ToString());
+            parent.SetAttribute("name", KeyName);
         }
         #endregion
     }

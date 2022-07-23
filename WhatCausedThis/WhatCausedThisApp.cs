@@ -19,8 +19,8 @@ namespace WhatCausedThis
         public static String AppName = "What Caused This";
 
         public static int AppVersionMajor = 1;
-        public static int AppVersionMinor = 5;
-        public static String AppVersionType = "b"; // a - alpha, b - beta, r - release
+        public static int AppVersionMinor = 6;
+        public static String AppVersionType = "r"; // a - alpha, b - beta, r - release
 
 #if DEBUG
         public static String AppVersionBuild = " (debug)";

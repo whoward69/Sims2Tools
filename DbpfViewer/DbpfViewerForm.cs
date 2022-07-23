@@ -19,7 +19,6 @@ using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
-using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SLOT;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
@@ -504,21 +503,6 @@ namespace DbpfViewer
             {
                 using (DBPFFile package = new DBPFFile(packageFile))
                 {
-                    // TODO - testing only
-                    /* {
-                        foreach (DBPFEntry entry in package.GetEntriesByType(Txmt.TYPE))
-                        {
-                            Txmt txmt = (Txmt)package.GetResourceByEntry(entry);
-
-                            txmt.SetProperty("stdMatBaseTextureName", "updated-from-c#-code");
-                            txmt.AddProperty("whatsThisThen", "added-from-c#-code");
-
-                            package.Commit(txmt);
-                        }
-
-                        package.Update(true);
-                    } */
-
                     localObjectsByGroupID.Clear();
 
                     try
@@ -559,7 +543,7 @@ namespace DbpfViewer
                                     row["Type"] = DBPFData.TypeName(type);
                                     row["Group"] = GameData.GroupName(entry.GroupID, localObjectsByGroupID);
                                     row["Instance"] = entry.InstanceID.ToString();
-                                    row["Name"] = resource.FileName;
+                                    row["Name"] = resource.KeyName;
 
                                     row["Hash"] = Hash.TGIRHash(entry.InstanceID, entry.ResourceID, entry.TypeID, entry.GroupID);
 

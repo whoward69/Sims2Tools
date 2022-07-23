@@ -44,7 +44,7 @@ namespace Sims2Tools.DBPF.TRCN
         {
             this.duff = false;
 
-            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
+            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
 
             this.items = new List<TrcnItem>();
             this.header = new uint[3];

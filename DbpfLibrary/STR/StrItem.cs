@@ -97,14 +97,19 @@ namespace Sims2Tools.DBPF.STR
         }
     }
 
-    public class StrToken
+    public class StrItem
     {
-        readonly int index;
-        readonly StrLanguage lid;
-        readonly string title;
-        readonly string desc;
+        private readonly int index;
+        private readonly StrLanguage lid;
+        private string title;
+        private string desc;
 
-        public StrToken(int index, byte lid, string title, string desc)
+        private bool isDirty = false;
+
+        public bool IsDirty => isDirty;
+        public void SetClean() { isDirty = false; }
+
+        public StrItem(int index, byte lid, string title, string desc)
         {
             this.index = index;
             this.lid = new StrLanguage(lid);
@@ -125,11 +130,21 @@ namespace Sims2Tools.DBPF.STR
         public string Title
         {
             get => title;
+            set
+            {
+                title = value ?? "";
+                isDirty = true;
+            }
         }
 
         public string Description
         {
             get => desc;
+            set
+            {
+                desc = value ?? "";
+                isDirty = true;
+            }
         }
 
         internal static void Unserialize(DbpfReader reader, Hashtable lines)
@@ -138,34 +153,37 @@ namespace Sims2Tools.DBPF.STR
             string title = reader.ReadPChar();
             string desc = reader.ReadPChar();
 
-            if (lines[lid.Id] == null) lines[lid.Id] = new StrItemList(); // Add a new StrItemList if needed
+            if (lines[lid.Id] == null) lines[lid.Id] = new StrItemList();
 
-            ((StrItemList)lines[lid.Id]).Add(new StrToken(((StrItemList)lines[lid.Id]).Count, lid, title, desc));
+            ((StrItemList)lines[lid.Id]).Add(new StrItem(((StrItemList)lines[lid.Id]).Count, lid, title, desc));
+        }
+
+        public uint FileSize => (uint)(1 + title.Length + 1 + desc.Length + 1);
+
+        public void Serialize(DbpfWriter writer)
+        {
+            writer.WriteByte(lid.Id);
+            writer.WritePChar(title);
+            writer.WritePChar(desc);
         }
 
         public override string ToString()
         {
             return "{Helper.Hex4PrefixString((uint)index)} - {this.Title}";
         }
-
     }
 
     public class StrItemList : ArrayList
     {
-        public new StrToken this[int index]
+        public new StrItem this[int index]
         {
-            get => index < base.Count ? ((StrToken)base[index]) : null;
+            get => index < base.Count ? ((StrItem)base[index]) : null;
             set => base[index] = value;
         }
 
-        public int Add(StrToken stritem)
+        public int Add(StrItem strItem)
         {
-            return base.Add(stritem);
-        }
-
-        public int Length
-        {
-            get => this.Count;
+            return base.Add(strItem);
         }
     }
 }

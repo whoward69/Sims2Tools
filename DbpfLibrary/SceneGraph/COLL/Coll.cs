@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.COLL
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x6C4F359D;
         public const String NAME = "COLL";
 
-        public override string FileName
+        public override string KeyName
         {
             get => "Collection";
         }

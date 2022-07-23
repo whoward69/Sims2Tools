@@ -67,7 +67,7 @@ namespace SgChecker
         private readonly TypeTypeID[] sgPriorityTypes = { Idr.TYPE };
         private readonly TypeTypeID[] sgReferenceTypes = { Binx.TYPE, Coll.TYPE, Gzps.TYPE, Xfch.TYPE, Xmol.TYPE, Xhtn.TYPE, Xstn.TYPE, Xtol.TYPE };
         private readonly TypeTypeID[] sgSpecialTypes = { Objd.TYPE, Mmat.TYPE };
-        // TODO - what about LIFO entries?
+        // What to do about LIFO entries?
         private readonly TypeTypeID[] sgCommonTypes = { Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE };
 
         // Types not reported as duplicates if in group 0xFFFFFFFF

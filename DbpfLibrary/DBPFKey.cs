@@ -112,34 +112,34 @@ namespace Sims2Tools.DBPF
 
     public interface IDBPFNamedKey : IDBPFKey
     {
-        String FileName { get; set; }
+        String KeyName { get; set; }
     }
 
     public abstract class DBPFNamedKey : DBPFKey, IDBPFNamedKey
     {
-        private String fileName;
+        private String keyName;
 
-        public virtual String FileName
+        public virtual String KeyName
         {
-            get => fileName;
-            set => fileName = value;
+            get => keyName;
+            set => keyName = value;
         }
 
-        public DBPFNamedKey(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID, String fileName) : base(typeID, groupID, instanceID, resourceID)
+        public DBPFNamedKey(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID, String keyName) : base(typeID, groupID, instanceID, resourceID)
         {
-            this.fileName = fileName;
+            this.keyName = keyName;
         }
 
-        public DBPFNamedKey(IDBPFKey key, String fileName) : this(key.TypeID, key.GroupID, key.InstanceID, key.ResourceID, fileName)
+        public DBPFNamedKey(IDBPFKey key, String keyName) : this(key.TypeID, key.GroupID, key.InstanceID, key.ResourceID, keyName)
         {
         }
 
-        public DBPFNamedKey(IDBPFNamedKey namedKey) : this(namedKey, namedKey.FileName)
+        public DBPFNamedKey(IDBPFNamedKey namedKey) : this(namedKey, namedKey.KeyName)
         {
         }
         public override string ToString()
         {
-            return $"{base.ToString()} '{FileName}'";
+            return $"{base.ToString()} '{KeyName}'";
         }
     }
 }

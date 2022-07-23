@@ -76,6 +76,12 @@
       <DependentUpon>TextProgressBar.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\MsgBox.cs" />
+    <Compile Include="Dialogs\Sims2ToolsTextEntryDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Sims2ToolsTextEntryDialog.Designer.cs">
+      <DependentUpon>Sims2ToolsTextEntryDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="SimpeData.cs" />
     <Compile Include="GameData.cs" />
     <Compile Include="Dialogs\Sims2ToolsAboutDialog.cs">
@@ -107,6 +113,9 @@
     <Compile Include="Win32\WndProcRetHook.cs" />
     <EmbeddedResource Include="Dialogs\Sims2ToolsAboutDialog.resx">
       <DependentUpon>Sims2ToolsAboutDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Sims2ToolsTextEntryDialog.resx">
+      <DependentUpon>Sims2ToolsTextEntryDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Sims2ToolsConfigDialog.resx">
       <DependentUpon>Sims2ToolsConfigDialog.cs</DependentUpon>

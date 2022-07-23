@@ -6,10 +6,12 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+#region Usings
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.Cigen;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Package;
@@ -30,6 +32,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml;
+#endregion
 
 namespace BsokEditor
 {
@@ -37,12 +40,14 @@ namespace BsokEditor
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private CigenFile cigenCache = null;
+
         private string folder = null;
 
         private MruList MyMruList;
         private Updater MyUpdater;
 
-        private readonly BsokEditorData bsokData = new BsokEditorData();
+        private readonly ResourcesDataTable dataTableResources = new ResourcesDataTable();
         private readonly XmlElement bsokXml;
 
         private bool dataLoading = false;
@@ -50,6 +55,7 @@ namespace BsokEditor
 
         private bool IsAutoUpdate => (!dataLoading && !ignoreEdits);
 
+        #region Constructor and Dispose
         public BsokEditorForm()
         {
             logger.Info(BsokEditorApp.AppProduct);
@@ -94,28 +100,27 @@ namespace BsokEditor
                 dataLoading = false;
             }
 
-            gridObjects.DataSource = bsokData;
+            gridViewResources.DataSource = dataTableResources;
+
+            if (Sims2ToolsLib.IsSims2HomePathSet)
+            {
+                cigenCache = new CigenFile($"{Sims2ToolsLib.Sims2HomePath}\\cigen.package");
+            }
         }
 
-        private void LoadBsokProductComboBoxes()
+        public new void Dispose()
         {
-            bool oldDataLoading = dataLoading;
-            dataLoading = true;
-
-            comboBsokGenre.Items.Clear();
-
-            foreach (XmlNode node in bsokXml.ChildNodes)
+            if (cigenCache != null)
             {
-                if (node is XmlElement element) comboBsokGenre.Items.Add(new XmlValue(element.GetAttribute("name"), element));
+                cigenCache.Close();
+                cigenCache = null;
             }
 
-            comboBsokGenre.SelectedIndex = 0;
-
-            cachedBsokValue = "";
-
-            dataLoading = oldDataLoading;
+            base.Dispose();
         }
+        #endregion
 
+        #region Form Management
         private void OnLoad(object sender, EventArgs e)
         {
             RegistryTools.LoadAppSettings(BsokEditorApp.RegistryKey, BsokEditorApp.AppVersionMajor, BsokEditorApp.AppVersionMinor);
@@ -129,6 +134,8 @@ namespace BsokEditor
             menuItemShowGenderAge.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowGenderAge.Name, 0) != 0); OnShowGenderAndAgeClicked(menuItemShowGenderAge, null);
 
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
+
+            UpdateFormState();
 
             MyUpdater = new Updater(BsokEditorApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
@@ -157,32 +164,6 @@ namespace BsokEditor
             RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
         }
 
-        private bool IsAnyDirty()
-        {
-            foreach (DataGridViewRow row in gridObjects.Rows)
-            {
-                if ((row.Cells["colCpf"].Value as Cpf).IsDirty)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool IsAnyHiddenDirty()
-        {
-            foreach (DataGridViewRow row in gridObjects.Rows)
-            {
-                if (row.Visible == false && (row.Cells["colCpf"].Value as Cpf).IsDirty)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         private void OnExitClicked(object sender, EventArgs e)
         {
             this.Close();
@@ -192,44 +173,9 @@ namespace BsokEditor
         {
             new Sims2ToolsAboutDialog(BsokEditorApp.AppProduct).ShowDialog();
         }
+        #endregion
 
-        private void OnConfigurationClicked(object sender, EventArgs e)
-        {
-            Form config = new Sims2ToolsConfigDialog();
-
-            if (config.ShowDialog() == DialogResult.OK)
-            {
-                // Perform any reload necessary after changing the objects.package location
-            }
-        }
-
-        private void OnToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                int index = e.RowIndex;
-
-                if (index < bsokData.Rows.Count)
-                {
-                    DataGridViewRow row = gridObjects.Rows[index];
-
-                    if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colPackageName"))
-                    {
-                        e.ToolTipText = row.Cells["colPackagePath"].Value as string;
-                    }
-                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colBsok"))
-                    {
-                        e.ToolTipText = (row.Cells["colCpf"].Value as Cpf).GetItem("product").StringValue;
-                    }
-                }
-            }
-        }
-
-        private void MyMruList_FolderSelected(string folder)
-        {
-            DoWork_FillGrid(folder);
-        }
-
+        #region Worker
         private void DoWork_FillGrid(string folder)
         {
             if (folder == null) return;
@@ -251,8 +197,9 @@ namespace BsokEditor
             menuItemRecentFolders.Enabled = false;
 
             dataLoading = true;
+            dataTableResources.BeginLoadData();
 
-            bsokData.Clear();
+            dataTableResources.Clear();
             panelEditor.Enabled = false;
 
             Sims2ToolsProgressDialog progressDialog = new Sims2ToolsProgressDialog();
@@ -261,6 +208,7 @@ namespace BsokEditor
 
             DialogResult result = progressDialog.ShowDialog();
 
+            dataTableResources.EndLoadData();
             dataLoading = false;
 
             menuItemRecentFolders.Enabled = true;
@@ -328,11 +276,13 @@ namespace BsokEditor
 
                             if (IsBsokPackage(package, binx, idr, out Cpf cpf))
                             {
-                                DataRow row = bsokData.NewRow();
+                                DataRow row = dataTableResources.NewRow();
+                                row["Visible"] = "Yes";
+
                                 row["PackageName"] = new FileInfo(packageFile).Name;
                                 row["PackagePath"] = packageFile;
 
-                                row["Cpf"] = cpf;
+                                row["ResRef"] = cpf;
 
                                 if (cpf == null)
                                 {
@@ -392,6 +342,21 @@ namespace BsokEditor
             }
         }
 
+        private void DoAsyncWork_FillGrid_Data(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke((MethodInvoker)delegate { DoAsyncWork_FillGrid_Data(sender, e); });
+                return;
+            }
+
+            // This will be run on main (UI) thread 
+            DataRow row = e.Argument as DataRow;
+            dataTableResources.Append(row);
+        }
+        #endregion
+
+        #region Worker Helpers
         private bool IsBsokPackage(DBPFFile package, Binx binx, Idr idr, out Cpf cpf)
         {
             cpf = null;
@@ -408,16 +373,52 @@ namespace BsokEditor
 
             return false;
         }
-
-        private void UpdateRowVisibility()
+        private void LoadBsokProductComboBoxes()
         {
-            gridObjects.CurrentCell = null;
-            gridObjects.ClearSelection();
+            bool oldDataLoading = dataLoading;
+            dataLoading = true;
 
-            foreach (DataGridViewRow row in gridObjects.Rows)
+            comboBsokGenre.Items.Clear();
+
+            foreach (XmlNode node in bsokXml.ChildNodes)
             {
-                row.Visible = IsVisibleObject(row.Cells["colCpf"].Value as Cpf);
+                if (node is XmlElement element) comboBsokGenre.Items.Add(new XmlValue(element.GetAttribute("name"), element));
             }
+
+            comboBsokGenre.SelectedIndex = 0;
+
+            cachedBsokValue = "";
+
+            dataLoading = oldDataLoading;
+        }
+
+        #endregion
+
+        #region Form State
+        private bool IsAnyDirty()
+        {
+            foreach (DataRow row in dataTableResources.Rows)
+            {
+                if ((row["ResRef"] as Cpf).IsDirty)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsAnyHiddenDirty()
+        {
+            foreach (DataRow row in dataTableResources.Rows)
+            {
+                if (!row["Visible"].Equals("Yes") && (row["ResRef"] as Cpf).IsDirty)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool IsVisibleObject(Cpf cpf)
@@ -428,6 +429,166 @@ namespace BsokEditor
             return true;
         }
 
+        private bool updatingFormState = false;
+
+        private void UpdateFormState()
+        {
+            if (updatingFormState) return;
+
+            updatingFormState = true;
+
+            btnSave.Enabled = false;
+
+            // Update the visibility in the underlying DataTable, do NOT use the Visible property of the DataGridView rows!!!
+            foreach (DataRow row in dataTableResources.Rows)
+            {
+                Cpf cpf = row["ResRef"] as Cpf;
+
+                row["Visible"] = IsVisibleObject(cpf) ? "Yes" : "No";
+            }
+
+            // Update the highlight state of the rows in the DataGridView
+            foreach (DataGridViewRow row in gridViewResources.Rows)
+            {
+                Cpf cpf = row.Cells["colResRef"].Value as Cpf;
+
+                if (cpf.IsDirty)
+                {
+                    btnSave.Enabled = true;
+                    row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+                }
+                else
+                {
+                    row.DefaultCellStyle.BackColor = Color.Empty;
+                }
+            }
+
+            updatingFormState = false;
+        }
+
+        private void ReselectRows(List<Cpf> selectedData)
+        {
+            if (ignoreEdits) return;
+
+            UpdateFormState();
+
+            foreach (DataGridViewRow row in gridViewResources.Rows)
+            {
+                row.Selected = selectedData.Contains(row.Cells["colResRef"].Value as Cpf);
+            }
+        }
+        #endregion
+
+        #region File Menu Actions
+        private void OnSelectFolderClicked(object sender, EventArgs e)
+        {
+            if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                DoWork_FillGrid(selectPathDialog.FileName);
+            }
+        }
+
+        private void MyMruList_FolderSelected(string folder)
+        {
+            DoWork_FillGrid(folder);
+        }
+
+        private void OnConfigurationClicked(object sender, EventArgs e)
+        {
+            Form config = new Sims2ToolsConfigDialog();
+
+            if (config.ShowDialog() == DialogResult.OK)
+            {
+                // Perform any reload necessary after changing the objects.package location
+            }
+        }
+        #endregion
+
+        #region Options Menu Actions
+        private void OnExcludeUnknown(object sender, EventArgs e)
+        {
+            UpdateFormState();
+        }
+
+        private void OnShowGenderAndAgeClicked(object sender, EventArgs e)
+        {
+            gridViewResources.Columns["colGender"].Visible = menuItemShowGenderAge.Checked;
+            gridViewResources.Columns["colAge"].Visible = menuItemShowGenderAge.Checked;
+
+            grpGender.Visible = menuItemShowGenderAge.Checked;
+            grpAge.Visible = menuItemShowGenderAge.Checked;
+        }
+
+        private void OnShowCategoryAndShoeClicked(object sender, EventArgs e)
+        {
+            gridViewResources.Columns["colCategory"].Visible = menuItemShowCategoryShoe.Checked;
+            gridViewResources.Columns["colShoe"].Visible = menuItemShowCategoryShoe.Checked;
+
+            grpCategory.Visible = menuItemShowCategoryShoe.Checked;
+            grpShoe.Visible = menuItemShowCategoryShoe.Checked;
+        }
+        #endregion
+
+        #region Mode Menu Actions
+        #endregion
+
+        #region Tooltips and Thumbnails
+        private void OnToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                int index = e.RowIndex;
+
+                if (index < dataTableResources.Rows.Count)
+                {
+                    DataGridViewRow row = gridViewResources.Rows[index];
+
+                    if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colPackageName"))
+                    {
+                        e.ToolTipText = row.Cells["colPackagePath"].Value as string;
+                    }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colBsok"))
+                    {
+                        e.ToolTipText = (row.Cells["colResRef"].Value as Cpf).GetItem("product")?.StringValue;
+                    }
+                }
+            }
+        }
+
+        private Image GetThumbnail(DataGridViewRow row)
+        {
+            return cigenCache?.GetThumbnail(row.Cells["colResRef"].Value as Cpf);
+        }
+        #endregion
+
+        #region Grid Management
+        private void OnGridSelectionChanged(object sender, EventArgs e)
+        {
+            if (dataLoading) return;
+
+            ClearEditor();
+
+            if (gridViewResources.SelectedRows.Count >= 1)
+            {
+                bool append = false;
+                foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+                {
+                    UpdateEditor(row.Cells["colResRef"].Value as Cpf, append);
+                    append = true;
+                }
+            }
+        }
+
+        private void OnResourceBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            if (gridViewResources.SortedColumn != null)
+            {
+                UpdateFormState();
+            }
+        }
+        #endregion
+
+        #region Grid Row Fill
         private string BuildBsokString(Cpf cpf)
         {
             string bsok = "";
@@ -567,470 +728,126 @@ namespace BsokEditor
 
             return shoe;
         }
+        #endregion
 
-        private void DoAsyncWork_FillGrid_Data(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        #region Grid Row Update
+        private void UpdateGridRow(Cpf cpf)
         {
-            if (InvokeRequired)
+            foreach (DataGridViewRow row in gridViewResources.Rows)
             {
-                Invoke((MethodInvoker)delegate { DoAsyncWork_FillGrid_Data(sender, e); });
-                return;
-            }
-
-            // This will be run on main (UI) thread 
-            DataRow row = e.Argument as DataRow;
-            bsokData.Append(row);
-            gridObjects.CurrentCell = null;
-            gridObjects.Rows[gridObjects.RowCount - 1].Visible = IsVisibleObject(row["Cpf"] as Cpf);
-        }
-
-        private DataGridViewCellEventArgs mouseLocation = null;
-        readonly DataGridViewRow highlightRow = null;
-        readonly Color highlightColor = Color.Empty;
-
-        private void OnCellMouseEnter(object sender, DataGridViewCellEventArgs e)
-        {
-            mouseLocation = e;
-        }
-
-        private void OnContextMenuOpening(object sender, CancelEventArgs e)
-        {
-            if (mouseLocation == null || mouseLocation.RowIndex == -1)
-            {
-                e.Cancel = true;
-                return;
-            }
-
-            foreach (DataGridViewRow selectedRow in gridObjects.SelectedRows)
-            {
-                if (selectedRow.Visible && mouseLocation.RowIndex == selectedRow.Index && (selectedRow.Cells["colCpf"].Value as Cpf).IsDirty)
+                if ((row.Cells["colResRef"].Value as Cpf).Equals(cpf))
                 {
+                    row.Cells["colBsok"].Value = BuildBsokString(cpf);
+
+                    row.Cells["colGender"].Value = BuildGenderString(cpf);
+                    row.Cells["colAge"].Value = BuildAgeString(cpf);
+
+                    row.Cells["colCategory"].Value = BuildCategoryString(cpf);
+                    row.Cells["colShoe"].Value = BuildShoeString(cpf);
+
+                    UpdateFormState();
+
                     return;
                 }
             }
-
-            e.Cancel = true;
-            return;
         }
+        #endregion
 
-        private void OnContextMenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
+        #region Selected Row Update
+        private void UpdateSelectedRows(uint data, string name)
         {
-            if (highlightRow != null)
+            if (ignoreEdits) return;
+
+            List<Cpf> selectedData = new List<Cpf>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
             {
-                highlightRow.DefaultCellStyle.BackColor = highlightColor;
+                selectedData.Add(row.Cells["colResRef"].Value as Cpf);
             }
+
+            foreach (Cpf cpf in selectedData)
+            {
+                UpdateCpfData(cpf, name, data);
+            }
+
+            ReselectRows(selectedData);
         }
 
-        private void UpdateFormState()
+        private void UpdateSelectedRowsForcingUInt32(string data, string name)
         {
-            btnSave.Enabled = false;
+            if (ignoreEdits) return;
 
-            foreach (DataGridViewRow row in gridObjects.Rows)
+            List<Cpf> selectedData = new List<Cpf>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
             {
-                if (row.Visible)
+                selectedData.Add(row.Cells["colResRef"].Value as Cpf);
+            }
+
+            foreach (Cpf cpf in selectedData)
+            {
+                uint dataAsUint32;
+
+                if (data.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (row.Cells["colCpf"].Value is Cpf cpf && cpf.IsDirty)
-                    {
-                        btnSave.Enabled = true;
-                        break;
-                    }
+                    dataAsUint32 = Convert.ToUInt32(data.Substring(2), 16);
                 }
-            }
-        }
-
-        private void OnSelectFolderClicked(object sender, EventArgs e)
-        {
-            if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                DoWork_FillGrid(selectPathDialog.FileName);
-            }
-        }
-
-        private void OnExcludeHidden(object sender, EventArgs e)
-        {
-            UpdateRowVisibility();
-        }
-
-        private void BsokLevelChanged(ComboBox comboBsokParent, ComboBox comboBsokChild)
-        {
-            bool oldDataLoading = dataLoading;
-            dataLoading = true;
-
-            int oldSelectedIndex = comboBsokChild.SelectedIndex;
-
-            comboBsokChild.Items.Clear();
-
-            bool singular = ((comboBsokParent.SelectedItem as XmlValue).Element == null || (comboBsokParent.SelectedItem as XmlValue).Element.ChildNodes.Count == 1);
-
-            if (!singular) comboBsokChild.Items.Add(new XmlValue("", null));
-
-            if ((comboBsokParent.SelectedItem as XmlValue).Element != null)
-            {
-                foreach (XmlNode node in (comboBsokParent.SelectedItem as XmlValue).Element.ChildNodes)
+                else
                 {
-                    if (node is XmlElement element)
-                    {
-                        string name = element.GetAttribute("name");
-                        string gender = element.GetAttribute("gender").ToLower();
-
-                        if (!string.IsNullOrWhiteSpace(gender))
-                        {
-                            if ("female".Equals(gender))
-                            {
-                                if (cachedGenderValue != 0x01) continue;
-                            }
-                            else if ("male".Equals(gender))
-                            {
-                                if (cachedGenderValue != 0x02) continue;
-                            }
-                            else if ("unisex".Equals(gender))
-                            {
-                                if (cachedGenderValue == 0x00) continue;
-                            }
-                        }
-
-                        if (!string.IsNullOrWhiteSpace(gender))
-                        {
-                            name = $"{name} ({gender})";
-                        }
-
-                        comboBsokChild.Items.Add(new XmlValue(name, element));
-                    }
-                }
-            }
-
-            if (comboBsokChild == comboBsokGenre && bsokGenreLocked && comboBsokChild.Items.Count > oldSelectedIndex)
-            {
-                comboBsokChild.SelectedIndex = oldSelectedIndex;
-            }
-            else if (comboBsokChild == comboBsokStyle && bsokStyleLocked && comboBsokChild.Items.Count > oldSelectedIndex)
-            {
-                comboBsokChild.SelectedIndex = oldSelectedIndex;
-            }
-            else if (comboBsokChild == comboBsokRoles && bsokRolesLocked && comboBsokChild.Items.Count > oldSelectedIndex)
-            {
-                comboBsokChild.SelectedIndex = oldSelectedIndex;
-            }
-            else
-            {
-                comboBsokChild.SelectedIndex = Math.Min(comboBsokChild.Items.Count - 1, (singular ? (((comboBsokParent.SelectedItem as XmlValue).Element == null) ? -1 : 0) : 1));
-            }
-
-            dataLoading = oldDataLoading;
-        }
-
-        private void OnBsokGenreChanged(object sender, EventArgs e)
-        {
-            if (comboBsokGenre.SelectedIndex != -1)
-            {
-                UpdateLockButtons();
-                BsokLevelChanged(comboBsokGenre, comboBsokStyle);
-            }
-
-            if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedValueForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
-        }
-
-        private void OnBsokStyleChanged(object sender, EventArgs e)
-        {
-            if (comboBsokStyle.SelectedIndex != -1)
-            {
-                UpdateLockButtons();
-                BsokLevelChanged(comboBsokStyle, comboBsokGroup);
-            }
-
-            if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedValueForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
-        }
-
-        private void OnBsokGroupChanged(object sender, EventArgs e)
-        {
-            if (comboBsokGroup.SelectedIndex != -1)
-            {
-                UpdateLockButtons();
-                BsokLevelChanged(comboBsokGroup, comboBsokShape);
-            }
-
-            if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedValueForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
-        }
-
-        private void OnBsokShapeChanged(object sender, EventArgs e)
-        {
-            if (comboBsokShape.SelectedIndex != -1)
-            {
-                UpdateLockButtons();
-                BsokLevelChanged(comboBsokShape, comboBsokRoles);
-            }
-
-            if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedValueForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
-        }
-
-        private void OnBsokRoleChanged(object sender, EventArgs e)
-        {
-            if (comboBsokRoles.SelectedIndex != -1)
-            {
-                UpdateLockButtons();
-            }
-
-            if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedValueForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
-        }
-
-        private void OnGenderChanged(object sender, EventArgs e)
-        {
-            if (comboGender.SelectedIndex != -1)
-            {
-                if (IsAutoUpdate)
-                {
-                    cachedGenderValue = (comboGender.SelectedItem as NamedValue).Value;
-                    UpdateSelectedValue(cachedGenderValue, "gender");
+                    dataAsUint32 = Convert.ToUInt32(data);
                 }
 
-                LoadBsokProductComboBoxes();
+                UpdateCpfData(cpf, name, dataAsUint32);
             }
+
+            ReselectRows(selectedData);
         }
 
-        private void OnShoeChanged(object sender, EventArgs e)
+        private void UpdateSelectedRows(bool state, string name, ushort flag)
         {
-            if (comboShoe.SelectedIndex != -1)
+            if (ignoreEdits) return;
+
+            List<Cpf> selectedData = new List<Cpf>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
             {
-                if (IsAutoUpdate) UpdateSelectedValue((comboShoe.SelectedItem as NamedValue).Value, "shoe");
+                selectedData.Add(row.Cells["colResRef"].Value as Cpf);
             }
-        }
 
-        private void OnGridSelectionChanged(object sender, EventArgs e)
-        {
-            if (dataLoading) return;
-
-            ClearEditor();
-
-            if (gridObjects.SelectedRows.Count >= 1)
+            foreach (Cpf cpf in selectedData)
             {
-                bool append = false;
-                foreach (DataGridViewRow row in gridObjects.SelectedRows)
+                uint data = cpf.GetItem(name).UIntegerValue;
+
+                if (state)
                 {
-                    if (row.Visible)
-                    {
-                        UpdateEditor(row.Cells["colCpf"].Value as Cpf, append);
-                        append = true;
-                    }
+                    data |= flag;
                 }
-            }
-        }
+                else
+                {
+                    data &= (uint)(~flag & 0xffff);
+                }
 
-
-        string cachedBsokValue;
-        uint cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedShoeValue;
-
-        private void UpdateGridRow(DataGridViewRow row, Cpf cpf)
-        {
-            if (cpf == null)
-            {
-                cpf = row.Cells["colCpf"].Value as Cpf;
+                UpdateCpfData(cpf, name, data);
             }
 
-            row.Cells["colBsok"].Value = BuildBsokString(cpf);
-
-            row.Cells["colGender"].Value = BuildGenderString(cpf);
-            row.Cells["colAge"].Value = BuildAgeString(cpf);
-
-            row.Cells["colCategory"].Value = BuildCategoryString(cpf);
-            row.Cells["colShoe"].Value = BuildShoeString(cpf);
-
-            UpdateFormState();
+            ReselectRows(selectedData);
         }
+        #endregion
 
-        private void UpdateCpfData(Cpf cpf, string name, uint data, DataGridViewRow row)
+        #region Resource Update
+        private void UpdateCpfData(Cpf cpf, string name, uint data)
         {
             if (ignoreEdits) return;
 
             cpf.GetItem(name).UIntegerValue = data;
 
-            if (cpf.IsDirty)
-            {
-                row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
-            }
-
-            UpdateGridRow(row, cpf);
+            UpdateGridRow(cpf);
         }
+        #endregion
 
-        private void UpdateSelectedValue(uint data, string name)
-        {
-            foreach (DataGridViewRow row in gridObjects.SelectedRows)
-            {
-                if (row.Visible)
-                {
-                    Cpf cpf = row.Cells["colCpf"].Value as Cpf;
-
-                    UpdateCpfData(cpf, name, data, row);
-                }
-            }
-        }
-
-        private void UpdateSelectedValueForcingUInt32(string data, string name)
-        {
-            uint dataAsUint32;
-
-            if (data.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-            {
-                dataAsUint32 = Convert.ToUInt32(data.Substring(2), 16);
-            }
-            else
-            {
-                dataAsUint32 = Convert.ToUInt32(data);
-            }
-
-            foreach (DataGridViewRow row in gridObjects.SelectedRows)
-            {
-                if (row.Visible)
-                {
-                    Cpf cpf = row.Cells["colCpf"].Value as Cpf;
-
-                    UpdateCpfData(cpf, name, dataAsUint32, row);
-                }
-            }
-        }
-
-        private void UpdateSelectedFlag(bool state, string name, ushort flag)
-        {
-            foreach (DataGridViewRow row in gridObjects.SelectedRows)
-            {
-                if (row.Visible)
-                {
-                    Cpf cpf = row.Cells["colCpf"].Value as Cpf;
-
-                    uint data = cpf.GetItem(name).UIntegerValue;
-
-                    if (state)
-                    {
-                        data |= flag;
-                    }
-                    else
-                    {
-                        data &= (uint)(~flag & 0xffff);
-                    }
-
-                    UpdateCpfData(cpf, name, data, row);
-                }
-            }
-        }
-
-        private void OnCatEverydayClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCatEveryday.Checked, "category", 0x0007);
-        }
-
-        private void OnCatFormalClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCatFormal.Checked, "category", 0x0020);
-        }
-
-        private void OnCatGymClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCatGym.Checked, "category", 0x0200);
-        }
-
-        private void OnCatMaternityClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCatMaternity.Checked, "category", 0x0100);
-        }
-
-        private void OnCatOuterwearClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCatOuterwear.Checked, "category", 0x1000);
-        }
-
-        private void OnCatPJsClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCatPJs.Checked, "category", 0x0010);
-        }
-
-        private void OnCatSwimwearClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCatSwimwear.Checked, "category", 0x0008);
-        }
-
-        private void OnCatUnderwearClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCatUnderwear.Checked, "category", 0x0040);
-        }
-
-        private void OnAgeBabiesClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbAgeBabies.Checked, "age", 0x0020);
-        }
-
-        private void OnAgeToddlersClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbAgeToddlers.Checked, "age", 0x0001);
-        }
-
-        private void OnAgeChildrenClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbAgeChildren.Checked, "age", 0x0002);
-        }
-
-        private void OnAgeTeensClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbAgeTeens.Checked, "age", 0x0004);
-        }
-
-        private void OnAgeYoungAdultsClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbAgeAdults.Checked, "age", 0x0008);
-        }
-
-        private void OnAgeAdultsClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbAgeAdults.Checked, "age", 0x0040);
-        }
-
-        private void OnAgeEldersClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbAgeElders.Checked, "age", 0x0010);
-        }
-
-        private void OnRowRevertClicked(object sender, EventArgs e)
-        {
-            foreach (DataGridViewRow row in gridObjects.SelectedRows)
-            {
-                if (row.Visible)
-                {
-                    Cpf cpf = row.Cells["colCpf"].Value as Cpf;
-
-                    if (cpf.IsDirty)
-                    {
-                        string packageFile = row.Cells["colPackagePath"].Value as string;
-
-                        using (DBPFFile package = new DBPFFile(packageFile))
-                        {
-                            Cpf originalCpf = (Cpf)package.GetResourceByKey(cpf);
-
-                            row.Cells["colCpf"].Value = originalCpf;
-
-                            package.Close();
-
-                            UpdateGridRow(row, originalCpf);
-                            row.DefaultCellStyle.BackColor = Color.Empty;
-                        }
-                    }
-                }
-            }
-        }
-
-        private void OnShowGenderAndAgeClicked(object sender, EventArgs e)
-        {
-            gridObjects.Columns["colGender"].Visible = menuItemShowGenderAge.Checked;
-            gridObjects.Columns["colAge"].Visible = menuItemShowGenderAge.Checked;
-
-            grpGender.Visible = menuItemShowGenderAge.Checked;
-            grpAge.Visible = menuItemShowGenderAge.Checked;
-        }
-
-        private void OnShowCategoryAndShoeClicked(object sender, EventArgs e)
-        {
-            gridObjects.Columns["colCategory"].Visible = menuItemShowCategoryShoe.Checked;
-            gridObjects.Columns["colShoe"].Visible = menuItemShowCategoryShoe.Checked;
-
-            grpCategory.Visible = menuItemShowCategoryShoe.Checked;
-            grpShoe.Visible = menuItemShowCategoryShoe.Checked;
-        }
+        #region Editor
+        string cachedBsokValue;
+        uint cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedShoeValue;
 
         private void ClearEditor()
         {
@@ -1272,58 +1089,133 @@ namespace BsokEditor
                 if (!locked && comboBsok.Items.Count > 0) comboBsok.SelectedIndex = 0;
             }
         }
+        #endregion
 
-        private void OnSaveClicked(object sender, EventArgs e)
+        #region BSOK Dropdown Events
+        private void OnBsokGenreChanged(object sender, EventArgs e)
         {
-            Save();
+            if (comboBsokGenre.SelectedIndex != -1)
+            {
+                UpdateLockButtons();
+                BsokLevelChanged(comboBsokGenre, comboBsokStyle);
+            }
 
-            UpdateFormState();
+            if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedRowsForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
         }
 
-        private void Save()
+        private void OnBsokStyleChanged(object sender, EventArgs e)
         {
-            Dictionary<string, List<Cpf>> dirtyCpfsByPackage = new Dictionary<string, List<Cpf>>();
-
-            foreach (DataGridViewRow row in gridObjects.Rows)
+            if (comboBsokStyle.SelectedIndex != -1)
             {
-                if (row.Visible)
+                UpdateLockButtons();
+                BsokLevelChanged(comboBsokStyle, comboBsokGroup);
+            }
+
+            if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedRowsForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
+        }
+
+        private void OnBsokGroupChanged(object sender, EventArgs e)
+        {
+            if (comboBsokGroup.SelectedIndex != -1)
+            {
+                UpdateLockButtons();
+                BsokLevelChanged(comboBsokGroup, comboBsokShape);
+            }
+
+            if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedRowsForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
+        }
+
+        private void OnBsokShapeChanged(object sender, EventArgs e)
+        {
+            if (comboBsokShape.SelectedIndex != -1)
+            {
+                UpdateLockButtons();
+                BsokLevelChanged(comboBsokShape, comboBsokRoles);
+            }
+
+            if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedRowsForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
+        }
+
+        private void OnBsokRoleChanged(object sender, EventArgs e)
+        {
+            if (comboBsokRoles.SelectedIndex != -1)
+            {
+                UpdateLockButtons();
+            }
+
+            if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedRowsForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
+        }
+
+        private void BsokLevelChanged(ComboBox comboBsokParent, ComboBox comboBsokChild)
+        {
+            bool oldDataLoading = dataLoading;
+            dataLoading = true;
+
+            int oldSelectedIndex = comboBsokChild.SelectedIndex;
+
+            comboBsokChild.Items.Clear();
+
+            bool singular = ((comboBsokParent.SelectedItem as XmlValue).Element == null || (comboBsokParent.SelectedItem as XmlValue).Element.ChildNodes.Count == 1);
+
+            if (!singular) comboBsokChild.Items.Add(new XmlValue("", null));
+
+            if ((comboBsokParent.SelectedItem as XmlValue).Element != null)
+            {
+                foreach (XmlNode node in (comboBsokParent.SelectedItem as XmlValue).Element.ChildNodes)
                 {
-                    Cpf editedCpf = row.Cells["colCpf"].Value as Cpf;
-
-                    if (editedCpf.IsDirty)
+                    if (node is XmlElement element)
                     {
-                        String packageFile = row.Cells["colPackagePath"].Value as string;
+                        string name = element.GetAttribute("name");
+                        string gender = element.GetAttribute("gender").ToLower();
 
-                        if (!dirtyCpfsByPackage.ContainsKey(packageFile))
+                        if (!string.IsNullOrWhiteSpace(gender))
                         {
-                            dirtyCpfsByPackage.Add(packageFile, new List<Cpf>());
+                            if ("female".Equals(gender))
+                            {
+                                if (cachedGenderValue != 0x01) continue;
+                            }
+                            else if ("male".Equals(gender))
+                            {
+                                if (cachedGenderValue != 0x02) continue;
+                            }
+                            else if ("unisex".Equals(gender))
+                            {
+                                if (cachedGenderValue == 0x00) continue;
+                            }
                         }
 
-                        dirtyCpfsByPackage[packageFile].Add(editedCpf);
+                        if (!string.IsNullOrWhiteSpace(gender))
+                        {
+                            name = $"{name} ({gender})";
+                        }
 
-                        row.DefaultCellStyle.BackColor = Color.Empty;
+                        comboBsokChild.Items.Add(new XmlValue(name, element));
                     }
                 }
             }
 
-            foreach (string packageFile in dirtyCpfsByPackage.Keys)
+            if (comboBsokChild == comboBsokGenre && bsokGenreLocked && comboBsokChild.Items.Count > oldSelectedIndex)
             {
-                using (DBPFFile dbpfPackage = new DBPFFile(packageFile))
-                {
-                    foreach (Cpf editedCpf in dirtyCpfsByPackage[packageFile])
-                    {
-                        editedCpf.GetItem("creator").StringValue = "00000000-0000-0000-0000-000000000000";
-                        dbpfPackage.Commit(editedCpf);
-                        editedCpf.SetClean();
-                    }
-
-                    if (dbpfPackage.IsDirty) dbpfPackage.Update(menuItemAutoBackup.Checked);
-
-                    dbpfPackage.Close();
-                }
+                comboBsokChild.SelectedIndex = oldSelectedIndex;
             }
-        }
+            else if (comboBsokChild == comboBsokStyle && bsokStyleLocked && comboBsokChild.Items.Count > oldSelectedIndex)
+            {
+                comboBsokChild.SelectedIndex = oldSelectedIndex;
+            }
+            else if (comboBsokChild == comboBsokRoles && bsokRolesLocked && comboBsokChild.Items.Count > oldSelectedIndex)
+            {
+                comboBsokChild.SelectedIndex = oldSelectedIndex;
+            }
+            else
+            {
+                comboBsokChild.SelectedIndex = Math.Min(comboBsokChild.Items.Count - 1, (singular ? (((comboBsokParent.SelectedItem as XmlValue).Element == null) ? -1 : 0) : 1));
+            }
 
+            dataLoading = oldDataLoading;
+        }
+        #endregion
+
+        #region BSOK Lock Events
         private bool bsokGenreLocked = true;
         private bool bsokStyleLocked = true;
         private bool bsokRolesLocked = true;
@@ -1368,5 +1260,268 @@ namespace BsokEditor
             btnBsokStyle.Image = (btnBsokStyle.Enabled) ? (bsokStyleLocked ? ln : un) : (bsokStyleLocked ? lg : ug);
             btnBsokRoles.Image = (btnBsokRoles.Enabled) ? (bsokRolesLocked ? ln : un) : (bsokRolesLocked ? lg : ug);
         }
+        #endregion
+
+        #region Dropdown Events
+        private void OnGenderChanged(object sender, EventArgs e)
+        {
+            if (comboGender.SelectedIndex != -1)
+            {
+                if (IsAutoUpdate)
+                {
+                    cachedGenderValue = (comboGender.SelectedItem as NamedValue).Value;
+                    UpdateSelectedRows(cachedGenderValue, "gender");
+                }
+
+                LoadBsokProductComboBoxes();
+            }
+        }
+
+        private void OnShoeChanged(object sender, EventArgs e)
+        {
+            if (comboShoe.SelectedIndex != -1)
+            {
+                if (IsAutoUpdate) UpdateSelectedRows((comboShoe.SelectedItem as NamedValue).Value, "shoe");
+            }
+        }
+        #endregion
+
+        #region Checkbox Events
+        private void OnCatEverydayClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCatEveryday.Checked, "category", 0x0007);
+        }
+
+        private void OnCatFormalClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCatFormal.Checked, "category", 0x0020);
+        }
+
+        private void OnCatGymClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCatGym.Checked, "category", 0x0200);
+        }
+
+        private void OnCatMaternityClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCatMaternity.Checked, "category", 0x0100);
+        }
+
+        private void OnCatOuterwearClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCatOuterwear.Checked, "category", 0x1000);
+        }
+
+        private void OnCatPJsClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCatPJs.Checked, "category", 0x0010);
+        }
+
+        private void OnCatSwimwearClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCatSwimwear.Checked, "category", 0x0008);
+        }
+
+        private void OnCatUnderwearClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCatUnderwear.Checked, "category", 0x0040);
+        }
+
+        private void OnAgeBabiesClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeBabies.Checked, "age", 0x0020);
+        }
+
+        private void OnAgeToddlersClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeToddlers.Checked, "age", 0x0001);
+        }
+
+        private void OnAgeChildrenClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeChildren.Checked, "age", 0x0002);
+        }
+
+        private void OnAgeTeensClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeTeens.Checked, "age", 0x0004);
+        }
+
+        private void OnAgeYoungAdultsClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeYoungAdults.Checked, "age", 0x0008);
+        }
+
+        private void OnAgeAdultsClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeAdults.Checked, "age", 0x0040);
+        }
+
+        private void OnAgeEldersClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeElders.Checked, "age", 0x0010);
+        }
+        #endregion
+
+        #region Textbox Events
+        #endregion
+
+        #region Mouse Management
+        private DataGridViewCellEventArgs mouseLocation = null;
+        readonly DataGridViewRow highlightRow = null;
+        readonly Color highlightColor = Color.Empty;
+
+        private void OnCellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            mouseLocation = e;
+            Point MousePosition = Cursor.Position;
+
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < gridViewResources.RowCount && e.ColumnIndex < gridViewResources.ColumnCount)
+            {
+                DataGridViewRow row = gridViewResources.Rows[e.RowIndex];
+
+                if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colType") || row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colPackageName"))
+                {
+                    Image thumbnail = GetThumbnail(row);
+
+                    if (thumbnail != null)
+                    {
+                        thumbBox.Image = thumbnail;
+                        thumbBox.Location = new System.Drawing.Point(MousePosition.X - this.Location.X, MousePosition.Y - this.Location.Y);
+                        thumbBox.Visible = true;
+                    }
+                }
+            }
+        }
+
+        private void OnCellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            thumbBox.Visible = false;
+        }
+        #endregion
+
+        #region Context Menu
+        private void OnContextMenuOpening(object sender, CancelEventArgs e)
+        {
+            if (mouseLocation == null || mouseLocation.RowIndex == -1)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
+            {
+                if (mouseLocation.RowIndex == selectedRow.Index && (selectedRow.Cells["colResRef"].Value as Cpf).IsDirty)
+                {
+                    return;
+                }
+            }
+
+            e.Cancel = true;
+            return;
+        }
+
+        private void OnContextMenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+            if (highlightRow != null)
+            {
+                highlightRow.DefaultCellStyle.BackColor = highlightColor;
+            }
+        }
+
+        private void OnRowRevertClicked(object sender, EventArgs e)
+        {
+            List<Cpf> selectedData = new List<Cpf>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            {
+                Cpf cpf = row.Cells["colResRef"].Value as Cpf;
+
+                if (cpf.IsDirty)
+                {
+                    selectedData.Add(cpf);
+                }
+            }
+
+            foreach (Cpf cpf in selectedData)
+            {
+                foreach (DataGridViewRow row in gridViewResources.Rows)
+                {
+                    if ((row.Cells["colResRef"].Value as Cpf).Equals(cpf))
+                    {
+                        string packageFile = row.Cells["colPackagePath"].Value as string;
+
+                        using (DBPFFile package = new DBPFFile(packageFile))
+                        {
+                            Cpf originalCpf = (Cpf)package.GetResourceByKey(cpf);
+
+                            row.Cells["colResRef"].Value = originalCpf;
+
+                            package.Close();
+
+                            UpdateGridRow(originalCpf);
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region Save Button
+        private void OnSaveClicked(object sender, EventArgs e)
+        {
+            Save();
+
+            UpdateFormState();
+        }
+
+        private void Save()
+        {
+            Dictionary<string, List<Cpf>> dirtyCpfsByPackage = new Dictionary<string, List<Cpf>>();
+
+            foreach (DataGridViewRow row in gridViewResources.Rows)
+            {
+                Cpf editedCpf = row.Cells["colResRef"].Value as Cpf;
+
+                if (editedCpf.IsDirty)
+                {
+                    String packageFile = row.Cells["colPackagePath"].Value as string;
+
+                    if (!dirtyCpfsByPackage.ContainsKey(packageFile))
+                    {
+                        dirtyCpfsByPackage.Add(packageFile, new List<Cpf>());
+                    }
+
+                    dirtyCpfsByPackage[packageFile].Add(editedCpf);
+
+                    row.DefaultCellStyle.BackColor = Color.Empty;
+                }
+            }
+
+            foreach (string packageFile in dirtyCpfsByPackage.Keys)
+            {
+                using (DBPFFile dbpfPackage = new DBPFFile(packageFile))
+                {
+                    foreach (Cpf editedCpf in dirtyCpfsByPackage[packageFile])
+                    {
+                        editedCpf.GetItem("creator").StringValue = "00000000-0000-0000-0000-000000000000";
+                        dbpfPackage.Commit(editedCpf);
+                        editedCpf.SetClean();
+                    }
+
+                    try
+                    {
+                        if (dbpfPackage.IsDirty) dbpfPackage.Update(menuItemAutoBackup.Checked);
+                    }
+                    catch (Exception)
+                    {
+                        MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
+                    }
+
+                    dbpfPackage.Close();
+                }
+            }
+        }
+        #endregion
     }
 }

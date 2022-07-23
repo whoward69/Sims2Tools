@@ -122,7 +122,7 @@ namespace Sims2Tools.DBPF.Package
         {
             foreach (DBPFEntry entry in GetAllEntries())
             {
-                if (key.Equals(entry)) return entry;
+                if (key != null && key.Equals(entry)) return entry;
             }
 
             return null;
@@ -217,6 +217,16 @@ namespace Sims2Tools.DBPF.Package
 
                 resourceCache.Commit(resource);
             }
+        }
+
+        internal void Commit(DBPFKey key, byte[] item)
+        {
+            if (GetEntryByKey(key) == null)
+            {
+                entryByKey.Add(key, new DBPFEntry(key));
+            }
+
+            resourceCache.Commit(key, item);
         }
 
         #region Clst Handling

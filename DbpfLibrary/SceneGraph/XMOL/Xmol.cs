@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.XMOL
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x0C1FE246;
         public const String NAME = "XMOL";
 
-        public override string FileName
+        public override string KeyName
         {
             get => Name;
         }

@@ -101,7 +101,7 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public static String SgName(DBPFNamedKey namedKey)
         {
-            return SgName(namedKey.TypeID, namedKey.GroupID, namedKey.FileName);
+            return SgName(namedKey.TypeID, namedKey.GroupID, namedKey.KeyName);
         }
 
         public static DBPFKey TGIRFromQualifiedName(string fileName, TypeTypeID typeId, TypeGroupID defGroupId)

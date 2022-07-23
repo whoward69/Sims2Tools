@@ -63,10 +63,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             type = "";
             desc = "";
         }
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
+
         public void Unserialize(DbpfReader reader)
         {
             type = reader.ReadString();
@@ -81,9 +78,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
     }
 
-    /// <summary>
-    /// A Shape Item
-    /// </summary>
     public class ShapeItem
     {
         readonly CShape parent;
@@ -129,11 +123,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             filename = "";
         }
 
-
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public void Unserialize(DbpfReader reader)
         {
             unknown1 = reader.ReadInt32();
@@ -161,24 +150,33 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
     }
 
-    /// <summary>
-    /// This is the actual FileWrapper
-    /// </summary>
-    /// <remarks>
-    /// The wrapper is used to (un)serialize the Data of a file into it's Attributes. So Basically it reads 
-    /// a BinaryStream and translates the data into some userdefine Attributes.
-    /// </remarks>
     public class CShape : AbstractRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xFC6EB1F7;
         public static String NAME = "cShape";
 
 
-        uint[] unknown;
-        public uint[] Unknwon
+        uint[] lodData;
+        public uint[] LodData
         {
-            get { return unknown; }
-            set { unknown = value; }
+            get { return lodData; }
+            set { lodData = value; }
+        }
+
+        public uint Lod
+        {
+            get { return lodData.Length > 0 ? lodData[0] : 0; }
+            set
+            {
+                if (lodData.Length > 0)
+                {
+                    lodData[0] = value;
+                }
+                else
+                {
+                    lodData = new uint[] { value };
+                }
+            }
         }
 
         ShapeItem[] items;
@@ -217,7 +215,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             refnode = new ReferentNode(null);
             ogn = new ObjectGraphNode(null);
 
-            unknown = new uint[0];
+            lodData = new uint[0];
             items = new ShapeItem[0];
             parts = new ShapePart[0];
             BlockID = TYPE;
@@ -239,9 +237,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             ogn.BlockID = reader.ReadBlockId();
             ogn.Unserialize(reader);
 
-            if (version != 0x06) unknown = new uint[reader.ReadUInt32()];
-            else unknown = new uint[0];
-            for (int i = 0; i < unknown.Length; i++) unknown[i] = reader.ReadUInt32();
+            if (version != 0x06) lodData = new uint[reader.ReadUInt32()];
+            else lodData = new uint[0];
+            for (int i = 0; i < lodData.Length; i++) lodData[i] = reader.ReadUInt32();
 
             items = new ShapeItem[reader.ReadUInt32()];
             for (int i = 0; i < items.Length; i++)

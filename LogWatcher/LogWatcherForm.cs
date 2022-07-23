@@ -237,7 +237,7 @@ namespace LogWatcher
                 {
                     try
                     {
-                        File.Delete(logFilePath);
+                        Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(logFilePath, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
                         MyMruList.RemoveFile(logFilePath);
                     }
                     catch (Exception) { }
@@ -306,7 +306,7 @@ namespace LogWatcher
 
         private void OnLogFileRenamed(object sender, RenamedEventArgs e)
         {
-            // TODO - do what with a renamed file?
+            // Do what with a renamed file?
         }
 
         private void OnAutoOpenClicked(object sender, EventArgs e)

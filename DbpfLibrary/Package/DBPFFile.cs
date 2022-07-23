@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.BCON;
 using Sims2Tools.DBPF.BHAV;
+using Sims2Tools.DBPF.Cigen.CGN1;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.Images.IMG;
@@ -75,6 +76,8 @@ namespace Sims2Tools.DBPF.Package
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly string packagePath;
+        private readonly string packageName;
+        private readonly string packageNameNoExtn;
 
         private DBPFHeader header;
         private DBPFResourceIndex resourceIndex;
@@ -83,6 +86,8 @@ namespace Sims2Tools.DBPF.Package
         private DbpfReader m_Reader;
 
         public string PackagePath => packagePath;
+        public string PackageName => packageName;
+        public string PackageNameNoExtn => packageNameNoExtn;
 
         public uint ResourceCount => header.ResourceIndexCount;
 
@@ -94,6 +99,9 @@ namespace Sims2Tools.DBPF.Package
 
             if (File.Exists(packagePath))
             {
+                this.packageName = new FileInfo(packagePath).Name;
+                this.packageNameNoExtn = packageName.Substring(0, packageName.LastIndexOf('.'));
+
                 Read(File.OpenRead(packagePath));
             }
             else
@@ -122,9 +130,13 @@ namespace Sims2Tools.DBPF.Package
 
                 foreach (DBPFEntry entry in resourceIndex.GetAllEntries())
                 {
-                    if (resourceCache.IsCached(entry))
+                    if (resourceCache.IsResource(entry))
                     {
-                        resourceCache.GetResourceByEntry(entry).Serialize(writer);
+                        resourceCache.GetResourceByKey(entry).Serialize(writer);
+                    }
+                    else if (resourceCache.IsItem(entry))
+                    {
+                        writer.WriteBytes(resourceCache.GetItemByKey(entry));
                     }
                     else
                     {
@@ -135,7 +147,7 @@ namespace Sims2Tools.DBPF.Package
             }
         }
 
-        public void Update(bool autoBackup)
+        public string Update(bool autoBackup)
         {
             string originalName = packagePath;
             string updateName = $"{packagePath}.temp";
@@ -160,11 +172,18 @@ namespace Sims2Tools.DBPF.Package
 
                 Read(File.OpenRead(originalName));
             }
+
+            return backupName;
         }
 
         public void Commit(DBPFResource resource)
         {
             resourceIndex.Commit(resource);
+        }
+
+        public void Commit(DBPFKey key, byte[] item)
+        {
+            resourceIndex.Commit(key, item);
         }
 
         private DbpfReader GetDbpfReader(DBPFEntry entry)
@@ -220,6 +239,11 @@ namespace Sims2Tools.DBPF.Package
             return resourceIndex.GetEntryByKey(key);
         }
 
+        public List<DBPFEntry> GetAllEntries()
+        {
+            return resourceIndex.GetAllEntries();
+        }
+
         public List<DBPFEntry> GetEntriesByType(TypeTypeID type)
         {
             return resourceIndex.GetEntriesByType(type);
@@ -246,7 +270,7 @@ namespace Sims2Tools.DBPF.Package
 
             if (resourceCache.IsCached(entry))
             {
-                return resourceCache.GetResourceByEntry(entry);
+                return resourceCache.GetResourceByKey(entry);
             }
 
             DBPFResource res = null;
@@ -478,6 +502,14 @@ namespace Sims2Tools.DBPF.Package
             {
                 res = new Xtol(entry, this.GetDbpfReader(entry));
             }
+            //
+            // Cigen Resources
+            //
+            else if (entry.TypeID == Cgn1.TYPE)
+            {
+                res = new Cgn1(entry, this.GetDbpfReader(entry));
+            }
+
 
             return res;
         }

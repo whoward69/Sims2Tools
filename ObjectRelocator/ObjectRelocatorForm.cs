@@ -6,6 +6,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+#region Usings
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.Controls;
@@ -32,11 +33,10 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+#endregion
 
 namespace ObjectRelocator
 {
-    // IDEA - manual commit
-    // IDEA - display thumbnail of object
     public partial class ObjectRelocatorForm : Form
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -44,8 +44,16 @@ namespace ObjectRelocator
         private static readonly ushort QuarterTileOn = 0x0023;
         private static readonly ushort QuarterTileOff = 0x0001;
 
+        private MruList MyMruList;
+        private Updater MyUpdater;
+
         private DBPFFile thumbCacheBuyMode = null;
         private DBPFFile thumbCacheBuildMode = null;
+
+        private readonly TypeTypeID[] buyModeResources = new TypeTypeID[] { Objd.TYPE };
+        private readonly TypeTypeID[] buildModeResources = new TypeTypeID[] { Objd.TYPE, Xfnc.TYPE, Xobj.TYPE };
+
+        private readonly ResourcesDataTable dataTableResources = new ResourcesDataTable();
 
         private string folder = null;
         private bool buyMode = true;
@@ -53,18 +61,26 @@ namespace ObjectRelocator
         private bool IsBuyMode => buyMode;
         private bool IsBuildMode => !buyMode;
 
-        private MruList MyMruList;
-        private Updater MyUpdater;
-
-        private readonly TypeTypeID[] buyModeResources = new TypeTypeID[] { Objd.TYPE };
-        private readonly TypeTypeID[] buildModeResources = new TypeTypeID[] { Objd.TYPE, Xfnc.TYPE, Xobj.TYPE };
-
-        private readonly ObjectRelocatorData objectData = new ObjectRelocatorData();
-
         private bool dataLoading = false;
         private bool ignoreEdits = false;
 
-        private bool IsAutoUpdate => (menuItemAutoCommit.Checked && !ignoreEdits);
+        private bool IsAutoUpdate => !ignoreEdits;
+
+        #region Dropdown Menu Items
+        private readonly NamedValue[] functionSortItems = {
+                new NamedValue("", 0x00),
+                new NamedValue("Appliance", 0x04),
+                new NamedValue("Decorative", 0x20),
+                new NamedValue("Electronic", 0x08),
+                new NamedValue("Hobby", 0x100),
+                new NamedValue("Lighting", 0x80),
+                new NamedValue("Misc", 0x40),
+                new NamedValue("Plumbing", 0x10),
+                new NamedValue("Seating", 0x01),
+                new NamedValue("Surface", 0x02),
+                new NamedValue("Aspiration Reward", 0x400),
+                new NamedValue("Career Reward", 0x800)
+            };
 
         private readonly NamedValue[] buildSortItems = {
                 new NamedValue("", 0x00),
@@ -92,11 +108,25 @@ namespace ObjectRelocator
                 new NamedValue("wood", 0x0800)
             };
 
-        private enum FakeCoveringSubsort
+        private enum CoveringSubsortIndex
         {
-            brick = 1,
+            None,
+            Brick,
+            Carpet,
+            Lino,
+            Masonry,
+            Paint,
+            Paneling,
+            Poured,
+            Siding,
+            Stone,
+            Tile,
+            Wallpaper,
+            Wood
         }
+        #endregion
 
+        #region Constructor and Dispose
         public ObjectRelocatorForm()
         {
             logger.Info(ObjectRelocatorApp.AppProduct);
@@ -109,24 +139,11 @@ namespace ObjectRelocator
                 IsFolderPicker = true
             };
 
-            comboFunction.Items.AddRange(new NamedValue[] {
-                new NamedValue("", 0x00),
-                new NamedValue("Appliance", 0x04),
-                new NamedValue("Decorative", 0x20),
-                new NamedValue("Electronic", 0x08),
-                new NamedValue("Hobby", 0x100),
-                new NamedValue("Lighting", 0x80),
-                new NamedValue("Misc", 0x40),
-                new NamedValue("Plumbing", 0x10),
-                new NamedValue("Seating", 0x01),
-                new NamedValue("Surface", 0x02),
-                new NamedValue("Aspiration Reward", 0x400),
-                new NamedValue("Career Reward", 0x800)
-            });
+            comboFunction.Items.AddRange(functionSortItems);
 
             comboBuild.Items.AddRange(buildSortItems);
 
-            gridObjects.DataSource = objectData;
+            gridViewResources.DataSource = dataTableResources;
 
             if (Sims2ToolsLib.IsSims2HomePathSet)
             {
@@ -151,7 +168,9 @@ namespace ObjectRelocator
 
             base.Dispose();
         }
+        #endregion
 
+        #region Form Management
         private void OnLoad(object sender, EventArgs e)
         {
             RegistryTools.LoadAppSettings(ObjectRelocatorApp.RegistryKey, ObjectRelocatorApp.AppVersionMajor, ObjectRelocatorApp.AppVersionMinor);
@@ -174,9 +193,10 @@ namespace ObjectRelocator
             menuItemShowDepreciation.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowDepreciation.Name, 0) != 0); OnShowHideDepreciation(menuItemShowDepreciation, null);
 
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
-            menuItemAutoCommit.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoCommit.Name, 1) != 0); OnAutoCommitClicked(menuItemAutoCommit, null);
 
             menuItemMakeReplacements.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemMakeReplacements.Name, 0) != 0); OnMakeReplcementsClicked(menuItemMakeReplacements, null);
+
+            UpdateFormState();
 
             MyUpdater = new Updater(ObjectRelocatorApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
@@ -210,35 +230,8 @@ namespace ObjectRelocator
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowDepreciation.Name, menuItemShowDepreciation.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoCommit.Name, menuItemAutoCommit.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemMakeReplacements.Name, menuItemMakeReplacements.Checked ? 1 : 0);
-        }
-
-        private bool IsAnyDirty()
-        {
-            foreach (DataGridViewRow row in gridObjects.Rows)
-            {
-                if ((row.Cells["colResRef"].Value as DBPFResource).IsDirty)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool IsAnyHiddenDirty()
-        {
-            foreach (DataGridViewRow row in gridObjects.Rows)
-            {
-                if (row.Visible == false && (row.Cells["colResRef"].Value as DBPFResource).IsDirty)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -250,82 +243,18 @@ namespace ObjectRelocator
         {
             new Sims2ToolsAboutDialog(ObjectRelocatorApp.AppProduct).ShowDialog();
         }
+        #endregion
 
-        private void OnConfigurationClicked(object sender, EventArgs e)
-        {
-            Form config = new Sims2ToolsConfigDialog();
-
-            if (config.ShowDialog() == DialogResult.OK)
-            {
-                // Perform any reload necessary after changing the objects.package location
-            }
-        }
-
-        private void OnToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                int index = e.RowIndex;
-
-                if (index < objectData.Rows.Count)
-                {
-                    DataGridViewRow row = gridObjects.Rows[index];
-
-                    if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colTitle"))
-                    {
-                        e.ToolTipText = row.Cells["colDescription"].Value as string;
-                    }
-                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colName"))
-                    {
-                        if (menuItemShowGuids.Checked)
-                        {
-                            e.ToolTipText = row.Cells["colPackage"].Value as string;
-                        }
-                        else
-                        {
-                            e.ToolTipText = $"{ row.Cells["ColGuid"].Value} - { row.Cells["colPackage"].Value}";
-                        }
-                    }
-                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colGuid"))
-                    {
-                        e.ToolTipText = (row.Cells["colResRef"].Value as DBPFResource).ToString();
-                    }
-                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colFunction"))
-                    {
-                        if (row.Cells["colResRef"].Value is Objd objd)
-                        {
-                            if (IsBuyMode)
-                                e.ToolTipText = $"{Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.FunctionSortFlags))} - {Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.FunctionSubSort))}";
-                            else
-                                e.ToolTipText = $"{Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.BuildModeType))} - {Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.BuildModeSubsort))}";
-                        }
-                        else if (row.Cells["colResRef"].Value is Xobj xobj)
-                        {
-                            e.ToolTipText = $"{xobj.GetItem("type").StringValue} - {xobj.GetItem("subsort").StringValue}";
-                        }
-                    }
-                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colDepreciation"))
-                    {
-                        e.ToolTipText = "Limit, Initial, Daily, Self";
-                    }
-                }
-            }
-        }
-
-        private void MyMruList_FolderSelected(string folder)
-        {
-            DoWork_FillGrid(folder);
-        }
-
-        private void DoWork_FillGrid(string folder)
+        #region Worker
+        private void DoWork_FillGrid(string folder, bool ignoreDirty)
         {
             if (folder == null) return;
 
-            if (IsAnyDirty())
+            if (!ignoreDirty && IsAnyDirty())
             {
                 string qualifier = IsAnyHiddenDirty() ? " HIDDEN" : "";
 
-                if (MsgBox.Show($"There are{qualifier} unsaved changes, do you really want to exit?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                if (MsgBox.Show($"There are{qualifier} unsaved changes, do you really want to reload?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
                     return;
                 }
@@ -333,13 +262,14 @@ namespace ObjectRelocator
 
             this.folder = folder;
 
-            this.Text = $"{ ObjectRelocatorApp.AppName} - {(IsBuyMode ? "Buy" : "Build")} Mode - {(new DirectoryInfo(folder)).FullName}";
+            this.Text = $"{ObjectRelocatorApp.AppName} - {(IsBuyMode ? "Buy" : "Build")} Mode - {(new DirectoryInfo(folder)).FullName}";
             menuItemSelectFolder.Enabled = false;
             menuItemRecentFolders.Enabled = false;
 
             dataLoading = true;
+            dataTableResources.BeginLoadData();
 
-            objectData.Clear();
+            dataTableResources.Clear();
             panelBuyModeEditor.Enabled = false;
             panelBuildModeEditor.Enabled = false;
 
@@ -349,6 +279,7 @@ namespace ObjectRelocator
 
             DialogResult result = progressDialog.ShowDialog();
 
+            dataTableResources.EndLoadData();
             dataLoading = false;
 
             menuItemRecentFolders.Enabled = true;
@@ -374,6 +305,7 @@ namespace ObjectRelocator
                 {
                     panelBuyModeEditor.Enabled = true;
                     panelBuildModeEditor.Enabled = true;
+
                     UpdateFormState();
                 }
             }
@@ -416,7 +348,7 @@ namespace ObjectRelocator
 
                                 if (IsModeResource(res))
                                 {
-                                    sender.SetData(FillRow(package, objectData.NewRow(), res));
+                                    sender.SetData(FillRow(package, dataTableResources.NewRow(), res));
 
                                     ++found;
                                 }
@@ -442,17 +374,445 @@ namespace ObjectRelocator
             }
         }
 
+        private void DoAsyncWork_FillGrid_Data(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke((MethodInvoker)delegate { DoAsyncWork_FillGrid_Data(sender, e); });
+                return;
+            }
+
+            // This will be run on main (UI) thread 
+            DataRow row = e.Argument as DataRow;
+            dataTableResources.Append(row);
+        }
+        #endregion
+
+        #region Worker Helpers
+        private bool IsModeResource(DBPFResource res)
+        {
+            if (IsBuyMode)
+                return IsBuyModeResource(res);
+            else
+                return IsBuildModeResource(res);
+        }
+
+        private bool IsBuyModeResource(DBPFResource res)
+        {
+            if (res == null || !(res is DBPFResource)) return false;
+
+            Objd objd = res as Objd;
+
+            // Ignore Build Mode objects
+            if (objd.GetRawData(ObjdIndex.BuildModeType) != 0x0000) return false;
+
+            // Ignore "globals", eg controllers, emitters and the like
+            if (objd.GetRawData(ObjdIndex.IsGlobalSimObject) != 0x0000) return false;
+
+            // Only normal objects and vehicles
+            if (objd.Type == ObjdType.Normal || objd.Type == ObjdType.Vehicle)
+            {
+                // Single or multi-tile object?
+                if (objd.GetRawData(ObjdIndex.MultiTileMasterId) == 0x0000)
+                {
+                    // Single tile object
+                    return true;
+                }
+                else
+                {
+                    // Is this the main object (and not one of the tiles?)
+                    if (objd.GetRawData(ObjdIndex.MultiTileSubIndex) == 0xFFFF)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsBuildModeResource(DBPFResource res)
+        {
+            if (res == null) return false;
+
+            if (res is Objd objd)
+            {
+                // Exclude diagonal doors and windows
+                if (!menuItemDisableBuildModeSortFilters.Checked &&
+                    (objd.Type == ObjdType.Door || objd.Type == ObjdType.Window) && objd.GetRawData(ObjdIndex.BuildModeType) == 0x0000) return false;
+
+                // Ignore "globals", eg controllers, emitters and the like
+                if (objd.GetRawData(ObjdIndex.IsGlobalSimObject) != 0x0000) return false;
+
+                // Only Build Mode objects
+                if (
+                    objd.Type == ObjdType.Door || objd.Type == ObjdType.Window || objd.Type == ObjdType.Stairs || objd.Type == ObjdType.ArchitecturalSupport ||
+                    objd.Type == ObjdType.Normal && (menuItemDisableBuildModeSortFilters.Checked || (objd.GetRawData(ObjdIndex.RoomSortFlags) == 0x0000 && objd.GetRawData(ObjdIndex.FunctionSortFlags) == 0x0000 /* && objd.GetRawData(ObjdIndex.FunctionSubSort) == 0x0000 */))
+                )
+                {
+                    // Single or multi-tile object?
+                    if (objd.GetRawData(ObjdIndex.MultiTileMasterId) == 0x0000)
+                    {
+                        // Single tile object
+                        return true;
+                    }
+                    else
+                    {
+                        // Is this the main object (and not one of the tiles?)
+                        if (objd.GetRawData(ObjdIndex.MultiTileSubIndex) == 0xFFFF)
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+            }
+            else if (res is Xfnc xfnc)
+            {
+                string type = xfnc.GetItem("type").StringValue;
+                return type.Equals("fence");
+            }
+            else if (res is Xobj xobj)
+            {
+                string type = xobj.GetItem("type").StringValue;
+                return type.Equals("wall") || type.Equals("floor");
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region Form State
+        private bool IsAnyDirty()
+        {
+            foreach (DataRow row in dataTableResources.Rows)
+            {
+                if ((row["ObjectData"] as ObjectDbpfData).IsDirty)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsAnyHiddenDirty()
+        {
+            foreach (DataRow row in dataTableResources.Rows)
+            {
+                if (!row["Visible"].Equals("Yes") && (row["ObjectData"] as ObjectDbpfData).IsDirty)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsVisibleObject(DBPFResource res)
+        {
+            if (menuItemHideLocals.Checked && res.GroupID == DBPFData.GROUP_LOCAL) return false;
+
+            if (menuItemHideNonLocals.Checked && res.GroupID != DBPFData.GROUP_LOCAL) return false;
+
+            if (res is Objd)
+            {
+                Objd objd = res as Objd;
+
+                // Exclude hidden objects?
+                if (menuItemExcludeHidden.Checked)
+                {
+                    if (IsBuyMode)
+                    {
+                        return !(objd.GetRawData(ObjdIndex.RoomSortFlags) == 0 && objd.GetRawData(ObjdIndex.FunctionSortFlags) == 0 /* && objd.GetRawData(ObjdIndex.FunctionSubSort) == 0 */ && objd.GetRawData(ObjdIndex.CommunitySort) == 0);
+                    }
+                    else
+                    {
+                        return !(objd.GetRawData(ObjdIndex.BuildModeType) == 0 /* && objd.GetRawData(ObjdIndex.BuildModeSubsort) == 0*/);
+                    }
+                }
+            }
+            else
+            {
+                Cpf cpf = res as Cpf;
+                string type = cpf.GetItem("type").StringValue;
+
+                if (cpf is Xfnc && !type.Equals("fence")) return false;
+
+                if (cpf is Xobj && !(type.Equals("floor") || type.Equals("wall"))) return false;
+            }
+
+            return true;
+        }
+
+        private bool updatingFormState = false;
+
+        private void UpdateFormState()
+        {
+            if (updatingFormState) return;
+
+            updatingFormState = true;
+
+            btnSave.Enabled = false;
+
+            // Update the visibility in the underlying DataTable, do NOT use the Visible property of the DataGridView rows!!!
+            foreach (DataRow row in dataTableResources.Rows)
+            {
+                DBPFResource res = (row["ObjectData"] as ObjectDbpfData).Resource;
+
+                row["Visible"] = IsVisibleObject(res) ? "Yes" : "No";
+            }
+
+            // Update the highlight state of the rows in the DataGridView
+            foreach (DataGridViewRow row in gridViewResources.Rows)
+            {
+                DBPFResource res = (row.Cells["colObjectData"].Value as ObjectDbpfData).Resource;
+
+                if (res.IsDirty)
+                {
+                    btnSave.Enabled = true;
+                    row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+                }
+                else
+                {
+                    row.DefaultCellStyle.BackColor = Color.Empty;
+                }
+            }
+
+            updatingFormState = false;
+        }
+
+        private void ReselectRows(List<ObjectDbpfData> selectedData)
+        {
+            if (ignoreEdits) return;
+
+            UpdateFormState();
+
+            foreach (DataGridViewRow row in gridViewResources.Rows)
+            {
+                row.Selected = selectedData.Contains(row.Cells["colObjectData"].Value as ObjectDbpfData);
+            }
+        }
+        #endregion
+
+        #region File Menu Actions
+        private void OnSelectFolderClicked(object sender, EventArgs e)
+        {
+            if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                DoWork_FillGrid(selectPathDialog.FileName, false);
+            }
+        }
+
+        private void MyMruList_FolderSelected(string folder)
+        {
+            DoWork_FillGrid(folder, false);
+        }
+
+        private void OnConfigurationClicked(object sender, EventArgs e)
+        {
+            Form config = new Sims2ToolsConfigDialog();
+
+            if (config.ShowDialog() == DialogResult.OK)
+            {
+                // Perform any reload necessary after changing the objects.package location
+            }
+        }
+        #endregion
+
+        #region Options Menu Actions
+        private void OnShowHideName(object sender, EventArgs e)
+        {
+            gridViewResources.Columns["colName"].Visible = menuItemShowName.Checked;
+        }
+
+        private void OnShowHidePath(object sender, EventArgs e)
+        {
+            gridViewResources.Columns["colPath"].Visible = menuItemShowPath.Checked;
+        }
+
+        private void OnShowHideGuids(object sender, EventArgs e)
+        {
+            gridViewResources.Columns["colGuid"].Visible = menuItemShowGuids.Checked;
+        }
+
+        private void OnShowHideDepreciation(object sender, EventArgs e)
+        {
+            gridViewResources.Columns["colDepreciation"].Visible = menuItemShowDepreciation.Checked;
+            grpDepreciation.Visible = menuItemShowDepreciation.Checked;
+        }
+
+        private void OnExcludeHidden(object sender, EventArgs e)
+        {
+            UpdateFormState();
+        }
+
+        private void OnHideNonLocalsClicked(object sender, EventArgs e)
+        {
+            if (menuItemHideNonLocals.Checked)
+            {
+                menuItemHideLocals.Checked = false;
+                menuItemMakeReplacements.Enabled = false;
+                menuItemMakeReplacements.Checked = false;
+                OnMakeReplcementsClicked(menuItemMakeReplacements, null);
+            }
+            else
+            {
+                if (menuItemHideLocals.Checked == false)
+                {
+                    menuItemMakeReplacements.Enabled = false;
+                    menuItemMakeReplacements.Checked = false;
+                    OnMakeReplcementsClicked(menuItemMakeReplacements, null);
+                }
+            }
+
+            UpdateFormState();
+        }
+
+        private void OnHideLocalsClicked(object sender, EventArgs e)
+        {
+            if (menuItemHideLocals.Checked)
+            {
+                menuItemHideNonLocals.Checked = false;
+                menuItemMakeReplacements.Enabled = true;
+            }
+            else
+            {
+                menuItemMakeReplacements.Enabled = false;
+                menuItemMakeReplacements.Checked = false;
+                OnMakeReplcementsClicked(menuItemMakeReplacements, null);
+            }
+
+            UpdateFormState();
+        }
+
+        private void OnDisableBuildModeSortFiltersClicked(object sender, EventArgs e)
+        {
+            if (!menuItemDisableBuildModeSortFilters.Checked)
+            {
+                if (MsgBox.Show("Do you really want to disable the build mode selection sort filters?\n\nThis is NOT recommended.",
+                                "Disable Sort Filters", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No) return;
+            }
+
+            menuItemDisableBuildModeSortFilters.Checked = !menuItemDisableBuildModeSortFilters.Checked;
+
+            if (IsBuildMode)
+            {
+                DoWork_FillGrid(folder, false);
+            }
+        }
+        #endregion
+
+        #region Mode Menu Actions
+        private void OnBuyBuildModeClicked(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItemMode = sender as ToolStripMenuItem;
+
+            if (menuItemMode == menuItemBuyMode && IsBuyMode) return;
+            if (menuItemMode == menuItemBuildMode && IsBuildMode) return;
+
+            if (IsAnyDirty())
+            {
+                if (MsgBox.Show($"There are unsaved changes, do you really want to change mode?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                {
+                    return;
+                }
+            }
+
+            buyMode = !buyMode;
+
+            this.Text = $"{ObjectRelocatorApp.AppName} - {(IsBuyMode ? "Buy" : "Build")} Mode";
+
+            menuItemBuildMode.Checked = IsBuildMode;
+            menuItemBuyMode.Checked = IsBuyMode;
+
+            menuItemShowDepreciation.Enabled = IsBuyMode;
+
+            panelBuyModeEditor.Visible = IsBuyMode;
+            panelBuildModeEditor.Visible = IsBuildMode;
+
+            gridViewResources.Columns["colRooms"].Visible = IsBuyMode;
+            gridViewResources.Columns["colCommunity"].Visible = IsBuyMode;
+            gridViewResources.Columns["colUse"].Visible = IsBuyMode;
+            gridViewResources.Columns["colQuarterTile"].Visible = IsBuyMode;
+            gridViewResources.Columns["colDepreciation"].Visible = IsBuyMode;
+            gridViewResources.Columns["colFunction"].HeaderText = IsBuyMode ? "Function" : "Build";
+
+            DoWork_FillGrid(folder, true);
+        }
+
+        private void OnMakeReplcementsClicked(object sender, EventArgs e)
+        {
+            btnSave.Text = (menuItemMakeReplacements.Checked) ? "&Save As..." : "&Save";
+        }
+        #endregion
+
+        #region Tooltips and Thumbnails
+        private void OnToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                int index = e.RowIndex;
+
+                if (index < dataTableResources.Rows.Count)
+                {
+                    DataGridViewRow row = gridViewResources.Rows[index];
+
+                    if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colTitle"))
+                    {
+                        e.ToolTipText = row.Cells["colDescription"].Value as string;
+                    }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colName"))
+                    {
+                        if (menuItemShowGuids.Checked)
+                        {
+                            e.ToolTipText = (row.Cells["colObjectData"].Value as ObjectDbpfData).PackagePath;
+                        }
+                        else
+                        {
+                            e.ToolTipText = $"{row.Cells["ColGuid"].Value} - {(row.Cells["colObjectData"].Value as ObjectDbpfData).PackagePath}";
+                        }
+                    }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colGuid"))
+                    {
+                        e.ToolTipText = (row.Cells["colObjectData"].Value as ObjectDbpfData).Resource.ToString();
+                    }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colFunction"))
+                    {
+                        if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Resource is Objd objd)
+                        {
+                            if (IsBuyMode)
+                                e.ToolTipText = $"{Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.FunctionSortFlags))} - {Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.FunctionSubSort))}";
+                            else
+                                e.ToolTipText = $"{Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.BuildModeType))} - {Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.BuildModeSubsort))}";
+                        }
+                        else if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Resource is Xobj xobj)
+                        {
+                            e.ToolTipText = $"{xobj.GetItem("type")?.StringValue} - {xobj.GetItem("subsort")?.StringValue}";
+                        }
+                    }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colDepreciation"))
+                    {
+                        e.ToolTipText = "Limit, Initial, Daily, Self";
+                    }
+                }
+            }
+        }
+
         private Image GetThumbnail(DataGridViewRow row)
         {
             Image thumbnail = null;
 
-            if (row.Cells["colResRef"].Value is Objd objd)
+            ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+            if (objectData.Resource is Objd objd)
             {
-                if (thumbCacheBuyMode != null) thumbnail = GetThumbnail(row.Cells["colPackage"].Value as string, objd);
+                if (thumbCacheBuyMode != null) thumbnail = GetThumbnail(objectData.PackagePath, objd);
             }
-            else if (row.Cells["colResRef"].Value is Cpf cpf)
+            else if (objectData.Resource is Cpf cpf)
             {
-                if (thumbCacheBuyMode != null) thumbnail = GetThumbnail(row.Cells["colPackage"].Value as string, cpf);
+                if (thumbCacheBuyMode != null) thumbnail = GetThumbnail(objectData.PackagePath, cpf);
             }
 
             return thumbnail;
@@ -520,7 +880,7 @@ namespace ObjectRelocator
                         TypeTypeID thumbTypeID = DBPFData.Type_NULL;
                         TypeInstanceID thumbInstanceID = (TypeInstanceID)cpf.GetItem("guid").UIntegerValue;
                         TypeResourceID thumbResourceID = (TypeResourceID)groupId.AsUInt();
-                        // TODO - Build Mode thumbnails, thumbInstanceID & thumbResourceID are garbage!
+                        // How to get a Build Mode thumbnail? As thumbInstanceID & thumbResourceID are garbage!
 
                         string cpfType = cpf.GetItem("type").StringValue;
                         if (cpf is Xobj && cpfType.Equals("floor"))
@@ -572,12 +932,39 @@ namespace ObjectRelocator
 
             return thumbnail;
         }
+        #endregion
 
+        #region Grid Management
+        private void OnGridSelectionChanged(object sender, EventArgs e)
+        {
+            if (dataLoading) return;
+
+            ClearEditor();
+
+            if (gridViewResources.SelectedRows.Count >= 1)
+            {
+                bool append = false;
+                foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+                {
+                    UpdateEditor((row.Cells["colObjectData"].Value as ObjectDbpfData).Resource, append);
+                    append = true;
+                }
+            }
+        }
+
+        private void OnResourceBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            if (gridViewResources.SortedColumn != null)
+            {
+                UpdateFormState();
+            }
+        }
+        #endregion
+
+        #region Grid Row Fill
         private DataRow FillRow(DBPFFile package, DataRow row, DBPFResource res)
         {
             row["Path"] = BuildPathString(package.PackagePath);
-
-            row["Package"] = package.PackagePath;
 
             if (IsBuyMode)
                 return FillBuyModeRow(package, row, res);
@@ -589,7 +976,8 @@ namespace ObjectRelocator
         {
             Objd objd = res as Objd;
 
-            row["ResRef"] = objd;
+            row["Visible"] = "Yes";
+            row["ObjectData"] = new ObjectDbpfData(package.PackagePath, objd);
 
             DBPFEntry ctssEntry = package.GetEntryByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
 
@@ -609,7 +997,7 @@ namespace ObjectRelocator
                 }
             }
 
-            row["Name"] = objd.FileName;
+            row["Name"] = objd.KeyName;
             row["Guid"] = objd.Guid;
 
             row["Rooms"] = BuildRoomsString(objd);
@@ -627,9 +1015,11 @@ namespace ObjectRelocator
 
         private DataRow FillBuildModeRow(DBPFFile package, DataRow row, DBPFResource res)
         {
+            row["Visible"] = "Yes";
+
             if (res is Objd objd)
             {
-                row["ResRef"] = objd;
+                row["ObjectData"] = new ObjectDbpfData(package.PackagePath, objd);
 
                 DBPFEntry ctssEntry = package.GetEntryByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
 
@@ -649,7 +1039,7 @@ namespace ObjectRelocator
                     }
                 }
 
-                row["Name"] = objd.FileName;
+                row["Name"] = objd.KeyName;
                 row["Guid"] = objd.Guid;
 
                 row["Function"] = BuildBuildString(objd);
@@ -658,12 +1048,12 @@ namespace ObjectRelocator
             }
             else if (res is Cpf cpf)
             {
-                row["ResRef"] = cpf;
+                row["ObjectData"] = new ObjectDbpfData(package.PackagePath, cpf);
 
                 row["Title"] = cpf.GetItem("name").StringValue;
                 row["Description"] = cpf.GetItem("description").StringValue;
 
-                row["Name"] = cpf.FileName;
+                row["Name"] = cpf.KeyName;
                 row["Guid"] = Helper.Hex8PrefixString(cpf.GetItem("guid").UIntegerValue);
 
                 row["Function"] = BuildBuildString(cpf);
@@ -674,145 +1064,9 @@ namespace ObjectRelocator
             return row;
         }
 
-        private bool IsModeResource(DBPFResource res)
-        {
-            if (IsBuyMode)
-                return IsBuyModeResource(res);
-            else
-                return IsBuildModeResource(res);
-        }
-
-        private bool IsBuyModeResource(DBPFResource res)
-        {
-            if (res == null || !(res is DBPFResource)) return false;
-
-            Objd objd = res as Objd;
-
-            // Ignore Build Mode objects
-            if (objd.GetRawData(ObjdIndex.BuildModeType) != 0x0000) return false;
-
-            // Ignore "globals", eg controllers, emitters and the like
-            if (objd.GetRawData(ObjdIndex.IsGlobalSimObject) != 0x0000) return false;
-
-            // Only normal objects and vehicles
-            if (objd.Type == ObjdType.Normal || objd.Type == ObjdType.Vehicle)
-            {
-                // Single or multi-tile object?
-                if (objd.GetRawData(ObjdIndex.MultiTileMasterId) == 0x0000)
-                {
-                    // Single tile object
-                    return true;
-                }
-                else
-                {
-                    // Is this the main object (and not one of the tiles?)
-                    if (objd.GetRawData(ObjdIndex.MultiTileSubIndex) == 0xFFFF)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        private bool IsBuildModeResource(DBPFResource res)
-        {
-            if (res == null) return false;
-
-            if (res is Objd objd)
-            {
-                // Exclude diagonal doors and windows
-                if ((objd.Type == ObjdType.Door || objd.Type == ObjdType.Window) && objd.GetRawData(ObjdIndex.BuildModeType) == 0x0000) return false;
-
-                // Ignore "globals", eg controllers, emitters and the like
-                if (objd.GetRawData(ObjdIndex.IsGlobalSimObject) != 0x0000) return false;
-
-                // Only Build Mode objects
-                if (
-                    objd.Type == ObjdType.Door ||
-                    objd.Type == ObjdType.Window ||
-                    objd.Type == ObjdType.Stairs ||
-                    objd.Type == ObjdType.ArchitecturalSupport ||
-                    objd.Type == ObjdType.Normal && objd.GetRawData(ObjdIndex.BuildModeType) != 0x0000
-                )
-                {
-                    // Single or multi-tile object?
-                    if (objd.GetRawData(ObjdIndex.MultiTileMasterId) == 0x0000)
-                    {
-                        // Single tile object
-                        return true;
-                    }
-                    else
-                    {
-                        // Is this the main object (and not one of the tiles?)
-                        if (objd.GetRawData(ObjdIndex.MultiTileSubIndex) == 0xFFFF)
-                        {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                }
-            }
-            else if (res is Xfnc xfnc)
-            {
-                string type = xfnc.GetItem("type").StringValue;
-                return type.Equals("fence");
-            }
-            else if (res is Xobj xobj)
-            {
-                string type = xobj.GetItem("type").StringValue;
-                return type.Equals("wall") || type.Equals("floor");
-            }
-
-            return false;
-        }
-
-        private void UpdateRowVisibility()
-        {
-            gridObjects.CurrentCell = null;
-            gridObjects.ClearSelection();
-
-            foreach (DataGridViewRow row in gridObjects.Rows)
-            {
-                row.Visible = IsVisibleObject(row.Cells["colResRef"].Value as DBPFResource);
-            }
-        }
-
-        private bool IsVisibleObject(DBPFResource res)
-        {
-            if (res is Objd)
-            {
-                Objd objd = res as Objd;
-
-                // Exclude hidden objects?
-                if (menuItemExcludeHidden.Enabled && menuItemExcludeHidden.Checked && objd.GetRawData(ObjdIndex.RoomSortFlags) == 0 && objd.GetRawData(ObjdIndex.FunctionSortFlags) == 0 /* && objd.GetRawData(ObjdIndex.FunctionSubSort) == 0 */ && objd.GetRawData(ObjdIndex.CommunitySort) == 0) return false;
-            }
-            else
-            {
-                Cpf cpf = res as Cpf;
-                string type = cpf.GetItem("type").StringValue;
-
-                if (cpf is Xfnc && !type.Equals("fence")) return false;
-
-                if (cpf is Xobj && !(type.Equals("floor") || type.Equals("wall"))) return false;
-            }
-
-            if (menuItemHideLocals.Checked && res.GroupID == DBPFData.GROUP_LOCAL) return false;
-
-            if (menuItemHideNonLocals.Checked && res.GroupID != DBPFData.GROUP_LOCAL) return false;
-
-            return true;
-        }
-
         private string BuildPathString(string packagePath)
         {
-            string path = new FileInfo(packagePath).Directory.FullName;
-
-            if (Sims2ToolsLib.IsSims2HomePathSet && path.StartsWith($"{Sims2ToolsLib.Sims2HomePath}\\Downloads\\")) path = $"~{path.Substring(Sims2ToolsLib.Sims2HomePath.Length + 11)}";
-
-            return path;
+            return new FileInfo(packagePath).FullName.Substring(folder.Length + 1);
         }
 
         private string BuildRoomsString(Objd objd)
@@ -1043,13 +1297,6 @@ namespace ObjectRelocator
             return "";
         }
 
-        private string CapitaliseString(string s)
-        {
-            if (string.IsNullOrWhiteSpace(s) || s.Length == 1) return s;
-
-            return $"{s.Substring(0, 1).ToUpper()}{s.Substring(1)}";
-        }
-
         private string BuildUseString(Objd objd)
         {
             ushort useFlags = objd.GetRawData(ObjdIndex.CatalogUseFlags);
@@ -1084,894 +1331,219 @@ namespace ObjectRelocator
             return (quarterTile == QuarterTileOn) ? "Yes" : "No";
         }
 
-        private void DoAsyncWork_FillGrid_Data(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        private string CapitaliseString(string s)
         {
-            if (InvokeRequired)
-            {
-                Invoke((MethodInvoker)delegate { DoAsyncWork_FillGrid_Data(sender, e); });
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(s) || s.Length == 1) return s;
 
-            // This will be run on main (UI) thread 
-            DataRow row = e.Argument as DataRow;
-            objectData.Append(row);
-            gridObjects.CurrentCell = null;
-            gridObjects.Rows[gridObjects.RowCount - 1].Visible = IsVisibleObject(row["ResRef"] as DBPFResource);
+            return $"{s.Substring(0, 1).ToUpper()}{s.Substring(1)}";
+        }
+        #endregion
+
+        #region Grid Row Update
+        private void UpdateGridRow(ObjectDbpfData selectedObject)
+        {
+            if (IsBuyMode)
+                UpdateBuyModeGridRow(selectedObject);
+            else
+                UpdateBuildModeGridRow(selectedObject);
         }
 
-        private DataGridViewCellEventArgs mouseLocation = null;
-        readonly DataGridViewRow highlightRow = null;
-        readonly Color highlightColor = Color.Empty;
-
-        private void OnCellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        private void UpdateBuyModeGridRow(ObjectDbpfData selectedObject)
         {
-            mouseLocation = e;
-            Point MousePosition = Cursor.Position;
-
-            if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < gridObjects.RowCount && e.ColumnIndex < gridObjects.ColumnCount)
+            foreach (DataGridViewRow row in gridViewResources.Rows)
             {
-                DataGridViewRow row = gridObjects.Rows[e.RowIndex];
-
-                if (e.ColumnIndex == 0 || (menuItemShowName.Checked && e.ColumnIndex == 2)) // See order in ObjectRelocatorData class
+                if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Equals(selectedObject))
                 {
-                    Image thumbnail = GetThumbnail(row);
+                    bool oldDataLoading = dataLoading;
+                    dataLoading = true;
 
-                    if (thumbnail != null)
-                    {
-                        thumbBox.Image = thumbnail;
-                        thumbBox.Location = new System.Drawing.Point(MousePosition.X - this.Location.X, MousePosition.Y - this.Location.Y);
-                        thumbBox.Visible = true;
-                    }
-                }
-            }
-        }
+                    Objd objd = selectedObject.Resource as Objd;
 
-        private void OnCellMouseLeave(object sender, DataGridViewCellEventArgs e)
-        {
-            thumbBox.Visible = false;
-        }
+                    row.Cells["colRooms"].Value = BuildRoomsString(objd);
+                    row.Cells["colFunction"].Value = BuildFunctionString(objd);
+                    row.Cells["colCommunity"].Value = BuildCommunityString(objd);
+                    row.Cells["colUse"].Value = BuildUseString(objd);
+                    row.Cells["colQuarterTile"].Value = BuildQuarterTileString(objd);
+                    row.Cells["colPrice"].Value = objd.GetRawData(ObjdIndex.Price);
+                    row.Cells["colDepreciation"].Value = $"{objd.GetRawData(ObjdIndex.DepreciationLimit)}, {objd.GetRawData(ObjdIndex.InitialDepreciation)}, {objd.GetRawData(ObjdIndex.DailyDepreciation)}, {objd.GetRawData(ObjdIndex.SelfDepreciating)}";
 
-        private void OnContextMenuOpening(object sender, CancelEventArgs e)
-        {
-            if (mouseLocation == null || mouseLocation.RowIndex == -1)
-            {
-                e.Cancel = true;
-                return;
-            }
-
-            foreach (DataGridViewRow selectedRow in gridObjects.SelectedRows)
-            {
-                if (selectedRow.Visible && mouseLocation.RowIndex == selectedRow.Index)
-                {
+                    dataLoading = oldDataLoading;
                     return;
                 }
             }
-
-            e.Cancel = true;
-            return;
         }
 
-        private void OnContextMenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
+        private void UpdateBuildModeGridRow(ObjectDbpfData selectedObject)
         {
-            if (highlightRow != null)
+            foreach (DataGridViewRow row in gridViewResources.Rows)
             {
-                highlightRow.DefaultCellStyle.BackColor = highlightColor;
-            }
-        }
-
-        private bool IsInvalidBuyModeEditorState()
-        {
-            return ckbRoomBathroom.CheckState == CheckState.Indeterminate
-                || ckbRoomNursery.CheckState == CheckState.Indeterminate
-                || ckbRoomStudy.CheckState == CheckState.Indeterminate
-                || ckbRoomOutside.CheckState == CheckState.Indeterminate
-                || ckbRoomMisc.CheckState == CheckState.Indeterminate
-                || ckbRoomLounge.CheckState == CheckState.Indeterminate
-                || ckbRoomKitchen.CheckState == CheckState.Indeterminate
-                || ckbRoomDiningroom.CheckState == CheckState.Indeterminate
-                || ckbRoomBedroom.CheckState == CheckState.Indeterminate
-
-                || comboFunction.SelectedIndex == -1
-                || comboSubfunction.SelectedIndex == -1
-
-                || ckbCommStreet.CheckState == CheckState.Indeterminate
-                || ckbCommShopping.CheckState == CheckState.Indeterminate
-                || ckbCommOutside.CheckState == CheckState.Indeterminate
-                || ckbCommMisc.CheckState == CheckState.Indeterminate
-                || ckbCommDining.CheckState == CheckState.Indeterminate
-
-                || ckbUseToddlers.CheckState == CheckState.Indeterminate
-                || ckbUseChildren.CheckState == CheckState.Indeterminate
-                || ckbUseTeens.CheckState == CheckState.Indeterminate
-                || ckbUseAdults.CheckState == CheckState.Indeterminate
-                || ckbUseElders.CheckState == CheckState.Indeterminate
-                || ckbUseGroupActivity.CheckState == CheckState.Indeterminate
-
-                || ckbQuarterTile.CheckState == CheckState.Indeterminate
-
-                || string.IsNullOrWhiteSpace(textBuyPrice.Text)
-
-                || string.IsNullOrWhiteSpace(textDepLimit.Text)
-                || string.IsNullOrWhiteSpace(textDepInitial.Text)
-                || string.IsNullOrWhiteSpace(textDepDaily.Text)
-                || ckbDepSelf.CheckState == CheckState.Indeterminate;
-        }
-
-        private bool IsInvalidBuildModeEditorState()
-        {
-            return string.IsNullOrWhiteSpace(textBuildPrice.Text);
-        }
-
-        private void UpdateFormState()
-        {
-            if (IsBuyMode && IsInvalidBuyModeEditorState() || IsBuildMode && IsInvalidBuildModeEditorState())
-            {
-                btnCommit.Enabled = false;
-            }
-            else
-            {
-                btnCommit.Enabled = true;
-            }
-
-            btnSave.Enabled = false;
-
-            foreach (DataGridViewRow row in gridObjects.Rows)
-            {
-                if (row.Visible)
+                if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Equals(selectedObject))
                 {
-                    DBPFResource res = row.Cells["colResRef"].Value as DBPFResource;
+                    bool oldDataLoading = dataLoading;
+                    dataLoading = true;
 
-                    if (res.IsDirty)
+                    DBPFResource res = selectedObject.Resource;
+
+                    row.Cells["colFunction"].Value = BuildBuildString(res);
+
+                    if (res is Objd objd)
                     {
-                        btnSave.Enabled = true;
-                        break;
+                        row.Cells["colPrice"].Value = objd.GetRawData(ObjdIndex.Price);
                     }
-                }
-            }
-        }
-
-        private void OnShowHideName(object sender, EventArgs e)
-        {
-            gridObjects.Columns["colName"].Visible = menuItemShowName.Checked;
-        }
-
-        private void OnShowHidePath(object sender, EventArgs e)
-        {
-            gridObjects.Columns["colPath"].Visible = menuItemShowPath.Checked;
-        }
-
-        private void OnShowHideGuids(object sender, EventArgs e)
-        {
-            gridObjects.Columns["colGuid"].Visible = menuItemShowGuids.Checked;
-        }
-
-        private void OnShowHideDepreciation(object sender, EventArgs e)
-        {
-            gridObjects.Columns["colDepreciation"].Visible = menuItemShowDepreciation.Checked;
-            grpDepreciation.Visible = menuItemShowDepreciation.Checked;
-        }
-
-        private void OnSelectFolderClicked(object sender, EventArgs e)
-        {
-            if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                DoWork_FillGrid(selectPathDialog.FileName);
-            }
-        }
-
-        private void OnExcludeHidden(object sender, EventArgs e)
-        {
-            UpdateRowVisibility();
-        }
-
-        private void OnFunctionSortChanged(object sender, EventArgs e)
-        {
-            UpdateFunctionSorts(0x80);
-
-            if (comboFunction.SelectedIndex != -1)
-            {
-                UpdateSelectedValue((ushort)(comboFunction.SelectedItem as NamedValue).Value, ObjdIndex.FunctionSortFlags);
-            }
-        }
-
-        private void OnFunctionSubsortChanged(object sender, EventArgs e)
-        {
-            if (comboSubfunction.SelectedIndex != -1)
-            {
-                UpdateSelectedValue((ushort)(comboSubfunction.SelectedItem as NamedValue).Value, ObjdIndex.FunctionSubSort);
-            }
-        }
-
-        private void UpdateFunctionSorts(ushort subFunctionFlags)
-        {
-            if (comboFunction.SelectedItem == null) return;
-
-            comboSubfunction.Items.Clear();
-            comboSubfunction.Enabled = true;
-
-            switch ((comboFunction.SelectedItem as NamedValue).Value)
-            {
-                case 0x04:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Cooking", 0x01),
-                        new NamedValue("Fridge", 0x02),
-                        new NamedValue("Large", 0x08),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Small", 0x04)
-                    });
-                    break;
-                case 0x20:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Curtain", 0x20),
-                        new NamedValue("Mirror", 0x10),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Picture", 0x01),
-                        new NamedValue("Plant", 0x08),
-                        new NamedValue("Rug", 0x04),
-                        new NamedValue("Sculpture", 0x02)
-                    });
-                    break;
-                case 0x08:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Audio", 0x04),
-                        new NamedValue("Entertainment", 0x01),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Small", 0x08),
-                        new NamedValue("TV/Computer", 0x02)
-                    });
-                    break;
-                case 0x40:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Car", 0x20),
-                        new NamedValue("Children", 0x10),
-                        new NamedValue("Dresser", 0x02),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Party", 0x08),
-                        new NamedValue("Pets", 0x40)
-                    });
-                    break;
-                case 0x100:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Creative", 0x01),
-                        new NamedValue("Exercise", 0x04),
-                        new NamedValue("Knowledge", 0x02),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Recreation", 0x08)
-                    });
-                    break;
-                case 0x80:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Ceiling", 0x08),
-                        new NamedValue("Floor", 0x02),
-                        new NamedValue("Garden", 0x10),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Table", 0x01),
-                        new NamedValue("Wall", 0x04)
-                    });
-                    break;
-                case 0x10:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Bath/Shower", 0x02),
-                        new NamedValue("Hot Tub", 0x08),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Sink", 0x04),
-                        new NamedValue("Toilet", 0x01)
-                    });
-                    break;
-                case 0x01:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Arm Chair", 0x02),
-                        new NamedValue("Bed", 0x08),
-                        new NamedValue("Dining Chair", 0x01),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Recliner", 0x10),
-                        new NamedValue("Sofa", 0x04)
-                    });
-                    break;
-                case 0x02:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Coffee Table", 0x10),
-                        new NamedValue("Counter", 0x01),
-                        new NamedValue("Desk", 0x08),
-                        new NamedValue("Dining Table", 0x02),
-                        new NamedValue("End Table", 0x04),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Shelf", 0x20)
-                    });
-                    break;
-                case 0x400:
-                    // Aspiration Reward
-                    comboSubfunction.Enabled = false;
-                    break;
-                case 0x800:
-                    // Career Reward
-                    comboSubfunction.Enabled = false;
-                    break;
-            }
-
-            // Select the requited sub-function item
-            foreach (object o in comboSubfunction.Items)
-            {
-                if ((o as NamedValue).Value == subFunctionFlags)
-                {
-                    comboSubfunction.SelectedItem = o;
-                    break;
-                }
-            }
-        }
-
-        private void OnBuildSortChanged(object sender, EventArgs e)
-        {
-            UpdateBuildSorts(0x00);
-
-            if (comboBuild.SelectedIndex != -1)
-            {
-                UpdateSelectedValue(comboBuild.SelectedItem as NamedValue, ObjdIndex.BuildModeType, "type");
-            }
-        }
-
-        private void OnBuildSubsortChanged(object sender, EventArgs e)
-        {
-            if (comboSubbuild.SelectedIndex != -1)
-            {
-                UpdateSelectedValue(comboSubbuild.SelectedItem as NamedValue, ObjdIndex.BuildModeSubsort, "subsort");
-            }
-        }
-
-        private void UpdateBuildSorts(ushort subBuildFlags)
-        {
-            if (comboBuild.SelectedItem == null) return;
-
-            comboSubbuild.Items.Clear();
-            comboSubbuild.Enabled = true;
-
-            switch ((comboBuild.SelectedItem as NamedValue).Value)
-            {
-                case 0x0001: // Other
-                    comboSubbuild.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Architecture", 0x1000),
-                        new NamedValue("Columns", 0x0008),
-                        new NamedValue("Connecting Arches", 0x0200),
-                        new NamedValue("Elevator", 0x0800),
-                        new NamedValue("Fence", 0x8000),
-                        new NamedValue("Garage", 0x0400),
-                        new NamedValue("Multi-Story Columns", 0x0100),
-                        new NamedValue("Pools", 0x0040),
-                        new NamedValue("Staircases", 0x0020)
-                    });
-                    break;
-                case 0x0004: // Garden Centre
-                    comboSubbuild.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Flowers", 0x0004),
-                        new NamedValue("Gardening", 0x0010),
-                        new NamedValue("Shrubs", 0x0002),
-                        new NamedValue("Trees", 0x0001)
-                    });
-                    break;
-                case 0x0008: // Doors & Windows
-                    comboSubbuild.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Archways", 0x0010),
-                        new NamedValue("Doors", 0x0001),
-                        new NamedValue("Gates", 0x0008),
-                        new NamedValue("Multi-Story Doors", 0x0100),
-                        new NamedValue("Multi-Story Windows", 0x0002),
-                        new NamedValue("Windows", 0x0004)
-                    });
-                    break;
-
-                // Fake build types for XFNC/XOBJ resources
-                case 0x1000: // Floor Coverings
-                    comboSubbuild.Items.Add(coveringSubsortItems[0]);  // Brick
-                    comboSubbuild.Items.Add(coveringSubsortItems[1]);  // Carpet
-                    comboSubbuild.Items.Add(coveringSubsortItems[2]);  // Lino
-                    comboSubbuild.Items.Add(coveringSubsortItems[6]);  // Poured
-                    comboSubbuild.Items.Add(coveringSubsortItems[8]);  // Stone
-                    comboSubbuild.Items.Add(coveringSubsortItems[9]);  // Tile
-                    comboSubbuild.Items.Add(coveringSubsortItems[11]); // Wood
-                    break;
-                case 0x2000: // Wall Coverings
-                    comboSubbuild.Items.Add(coveringSubsortItems[0]);  // Brick
-                    comboSubbuild.Items.Add(coveringSubsortItems[3]);  // Masonry
-                    comboSubbuild.Items.Add(coveringSubsortItems[4]);  // Paint
-                    comboSubbuild.Items.Add(coveringSubsortItems[5]);  // Paneling
-                    comboSubbuild.Items.Add(coveringSubsortItems[6]);  // Poured
-                    comboSubbuild.Items.Add(coveringSubsortItems[7]);  // Siding
-                    comboSubbuild.Items.Add(coveringSubsortItems[9]);  // Tile
-                    comboSubbuild.Items.Add(coveringSubsortItems[10]); // Wallpaper
-                    break;
-                case 0x4000: // Walls
-                    comboSubbuild.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Halfwalls", 0x8000)
-                    });
-                    break;
-            }
-
-            // Select the require sub-build item
-            foreach (object o in comboSubbuild.Items)
-            {
-                if ((o as NamedValue).Value == subBuildFlags)
-                {
-                    comboSubbuild.SelectedItem = o;
-                    break;
-                }
-            }
-        }
-
-        private void OnGridSelectionChanged(object sender, EventArgs e)
-        {
-            if (dataLoading) return;
-
-            ClearEditor();
-
-            if (gridObjects.SelectedRows.Count >= 1)
-            {
-                bool append = false;
-                foreach (DataGridViewRow row in gridObjects.SelectedRows)
-                {
-                    if (row.Visible)
+                    else
                     {
-                        UpdateEditor(row.Cells["colResRef"].Value as DBPFResource, append);
-                        append = true;
+                        row.Cells["colPrice"].Value = (res as Cpf).GetItem("cost").UIntegerValue;
                     }
+
+                    dataLoading = oldDataLoading;
+                    return;
                 }
             }
         }
+        #endregion
 
+        #region Selected Row Update
+        private void UpdateSelectedRows(NamedValue nv, ObjdIndex index, string itemName)
+        {
+            if (ignoreEdits) return;
+
+            List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            {
+                selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
+            }
+
+            foreach (ObjectDbpfData selectedObject in selectedData)
+            {
+                if (selectedObject.Resource is Objd)
+                {
+                    UpdateObjdData(selectedObject, index, (ushort)nv.Value);
+                }
+                else
+                {
+                    string value = nv.Name;
+                    if (value.Equals("Wall Coverings")) value = "wall";
+                    else if (value.Equals("Floor Coverings")) value = "floor";
+                    else if (value.Equals("Other")) value = "fence";
+                    else if (value.Equals("Walls")) value = "fence";
+
+                    UpdateCpfData(selectedObject, itemName, value);
+                }
+            }
+
+            ReselectRows(selectedData);
+        }
+
+        private void UpdateSelectedRows(ushort data, ObjdIndex index, string itemName)
+        {
+            if (ignoreEdits) return;
+
+            List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            {
+                selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
+            }
+
+            foreach (ObjectDbpfData selectedObject in selectedData)
+            {
+                if (selectedObject.Resource is Objd)
+                {
+                    UpdateObjdData(selectedObject, index, data);
+                }
+                else
+                {
+                    UpdateCpfData(selectedObject, itemName, data);
+                }
+            }
+
+            ReselectRows(selectedData);
+        }
+
+        private void UpdateSelectedRows(ushort data, ObjdIndex index)
+        {
+            if (ignoreEdits) return;
+
+            List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            {
+                selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
+            }
+
+            foreach (ObjectDbpfData selectedObject in selectedData)
+            {
+                UpdateObjdData(selectedObject, index, data);
+            }
+
+            ReselectRows(selectedData);
+        }
+
+        private void UpdateSelectedRows(bool state, ObjdIndex index, ushort flag)
+        {
+            if (ignoreEdits) return;
+
+            List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            {
+                selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
+            }
+
+            foreach (ObjectDbpfData selectedObject in selectedData)
+            {
+                Objd objd = selectedObject.Resource as Objd;
+
+                ushort data = objd.GetRawData(index);
+
+                if (state)
+                {
+                    data |= flag;
+                }
+                else
+                {
+                    data &= (ushort)(~flag & 0xffff);
+                }
+
+                UpdateObjdData(selectedObject, index, data);
+            }
+
+            ReselectRows(selectedData);
+        }
+        #endregion
+
+        #region Resource Update
+        private void UpdateObjdData(ObjectDbpfData selectedObject, ObjdIndex index, ushort data)
+        {
+            if (ignoreEdits) return;
+
+            (selectedObject.Resource as Objd).SetRawData(index, data);
+
+            UpdateGridRow(selectedObject);
+        }
+
+        private void UpdateCpfData(ObjectDbpfData selectedObject, string itemName, ushort data)
+        {
+            if (ignoreEdits) return;
+
+            (selectedObject.Resource as Cpf).GetItem(itemName).UIntegerValue = data;
+
+            UpdateGridRow(selectedObject);
+        }
+
+        private void UpdateCpfData(ObjectDbpfData selectedObject, string itemName, string value)
+        {
+            if (ignoreEdits) return;
+
+            (selectedObject.Resource as Cpf).GetItem(itemName).StringValue = value;
+
+            UpdateGridRow(selectedObject);
+        }
+        #endregion
+
+        #region Editor
         ushort cachedRoomFlags, cachedFunctionFlags, cachedSubfunctionFlags, cachedUseFlags, cachedCommunityFlags, cachedQuarterTile, cachedBuildFlags, cachedSubbuildFlags;
-
-        private void UpdateGridRow(DataGridViewRow row, DBPFResource res)
-        {
-            if (res == null)
-            {
-                res = row.Cells["colResRef"].Value as DBPFResource;
-            }
-
-            if (IsBuyMode)
-                UpdateBuyModeGridRow(row, res);
-            else
-                UpdateBuildModeGridRow(row, res);
-        }
-
-        private void UpdateBuyModeGridRow(DataGridViewRow row, DBPFResource res)
-        {
-            Objd objd = res as Objd;
-
-            row.Cells["colRooms"].Value = BuildRoomsString(objd);
-            row.Cells["colFunction"].Value = BuildFunctionString(objd);
-            row.Cells["colCommunity"].Value = BuildCommunityString(objd);
-            row.Cells["colUse"].Value = BuildUseString(objd);
-            row.Cells["colQuarterTile"].Value = BuildQuarterTileString(objd);
-            row.Cells["colPrice"].Value = objd.GetRawData(ObjdIndex.Price);
-            row.Cells["colDepreciation"].Value = $"{objd.GetRawData(ObjdIndex.DepreciationLimit)}, {objd.GetRawData(ObjdIndex.InitialDepreciation)}, {objd.GetRawData(ObjdIndex.DailyDepreciation)}, {objd.GetRawData(ObjdIndex.SelfDepreciating)}";
-        }
-
-        private void UpdateBuildModeGridRow(DataGridViewRow row, DBPFResource res)
-        {
-            row.Cells["colFunction"].Value = BuildBuildString(res);
-
-            if (res is Objd objd)
-            {
-                row.Cells["colPrice"].Value = objd.GetRawData(ObjdIndex.Price);
-            }
-            else
-            {
-                row.Cells["colPrice"].Value = (res as Cpf).GetItem("cost").UIntegerValue;
-            }
-        }
-
-        private void UpdateObjdData(Objd objd, ObjdIndex index, ushort data, DataGridViewRow row)
-        {
-            if (ignoreEdits) return;
-
-            objd.SetRawData(index, data);
-
-            if (objd.IsDirty)
-            {
-                row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
-            }
-
-            UpdateGridRow(row, objd);
-        }
-
-        private void UpdateCpfData(Cpf cpf, string itemName, ushort data, DataGridViewRow row)
-        {
-            if (ignoreEdits) return;
-
-            cpf.GetItem(itemName).UIntegerValue = data;
-
-            if (cpf.IsDirty)
-            {
-                row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
-            }
-
-            UpdateGridRow(row, cpf);
-        }
-
-        private void UpdateCpfData(Cpf cpf, string itemName, string value, DataGridViewRow row)
-        {
-            if (ignoreEdits) return;
-
-            cpf.GetItem(itemName).StringValue = value;
-
-            if (cpf.IsDirty)
-            {
-                row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
-            }
-
-            UpdateGridRow(row, cpf);
-        }
-
-        private void UpdateSelectedValue(NamedValue nv, ObjdIndex index, string itemName)
-        {
-            foreach (DataGridViewRow row in gridObjects.SelectedRows)
-            {
-                if (row.Visible)
-                {
-                    if (row.Cells["colResRef"].Value is Objd objd)
-                    {
-                        UpdateObjdData(objd, index, (ushort)nv.Value, row);
-                    }
-                    else
-                    {
-                        string value = nv.Name;
-                        if (value.Equals("Wall Coverings")) value = "wall";
-                        else if (value.Equals("Floor Coverings")) value = "floor";
-                        else if (value.Equals("Other")) value = "fence";
-                        else if (value.Equals("Walls")) value = "fence";
-                        UpdateCpfData(row.Cells["colResRef"].Value as Cpf, itemName, value, row);
-                    }
-                }
-            }
-        }
-
-        private void UpdateSelectedValue(string text, ObjdIndex index, string itemName)
-        {
-            ushort data = 0;
-
-            if (string.IsNullOrWhiteSpace(text) || UInt16.TryParse(text, out data))
-            {
-                UpdateSelectedValue(data, index, itemName);
-            }
-        }
-
-        private void UpdateSelectedValue(ushort data, ObjdIndex index, string itemName)
-        {
-            foreach (DataGridViewRow row in gridObjects.SelectedRows)
-            {
-                if (row.Visible)
-                {
-                    if (row.Cells["colResRef"].Value is Objd objd)
-                    {
-                        UpdateObjdData(objd, index, data, row);
-                    }
-                    else
-                    {
-                        UpdateCpfData(row.Cells["colResRef"].Value as Cpf, itemName, data, row);
-                    }
-                }
-            }
-        }
-
-        private void UpdateSelectedValue(string text, ObjdIndex index)
-        {
-            ushort data = 0;
-
-            if (string.IsNullOrWhiteSpace(text) || UInt16.TryParse(text, out data))
-            {
-                UpdateSelectedValue(data, index);
-            }
-        }
-
-        private void UpdateSelectedValue(ushort data, ObjdIndex index)
-        {
-            foreach (DataGridViewRow row in gridObjects.SelectedRows)
-            {
-                if (row.Visible)
-                {
-                    Objd objd = row.Cells["colResRef"].Value as Objd;
-
-                    UpdateObjdData(objd, index, data, row);
-                }
-            }
-        }
-
-        private void UpdateSelectedFlag(bool state, ObjdIndex index, ushort flag)
-        {
-            foreach (DataGridViewRow row in gridObjects.SelectedRows)
-            {
-                if (row.Visible)
-                {
-                    Objd objd = row.Cells["colResRef"].Value as Objd;
-
-                    ushort data = objd.GetRawData(index);
-
-                    if (state)
-                    {
-                        data |= flag;
-                    }
-                    else
-                    {
-                        data &= (ushort)(~flag & 0xffff);
-                    }
-
-                    UpdateObjdData(objd, index, data, row);
-                }
-            }
-        }
-
-        private void OnRoomBathroomClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbRoomBathroom.Checked, ObjdIndex.RoomSortFlags, 0x0004);
-            UpdateFormState();
-        }
-
-        private void OnRoomBedroomClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbRoomBedroom.Checked, ObjdIndex.RoomSortFlags, 0x0002);
-            UpdateFormState();
-        }
-
-        private void OnRoomDiningroomClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbRoomDiningroom.Checked, ObjdIndex.RoomSortFlags, 0x0020);
-            UpdateFormState();
-        }
-
-        private void OnRoomKitchenClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbRoomKitchen.Checked, ObjdIndex.RoomSortFlags, 0x0001);
-            UpdateFormState();
-        }
-
-        private void OnRoomLoungeClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbRoomLounge.Checked, ObjdIndex.RoomSortFlags, 0x0008);
-            UpdateFormState();
-        }
-
-        private void OnRoomMiscClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbRoomMisc.Checked, ObjdIndex.RoomSortFlags, 0x0040);
-            UpdateFormState();
-        }
-
-        private void OnRoomNurseryClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbRoomNursery.Checked, ObjdIndex.RoomSortFlags, 0x0100);
-            UpdateFormState();
-        }
-
-        private void OnRoomOutsideClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbRoomOutside.Checked, ObjdIndex.RoomSortFlags, 0x0010);
-            UpdateFormState();
-        }
-
-        private void OnRoomStudyClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbRoomStudy.Checked, ObjdIndex.RoomSortFlags, 0x0080);
-            UpdateFormState();
-        }
-
-        private void OnCommunityDiningClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCommDining.Checked, ObjdIndex.CommunitySort, 0x0001);
-            UpdateFormState();
-        }
-
-        private void OnCommunityMiscClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCommMisc.Checked, ObjdIndex.CommunitySort, 0x0080);
-            UpdateFormState();
-        }
-
-        private void OnCommunityOutsideClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCommOutside.Checked, ObjdIndex.CommunitySort, 0x0004);
-            UpdateFormState();
-        }
-
-        private void OnCommunityShoppingClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCommShopping.Checked, ObjdIndex.CommunitySort, 0x0002);
-            UpdateFormState();
-        }
-
-        private void OnCommunityStreetClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbCommStreet.Checked, ObjdIndex.CommunitySort, 0x0008);
-            UpdateFormState();
-        }
-
-        private void OnUseToddlersClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbUseToddlers.Checked, ObjdIndex.CatalogUseFlags, 0x0020);
-            UpdateFormState();
-        }
-
-        private void OnUseChildrenClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbUseChildren.Checked, ObjdIndex.CatalogUseFlags, 0x0002);
-            UpdateFormState();
-        }
-
-        private void OnUseTeensClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbUseTeens.Checked, ObjdIndex.CatalogUseFlags, 0x0008);
-            UpdateFormState();
-        }
-
-        private void OnUseAdultsClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbUseAdults.Checked, ObjdIndex.CatalogUseFlags, 0x0001);
-            UpdateFormState();
-        }
-
-        private void OnUseEldersClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbUseElders.Checked, ObjdIndex.CatalogUseFlags, 0x0010);
-            UpdateFormState();
-        }
-
-        private void OnUseGroupActivityClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedFlag(ckbUseGroupActivity.Checked, ObjdIndex.CatalogUseFlags, 0x0004);
-            UpdateFormState();
-        }
-
-        private void OnQuarterTileClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate) UpdateSelectedValue(ckbQuarterTile.Checked ? QuarterTileOn : QuarterTileOff, ObjdIndex.IgnoreQuarterTilePlacement);
-            UpdateFormState();
-        }
-
-        private void OnBuyPriceChanged(object sender, EventArgs e)
-        {
-            if (textBuyPrice.Text.Length > 0 && !UInt16.TryParse(textBuyPrice.Text, out ushort _)) textBuyPrice.Text = "0";
-
-            if (IsAutoUpdate) UpdateSelectedValue(textBuyPrice.Text, ObjdIndex.Price);
-            UpdateFormState();
-        }
-
-        private void OnBuildPriceChanged(object sender, EventArgs e)
-        {
-            if (textBuildPrice.Text.Length > 0 && !UInt16.TryParse(textBuildPrice.Text, out ushort _)) textBuildPrice.Text = "0";
-
-            if (IsAutoUpdate) UpdateSelectedValue(textBuildPrice.Text, ObjdIndex.Price, "cost");
-            UpdateFormState();
-        }
-
-        private void OnDepreciationLimitChanged(object sender, EventArgs e)
-        {
-            if (textDepLimit.Text.Length > 0 && !UInt16.TryParse(textDepLimit.Text, out ushort _)) textDepLimit.Text = "0";
-
-            if (IsAutoUpdate) UpdateSelectedValue(textDepLimit.Text, ObjdIndex.DepreciationLimit);
-            UpdateFormState();
-        }
-
-        private void OnDepreciationInitialChanged(object sender, EventArgs e)
-        {
-            if (textDepInitial.Text.Length > 0 && !UInt16.TryParse(textDepInitial.Text, out ushort _)) textDepInitial.Text = "0";
-
-            if (IsAutoUpdate) UpdateSelectedValue(textDepInitial.Text, ObjdIndex.InitialDepreciation);
-            UpdateFormState();
-        }
-
-        private void OnDepreciationDailyChanged(object sender, EventArgs e)
-        {
-            if (textDepDaily.Text.Length > 0 && !UInt16.TryParse(textDepDaily.Text, out ushort _)) textDepDaily.Text = "0";
-
-            if (IsAutoUpdate) UpdateSelectedValue(textDepDaily.Text, ObjdIndex.DailyDepreciation);
-            UpdateFormState();
-        }
-
-        private void OnDepreciationSelfClicked(object sender, EventArgs e)
-        {
-            if (IsAutoUpdate)
-            {
-                foreach (DataGridViewRow row in gridObjects.SelectedRows)
-                {
-                    if (row.Visible)
-                    {
-                        Objd objd = row.Cells["colResRef"].Value as Objd;
-
-                        UpdateObjdData(objd, ObjdIndex.SelfDepreciating, (ushort)(ckbDepSelf.Checked ? 1 : 0), row);
-                    }
-                }
-            }
-
-            UpdateFormState();
-        }
-
-        private void OnKeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!(Char.IsControl(e.KeyChar) || (e.KeyChar >= '0' && e.KeyChar <= '9')))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void OnAutoCommitClicked(object sender, EventArgs e)
-        {
-            btnCommit.Visible = !menuItemAutoCommit.Checked;
-
-            if (menuItemAutoCommit.Checked)
-            {
-                OnGridSelectionChanged(gridObjects, null);
-            }
-        }
-
-        private void OnHideNonLocalsClicked(object sender, EventArgs e)
-        {
-            if (menuItemHideNonLocals.Checked)
-            {
-                menuItemHideLocals.Checked = false;
-                menuItemMakeReplacements.Enabled = false;
-                menuItemMakeReplacements.Checked = false;
-                OnMakeReplcementsClicked(menuItemMakeReplacements, null);
-            }
-            else
-            {
-                if (menuItemHideLocals.Checked == false)
-                {
-                    menuItemMakeReplacements.Enabled = false;
-                    menuItemMakeReplacements.Checked = false;
-                    OnMakeReplcementsClicked(menuItemMakeReplacements, null);
-                }
-            }
-
-            UpdateRowVisibility();
-        }
-
-        private void OnHideLocalsClicked(object sender, EventArgs e)
-        {
-            if (menuItemHideLocals.Checked)
-            {
-                menuItemHideNonLocals.Checked = false;
-                menuItemMakeReplacements.Enabled = true;
-            }
-            else
-            {
-                menuItemMakeReplacements.Enabled = false;
-                menuItemMakeReplacements.Checked = false;
-                OnMakeReplcementsClicked(menuItemMakeReplacements, null);
-            }
-
-            UpdateRowVisibility();
-        }
-
-        private void OnRowRevertClicked(object sender, EventArgs e)
-        {
-            foreach (DataGridViewRow row in gridObjects.SelectedRows)
-            {
-                if (row.Visible)
-                {
-                    DBPFResource res = row.Cells["colResRef"].Value as DBPFResource;
-
-                    if (res.IsDirty)
-                    {
-                        string packageFile = row.Cells["colPackage"].Value as string;
-
-                        using (DBPFFile package = new DBPFFile(packageFile))
-                        {
-                            DBPFResource originalRes = package.GetResourceByKey(res);
-
-                            row.Cells["colResRef"].Value = originalRes;
-
-                            package.Close();
-
-                            UpdateGridRow(row, originalRes);
-                            row.DefaultCellStyle.BackColor = Color.Empty;
-                        }
-                    }
-                }
-            }
-        }
-
-        private void OnMakeReplcementsClicked(object sender, EventArgs e)
-        {
-            btnSave.Text = (menuItemMakeReplacements.Checked) ? "&Save As..." : "&Save";
-        }
 
         private void ClearEditor()
         {
@@ -2026,44 +1598,6 @@ namespace ObjectRelocator
         private void ClearBuildModeEditor()
         {
             textBuildPrice.Text = "";
-        }
-
-        private void OnBuyBuildModeClicked(object sender, EventArgs e)
-        {
-            ToolStripMenuItem menuItemMode = sender as ToolStripMenuItem;
-
-            if (menuItemMode == menuItemBuyMode && IsBuyMode) return;
-            if (menuItemMode == menuItemBuildMode && IsBuildMode) return;
-
-            if (IsAnyDirty())
-            {
-                if (MsgBox.Show($"There are unsaved changes, do you really want to change mode?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
-                {
-                    return;
-                }
-            }
-
-            buyMode = !buyMode;
-
-            this.Text = $"{ObjectRelocatorApp.AppName} - {(IsBuyMode ? "Buy" : "Build")} Mode";
-
-            menuItemBuildMode.Checked = IsBuildMode;
-            menuItemBuyMode.Checked = IsBuyMode;
-
-            menuItemExcludeHidden.Enabled = IsBuyMode;
-            menuItemShowDepreciation.Enabled = IsBuyMode;
-
-            panelBuyModeEditor.Visible = IsBuyMode;
-            panelBuildModeEditor.Visible = IsBuildMode;
-
-            gridObjects.Columns["colRooms"].Visible = IsBuyMode;
-            gridObjects.Columns["colCommunity"].Visible = IsBuyMode;
-            gridObjects.Columns["colUse"].Visible = IsBuyMode;
-            gridObjects.Columns["colQuarterTile"].Visible = IsBuyMode;
-            gridObjects.Columns["colDepreciation"].Visible = IsBuyMode;
-            gridObjects.Columns["colFunction"].HeaderText = IsBuyMode ? "Function" : "Build";
-
-            DoWork_FillGrid(folder);
         }
 
         private void UpdateEditor(DBPFResource res, bool append)
@@ -2136,7 +1670,7 @@ namespace ObjectRelocator
                     if ((o as NamedValue).Value == cachedFunctionFlags)
                     {
                         comboFunction.SelectedItem = o;
-                        UpdateFunctionSorts(cachedSubfunctionFlags);
+                        UpdateFunctionSubsortItems(cachedSubfunctionFlags);
                         break;
                     }
                 }
@@ -2239,14 +1773,6 @@ namespace ObjectRelocator
             }
         }
 
-        private void OnModeMenuOpening(object sender, EventArgs e)
-        {
-            // Can't change mode if any unsaved changes
-            //            bool anyDirty = IsAnyDirty();
-            //            menuItemBuyMode.Enabled = !anyDirty;
-            //            menuItemBuildMode.Enabled = !anyDirty;
-        }
-
         private void UpdateBuildModeEditor(DBPFResource res, bool append)
         {
             if (res is Objd objd)
@@ -2275,7 +1801,7 @@ namespace ObjectRelocator
                         if ((o as NamedValue).Value == cachedBuildFlags)
                         {
                             comboBuild.SelectedItem = o;
-                            UpdateBuildSorts(cachedSubbuildFlags);
+                            UpdateBuildSubsortItems(cachedSubbuildFlags);
                             break;
                         }
                     }
@@ -2302,7 +1828,7 @@ namespace ObjectRelocator
 
                 if (cpf is Xfnc)
                 {
-                    fakeBuildSort = (ushort)((cpf.GetItem("ishalfwall").UIntegerValue == 0) ? 0x0001 : 0x1000);
+                    fakeBuildSort = (ushort)((cpf.GetItem("ishalfwall") != null && cpf.GetItem("ishalfwall").UIntegerValue != 0) ? 0x1000 : 0x0001);
                     fakeBuildSubsort = 0x8000;
                 }
                 else
@@ -2353,7 +1879,7 @@ namespace ObjectRelocator
                         if ((o as NamedValue).Value == cachedBuildFlags)
                         {
                             comboBuild.SelectedItem = o;
-                            UpdateBuildSorts(cachedSubbuildFlags);
+                            UpdateBuildSubsortItems(cachedSubbuildFlags);
                             break;
                         }
                     }
@@ -2372,6 +1898,599 @@ namespace ObjectRelocator
                 }
             }
         }
+        #endregion
+
+        #region Dropdown Events
+        private void OnFunctionSortChanged(object sender, EventArgs e)
+        {
+            if (comboFunction.SelectedIndex != -1)
+            {
+                UpdateSelectedRows((ushort)(comboFunction.SelectedItem as NamedValue).Value, ObjdIndex.FunctionSortFlags);
+            }
+
+            UpdateFunctionSubsortItems(0x80);
+        }
+
+        private void OnFunctionSubsortChanged(object sender, EventArgs e)
+        {
+            if (comboSubfunction.SelectedIndex != -1)
+            {
+                UpdateSelectedRows((ushort)(comboSubfunction.SelectedItem as NamedValue).Value, ObjdIndex.FunctionSubSort);
+            }
+        }
+
+        private void UpdateFunctionSubsortItems(ushort subFunctionFlags)
+        {
+            if (comboFunction.SelectedItem == null) return;
+
+            comboSubfunction.Items.Clear();
+            comboSubfunction.Enabled = true;
+
+            switch ((comboFunction.SelectedItem as NamedValue).Value)
+            {
+                case 0x00:
+                    UpdateSelectedRows(0x00, ObjdIndex.FunctionSubSort);
+                    break;
+                case 0x04:
+                    comboSubfunction.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Cooking", 0x01),
+                        new NamedValue("Fridge", 0x02),
+                        new NamedValue("Large", 0x08),
+                        new NamedValue("Misc", 0x80),
+                        new NamedValue("Small", 0x04)
+                    });
+                    break;
+                case 0x20:
+                    comboSubfunction.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Curtain", 0x20),
+                        new NamedValue("Mirror", 0x10),
+                        new NamedValue("Misc", 0x80),
+                        new NamedValue("Picture", 0x01),
+                        new NamedValue("Plant", 0x08),
+                        new NamedValue("Rug", 0x04),
+                        new NamedValue("Sculpture", 0x02)
+                    });
+                    break;
+                case 0x08:
+                    comboSubfunction.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Audio", 0x04),
+                        new NamedValue("Entertainment", 0x01),
+                        new NamedValue("Misc", 0x80),
+                        new NamedValue("Small", 0x08),
+                        new NamedValue("TV/Computer", 0x02)
+                    });
+                    break;
+                case 0x40:
+                    comboSubfunction.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Car", 0x20),
+                        new NamedValue("Children", 0x10),
+                        new NamedValue("Dresser", 0x02),
+                        new NamedValue("Misc", 0x80),
+                        new NamedValue("Party", 0x08),
+                        new NamedValue("Pets", 0x40)
+                    });
+                    break;
+                case 0x100:
+                    comboSubfunction.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Creative", 0x01),
+                        new NamedValue("Exercise", 0x04),
+                        new NamedValue("Knowledge", 0x02),
+                        new NamedValue("Misc", 0x80),
+                        new NamedValue("Recreation", 0x08)
+                    });
+                    break;
+                case 0x80:
+                    comboSubfunction.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Ceiling", 0x08),
+                        new NamedValue("Floor", 0x02),
+                        new NamedValue("Garden", 0x10),
+                        new NamedValue("Misc", 0x80),
+                        new NamedValue("Table", 0x01),
+                        new NamedValue("Wall", 0x04)
+                    });
+                    break;
+                case 0x10:
+                    comboSubfunction.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Bath/Shower", 0x02),
+                        new NamedValue("Hot Tub", 0x08),
+                        new NamedValue("Misc", 0x80),
+                        new NamedValue("Sink", 0x04),
+                        new NamedValue("Toilet", 0x01)
+                    });
+                    break;
+                case 0x01:
+                    comboSubfunction.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Arm Chair", 0x02),
+                        new NamedValue("Bed", 0x08),
+                        new NamedValue("Dining Chair", 0x01),
+                        new NamedValue("Misc", 0x80),
+                        new NamedValue("Recliner", 0x10),
+                        new NamedValue("Sofa", 0x04)
+                    });
+                    break;
+                case 0x02:
+                    comboSubfunction.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Coffee Table", 0x10),
+                        new NamedValue("Counter", 0x01),
+                        new NamedValue("Desk", 0x08),
+                        new NamedValue("Dining Table", 0x02),
+                        new NamedValue("End Table", 0x04),
+                        new NamedValue("Misc", 0x80),
+                        new NamedValue("Shelf", 0x20)
+                    });
+                    break;
+                case 0x400:
+                    // Aspiration Reward
+                    comboSubfunction.Enabled = false;
+                    break;
+                case 0x800:
+                    // Career Reward
+                    comboSubfunction.Enabled = false;
+                    break;
+            }
+
+            // Select the required sub-function item
+            foreach (object o in comboSubfunction.Items)
+            {
+                if ((o as NamedValue).Value == subFunctionFlags)
+                {
+                    comboSubfunction.SelectedItem = o;
+                    break;
+                }
+            }
+        }
+
+        private void OnBuildSortChanged(object sender, EventArgs e)
+        {
+            if (comboBuild.SelectedIndex != -1)
+            {
+                UpdateSelectedRows(comboBuild.SelectedItem as NamedValue, ObjdIndex.BuildModeType, "type");
+            }
+
+            UpdateBuildSubsortItems(0x00);
+        }
+
+        private void OnBuildSubsortChanged(object sender, EventArgs e)
+        {
+            if (comboSubbuild.SelectedIndex != -1)
+            {
+                UpdateSelectedRows(comboSubbuild.SelectedItem as NamedValue, ObjdIndex.BuildModeSubsort, "subsort");
+            }
+        }
+
+        private void UpdateBuildSubsortItems(ushort subBuildFlags)
+        {
+            if (comboBuild.SelectedItem == null) return;
+
+            comboSubbuild.Items.Clear();
+            comboSubbuild.Enabled = true;
+
+            switch ((comboBuild.SelectedItem as NamedValue).Value)
+            {
+                case 0x0000:
+                    UpdateSelectedRows(0x00, ObjdIndex.BuildModeSubsort);
+                    break;
+                case 0x0001: // Other
+                    comboSubbuild.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Architecture", 0x1000),
+                        new NamedValue("Columns", 0x0008),
+                        new NamedValue("Connecting Arches", 0x0200),
+                        new NamedValue("Elevator", 0x0800),
+                        new NamedValue("Fence", 0x8000),
+                        new NamedValue("Garage", 0x0400),
+                        new NamedValue("Multi-Story Columns", 0x0100),
+                        new NamedValue("Pools", 0x0040),
+                        new NamedValue("Staircases", 0x0020)
+                    });
+                    break;
+                case 0x0004: // Garden Centre
+                    comboSubbuild.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Flowers", 0x0004),
+                        new NamedValue("Gardening", 0x0010),
+                        new NamedValue("Shrubs", 0x0002),
+                        new NamedValue("Trees", 0x0001)
+                    });
+                    break;
+                case 0x0008: // Doors & Windows
+                    comboSubbuild.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Archways", 0x0010),
+                        new NamedValue("Doors", 0x0001),
+                        new NamedValue("Gates", 0x0008),
+                        new NamedValue("Multi-Story Doors", 0x0100),
+                        new NamedValue("Multi-Story Windows", 0x0002),
+                        new NamedValue("Windows", 0x0004)
+                    });
+                    break;
+
+                // Fake build types for XFNC/XOBJ resources
+                case 0x1000: // Floor Coverings
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Brick]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Carpet]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Lino]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Poured]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Stone]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Tile]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Wood]);
+                    break;
+                case 0x2000: // Wall Coverings
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Brick]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Masonry]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Paint]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Paneling]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Poured]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Siding]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Tile]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Wallpaper]);
+                    break;
+                case 0x4000: // Walls
+                    comboSubbuild.Items.AddRange(new NamedValue[] {
+                        new NamedValue("Halfwalls", 0x8000)
+                    });
+                    break;
+            }
+
+            // Select the required sub-build item
+            foreach (object o in comboSubbuild.Items)
+            {
+                if ((o as NamedValue).Value == subBuildFlags)
+                {
+                    comboSubbuild.SelectedItem = o;
+                    break;
+                }
+            }
+        }
+        #endregion
+
+        #region Checkbox Events
+        private void OnRoomBathroomClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbRoomBathroom.Checked, ObjdIndex.RoomSortFlags, 0x0004);
+        }
+
+        private void OnRoomBedroomClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbRoomBedroom.Checked, ObjdIndex.RoomSortFlags, 0x0002);
+        }
+
+        private void OnRoomDiningroomClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbRoomDiningroom.Checked, ObjdIndex.RoomSortFlags, 0x0020);
+        }
+
+        private void OnRoomKitchenClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbRoomKitchen.Checked, ObjdIndex.RoomSortFlags, 0x0001);
+        }
+
+        private void OnRoomLoungeClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbRoomLounge.Checked, ObjdIndex.RoomSortFlags, 0x0008);
+        }
+
+        private void OnRoomMiscClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbRoomMisc.Checked, ObjdIndex.RoomSortFlags, 0x0040);
+        }
+
+        private void OnRoomNurseryClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbRoomNursery.Checked, ObjdIndex.RoomSortFlags, 0x0100);
+        }
+
+        private void OnRoomOutsideClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbRoomOutside.Checked, ObjdIndex.RoomSortFlags, 0x0010);
+        }
+
+        private void OnRoomStudyClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbRoomStudy.Checked, ObjdIndex.RoomSortFlags, 0x0080);
+        }
+
+        private void OnCommunityDiningClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCommDining.Checked, ObjdIndex.CommunitySort, 0x0001);
+        }
+
+        private void OnCommunityMiscClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCommMisc.Checked, ObjdIndex.CommunitySort, 0x0080);
+        }
+
+        private void OnCommunityOutsideClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCommOutside.Checked, ObjdIndex.CommunitySort, 0x0004);
+        }
+
+        private void OnCommunityShoppingClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCommShopping.Checked, ObjdIndex.CommunitySort, 0x0002);
+        }
+
+        private void OnCommunityStreetClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCommStreet.Checked, ObjdIndex.CommunitySort, 0x0008);
+        }
+
+        private void OnUseToddlersClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbUseToddlers.Checked, ObjdIndex.CatalogUseFlags, 0x0020);
+        }
+
+        private void OnUseChildrenClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbUseChildren.Checked, ObjdIndex.CatalogUseFlags, 0x0002);
+        }
+
+        private void OnUseTeensClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbUseTeens.Checked, ObjdIndex.CatalogUseFlags, 0x0008);
+        }
+
+        private void OnUseAdultsClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbUseAdults.Checked, ObjdIndex.CatalogUseFlags, 0x0001);
+        }
+
+        private void OnUseEldersClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbUseElders.Checked, ObjdIndex.CatalogUseFlags, 0x0010);
+        }
+
+        private void OnUseGroupActivityClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbUseGroupActivity.Checked, ObjdIndex.CatalogUseFlags, 0x0004);
+        }
+
+        private void OnQuarterTileClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbQuarterTile.Checked ? QuarterTileOn : QuarterTileOff, ObjdIndex.IgnoreQuarterTilePlacement);
+        }
+
+        private void OnDepreciationSelfClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate)
+            {
+                List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+                foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+                {
+                    selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
+                }
+
+                foreach (ObjectDbpfData selectedObject in selectedData)
+                {
+                    UpdateObjdData(selectedObject, ObjdIndex.SelfDepreciating, (ushort)(ckbDepSelf.Checked ? 1 : 0));
+                }
+
+                ReselectRows(selectedData);
+            }
+        }
+        #endregion
+
+        #region Textbox Events
+        private void OnBuyPriceKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                ushort data = 0;
+
+                if (textBuyPrice.Text.Length > 0 && !UInt16.TryParse(textBuyPrice.Text, out data))
+                {
+                    textBuyPrice.Text = "0";
+                    data = 0;
+                }
+
+                if (IsAutoUpdate && textBuyPrice.Text.Length > 0) UpdateSelectedRows(data, ObjdIndex.Price);
+
+                e.Handled = true;
+            }
+        }
+
+        private void OnBuildPriceKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                ushort data = 0;
+
+                if (textBuildPrice.Text.Length > 0 && !UInt16.TryParse(textBuildPrice.Text, out data))
+                {
+                    textBuyPrice.Text = "0";
+                    data = 0;
+                }
+
+                if (IsAutoUpdate && textBuildPrice.Text.Length > 0) UpdateSelectedRows(data, ObjdIndex.Price, "cost");
+
+                e.Handled = true;
+            }
+        }
+
+        private void OnDepreciationLimitKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                ushort data = 0;
+
+                if (textDepLimit.Text.Length > 0 && !UInt16.TryParse(textDepLimit.Text, out data))
+                {
+                    textBuyPrice.Text = "0";
+                    data = 0;
+                }
+
+                if (IsAutoUpdate && textDepLimit.Text.Length > 0) UpdateSelectedRows(data, ObjdIndex.DepreciationLimit);
+
+                e.Handled = true;
+            }
+        }
+
+        private void OnDepreciationInitialKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                ushort data = 0;
+
+                if (textDepInitial.Text.Length > 0 && !UInt16.TryParse(textDepInitial.Text, out data))
+                {
+                    textBuyPrice.Text = "0";
+                    data = 0;
+                }
+
+                if (IsAutoUpdate && textDepInitial.Text.Length > 0) UpdateSelectedRows(data, ObjdIndex.InitialDepreciation);
+
+                e.Handled = true;
+            }
+        }
+
+        private void OnDepreciationDailyKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                ushort data = 0;
+
+                if (textDepDaily.Text.Length > 0 && !UInt16.TryParse(textDepDaily.Text, out data))
+                {
+                    textBuyPrice.Text = "0";
+                    data = 0;
+                }
+
+                if (IsAutoUpdate && textDepDaily.Text.Length > 0) UpdateSelectedRows(data, ObjdIndex.DailyDepreciation);
+
+                e.Handled = true;
+            }
+        }
+
+        private void OnKeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!(Char.IsControl(e.KeyChar) || (e.KeyChar >= '0' && e.KeyChar <= '9')))
+            {
+                e.Handled = true;
+            }
+        }
+        #endregion
+
+        #region Mouse Management
+        private DataGridViewCellEventArgs mouseLocation = null;
+        readonly DataGridViewRow highlightRow = null;
+        readonly Color highlightColor = Color.Empty;
+
+        private void OnCellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            mouseLocation = e;
+            Point MousePosition = Cursor.Position;
+
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < gridViewResources.RowCount && e.ColumnIndex < gridViewResources.ColumnCount)
+            {
+                DataGridViewRow row = gridViewResources.Rows[e.RowIndex];
+
+                if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colTitle") || row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colName"))
+                {
+                    Image thumbnail = GetThumbnail(row);
+
+                    if (thumbnail != null)
+                    {
+                        thumbBox.Image = thumbnail;
+                        thumbBox.Location = new System.Drawing.Point(MousePosition.X - this.Location.X, MousePosition.Y - this.Location.Y);
+                        thumbBox.Visible = true;
+                    }
+                }
+            }
+        }
+
+        private void OnCellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            thumbBox.Visible = false;
+        }
+        #endregion
+
+        #region Context Menu
+        private void OnContextMenuOpening(object sender, CancelEventArgs e)
+        {
+            if (mouseLocation == null || mouseLocation.RowIndex == -1)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            bool proceed = false;
+
+            // Was the mouse right-click over a selected row?
+            foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
+            {
+                if (mouseLocation.RowIndex == selectedRow.Index)
+                {
+                    proceed = true;
+
+                    break;
+                }
+            }
+
+            if (!proceed)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            menuItemContextRowRestore.Enabled = false;
+            menuItemContextMoveFiles.Enabled = true;
+
+            foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
+            {
+                if ((selectedRow.Cells["colObjectData"].Value as ObjectDbpfData).IsDirty)
+                {
+                    menuItemContextRowRestore.Enabled = true;
+                    menuItemContextMoveFiles.Enabled = false;
+
+                    break;
+                }
+            }
+        }
+
+        private void OnContextMenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+            if (highlightRow != null)
+            {
+                highlightRow.DefaultCellStyle.BackColor = highlightColor;
+            }
+        }
+
+        private void OnRowRevertClicked(object sender, EventArgs e)
+        {
+            List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            {
+                ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                if (objectData.IsDirty)
+                {
+                    selectedData.Add(objectData);
+                }
+            }
+
+            foreach (ObjectDbpfData selectedObject in selectedData)
+            {
+                foreach (DataGridViewRow row in gridViewResources.Rows)
+                {
+                    ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                    if (objectData.Equals(selectedObject))
+                    {
+                        using (DBPFFile package = new DBPFFile(objectData.PackagePath))
+                        {
+                            DBPFResource originalRes = package.GetResourceByKey(objectData.Resource);
+
+                            objectData.Resource = originalRes;
+
+                            package.Close();
+
+                            UpdateGridRow(objectData);
+                        }
+                    }
+                }
+            }
+
+            UpdateFormState();
+        }
 
         private void OnMoveFilesClicked(object sender, EventArgs e)
         {
@@ -2381,9 +2500,9 @@ namespace ObjectRelocator
                 HashSet<string> filesToMove = new HashSet<string>();
                 Dictionary<string, string> filesThatMoved = new Dictionary<string, string>();
 
-                foreach (DataGridViewRow row in gridObjects.SelectedRows)
+                foreach (DataGridViewRow row in gridViewResources.SelectedRows)
                 {
-                    string srcFile = row.Cells["colPackage"].Value as string;
+                    string srcFile = (row.Cells["colObjectData"].Value as ObjectDbpfData).PackagePath;
 
                     if (!(new FileInfo(srcFile).Directory.FullName.Equals(destPath)))
                     {
@@ -2413,21 +2532,25 @@ namespace ObjectRelocator
                     }
                 }
 
-                foreach (DataGridViewRow row in gridObjects.Rows)
+                foreach (DataGridViewRow row in gridViewResources.Rows)
                 {
-                    string rowFile = row.Cells["colPackage"].Value as string;
+                    ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                    string rowFile = objectData.PackagePath;
 
                     if (filesThatMoved.ContainsKey(rowFile))
                     {
                         string newPath = filesThatMoved[rowFile];
 
-                        row.Cells["colPackage"].Value = newPath;
+                        objectData.PackagePath = newPath;
                         row.Cells["colPath"].Value = BuildPathString(newPath);
                     }
                 }
             }
         }
+        #endregion
 
+        #region Save Button
         private void OnSaveClicked(object sender, EventArgs e)
         {
             if (menuItemMakeReplacements.Enabled && menuItemMakeReplacements.Checked)
@@ -2451,25 +2574,20 @@ namespace ObjectRelocator
         {
             Dictionary<string, List<DBPFResource>> dirtyResourceByPackage = new Dictionary<string, List<DBPFResource>>();
 
-            foreach (DataGridViewRow row in gridObjects.Rows)
+            foreach (DataGridViewRow row in gridViewResources.Rows)
             {
-                if (row.Visible)
+                ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                if (objectData.IsDirty)
                 {
-                    DBPFResource editedRes = row.Cells["colResRef"].Value as DBPFResource;
+                    String packageFile = objectData.PackagePath;
 
-                    if (editedRes.IsDirty)
+                    if (!dirtyResourceByPackage.ContainsKey(packageFile))
                     {
-                        String packageFile = row.Cells["colPackage"].Value as string;
-
-                        if (!dirtyResourceByPackage.ContainsKey(packageFile))
-                        {
-                            dirtyResourceByPackage.Add(packageFile, new List<DBPFResource>());
-                        }
-
-                        dirtyResourceByPackage[packageFile].Add(editedRes);
-
-                        row.DefaultCellStyle.BackColor = Color.Empty;
+                        dirtyResourceByPackage.Add(packageFile, new List<DBPFResource>());
                     }
+
+                    dirtyResourceByPackage[packageFile].Add(objectData.Resource);
                 }
             }
 
@@ -2484,7 +2602,14 @@ namespace ObjectRelocator
                         editedObjd.SetClean();
                     }
 
-                    if (dbpfPackage.IsDirty) dbpfPackage.Update(menuItemAutoBackup.Checked);
+                    try
+                    {
+                        if (dbpfPackage.IsDirty) dbpfPackage.Update(menuItemAutoBackup.Checked);
+                    }
+                    catch (Exception)
+                    {
+                        MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
+                    }
 
                     dbpfPackage.Close();
                 }
@@ -2495,26 +2620,30 @@ namespace ObjectRelocator
         {
             using (DBPFFile dbpfPackage = new DBPFFile(packageFile))
             {
-                foreach (DataGridViewRow row in gridObjects.Rows)
+                foreach (DataGridViewRow row in gridViewResources.Rows)
                 {
-                    if (row.Visible)
+                    ObjectDbpfData editedObject = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                    if (editedObject.IsDirty)
                     {
-                        DBPFResource editedRes = row.Cells["colResRef"].Value as DBPFResource;
+                        dbpfPackage.Commit(editedObject.Resource);
 
-                        if (editedRes.IsDirty)
-                        {
-                            row.DefaultCellStyle.BackColor = Color.Empty;
-                            dbpfPackage.Commit(editedRes);
-
-                            editedRes.SetClean();
-                        }
+                        editedObject.SetClean();
                     }
                 }
 
-                dbpfPackage.Update(menuItemAutoBackup.Checked);
+                try
+                {
+                    dbpfPackage.Update(menuItemAutoBackup.Checked);
+                }
+                catch (Exception)
+                {
+                    MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
+                }
 
                 dbpfPackage.Close();
             }
         }
+        #endregion
     }
 }

@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.XSTN
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4C158081;
         public const String NAME = "XSTN";
 
-        public override string FileName
+        public override string KeyName
         {
             get => Name;
         }

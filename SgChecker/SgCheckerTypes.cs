@@ -346,7 +346,7 @@ namespace SgChecker
             }
             else
             {
-                return qualifiedName.Equals(other.SgName) || qualifiedName.Equals(other.FileName.ToLower());
+                return qualifiedName.Equals(other.SgName) || qualifiedName.Equals(other.KeyName.ToLower());
             }
         }
 
@@ -455,7 +455,7 @@ namespace SgChecker
 
         public void Remove(ISgResource sgRes)
         {
-            if (sgRes.FileName != null) missingSgResourcesByType.Remove(new NeededSgResource(sgRes.TypeID, sgRes.FileName));
+            if (sgRes.KeyName != null) missingSgResourcesByType.Remove(new NeededSgResource(sgRes.TypeID, sgRes.KeyName));
             missingSgResourcesByType.Remove(new NeededSgResource(sgRes.SgName));
             missingSgResourcesByType.Remove(new NeededSgResource(sgRes.SgHash));
         }

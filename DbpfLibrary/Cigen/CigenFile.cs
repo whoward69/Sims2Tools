@@ -11,8 +11,10 @@
  */
 
 using Sims2Tools.DBPF.Cigen.CGN1;
+using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Package;
 using System;
+using System.Drawing;
 
 namespace Sims2Tools.DBPF.Cigen
 {
@@ -23,6 +25,8 @@ namespace Sims2Tools.DBPF.Cigen
 
         private readonly Cgn1 cigenIndex;
 
+        public string CigenPath => cigenPath;
+
         public CigenFile(string cigenPath)
         {
             this.cigenPath = cigenPath;
@@ -31,9 +35,16 @@ namespace Sims2Tools.DBPF.Cigen
             cigenIndex = (Cgn1)cigenPackage?.GetResourceByKey(new DBPFKey(Cgn1.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000001, (TypeResourceID)0x00000000));
         }
 
-        public DBPFKey GetImageKey(DBPFKey ownerKey)
+        private DBPFKey GetImageKey(DBPFKey ownerKey)
         {
             return cigenIndex?.GetImageKey(ownerKey);
+        }
+
+        public Image GetThumbnail(DBPFKey ownerKey)
+        {
+            Img img = (Img)cigenPackage?.GetResourceByKey(GetImageKey(ownerKey));
+
+            return img?.Image;
         }
 
         public void Close()

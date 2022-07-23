@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xEBCF3E27;
         public const String NAME = "GZPS";
 
-        public override string FileName
+        public override string KeyName
         {
             get => Name;
         }

@@ -41,7 +41,7 @@ namespace Sims2Tools.DBPF.BHAV
 
         protected void Unserialize(DbpfReader reader)
         {
-            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
+            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
 
             this.header.Unserialize(reader);
             this.items = new List<Instruction>();

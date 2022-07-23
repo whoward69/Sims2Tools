@@ -10,7 +10,9 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.IO;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.Cigen.CGN1
 {
@@ -32,12 +34,22 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
 
         protected void Unserialize(DbpfReader reader)
         {
+            // Unknown 4 bytes, that look like two 16-bit values, first is usually 0x0012, second looks like it could be the length of the image data
             _ = reader.ReadUInt16();
             _ = reader.ReadUInt16();
 
+            // TGIR of the owning resource, have seen AGED (skins) and GZPS (clothing) types, but probably more
             ownerKey = new DBPFKey(reader.ReadTypeId(), reader.ReadGroupId(), reader.ReadInstanceId(), reader.ReadResourceId());
-            imageKey = new DBPFKey(reader.ReadTypeId(), reader.ReadGroupId(), reader.ReadInstanceId(), reader.ReadResourceId());
 
+            // We're expecting an IMG resource now
+            TypeTypeID nextType = reader.ReadTypeId();
+            Debug.Assert(nextType.Equals(Img.TYPE));
+
+            // Oddly, the group for the IMG is given as 0x6F001872 (which could be a hash of "cigen"), but the actual group is 0xFFFFFFFF
+            _ = reader.ReadGroupId();
+            imageKey = new DBPFKey(nextType, DBPFData.GROUP_LOCAL, reader.ReadInstanceId(), reader.ReadResourceId());
+
+            // Unknown 68 bytes, mostly 0x00s, could be anything!
             _ = reader.ReadBytes(17 * 4);
         }
     }

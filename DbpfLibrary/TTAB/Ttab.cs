@@ -44,7 +44,7 @@ namespace Sims2Tools.DBPF.TTAB
         // See - https://modthesims.info/wiki.php?title=54544142
         protected void Unserialize(DbpfReader reader)
         {
-            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
+            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
 
             this.header = new uint[3];
             this.header[0] = reader.ReadUInt32();

@@ -40,7 +40,7 @@ namespace Sims2Tools.DBPF.BCON
 
         protected void Unserialize(DbpfReader reader)
         {
-            this.FileName = Helper.ToString(reader.ReadBytes(0x40));
+            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
 
             ushort num1 = reader.ReadUInt16();
             this.flag = (num1 & 0x8000) != 0;

@@ -71,7 +71,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
         bool duff = false;
         public bool Duff { get { return duff; } }
 
-        public override string FileName
+        public override string KeyName
         {
             get
             {
@@ -171,7 +171,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                 if (size > 0)
                 {
                     oversize = reader.ReadBytes((int)size);
-                    logger.Debug($"Reading 'oversize' bytes in RCol '{FileName}' part of {ToString()}");
+                    logger.Debug($"Reading 'oversize' bytes in RCol '{KeyName}' part of {ToString()}");
                 }
                 else
                 {

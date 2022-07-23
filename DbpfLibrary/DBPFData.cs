@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.BCON;
 using Sims2Tools.DBPF.BHAV;
+using Sims2Tools.DBPF.Cigen.CGN1;
 using Sims2Tools.DBPF.CLST;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
@@ -161,6 +162,8 @@ namespace Sims2Tools.DBPF
             OtherTypeNames.Add(Xfnc.TYPE, Xfnc.NAME);
             OtherTypeNames.Add(Xobj.TYPE, Xobj.NAME);
             OtherTypeNames.Add(Xrof.TYPE, Xrof.NAME);
+
+            OtherTypeNames.Add(Cgn1.TYPE, Cgn1.NAME);
 
             foreach (KeyValuePair<TypeTypeID, String> kvPair in ModTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, String> kvPair in ImgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }

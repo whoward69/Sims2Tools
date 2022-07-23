@@ -170,7 +170,7 @@ namespace HcduPlus
                                     {
                                         for (int i = 0; i < scanPackages.Count - 1; ++i)
                                         {
-                                            // TODO - It would be better not to store these in the first place!
+                                            // It would be better not to store these in the first place, but the overhead is minimal.
                                             if (!(
                                                 // Ignore HomeCrafter string conflicts?
                                                 (typeId == Str.TYPE && instanceId == (TypeInstanceID)0x0000007B && menuItemHomeCrafterConflicts.Checked) ||

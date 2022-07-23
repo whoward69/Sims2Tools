@@ -22,7 +22,10 @@ namespace Sims2Tools.DBPF.Images.JPG
         public new static readonly TypeTypeID TYPE = (TypeTypeID)0x8C3CE95A;
         public new const string NAME = "JPG";
 
-        // TODO - what about other image types (see link above) - 0x0C7E9A76, 0x424D505F, 0x4D533EDD (THUB for XNGB in CANHObjectsThumbnails)
+        // What about other image types (see link above)
+        //   0x0C7E9A76
+        //   0x424D505F
+        //   0x4D533EDD (THUB for XNGB in CANHObjectsThumbnails)
 
         public Jpg(DBPFEntry entry, DbpfReader reader) : base(entry, reader) { }
     }

@@ -21,10 +21,15 @@ namespace Sims2Tools.DBPF.Package
 #pragma warning restore IDE0052 // Remove unread private members
 
         private readonly Dictionary<DBPFKey, DBPFResource> resourceByKey = new Dictionary<DBPFKey, DBPFResource>();
+        private readonly Dictionary<DBPFKey, byte[]> itemByKey = new Dictionary<DBPFKey, byte[]>();
 
         public bool IsDirty => (resourceByKey.Count > 0);
 
-        internal bool IsCached(DBPFKey key) => resourceByKey.ContainsKey(key);
+        internal bool IsCached(DBPFKey key) => resourceByKey.ContainsKey(key) || itemByKey.ContainsKey(key);
+
+        internal bool IsResource(DBPFKey key) => resourceByKey.ContainsKey(key);
+
+        internal bool IsItem(DBPFKey key) => itemByKey.ContainsKey(key);
 
         internal List<DBPFEntry> GetAllEntries()
         {
@@ -35,12 +40,22 @@ namespace Sims2Tools.DBPF.Package
                 entries.Add(new DBPFEntry(resource) { FileOffset = 0, FileSize = resource.FileSize });
             }
 
+            foreach (DBPFKey key in itemByKey.Keys)
+            {
+                entries.Add(new DBPFEntry(key) { FileOffset = 0, FileSize = (uint)itemByKey[key].Length });
+            }
+
             return entries;
         }
 
-        internal DBPFResource GetResourceByEntry(DBPFEntry entry)
+        internal DBPFResource GetResourceByKey(DBPFKey key)
         {
-            return resourceByKey[entry];
+            return resourceByKey[key];
+        }
+
+        internal byte[] GetItemByKey(DBPFKey key)
+        {
+            return itemByKey[key];
         }
 
         internal void Commit(DBPFResource resource)
@@ -49,6 +64,11 @@ namespace Sims2Tools.DBPF.Package
             {
                 resourceByKey[resource] = resource;
             }
+        }
+
+        internal void Commit(DBPFKey key, byte[] item)
+        {
+            itemByKey[key] = item;
         }
     }
 }

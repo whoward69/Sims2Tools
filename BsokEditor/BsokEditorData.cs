@@ -11,10 +11,13 @@ using System.Data;
 namespace BsokEditor
 {
     [System.ComponentModel.DesignerCategory("")]
-    class BsokEditorData : DataTable
+    class ResourcesDataTable : DataTable
     {
-        public BsokEditorData()
+        public ResourcesDataTable()
         {
+            // Must match the order in the DataGridView control
+            this.Columns.Add(new DataColumn("Visible", typeof(string)));
+
             this.Columns.Add(new DataColumn("Type", typeof(string)));
             this.Columns.Add(new DataColumn("PackageName", typeof(string)));
             this.Columns.Add(new DataColumn("Name", typeof(string)));
@@ -25,7 +28,9 @@ namespace BsokEditor
             this.Columns.Add(new DataColumn("Shoe", typeof(string)));
 
             this.Columns.Add(new DataColumn("PackagePath", typeof(string)));
-            this.Columns.Add(new DataColumn("Cpf", typeof(object)));
+            this.Columns.Add(new DataColumn("ResRef", typeof(object)));
+
+            this.DefaultView.RowFilter = "Visible = 'Yes'";
         }
 
         public void Append(DataRow row)

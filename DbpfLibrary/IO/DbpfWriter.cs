@@ -130,6 +130,12 @@ namespace Sims2Tools.DBPF.IO
         {
             m_writer.Write(value);
         }
+
+        public void WritePChar(string value)
+        {
+            WriteChars(value.ToCharArray());
+            WriteByte(0x00);
+        }
         #endregion
 
         public void Dispose()

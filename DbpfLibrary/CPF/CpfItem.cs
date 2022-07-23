@@ -86,7 +86,7 @@ namespace Sims2Tools.DBPF.CPF
 
             set
             {
-                if (DataType != MetaData.DataTypes.dtString) throw new ArgumentException();
+                if (DataType != MetaData.DataTypes.dtString) throw new ArgumentException("Different data types");
 
                 val = Helper.ToBytes(value, 0);
 
@@ -128,7 +128,17 @@ namespace Sims2Tools.DBPF.CPF
 
             set
             {
-                if (DataType != MetaData.DataTypes.dtUInteger) throw new ArgumentException();
+                if (DataType != MetaData.DataTypes.dtUInteger)
+                {
+                    if (DataType == MetaData.DataTypes.dtInteger)
+                    {
+                        if (value > int.MaxValue) throw new ArgumentException("Different data types");
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Different data types");
+                    }
+                }
 
                 System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
                 bw.Write(value);
@@ -176,7 +186,17 @@ namespace Sims2Tools.DBPF.CPF
 
             set
             {
-                if (DataType != MetaData.DataTypes.dtInteger) throw new ArgumentException();
+                if (DataType != MetaData.DataTypes.dtInteger)
+                {
+                    if (DataType == MetaData.DataTypes.dtUInteger)
+                    {
+                        if (value < 0) throw new ArgumentException("Different data types");
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Different data types");
+                    }
+                }
 
                 System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
                 bw.Write(value);
@@ -224,7 +244,7 @@ namespace Sims2Tools.DBPF.CPF
 
             set
             {
-                if (DataType != MetaData.DataTypes.dtSingle) throw new ArgumentException();
+                if (DataType != MetaData.DataTypes.dtSingle) throw new ArgumentException("Different data types");
 
                 System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
                 bw.Write(value);
@@ -278,7 +298,7 @@ namespace Sims2Tools.DBPF.CPF
 
             set
             {
-                if (DataType != MetaData.DataTypes.dtBoolean) throw new ArgumentException();
+                if (DataType != MetaData.DataTypes.dtBoolean) throw new ArgumentException("Different data types");
 
                 System.IO.BinaryWriter bw = new System.IO.BinaryWriter(new System.IO.MemoryStream());
                 bw.Write(value);

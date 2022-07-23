@@ -57,7 +57,8 @@ namespace BsokEditor
             this.menuItemShowCategoryShoe = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
-            this.gridObjects = new System.Windows.Forms.DataGridView();
+            this.gridViewResources = new System.Windows.Forms.DataGridView();
+            this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackageName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -67,7 +68,7 @@ namespace BsokEditor
             this.colCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colShoe = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colCpf = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colResRef = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemContextRowRestore = new System.Windows.Forms.ToolStripMenuItem();
             this.comboBsokGenre = new System.Windows.Forms.ComboBox();
@@ -103,8 +104,9 @@ namespace BsokEditor
             this.ckbAgeTeens = new System.Windows.Forms.CheckBox();
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.thumbBox = new System.Windows.Forms.PictureBox();
             this.menuMain.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridObjects)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextGrid.SuspendLayout();
             this.grpCategory.SuspendLayout();
             this.panelEditor.SuspendLayout();
@@ -112,6 +114,7 @@ namespace BsokEditor
             this.grpGender.SuspendLayout();
             this.grpShoe.SuspendLayout();
             this.grpAge.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             this.SuspendLayout();
             // 
             // menuMain
@@ -214,7 +217,7 @@ namespace BsokEditor
             this.menuItemExcludeUnknown.Name = "menuItemExcludeUnknown";
             this.menuItemExcludeUnknown.Size = new System.Drawing.Size(191, 22);
             this.menuItemExcludeUnknown.Text = "E&xclude Unknown";
-            this.menuItemExcludeUnknown.Click += new System.EventHandler(this.OnExcludeHidden);
+            this.menuItemExcludeUnknown.Click += new System.EventHandler(this.OnExcludeUnknown);
             // 
             // menuItemSeparator4
             // 
@@ -252,18 +255,19 @@ namespace BsokEditor
             this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
             this.menuItemAutoBackup.Text = "Auto-&Backup";
             // 
-            // gridObjects
+            // gridViewResources
             // 
-            this.gridObjects.AllowUserToAddRows = false;
-            this.gridObjects.AllowUserToDeleteRows = false;
-            this.gridObjects.AllowUserToOrderColumns = true;
-            this.gridObjects.AllowUserToResizeRows = false;
-            this.gridObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.gridViewResources.AllowUserToAddRows = false;
+            this.gridViewResources.AllowUserToDeleteRows = false;
+            this.gridViewResources.AllowUserToOrderColumns = true;
+            this.gridViewResources.AllowUserToResizeRows = false;
+            this.gridViewResources.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gridObjects.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.gridObjects.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridObjects.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.gridViewResources.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.gridViewResources.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridViewResources.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colVisible,
             this.colType,
             this.colPackageName,
             this.colName,
@@ -273,19 +277,29 @@ namespace BsokEditor
             this.colCategory,
             this.colShoe,
             this.colPackagePath,
-            this.colCpf});
-            this.gridObjects.ContextMenuStrip = this.menuContextGrid;
-            this.gridObjects.Location = new System.Drawing.Point(4, 27);
-            this.gridObjects.Name = "gridObjects";
-            this.gridObjects.ReadOnly = true;
-            this.gridObjects.RowHeadersVisible = false;
-            this.gridObjects.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridObjects.Size = new System.Drawing.Size(905, 314);
-            this.gridObjects.TabIndex = 1;
-            this.gridObjects.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
-            this.gridObjects.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
-            this.gridObjects.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
-            this.gridObjects.SelectionChanged += new System.EventHandler(this.OnGridSelectionChanged);
+            this.colResRef});
+            this.gridViewResources.ContextMenuStrip = this.menuContextGrid;
+            this.gridViewResources.Location = new System.Drawing.Point(4, 27);
+            this.gridViewResources.Name = "gridViewResources";
+            this.gridViewResources.ReadOnly = true;
+            this.gridViewResources.RowHeadersVisible = false;
+            this.gridViewResources.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.gridViewResources.Size = new System.Drawing.Size(905, 314);
+            this.gridViewResources.TabIndex = 1;
+            this.gridViewResources.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
+            this.gridViewResources.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
+            this.gridViewResources.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
+            this.gridViewResources.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
+            this.gridViewResources.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
+            this.gridViewResources.SelectionChanged += new System.EventHandler(this.OnGridSelectionChanged);
+            // 
+            // colVisible
+            // 
+            this.colVisible.DataPropertyName = "Visible";
+            this.colVisible.HeaderText = "Visible";
+            this.colVisible.Name = "colVisible";
+            this.colVisible.ReadOnly = true;
+            this.colVisible.Visible = false;
             // 
             // colType
             // 
@@ -299,75 +313,60 @@ namespace BsokEditor
             // 
             // colPackageName
             // 
-            this.colPackageName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colPackageName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.colPackageName.DataPropertyName = "PackageName";
-            this.colPackageName.FillWeight = 50F;
             this.colPackageName.HeaderText = "Package";
-            this.colPackageName.MinimumWidth = 100;
+            this.colPackageName.MinimumWidth = 50;
             this.colPackageName.Name = "colPackageName";
             this.colPackageName.ReadOnly = true;
             // 
             // colName
             // 
-            this.colName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.colName.DataPropertyName = "Name";
             this.colName.HeaderText = "Name";
-            this.colName.MinimumWidth = 100;
+            this.colName.MinimumWidth = 50;
             this.colName.Name = "colName";
             this.colName.ReadOnly = true;
             // 
             // colBsok
             // 
-            this.colBsok.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.colBsok.DataPropertyName = "Bsok";
             this.colBsok.HeaderText = "Bsok";
-            this.colBsok.MinimumWidth = 100;
+            this.colBsok.MinimumWidth = 50;
             this.colBsok.Name = "colBsok";
             this.colBsok.ReadOnly = true;
             // 
             // colGender
             // 
-            this.colGender.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.colGender.DataPropertyName = "Gender";
-            this.colGender.FillWeight = 50F;
             this.colGender.HeaderText = "Gender";
-            this.colGender.MinimumWidth = 55;
+            this.colGender.MinimumWidth = 50;
             this.colGender.Name = "colGender";
             this.colGender.ReadOnly = true;
-            this.colGender.Width = 73;
             // 
             // colAge
             // 
-            this.colAge.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.colAge.DataPropertyName = "Age";
-            this.colAge.FillWeight = 50F;
             this.colAge.HeaderText = "Age";
-            this.colAge.MinimumWidth = 55;
+            this.colAge.MinimumWidth = 50;
             this.colAge.Name = "colAge";
             this.colAge.ReadOnly = true;
-            this.colAge.Width = 55;
             // 
             // colCategory
             // 
-            this.colCategory.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.colCategory.DataPropertyName = "Category";
-            this.colCategory.FillWeight = 50F;
             this.colCategory.HeaderText = "Category";
-            this.colCategory.MinimumWidth = 95;
+            this.colCategory.MinimumWidth = 50;
             this.colCategory.Name = "colCategory";
             this.colCategory.ReadOnly = true;
-            this.colCategory.Width = 95;
             // 
             // colShoe
             // 
-            this.colShoe.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.colShoe.DataPropertyName = "Shoe";
-            this.colShoe.FillWeight = 50F;
             this.colShoe.HeaderText = "Shoe";
-            this.colShoe.MinimumWidth = 55;
+            this.colShoe.MinimumWidth = 50;
             this.colShoe.Name = "colShoe";
             this.colShoe.ReadOnly = true;
-            this.colShoe.Width = 61;
             // 
             // colPackagePath
             // 
@@ -377,13 +376,13 @@ namespace BsokEditor
             this.colPackagePath.ReadOnly = true;
             this.colPackagePath.Visible = false;
             // 
-            // colCpf
+            // colResRef
             // 
-            this.colCpf.DataPropertyName = "Cpf";
-            this.colCpf.HeaderText = "Cpf";
-            this.colCpf.Name = "colCpf";
-            this.colCpf.ReadOnly = true;
-            this.colCpf.Visible = false;
+            this.colResRef.DataPropertyName = "ResRef";
+            this.colResRef.HeaderText = "ResRef";
+            this.colResRef.Name = "colResRef";
+            this.colResRef.ReadOnly = true;
+            this.colResRef.Visible = false;
             // 
             // menuContextGrid
             // 
@@ -572,9 +571,9 @@ namespace BsokEditor
             // 
             // btnBsokRoles
             // 
-            this.btnBsokRoles.Image = ((System.Drawing.Image)(resources.GetObject("btnBsokRole.Image")));
+            this.btnBsokRoles.Image = ((System.Drawing.Image)(resources.GetObject("btnBsokRoles.Image")));
             this.btnBsokRoles.Location = new System.Drawing.Point(5, 140);
-            this.btnBsokRoles.Name = "btnBsokRole";
+            this.btnBsokRoles.Name = "btnBsokRoles";
             this.btnBsokRoles.Size = new System.Drawing.Size(22, 23);
             this.btnBsokRoles.TabIndex = 14;
             this.btnBsokRoles.UseVisualStyleBackColor = true;
@@ -605,7 +604,7 @@ namespace BsokEditor
             this.comboBsokRoles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBsokRoles.FormattingEnabled = true;
             this.comboBsokRoles.Location = new System.Drawing.Point(32, 140);
-            this.comboBsokRoles.Name = "comboBsokRole";
+            this.comboBsokRoles.Name = "comboBsokRoles";
             this.comboBsokRoles.Size = new System.Drawing.Size(333, 23);
             this.comboBsokRoles.TabIndex = 9;
             this.comboBsokRoles.SelectedIndexChanged += new System.EventHandler(this.OnBsokRoleChanged);
@@ -768,14 +767,26 @@ namespace BsokEditor
             this.saveAsFileDialog.Filter = "DBPF Package|*.package";
             this.saveAsFileDialog.Title = "Save as replacements";
             // 
+            // thumbBox
+            // 
+            this.thumbBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.thumbBox.Location = new System.Drawing.Point(10, 60);
+            this.thumbBox.Name = "thumbBox";
+            this.thumbBox.Size = new System.Drawing.Size(192, 192);
+            this.thumbBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.thumbBox.TabIndex = 25;
+            this.thumbBox.TabStop = false;
+            this.thumbBox.Visible = false;
+            // 
             // BsokEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(914, 519);
-            this.Controls.Add(this.panelEditor);
-            this.Controls.Add(this.gridObjects);
             this.Controls.Add(this.menuMain);
+            this.Controls.Add(this.thumbBox);
+            this.Controls.Add(this.gridViewResources);
+            this.Controls.Add(this.panelEditor);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
@@ -787,7 +798,7 @@ namespace BsokEditor
             this.Load += new System.EventHandler(this.OnLoad);
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridObjects)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).EndInit();
             this.menuContextGrid.ResumeLayout(false);
             this.grpCategory.ResumeLayout(false);
             this.grpCategory.PerformLayout();
@@ -797,6 +808,7 @@ namespace BsokEditor
             this.grpShoe.ResumeLayout(false);
             this.grpAge.ResumeLayout(false);
             this.grpAge.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -822,7 +834,7 @@ namespace BsokEditor
         private System.Windows.Forms.ToolStripMenuItem menuMode;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoBackup;
         private CommonOpenFileDialog selectPathDialog;
-        private System.Windows.Forms.DataGridView gridObjects;
+        private System.Windows.Forms.DataGridView gridViewResources;
         private System.Windows.Forms.Panel panelEditor;
         private System.Windows.Forms.GroupBox grpBsok;
         private System.Windows.Forms.GroupBox grpGender;
@@ -858,6 +870,8 @@ namespace BsokEditor
         private System.Windows.Forms.ContextMenuStrip menuContextGrid;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextRowRestore;
         private System.Windows.Forms.SaveFileDialog saveAsFileDialog;
+        private System.Windows.Forms.PictureBox thumbBox;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colVisible;
         private System.Windows.Forms.DataGridViewTextBoxColumn colType;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPackageName;
         private System.Windows.Forms.DataGridViewTextBoxColumn colName;
@@ -867,6 +881,6 @@ namespace BsokEditor
         private System.Windows.Forms.DataGridViewTextBoxColumn colCategory;
         private System.Windows.Forms.DataGridViewTextBoxColumn colShoe;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPackagePath;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colCpf;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colResRef;
     }
 }

@@ -211,7 +211,7 @@ namespace Sims2Tools.DBPF.CPF
             return null;
         }
 
-        // TODO - do we really need this? Why not use GetItem instead?
+        // TODO - _library - do we really need this? Why not use GetItem instead?
         public CpfItem GetSaveItem(string name)
         {
             CpfItem res = GetItem(name);

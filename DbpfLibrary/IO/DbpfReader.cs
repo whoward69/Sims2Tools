@@ -171,14 +171,15 @@ namespace Sims2Tools.DBPF.IO
 
         public string ReadPChar()
         {
+            string s = "";
 
             char b = m_reader.ReadChar();
-            string s = "";
             while (b != 0 && m_reader.BaseStream.Position <= m_reader.BaseStream.Length)
             {
                 s += b;
                 b = m_reader.ReadChar();
             }
+
             return s;
         }
 

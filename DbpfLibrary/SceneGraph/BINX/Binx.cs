@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x0C560F39;
         public const String NAME = "BINX";
 
-        public override string FileName
+        public override string KeyName
         {
             get => "Binary Index";
         }

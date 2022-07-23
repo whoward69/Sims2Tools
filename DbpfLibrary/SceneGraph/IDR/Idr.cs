@@ -22,7 +22,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xAC506764;
         public const String NAME = "3IDR";
 
-        public override string FileName
+        public override string KeyName
         {
             get => "3D ID Referencing File";
         }

@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.XFCH
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x8C93E35C;
         public const String NAME = "XFCH";
 
-        public override string FileName
+        public override string KeyName
         {
             get => Name;
         }
