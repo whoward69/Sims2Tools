@@ -20,7 +20,7 @@ namespace SgChecker
 
         public static int AppVersionMajor = 1;
         public static int AppVersionMinor = 2;
-        public static String AppVersionType = "a"; // a - alpha, b - beta, r - release
+        public static String AppVersionType = "b"; // a - alpha, b - beta, r - release
 
 #if DEBUG
         public static String AppVersionBuild = " (debug)";

@@ -2430,6 +2430,7 @@ namespace ObjectRelocator
                 return;
             }
 
+            menuItemContextEditTitleDesc.Enabled = (gridViewResources.SelectedRows.Count == 1);
             menuItemContextRowRestore.Enabled = false;
             menuItemContextMoveFiles.Enabled = true;
 
@@ -2443,6 +2444,8 @@ namespace ObjectRelocator
                     break;
                 }
             }
+
+            menuItemContextEditTitleDesc.Enabled = false; // TODO - WH
         }
 
         private void OnContextMenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
@@ -2451,6 +2454,20 @@ namespace ObjectRelocator
             {
                 highlightRow.DefaultCellStyle.BackColor = highlightColor;
             }
+        }
+
+        private void OnEditTitleDescClicked(object sender, EventArgs e)
+        {
+            ObjectDbpfData objectData = gridViewResources.SelectedRows[0].Cells["colObjectData"].Value as ObjectDbpfData;
+
+            Sims2ToolsTitleAndDescEntryDialog dialog = new Sims2ToolsTitleAndDescEntryDialog(objectData.Title, objectData.Description);
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                objectData.Title = dialog.Title;
+                objectData.Description = dialog.Description;
+            }
+
         }
 
         private void OnRowRevertClicked(object sender, EventArgs e)

@@ -61,6 +61,18 @@ namespace ObjectRelocator
             set => res = value;
         }
 
+        public string Title
+        {
+            get => ""; // TODO - WH
+            set { } // TODO - WH
+        }
+
+        public string Description
+        {
+            get => ""; // TODO - WH
+            set { } // TODO - WH
+        }
+
         public bool IsDirty => res.IsDirty;
         public void SetClean() => res.SetClean();
 

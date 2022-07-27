@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 
 namespace OutfitOrganiser
 {
@@ -37,6 +38,8 @@ namespace OutfitOrganiser
         }
 
         private string packagePath;
+        private string packageNameNoExtn;
+        private string packageName;
 
         private readonly Binx binx;
         private readonly Idr idr;
@@ -50,6 +53,8 @@ namespace OutfitOrganiser
         private readonly bool hasShoe = false;
 
         public string PackagePath => packagePath;
+        public string PackageNameNoExtn => packageNameNoExtn;
+        public string PackageName => packageName;
 
         public DBPFKey BinxKey => binx;
 
@@ -119,6 +124,8 @@ namespace OutfitOrganiser
         private OutfitDbpfData(OrganiserDbpfFile package, Binx binx, Idr idr, Cpf cpf)
         {
             this.packagePath = package.PackagePath;
+            this.packageNameNoExtn = package.PackageNameNoExtn;
+            this.packageName = package.PackageName;
 
             this.binx = binx;
             this.idr = idr;
@@ -160,6 +167,8 @@ namespace OutfitOrganiser
             Debug.Assert(packagePath.Equals(fromPackagePath));
 
             packagePath = toPackagePath;
+            packageName = new FileInfo(packagePath).Name;
+            packageNameNoExtn = packageName.Substring(0, packageName.LastIndexOf('.'));
         }
 
         private void UpdatePackage()
@@ -310,7 +319,7 @@ namespace OutfitOrganiser
     public class OrganiserDbpfFile : IDisposable
     {
         private readonly DBPFFile package;
-        private readonly bool isCached;
+        private bool isCached;
 
         public string PackagePath => package.PackagePath;
         public string PackageName => package.PackageName;
@@ -334,6 +343,11 @@ namespace OutfitOrganiser
 
         public void Update(bool autoBackup) => package.Update(autoBackup);
 
+        internal void DeCache()
+        {
+            isCached = false;
+        }
+
         public void Close()
         {
             if (!isCached) package.Close();
@@ -349,9 +363,17 @@ namespace OutfitOrganiser
     {
         private readonly Dictionary<string, OrganiserDbpfFile> cache = new Dictionary<string, OrganiserDbpfFile>();
 
+        public bool IsDirty() => (cache.Count > 0);
+
         public bool Contains(string packagePath)
         {
             return cache.ContainsKey(packagePath);
+        }
+
+        public bool SetClean(OrganiserDbpfFile package)
+        {
+            package.DeCache();
+            return SetClean(package.PackagePath);
         }
 
         public bool SetClean(string packagePath)

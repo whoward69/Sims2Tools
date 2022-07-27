@@ -138,6 +138,8 @@ namespace ObjectRelocator
             this.panelBuildModeEditor = new System.Windows.Forms.Panel();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
+            this.menuItemContextEditTitleDesc = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextGrid.SuspendLayout();
@@ -554,31 +556,33 @@ namespace ObjectRelocator
             // menuContextGrid
             // 
             this.menuContextGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemContextEditTitleDesc,
+            this.toolStripSeparator1,
             this.menuItemContextRowRestore,
             this.menuItemSeparator6,
             this.menuItemContextMoveFiles});
             this.menuContextGrid.Name = "menuContextGrid";
-            this.menuContextGrid.Size = new System.Drawing.Size(195, 54);
+            this.menuContextGrid.Size = new System.Drawing.Size(227, 104);
             this.menuContextGrid.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextGrid.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             // 
             // menuItemContextRowRestore
             // 
             this.menuItemContextRowRestore.Name = "menuItemContextRowRestore";
-            this.menuItemContextRowRestore.Size = new System.Drawing.Size(194, 22);
-            this.menuItemContextRowRestore.Text = "Restore Original Values";
+            this.menuItemContextRowRestore.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextRowRestore.Text = "&Restore Original Values";
             this.menuItemContextRowRestore.Click += new System.EventHandler(this.OnRowRevertClicked);
             // 
             // menuItemSeparator6
             // 
             this.menuItemSeparator6.Name = "menuItemSeparator6";
-            this.menuItemSeparator6.Size = new System.Drawing.Size(191, 6);
+            this.menuItemSeparator6.Size = new System.Drawing.Size(223, 6);
             // 
             // menuItemContextMoveFiles
             // 
             this.menuItemContextMoveFiles.Name = "menuItemContextMoveFiles";
-            this.menuItemContextMoveFiles.Size = new System.Drawing.Size(194, 22);
-            this.menuItemContextMoveFiles.Text = "Move Package Files";
+            this.menuItemContextMoveFiles.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextMoveFiles.Text = "&Move Package Files";
             this.menuItemContextMoveFiles.Click += new System.EventHandler(this.OnMoveFilesClicked);
             // 
             // comboFunction
@@ -1135,6 +1139,18 @@ namespace ObjectRelocator
             this.thumbBox.TabStop = false;
             this.thumbBox.Visible = false;
             // 
+            // menuItemContextEditTitleDesc
+            // 
+            this.menuItemContextEditTitleDesc.Name = "menuItemContextEditTitleDesc";
+            this.menuItemContextEditTitleDesc.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextEditTitleDesc.Text = "&Change Title and Description";
+            this.menuItemContextEditTitleDesc.Click += new System.EventHandler(this.OnEditTitleDescClicked);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(223, 6);
+            // 
             // ObjectRelocatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1286,5 +1302,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.DataGridViewTextBoxColumn colPrice;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDepreciation;
         private System.Windows.Forms.DataGridViewTextBoxColumn colObjectData;
+        private System.Windows.Forms.ToolStripMenuItem menuItemContextEditTitleDesc;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }

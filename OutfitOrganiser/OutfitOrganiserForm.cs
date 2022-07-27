@@ -80,14 +80,15 @@ namespace OutfitOrganiser
             new UintNamedValue("Sandal", 5)
         };
 
-        private readonly StringNamedValue[] hairtoneItems = {
+        /* private readonly StringNamedValue[] hairtoneItems = {
             new StringNamedValue("", ""),
+            new StringNamedValue("All", "00000000-0000-0000-0000-000000000000"),
             new StringNamedValue("Black", "00000001-0000-0000-0000-000000000000"),
             new StringNamedValue("Blond", "00000003-0000-0000-0000-000000000000"),
             new StringNamedValue("Brown", "00000002-0000-0000-0000-000000000000"),
             new StringNamedValue("Grey", "00000005-0000-0000-0000-000000000000"),
             new StringNamedValue("Red", "00000004-0000-0000-0000-000000000000")
-        };
+        }; */
         #endregion
 
         private bool dataLoading = false;
@@ -122,19 +123,14 @@ namespace OutfitOrganiser
                 comboShoe.Items.Clear();
                 comboShoe.Items.AddRange(shoeItems);
 
-                comboHairtone.Items.Clear();
-                comboHairtone.Items.AddRange(hairtoneItems);
+                // comboHairtone.Items.Clear();
+                // comboHairtone.Items.AddRange(hairtoneItems);
 
                 dataLoading = false;
             }
 
             gridPackageFiles.DataSource = dataPackageFiles;
             gridResources.DataSource = dataResources;
-
-            if (Sims2ToolsLib.IsSims2HomePathSet)
-            {
-                cigenCache = new CigenFile($"{Sims2ToolsLib.Sims2HomePath}\\cigen.package");
-            }
         }
 
         public new void Dispose()
@@ -161,9 +157,9 @@ namespace OutfitOrganiser
             MyMruList.FileSelected += MyMruList_FileSelected;
 
             menuItemOutfitClothing.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitClothing.Name, 1) != 0);
-            menuItemOutfitHair.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitHair.Name, 1) != 0);
-            menuItemOutfitAccessory.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitAccessory.Name, 1) != 0);
-            menuItemOutfitMakeUp.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitMakeUp.Name, 1) != 0);
+            menuItemOutfitHair.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitHair.Name, 0) != 0);
+            menuItemOutfitAccessory.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitAccessory.Name, 0) != 0);
+            menuItemOutfitMakeUp.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitMakeUp.Name, 0) != 0);
 
             menuItemShowResTitle.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, 1) != 0); OnShowResTitleClicked(menuItemShowResFilename, null);
             menuItemShowResFilename.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, 1) != 0); OnShowResFilenameClicked(menuItemShowResFilename, null);
@@ -176,6 +172,26 @@ namespace OutfitOrganiser
 
             MyUpdater = new Updater(OutfitOrganiserApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
+
+            if (Sims2ToolsLib.IsSims2HomePathSet)
+            {
+                string cigenPath = $"{Sims2ToolsLib.Sims2HomePath}\\cigen.package";
+
+                if (File.Exists(cigenPath))
+                {
+                    cigenCache = new CigenFile(cigenPath);
+                }
+                else
+                {
+                    logger.Warn("'cigen.package' not found - thumbnails will NOT display.");
+                    MsgBox.Show("'cigen.package' not found - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                }
+            }
+            else
+            {
+                logger.Warn("'Sims2HomePath' not set - thumbnails will NOT display.");
+                MsgBox.Show("'Sims2HomePath' not set - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+            }
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
@@ -615,9 +631,14 @@ namespace OutfitOrganiser
             return false;
         }
 
+        private bool InUpdateFormState = false;
         private void UpdateFormState()
         {
-            btnSave.Enabled = false;
+            if (InUpdateFormState) return;
+
+            InUpdateFormState = true;
+
+            menuItemSaveAll.Enabled = btnSaveAll.Enabled = false;
 
             foreach (DataRow row in dataResources.Rows)
             {
@@ -633,7 +654,7 @@ namespace OutfitOrganiser
                 if (packageCache.Contains(packagePath))
                 {
                     row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
-                    btnSave.Enabled = true;
+                    menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
                 }
                 else
                 {
@@ -655,8 +676,13 @@ namespace OutfitOrganiser
                 }
             }
 
-            gridResources.Columns["colHairtone"].Visible = grpHairtone.Visible = menuItemOutfitHair.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitMakeUp.Checked;
-            gridResources.Columns["colShoe"].Visible = grpShoe.Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
+            gridResources.Columns["colHairtone"].Visible = menuItemOutfitHair.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitMakeUp.Checked;
+            // grpHairtone.Visible = gridResources.Columns["colHairtone"].Visible;
+            grpHairtone.Visible = false;
+            gridResources.Columns["colShoe"].Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
+            grpShoe.Visible = gridResources.Columns["colShoe"].Visible;
+
+            InUpdateFormState = false;
         }
 
         private void ReselectResourceRows(List<OutfitDbpfData> selectedData)
@@ -969,7 +995,14 @@ namespace OutfitOrganiser
                         package.Close();
                     }
 
-                    Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(fromPackagePath, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                    try
+                    {
+                        Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(fromPackagePath, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                    }
+                    catch (Exception)
+                    {
+                        MsgBox.Show($"Error trying to remove {fromPackagePath}, you should delete this file manually.", "Package Merge Error!");
+                    }
                 }
             }
 
@@ -982,12 +1015,15 @@ namespace OutfitOrganiser
 
                     if (PackageRename(masterRow))
                     {
-                        Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(backupName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                        if (File.Exists(backupName))
+                        {
+                            Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(backupName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                        }
                     }
                 }
                 catch (Exception)
                 {
-                    MsgBox.Show($"Error trying to update {masterPackage.PackageName}", "Package Update Error!");
+                    MsgBox.Show($"Error trying to update {masterPackage.PackageName}", "Package Merge Error!");
                 }
             }
 
@@ -1016,11 +1052,17 @@ namespace OutfitOrganiser
 
             if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
             {
-                string toPackagePath = $"{new FileInfo(fromPackagePath).DirectoryName}\\{rename.TextEntry}";
+                string renameTo = rename.TextEntry;
+                if (!renameTo.EndsWith(".package", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    renameTo += ".package";
+                }
+
+                string toPackagePath = $"{new FileInfo(fromPackagePath).DirectoryName}\\{renameTo}";
 
                 if (File.Exists(toPackagePath))
                 {
-                    MsgBox.Show($"Name clash, {rename.TextEntry} already exists.", "Package Rename Error");
+                    MsgBox.Show($"Name clash, {renameTo} already exists.", "Package Rename Error");
                     return wasRenamed;
                 }
 
@@ -1028,7 +1070,7 @@ namespace OutfitOrganiser
                 {
                     File.Move(fromPackagePath, toPackagePath);
 
-                    packageRow.Cells["colName"].Value = rename.TextEntry;
+                    packageRow.Cells["colName"].Value = renameTo;
                     packageRow.Cells["colPackagePath"].Value = toPackagePath;
 
                     foreach (DataRow resourceRow in dataResources.Rows)
@@ -1106,6 +1148,12 @@ namespace OutfitOrganiser
             if (key != null)
             {
                 thumbnail = cigenCache?.GetThumbnail(key);
+
+                if (cigenCache != null && thumbnail == null)
+                {
+                    // Way to many of these to log this way!
+                    // logger.Warn($"Thumbnail missing for {key}");
+                }
             }
 
             return thumbnail;
@@ -1305,6 +1353,9 @@ namespace OutfitOrganiser
 
             switch (value)
             {
+                case "00000000-0000-0000-0000-000000000000":
+                    hair = "All";
+                    break;
                 case "00000001-0000-0000-0000-000000000000":
                     hair = "Black";
                     break;
@@ -1323,6 +1374,64 @@ namespace OutfitOrganiser
             }
 
             return hair;
+        }
+
+        private string BuildTooltipString(OutfitDbpfData outfitData, string data)
+        {
+            string tooltip = "";
+
+            if (data != null)
+            {
+                int idx = data.IndexOf("$");
+
+                while (idx != -1 && data.Length > 1)
+                {
+                    tooltip += data.Substring(0, idx);
+
+                    string code = data.Substring(idx + 1, 1);
+                    switch (code)
+                    {
+                        case "A":
+                            tooltip += BuildAgeString(outfitData.Age);
+                            break;
+                        case "C":
+                            tooltip += BuildCategoryString(outfitData.Category);
+                            break;
+                        case "F":
+                            tooltip += outfitData.PackageNameNoExtn;
+                            break;
+                        case "G":
+                            tooltip += BuildGenderString(outfitData.Gender);
+                            break;
+                        case "H":
+                            tooltip += BuildHairString(outfitData.Hairtone);
+                            break;
+                        case "N":
+                            tooltip += outfitData.PackageName;
+                            break;
+                        case "S":
+                            tooltip += BuildShoeString(outfitData.Shoe);
+                            break;
+                        case "T":
+                            tooltip += outfitData.Title;
+                            break;
+                        case "$":
+                            tooltip += "$";
+                            break;
+                        default:
+                            tooltip += "$" + code;
+                            break;
+                    }
+
+                    data = data.Length > 2 ? data.Substring(idx + 2) : "";
+
+                    idx = data.IndexOf("$");
+                }
+
+                tooltip += data;
+            }
+
+            return tooltip;
         }
         #endregion
 
@@ -1468,11 +1577,11 @@ namespace OutfitOrganiser
 
             switch (name)
             {
-                case "hairtone":
+                /* case "hairtone":
                     if (outfitData.IsHair) outfitData.Hairtone = data;
-                    break;
+                    break; */
                 case "tooltip":
-                    outfitData.Tooltip = data;
+                    outfitData.Tooltip = BuildTooltipString(outfitData, data);
                     break;
                 default:
                     throw new ArgumentException($"Unknown string named value '{name}'={data}");
@@ -1484,7 +1593,7 @@ namespace OutfitOrganiser
 
         #region Editor
         private uint cachedShownValue, cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedShoeValue, cachedSortValue;
-        private string cachedHairtoneValue;
+        // private string cachedHairtoneValue;
 
         private void ClearEditor()
         {
@@ -1511,7 +1620,7 @@ namespace OutfitOrganiser
             ckbCatUnderwear.Checked = false;
 
             comboShoe.SelectedIndex = -1;
-            comboHairtone.SelectedIndex = -1;
+            // comboHairtone.SelectedIndex = -1;
 
             textTooltip.Text = "";
             textSort.Text = "";
@@ -1651,6 +1760,7 @@ namespace OutfitOrganiser
                 }
             }
 
+            /*
             string newHairtoneValue = outfitData.Hairtone;
             if (append)
             {
@@ -1672,6 +1782,7 @@ namespace OutfitOrganiser
                     }
                 }
             }
+            */
 
             if (append)
             {
@@ -1731,10 +1842,10 @@ namespace OutfitOrganiser
 
         private void OnHairtoneChanged(object sender, EventArgs e)
         {
-            if (comboHairtone.SelectedIndex != -1)
+            /* if (comboHairtone.SelectedIndex != -1)
             {
                 if (IsAutoUpdate) UpdateSelectedRows((comboHairtone.SelectedItem as StringNamedValue).Value, "hairtone");
-            }
+            } */
         }
         #endregion
 
@@ -1868,7 +1979,7 @@ namespace OutfitOrganiser
                     DataGridViewRow row = grid.Rows[e.RowIndex];
                     string colName = row.Cells[e.ColumnIndex].OwningColumn.Name;
 
-                    if (colName.Equals("colType") || colName.Equals("colTitle") || colName.Equals("colFilename") || colName.Equals("colTooltip"))
+                    if (colName.Equals("colType") || colName.Equals("colTitle") || colName.Equals("colName") || colName.Equals("colFilename") || colName.Equals("colTooltip"))
                     {
                         Image thumbnail = null;
 
@@ -2184,14 +2295,14 @@ namespace OutfitOrganiser
         #endregion
 
         #region Save Button
-        private void OnSaveClicked(object sender, EventArgs e)
+        private void OnSaveAllClicked(object sender, EventArgs e)
         {
-            Save();
+            SaveAll();
 
             UpdateFormState();
         }
 
-        private void Save()
+        private void SaveAll()
         {
             foreach (DataGridViewRow row in gridPackageFiles.Rows)
             {
@@ -2205,7 +2316,7 @@ namespace OutfitOrganiser
                         {
                             package.Update(menuItemAutoBackup.Checked);
 
-                            packageCache.SetClean(packagePath);
+                            packageCache.SetClean(package);
                         }
                         catch (Exception)
                         {

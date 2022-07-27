@@ -47,6 +47,8 @@ namespace OutfitOrganiser
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSelectFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemRecentFolders = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemSaveAll = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -117,7 +119,7 @@ namespace OutfitOrganiser
             this.ckbAgeAdults = new System.Windows.Forms.CheckBox();
             this.ckbAgeTeens = new System.Windows.Forms.CheckBox();
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
-            this.btnSave = new System.Windows.Forms.Button();
+            this.btnSaveAll = new System.Windows.Forms.Button();
             this.gridResources = new System.Windows.Forms.DataGridView();
             this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -187,6 +189,8 @@ namespace OutfitOrganiser
             this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemSelectFolder,
             this.menuItemRecentFolders,
+            this.toolStripSeparator1,
+            this.menuItemSaveAll,
             this.menuItemSeparator2,
             this.menuItemConfiguration,
             this.toolStripSeparator2,
@@ -199,38 +203,51 @@ namespace OutfitOrganiser
             // 
             this.menuItemSelectFolder.Name = "menuItemSelectFolder";
             this.menuItemSelectFolder.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.menuItemSelectFolder.Size = new System.Drawing.Size(157, 22);
-            this.menuItemSelectFolder.Text = "&Folder";
+            this.menuItemSelectFolder.Size = new System.Drawing.Size(184, 22);
+            this.menuItemSelectFolder.Text = "Select &Folder";
             this.menuItemSelectFolder.Click += new System.EventHandler(this.OnSelectFolderClicked);
             // 
             // menuItemRecentFolders
             // 
             this.menuItemRecentFolders.Name = "menuItemRecentFolders";
-            this.menuItemRecentFolders.Size = new System.Drawing.Size(157, 22);
+            this.menuItemRecentFolders.Size = new System.Drawing.Size(184, 22);
             this.menuItemRecentFolders.Text = "&Recent Folders";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(181, 6);
+            // 
+            // menuItemSaveAll
+            // 
+            this.menuItemSaveAll.Name = "menuItemSaveAll";
+            this.menuItemSaveAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this.menuItemSaveAll.Size = new System.Drawing.Size(184, 22);
+            this.menuItemSaveAll.Text = "&Save All";
+            this.menuItemSaveAll.Click += new System.EventHandler(this.OnSaveAllClicked);
             // 
             // menuItemSeparator2
             // 
             this.menuItemSeparator2.Name = "menuItemSeparator2";
-            this.menuItemSeparator2.Size = new System.Drawing.Size(154, 6);
+            this.menuItemSeparator2.Size = new System.Drawing.Size(181, 6);
             // 
             // menuItemConfiguration
             // 
             this.menuItemConfiguration.Name = "menuItemConfiguration";
-            this.menuItemConfiguration.Size = new System.Drawing.Size(157, 22);
+            this.menuItemConfiguration.Size = new System.Drawing.Size(184, 22);
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigClicked);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(154, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(181, 6);
             // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
             this.menuItemExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.menuItemExit.Size = new System.Drawing.Size(157, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(184, 22);
             this.menuItemExit.Text = "E&xit";
             this.menuItemExit.Click += new System.EventHandler(this.OnExitClicked);
             // 
@@ -590,7 +607,7 @@ namespace OutfitOrganiser
             this.panelEditor.Controls.Add(this.grpShown);
             this.panelEditor.Controls.Add(this.grpShoe);
             this.panelEditor.Controls.Add(this.grpAge);
-            this.panelEditor.Controls.Add(this.btnSave);
+            this.panelEditor.Controls.Add(this.btnSaveAll);
             this.panelEditor.Enabled = false;
             this.panelEditor.Location = new System.Drawing.Point(0, 155);
             this.panelEditor.Name = "panelEditor";
@@ -917,16 +934,16 @@ namespace OutfitOrganiser
             this.ckbAgeChildren.UseVisualStyleBackColor = true;
             this.ckbAgeChildren.Click += new System.EventHandler(this.OnAgeChildrenClicked);
             // 
-            // btnSave
+            // btnSaveAll
             // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(896, 128);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(88, 26);
-            this.btnSave.TabIndex = 23;
-            this.btnSave.Text = "&Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.OnSaveClicked);
+            this.btnSaveAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSaveAll.Location = new System.Drawing.Point(896, 128);
+            this.btnSaveAll.Name = "btnSaveAll";
+            this.btnSaveAll.Size = new System.Drawing.Size(88, 26);
+            this.btnSaveAll.TabIndex = 23;
+            this.btnSaveAll.Text = "&Save All";
+            this.btnSaveAll.UseVisualStyleBackColor = true;
+            this.btnSaveAll.Click += new System.EventHandler(this.OnSaveAllClicked);
             // 
             // gridResources
             // 
@@ -1222,7 +1239,7 @@ namespace OutfitOrganiser
         private System.Windows.Forms.CheckBox ckbAgeAdults;
         private System.Windows.Forms.CheckBox ckbAgeTeens;
         private System.Windows.Forms.CheckBox ckbAgeChildren;
-        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnSaveAll;
         private System.Windows.Forms.GroupBox grpSort;
         private System.Windows.Forms.TextBox textSort;
         private System.Windows.Forms.GroupBox grpTooltip;
@@ -1269,6 +1286,8 @@ namespace OutfitOrganiser
         private System.Windows.Forms.DataGridViewTextBoxColumn colOutfitData;
         private System.Windows.Forms.ToolStripMenuItem menuItemMode;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoBackup;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSaveAll;
     }
 }
 
