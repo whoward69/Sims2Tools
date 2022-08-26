@@ -70,6 +70,11 @@ namespace Sims2Tools.DBPF.SceneGraph
             get;
         }
 
+        DBPFKey DbpfKey
+        {
+            get;
+        }
+
         /// <summary>
         /// Must override the Equals Method!
         /// </summary>

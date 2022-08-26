@@ -101,16 +101,15 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             sgres.Unserialize(reader);
             sgres.BlockID = myid;
 
-            if (true)
+            /* if (true)
             {
                 elements.Clear();
                 links.Clear();
                 groups.Clear();
                 joints.Clear();
                 return;
-            }
+            } */
 
-            /*
             int count = reader.ReadInt32();
             elements.Clear();
             for (int i = 0; i < count; i++)
@@ -148,10 +147,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 s.Unserialize(reader);
                 joints.Add(s);
             }
-            */
         }
-
-
 
         public override void Dispose()
         {

@@ -12,6 +12,7 @@
 #region Usings
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
+using Sims2Tools.Cache;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Cigen;
@@ -34,7 +35,10 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 #endregion
 
@@ -89,6 +93,33 @@ namespace OutfitOrganiser
             new StringNamedValue("Grey", "00000005-0000-0000-0000-000000000000"),
             new StringNamedValue("Red", "00000004-0000-0000-0000-000000000000")
         }; */
+
+        private readonly UintNamedValue[] jewelryItems = {
+            new UintNamedValue("Accessory (non-BV)", 0x00000000),
+            new UintNamedValue("Left Earring", 0x00000032),
+            new UintNamedValue("Right Earring", 0x00000033),
+            new UintNamedValue("Necklace", 0x00000034),
+            new UintNamedValue("Left Bracelet", 0x00000035),
+            new UintNamedValue("Right Bracelet", 0x00000036),
+            new UintNamedValue("Nose Ring", 0x00000037),
+            new UintNamedValue("Lip Ring", 0x00000038),
+            new UintNamedValue("Eyebrow Ring", 0x00000039),
+            new UintNamedValue("Left Index Ring", 0x0000003A),
+            new UintNamedValue("Right Index Ring", 0x0000003B),
+            new UintNamedValue("Alt Right Index Ring", 0x0000003C),
+            new UintNamedValue("Left Pinky Ring", 0x0000003D),
+            new UintNamedValue("Right Pinky Ring", 0x0000003E),
+            new UintNamedValue("Left Thumb Ring", 0x0000003F),
+            new UintNamedValue("Right Thumb Ring", 0x00000040)
+        };
+
+        private readonly UintNamedValue[] destinationItems = {
+            new UintNamedValue("Non-Vacation", 0xD327EED9),
+            new UintNamedValue("Tropical", 0xD327EED8),
+            new UintNamedValue("Far East", 0xD327EED7),
+            new UintNamedValue("Mountain", 0xD327EED6),
+            new UintNamedValue("Collectible", 0xB343967F)
+        };
         #endregion
 
         private bool dataLoading = false;
@@ -125,6 +156,12 @@ namespace OutfitOrganiser
 
                 // comboHairtone.Items.Clear();
                 // comboHairtone.Items.AddRange(hairtoneItems);
+
+                comboJewelry.Items.Clear();
+                comboJewelry.Items.AddRange(jewelryItems);
+
+                comboDestination.Items.Clear();
+                comboDestination.Items.AddRange(destinationItems);
 
                 dataLoading = false;
             }
@@ -164,6 +201,8 @@ namespace OutfitOrganiser
             menuItemShowResTitle.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, 1) != 0); OnShowResTitleClicked(menuItemShowResFilename, null);
             menuItemShowResFilename.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, 1) != 0); OnShowResFilenameClicked(menuItemShowResFilename, null);
 
+            menuItemPreloadMeshes.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, 0) != 0);
+
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
 
             SetTitle(null);
@@ -192,15 +231,22 @@ namespace OutfitOrganiser
                 logger.Warn("'Sims2HomePath' not set - thumbnails will NOT display.");
                 MsgBox.Show("'Sims2HomePath' not set - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
             }
+
+            downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\Downloads", "downloads"), "downloads");
+            savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims", "savedsims"), "savedsims");
+            meshCachesLoaded = false;
+
+            if (menuItemPreloadMeshes.Checked) CacheMeshes();
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            if (IsAnyDirty())
+            if (IsAnyPackageDirty() || IsCigenDirty())
             {
-                string qualifier = IsAnyHiddenDirty() ? " HIDDEN" : "";
+                string qualifier = IsAnyHiddenResourceDirty() ? " HIDDEN" : "";
+                string type = (IsAnyPackageDirty() ? (IsCigenDirty() ? "resource and thumbnail" : "resource") : "thumbnail");
 
-                if (MsgBox.Show($"There are{qualifier} unsaved changes, do you really want to exit?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                if (MsgBox.Show($"There are{qualifier} unsaved {type} changes, do you really want to exit?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
                     e.Cancel = true;
                     return;
@@ -219,6 +265,8 @@ namespace OutfitOrganiser
 
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
+
+            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
         }
@@ -336,9 +384,9 @@ namespace OutfitOrganiser
         {
             if (folder == null) return;
 
-            if (!ignoreDirty && IsAnyDirty())
+            if (!ignoreDirty && IsAnyPackageDirty())
             {
-                string qualifier = IsAnyHiddenDirty() ? " HIDDEN" : "";
+                string qualifier = IsAnyHiddenResourceDirty() ? " HIDDEN" : "";
 
                 if (MsgBox.Show($"There are{qualifier} unsaved changes, do you really want to change folder?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
@@ -500,18 +548,21 @@ namespace OutfitOrganiser
 
                                     row["OutfitData"] = outfitData;
 
+                                    row["Shoe"] = "";
+                                    row["Hairtone"] = "";
+                                    row["Jewelry"] = "";
+                                    row["Destination"] = "";
+
                                     switch (outfitData.Outfit)
                                     {
                                         case 0x01:
                                             row["Type"] = "Hair";
                                             row["Visible"] = menuItemOutfitHair.Checked ? "Yes" : "No";
-                                            row["Shoe"] = "";
                                             row["Hairtone"] = BuildHairString(outfitData.Hairtone);
                                             break;
                                         case 0x02:
                                             row["Type"] = "Make-Up";
                                             row["Visible"] = menuItemOutfitMakeUp.Checked ? "Yes" : "No";
-                                            row["Shoe"] = "";
                                             break;
                                         case 0x04:
                                             row["Type"] = "Clothes - Top";
@@ -531,7 +582,8 @@ namespace OutfitOrganiser
                                         case 0x20:
                                             row["Type"] = "Accessory";
                                             row["Visible"] = menuItemOutfitAccessory.Checked ? "Yes" : "No";
-                                            row["Shoe"] = "";
+                                            row["Jewelry"] = BuildJewelryString(outfitData.Jewelry);
+                                            row["Destination"] = BuildDestinationString(outfitData.Destination);
                                             break;
                                         default:
                                             // Unsupported type
@@ -605,7 +657,12 @@ namespace OutfitOrganiser
         #endregion
 
         #region Form State
-        private bool IsAnyDirty()
+        private bool IsCigenDirty()
+        {
+            return (cigenCache != null && cigenCache.IsDirty);
+        }
+
+        private bool IsAnyPackageDirty()
         {
             foreach (DataRow row in dataPackageFiles.Rows)
             {
@@ -618,7 +675,7 @@ namespace OutfitOrganiser
             return false;
         }
 
-        private bool IsAnyHiddenDirty()
+        private bool IsAnyHiddenResourceDirty()
         {
             foreach (DataRow row in dataResources.Rows)
             {
@@ -639,6 +696,8 @@ namespace OutfitOrganiser
             InUpdateFormState = true;
 
             menuItemSaveAll.Enabled = btnSaveAll.Enabled = false;
+
+            btnMeshes.Enabled = meshCachesLoaded && (gridResources.SelectedRows.Count > 0);
 
             foreach (DataRow row in dataResources.Rows)
             {
@@ -679,8 +738,18 @@ namespace OutfitOrganiser
             gridResources.Columns["colHairtone"].Visible = menuItemOutfitHair.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitMakeUp.Checked;
             // grpHairtone.Visible = gridResources.Columns["colHairtone"].Visible;
             grpHairtone.Visible = false;
+
             gridResources.Columns["colShoe"].Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
             grpShoe.Visible = gridResources.Columns["colShoe"].Visible;
+
+            gridResources.Columns["colJewelry"].Visible = menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
+            gridResources.Columns["colDestination"].Visible = gridResources.Columns["colJewelry"].Visible;
+            grpJewelry.Visible = gridResources.Columns["colJewelry"].Visible;
+
+            if (IsCigenDirty())
+            {
+                menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
+            }
 
             InUpdateFormState = false;
         }
@@ -745,9 +814,9 @@ namespace OutfitOrganiser
             }
             else
             {
-                menuItemDirRename.Enabled = !IsAnyDirty();
+                menuItemDirRename.Enabled = !IsAnyPackageDirty();
                 menuItemDirAdd.Enabled = true;
-                menuItemDirMove.Enabled = !IsAnyDirty();
+                menuItemDirMove.Enabled = !IsAnyPackageDirty();
 
                 DirectoryInfo di = new DirectoryInfo(lastFolder);
                 menuItemDirDelete.Enabled = ((di.GetDirectories().Length + di.GetFiles().Length) == 0);
@@ -760,7 +829,7 @@ namespace OutfitOrganiser
 
             string fromFolderPath = treeFolders.SelectedNode.Name;
 
-            if (IsAnyDirty())
+            if (IsAnyPackageDirty())
             {
                 MsgBox.Show("Cannot rename a folder with unsaved changes.", "Folder Rename Error");
                 return;
@@ -825,7 +894,7 @@ namespace OutfitOrganiser
 
             string fromFolderPath = treeFolders.SelectedNode.Name;
 
-            if (IsAnyDirty())
+            if (IsAnyPackageDirty())
             {
                 MsgBox.Show("Cannot move a folder with unsaved changes.", "Folder Move Error");
                 return;
@@ -1096,6 +1165,11 @@ namespace OutfitOrganiser
         #endregion
 
         #region Options Menu Actions
+        private void OnOptionsMenuOpening(object sender, EventArgs e)
+        {
+            menuItemLoadMeshesNow.Enabled = !(meshCachesLoaded || meshCachesLoading);
+        }
+
         private void OnShowResTitleClicked(object sender, EventArgs e)
         {
             gridResources.Columns["colTitle"].Visible = menuItemShowResTitle.Checked;
@@ -1104,6 +1178,19 @@ namespace OutfitOrganiser
         private void OnShowResFilenameClicked(object sender, EventArgs e)
         {
             gridResources.Columns["colFilename"].Visible = menuItemShowResFilename.Checked;
+        }
+
+        private void OnLoadMeshesNowClicked(object sender, EventArgs e)
+        {
+            CacheMeshes();
+        }
+
+        private void OnPreloadMeshesClicked(object sender, EventArgs e)
+        {
+            if (menuItemPreloadMeshes.Checked && !meshCachesLoaded)
+            {
+                CacheMeshes();
+            }
         }
         #endregion
 
@@ -1147,11 +1234,11 @@ namespace OutfitOrganiser
 
             if (key != null)
             {
-                thumbnail = cigenCache?.GetThumbnail(key);
+                thumbnail = cigenCache.GetThumbnail(key);
 
                 if (cigenCache != null && thumbnail == null)
                 {
-                    // Way to many of these to log this way!
+                    // Way too many of these to log this way!
                     // logger.Warn($"Thumbnail missing for {key}");
                 }
             }
@@ -1376,6 +1463,88 @@ namespace OutfitOrganiser
             return hair;
         }
 
+        private string BuildJewelryString(uint value)
+        {
+            string jewelry = "Accessory (non-BV)";
+
+            switch (value)
+            {
+                case 0x00000032:
+                    jewelry = "Left Earring";
+                    break;
+                case 0x00000033:
+                    jewelry = "Right Earring";
+                    break;
+                case 0x00000034:
+                    jewelry = "Necklace";
+                    break;
+                case 0x00000035:
+                    jewelry = "Left Bracelet";
+                    break;
+                case 0x00000036:
+                    jewelry = "Right Bracelet";
+                    break;
+                case 0x00000037:
+                    jewelry = "Nose Ring";
+                    break;
+                case 0x00000038:
+                    jewelry = "Lip Ring";
+                    break;
+                case 0x00000039:
+                    jewelry = "Eyebrow Ring";
+                    break;
+                case 0x0000003A:
+                    jewelry = "Left Index Finger Ring";
+                    break;
+                case 0x0000003B:
+                    jewelry = "Right Index Finger Ring";
+                    break;
+                case 0x0000003C:
+                    jewelry = "Alternate Right Index Finger Ring";
+                    break;
+                case 0x0000003D:
+                    jewelry = "Left Pinky Ring";
+                    break;
+                case 0x0000003E:
+                    jewelry = "Right Pinky Ring";
+                    break;
+                case 0x0000003F:
+                    jewelry = "Left Thumb Ring";
+                    break;
+                case 0x00000040:
+                    jewelry = "Right Thumb Ring";
+                    break;
+            }
+
+            return jewelry;
+        }
+
+        private string BuildDestinationString(uint value)
+        {
+            string destination = "N/A";
+
+            switch (value)
+            {
+                case 0xD327EED9:
+                    destination = "Non-Vacation";
+                    break;
+                case 0xD327EED8:
+                    destination = "Tropical";
+                    break;
+                case 0xD327EED7:
+                    destination = "Far East";
+                    break;
+                case 0xD327EED6:
+                    destination = "Mountain";
+                    break;
+                case 0xB343967F:
+                    destination = "Collectible";
+                    break;
+            }
+
+            return destination;
+        }
+
         private string BuildTooltipString(OutfitDbpfData outfitData, string data)
         {
             string tooltip = "";
@@ -1397,6 +1566,9 @@ namespace OutfitOrganiser
                         case "C":
                             tooltip += BuildCategoryString(outfitData.Category);
                             break;
+                        case "D":
+                            tooltip += BuildDestinationString(outfitData.Destination);
+                            break;
                         case "F":
                             tooltip += outfitData.PackageNameNoExtn;
                             break;
@@ -1405,6 +1577,9 @@ namespace OutfitOrganiser
                             break;
                         case "H":
                             tooltip += BuildHairString(outfitData.Hairtone);
+                            break;
+                        case "J":
+                            tooltip += BuildJewelryString(outfitData.Jewelry);
                             break;
                         case "N":
                             tooltip += outfitData.PackageName;
@@ -1451,6 +1626,12 @@ namespace OutfitOrganiser
                     if (outfitData.HasShoe) row.Cells["colShoe"].Value = BuildShoeString(outfitData.Shoe);
 
                     if (outfitData.IsHair) row.Cells["colHairtone"].Value = BuildHairString(outfitData.Hairtone);
+
+                    if (outfitData.IsAccessory)
+                    {
+                        row.Cells["colJewelry"].Value = BuildJewelryString(outfitData.Jewelry);
+                        row.Cells["colDestination"].Value = BuildDestinationString(outfitData.Destination);
+                    }
 
                     row.Cells["colTooltip"].Value = outfitData.Tooltip;
 
@@ -1552,8 +1733,14 @@ namespace OutfitOrganiser
                 case "category":
                     outfitData.Category = data;
                     break;
+                case "destination":
+                    if (outfitData.IsAccessory) outfitData.Destination = data;
+                    break;
                 case "gender":
                     outfitData.Gender = data;
+                    break;
+                case "jewelry":
+                    if (outfitData.IsAccessory) outfitData.Jewelry = data;
                     break;
                 case "shoe":
                     if (outfitData.HasShoe) outfitData.Shoe = data;
@@ -1592,7 +1779,7 @@ namespace OutfitOrganiser
         #endregion
 
         #region Editor
-        private uint cachedShownValue, cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedShoeValue, cachedSortValue;
+        private uint cachedShownValue, cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedShoeValue, cachedJewelryValue, cachedDestinationValue, cachedSortValue;
         // private string cachedHairtoneValue;
 
         private void ClearEditor()
@@ -1621,6 +1808,8 @@ namespace OutfitOrganiser
 
             comboShoe.SelectedIndex = -1;
             // comboHairtone.SelectedIndex = -1;
+            comboJewelry.SelectedIndex = -1;
+            comboDestination.SelectedIndex = -1;
 
             textTooltip.Text = "";
             textSort.Text = "";
@@ -1784,6 +1973,54 @@ namespace OutfitOrganiser
             }
             */
 
+            uint newJewelryValue = outfitData.Jewelry;
+            if (append)
+            {
+                if (cachedJewelryValue != newJewelryValue)
+                {
+                    comboJewelry.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                cachedJewelryValue = newJewelryValue;
+                comboJewelry.SelectedIndex = 0;
+
+                foreach (Object o in comboJewelry.Items)
+                {
+                    if ((o as UintNamedValue).Value == cachedJewelryValue)
+                    {
+                        comboJewelry.SelectedItem = o;
+                        break;
+                    }
+                }
+            }
+
+            uint newDestinationValue = outfitData.Destination;
+            if (append)
+            {
+                if (cachedDestinationValue != newDestinationValue)
+                {
+                    comboDestination.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                cachedDestinationValue = newDestinationValue;
+                comboDestination.SelectedIndex = 0;
+                comboDestination.Enabled = false;
+
+                foreach (Object o in comboDestination.Items)
+                {
+                    if ((o as UintNamedValue).Value == cachedDestinationValue)
+                    {
+                        comboDestination.SelectedItem = o;
+                        comboDestination.Enabled = true;
+                        break;
+                    }
+                }
+            }
+
             if (append)
             {
                 if (!textTooltip.Text.Equals(outfitData.Tooltip))
@@ -1847,6 +2084,29 @@ namespace OutfitOrganiser
                 if (IsAutoUpdate) UpdateSelectedRows((comboHairtone.SelectedItem as StringNamedValue).Value, "hairtone");
             } */
         }
+
+        private void OnJewelryChanged(object sender, EventArgs e)
+        {
+            if (comboJewelry.SelectedIndex != -1)
+            {
+                if (IsAutoUpdate)
+                {
+                    comboDestination.Enabled = (comboJewelry.SelectedIndex != 0);
+
+                    if (comboDestination.Enabled) UpdateSelectedRows((comboDestination.SelectedItem as UintNamedValue).Value, "destination");
+                    UpdateSelectedRows((comboJewelry.SelectedItem as UintNamedValue).Value, "jewelry");
+                }
+            }
+        }
+
+        private void OnDestinationChanged(object sender, EventArgs e)
+        {
+            if (comboDestination.SelectedIndex != -1)
+            {
+                if (IsAutoUpdate) UpdateSelectedRows((comboDestination.SelectedItem as UintNamedValue).Value, "destination");
+            }
+        }
+
         #endregion
 
         #region Checkbox Events
@@ -2004,7 +2264,7 @@ namespace OutfitOrganiser
 
                                         if (idr != null)
                                         {
-                                            DBPFResource res = package.GetResourceByKey(idr.Items[binx.GetItem("objectidx").UIntegerValue]);
+                                            DBPFResource res = package.GetResourceByKey(idr.GetItem(binx.GetItem("objectidx").UIntegerValue));
 
                                             if (res != null)
                                             {
@@ -2052,9 +2312,9 @@ namespace OutfitOrganiser
         #region Folders Context Menu
         private void OnContextMenuFoldersOpening(object sender, CancelEventArgs e)
         {
-            menuContextDirRename.Enabled = !IsAnyDirty();
+            menuContextDirRename.Enabled = !IsAnyPackageDirty();
             menuContextDirAdd.Enabled = true;
-            menuContextDirMove.Enabled = !IsAnyDirty();
+            menuContextDirMove.Enabled = !IsAnyPackageDirty();
 
             DirectoryInfo di = new DirectoryInfo(lastFolder);
             menuContextDirDelete.Enabled = ((di.GetDirectories().Length + di.GetFiles().Length) == 0);
@@ -2106,7 +2366,9 @@ namespace OutfitOrganiser
             e.Cancel = true;
             return;
         }
+        #endregion
 
+        #region Resources Context Menu
         private void OnContextMenuResourcesOpening(object sender, CancelEventArgs e)
         {
             if (mouseLocation == null || mouseLocation.RowIndex == -1)
@@ -2115,10 +2377,28 @@ namespace OutfitOrganiser
                 return;
             }
 
-            foreach (DataGridViewRow selectedRow in gridResources.SelectedRows)
+            // Mouse has to be over a selected row
+            foreach (DataGridViewRow mouseRow in gridResources.SelectedRows)
             {
-                if (mouseLocation.RowIndex == selectedRow.Index && (selectedRow.Cells["colOutfitData"].Value as OutfitDbpfData).IsDirty)
+                if (mouseLocation.RowIndex == mouseRow.Index)
                 {
+                    OutfitDbpfData outfitData = mouseRow.Cells["colOutfitData"].Value as OutfitDbpfData;
+                    Cpf thumbnailOwner = outfitData?.ThumbnailOwner;
+                    Image thumbnail = (thumbnailOwner != null) ? GetResourceThumbnail(thumbnailOwner) : outfitData?.Thumbnail;
+
+                    menuContextResSaveThumb.Enabled = menuContextResReplaceThumb.Enabled = menuContextResDeleteThumb.Enabled = ((cigenCache != null) && (gridResources.SelectedRows.Count == 1) && (thumbnail != null));
+
+                    menuContextResRestore.Enabled = false;
+
+                    foreach (DataGridViewRow selectedRow in gridResources.SelectedRows)
+                    {
+                        if ((selectedRow.Cells["colOutfitData"].Value as OutfitDbpfData).IsDirty)
+                        {
+                            menuContextResRestore.Enabled = true;
+                            break;
+                        }
+                    }
+
                     return;
                 }
             }
@@ -2126,9 +2406,12 @@ namespace OutfitOrganiser
             e.Cancel = true;
             return;
         }
-        #endregion
 
-        #region Resources Context Menu
+        private void OnContextMenuResourcesOpened(object sender, EventArgs e)
+        {
+            thumbBox.Visible = false;
+        }
+
         private void OnResRevertClicked(object sender, EventArgs e)
         {
             List<OutfitDbpfData> selectedData = new List<OutfitDbpfData>();
@@ -2165,6 +2448,73 @@ namespace OutfitOrganiser
                 }
             }
         }
+
+        private void OnResSaveThumbClicked(object sender, EventArgs e)
+        {
+            DataGridViewRow selectedRow = gridResources.SelectedRows[0];
+
+            saveThumbnailDialog.DefaultExt = "png";
+            saveThumbnailDialog.Filter = $"PNG file|*.png|JPG file|*.jpg|All files|*.*";
+            saveThumbnailDialog.FileName = $"{selectedRow.Cells["colFilename"].Value as string}.png";
+
+            saveThumbnailDialog.ShowDialog();
+
+            if (saveThumbnailDialog.FileName != "")
+            {
+                using (Stream stream = saveThumbnailDialog.OpenFile())
+                {
+                    OutfitDbpfData outfitData = selectedRow.Cells["colOutfitData"].Value as OutfitDbpfData;
+                    Cpf thumbnailOwner = outfitData?.ThumbnailOwner;
+                    Image thumbnail = (thumbnailOwner != null) ? GetResourceThumbnail(thumbnailOwner) : outfitData?.Thumbnail;
+
+                    thumbnail?.Save(stream, (saveThumbnailDialog.FileName.EndsWith("jpg") ? ImageFormat.Jpeg : ImageFormat.Png));
+
+                    stream.Close();
+                }
+            }
+        }
+
+        private void OnResReplaceThumbClicked(object sender, EventArgs e)
+        {
+            DataGridViewRow selectedRow = gridResources.SelectedRows[0];
+            OutfitDbpfData outfitData = selectedRow.Cells["colOutfitData"].Value as OutfitDbpfData;
+
+            if (openThumbnailDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    Image newThumbnail = Image.FromFile(openThumbnailDialog.FileName);
+
+                    cigenCache.ReplaceThumbnail(outfitData.ThumbnailOwner, newThumbnail);
+
+                    if (IsCigenDirty())
+                    {
+                        menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn(ex);
+                    MsgBox.Show($"Unable to open/read {openThumbnailDialog.FileName}", "Thumbnail Error");
+                }
+            }
+        }
+
+        private void OnResDeleteThumbClicked(object sender, EventArgs e)
+        {
+            DataGridViewRow selectedRow = gridResources.SelectedRows[0];
+            OutfitDbpfData outfitData = selectedRow.Cells["colOutfitData"].Value as OutfitDbpfData;
+
+            if (outfitData?.ThumbnailOwner != null)
+            {
+                cigenCache.DeleteThumbnail(outfitData.ThumbnailOwner);
+
+                if (IsCigenDirty())
+                {
+                    menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
+                }
+            }
+        }
         #endregion
 
         #region Drag And Drop
@@ -2173,7 +2523,7 @@ namespace OutfitOrganiser
             // See https://www.c-sharpcorner.com/blogs/perform-drag-and-drop-operation-on-treeview-node-in-c-sharp-net
             if (e.Button == MouseButtons.Left)
             {
-                if (!IsAnyDirty()) DoDragDrop(e.Item, DragDropEffects.Move);
+                if (!IsAnyPackageDirty()) DoDragDrop(e.Item, DragDropEffects.Move);
             }
 
             // For grid -> tree see https://social.msdn.microsoft.com/Forums/windows/en-US/37845d81-0d0c-4696-97ca-df68570c5325/how-to-drag-amp-drop-from-datagridview-to-treeview?forum=winforms
@@ -2333,6 +2683,65 @@ namespace OutfitOrganiser
                 OutfitDbpfData outfitData = row.Cells["colOutfitData"].Value as OutfitDbpfData;
 
                 outfitData.SetClean();
+            }
+
+            if (IsCigenDirty())
+            {
+                try
+                {
+                    cigenCache.Update(menuItemAutoBackup.Checked);
+                }
+                catch (Exception e)
+                {
+                    logger.Warn("Error trying to update cigen.package", e);
+                    MsgBox.Show("Error trying to update cigen.package", "Package Update Error!");
+                }
+            }
+        }
+        #endregion
+
+        #region Meshes Button
+        private void OnMeshesClicked(object sender, EventArgs e)
+        {
+            Form meshesDialog = new OutfitOrganiserMeshesDialog(gridResources, packageCache, cigenCache, downloadsSgCache, savedsimsSgCache);
+
+            if (meshesDialog.ShowDialog() == DialogResult.OK)
+            {
+            }
+        }
+        #endregion
+
+        #region Meshes Cache
+        private bool meshCachesLoaded = false;
+        private bool meshCachesLoading = false;
+        private SceneGraphCache downloadsSgCache;
+        private SceneGraphCache savedsimsSgCache;
+
+        private void CacheMeshes()
+        {
+            if (!meshCachesLoaded && !meshCachesLoading)
+            {
+                int usableCores = Math.Max(1, System.Environment.ProcessorCount - 2);
+                SemaphoreSlim throttler = new SemaphoreSlim(initialCount: usableCores);
+
+                meshCachesLoading = true;
+
+                List<Task> cacheTasks = new List<Task>(2)
+                {
+                    downloadsSgCache.DeserializeAsync(throttler),
+                    savedsimsSgCache.DeserializeAsync(throttler)
+                };
+
+                Task.WhenAll(cacheTasks).ContinueWith(t =>
+                {
+                    // Run UpdateFormState() on the main thread
+                    btnMeshes.BeginInvoke((Action)(() =>
+                    {
+                        meshCachesLoaded = true;
+                        meshCachesLoading = false;
+                        UpdateFormState();
+                    }));
+                });
             }
         }
         #endregion

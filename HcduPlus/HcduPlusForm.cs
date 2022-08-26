@@ -31,6 +31,7 @@ using Sims2Tools.DBPF.TTAS;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.VERS;
 using Sims2Tools.Dialogs;
+using Sims2Tools.Files;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -107,29 +108,47 @@ namespace HcduPlus
                 modsFolder = "";
             }
 
-            List<String> modsFiles = new List<String>();
-            List<String> scanFiles = new List<String>();
+            List<String> modsFiles;
+            List<String> scanFiles;
 
+#if DEBUG
+            logger.Debug("Starting Downloads Folder .package search");
+#endif
             if (modsFolder.Length > 0)
             {
                 if (Directory.Exists(modsFolder))
                 {
-                    modsFiles = new List<String>(Directory.GetFiles(modsFolder, "*.package", SearchOption.AllDirectories));
+                    modsFiles = new List<string>(Sims2Directory.GetFiles(modsFolder, "*.package", SearchOption.AllDirectories));
                 }
                 else
                 {
                     MsgBox.Show("The selected Downloads directory does not exist!", "Invalid Directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
             }
+            else
+            {
+                modsFiles = new List<string>();
+            }
+#if DEBUG
+            logger.Debug($"Finished Downloads Folder .package search - found {modsFiles.Count}");
+#endif
 
+#if DEBUG
+            logger.Debug("Starting Scan Folder .package search");
+#endif
             if (Directory.Exists(scanFolder))
             {
-                scanFiles = new List<String>(Directory.GetFiles(scanFolder, "*.package", SearchOption.AllDirectories));
+                scanFiles = new List<string>(Sims2Directory.GetFiles(scanFolder, "*.package", SearchOption.AllDirectories));
             }
             else
             {
                 MsgBox.Show("The selected Scan directory does not exist!", "Invalid Directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
+#if DEBUG
+            logger.Debug($"Finished Scan Folder .package search - found {scanFiles.Count}");
+#endif
 
             foreach (String scanFile in scanFiles)
             {
@@ -646,7 +665,9 @@ namespace HcduPlus
         {
             String text = "";
 
-            text += $"Mods conflict report for '{textScanPath.Text}'";
+            String scanPath = textScanPath.Text;
+            if (String.IsNullOrWhiteSpace(scanPath)) scanPath = textModsPath.Text;
+            text += $"Mods conflict report for '{scanPath}'";
 
             DateTime now = DateTime.Now;
             text += $" at {now.ToShortDateString()} {now.ToShortTimeString()}";

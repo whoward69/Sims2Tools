@@ -17,6 +17,7 @@ using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using System;
+using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.SceneGraph.SHPE
 {
@@ -29,6 +30,30 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
         public Shpe(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
         }
+
+        public List<string> GmndNames
+        {
+            get
+            {
+                List<string> gmndKeys = new List<string>();
+
+                foreach (IRcolBlock block in Blocks)
+                {
+                    if (block.BlockID == CShape.TYPE)
+                    {
+                        CShape cShape = block as CShape;
+
+                        foreach (ShapeItem item in cShape.Items)
+                        {
+                            gmndKeys.Add(item.FileName);
+                        }
+                    }
+                }
+
+                return gmndKeys;
+            }
+        }
+
 
         public override SgResourceList SgNeededResources()
         {

@@ -63,14 +63,14 @@ namespace ObjectRelocator
 
         public string Title
         {
-            get => ""; // TODO - WH
-            set { } // TODO - WH
+            get => ""; // TODO - ObjReloc - Title & Desc
+            set { } // TODO - ObjReloc - Title & Desc
         }
 
         public string Description
         {
-            get => ""; // TODO - WH
-            set { } // TODO - WH
+            get => ""; // TODO - ObjReloc - Title & Desc
+            set { } // TODO - ObjReloc - Title & Desc
         }
 
         public bool IsDirty => res.IsDirty;

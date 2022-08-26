@@ -81,7 +81,7 @@ namespace Sims2Tools.DBPF.Package
 
         private DBPFHeader header;
         private DBPFResourceIndex resourceIndex;
-        private readonly DBPFResourceCache resourceCache = new DBPFResourceCache();
+        private DBPFResourceCache resourceCache;
 
         private DbpfReader m_Reader;
 
@@ -107,6 +107,7 @@ namespace Sims2Tools.DBPF.Package
             else
             {
                 header = new DBPFHeader();
+                resourceCache = new DBPFResourceCache();
                 resourceIndex = new DBPFResourceIndex(header, resourceCache, null);
             }
         }
@@ -117,6 +118,7 @@ namespace Sims2Tools.DBPF.Package
 
             header = new DBPFHeader(m_Reader);
 
+            resourceCache = new DBPFResourceCache();
             resourceIndex = new DBPFResourceIndex(header, resourceCache, m_Reader);
         }
 
@@ -184,6 +186,11 @@ namespace Sims2Tools.DBPF.Package
         public void Commit(DBPFKey key, byte[] item)
         {
             resourceIndex.Commit(key, item);
+        }
+
+        public bool Remove(DBPFResource resource)
+        {
+            return resourceIndex.Remove(resource);
         }
 
         private DbpfReader GetDbpfReader(DBPFEntry entry)

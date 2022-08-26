@@ -16,6 +16,7 @@ using Sims2Tools.DBPF.SceneGraph.LPNT;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using System;
+using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.SceneGraph.CRES
 {
@@ -27,6 +28,24 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
 
         public Cres(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
+        }
+
+        public List<DBPFKey> ShpeKeys
+        {
+            get
+            {
+                List<DBPFKey> shpeKeys = new List<DBPFKey>();
+
+                for (int i = 0; i < ReferencedFiles.Length; ++i)
+                {
+                    if (ReferencedFiles[i].Type == Shpe.TYPE)
+                    {
+                        shpeKeys.Add(ReferencedFiles[i].DbpfKey);
+                    }
+                }
+
+                return shpeKeys;
+            }
         }
 
         public override SgResourceList SgNeededResources()

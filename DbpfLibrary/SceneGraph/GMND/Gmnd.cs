@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using System;
+using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.SceneGraph.GMND
 {
@@ -26,6 +27,24 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
 
         public Gmnd(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
+        }
+
+        public List<DBPFKey> GmdcKeys
+        {
+            get
+            {
+                List<DBPFKey> gmdcKeys = new List<DBPFKey>();
+
+                for (int i = 0; i < ReferencedFiles.Length; ++i)
+                {
+                    if (ReferencedFiles[i].Type == Gmdc.TYPE)
+                    {
+                        gmdcKeys.Add(ReferencedFiles[i].DbpfKey);
+                    }
+                }
+
+                return gmdcKeys;
+            }
         }
 
         public override SgResourceList SgNeededResources()

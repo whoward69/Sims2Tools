@@ -13,7 +13,10 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System;
+using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.SceneGraph.GMDC
 {
@@ -25,6 +28,34 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
 
         public Gmdc(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
+        }
+
+        public List<string> BotMorphs
+        {
+            get
+            {
+                List<string> morphs = new List<string>();
+
+                foreach (IRcolBlock block in Blocks)
+                {
+                    if (block.BlockID == CGeometryDataContainer.TYPE)
+                    {
+                        CGeometryDataContainer gmdcBlock = (CGeometryDataContainer)block;
+
+                        GmdcNamePairs botmorphs = gmdcBlock.Model.BlendGroupDefinition;
+
+                        foreach (GmdcNamePair botmorph in botmorphs)
+                        {
+                            if (botmorph.BlendGroupName.Equals("botmorphs"))
+                            {
+                                morphs.Add(botmorph.AssignedElementName); // fatbot, pregbot
+                            }
+                        }
+                    }
+                }
+
+                return morphs;
+            }
         }
 
         public override SgResourceList SgNeededResources()

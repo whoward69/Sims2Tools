@@ -14,6 +14,8 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Images.IMG
@@ -25,6 +27,27 @@ namespace Sims2Tools.DBPF.Images.IMG
         public const string NAME = "IMG";
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        /* public static Image SetAlpha(Image img)
+        {
+            Bitmap bmpJfif = img as Bitmap;
+            Bitmap bmpAlfa = new Bitmap(img.Size.Width, img.Size.Height, PixelFormat.Format32bppArgb);
+
+            for (int y = 0; y < bmpAlfa.Size.Height; y++)
+            {
+                for (int x = 0; x < bmpAlfa.Size.Width; x++)
+                {
+                    Color colourJfif = bmpJfif.GetPixel(x, y);
+                    int a = 0xFF - ((colourJfif.R + colourJfif.G + colourJfif.B) / 3);
+                    if (a > 0x10) a = 0xff;
+
+                    Color colourAlfa = Color.FromArgb(a, colourJfif);
+                    bmpAlfa.SetPixel(x, y, colourAlfa);
+                }
+            }
+
+            return bmpAlfa;
+        } */
 
         private static readonly ImageConverter imageConverter = new ImageConverter();
 
@@ -64,6 +87,19 @@ namespace Sims2Tools.DBPF.Images.IMG
 
                 return image;
             }
+
+            set
+            {
+                image = value;
+
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    image.Save(memoryStream, ImageFormat.Png); // PNG is the best we can do, ideally this would be "Sims2 modified jpeg with alfa data"
+                    data = memoryStream.ToArray();
+                }
+
+                _isDirty = true;
+            }
         }
 
         public Img(DBPFEntry entry, DbpfReader reader) : base(entry)
@@ -74,6 +110,13 @@ namespace Sims2Tools.DBPF.Images.IMG
         protected void Unserialize(DbpfReader reader)
         {
             data = reader.ReadBytes((int)reader.Length);
+        }
+
+        public override uint FileSize => (uint)data.Length;
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteBytes(data);
         }
 
         private Image BuildImage(byte[] data)

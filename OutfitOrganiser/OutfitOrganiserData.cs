@@ -42,6 +42,8 @@ namespace OutfitOrganiser
             this.Columns.Add(new DataColumn("Category", typeof(string)));
             this.Columns.Add(new DataColumn("Shoe", typeof(string)));
             this.Columns.Add(new DataColumn("Hairtone", typeof(string)));
+            this.Columns.Add(new DataColumn("Jewelry", typeof(string)));
+            this.Columns.Add(new DataColumn("Destination", typeof(string)));
             this.Columns.Add(new DataColumn("Sort", typeof(uint)));
             this.Columns.Add(new DataColumn("Shown", typeof(string)));
             this.Columns.Add(new DataColumn("Tooltip", typeof(string)));
@@ -51,4 +53,27 @@ namespace OutfitOrganiser
             this.DefaultView.RowFilter = "Visible = 'Yes'";
         }
     }
+
+    [System.ComponentModel.DesignerCategory("")]
+    class OutfitOrganiserMeshData : DataTable
+    {
+        public OutfitOrganiserMeshData()
+        {
+            // Must match the order in the DataGridView control
+            this.Columns.Add(new DataColumn("PackageName", typeof(string)));
+
+            this.Columns.Add(new DataColumn("Subsets", typeof(string)));
+            this.Columns.Add(new DataColumn("CresName", typeof(string)));
+            this.Columns.Add(new DataColumn("ShpeName", typeof(string)));
+            this.Columns.Add(new DataColumn("TxmtName", typeof(string)));
+
+            this.Columns.Add(new DataColumn("PackagePath", typeof(string)));
+            this.Columns.Add(new DataColumn("PackageIcon", typeof(object)));
+
+            this.Columns.Add(new DataColumn("CresPath", typeof(string)));
+            this.Columns.Add(new DataColumn("ShpePath", typeof(string)));
+            this.Columns.Add(new DataColumn("TxmtPath", typeof(string)));
+        }
+    }
+
 }

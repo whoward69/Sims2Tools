@@ -14,190 +14,97 @@ namespace Sims2Tools.DBPF.SceneGraph
 {
     public class PackedFileDescriptorSimple : IPackedFileDescriptorSimple
     {
+        protected TypeTypeID typeId;
+        protected TypeGroupID groupId;
+        protected TypeResourceID resourceId;
+        protected TypeInstanceID instanceId;
+
         public PackedFileDescriptorSimple() : this((TypeTypeID)0x00000000, (TypeGroupID)0x00000000, (TypeResourceID)0x00000000, (TypeInstanceID)0x00000000)
         {
         }
 
-        public PackedFileDescriptorSimple(TypeTypeID type, TypeGroupID grp, TypeResourceID ihi, TypeInstanceID ilo)
+        public PackedFileDescriptorSimple(TypeTypeID typeId, TypeGroupID groupId, TypeResourceID resourceId, TypeInstanceID instanceId)
         {
-            this.type = type;
-            this.group = grp;
-            this.subtype = ihi;
-            this.instance = ilo;
+            this.typeId = typeId;
+            this.groupId = groupId;
+            this.resourceId = resourceId;
+            this.instanceId = instanceId;
         }
 
-        /// <summary>
-        /// Type of the referenced File
-        /// </summary>
-        protected TypeTypeID type;
-
-        /// <summary>
-        /// Returns/Sets the Type of the referenced File
-        /// </summary>
         public TypeTypeID Type
         {
-            get
-            {
-                return type;
-            }
-            set
-            {
-                if (type != value)
-                {
-                    type = value;
-                }
-            }
+            get => typeId;
+            set => typeId = value;
         }
 
-        /// <summary>
-        /// Group the referenced file is assigned to
-        /// </summary>
-        protected TypeGroupID group;
-
-        /// <summary>
-        /// Returns/Sets the Group the referenced file is assigned to
-        /// </summary>
         public TypeGroupID Group
         {
-            get
-            {
-                return group;
-            }
-            set
-            {
-                if (group != value)
-                {
-                    group = value;
-                }
-            }
+            get => groupId;
+            set => groupId = value;
         }
 
-
-
-        /// <summary>
-        /// Instance Data
-        /// </summary>
-        protected TypeInstanceID instance;
-
-        /// <summary>
-        /// Returns or sets the Instance Data
-        /// </summary>
-        public TypeInstanceID Instance
-        {
-            get
-            {
-                return instance;
-            }
-            set
-            {
-                if (instance != value)
-                {
-                    instance = value;
-                }
-            }
-        }
-
-
-
-        /// <summary>
-        /// An yet unknown Type
-        /// </summary>
-        /// <remarks>Only in Version 1.1 of package Files</remarks>
-        protected TypeResourceID subtype;
-
-        /// <summary>
-        /// Returns/Sets an yet unknown Type
-        /// </summary>		
-        /// <remarks>Only in Version 1.1 of package Files</remarks>
         public TypeResourceID SubType
         {
-            get
-            {
-                return subtype;
-            }
-            set
-            {
-                if (subtype != value)
-                {
-                    subtype = value;
-                }
-            }
+            get => resourceId;
+            set => resourceId = value;
+        }
+
+        public TypeInstanceID Instance
+        {
+            get => instanceId;
+            set => instanceId = value;
+        }
+
+        public DBPFKey DbpfKey
+        {
+            get => new DBPFKey(typeId, groupId, instanceId, resourceId);
         }
 
         protected virtual void DescriptionChangedFkt()
         {
         }
     }
+
     /// <summary>
     /// Structure of a FileIndex Item
     /// </summary>
     public class PackedFileDescriptor : PackedFileDescriptorSimple, IPackedFileDescriptor, System.IDisposable
     {
+        protected uint offset;
+        protected int size;
 
-        /// <summary>
-        /// Creates a clone of this Object
-        /// </summary>
-        /// <returns>The Cloned Object</returns>
-        public IPackedFileDescriptor Clone()
+        public int IndexedSize
         {
-            PackedFileDescriptor pfd = new PackedFileDescriptor
-            {
-                group = group,
-                instance = instance,
-                offset = offset,
-                size = size,
-                subtype = subtype,
-                type = type
-            };
-
-            return pfd;
+            get => size;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        public uint Offset
+        {
+            get => offset;
+            set => offset = value;
+        }
+
         public PackedFileDescriptor()
         {
-            subtype = (TypeResourceID)0x00000000;
+            resourceId = (TypeResourceID)0x00000000;
             offset = 0;
             size = 0;
         }
 
-        /// <summary>
-        /// Returns the size stored in teh index
-        /// </summary>
-        public int IndexedSize
+        public IPackedFileDescriptor Clone()
         {
-            get
+            PackedFileDescriptor pfd = new PackedFileDescriptor
             {
-                return size;
-            }
+                typeId = typeId,
+                groupId = groupId,
+                resourceId = resourceId,
+                instanceId = instanceId,
+                offset = offset,
+                size = size
+            };
+
+            return pfd;
         }
-
-
-        /// <summary>
-        /// Location of the File within the Package
-        /// </summary>
-        protected uint offset;
-
-        /// <summary>
-        /// Returns the Location of the File within the Package
-        /// </summary>
-        public uint Offset
-        {
-            get
-            {
-                return offset;
-            }
-            set { offset = value; }
-        }
-
-
-
-        /// <summary>
-        /// Size of the compressed File
-        /// </summary>		
-        protected int size;
 
         public override bool Equals(object obj)
         {

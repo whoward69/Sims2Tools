@@ -2445,7 +2445,7 @@ namespace ObjectRelocator
                 }
             }
 
-            menuItemContextEditTitleDesc.Enabled = false; // TODO - WH
+            menuItemContextEditTitleDesc.Enabled = false; // TODO - ObjReloc - Title & Desc
         }
 
         private void OnContextMenuClosing(object sender, ToolStripDropDownClosingEventArgs e)

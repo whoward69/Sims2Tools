@@ -100,7 +100,10 @@ namespace SgChecker
 
             if (TypeID == Idr.TYPE)
             {
-                props.Add(SgChecker.PROP_IDR_ITEMS, (sgRes as Idr).Items);
+#pragma warning disable CS0618 // Type or member is obsolete
+                // This code is pre-serialization
+                props.Add(SgChecker.PROP_IDR_ITEMS, (sgRes as Idr).GetItems());
+#pragma warning restore CS0618 // Type or member is obsolete
             }
             else if (sgRes is ISgRefResource sgRefRes)
             {

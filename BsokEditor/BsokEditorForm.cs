@@ -290,7 +290,7 @@ namespace BsokEditor
                                 }
                                 else
                                 {
-                                    Str str = (Str)package.GetResourceByKey(idr.Items[binx.StringSetIdx]);
+                                    Str str = (Str)package.GetResourceByKey(idr.GetItem(binx.StringSetIdx));
 
                                     row["Name"] = str?.LanguageItems(MetaData.Languages.English)?[0]?.Title;
 
@@ -363,7 +363,7 @@ namespace BsokEditor
 
             if (idr == null) return false;
 
-            var res = package.GetResourceByKey(idr.Items[binx.ObjectIdx]);
+            var res = package.GetResourceByKey(idr.GetItem(binx.ObjectIdx));
 
             if (res is Gzps || res is Xmol)
             {

@@ -10,6 +10,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
@@ -195,12 +196,14 @@ namespace Sims2Tools.DBPF.CPF
             }
         }
 
-        public void AddItem(CpfItem item)
+        public CpfItem AddItem(CpfItem item)
         {
             if (item != null)
             {
                 items = (CpfItem[])Helper.Add(items, item);
             }
+
+            return item;
         }
 
         public CpfItem GetItem(string name)
@@ -209,6 +212,14 @@ namespace Sims2Tools.DBPF.CPF
                 if (item.Name == name) return item;
 
             return null;
+        }
+
+        public CpfItem GetOrAddItem(string name, MetaData.DataTypes datatype)
+        {
+            foreach (CpfItem item in this.items)
+                if (item.Name == name) return item;
+
+            return AddItem(new CpfItem(name, datatype));
         }
 
         // TODO - _library - do we really need this? Why not use GetItem instead?

@@ -66,14 +66,13 @@ namespace Sims2Tools.DBPF.SceneGraph
         string filename;
         public string FileName
         {
-            get { return filename; }
+            get { return filename ?? BlockName; }
             set { filename = value; }
         }
 
         public ObjectGraphNode(Rcol parent) : base(parent)
         {
             items = new ObjectGraphNodeItem[0];
-            filename = this.BlockName;
             version = 4;
         }
 

@@ -41,6 +41,11 @@ namespace Sims2Tools.DBPF.CPF
             this.name = name;
         }
 
+        public CpfItem(string name, MetaData.DataTypes datatype) : this(name)
+        {
+            this.datatype = datatype;
+        }
+
         public string Name
         {
             get => name;

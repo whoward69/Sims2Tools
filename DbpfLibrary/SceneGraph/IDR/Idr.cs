@@ -29,9 +29,21 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
 
         private DBPFKey[] items;
 
-        public DBPFKey[] Items
+        [Obsolete("Use GetItem/SetItem methods instead")]
+        public DBPFKey[] GetItems()
         {
-            get { return items; }
+            return items;
+        }
+
+        public DBPFKey GetItem(uint idx)
+        {
+            return items[idx];
+        }
+
+        public void SetItem(uint idx, DBPFKey value)
+        {
+            items[idx] = value;
+            _isDirty = true;
         }
 
         public Idr(DBPFEntry entry, DbpfReader reader) : base(entry)
@@ -54,6 +66,25 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
                 TypeResourceID resourceID = (type == 0x02) ? reader.ReadResourceId() : (TypeResourceID)0x00000000;
 
                 items[i] = new DBPFKey(typeID, groupID, instanceID, resourceID);
+            }
+        }
+
+        public override uint FileSize => (uint)(12 + (items.Length * 16));
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(0xDEADBEEF);
+            writer.WriteUInt32(0x02);
+            writer.WriteUInt32((uint)items.Length);
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                DBPFKey item = items[i];
+
+                writer.WriteTypeId(item.TypeID);
+                writer.WriteGroupId(item.GroupID);
+                writer.WriteInstanceId(item.InstanceID);
+                writer.WriteResourceId(item.ResourceID);
             }
         }
 

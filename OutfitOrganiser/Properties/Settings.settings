@@ -14,5 +14,8 @@
     <Setting Name="MaxMergeFiles" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">12</Value>
     </Setting>
+    <Setting Name="AccessoryBin" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

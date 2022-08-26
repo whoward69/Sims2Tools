@@ -70,5 +70,17 @@ namespace OutfitOrganiser.Properties {
                 this["MaxMergeFiles"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
+        public uint AccessoryBin {
+            get {
+                return ((uint)(this["AccessoryBin"]));
+            }
+            set {
+                this["AccessoryBin"] = value;
+            }
+        }
     }
 }

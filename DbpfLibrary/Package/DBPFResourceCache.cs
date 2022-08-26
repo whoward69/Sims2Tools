@@ -70,5 +70,10 @@ namespace Sims2Tools.DBPF.Package
         {
             itemByKey[key] = item;
         }
+
+        internal bool Remove(DBPFResource resource)
+        {
+            return resourceByKey.Remove(resource);
+        }
     }
 }

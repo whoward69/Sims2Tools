@@ -94,7 +94,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         GmdcNamePairs names;
         /// <summary>
-        /// Groups to BlendGroup assignements
+        /// Groups to BlendGroup assignments
         /// </summary>
         public GmdcNamePairs BlendGroupDefinition
         {

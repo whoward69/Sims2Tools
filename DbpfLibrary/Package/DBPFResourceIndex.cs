@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.CLST;
 using Sims2Tools.DBPF.IO;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Sims2Tools.DBPF.Package
@@ -64,6 +65,9 @@ namespace Sims2Tools.DBPF.Package
 
         internal DBPFResourceIndex(DBPFHeader header, DBPFResourceCache resourceCache, DbpfReader reader)
         {
+            Debug.Assert(header != null, "Header cannot be null");
+            Debug.Assert(resourceCache != null, "ResourceCache cannot be null");
+
             this.resourceCache = resourceCache;
 
             //this.indexMajorVersion = header.IndexMajorVersion;
@@ -120,9 +124,12 @@ namespace Sims2Tools.DBPF.Package
 
         internal DBPFEntry GetEntryByKey(DBPFKey key)
         {
-            foreach (DBPFEntry entry in GetAllEntries())
+            if (key != null)
             {
-                if (key != null && key.Equals(entry)) return entry;
+                foreach (DBPFEntry entry in GetAllEntries())
+                {
+                    if (key.Equals(entry)) return entry;
+                }
             }
 
             return null;
@@ -227,6 +234,11 @@ namespace Sims2Tools.DBPF.Package
             }
 
             resourceCache.Commit(key, item);
+        }
+
+        internal bool Remove(DBPFResource resource)
+        {
+            return (entryByKey.Remove(resource) && resourceCache.Remove(resource));
         }
 
         #region Clst Handling
