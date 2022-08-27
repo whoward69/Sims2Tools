@@ -46,6 +46,7 @@ namespace OutfitOrganiser
             this.Columns.Add(new DataColumn("Destination", typeof(string)));
             this.Columns.Add(new DataColumn("Sort", typeof(uint)));
             this.Columns.Add(new DataColumn("Shown", typeof(string)));
+            this.Columns.Add(new DataColumn("Townie", typeof(string)));
             this.Columns.Add(new DataColumn("Tooltip", typeof(string)));
 
             this.Columns.Add(new DataColumn("OutfitData", typeof(object)));

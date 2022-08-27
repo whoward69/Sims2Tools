@@ -597,6 +597,8 @@ namespace OutfitOrganiser
 
                                     row["Shown"] = BuildShownString(outfitData.Shown);
 
+                                    row["Townie"] = BuildTownieString(outfitData);
+
                                     row["Gender"] = BuildGenderString(outfitData.Gender);
                                     row["Age"] = BuildAgeString(outfitData.Age);
                                     row["Category"] = BuildCategoryString(outfitData.Category);
@@ -698,6 +700,7 @@ namespace OutfitOrganiser
             menuItemSaveAll.Enabled = btnSaveAll.Enabled = false;
 
             btnMeshes.Enabled = meshCachesLoaded && (gridResources.SelectedRows.Count > 0);
+            btnTownify.Visible = (menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked) && (gridResources.SelectedRows.Count > 0);
 
             foreach (DataRow row in dataResources.Rows)
             {
@@ -741,6 +744,8 @@ namespace OutfitOrganiser
 
             gridResources.Columns["colShoe"].Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
             grpShoe.Visible = gridResources.Columns["colShoe"].Visible;
+
+            gridResources.Columns["colTownie"].Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
 
             gridResources.Columns["colJewelry"].Visible = menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
             gridResources.Columns["colDestination"].Visible = gridResources.Columns["colJewelry"].Visible;
@@ -1319,6 +1324,26 @@ namespace OutfitOrganiser
         #endregion
 
         #region Resource Grid Row Fill
+        private string BuildTownieString(OutfitDbpfData outfitData)
+        {
+            string townie = "No";
+
+            if (outfitData.Creator.Equals("00000000-0000-0000-0000-000000000000") && outfitData.Family.Equals("00000000-0000-0000-0000-000000000000") && outfitData.Flags == 0)
+            {
+                townie = "Yes";
+
+                if ((outfitData.Age & 0x0040) == 0x0040)
+                {
+                    if (outfitData.Version == 0x00000001)
+                    {
+                        townie = "Yes!!!";
+                    }
+                }
+            }
+
+            return townie;
+        }
+
         private string BuildShownString(uint value)
         {
             string shown = "Yes";
@@ -1618,6 +1643,8 @@ namespace OutfitOrganiser
                 if ((row.Cells["colOutfitData"].Value as OutfitDbpfData).Equals(outfitData))
                 {
                     row.Cells["colShown"].Value = BuildShownString(outfitData.Shown);
+
+                    row.Cells["colTownie"].Value = BuildTownieString(outfitData);
 
                     row.Cells["colGender"].Value = BuildGenderString(outfitData.Gender);
                     row.Cells["colAge"].Value = BuildAgeString(outfitData.Age);
@@ -2654,35 +2681,35 @@ namespace OutfitOrganiser
 
         private void SaveAll()
         {
-            foreach (DataGridViewRow row in gridPackageFiles.Rows)
+            foreach (DataGridViewRow packageRow in gridPackageFiles.Rows)
             {
-                string packagePath = row.Cells["colPackagePath"].Value as string;
+                string packagePath = packageRow.Cells["colPackagePath"].Value as string;
 
                 using (OrganiserDbpfFile package = packageCache.GetOrOpen(packagePath))
                 {
                     if (package.IsDirty)
                     {
-                        try
+                        if (package.Update(menuItemAutoBackup.Checked) == null)
                         {
-                            package.Update(menuItemAutoBackup.Checked);
-
-                            packageCache.SetClean(package);
+                            MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!", "Package Update Error!");
                         }
-                        catch (Exception)
+
+                        // Do this regardless, as the failed Update() will have written a temp/backup file and re-opened the locked file.
+                        packageCache.SetClean(package);
+
+                        foreach (DataGridViewRow resourceRow in gridResources.Rows)
                         {
-                            MsgBox.Show($"Error trying to update {package.PackageName}", "Package Update Error!");
+                            OutfitDbpfData outfitData = resourceRow.Cells["colOutfitData"].Value as OutfitDbpfData;
+
+                            if (outfitData.PackagePath.Equals(packagePath))
+                            {
+                                outfitData.SetClean();
+                            }
                         }
                     }
 
                     package.Close();
                 }
-            }
-
-            foreach (DataGridViewRow row in gridResources.Rows)
-            {
-                OutfitDbpfData outfitData = row.Cells["colOutfitData"].Value as OutfitDbpfData;
-
-                outfitData.SetClean();
             }
 
             if (IsCigenDirty())
@@ -2697,6 +2724,32 @@ namespace OutfitOrganiser
                     MsgBox.Show("Error trying to update cigen.package", "Package Update Error!");
                 }
             }
+        }
+        #endregion
+
+
+        #region Townify Button
+        private void OnTownifyClicked(object sender, EventArgs e)
+        {
+            // See https://rikkulidea.livejournal.com/23530.html and https://hat-plays-sims.dreamwidth.org/34791.html
+            foreach (DataGridViewRow selectedRow in gridResources.SelectedRows)
+            {
+                OutfitDbpfData outfitData = selectedRow.Cells["colOutfitData"].Value as OutfitDbpfData;
+
+                outfitData.Flags = 0x00000000;
+                outfitData.Creator = "00000000-0000-0000-0000-000000000000";
+                outfitData.Family = "00000000-0000-0000-0000-000000000000";
+
+                if ((outfitData.Age & 0x0040) == 0x0040)
+                {
+                    if (outfitData.Product == 0x000000000) outfitData.Product = 0x00000000; // Do not remove - as this will add the value if it's missing!!!
+                    if (outfitData.Version <= 0x000000001) outfitData.Version = 0x00000000;
+                }
+
+                UpdateGridRow(outfitData);
+            }
+
+            UpdateFormState();
         }
         #endregion
 

@@ -139,6 +139,7 @@ namespace OutfitOrganiser
             this.colDestination = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSort = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colShown = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colTownie = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTooltip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colOutfitData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextResources = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -156,6 +157,7 @@ namespace OutfitOrganiser
             this.menuContextDirDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
+            this.btnTownify = new System.Windows.Forms.Button();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -639,6 +641,7 @@ namespace OutfitOrganiser
             // 
             this.panelEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelEditor.Controls.Add(this.btnTownify);
             this.panelEditor.Controls.Add(this.btnMeshes);
             this.panelEditor.Controls.Add(this.grpSort);
             this.panelEditor.Controls.Add(this.grpTooltip);
@@ -1032,6 +1035,7 @@ namespace OutfitOrganiser
             this.colDestination,
             this.colSort,
             this.colShown,
+            this.colTownie,
             this.colTooltip,
             this.colOutfitData});
             this.gridResources.ContextMenuStrip = this.menuContextResources;
@@ -1142,6 +1146,13 @@ namespace OutfitOrganiser
             this.colShown.HeaderText = "Shown";
             this.colShown.Name = "colShown";
             this.colShown.ReadOnly = true;
+            // 
+            // colTownie
+            // 
+            this.colTownie.DataPropertyName = "Townie";
+            this.colTownie.HeaderText = "Townie";
+            this.colTownie.Name = "colTownie";
+            this.colTownie.ReadOnly = true;
             // 
             // colTooltip
             // 
@@ -1276,6 +1287,17 @@ namespace OutfitOrganiser
             this.openThumbnailDialog.Filter = "JPG file|*.jpg|PNG file|*.png|BMP file|*.bmp|All files|*.*";
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
+            // 
+            // btnTownify
+            // 
+            this.btnTownify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTownify.Location = new System.Drawing.Point(708, 128);
+            this.btnTownify.Name = "btnTownify";
+            this.btnTownify.Size = new System.Drawing.Size(88, 26);
+            this.btnTownify.TabIndex = 28;
+            this.btnTownify.Text = "Townify";
+            this.btnTownify.UseVisualStyleBackColor = true;
+            this.btnTownify.Click += new System.EventHandler(this.OnTownifyClicked);
             // 
             // OutfitOrganiserForm
             // 
@@ -1433,6 +1455,7 @@ namespace OutfitOrganiser
         private System.Windows.Forms.DataGridViewTextBoxColumn colDestination;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSort;
         private System.Windows.Forms.DataGridViewTextBoxColumn colShown;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colTownie;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTooltip;
         private System.Windows.Forms.DataGridViewTextBoxColumn colOutfitData;
         private System.Windows.Forms.Button btnMeshes;
@@ -1445,6 +1468,7 @@ namespace OutfitOrganiser
         private System.Windows.Forms.ToolStripMenuItem menuContextResDeleteThumb;
         private System.Windows.Forms.SaveFileDialog saveThumbnailDialog;
         private System.Windows.Forms.OpenFileDialog openThumbnailDialog;
+        private System.Windows.Forms.Button btnTownify;
     }
 }
 

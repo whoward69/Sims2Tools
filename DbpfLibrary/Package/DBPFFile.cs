@@ -168,9 +168,18 @@ namespace Sims2Tools.DBPF.Package
                     File.Copy(originalName, backupName, true);
                 }
 
-                File.Delete(originalName);
-                File.Copy(updateName, originalName, true);
-                File.Delete(updateName);
+                try
+                {
+                    File.Delete(originalName);
+
+                    File.Copy(updateName, originalName, true);
+                    File.Delete(updateName);
+                }
+                catch (Exception)
+                {
+                    // SimPe propbably has the file open!
+                    backupName = null;
+                }
 
                 Read(File.OpenRead(originalName));
             }

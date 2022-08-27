@@ -188,6 +188,76 @@ namespace OutfitOrganiser
             if (str.IsDirty) cache.GetOrAdd(packagePath).Commit(str);
         }
 
+        public uint Product
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("product");
+                return (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
+            }
+            set
+            {
+                cpf.GetOrAddItem("product", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
+                UpdatePackage();
+            }
+        }
+
+        public uint Version
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("version");
+                return (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
+            }
+            set
+            {
+                cpf.GetOrAddItem("version", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
+                UpdatePackage();
+            }
+        }
+
+        public uint Flags
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("flags");
+                return (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
+            }
+            set
+            {
+                cpf.GetOrAddItem("flags", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
+                UpdatePackage();
+            }
+        }
+
+        public string Creator
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("creator");
+                return (cpfItem == null) ? "" : cpfItem.StringValue;
+            }
+            set
+            {
+                cpf.GetOrAddItem("creator", MetaData.DataTypes.dtString).StringValue = value;
+                UpdatePackage();
+            }
+        }
+
+        public string Family
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("family");
+                return (cpfItem == null) ? "" : cpfItem.StringValue;
+            }
+            set
+            {
+                cpf.GetOrAddItem("family", MetaData.DataTypes.dtString).StringValue = value;
+                UpdatePackage();
+            }
+        }
+
         public uint Outfit
         {
             get
@@ -210,7 +280,7 @@ namespace OutfitOrganiser
             }
             set
             {
-                cpf.GetItem("flags").UIntegerValue = (Shown & 0xFFFFFFFE) | (value & 0x00000001);
+                cpf.GetOrAddItem("flags", MetaData.DataTypes.dtUInteger).UIntegerValue = (Shown & 0xFFFFFFFE) | (value & 0x00000001);
                 UpdatePackage();
             }
         }
@@ -224,7 +294,7 @@ namespace OutfitOrganiser
             }
             set
             {
-                cpf.GetItem("gender").UIntegerValue = value;
+                cpf.GetOrAddItem("gender", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
                 UpdatePackage();
             }
         }
@@ -238,7 +308,7 @@ namespace OutfitOrganiser
             }
             set
             {
-                cpf.GetItem("age").UIntegerValue = value;
+                cpf.GetOrAddItem("age", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
                 UpdatePackage();
             }
         }
@@ -252,7 +322,7 @@ namespace OutfitOrganiser
             }
             set
             {
-                cpf.GetItem("category").UIntegerValue = value;
+                cpf.GetOrAddItem("category", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
                 UpdatePackage();
             }
         }
@@ -266,7 +336,7 @@ namespace OutfitOrganiser
             }
             set
             {
-                cpf.GetItem("shoe").UIntegerValue = value;
+                cpf.GetOrAddItem("shoe", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
                 UpdatePackage();
             }
         }
@@ -280,7 +350,7 @@ namespace OutfitOrganiser
             }
             set
             {
-                cpf.GetItem("hairtone").StringValue = value;
+                cpf.GetOrAddItem("hairtone", MetaData.DataTypes.dtString).StringValue = value;
                 UpdatePackage();
             }
         }
@@ -487,7 +557,7 @@ namespace OutfitOrganiser
 
         public void Commit(DBPFResource resource) => package.Commit(resource);
 
-        public void Update(bool autoBackup) => package.Update(autoBackup);
+        public string Update(bool autoBackup) => package.Update(autoBackup);
 
         internal void DeCache()
         {
