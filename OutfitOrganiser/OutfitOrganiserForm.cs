@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -190,7 +190,7 @@ namespace OutfitOrganiser
             splitTopBottom.SplitterDistance = (int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
             splitTopLeftRight.SplitterDistance = (int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
 
-            MyMruList = new MruList(OutfitOrganiserApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize);
+            MyMruList = new MruList(OutfitOrganiserApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FileSelected;
 
             menuItemOutfitClothing.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitClothing.Name, 1) != 0);
@@ -2463,7 +2463,7 @@ namespace OutfitOrganiser
 
                         using (OrganiserDbpfFile package = packageCache.GetOrOpen(outfitData.PackagePath))
                         {
-                            OutfitDbpfData originalData = OutfitDbpfData.Create(package, outfitData.BinxKey);
+                            OutfitDbpfData originalData = OutfitDbpfData.Create(package, outfitData);
 
                             row.Cells["colOutfitData"].Value = originalData;
 

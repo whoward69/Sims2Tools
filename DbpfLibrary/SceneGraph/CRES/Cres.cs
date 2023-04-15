@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -17,6 +17,7 @@ using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.CRES
 {
@@ -61,6 +62,11 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
             }
 
             return needed;
+        }
+
+        public override XmlElement AddXml(XmlElement parent)
+        {
+            return AddXml(parent, NAME);
         }
     }
 }

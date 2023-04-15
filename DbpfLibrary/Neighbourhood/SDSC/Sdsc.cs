@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -236,6 +236,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             description.bodyFlags = reader.ReadUInt16();
             reader.Seek(SeekOrigin.Begin, startpos + 0xB0);
             skills.Fatness = reader.ReadUInt16();
+            reader.Seek(SeekOrigin.Begin, startpos + 0xB4);
+            description.LifeState = (LifeStateFlags)reader.ReadUInt16();
             reader.Seek(SeekOrigin.Begin, startpos + 0xBE);
             description.Career = (Careers)reader.ReadUInt32();
             reader.Seek(SeekOrigin.Begin, startpos + 0xE2);
@@ -350,7 +352,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateInstElement(parent, NAME, "simId");
+            XmlElement element = XmlHelper.CreateInstElement(parent, NAME, "simId", InstanceID);
 
             element.SetAttribute("simGuid", Helper.Hex8PrefixString(simGuid));
             element.SetAttribute("familyId", Helper.Hex8PrefixString(familyinstance));

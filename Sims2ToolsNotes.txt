@@ -1,0 +1,175 @@
+DbpfLibrary
+===========
+  Code tidy
+    setters
+    unused methods
+
+
+Deploy Sims2Utils App To Web Site
+=================================
+
+1) Make sure it works!
+2) Open "D:\Tomcat6.0\webapps\ROOT\Sims2\Notes\Sims2Tools.html"
+3) App version in Visual Studio should be "one more" than in the file
+4) Change to "Release", clean and build
+5) Change to "Debug", clean, code cleanup (Analyze menu), build and analyze (Build menu)
+6) Open "C:\Users\whowa\Documents\Visual Studio 2022\Projects\Sims2Tools", change into app's sub-dir, then "bin"
+7) Copy "Debug" and "Release" sub-folders
+8) Open "D:\Tomcat6.0\webapps\ROOT\Sims2\Notes", then the app's web page sub-dir and paste in
+9) Rename "Release" as "{App}{Version}", eg "HcduPlusV1.4"
+10) Rename "Debug" as "{App}{Version}_Debug", eg "HcduPlusV1.4_Debug"
+11) Delete the "*.pdb" and "*.xml" files from both of these sub-dirs
+12) Run the app directly from both sub-dirs and check the version number in the about box
+12b) Delete the .log files
+13) Zip both sub-dirs, then remove the sub-dirs
+14) Edit the app's web page .html file
+15) Add the new downloads into the "Files" section
+16) Update the "Change Log" section
+17) Update the "Sims2Tools.html" file
+18) Start WinScp and log in, navigate the the app's web page sub-dir
+19) Copy over the new .zip files
+20) Update the .html file
+21) Nav into the parent dir
+22) Update the "Sims2Tools.html" file
+23) Check app's web page and confirm downloads are correct
+24) Start "GitHub Desktop" and select "Sims2Tools" repository
+25) Enter something into "Summary" and "Commit to main"
+26) Click "Push origin" button
+27) Click "View on GitHub" button
+28) Make sure changes have arrived
+29) In Visual Studio, increment version number
+
+
+DBPF Library Serialized Resources
+=================================
+
+Process to make a resource class serializable (based on modding STR#)
+
+Pick the class
+Find the SimPe/JetBrains source code and make sure Unserialize is complete
+Implement public override void Serialize(DbpfWriter writer)
+Implement public override uint FileSize
+Repeat for each associated class (eg CpfItem for Cpf)
+
+Check every data member is private
+Check every data structure is readonly
+Check for any existing setters and how they are used (ideally there should be none)
+
+Decide what class data needs setters
+Implement setters, setting the _isDirty flag
+Override public override bool IsDirty AND public override void SetClean()
+Repeat for each associated class (eg CpfItem for Cpf)
+
+
+Sims 2 Log Watcher
+==================
+
+IDEAS
+-----
+  Give option to open updated logs in new tab
+
+  Context menu on tab - Rename
+
+
+"What Changes This" Utility
+===========================
+
+Use case
+  Find all mods that override BHAV, BCON, STR#, TTAB/TTAs, OBJD/OBJf (any others?) in a specific group.  Choose from ...
+    globals
+	semi-globals
+	object (eg specific controller)
+	objects that use a specific semi-global group (eg all beds)
+
+Kinda like BHAV Finder
+
+UI
+  Menu for resources
+  
+  Downloads Path
+  
+  Check box for "Globals"
+  Check box for "Any semi-global"
+  Check box for "Any non-local"
+  Check box for "Any objects using specific semi-global"
+  
+  Drop-down for specific semi-global group
+  Drop-down for specific object group
+  
+  
+Display
+  Package path, resource type, resource instance, resource name, resource group/object
+
+
+
+SG Checker
+==========
+
+SG Checker
+
+SG Checker and Saved Sims sub-dir
+
+  http://under-your-skin.com/?p=1559
+  
+  D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Double Deluxe\Base\TSData\Res\Catalog\Bins
+  https://modthesims.info/t/573862
+  https://moonkistsims.tumblr.com/post/105327317901/sims-2-ultimate-collection-happy-holidays
+
+
+	
+DBPF Viewer
+===========
+  TODO
+    Add SceneGraph options
+	
+	Watch a file for changes
+https://stackoverflow.com/questions/721714/notification-when-a-file-changes
+
+Would be nice to add a Sims2Tools right-click for .package files
+  Sims2Tools
+    DBPF Viewer
+	BHAV Finder
+
+	
+
+BHAV Finder
+===========
+  TODO
+    Add a Save To Clipboard option
+
+
+
+
+HCDU Plus
+=========
+  Magic with pasting into known conflict table
+    Remove leading spaces/tabs
+	Remove multiple spaces/tabs
+	On tab select next column
+	On return select next line
+	
+WH_DrivingLicence_Core_.*\.package	WH_DrivingLicence_Option_.*\.package
+WH_DrivingLicence_Option_.*\.package	WH_DrivingLicence_Option_.*\.package
+WH_AutoWalkToSchool_NotificationChanges\.package	WH_DrivingLicence_Core_PrivateLessons_CarMods\.package
+decorative-parking-space-Mog-20090327\.package	WH_DrivingLicence_Core_Restrictions\.package
+InTeenimater_B\.package	WH_DrivingLicence_Core_Restrictions\.package
+InTeenimater_B\.package	WH_DrivingLicence_Core_PrivateLessons_CarMods\.package
+InTeenimater_FlavorPak_BackToSchool\.package	WH_DrivingLicence_Core_PrivateLessons_CarMods\.package
+CJ-VariableBookcases\.package	WH_DrivingLicence_Option_Theory_Book\.package #
+canmyfriendcometoohack\.package	WH_DrivingLicence_Option_RiskySneakOut\.package
+phonehack\.package	WH_DrivingLicence_Option_RiskySneakOut\.package
+
+^\s*(.*?\.package)\s+(.*?\.package)
+	
+  Enable/Disable known conflicts
+
+
+
+Sims 2 Resource Database
+========================
+
+Use cases
+  GUID -> Object Name
+  Group -> Object Name
+  TGIR -> Resource Name
+  

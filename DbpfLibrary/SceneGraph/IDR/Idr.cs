@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -12,7 +12,9 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.Utils;
 using System;
+using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.IDR
 {
@@ -91,6 +93,23 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
         public override SgResourceList SgNeededResources()
         {
             return new SgResourceList();
+        }
+
+        public override XmlElement AddXml(XmlElement parent)
+        {
+            XmlElement element = XmlHelper.CreateResElement(parent, "IDR", this);
+
+            for (uint idx = 0; idx < items.Length; ++idx)
+            {
+                XmlElement ele = XmlHelper.CreateElement(element, "item");
+                ele.SetAttribute("index", idx.ToString());
+                ele.SetAttribute("type", DBPFData.TypeName(GetItem(idx).TypeID));
+                ele.SetAttribute("group", GetItem(idx).GroupID.ToString());
+                ele.SetAttribute("instance", GetItem(idx).InstanceID.ToString());
+                ele.SetAttribute("resource", GetItem(idx).ResourceID.ToString());
+            }
+
+            return element;
         }
     }
 }

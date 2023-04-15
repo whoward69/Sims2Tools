@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -88,7 +88,7 @@ namespace Sims2Tools.DBPF.TPRP
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateResElement(parent, NAME);
+            XmlElement element = XmlHelper.CreateResElement(parent, NAME, this);
             element.SetAttribute("params", ParamCount.ToString());
             element.SetAttribute("locals", LocalCount.ToString());
 
@@ -96,7 +96,7 @@ namespace Sims2Tools.DBPF.TPRP
             for (int i = 0; i < ParamCount; ++i)
             {
                 TprpItem item = items[index++];
-                XmlElement ele = CreateTextElement(element, "param", item.Label);
+                XmlElement ele = XmlHelper.CreateTextElement(element, "param", item.Label);
                 ele.SetAttribute("index", Helper.Hex4PrefixString(i));
                 ele.SetAttribute("data", Helper.Hex2PrefixString(((TprpParamLabel)item).PData));
             }
@@ -104,7 +104,7 @@ namespace Sims2Tools.DBPF.TPRP
             for (int i = 0; i < LocalCount; ++i)
             {
                 TprpItem item = items[index++];
-                XmlElement ele = CreateTextElement(element, "local", item.Label);
+                XmlElement ele = XmlHelper.CreateTextElement(element, "local", item.Label);
                 ele.SetAttribute("index", Helper.Hex4PrefixString(i));
             }
 

@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -149,7 +149,7 @@ namespace Sims2Tools.DBPF.OBJD
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateResElement(parent, NAME);
+            XmlElement element = XmlHelper.CreateResElement(parent, NAME, this);
             element.SetAttribute("type", Helper.Hex4PrefixString((ushort)Type));
             element.SetAttribute("guid", Guid.ToString());
             element.SetAttribute("originalGuid", OriginalGuid.ToString());
@@ -160,7 +160,7 @@ namespace Sims2Tools.DBPF.OBJD
             {
                 if (GetRawData(i) != 0x0000)
                 {
-                    CreateTextElement(element, "data", Helper.Hex4PrefixString(GetRawData(i))).SetAttribute("index", Helper.Hex4PrefixString(i));
+                    XmlHelper.CreateTextElement(element, "data", Helper.Hex4PrefixString(GetRawData(i))).SetAttribute("index", Helper.Hex4PrefixString(i));
                 }
             }
 

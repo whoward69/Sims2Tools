@@ -1,7 +1,7 @@
 ﻿/*
  * BSOK Editor - a utility for adding BSOK data to clothing and accessory packages
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -19,6 +19,7 @@ using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
+using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
@@ -72,9 +73,34 @@ namespace BsokEditor
                 dataLoading = true;
 
                 XmlDocument bsokXmlDoc = new XmlDocument();
-                bsokXmlDoc.Load("Resources/XML/bsok.xml");
 
-                bsokXml = bsokXmlDoc.DocumentElement;
+                string[] bsokXmlFiles = Directory.GetFiles("Resources/XML", "bsok_*.xml", SearchOption.TopDirectoryOnly);
+
+                if (bsokXmlFiles.Length > 0)
+                {
+                    bsokXmlDoc.Load(bsokXmlFiles[0]);
+
+                    bsokXml = bsokXmlDoc.DocumentElement;
+
+                    for (int i = 1; i < bsokXmlFiles.Length; ++i)
+                    {
+                        XmlDocument bsokDoc = new XmlDocument();
+                        bsokDoc.Load(bsokXmlFiles[i]);
+
+                        XmlElement rootElement = bsokDoc.DocumentElement;
+
+                        foreach (XmlNode genreNode in rootElement.ChildNodes)
+                        {
+                            bsokXml.AppendChild(bsokXmlDoc.ImportNode(genreNode, true));
+                        }
+                    }
+                }
+                else
+                {
+                    bsokXmlDoc.Load("Resources/XML/bsok.xml");
+
+                    bsokXml = bsokXmlDoc.DocumentElement;
+                }
 
                 LoadBsokProductComboBoxes();
 
@@ -126,7 +152,7 @@ namespace BsokEditor
             RegistryTools.LoadAppSettings(BsokEditorApp.RegistryKey, BsokEditorApp.AppVersionMajor, BsokEditorApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(BsokEditorApp.RegistryKey, this);
 
-            MyMruList = new MruList(BsokEditorApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize);
+            MyMruList = new MruList(BsokEditorApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FolderSelected;
 
             menuItemExcludeUnknown.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemExcludeUnknown.Name, 0) != 0);
@@ -306,9 +332,23 @@ namespace BsokEditor
                                         row["Category"] = BuildCategoryString(cpf);
                                         row["Shoe"] = BuildShoeString(cpf);
                                     }
-                                    else
+                                    else if (cpf is Xmol)
                                     {
                                         row["Type"] = "Accessory";
+
+                                        row["Category"] = "";
+                                        row["Shoe"] = "";
+                                    }
+                                    else if (cpf is Xtol)
+                                    {
+                                        row["Type"] = "Eyebrow";
+
+                                        row["Category"] = "";
+                                        row["Shoe"] = "";
+                                    }
+                                    else
+                                    {
+                                        row["Type"] = "Unknown";
 
                                         row["Category"] = "";
                                         row["Shoe"] = "";
@@ -365,7 +405,7 @@ namespace BsokEditor
 
             var res = package.GetResourceByKey(idr.GetItem(binx.ObjectIdx));
 
-            if (res is Gzps || res is Xmol)
+            if (res is Gzps || res is Xmol || res is Xtol)
             {
                 cpf = (Cpf)res;
                 return true;
@@ -1180,7 +1220,7 @@ namespace BsokEditor
                             }
                             else if ("unisex".Equals(gender))
                             {
-                                if (cachedGenderValue == 0x00) continue;
+                                // if (cachedGenderValue == 0x00) continue;
                             }
                         }
 

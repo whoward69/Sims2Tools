@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -16,6 +16,7 @@ using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.RCOL
 {
@@ -226,6 +227,33 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             foreach (IRcolBlock blk in blocks) WriteBlock(blk, writer);
 
             writer.WriteBytes(oversize);
+        }
+
+        protected XmlElement AddXml(XmlElement parent, string name)
+        {
+            XmlElement element = XmlHelper.CreateResElement(parent, name, this);
+
+            for (uint idx = 0; idx < reffiles.Length; ++idx)
+            {
+                XmlElement ele = XmlHelper.CreateElement(element, "reference");
+                ele.SetAttribute("index", idx.ToString());
+                ele.SetAttribute("type", DBPFData.TypeName(reffiles[idx].Type));
+                ele.SetAttribute("group", reffiles[idx].Group.ToString());
+                ele.SetAttribute("instance", reffiles[idx].Instance.ToString());
+                ele.SetAttribute("resource", reffiles[idx].SubType.ToString());
+            }
+
+            for (uint idx = 0; idx < blocks.Length; ++idx)
+            {
+                XmlElement ele = XmlHelper.CreateElement(element, "block");
+                ele.SetAttribute("index", idx.ToString());
+                ele.SetAttribute("id", blocks[idx].BlockID.ToString());
+                ele.SetAttribute("name", blocks[idx].BlockName);
+
+                blocks[idx].AddXml(ele);
+            }
+
+            return element;
         }
 
 

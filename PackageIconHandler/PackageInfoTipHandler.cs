@@ -5,7 +5,7 @@
  * 
  * Based on the SharpShell extensions - see https://www.codeproject.com/Articles/527058/NET-Shell-Extensions-Shell-Info-Tip-Handlers
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */

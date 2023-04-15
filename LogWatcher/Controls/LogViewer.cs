@@ -1,11 +1,12 @@
 ﻿/*
  * Log Watcher - a utility for monitoring Sims 2 ObjectError logs
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,7 +27,7 @@ namespace LogWatcher.Controls
         private static readonly Dictionary<int, String> dataPerson = new Dictionary<int, string>();
         private static readonly Dictionary<int, String> dataMotive = new Dictionary<int, string>();
 
-        private readonly Regex reProp = new Regex("Property ([0-9]+)(: -?[0-9]+)");
+        private readonly Regex reProp = new Regex("Property ([0-9]+): (-?[0-9]+)");
 
         static LogViewer()
         {
@@ -288,7 +289,10 @@ namespace LogWatcher.Controls
                                     ++index;
                                 }
 
-                                textBox.AppendText($"\tProperty {index}{m.Groups[2].Value}");
+                                string propDecValue = m.Groups[2].Value;
+                                string propHexValue = Helper.Hex4PrefixString(int.Parse(propDecValue));
+
+                                textBox.AppendText($"\tProperty {index}: {propHexValue} ({propDecValue})");
                             }
                             else
                             {

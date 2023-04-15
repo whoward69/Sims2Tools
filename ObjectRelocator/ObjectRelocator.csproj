@@ -82,6 +82,7 @@
     <Compile Include="ObjectRelocatorForm.Designer.cs">
       <DependentUpon>ObjectRelocatorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ObjectRelocatorCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="ObjectRelocatorForm.resx">
       <DependentUpon>ObjectRelocatorForm.cs</DependentUpon>

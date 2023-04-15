@@ -231,6 +231,7 @@
     <Compile Include="Utils\Helper.cs" />
     <Compile Include="Utils\MetaData.cs" />
     <Compile Include="Utils\WrappedByteArray.cs" />
+    <Compile Include="Utils\XmlHelper.cs" />
     <Compile Include="VERS\Vers.cs" />
     <Compile Include="XFLR\Xflr.cs" />
     <Compile Include="XFNC\Xfnc.cs" />

@@ -20,6 +20,7 @@ namespace DpbfLister
                 {
                     Console.WriteLine($"'{arg}' contains ...");
 
+#pragma warning disable IDE0063 // Use simple 'using' statement
                     using (DBPFFile package = new DBPFFile(arg))
                     {
                         foreach (TypeTypeID type in DBPFData.AllTypes)
@@ -32,6 +33,7 @@ namespace DpbfLister
 
                         package.Close();
                     }
+#pragma warning restore IDE0063 // Use simple 'using' statement
                 }
                 else
                 {

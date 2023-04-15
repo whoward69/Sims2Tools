@@ -1,7 +1,7 @@
 ﻿/*
  * DBPF Viewer - a utility for testing the DBPF Library
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -74,7 +74,7 @@ namespace DbpfViewer
             RegistryTools.LoadAppSettings(DbpfViewerApp.RegistryKey, DbpfViewerApp.AppVersionMajor, DbpfViewerApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(DbpfViewerApp.RegistryKey, this);
 
-            MyMruList = new MruList(DbpfViewerApp.RegistryKey, menuItemRecentPackages, Properties.Settings.Default.MruSize);
+            MyMruList = new MruList(DbpfViewerApp.RegistryKey, menuItemRecentPackages, Properties.Settings.Default.MruSize, true, false);
             MyMruList.FileSelected += MyMruList_FileSelected;
 
             menuItemBcon.Checked = ((int)RegistryTools.GetSetting(DbpfViewerApp.RegistryKey + @"\Resources", Bcon.NAME, 1) != 0); OnBconClicked(menuItemBcon, null);
@@ -523,7 +523,7 @@ namespace DbpfViewer
 
                     foreach (TypeTypeID type in DBPFData.AllTypes)
                     {
-                        if (enabledResources.Contains(type))
+                        // if (enabledResources.Contains(type))
                         {
                             List<DBPFEntry> resources = package.GetEntriesByType(type);
 
@@ -598,9 +598,9 @@ namespace DbpfViewer
                     uint total = package.ResourceCount;
                     uint done = 0;
 
-                    foreach (TypeTypeID type in DBPFData.ModTypes)
+                    foreach (TypeTypeID type in DBPFData.AllTypes)
                     {
-                        if (enabledResources.Contains(type))
+                        // if (enabledResources.Contains(type))
                         {
                             List<DBPFEntry> resources = package.GetEntriesByType(type);
                             SortedDictionary<DBPFKey, DBPFEntry> sortedResources = new SortedDictionary<DBPFKey, DBPFEntry>();

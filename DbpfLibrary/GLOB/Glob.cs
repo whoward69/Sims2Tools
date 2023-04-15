@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -50,10 +50,10 @@ namespace Sims2Tools.DBPF.GLOB
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateResElement(parent, NAME);
+            XmlElement element = XmlHelper.CreateResElement(parent, NAME, this);
 
-            CreateTextElement(element, "semigroup", SemiGlobalGroup.ToString());
-            CreateTextElement(element, "seminame", SemiGlobalName);
+            XmlHelper.CreateTextElement(element, "semigroup", SemiGlobalGroup.ToString());
+            XmlHelper.CreateTextElement(element, "seminame", SemiGlobalName);
 
             return element;
         }

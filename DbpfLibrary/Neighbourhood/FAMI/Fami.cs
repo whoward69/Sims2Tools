@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -195,7 +195,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateInstElement(parent, NAME, "familyId");
+            XmlElement element = XmlHelper.CreateInstElement(parent, NAME, "familyId", InstanceID);
 
             // element.SetAttribute("version", Version.ToString());
             element.SetAttribute("lotId", Helper.Hex8PrefixString(LotInstance));
@@ -214,11 +214,11 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
 
             if (sims.Length > 0)
             {
-                XmlElement eleSims = CreateElement(element, "sims");
+                XmlElement eleSims = XmlHelper.CreateElement(element, "sims");
 
                 foreach (uint sim in sims)
                 {
-                    CreateElement(eleSims, "sim").SetAttribute("simGuid", Helper.Hex8PrefixString(sim));
+                    XmlHelper.CreateElement(eleSims, "sim").SetAttribute("simGuid", Helper.Hex8PrefixString(sim));
                 }
             }
 

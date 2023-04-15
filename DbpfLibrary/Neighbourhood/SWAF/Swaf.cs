@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 using System.Xml;
@@ -96,25 +97,25 @@ namespace Sims2Tools.DBPF.Neighbourhood.SWAF
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateInstElement(parent, NAME, "simId");
+            XmlElement element = XmlHelper.CreateInstElement(parent, NAME, "simId", InstanceID);
 
             // element.SetAttribute("version", Version.ToString());
             element.SetAttribute("maxWants", MaxWants.ToString());
             element.SetAttribute("maxFears", MaxFears.ToString());
 
-            XmlElement eleLtw = CreateElement(element, "ltw");
+            XmlElement eleLtw = XmlHelper.CreateElement(element, "ltw");
             foreach (SwafItem ltw in LifetimeWants)
             {
                 ltw.AddXml(eleLtw);
             }
 
-            XmlElement eleWants = CreateElement(element, "wants");
+            XmlElement eleWants = XmlHelper.CreateElement(element, "wants");
             foreach (SwafItem want in Wants)
             {
                 want.AddXml(eleWants);
             }
 
-            XmlElement eleFears = CreateElement(element, "fears");
+            XmlElement eleFears = XmlHelper.CreateElement(element, "fears");
             foreach (SwafItem fear in Fears)
             {
                 fear.AddXml(eleFears);

@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -102,11 +102,11 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
 
         public XmlElement AddXml(XmlElement parent, bool lots, bool families, bool sims)
         {
-            XmlElement element = CreateInstElement(parent, NAME);
+            XmlElement element = XmlHelper.CreateInstElement(parent, NAME, InstanceID);
 
             element.SetAttribute("zonename", ZoneName);
 
-            XmlElement eleGlobals = CreateElement(element, "global");
+            XmlElement eleGlobals = XmlHelper.CreateElement(element, "global");
             foreach (NgbhGenericSlot item in GlobalSlots)
             {
                 item.AddXml(eleGlobals);
@@ -114,7 +114,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
 
             if (lots)
             {
-                XmlElement eleLots = CreateElement(element, "lots");
+                XmlElement eleLots = XmlHelper.CreateElement(element, "lots");
                 foreach (NgbhInstanceSlot item in LotSlots)
                 {
                     item.AddXml(eleLots, "lotId");
@@ -123,7 +123,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
 
             if (families)
             {
-                XmlElement eleFamilies = CreateElement(element, "families");
+                XmlElement eleFamilies = XmlHelper.CreateElement(element, "families");
                 foreach (NgbhInstanceSlot item in FamilySlots)
                 {
                     item.AddXml(eleFamilies, "familyId");
@@ -132,7 +132,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
 
             if (sims)
             {
-                XmlElement eleSims = CreateElement(element, "sims");
+                XmlElement eleSims = XmlHelper.CreateElement(element, "sims");
                 foreach (NgbhInstanceSlot item in SimSlots)
                 {
                     item.AddXml(eleSims, "simId");

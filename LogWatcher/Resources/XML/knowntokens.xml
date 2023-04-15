@@ -1,5 +1,532 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <tokens>
+  <!-- Sims 2 Traits Project -->
+  <token>
+    <value>0x0087BB04</value>
+    <name>Trait - Absent-Minded</name>
+  </token>
+  <token>
+    <value>0x0087BB05</value>
+    <name>Trait - Adventurous</name>
+  </token>
+  <token>
+    <value>0x0087BB06</value>
+    <name>Trait - Ambitious</name>
+  </token>
+  <token>
+    <value>0x0087BB07</value>
+    <name>Trait - Angler</name>
+  </token>
+  <token>
+    <value>0x0087BB08</value>
+    <name>Trait - Animal Lover</name>
+  </token>
+  <token>
+    <value>0x0087BB09</value>
+    <name>Trait - Artistic</name>
+  </token>
+  <token>
+    <value>0x0087BB0A</value>
+    <name>Trait - Athletic</name>
+  </token>
+  <token>
+    <value>0x0087BB0B</value>
+    <name>Trait - Avant Garde</name>
+  </token>
+  <token>
+    <value>0x0087BB0C</value>
+    <name>Trait - Bookworm</name>
+  </token>
+  <token>
+    <value>0x0087BB0D</value>
+    <name>Trait - Born Salesperson</name>
+  </token>
+  <token>
+    <value>0x0087BB0E</value>
+    <name>Trait - Bot Fan</name>
+  </token>
+  <token>
+    <value>0x0087BB0F</value>
+    <name>Trait - Brave</name>
+  </token>
+  <token>
+    <value>0x0087BB10</value>
+    <name>Trait - Brooding</name>
+  </token>
+  <token>
+    <value>0x0087BB11</value>
+    <name>Trait - Can&apos;t Stand Art</name>
+  </token>
+  <token>
+    <value>0x0087BB12</value>
+    <name>Trait - Cat Person</name>
+  </token>
+  <token>
+    <value>0x0087BB13</value>
+    <name>Trait - Charismatic</name>
+  </token>
+  <token>
+    <value>0x0087BB14</value>
+    <name>Trait - Childish</name>
+  </token>
+  <token>
+    <value>0x0087BB15</value>
+    <name>Trait - Clumsy</name>
+  </token>
+  <token>
+    <value>0x0087BB16</value>
+    <name>Trait - Commitment Issues</name>
+  </token>
+  <token>
+    <value>0x0087BB17</value>
+    <name>Trait - Computer Whiz</name>
+  </token>
+  <token>
+    <value>0x0087BB18</value>
+    <name>Trait - Couch Potato</name>
+  </token>
+  <token>
+    <value>0x0087BB19</value>
+    <name>Trait - Coward</name>
+  </token>
+  <token>
+    <value>0x0087BB1A</value>
+    <name>Trait - Daredevil</name>
+  </token>
+  <token>
+    <value>0x0087BB1B</value>
+    <name>Trait - Disciplined</name>
+  </token>
+  <token>
+    <value>0x0087BB1C</value>
+    <name>Trait - Dislikes Children</name>
+  </token>
+  <token>
+    <value>0x0087BB1D</value>
+    <name>Trait - Diva</name>
+  </token>
+  <token>
+    <value>0x0087BB1E</value>
+    <name>Trait - Dog Person</name>
+  </token>
+  <token>
+    <value>0x0087BB1F</value>
+    <name>Trait - Dramatic</name>
+  </token>
+  <token>
+    <value>0x0087BB20</value>
+    <name>Trait - Easily Impressed</name>
+  </token>
+  <token>
+    <value>0x0087BB21</value>
+    <name>Trait - Eccentric</name>
+  </token>
+  <token>
+    <value>0x0087BB22</value>
+    <name>Trait - Eco-Friendly</name>
+  </token>
+  <token>
+    <value>0x0087BB23</value>
+    <name>Trait - Equestrian</name>
+  </token>
+  <token>
+    <value>0x0087BB24</value>
+    <name>Trait - Evil</name>
+  </token>
+  <token>
+    <value>0x0087BB25</value>
+    <name>Trait - Excitable</name>
+  </token>
+  <token>
+    <value>0x0087BB26</value>
+    <name>Trait - Family-Oriented</name>
+  </token>
+  <token>
+    <value>0x0087BB27</value>
+    <name>Trait - Flirty</name>
+  </token>
+  <token>
+    <value>0x0087BB28</value>
+    <name>Trait - Friendly</name>
+  </token>
+  <token>
+    <value>0x0087BB29</value>
+    <name>Trait - Frugal</name>
+  </token>
+  <token>
+    <value>0x0087BB2A</value>
+    <name>Trait - Gatherer</name>
+  </token>
+  <token>
+    <value>0x0087BB2B</value>
+    <name>Trait - Genius</name>
+  </token>
+  <token>
+    <value>0x0087BB2C</value>
+    <name>Trait - Good</name>
+  </token>
+  <token>
+    <value>0x0087BB2D</value>
+    <name>Trait - Good Sense of Humor</name>
+  </token>
+  <token>
+    <value>0x0087BB2E</value>
+    <name>Trait - Great Kisser</name>
+  </token>
+  <token>
+    <value>0x0087BB2F</value>
+    <name>Trait - Green Thumb</name>
+  </token>
+  <token>
+    <value>0x0087BB30</value>
+    <name>Trait - Grumpy</name>
+  </token>
+  <token>
+    <value>0x0087BB31</value>
+    <name>Trait - Handy</name>
+  </token>
+  <token>
+    <value>0x0087BB32</value>
+    <name>Trait - Hates the Outdoors</name>
+  </token>
+  <token>
+    <value>0x0087BB33</value>
+    <name>Trait - Heavy Sleeper</name>
+  </token>
+  <token>
+    <value>0x0087BB34</value>
+    <name>Trait - Hopeless Romantic</name>
+  </token>
+  <token>
+    <value>0x0087BB35</value>
+    <name>Trait - Hot-Headed</name>
+  </token>
+  <token>
+    <value>0x0087BB36</value>
+    <name>Trait - Hydrophobic</name>
+  </token>
+  <token>
+    <value>0x0087BB37</value>
+    <name>Trait - Inappropriate</name>
+  </token>
+  <token>
+    <value>0x0087BB38</value>
+    <name>Trait - Insane</name>
+  </token>
+  <token>
+    <value>0x0087BB39</value>
+    <name>Trait - Irresistible</name>
+  </token>
+  <token>
+    <value>0x0087BB3A</value>
+    <name>Trait - Kleptomaniac</name>
+  </token>
+  <token>
+    <value>0x0087BB3B</value>
+    <name>Trait - Light Sleeper</name>
+  </token>
+  <token>
+    <value>0x0087BB3C</value>
+    <name>Trait - Loner</name>
+  </token>
+  <token>
+    <value>0x0087BB3D</value>
+    <name>Trait - Loser</name>
+  </token>
+  <token>
+    <value>0x0087BB3E</value>
+    <name>Trait - Loves the Cold</name>
+  </token>
+  <token>
+    <value>0x0087BB3F</value>
+    <name>Trait - Loves the Heat</name>
+  </token>
+  <token>
+    <value>0x0087BB40</value>
+    <name>Trait - Loves the Outdoors</name>
+  </token>
+  <token>
+    <value>0x0087BB41</value>
+    <name>Trait - Loves To Swim</name>
+  </token>
+  <token>
+    <value>0x0087BB42</value>
+    <name>Trait - Lucky</name>
+  </token>
+  <token>
+    <value>0x0087BB43</value>
+    <name>Trait - Mean Spirited</name>
+  </token>
+  <token>
+    <value>0x0087BB44</value>
+    <name>Trait - Mooch</name>
+  </token>
+  <token>
+    <value>0x0087BB45</value>
+    <name>Trait - Natural Born Performer</name>
+  </token>
+  <token>
+    <value>0x0087BB46</value>
+    <name>Trait - Natural Cook</name>
+  </token>
+  <token>
+    <value>0x0087BB47</value>
+    <name>Trait - Neat</name>
+  </token>
+  <token>
+    <value>0x0087BB48</value>
+    <name>Trait - Neurotic</name>
+  </token>
+  <token>
+    <value>0x0087BB49</value>
+    <name>Trait - Never Nude</name>
+  </token>
+  <token>
+    <value>0x0087BB4A</value>
+    <name>Trait - Night Owl</name>
+  </token>
+  <token>
+    <value>0x0087BB4B</value>
+    <name>Trait - No Sense of Humor</name>
+  </token>
+  <token>
+    <value>0x0087BB4C</value>
+    <name>Trait - Nurturing</name>
+  </token>
+  <token>
+    <value>0x0087BB4D</value>
+    <name>Trait - Over-Emotional</name>
+  </token>
+  <token>
+    <value>0x0087BB4E</value>
+    <name>Trait - Party Animal</name>
+  </token>
+  <token>
+    <value>0x0087BB4F</value>
+    <name>Trait - Perceptive</name>
+  </token>
+  <token>
+    <value>0x0087BB50</value>
+    <name>Trait - Perfectionist</name>
+  </token>
+  <token>
+    <value>0x0087BB51</value>
+    <name>Trait - Photographer&apos;s Eye</name>
+  </token>
+  <token>
+    <value>0x0087BB52</value>
+    <name>Trait - Proper</name>
+  </token>
+  <token>
+    <value>0x0087BB53</value>
+    <name>Trait - Rebellious</name>
+  </token>
+  <token>
+    <value>0x0087BB54</value>
+    <name>Trait - Sailor</name>
+  </token>
+  <token>
+    <value>0x0087BB55</value>
+    <name>Trait - Savvy Sculptor</name>
+  </token>
+  <token>
+    <value>0x0087BB56</value>
+    <name>Trait - Schmoozer</name>
+  </token>
+  <token>
+    <value>0x0087BB57</value>
+    <name>Trait - Shy</name>
+  </token>
+  <token>
+    <value>0x0087BB58</value>
+    <name>Trait - Slob</name>
+  </token>
+  <token>
+    <value>0x0087BB59</value>
+    <name>Trait - Snob</name>
+  </token>
+  <token>
+    <value>0x0087BB5A</value>
+    <name>Trait - Social Butterfly</name>
+  </token>
+  <token>
+    <value>0x0087BB5B</value>
+    <name>Trait - Socially Awkward</name>
+  </token>
+  <token>
+    <value>0x0087BB5C</value>
+    <name>Trait - Star Quality</name>
+  </token>
+  <token>
+    <value>0x0087BB5D</value>
+    <name>Trait - Supernatural Fan</name>
+  </token>
+  <token>
+    <value>0x0087BB5E</value>
+    <name>Trait - Supernatural Skeptic</name>
+  </token>
+  <token>
+    <value>0x0087BB5F</value>
+    <name>Trait - Technophobe</name>
+  </token>
+  <token>
+    <value>0x0087BB60</value>
+    <name>Trait - Unflirty</name>
+  </token>
+  <token>
+    <value>0x0087BB61</value>
+    <name>Trait - Unlucky</name>
+  </token>
+  <token>
+    <value>0x0087BB62</value>
+    <name>Trait - Unstable</name>
+  </token>
+  <token>
+    <value>0x0087BB63</value>
+    <name>Trait - Vegetarian</name>
+  </token>
+  <token>
+    <value>0x0087BB64</value>
+    <name>Trait - Vehicle Enthusiast</name>
+  </token>
+  <token>
+    <value>0x0087BB65</value>
+    <name>Trait - Virtuoso</name>
+  </token>
+  <token>
+    <value>0x0087BB66</value>
+    <name>Trait - Workaholic</name>
+  </token>
+
+  <!-- Medieval Caste Traits -->
+  <token>
+    <value>0x08C176BF</value>
+    <name>Trait - Caste - Orphan</name>
+  </token>
+  <token>
+    <value>0x21B775F7</value>
+    <name>Trait - Caste - Knight</name>
+  </token>
+  <token>
+    <value>0x3A718D4F</value>
+    <name>Trait - Caste - Outcast</name>
+  </token>
+  <token>
+    <value>0x63636D3F</value>
+    <name>Trait - Caste - Bourgeoisie</name>
+  </token>
+  <token>
+    <value>0x6D203547</value>
+    <name>Trait - Caste - Governess/Tutor</name>
+  </token>
+  <token>
+    <value>0xB827F8E8</value>
+    <name>Trait - Caste - Yeoman</name>
+  </token>
+  <token>
+    <value>0xEB834EC2</value>
+    <name>Trait - Caste - Servant</name>
+  </token>
+
+  <!-- Sims 2 Colour Traits Project - https://episims.tumblr.com/post/693405410225520640/a-little-something-ive-been-planning-to-do-for-a -->
+  <token>
+    <value>0x6E4E1001</value>
+    <name>Trait - Colour - Black</name>
+  </token>
+  <token>
+    <value>0x6E4E1002</value>
+    <name>Trait - Colour - Blue</name>
+  </token>
+  <token>
+    <value>0x6E4E1003</value>
+    <name>Trait - Colour - Brown</name>
+  </token>
+  <token>
+    <value>0x6E4E1004</value>
+    <name>Trait - Colour - Green</name>
+  </token>
+  <token>
+    <value>0x6E4E1005</value>
+    <name>Trait - Colour - Grey</name>
+  </token>
+  <token>
+    <value>0x6E4E1006</value>
+    <name>Trait - Colour - Orange</name>
+  </token>
+  <token>
+    <value>0x6E4E1007</value>
+    <name>Trait - Colour - Pink</name>
+  </token>
+  <token>
+    <value>0x6E4E1008</value>
+    <name>Trait - Colour - Purple</name>
+  </token>
+  <token>
+    <value>0x6E4E1009</value>
+    <name>Trait - Colour - Red</name>
+  </token>
+  <token>
+    <value>0x6E4E100A</value>
+    <name>Trait - Colour - Turquoise</name>
+  </token>
+  <token>
+    <value>0x6E4E100B</value>
+    <name>Trait - Colour - White</name>
+  </token>
+  <token>
+    <value>0x6E4E100C</value>
+    <name>Trait - Colour - Yellow</name>
+  </token>
+  <token>
+    <value>0x6E4E100D</value>
+    <name>Trait - Colour - Dislike Black</name>
+  </token>
+  <token>
+    <value>0x6E4E100E</value>
+    <name>Trait - Colour - Dislike Blue</name>
+  </token>
+  <token>
+    <value>0x6E4E100F</value>
+    <name>Trait - Colour - Dislike Brown</name>
+  </token>
+  <token>
+    <value>0x6E4E1010</value>
+    <name>Trait - Colour - Dislike Green</name>
+  </token>
+  <token>
+    <value>0x6E4E1011</value>
+    <name>Trait - Colour - Dislike Grey</name>
+  </token>
+  <token>
+    <value>0x6E4E1012</value>
+    <name>Trait - Colour - Dislike Orange</name>
+  </token>
+  <token>
+    <value>0x6E4E1013</value>
+    <name>Trait - Colour - Dislike Pink</name>
+  </token>
+  <token>
+    <value>0x6E4E1014</value>
+    <name>Trait - Colour - Dislike Purple</name>
+  </token>
+  <token>
+    <value>0x6E4E1015</value>
+    <name>Trait - Colour - Dislike Red</name>
+  </token>
+  <token>
+    <value>0x6E4E1016</value>
+    <name>Trait - Colour - Dislike Turquoise</name>
+  </token>
+  <token>
+    <value>0x6E4E1017</value>
+    <name>Trait - Colour - Dislike White</name>
+  </token>
+  <token>
+    <value>0x6E4E1018</value>
+    <name>Trait - Colour - Dislike Yellow</name>
+  </token>
+  
+  <!-- PickNMix Memories and Tokens -->
   <token>
     <value>0x0089AD0A</value>
     <name>Memory - Abortion</name>
@@ -57,9 +584,75 @@
     <name>Driving Licence - Card</name>
   </token>
   <token>
+    <value>0x0089AD9F</value>
+    <name>Memory - Driving Licence - Passed Exam</name>
+  </token>
+  <token>
+    <value>0x0089ADA0</value>
+    <name>Memory - Driving Licence - Failed Exam</name>
+  </token>
+  <token>
+    <value>0x0089ADA1</value>
+    <name>Memory - Driving Licence - Passed Test</name>
+  </token>
+  <token>
+    <value>0x0089ADA2</value>
+    <name>Memory - Driving Licence - Failed Test</name>
+  </token>
+  <token>
+    <value>0x0089ADA9</value>
+    <name>Token - Pubes Overlay</name>
+  </token>
+  <token>
+    <value>0x0089ADB1</value>
+    <name>Memory - Toddler - Never Learnt To Walk</name>
+  </token>
+  <token>
+    <value>0x0089ADB2</value>
+    <name>Memory - Toddler - Never Learnt To Talk</name>
+  </token>
+  <token>
+    <value>0x0089ADB3</value>
+    <name>Memory - Toddler - Never Learnt Nursery Rhyme</name>
+  </token>
+  <token>
+    <value>0x0089ADB4</value>
+    <name>Memory - Toddler - Never Potty Trained</name>
+  </token>
+  <token>
+    <value>0x0089ADB6</value>
+    <name>Memory - Toddler - Be Taught Nursery Rhyme</name>
+  </token>
+  <token>
+    <value>0x0089ADC3</value>
+    <name>Token - Shower Outfit Selector</name>
+  </token>
+  <token>
+    <value>0x0089ADC7</value>
+    <name>Token - Body Hair Overlay</name>
+  </token>
+  <token>
+    <value>0x0089ADCC</value>
+    <name>Token - Lengua Materna Overlay</name>
+  </token>
+  <token>
+    <value>0x0089ADD2</value>
+    <name>Memory - Cherry Popping - Mine</name>
+  </token>
+  <token>
+    <value>0x0089ADD3</value>
+    <name>Memory - Cherry Popping - Theirs</name>
+  </token>
+  <token>
+    <value>0x0089ADD4</value>
+    <name>Memory - Cherry Popping - Double</name>
+  </token>
+  <token>
     <value>0x008F6D14</value>
     <name>Coaster - Token - Details</name>
   </token>
+  
+  <!-- CBOYs Tokens -->
   <token>
     <value>0xEC191A1B</value>
     <name>Accessory - Cock</name>

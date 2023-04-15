@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -134,9 +134,9 @@ namespace Sims2Tools
 
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.TextBox textTitle;
+        private System.Windows.Forms.TextBox textDescription;
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label lblDesc;
-        private System.Windows.Forms.TextBox textDescription;
     }
 }

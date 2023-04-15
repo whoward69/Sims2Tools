@@ -1,0 +1,1471 @@
+<?xml version="1.0"?>
+<bsok>
+	<genre name="mfBSOK Fantasy">
+		<style name="Steampunk">
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis original (AF = 34B-34)" icon="EA-SP" creator="(Maxis)">
+					<role name="All" code="0x0000BB1C"/>
+					<role name="Serf" code="0x0000BB1B"/>
+					<role name="Serf / Lower Class" code="0x0000BB1A"/>
+					<role name="Merchant" code="0x0000BB19"/>
+					<role name="Noble" code="0x0000BB18"/>
+					<role name="Royal / Upper Class" code="0x0000BB17"/>
+					<role name="Clergy / Spiritual" code="0x0000BB16"/>
+					<role name="Knight / Protector" code="0x0000BB15"/>
+					<role name="Brothel" code="0x0000BB14"/>
+					<role name="Pirate" code="0x0000BB13"/>
+					<role name="Wizard" code="0x0000BB12"/>
+					<role name="Bohemian" code="0x0000BB11"/>
+				</shape>
+			</group>
+			<group name="Curvy" gender="female">
+				<shape name="Faerie Girl" icon="FE-SP" creator="Warlokk">
+					<role name="All" code="0x0000BA86"/>
+					<role name="Serf" code="0x0000BA85"/>
+					<role name="Serf / Lower Class" code="0x0000BA84"/>
+					<role name="Merchant" code="0x0000BA83"/>
+					<role name="Noble" code="0x0000BA82"/>
+					<role name="Royal / Upper Class" code="0x0000BA81"/>
+					<role name="Clergy / Spiritual" code="0x0000BA80"/>
+					<role name="Knight / Protector" code="0x0000BA7F"/>
+					<role name="Brothel" code="0x0000BA7E"/>
+					<role name="Pirate" code="0x0000BA7D"/>
+					<role name="Wizard" code="0x0000BA7C"/>
+					<role name="Bohemian" code="0x0000BA7B"/>
+				</shape>
+				<shape name="Androgyny" icon="AY-SP" creator="Gothplague (+ Aquilegia Edit available)">
+					<role name="All" code="0x0000BA54"/>
+					<role name="Serf" code="0x0000BA53"/>
+					<role name="Serf / Lower Class" code="0x0000BA52"/>
+					<role name="Merchant" code="0x0000BA51"/>
+					<role name="Noble" code="0x0000BA50"/>
+					<role name="Royal / Upper Class" code="0x0000BA4F"/>
+					<role name="Clergy / Spiritual" code="0x0000BA4E"/>
+					<role name="Knight / Protector" code="0x0000BA4D"/>
+					<role name="Brothel" code="0x0000BA4C"/>
+					<role name="Pirate" code="0x0000BA4B"/>
+					<role name="Wizard" code="0x0000BA4A"/>
+					<role name="Bohemian" code="0x0000BA49"/>
+				</shape>
+				<shape name="Fashion Model" icon="FM-SP" creator="Warlokk">
+					<role name="All" code="0x0000BA3B"/>
+					<role name="Serf" code="0x0000BA3A"/>
+					<role name="Serf / Lower Class" code="0x0000BA39"/>
+					<role name="Merchant" code="0x0000BA38"/>
+					<role name="Noble" code="0x0000BA37"/>
+					<role name="Royal / Upper Class" code="0x0000BA36"/>
+					<role name="Clergy / Spiritual" code="0x0000BA35"/>
+					<role name="Knight / Protector" code="0x0000BA34"/>
+					<role name="Brothel" code="0x0000BA33"/>
+					<role name="Pirate" code="0x0000BA32"/>
+					<role name="Wizard" code="0x0000BA31"/>
+					<role name="Bohemian" code="0x0000BA30"/>
+				</shape>
+				<shape name="FitChick" icon="FC-SP" creator="Poppeboy">
+					<role name="All" code="0x0000BA22"/>
+					<role name="Serf" code="0x0000BA21"/>
+					<role name="Serf / Lower Class" code="0x0000BA20"/>
+					<role name="Merchant" code="0x0000BA1F"/>
+					<role name="Noble" code="0x0000BA1E"/>
+					<role name="Royal / Upper Class" code="0x0000BA1D"/>
+					<role name="Clergy / Spiritual" code="0x0000BA1C"/>
+					<role name="Knight / Protector" code="0x0000BA1B"/>
+					<role name="Brothel" code="0x0000BA1A"/>
+					<role name="Pirate" code="0x0000BA19"/>
+					<role name="Wizard" code="0x0000BA18"/>
+					<role name="Bohemian" code="0x0000BA17"/>
+				</shape>
+				<shape name="Well Rounded Sim (WRS)" icon="WR-SP" creator="Dr. Pixel">
+					<role name="All" code="0x0000B9F0"/>
+					<role name="Serf" code="0x0000B9EF"/>
+					<role name="Serf / Lower Class" code="0x0000B9EE"/>
+					<role name="Merchant" code="0x0000B9ED"/>
+					<role name="Noble" code="0x0000B9EC"/>
+					<role name="Royal / Upper Class" code="0x0000B9EB"/>
+					<role name="Clergy / Spiritual" code="0x0000B9EA"/>
+					<role name="Knight / Protector" code="0x0000B9E9"/>
+					<role name="Brothel" code="0x0000B9E8"/>
+					<role name="Pirate" code="0x0000B9E7"/>
+					<role name="Wizard" code="0x0000B9E6"/>
+					<role name="Bohemian" code="0x0000B9E5"/>
+				</shape>
+				<shape name="Sussi" icon="SS-SP" creator="Sussi">
+					<role name="All" code="0x0000B9BE"/>
+					<role name="Serf" code="0x0000B9BD"/>
+					<role name="Serf / Lower Class" code="0x0000B9BC"/>
+					<role name="Merchant" code="0x0000B9BB"/>
+					<role name="Noble" code="0x0000B9BA"/>
+					<role name="Royal / Upper Class" code="0x0000B9B9"/>
+					<role name="Clergy / Spiritual" code="0x0000B9B8"/>
+					<role name="Knight / Protector" code="0x0000B9B7"/>
+					<role name="Brothel" code="0x0000B9B6"/>
+					<role name="Pirate" code="0x0000B9B5"/>
+					<role name="Wizard" code="0x0000B9B4"/>
+					<role name="Bohemian" code="0x0000B9B3"/>
+				</shape>
+				<shape name="Rio" icon="RO-SP" creator="Warlokk">
+					<role name="All" code="0x0000B98C"/>
+					<role name="Serf" code="0x0000B98B"/>
+					<role name="Serf / Lower Class" code="0x0000B98A"/>
+					<role name="Merchant" code="0x0000B989"/>
+					<role name="Noble" code="0x0000B988"/>
+					<role name="Royal / Upper Class" code="0x0000B987"/>
+					<role name="Clergy / Spiritual" code="0x0000B986"/>
+					<role name="Knight / Protector" code="0x0000B985"/>
+					<role name="Brothel" code="0x0000B984"/>
+					<role name="Pirate" code="0x0000B983"/>
+					<role name="Wizard" code="0x0000B982"/>
+					<role name="Bohemian" code="0x0000B981"/>
+				</shape>
+				<shape name="Voluptuous Gal (VG)" icon="VO-SP" creator="Warlokk">
+					<role name="All" code="0x0000B95A"/>
+					<role name="Serf" code="0x0000B959"/>
+					<role name="Serf / Lower Class" code="0x0000B958"/>
+					<role name="Merchant" code="0x0000B957"/>
+					<role name="Noble" code="0x0000B956"/>
+					<role name="Royal / Upper Class" code="0x0000B955"/>
+					<role name="Clergy / Spiritual" code="0x0000B954"/>
+					<role name="Knight / Protector" code="0x0000B953"/>
+					<role name="Brothel" code="0x0000B952"/>
+					<role name="Pirate" code="0x0000B951"/>
+					<role name="Wizard" code="0x0000B950"/>
+					<role name="Bohemian" code="0x0000B94F"/>
+				</shape>
+				<shape name="Classic Pinup (CPU)" icon="CP-SP" creator="Warlokk">
+					<role name="All" code="0x0000B928"/>
+					<role name="Serf" code="0x0000B927"/>
+					<role name="Serf / Lower Class" code="0x0000B926"/>
+					<role name="Merchant" code="0x0000B925"/>
+					<role name="Noble" code="0x0000B924"/>
+					<role name="Royal / Upper Class" code="0x0000B923"/>
+					<role name="Clergy / Spiritual" code="0x0000B922"/>
+					<role name="Knight / Protector" code="0x0000B921"/>
+					<role name="Brothel" code="0x0000B920"/>
+					<role name="Pirate" code="0x0000B91F"/>
+					<role name="Wizard" code="0x0000B91E"/>
+					<role name="Bohemian" code="0x0000B91D"/>
+				</shape>
+				<shape name="Renaissance Gal (RenGal)" icon="RG-SP" creator="Warlokk">
+					<role name="All" code="0x0000B8F6"/>
+					<role name="Serf" code="0x0000B8F5"/>
+					<role name="Serf / Lower Class" code="0x0000B8F4"/>
+					<role name="Merchant" code="0x0000B8F3"/>
+					<role name="Noble" code="0x0000B8F2"/>
+					<role name="Royal / Upper Class" code="0x0000B8F1"/>
+					<role name="Clergy / Spiritual" code="0x0000B8F0"/>
+					<role name="Knight / Protector" code="0x0000B8EF"/>
+					<role name="Brothel" code="0x0000B8EE"/>
+					<role name="Pirate" code="0x0000B8ED"/>
+					<role name="Wizard" code="0x0000B8EC"/>
+					<role name="Bohemian" code="0x0000B8EB"/>
+				</shape>
+				<shape name="Lady Apple" icon="(apple)-SP" creator="Spider+rugs">
+					<role name="All" code="0x0000B8C4"/>
+					<role name="Serf" code="0x0000B8C3"/>
+					<role name="Serf / Lower Class" code="0x0000B8C2"/>
+					<role name="Merchant" code="0x0000B8C1"/>
+					<role name="Noble" code="0x0000B8C0"/>
+					<role name="Royal / Upper Class" code="0x0000B8BF"/>
+					<role name="Clergy / Spiritual" code="0x0000B8BE"/>
+					<role name="Knight / Protector" code="0x0000B8BD"/>
+					<role name="Brothel" code="0x0000B8BC"/>
+					<role name="Pirate" code="0x0000B8BB"/>
+					<role name="Wizard" code="0x0000B8BA"/>
+					<role name="Bohemian" code="0x0000B8B9"/>
+				</shape>
+				<shape name="Momma Lisa" icon="ML-SP" creator="FrannySims">
+					<role name="All" code="0x0000B892"/>
+					<role name="Serf" code="0x0000B891"/>
+					<role name="Serf / Lower Class" code="0x0000B890"/>
+					<role name="Merchant" code="0x0000B88F"/>
+					<role name="Noble" code="0x0000B88E"/>
+					<role name="Royal / Upper Class" code="0x0000B88D"/>
+					<role name="Clergy / Spiritual" code="0x0000B88C"/>
+					<role name="Knight / Protector" code="0x0000B88B"/>
+					<role name="Brothel" code="0x0000B88A"/>
+					<role name="Pirate" code="0x0000B889"/>
+					<role name="Wizard" code="0x0000B888"/>
+					<role name="Bohemian" code="0x0000B887"/>
+				</shape>
+			</group>
+			<group name="Brawny" gender="female">
+				<shape name="Athletic Girl (AG)" icon="AT-SP" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000B798"/>
+					<role name="Serf" code="0x0000B797"/>
+					<role name="Serf / Lower Class" code="0x0000B796"/>
+					<role name="Merchant" code="0x0000B795"/>
+					<role name="Noble" code="0x0000B794"/>
+					<role name="Royal / Upper Class" code="0x0000B793"/>
+					<role name="Clergy / Spiritual" code="0x0000B792"/>
+					<role name="Knight / Protector" code="0x0000B791"/>
+					<role name="Brothel" code="0x0000B790"/>
+					<role name="Pirate" code="0x0000B78F"/>
+					<role name="Wizard" code="0x0000B78E"/>
+					<role name="Bohemian" code="0x0000B78D"/>
+				</shape>
+				<shape name="BodyBuilder Girl (BBG)" icon="BB-SP" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000B766"/>
+					<role name="Serf" code="0x0000B765"/>
+					<role name="Serf / Lower Class" code="0x0000B764"/>
+					<role name="Merchant" code="0x0000B763"/>
+					<role name="Noble" code="0x0000B762"/>
+					<role name="Royal / Upper Class" code="0x0000B761"/>
+					<role name="Clergy / Spiritual" code="0x0000B760"/>
+					<role name="Knight / Protector" code="0x0000B75F"/>
+					<role name="Brothel" code="0x0000B75E"/>
+					<role name="Pirate" code="0x0000B75D"/>
+					<role name="Wizard" code="0x0000B75C"/>
+					<role name="Bohemian" code="0x0000B75B"/>
+				</shape>
+				<shape name="Amazonian" icon="AZ-SP" creator="Ocelotecatl?">
+					<role name="All" code="0x0000B734"/>
+					<role name="Serf" code="0x0000B733"/>
+					<role name="Serf / Lower Class" code="0x0000B732"/>
+					<role name="Merchant" code="0x0000B731"/>
+					<role name="Noble" code="0x0000B730"/>
+					<role name="Royal / Upper Class" code="0x0000B72F"/>
+					<role name="Clergy / Spiritual" code="0x0000B72E"/>
+					<role name="Knight / Protector" code="0x0000B72D"/>
+					<role name="Brothel" code="0x0000B72C"/>
+					<role name="Pirate" code="0x0000B72B"/>
+					<role name="Wizard" code="0x0000B72A"/>
+					<role name="Bohemian" code="0x0000B729"/>
+				</shape>
+				<shape name="Death by Snu-Snu" icon="SN-SP" creator="Ocelotecatl?">
+					<role name="All" code="0x0000B702"/>
+					<role name="Serf" code="0x0000B701"/>
+					<role name="Serf / Lower Class" code="0x0000B700"/>
+					<role name="Merchant" code="0x0000B6FF"/>
+					<role name="Noble" code="0x0000B6FE"/>
+					<role name="Royal / Upper Class" code="0x0000B6FD"/>
+					<role name="Clergy / Spiritual" code="0x0000B6FC"/>
+					<role name="Knight / Protector" code="0x0000B6FB"/>
+					<role name="Brothel" code="0x0000B6FA"/>
+					<role name="Pirate" code="0x0000B6F9"/>
+					<role name="Wizard" code="0x0000B6F8"/>
+					<role name="Bohemian" code="0x0000B6F7"/>
+				</shape>
+			</group>
+			<group name="All" gender="male">
+				<shape name="Harem Dude" icon="HD-SP" creator="G-Knee">
+					<role name="All" code="0x0000B5D6"/>
+					<role name="Serf" code="0x0000B5D5"/>
+					<role name="Serf / Lower Class" code="0x0000B5D4"/>
+					<role name="Merchant" code="0x0000B5D3"/>
+					<role name="Noble" code="0x0000B5D2"/>
+					<role name="Royal / Upper Class" code="0x0000B5D1"/>
+					<role name="Clergy / Spiritual" code="0x0000B5D0"/>
+					<role name="Knight / Protector" code="0x0000B5CF"/>
+					<role name="Brothel" code="0x0000B5CE"/>
+					<role name="Pirate" code="0x0000B5CD"/>
+					<role name="Wizard" code="0x0000B5CC"/>
+					<role name="Bohemian" code="0x0000B5CB"/>
+				</shape>
+				<shape name="Androgyny" icon="AY-SP" creator="Gothplague (+ Aquilegia Edit available)">
+					<role name="All" code="0x0000B5A4"/>
+					<role name="Serf" code="0x0000B5A3"/>
+					<role name="Serf / Lower Class" code="0x0000B5A2"/>
+					<role name="Merchant" code="0x0000B5A1"/>
+					<role name="Noble" code="0x0000B5A0"/>
+					<role name="Royal / Upper Class" code="0x0000B59F"/>
+					<role name="Clergy / Spiritual" code="0x0000B59E"/>
+					<role name="Knight / Protector" code="0x0000B59D"/>
+					<role name="Brothel" code="0x0000B59C"/>
+					<role name="Pirate" code="0x0000B59B"/>
+					<role name="Wizard" code="0x0000B59A"/>
+					<role name="Bohemian" code="0x0000B599"/>
+				</shape>
+				<shape name="Runner" icon="RN-SP" creator="Jaccirocker">
+					<role name="All" code="0x0000B58B"/>
+					<role name="Serf" code="0x0000B58A"/>
+					<role name="Serf / Lower Class" code="0x0000B589"/>
+					<role name="Merchant" code="0x0000B588"/>
+					<role name="Noble" code="0x0000B587"/>
+					<role name="Royal / Upper Class" code="0x0000B586"/>
+					<role name="Clergy / Spiritual" code="0x0000B585"/>
+					<role name="Knight / Protector" code="0x0000B584"/>
+					<role name="Brothel" code="0x0000B583"/>
+					<role name="Pirate" code="0x0000B582"/>
+					<role name="Wizard" code="0x0000B581"/>
+					<role name="Bohemian" code="0x0000B580"/>
+				</shape>
+				<shape name="Lean BodyBuilder (LBB)" icon="LB-SP" creator="SynapticSim">
+					<role name="All" code="0x0000B572"/>
+					<role name="Serf" code="0x0000B571"/>
+					<role name="Serf / Lower Class" code="0x0000B570"/>
+					<role name="Merchant" code="0x0000B56F"/>
+					<role name="Noble" code="0x0000B56E"/>
+					<role name="Royal / Upper Class" code="0x0000B56D"/>
+					<role name="Clergy / Spiritual" code="0x0000B56C"/>
+					<role name="Knight / Protector" code="0x0000B56B"/>
+					<role name="Brothel" code="0x0000B56A"/>
+					<role name="Pirate" code="0x0000B569"/>
+					<role name="Wizard" code="0x0000B568"/>
+					<role name="Bohemian" code="0x0000B567"/>
+				</shape>
+				<shape name="Athletic" icon="AT-SP" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000B540"/>
+					<role name="Serf" code="0x0000B53F"/>
+					<role name="Serf / Lower Class" code="0x0000B53E"/>
+					<role name="Merchant" code="0x0000B53D"/>
+					<role name="Noble" code="0x0000B53C"/>
+					<role name="Royal / Upper Class" code="0x0000B53B"/>
+					<role name="Clergy / Spiritual" code="0x0000B53A"/>
+					<role name="Knight / Protector" code="0x0000B539"/>
+					<role name="Brothel" code="0x0000B538"/>
+					<role name="Pirate" code="0x0000B537"/>
+					<role name="Wizard" code="0x0000B536"/>
+					<role name="Bohemian" code="0x0000B535"/>
+				</shape>
+				<shape name="Slim BodyBuilder (SBB)" icon="SB-SP" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000B50E"/>
+					<role name="Serf" code="0x0000B50D"/>
+					<role name="Serf / Lower Class" code="0x0000B50C"/>
+					<role name="Merchant" code="0x0000B50B"/>
+					<role name="Noble" code="0x0000B50A"/>
+					<role name="Royal / Upper Class" code="0x0000B509"/>
+					<role name="Clergy / Spiritual" code="0x0000B508"/>
+					<role name="Knight / Protector" code="0x0000B507"/>
+					<role name="Brothel" code="0x0000B506"/>
+					<role name="Pirate" code="0x0000B505"/>
+					<role name="Wizard" code="0x0000B504"/>
+					<role name="Bohemian" code="0x0000B503"/>
+				</shape>
+				<shape name="BodyBuilder" icon="BB-SP" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000B4DC"/>
+					<role name="Serf" code="0x0000B4DB"/>
+					<role name="Serf / Lower Class" code="0x0000B4DA"/>
+					<role name="Merchant" code="0x0000B4D9"/>
+					<role name="Noble" code="0x0000B4D8"/>
+					<role name="Royal / Upper Class" code="0x0000B4D7"/>
+					<role name="Clergy / Spiritual" code="0x0000B4D6"/>
+					<role name="Knight / Protector" code="0x0000B4D5"/>
+					<role name="Brothel" code="0x0000B4D4"/>
+					<role name="Pirate" code="0x0000B4D3"/>
+					<role name="Wizard" code="0x0000B4D2"/>
+					<role name="Bohemian" code="0x0000B4D1"/>
+				</shape>
+				<shape name="Huge BodyBuilder (HBB)" icon="HB-SP" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000B4AA"/>
+					<role name="Serf" code="0x0000B4A9"/>
+					<role name="Serf / Lower Class" code="0x0000B4A8"/>
+					<role name="Merchant" code="0x0000B4A7"/>
+					<role name="Noble" code="0x0000B4A6"/>
+					<role name="Royal / Upper Class" code="0x0000B4A5"/>
+					<role name="Clergy / Spiritual" code="0x0000B4A4"/>
+					<role name="Knight / Protector" code="0x0000B4A3"/>
+					<role name="Brothel" code="0x0000B4A2"/>
+					<role name="Pirate" code="0x0000B4A1"/>
+					<role name="Wizard" code="0x0000B4A0"/>
+					<role name="Bohemian" code="0x0000B49F"/>
+				</shape>
+				<shape name="Bear BodyBuilder (BBB)" icon="BR-SP" creator="Mototo">
+					<role name="All" code="0x0000B478"/>
+					<role name="Serf" code="0x0000B477"/>
+					<role name="Serf / Lower Class" code="0x0000B476"/>
+					<role name="Merchant" code="0x0000B475"/>
+					<role name="Noble" code="0x0000B474"/>
+					<role name="Royal / Upper Class" code="0x0000B473"/>
+					<role name="Clergy / Spiritual" code="0x0000B472"/>
+					<role name="Knight / Protector" code="0x0000B471"/>
+					<role name="Brothel" code="0x0000B470"/>
+					<role name="Pirate" code="0x0000B46F"/>
+					<role name="Wizard" code="0x0000B46E"/>
+					<role name="Bohemian" code="0x0000B46D"/>
+				</shape>
+				<shape name="Massive BodyBuilder (MBB)" icon="MB-SP" creator="SynapticSim">
+					<role name="All" code="0x0000B446"/>
+					<role name="Serf" code="0x0000B445"/>
+					<role name="Serf / Lower Class" code="0x0000B444"/>
+					<role name="Merchant" code="0x0000B443"/>
+					<role name="Noble" code="0x0000B442"/>
+					<role name="Royal / Upper Class" code="0x0000B441"/>
+					<role name="Clergy / Spiritual" code="0x0000B440"/>
+					<role name="Knight / Protector" code="0x0000B43F"/>
+					<role name="Brothel" code="0x0000B43E"/>
+					<role name="Pirate" code="0x0000B43D"/>
+					<role name="Wizard" code="0x0000B43C"/>
+					<role name="Bohemian" code="0x0000B43B"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Elven">
+			<group name="Maxis" gender="unisex">
+				<shape name="Elven - Maxis" icon="EA-E" creator="(Maxis)">
+					<role name="All" code="0x0000B284"/>
+					<role name="Serf" code="0x0000B283"/>
+					<role name="Serf / Lower Class" code="0x0000B282"/>
+					<role name="Merchant" code="0x0000B281"/>
+					<role name="Noble" code="0x0000B280"/>
+					<role name="Royal / Upper Class" code="0x0000B27F"/>
+					<role name="Clergy / Spiritual" code="0x0000B27E"/>
+					<role name="Knight / Protector" code="0x0000B27D"/>
+					<role name="Brothel" code="0x0000B27C"/>
+					<role name="Pirate" code="0x0000B27B"/>
+					<role name="Wizard" code="0x0000B27A"/>
+					<role name="Bohemian" code="0x0000B279"/>
+				</shape>
+			</group>
+			<group name="Curvy" gender="female">
+				<shape name="Faerie" icon="FE-E" creator="Warlokk">
+					<role name="All" code="0x0000B1EE"/>
+					<role name="Serf" code="0x0000B1ED"/>
+					<role name="Serf / Lower Class" code="0x0000B1EC"/>
+					<role name="Merchant" code="0x0000B1EB"/>
+					<role name="Noble" code="0x0000B1EA"/>
+					<role name="Royal / Upper Class" code="0x0000B1E9"/>
+					<role name="Clergy / Spiritual" code="0x0000B1E8"/>
+					<role name="Knight / Protector" code="0x0000B1E7"/>
+					<role name="Brothel" code="0x0000B1E6"/>
+					<role name="Pirate" code="0x0000B1E5"/>
+					<role name="Wizard" code="0x0000B1E4"/>
+					<role name="Bohemian" code="0x0000B1E3"/>
+				</shape>
+				<shape name="Androgyny" icon="AY-E" creator="Gothplague (+ Aquilegia Edit available)">
+					<role name="All" code="0x0000B1BC"/>
+					<role name="Serf" code="0x0000B1BB"/>
+					<role name="Serf / Lower Class" code="0x0000B1BA"/>
+					<role name="Merchant" code="0x0000B1B9"/>
+					<role name="Noble" code="0x0000B1B8"/>
+					<role name="Royal / Upper Class" code="0x0000B1B7"/>
+					<role name="Clergy / Spiritual" code="0x0000B1B6"/>
+					<role name="Knight / Protector" code="0x0000B1B5"/>
+					<role name="Brothel" code="0x0000B1B4"/>
+					<role name="Pirate" code="0x0000B1B3"/>
+					<role name="Wizard" code="0x0000B1B2"/>
+					<role name="Bohemian" code="0x0000B1B1"/>
+				</shape>
+				<shape name="Fashion Model" icon="FM-E" creator="Warlokk">
+					<role name="All" code="0x0000B1A3"/>
+					<role name="Serf" code="0x0000B1A2"/>
+					<role name="Serf / Lower Class" code="0x0000B1A1"/>
+					<role name="Merchant" code="0x0000B1A0"/>
+					<role name="Noble" code="0x0000B19F"/>
+					<role name="Royal / Upper Class" code="0x0000B19E"/>
+					<role name="Clergy / Spiritual" code="0x0000B19D"/>
+					<role name="Knight / Protector" code="0x0000B19C"/>
+					<role name="Brothel" code="0x0000B19B"/>
+					<role name="Pirate" code="0x0000B19A"/>
+					<role name="Wizard" code="0x0000B199"/>
+					<role name="Bohemian" code="0x0000B198"/>
+				</shape>
+				<shape name="FitChick" icon="FC-E" creator="Poppeboy">
+					<role name="All" code="0x0000B18A"/>
+					<role name="Serf" code="0x0000B189"/>
+					<role name="Serf / Lower Class" code="0x0000B188"/>
+					<role name="Merchant" code="0x0000B187"/>
+					<role name="Noble" code="0x0000B186"/>
+					<role name="Royal / Upper Class" code="0x0000B185"/>
+					<role name="Clergy / Spiritual" code="0x0000B184"/>
+					<role name="Knight / Protector" code="0x0000B183"/>
+					<role name="Brothel" code="0x0000B182"/>
+					<role name="Pirate" code="0x0000B181"/>
+					<role name="Wizard" code="0x0000B180"/>
+					<role name="Bohemian" code="0x0000B17F"/>
+				</shape>
+				<shape name="Well Rounded Sim (WRS)" icon="WR-E" creator="Dr. Pixel">
+					<role name="All" code="0x0000B158"/>
+					<role name="Serf" code="0x0000B157"/>
+					<role name="Serf / Lower Class" code="0x0000B156"/>
+					<role name="Merchant" code="0x0000B155"/>
+					<role name="Noble" code="0x0000B154"/>
+					<role name="Royal / Upper Class" code="0x0000B153"/>
+					<role name="Clergy / Spiritual" code="0x0000B152"/>
+					<role name="Knight / Protector" code="0x0000B151"/>
+					<role name="Brothel" code="0x0000B150"/>
+					<role name="Pirate" code="0x0000B14F"/>
+					<role name="Wizard" code="0x0000B14E"/>
+					<role name="Bohemian" code="0x0000B14D"/>
+				</shape>
+				<shape name="Sussi" icon="SS-E" creator="Sussi">
+					<role name="All" code="0x0000B126"/>
+					<role name="Serf" code="0x0000B125"/>
+					<role name="Serf / Lower Class" code="0x0000B124"/>
+					<role name="Merchant" code="0x0000B123"/>
+					<role name="Noble" code="0x0000B122"/>
+					<role name="Royal / Upper Class" code="0x0000B121"/>
+					<role name="Clergy / Spiritual" code="0x0000B120"/>
+					<role name="Knight / Protector" code="0x0000B11F"/>
+					<role name="Brothel" code="0x0000B11E"/>
+					<role name="Pirate" code="0x0000B11D"/>
+					<role name="Wizard" code="0x0000B11C"/>
+					<role name="Bohemian" code="0x0000B11B"/>
+				</shape>
+				<shape name="Rio" icon="RO-E" creator="Warlokk">
+					<role name="All" code="0x0000B0F4"/>
+					<role name="Serf" code="0x0000B0F3"/>
+					<role name="Serf / Lower Class" code="0x0000B0F2"/>
+					<role name="Merchant" code="0x0000B0F1"/>
+					<role name="Noble" code="0x0000B0F0"/>
+					<role name="Royal / Upper Class" code="0x0000B0EF"/>
+					<role name="Clergy / Spiritual" code="0x0000B0EE"/>
+					<role name="Knight / Protector" code="0x0000B0ED"/>
+					<role name="Brothel" code="0x0000B0EC"/>
+					<role name="Pirate" code="0x0000B0EB"/>
+					<role name="Wizard" code="0x0000B0EA"/>
+					<role name="Bohemian" code="0x0000B0E9"/>
+				</shape>
+				<shape name="Voluptuous Gal (VG)" icon="VO-E" creator="Warlokk">
+					<role name="All" code="0x0000B0C2"/>
+					<role name="Serf" code="0x0000B0C1"/>
+					<role name="Serf / Lower Class" code="0x0000B0C0"/>
+					<role name="Merchant" code="0x0000B0BF"/>
+					<role name="Noble" code="0x0000B0BE"/>
+					<role name="Royal / Upper Class" code="0x0000B0BD"/>
+					<role name="Clergy / Spiritual" code="0x0000B0BC"/>
+					<role name="Knight / Protector" code="0x0000B0BB"/>
+					<role name="Brothel" code="0x0000B0BA"/>
+					<role name="Pirate" code="0x0000B0B9"/>
+					<role name="Wizard" code="0x0000B0B8"/>
+					<role name="Bohemian" code="0x0000B0B7"/>
+				</shape>
+				<shape name="Classic Pinup (CPU)" icon="CP-E" creator="Warlokk">
+					<role name="All" code="0x0000B090"/>
+					<role name="Serf" code="0x0000B08F"/>
+					<role name="Serf / Lower Class" code="0x0000B08E"/>
+					<role name="Merchant" code="0x0000B08D"/>
+					<role name="Noble" code="0x0000B08C"/>
+					<role name="Royal / Upper Class" code="0x0000B08B"/>
+					<role name="Clergy / Spiritual" code="0x0000B08A"/>
+					<role name="Knight / Protector" code="0x0000B089"/>
+					<role name="Brothel" code="0x0000B088"/>
+					<role name="Pirate" code="0x0000B087"/>
+					<role name="Wizard" code="0x0000B086"/>
+					<role name="Bohemian" code="0x0000B085"/>
+				</shape>
+				<shape name="Renaissance Gal (RenGal)" icon="RG-E" creator="Warlokk">
+					<role name="All" code="0x0000B05E"/>
+					<role name="Serf" code="0x0000B05D"/>
+					<role name="Serf / Lower Class" code="0x0000B05C"/>
+					<role name="Merchant" code="0x0000B05B"/>
+					<role name="Noble" code="0x0000B05A"/>
+					<role name="Royal / Upper Class" code="0x0000B059"/>
+					<role name="Clergy / Spiritual" code="0x0000B058"/>
+					<role name="Knight / Protector" code="0x0000B057"/>
+					<role name="Brothel" code="0x0000B056"/>
+					<role name="Pirate" code="0x0000B055"/>
+					<role name="Wizard" code="0x0000B054"/>
+					<role name="Bohemian" code="0x0000B053"/>
+				</shape>
+				<shape name="Lady Apple" icon="(apple)-E" creator="Spider+rugs">
+					<role name="All" code="0x0000B02C"/>
+					<role name="Serf" code="0x0000B02B"/>
+					<role name="Serf / Lower Class" code="0x0000B02A"/>
+					<role name="Merchant" code="0x0000B029"/>
+					<role name="Noble" code="0x0000B028"/>
+					<role name="Royal / Upper Class" code="0x0000B027"/>
+					<role name="Clergy / Spiritual" code="0x0000B026"/>
+					<role name="Knight / Protector" code="0x0000B025"/>
+					<role name="Brothel" code="0x0000B024"/>
+					<role name="Pirate" code="0x0000B023"/>
+					<role name="Wizard" code="0x0000B022"/>
+					<role name="Bohemian" code="0x0000B021"/>
+				</shape>
+				<shape name="Momma Lisa" icon="ML-E" creator="FrannySims">
+					<role name="All" code="0x0000AFFA"/>
+					<role name="Serf" code="0x0000AFF9"/>
+					<role name="Serf / Lower Class" code="0x0000AFF8"/>
+					<role name="Merchant" code="0x0000AFF7"/>
+					<role name="Noble" code="0x0000AFF6"/>
+					<role name="Royal / Upper Class" code="0x0000AFF5"/>
+					<role name="Clergy / Spiritual" code="0x0000AFF4"/>
+					<role name="Knight / Protector" code="0x0000AFF3"/>
+					<role name="Brothel" code="0x0000AFF2"/>
+					<role name="Pirate" code="0x0000AFF1"/>
+					<role name="Wizard" code="0x0000AFF0"/>
+					<role name="Bohemian" code="0x0000AFEF"/>
+				</shape>
+			</group>
+			<group name="Brawny" gender="female">
+				<shape name="Athletic Girl (AG)" icon="AT-E" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000AF00"/>
+					<role name="Serf" code="0x0000AEFF"/>
+					<role name="Serf / Lower Class" code="0x0000AEFE"/>
+					<role name="Merchant" code="0x0000AEFD"/>
+					<role name="Noble" code="0x0000AEFC"/>
+					<role name="Royal / Upper Class" code="0x0000AEFB"/>
+					<role name="Clergy / Spiritual" code="0x0000AEFA"/>
+					<role name="Knight / Protector" code="0x0000AEF9"/>
+					<role name="Brothel" code="0x0000AEF8"/>
+					<role name="Pirate" code="0x0000AEF7"/>
+					<role name="Wizard" code="0x0000AEF6"/>
+					<role name="Bohemian" code="0x0000AEF5"/>
+				</shape>
+				<shape name="BodyBuilder Girl (BBG)" icon="BB-E" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000AECE"/>
+					<role name="Serf" code="0x0000AECD"/>
+					<role name="Serf / Lower Class" code="0x0000AECC"/>
+					<role name="Merchant" code="0x0000AECB"/>
+					<role name="Noble" code="0x0000AECA"/>
+					<role name="Royal / Upper Class" code="0x0000AEC9"/>
+					<role name="Clergy / Spiritual" code="0x0000AEC8"/>
+					<role name="Knight / Protector" code="0x0000AEC7"/>
+					<role name="Brothel" code="0x0000AEC6"/>
+					<role name="Pirate" code="0x0000AEC5"/>
+					<role name="Wizard" code="0x0000AEC4"/>
+					<role name="Bohemian" code="0x0000AEC3"/>
+				</shape>
+				<shape name="Amazonian" icon="AZ-E" creator="Ocelotecatl?">
+					<role name="All" code="0x0000AE9C"/>
+					<role name="Serf" code="0x0000AE9B"/>
+					<role name="Serf / Lower Class" code="0x0000AE9A"/>
+					<role name="Merchant" code="0x0000AE99"/>
+					<role name="Noble" code="0x0000AE98"/>
+					<role name="Royal / Upper Class" code="0x0000AE97"/>
+					<role name="Clergy / Spiritual" code="0x0000AE96"/>
+					<role name="Knight / Protector" code="0x0000AE95"/>
+					<role name="Brothel" code="0x0000AE94"/>
+					<role name="Pirate" code="0x0000AE93"/>
+					<role name="Wizard" code="0x0000AE92"/>
+					<role name="Bohemian" code="0x0000AE91"/>
+				</shape>
+				<shape name="Death by Snu-Snu" icon="SN-E" creator="Ocelotecatl?">
+					<role name="All" code="0x0000AE6A"/>
+					<role name="Serf" code="0x0000AE69"/>
+					<role name="Serf / Lower Class" code="0x0000AE68"/>
+					<role name="Merchant" code="0x0000AE67"/>
+					<role name="Noble" code="0x0000AE66"/>
+					<role name="Royal / Upper Class" code="0x0000AE65"/>
+					<role name="Clergy / Spiritual" code="0x0000AE64"/>
+					<role name="Knight / Protector" code="0x0000AE63"/>
+					<role name="Brothel" code="0x0000AE62"/>
+					<role name="Pirate" code="0x0000AE61"/>
+					<role name="Wizard" code="0x0000AE60"/>
+					<role name="Bohemian" code="0x0000AE5F"/>
+				</shape>
+			</group>
+			<group name="All" gender="male">
+				<shape name="Harem Dude" icon="HD-E" creator="G-Knee">
+					<role name="All" code="0x0000AD3E"/>
+					<role name="Serf" code="0x0000AD3D"/>
+					<role name="Serf / Lower Class" code="0x0000AD3C"/>
+					<role name="Merchant" code="0x0000AD3B"/>
+					<role name="Noble" code="0x0000AD3A"/>
+					<role name="Royal / Upper Class" code="0x0000AD39"/>
+					<role name="Clergy / Spiritual" code="0x0000AD38"/>
+					<role name="Knight / Protector" code="0x0000AD37"/>
+					<role name="Brothel" code="0x0000AD36"/>
+					<role name="Pirate" code="0x0000AD35"/>
+					<role name="Wizard" code="0x0000AD34"/>
+					<role name="Bohemian" code="0x0000AD33"/>
+				</shape>
+				<shape name="Androgyny" icon="AY-E" creator="Gothplague (+ Aquilegia Edit available)">
+					<role name="All" code="0x0000AD0C"/>
+					<role name="Serf" code="0x0000AD0B"/>
+					<role name="Serf / Lower Class" code="0x0000AD0A"/>
+					<role name="Merchant" code="0x0000AD09"/>
+					<role name="Noble" code="0x0000AD08"/>
+					<role name="Royal / Upper Class" code="0x0000AD07"/>
+					<role name="Clergy / Spiritual" code="0x0000AD06"/>
+					<role name="Knight / Protector" code="0x0000AD05"/>
+					<role name="Brothel" code="0x0000AD04"/>
+					<role name="Pirate" code="0x0000AD03"/>
+					<role name="Wizard" code="0x0000AD02"/>
+					<role name="Bohemian" code="0x0000AD01"/>
+				</shape>
+				<shape name="Runner" icon="RN-E" creator="Jaccirocker">
+					<role name="All" code="0x0000ACF3"/>
+					<role name="Serf" code="0x0000ACF2"/>
+					<role name="Serf / Lower Class" code="0x0000ACF1"/>
+					<role name="Merchant" code="0x0000ACF0"/>
+					<role name="Noble" code="0x0000ACEF"/>
+					<role name="Royal / Upper Class" code="0x0000ACEE"/>
+					<role name="Clergy / Spiritual" code="0x0000ACED"/>
+					<role name="Knight / Protector" code="0x0000ACEC"/>
+					<role name="Brothel" code="0x0000ACEB"/>
+					<role name="Pirate" code="0x0000ACEA"/>
+					<role name="Wizard" code="0x0000ACE9"/>
+					<role name="Bohemian" code="0x0000ACE8"/>
+				</shape>
+				<shape name="Lean BodyBuilder (LBB)" icon="LB-E" creator="SynapticSim">
+					<role name="All" code="0x0000ACDA"/>
+					<role name="Serf" code="0x0000ACD9"/>
+					<role name="Serf / Lower Class" code="0x0000ACD8"/>
+					<role name="Merchant" code="0x0000ACD7"/>
+					<role name="Noble" code="0x0000ACD6"/>
+					<role name="Royal / Upper Class" code="0x0000ACD5"/>
+					<role name="Clergy / Spiritual" code="0x0000ACD4"/>
+					<role name="Knight / Protector" code="0x0000ACD3"/>
+					<role name="Brothel" code="0x0000ACD2"/>
+					<role name="Pirate" code="0x0000ACD1"/>
+					<role name="Wizard" code="0x0000ACD0"/>
+					<role name="Bohemian" code="0x0000ACCF"/>
+				</shape>
+				<shape name="Athletic" icon="AT-E" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000ACA8"/>
+					<role name="Serf" code="0x0000ACA7"/>
+					<role name="Serf / Lower Class" code="0x0000ACA6"/>
+					<role name="Merchant" code="0x0000ACA5"/>
+					<role name="Noble" code="0x0000ACA4"/>
+					<role name="Royal / Upper Class" code="0x0000ACA3"/>
+					<role name="Clergy / Spiritual" code="0x0000ACA2"/>
+					<role name="Knight / Protector" code="0x0000ACA1"/>
+					<role name="Brothel" code="0x0000ACA0"/>
+					<role name="Pirate" code="0x0000AC9F"/>
+					<role name="Wizard" code="0x0000AC9E"/>
+					<role name="Bohemian" code="0x0000AC9D"/>
+				</shape>
+				<shape name="Slim BodyBuilder (SBB)" icon="SB-E" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000AC76"/>
+					<role name="Serf" code="0x0000AC75"/>
+					<role name="Serf / Lower Class" code="0x0000AC74"/>
+					<role name="Merchant" code="0x0000AC73"/>
+					<role name="Noble" code="0x0000AC72"/>
+					<role name="Royal / Upper Class" code="0x0000AC71"/>
+					<role name="Clergy / Spiritual" code="0x0000AC70"/>
+					<role name="Knight / Protector" code="0x0000AC6F"/>
+					<role name="Brothel" code="0x0000AC6E"/>
+					<role name="Pirate" code="0x0000AC6D"/>
+					<role name="Wizard" code="0x0000AC6C"/>
+					<role name="Bohemian" code="0x0000AC6B"/>
+				</shape>
+				<shape name="BodyBuilder" icon="BB-E" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000AC44"/>
+					<role name="Serf" code="0x0000AC43"/>
+					<role name="Serf / Lower Class" code="0x0000AC42"/>
+					<role name="Merchant" code="0x0000AC41"/>
+					<role name="Noble" code="0x0000AC40"/>
+					<role name="Royal / Upper Class" code="0x0000AC3F"/>
+					<role name="Clergy / Spiritual" code="0x0000AC3E"/>
+					<role name="Knight / Protector" code="0x0000AC3D"/>
+					<role name="Brothel" code="0x0000AC3C"/>
+					<role name="Pirate" code="0x0000AC3B"/>
+					<role name="Wizard" code="0x0000AC3A"/>
+					<role name="Bohemian" code="0x0000AC39"/>
+				</shape>
+				<shape name="Huge BodyBuilder (HBB)" icon="HB-E" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000AC12"/>
+					<role name="Serf" code="0x0000AC11"/>
+					<role name="Serf / Lower Class" code="0x0000AC10"/>
+					<role name="Merchant" code="0x0000AC0F"/>
+					<role name="Noble" code="0x0000AC0E"/>
+					<role name="Royal / Upper Class" code="0x0000AC0D"/>
+					<role name="Clergy / Spiritual" code="0x0000AC0C"/>
+					<role name="Knight / Protector" code="0x0000AC0B"/>
+					<role name="Brothel" code="0x0000AC0A"/>
+					<role name="Pirate" code="0x0000AC09"/>
+					<role name="Wizard" code="0x0000AC08"/>
+					<role name="Bohemian" code="0x0000AC07"/>
+				</shape>
+				<shape name="Bear BodyBuilder (BBB)" icon="BR-E" creator="Mototo">
+					<role name="All" code="0x0000ABE0"/>
+					<role name="Serf" code="0x0000ABDF"/>
+					<role name="Serf / Lower Class" code="0x0000ABDE"/>
+					<role name="Merchant" code="0x0000ABDD"/>
+					<role name="Noble" code="0x0000ABDC"/>
+					<role name="Royal / Upper Class" code="0x0000ABDB"/>
+					<role name="Clergy / Spiritual" code="0x0000ABDA"/>
+					<role name="Knight / Protector" code="0x0000ABD9"/>
+					<role name="Brothel" code="0x0000ABD8"/>
+					<role name="Pirate" code="0x0000ABD7"/>
+					<role name="Wizard" code="0x0000ABD6"/>
+					<role name="Bohemian" code="0x0000ABD5"/>
+				</shape>
+				<shape name="Massive BodyBuilder (MBB)" icon="MB-E" creator="SynapticSim">
+					<role name="All" code="0x0000ABAE"/>
+					<role name="Serf" code="0x0000ABAD"/>
+					<role name="Serf / Lower Class" code="0x0000ABAC"/>
+					<role name="Merchant" code="0x0000ABAB"/>
+					<role name="Noble" code="0x0000ABAA"/>
+					<role name="Royal / Upper Class" code="0x0000ABA9"/>
+					<role name="Clergy / Spiritual" code="0x0000ABA8"/>
+					<role name="Knight / Protector" code="0x0000ABA7"/>
+					<role name="Brothel" code="0x0000ABA6"/>
+					<role name="Pirate" code="0x0000ABA5"/>
+					<role name="Wizard" code="0x0000ABA4"/>
+					<role name="Bohemian" code="0x0000ABA3"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Werewolf - Medieval">
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis" icon="EA-Wm" creator="Maxis">
+					<role name="All" code="0x00007530"/>
+					<role name="Serf" code="0x0000752F"/>
+					<role name="Serf / Lower Class" code="0x0000752E"/>
+					<role name="Merchant" code="0x0000752D"/>
+					<role name="Noble" code="0x0000752C"/>
+					<role name="Royal / Upper Class" code="0x0000752B"/>
+					<role name="Clergy / Spiritual" code="0x0000752A"/>
+					<role name="Knight / Protector" code="0x00007529"/>
+					<role name="Brothel" code="0x00007528"/>
+					<role name="Pirate" code="0x00007527"/>
+					<role name="Wizard" code="0x00007526"/>
+					<role name="Bohemian" code="0x00007525"/>
+				</shape>
+			</group>
+			<group name="Brawny" gender="female">
+				<shape name="Athletic Girl" icon="AT-Wm">
+					<role name="All" code="0x000073D2"/>
+					<role name="Serf" code="0x000073D1"/>
+					<role name="Serf / Lower Class" code="0x000073D0"/>
+					<role name="Merchant" code="0x000073CF"/>
+					<role name="Noble" code="0x000073CE"/>
+					<role name="Royal / Upper Class" code="0x000073CD"/>
+					<role name="Clergy / Spiritual" code="0x000073CC"/>
+					<role name="Knight / Protector" code="0x000073CB"/>
+					<role name="Brothel" code="0x000073CA"/>
+					<role name="Pirate" code="0x000073C9"/>
+					<role name="Wizard" code="0x000073C8"/>
+					<role name="Bohemian" code="0x000073C7"/>
+				</shape>
+				<shape name="BodyBuilder Girl" icon="BB-Wm">
+					<role name="All" code="0x000073A0"/>
+					<role name="Serf" code="0x0000739F"/>
+					<role name="Serf / Lower Class" code="0x0000739E"/>
+					<role name="Merchant" code="0x0000739D"/>
+					<role name="Noble" code="0x0000739C"/>
+					<role name="Royal / Upper Class" code="0x0000739B"/>
+					<role name="Clergy / Spiritual" code="0x0000739A"/>
+					<role name="Knight / Protector" code="0x00007399"/>
+					<role name="Brothel" code="0x00007398"/>
+					<role name="Pirate" code="0x00007397"/>
+					<role name="Wizard" code="0x00007396"/>
+					<role name="Bohemian" code="0x00007395"/>
+				</shape>
+				<shape name="Amazonian" icon="AZ-Wm">
+					<role name="All" code="0x0000736E"/>
+					<role name="Serf" code="0x0000736D"/>
+					<role name="Serf / Lower Class" code="0x0000736C"/>
+					<role name="Merchant" code="0x0000736B"/>
+					<role name="Noble" code="0x0000736A"/>
+					<role name="Royal / Upper Class" code="0x00007369"/>
+					<role name="Clergy / Spiritual" code="0x00007368"/>
+					<role name="Knight / Protector" code="0x00007367"/>
+					<role name="Brothel" code="0x00007366"/>
+					<role name="Pirate" code="0x00007365"/>
+					<role name="Wizard" code="0x00007364"/>
+					<role name="Bohemian" code="0x00007363"/>
+				</shape>
+				<shape name="Death by SnuSnu" icon="SN-Wm">
+					<role name="All" code="0x0000733C"/>
+					<role name="Serf" code="0x0000733B"/>
+					<role name="Serf / Lower Class" code="0x0000733A"/>
+					<role name="Merchant" code="0x00007339"/>
+					<role name="Noble" code="0x00007338"/>
+					<role name="Royal / Upper Class" code="0x00007337"/>
+					<role name="Clergy / Spiritual" code="0x00007336"/>
+					<role name="Knight / Protector" code="0x00007335"/>
+					<role name="Brothel" code="0x00007334"/>
+					<role name="Pirate" code="0x00007333"/>
+					<role name="Wizard" code="0x00007332"/>
+					<role name="Bohemian" code="0x00007331"/>
+				</shape>
+			</group>
+			<group name="All" gender="male">
+				<shape name="Lean BodyBuilder" icon="LB-Wm">
+					<role name="All" code="0x00007274"/>
+					<role name="Serf" code="0x00007273"/>
+					<role name="Serf / Lower Class" code="0x00007272"/>
+					<role name="Merchant" code="0x00007271"/>
+					<role name="Noble" code="0x00007270"/>
+					<role name="Royal / Upper Class" code="0x0000726F"/>
+					<role name="Clergy / Spiritual" code="0x0000726E"/>
+					<role name="Knight / Protector" code="0x0000726D"/>
+					<role name="Brothel" code="0x0000726C"/>
+					<role name="Pirate" code="0x0000726B"/>
+					<role name="Wizard" code="0x0000726A"/>
+					<role name="Bohemian" code="0x00007269"/>
+				</shape>
+				<shape name="Slim BodyBuilder" icon="SB-Wm">
+					<role name="All" code="0x00007210"/>
+					<role name="Serf" code="0x0000720F"/>
+					<role name="Serf / Lower Class" code="0x0000720E"/>
+					<role name="Merchant" code="0x0000720D"/>
+					<role name="Noble" code="0x0000720C"/>
+					<role name="Royal / Upper Class" code="0x0000720B"/>
+					<role name="Clergy / Spiritual" code="0x0000720A"/>
+					<role name="Knight / Protector" code="0x00007209"/>
+					<role name="Brothel" code="0x00007208"/>
+					<role name="Pirate" code="0x00007207"/>
+					<role name="Wizard" code="0x00007206"/>
+					<role name="Bohemian" code="0x00007205"/>
+				</shape>
+				<shape name="BodyBuilder" icon="BB-Wm">
+					<role name="All" code="0x000071DE"/>
+					<role name="Serf" code="0x000071DD"/>
+					<role name="Serf / Lower Class" code="0x000071DC"/>
+					<role name="Merchant" code="0x000071DB"/>
+					<role name="Noble" code="0x000071DA"/>
+					<role name="Royal / Upper Class" code="0x000071D9"/>
+					<role name="Clergy / Spiritual" code="0x000071D8"/>
+					<role name="Knight / Protector" code="0x000071D7"/>
+					<role name="Brothel" code="0x000071D6"/>
+					<role name="Pirate" code="0x000071D5"/>
+					<role name="Wizard" code="0x000071D4"/>
+					<role name="Bohemian" code="0x000071D3"/>
+				</shape>
+				<shape name="Huge BodyBuilder" icon="HB-Wm">
+					<role name="All" code="0x000071AC"/>
+					<role name="Serf" code="0x000071AB"/>
+					<role name="Serf / Lower Class" code="0x000071AA"/>
+					<role name="Merchant" code="0x000071A9"/>
+					<role name="Noble" code="0x000071A8"/>
+					<role name="Royal / Upper Class" code="0x000071A7"/>
+					<role name="Clergy / Spiritual" code="0x000071A6"/>
+					<role name="Knight / Protector" code="0x000071A5"/>
+					<role name="Brothel" code="0x000071A4"/>
+					<role name="Pirate" code="0x000071A3"/>
+					<role name="Wizard" code="0x000071A2"/>
+					<role name="Bohemian" code="0x000071A1"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Werewolf - Barbarian">
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis (BARBARIAN)" icon="EA-Wb">
+					<role name="All" code="0x00007080"/>
+					<role name="Serf" code="0x0000707F"/>
+					<role name="Serf / Lower Class" code="0x0000707E"/>
+					<role name="Merchant" code="0x0000707D"/>
+					<role name="Noble" code="0x0000707C"/>
+					<role name="Royal / Upper Class" code="0x0000707B"/>
+					<role name="Clergy / Spiritual" code="0x0000707A"/>
+					<role name="Knight / Protector" code="0x00007079"/>
+					<role name="Brothel" code="0x00007078"/>
+					<role name="Pirate" code="0x00007077"/>
+					<role name="Wizard" code="0x00007076"/>
+					<role name="Bohemian" code="0x00007075"/>
+				</shape>
+			</group>
+			<group name="Brawny" gender="female">
+				<shape name="Athletic Girl" icon="AT-Wb">
+					<role name="All" code="0x00006F22"/>
+					<role name="Serf" code="0x00006F21"/>
+					<role name="Serf / Lower Class" code="0x00006F20"/>
+					<role name="Merchant" code="0x00006F1F"/>
+					<role name="Noble" code="0x00006F1E"/>
+					<role name="Royal / Upper Class" code="0x00006F1D"/>
+					<role name="Clergy / Spiritual" code="0x00006F1C"/>
+					<role name="Knight / Protector" code="0x00006F1B"/>
+					<role name="Brothel" code="0x00006F1A"/>
+					<role name="Pirate" code="0x00006F19"/>
+					<role name="Wizard" code="0x00006F18"/>
+					<role name="Bohemian" code="0x00006F17"/>
+				</shape>
+				<shape name="BodyBuilder Girl" icon="BB-Wb">
+					<role name="All" code="0x00006EF0"/>
+					<role name="Serf" code="0x00006EEF"/>
+					<role name="Serf / Lower Class" code="0x00006EEE"/>
+					<role name="Merchant" code="0x00006EED"/>
+					<role name="Noble" code="0x00006EEC"/>
+					<role name="Royal / Upper Class" code="0x00006EEB"/>
+					<role name="Clergy / Spiritual" code="0x00006EEA"/>
+					<role name="Knight / Protector" code="0x00006EE9"/>
+					<role name="Brothel" code="0x00006EE8"/>
+					<role name="Pirate" code="0x00006EE7"/>
+					<role name="Wizard" code="0x00006EE6"/>
+					<role name="Bohemian" code="0x00006EE5"/>
+				</shape>
+				<shape name="Amazonian" icon="AZ-Wb">
+					<role name="All" code="0x00006EBE"/>
+					<role name="Serf" code="0x00006EBD"/>
+					<role name="Serf / Lower Class" code="0x00006EBC"/>
+					<role name="Merchant" code="0x00006EBB"/>
+					<role name="Noble" code="0x00006EBA"/>
+					<role name="Royal / Upper Class" code="0x00006EB9"/>
+					<role name="Clergy / Spiritual" code="0x00006EB8"/>
+					<role name="Knight / Protector" code="0x00006EB7"/>
+					<role name="Brothel" code="0x00006EB6"/>
+					<role name="Pirate" code="0x00006EB5"/>
+					<role name="Wizard" code="0x00006EB4"/>
+					<role name="Bohemian" code="0x00006EB3"/>
+				</shape>
+				<shape name="Death by SnuSnu" icon="SN-Wb">
+					<role name="All" code="0x00006E8C"/>
+					<role name="Serf" code="0x00006E8B"/>
+					<role name="Serf / Lower Class" code="0x00006E8A"/>
+					<role name="Merchant" code="0x00006E89"/>
+					<role name="Noble" code="0x00006E88"/>
+					<role name="Royal / Upper Class" code="0x00006E87"/>
+					<role name="Clergy / Spiritual" code="0x00006E86"/>
+					<role name="Knight / Protector" code="0x00006E85"/>
+					<role name="Brothel" code="0x00006E84"/>
+					<role name="Pirate" code="0x00006E83"/>
+					<role name="Wizard" code="0x00006E82"/>
+					<role name="Bohemian" code="0x00006E81"/>
+				</shape>
+			</group>
+			<group name="All" gender="male">
+				<shape name="Lean BodyBuilder" icon="LB-Wb">
+					<role name="All" code="0x00006DC4"/>
+					<role name="Serf" code="0x00006DC3"/>
+					<role name="Serf / Lower Class" code="0x00006DC2"/>
+					<role name="Merchant" code="0x00006DC1"/>
+					<role name="Noble" code="0x00006DC0"/>
+					<role name="Royal / Upper Class" code="0x00006DBF"/>
+					<role name="Clergy / Spiritual" code="0x00006DBE"/>
+					<role name="Knight / Protector" code="0x00006DBD"/>
+					<role name="Brothel" code="0x00006DBC"/>
+					<role name="Pirate" code="0x00006DBB"/>
+					<role name="Wizard" code="0x00006DBA"/>
+					<role name="Bohemian" code="0x00006DB9"/>
+				</shape>
+				<shape name="Slim BodyBuilder" icon="SB-Wb">
+					<role name="All" code="0x00006D60"/>
+					<role name="Serf" code="0x00006D5F"/>
+					<role name="Serf / Lower Class" code="0x00006D5E"/>
+					<role name="Merchant" code="0x00006D5D"/>
+					<role name="Noble" code="0x00006D5C"/>
+					<role name="Royal / Upper Class" code="0x00006D5B"/>
+					<role name="Clergy / Spiritual" code="0x00006D5A"/>
+					<role name="Knight / Protector" code="0x00006D59"/>
+					<role name="Brothel" code="0x00006D58"/>
+					<role name="Pirate" code="0x00006D57"/>
+					<role name="Wizard" code="0x00006D56"/>
+					<role name="Bohemian" code="0x00006D55"/>
+				</shape>
+				<shape name="BodyBuilder" icon="BB-Wb">
+					<role name="All" code="0x00006D2E"/>
+					<role name="Serf" code="0x00006D2D"/>
+					<role name="Serf / Lower Class" code="0x00006D2C"/>
+					<role name="Merchant" code="0x00006D2B"/>
+					<role name="Noble" code="0x00006D2A"/>
+					<role name="Royal / Upper Class" code="0x00006D29"/>
+					<role name="Clergy / Spiritual" code="0x00006D28"/>
+					<role name="Knight / Protector" code="0x00006D27"/>
+					<role name="Brothel" code="0x00006D26"/>
+					<role name="Pirate" code="0x00006D25"/>
+					<role name="Wizard" code="0x00006D24"/>
+					<role name="Bohemian" code="0x00006D23"/>
+				</shape>
+				<shape name="Huge BodyBuilder" icon="HB-Wb">
+					<role name="All" code="0x00006CFC"/>
+					<role name="Serf" code="0x00006CFB"/>
+					<role name="Serf / Lower Class" code="0x00006CFA"/>
+					<role name="Merchant" code="0x00006CF9"/>
+					<role name="Noble" code="0x00006CF8"/>
+					<role name="Royal / Upper Class" code="0x00006CF7"/>
+					<role name="Clergy / Spiritual" code="0x00006CF6"/>
+					<role name="Knight / Protector" code="0x00006CF5"/>
+					<role name="Brothel" code="0x00006CF4"/>
+					<role name="Pirate" code="0x00006CF3"/>
+					<role name="Wizard" code="0x00006CF2"/>
+					<role name="Bohemian" code="0x00006CF1"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Merfolk">
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis" icon="EA-M">
+					<role name="All" code="0x00006BD0"/>
+					<role name="Serf / Lower Class" code="0x00006BCF"/>
+					<role name="Royal / Upper Class" code="0x00006BCE"/>
+					<role name="Clergy / Spiritual" code="0x00006BCD"/>
+					<role name="Knight / Protector" code="0x00006BCC"/>
+				</shape>
+			</group>
+			<group name="Curvy" gender="female">
+				<shape name="Androgyny" icon="FM-A">
+					<role name="All" code="0x00006BA8"/>
+					<role name="Serf / Lower Class" code="0x00006BA7"/>
+					<role name="Royal / Upper Class" code="0x00006BA6"/>
+					<role name="Clergy / Spiritual" code="0x00006BA5"/>
+					<role name="Knight / Protector" code="0x00006BA4"/>
+				</shape>
+				<shape name="Fashion Model" icon="FM-M">
+					<role name="All" code="0x00006B9E"/>
+					<role name="Serf / Lower Class" code="0x00006B9D"/>
+					<role name="Royal / Upper Class" code="0x00006B9C"/>
+					<role name="Clergy / Spiritual" code="0x00006B9B"/>
+					<role name="Knight / Protector" code="0x00006B9A"/>
+				</shape>
+				<shape name="FitChick" icon="FC-M">
+					<role name="All" code="0x00006B94"/>
+					<role name="Serf / Lower Class" code="0x00006B93"/>
+					<role name="Royal / Upper Class" code="0x00006B92"/>
+					<role name="Clergy / Spiritual" code="0x00006B91"/>
+					<role name="Knight / Protector" code="0x00006B90"/>
+				</shape>
+				<shape name="Sussi" icon="SS-M">
+					<role name="All" code="0x00006B80"/>
+					<role name="Serf / Lower Class" code="0x00006B7F"/>
+					<role name="Royal / Upper Class" code="0x00006B7E"/>
+					<role name="Clergy / Spiritual" code="0x00006B7D"/>
+					<role name="Knight / Protector" code="0x00006B7C"/>
+				</shape>
+				<shape name="Rio" icon="RO-M">
+					<role name="All" code="0x00006B6C"/>
+					<role name="Serf / Lower Class" code="0x00006B6B"/>
+					<role name="Royal / Upper Class" code="0x00006B6A"/>
+					<role name="Clergy / Spiritual" code="0x00006B69"/>
+					<role name="Knight / Protector" code="0x00006B68"/>
+				</shape>
+				<shape name="VolGal" icon="VO-M">
+					<role name="All" code="0x00006B58"/>
+					<role name="Serf / Lower Class" code="0x00006B57"/>
+					<role name="Royal / Upper Class" code="0x00006B56"/>
+					<role name="Clergy / Spiritual" code="0x00006B55"/>
+					<role name="Knight / Protector" code="0x00006B54"/>
+				</shape>
+				<shape name="CPU" icon="CP-M">
+					<role name="All" code="0x00006B44"/>
+					<role name="Serf / Lower Class" code="0x00006B43"/>
+					<role name="Royal / Upper Class" code="0x00006B42"/>
+					<role name="Clergy / Spiritual" code="0x00006B41"/>
+					<role name="Knight / Protector" code="0x00006B40"/>
+				</shape>
+				<shape name="RenGal" icon="RG-M">
+					<role name="All" code="0x00006B3A"/>
+					<role name="Serf / Lower Class" code="0x00006B39"/>
+					<role name="Royal / Upper Class" code="0x00006B38"/>
+					<role name="Clergy / Spiritual" code="0x00006B37"/>
+					<role name="Knight / Protector" code="0x00006B36"/>
+				</shape>
+			</group>
+			<group name="All" gender="male">
+				<shape name="Harem Dude" icon="HD-M">
+					<role name="All" code="0x00006AAE"/>
+					<role name="Serf / Lower Class" code="0x00006AAD"/>
+					<role name="Royal / Upper Class" code="0x00006AAC"/>
+					<role name="Clergy / Spiritual" code="0x00006AAB"/>
+					<role name="Knight / Protector" code="0x00006AAA"/>
+				</shape>
+				<shape name="Androgyny" icon="AY-M">
+					<role name="All" code="0x00006AA4"/>
+					<role name="Serf / Lower Class" code="0x00006AA3"/>
+					<role name="Royal / Upper Class" code="0x00006AA2"/>
+					<role name="Clergy / Spiritual" code="0x00006AA1"/>
+					<role name="Knight / Protector" code="0x00006AA0"/>
+				</shape>
+				<shape name="Lean BodyBuilder" icon="LB-M">
+					<role name="All" code="0x00006A90"/>
+					<role name="Serf / Lower Class" code="0x00006A8F"/>
+					<role name="Royal / Upper Class" code="0x00006A8E"/>
+					<role name="Clergy / Spiritual" code="0x00006A8D"/>
+					<role name="Knight / Protector" code="0x00006A8C"/>
+				</shape>
+				<shape name="Slim BodyBuilder" icon="SB-M">
+					<role name="All" code="0x00006A7C"/>
+					<role name="Serf / Lower Class" code="0x00006A7B"/>
+					<role name="Royal / Upper Class" code="0x00006A7A"/>
+					<role name="Clergy / Spiritual" code="0x00006A79"/>
+					<role name="Knight / Protector" code="0x00006A78"/>
+				</shape>
+				<shape name="BodyBuilder" icon="BB-M">
+					<role name="All" code="0x00006A68"/>
+					<role name="Serf / Lower Class" code="0x00006A67"/>
+					<role name="Royal / Upper Class" code="0x00006A66"/>
+					<role name="Clergy / Spiritual" code="0x00006A65"/>
+					<role name="Knight / Protector" code="0x00006A64"/>
+				</shape>
+				<shape name="Huge BodyBuilder" icon="HB-M">
+					<role name="All" code="0x00006A54"/>
+					<role name="Serf / Lower Class" code="0x00006A53"/>
+					<role name="Royal / Upper Class" code="0x00006A52"/>
+					<role name="Clergy / Spiritual" code="0x00006A51"/>
+					<role name="Knight / Protector" code="0x00006A50"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Satyr">
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis" icon="EA-S">
+					<role name="All" code="0x000069B4"/>
+					<role name="Serf / Lower Class" code="0x000069B3"/>
+					<role name="Royal / Upper Class" code="0x000069B2"/>
+					<role name="Clergy / Spiritual" code="0x000069B1"/>
+					<role name="Knight / Protector" code="0x000069B0"/>
+				</shape>
+			</group>
+			<group name="Curvy" gender="female">
+				<shape name="FitChick" icon="FC-S">
+					<role name="All" code="0x00006978"/>
+					<role name="Serf / Lower Class" code="0x00006977"/>
+					<role name="Royal / Upper Class" code="0x00006976"/>
+					<role name="Clergy / Spiritual" code="0x00006975"/>
+					<role name="Knight / Protector" code="0x00006974"/>
+				</shape>
+				<shape name="Sussi" icon="SS-S">
+					<role name="All" code="0x00006964"/>
+					<role name="Serf / Lower Class" code="0x00006963"/>
+					<role name="Royal / Upper Class" code="0x00006962"/>
+					<role name="Clergy / Spiritual" code="0x00006961"/>
+					<role name="Knight / Protector" code="0x00006960"/>
+				</shape>
+				<shape name="Rio" icon="RO-S">
+					<role name="All" code="0x00006950"/>
+					<role name="Serf / Lower Class" code="0x0000694F"/>
+					<role name="Royal / Upper Class" code="0x0000694E"/>
+					<role name="Clergy / Spiritual" code="0x0000694D"/>
+					<role name="Knight / Protector" code="0x0000694C"/>
+				</shape>
+			</group>
+			<group name="Brawny" gender="female">
+				<shape name="Athletic Girl" icon="AG-S">
+					<role name="All" code="0x00006900"/>
+					<role name="Serf / Lower Class" code="0x000068FF"/>
+					<role name="Royal / Upper Class" code="0x000068FE"/>
+					<role name="Clergy / Spiritual" code="0x000068FD"/>
+					<role name="Knight / Protector" code="0x000068FC"/>
+				</shape>
+				<shape name="BodyBuilder Girl" icon="BB-S">
+					<role name="All" code="0x000068EC"/>
+					<role name="Serf / Lower Class" code="0x000068EB"/>
+					<role name="Royal / Upper Class" code="0x000068EA"/>
+					<role name="Clergy / Spiritual" code="0x000068E9"/>
+					<role name="Knight / Protector" code="0x000068E8"/>
+				</shape>
+			</group>
+			<group name="All" gender="male">
+				<shape name="Lean BodyBuilder" icon="LB-S">
+					<role name="All" code="0x00006874"/>
+					<role name="Serf / Lower Class" code="0x00006873"/>
+					<role name="Royal / Upper Class" code="0x00006872"/>
+					<role name="Clergy / Spiritual" code="0x00006871"/>
+					<role name="Knight / Protector" code="0x00006870"/>
+				</shape>
+				<shape name="Slim BodyBuilder" icon="SB-S">
+					<role name="All" code="0x00006860"/>
+					<role name="Serf / Lower Class" code="0x0000685F"/>
+					<role name="Royal / Upper Class" code="0x0000685E"/>
+					<role name="Clergy / Spiritual" code="0x0000685D"/>
+					<role name="Knight / Protector" code="0x0000685C"/>
+				</shape>
+				<shape name="BodyBuilder" icon="BB-S">
+					<role name="All" code="0x0000684C"/>
+					<role name="Serf / Lower Class" code="0x0000684B"/>
+					<role name="Royal / Upper Class" code="0x0000684A"/>
+					<role name="Clergy / Spiritual" code="0x00006849"/>
+					<role name="Knight / Protector" code="0x00006848"/>
+				</shape>
+				<shape name="Huge BodyBuilder" icon="HB-S">
+					<role name="All" code="0x00006838"/>
+					<role name="Serf / Lower Class" code="0x00006837"/>
+					<role name="Royal / Upper Class" code="0x00006836"/>
+					<role name="Clergy / Spiritual" code="0x00006835"/>
+					<role name="Knight / Protector" code="0x00006834"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Naga">
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis" icon="N-EA">
+					<role name="All" code="0x00006798"/>
+					<role name="Serf / Lower Class" code="0x00006797"/>
+					<role name="Royal / Upper Class" code="0x00006796"/>
+					<role name="Clergy / Spiritual" code="0x00006795"/>
+					<role name="Knight / Protector" code="0x00006794"/>
+				</shape>
+			</group>
+			<group name="Curvy" gender="female">
+				<shape name="FitChick" icon="FC-N">
+					<role name="All" code="0x0000675C"/>
+					<role name="Serf / Lower Class" code="0x0000675B"/>
+					<role name="Royal / Upper Class" code="0x0000675A"/>
+					<role name="Clergy / Spiritual" code="0x00006759"/>
+					<role name="Knight / Protector" code="0x00006758"/>
+				</shape>
+				<shape name="Sussi" icon="SS-N">
+					<role name="All" code="0x00006748"/>
+					<role name="Serf / Lower Class" code="0x00006747"/>
+					<role name="Royal / Upper Class" code="0x00006746"/>
+					<role name="Clergy / Spiritual" code="0x00006745"/>
+					<role name="Knight / Protector" code="0x00006744"/>
+				</shape>
+				<shape name="Rio" icon="RO-N">
+					<role name="All" code="0x00006734"/>
+					<role name="Serf / Lower Class" code="0x00006733"/>
+					<role name="Royal / Upper Class" code="0x00006732"/>
+					<role name="Clergy / Spiritual" code="0x00006731"/>
+					<role name="Knight / Protector" code="0x00006730"/>
+				</shape>
+				<shape name="VolGal" icon="VO-N">
+					<role name="All" code="0x00006720"/>
+					<role name="Serf / Lower Class" code="0x0000671F"/>
+					<role name="Royal / Upper Class" code="0x0000671E"/>
+					<role name="Clergy / Spiritual" code="0x0000671D"/>
+					<role name="Knight / Protector" code="0x0000671C"/>
+				</shape>
+				<shape name="CPU" icon="CP-N">
+					<role name="All" code="0x0000670C"/>
+					<role name="Serf / Lower Class" code="0x0000670B"/>
+					<role name="Royal / Upper Class" code="0x0000670A"/>
+					<role name="Clergy / Spiritual" code="0x00006709"/>
+					<role name="Knight / Protector" code="0x00006708"/>
+				</shape>
+			</group>
+			<group name="All" gender="male">
+				<shape name="Lean BodyBuilder" icon="LB-N">
+					<role name="All" code="0x00006658"/>
+					<role name="Serf / Lower Class" code="0x00006657"/>
+					<role name="Royal / Upper Class" code="0x00006656"/>
+					<role name="Clergy / Spiritual" code="0x00006655"/>
+					<role name="Knight / Protector" code="0x00006654"/>
+				</shape>
+				<shape name="Slim BodyBuilder" icon="SB-N">
+					<role name="All" code="0x00006644"/>
+					<role name="Serf / Lower Class" code="0x00006643"/>
+					<role name="Royal / Upper Class" code="0x00006642"/>
+					<role name="Clergy / Spiritual" code="0x00006641"/>
+					<role name="Knight / Protector" code="0x00006640"/>
+				</shape>
+				<shape name="BodyBuilder" icon="BB-N">
+					<role name="All" code="0x00006630"/>
+					<role name="Serf / Lower Class" code="0x0000662F"/>
+					<role name="Royal / Upper Class" code="0x0000662E"/>
+					<role name="Clergy / Spiritual" code="0x0000662D"/>
+					<role name="Knight / Protector" code="0x0000662C"/>
+				</shape>
+				<shape name="Huge BodyBuilder" icon="HB-N">
+					<role name="All" code="0x0000661C"/>
+					<role name="Serf / Lower Class" code="0x0000661B"/>
+					<role name="Royal / Upper Class" code="0x0000661A"/>
+					<role name="Clergy / Spiritual" code="0x00006619"/>
+					<role name="Knight / Protector" code="0x00006618"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Harpy">
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis" icon="EA-H">
+					<role name="All" code="0x0000657C"/>
+					<role name="Serf / Lower Class" code="0x0000657B"/>
+					<role name="Royal / Upper Class" code="0x0000657A"/>
+					<role name="Clergy / Spiritual" code="0x00006579"/>
+					<role name="Knight / Protector" code="0x00006578"/>
+				</shape>
+			</group>
+			<group name="Curvy" gender="female">
+				<shape name="FitChick" icon="FC-H">
+					<role name="All" code="0x00006540"/>
+					<role name="Serf / Lower Class" code="0x0000653F"/>
+					<role name="Royal / Upper Class" code="0x0000653E"/>
+					<role name="Clergy / Spiritual" code="0x0000653D"/>
+					<role name="Knight / Protector" code="0x0000653C"/>
+				</shape>
+				<shape name="Sussi" icon="SS-H">
+					<role name="All" code="0x0000652C"/>
+					<role name="Serf / Lower Class" code="0x0000652B"/>
+					<role name="Royal / Upper Class" code="0x0000652A"/>
+					<role name="Clergy / Spiritual" code="0x00006529"/>
+					<role name="Knight / Protector" code="0x00006528"/>
+				</shape>
+			</group>
+			<group name="Brawny" gender="female">
+				<shape name="Athletic Girl" icon="AG-H">
+					<role name="All" code="0x000064DC"/>
+					<role name="Serf / Lower Class" code="0x000064DB"/>
+					<role name="Royal / Upper Class" code="0x000064DA"/>
+					<role name="Clergy / Spiritual" code="0x000064D9"/>
+					<role name="Knight / Protector" code="0x000064D8"/>
+				</shape>
+				<shape name="BodyBuilder Girl" icon="BB-H">
+					<role name="All" code="0x000064C8"/>
+					<role name="Serf / Lower Class" code="0x000064C7"/>
+					<role name="Royal / Upper Class" code="0x000064C6"/>
+					<role name="Clergy / Spiritual" code="0x000064C5"/>
+					<role name="Knight / Protector" code="0x000064C4"/>
+				</shape>
+			</group>
+			<group name="All" gender="male">
+				<shape name="Lean BodyBuilder" icon="LB-H">
+					<role name="All" code="0x00006450"/>
+					<role name="Serf / Lower Class" code="0x0000644F"/>
+					<role name="Royal / Upper Class" code="0x0000644E"/>
+					<role name="Clergy / Spiritual" code="0x0000644D"/>
+					<role name="Knight / Protector" code="0x0000644C"/>
+				</shape>
+				<shape name="Slim BodyBuilder" icon="SB-H">
+					<role name="All" code="0x0000643C"/>
+					<role name="Serf / Lower Class" code="0x0000643B"/>
+					<role name="Royal / Upper Class" code="0x0000643A"/>
+					<role name="Clergy / Spiritual" code="0x00006439"/>
+					<role name="Knight / Protector" code="0x00006438"/>
+				</shape>
+				<shape name="BodyBuilder" icon="BB-H">
+					<role name="All" code="0x00006428"/>
+					<role name="Serf / Lower Class" code="0x00006427"/>
+					<role name="Royal / Upper Class" code="0x00006426"/>
+					<role name="Clergy / Spiritual" code="0x00006425"/>
+					<role name="Knight / Protector" code="0x00006424"/>
+				</shape>
+				<shape name="Huge BodyBuilder" icon="HB-H">
+					<role name="All" code="0x00006414"/>
+					<role name="Serf / Lower Class" code="0x00006413"/>
+					<role name="Royal / Upper Class" code="0x00006412"/>
+					<role name="Clergy / Spiritual" code="0x00006411"/>
+					<role name="Knight / Protector" code="0x00006410"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Dryad">
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis" icon="EA-D">
+					<role name="All" code="0x00006374"/>
+					<role name="Serf / Lower Class" code="0x00006373"/>
+					<role name="Royal / Upper Class" code="0x00006372"/>
+					<role name="Clergy / Spiritual" code="0x00006371"/>
+					<role name="Knight / Protector" code="0x00006370"/>
+				</shape>
+			</group>
+			<group name="Curvy" gender="female">
+				<shape name="FitChick" icon="FC-D">
+					<role name="All" code="0x00006338"/>
+					<role name="Serf / Lower Class" code="0x00006337"/>
+					<role name="Royal / Upper Class" code="0x00006336"/>
+					<role name="Clergy / Spiritual" code="0x00006335"/>
+					<role name="Knight / Protector" code="0x00006334"/>
+				</shape>
+				<shape name="Sussi" icon="SS-D">
+					<role name="All" code="0x00006324"/>
+					<role name="Serf / Lower Class" code="0x00006323"/>
+					<role name="Royal / Upper Class" code="0x00006322"/>
+					<role name="Clergy / Spiritual" code="0x00006321"/>
+					<role name="Knight / Protector" code="0x00006320"/>
+				</shape>
+				<shape name="Rio" icon="RO-D">
+					<role name="All" code="0x00006310"/>
+					<role name="Serf / Lower Class" code="0x0000630F"/>
+					<role name="Royal / Upper Class" code="0x0000630E"/>
+					<role name="Clergy / Spiritual" code="0x0000630D"/>
+					<role name="Knight / Protector" code="0x0000630C"/>
+				</shape>
+				<shape name="VolGal" icon="VO-D">
+					<role name="All" code="0x000062FC"/>
+					<role name="Serf / Lower Class" code="0x000062FB"/>
+					<role name="Royal / Upper Class" code="0x000062FA"/>
+					<role name="Clergy / Spiritual" code="0x000062F9"/>
+					<role name="Knight / Protector" code="0x000062F8"/>
+				</shape>
+				<shape name="CPU" icon="CP-D">
+					<role name="All" code="0x000062E7"/>
+					<role name="Serf / Lower Class" code="0x000062E6"/>
+					<role name="Royal / Upper Class" code="0x000062E5"/>
+					<role name="Clergy / Spiritual" code="0x000062E4"/>
+					<role name="Knight / Protector" code="0x000062E3"/>
+				</shape>
+			</group>
+			<group name="All" gender="male">
+				<shape name="Lean BodyBuilder" icon="LB-D">
+					<role name="All" code="0x00006220"/>
+					<role name="Serf / Lower Class" code="0x0000621F"/>
+					<role name="Royal / Upper Class" code="0x0000621E"/>
+					<role name="Clergy / Spiritual" code="0x0000621D"/>
+					<role name="Knight / Protector" code="0x0000621C"/>
+				</shape>
+				<shape name="Slim BodyBuilder" icon="SB-D">
+					<role name="All" code="0x0000620C"/>
+					<role name="Serf / Lower Class" code="0x0000620B"/>
+					<role name="Royal / Upper Class" code="0x0000620A"/>
+					<role name="Clergy / Spiritual" code="0x00006209"/>
+					<role name="Knight / Protector" code="0x00006208"/>
+				</shape>
+				<shape name="BodyBuilder" icon="BB-D">
+					<role name="All" code="0x000061F8"/>
+					<role name="Serf / Lower Class" code="0x000061F7"/>
+					<role name="Royal / Upper Class" code="0x000061F6"/>
+					<role name="Clergy / Spiritual" code="0x000061F5"/>
+					<role name="Knight / Protector" code="0x000061F4"/>
+				</shape>
+				<shape name="Massive BodyBuilder" icon="HB-D">
+					<role name="All" code="0x000061E7"/>
+					<role name="Serf / Lower Class" code="0x000061E6"/>
+					<role name="Royal / Upper Class" code="0x000061E5"/>
+					<role name="Clergy / Spiritual" code="0x000061E4"/>
+					<role name="Knight / Protector" code="0x000061E3"/>
+				</shape>
+			</group>
+		</style>
+	</genre>
+</bsok>

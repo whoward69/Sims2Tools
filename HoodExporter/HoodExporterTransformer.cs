@@ -1,4 +1,6 @@
 ﻿using Saxon.Api;
+using Sims2Tools;
+using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,8 @@ namespace HoodExporter
 {
     public class HoodExporterTransformer : IResultDocumentHandler
     {
+        public static string extnUri = "http://picknmixmods.com/Sims2Tools/SaxonExtns";
+
         private readonly Uri baseUri;
 
         // See https://www.saxonica.com/html/documentation10/dotnetdoc/Saxon/Api/Processor.html
@@ -29,6 +33,7 @@ namespace HoodExporter
             processor.RegisterExtensionFunction(new AsHexDefn());
             processor.RegisterExtensionFunction(new AsHexNoPrefixDefn());
             processor.RegisterExtensionFunction(new AsYesNoDefn());
+            processor.RegisterExtensionFunction(new AsObjectNameDefn());
 
             compiler = processor.NewXsltCompiler();
             compiler.BaseUri = baseUri;
@@ -68,7 +73,7 @@ namespace HoodExporter
             this.resultType = resultType;
         }
 
-        public override QName FunctionName => new QName("http://picknmixmods.com/Sims2Tools/SaxonExtns", name);
+        public override QName FunctionName => new QName(HoodExporterTransformer.extnUri, name);
         public override int MinimumNumberOfArguments => 0;
         public override int MaximumNumberOfArguments => 1;
         public override XdmSequenceType[] ArgumentTypes => new XdmSequenceType[] { new XdmSequenceType(XdmAtomicType.BuiltInAtomicType(QName.XS_STRING), XdmSequenceType.ZERO_OR_ONE) };
@@ -125,7 +130,7 @@ namespace HoodExporter
             this.resultType = resultType;
         }
 
-        public override QName FunctionName => new QName("http://picknmixmods.com/Sims2Tools/SaxonExtns", name);
+        public override QName FunctionName => new QName(HoodExporterTransformer.extnUri, name);
         public override int MinimumNumberOfArguments => 1;
         public override int MaximumNumberOfArguments => 2;
         public override XdmSequenceType[] ArgumentTypes => new XdmSequenceType[] { new XdmSequenceType(XdmAtomicType.BuiltInAtomicType(QName.XS_INTEGER), XdmSequenceType.ONE_OR_MORE) };
@@ -230,10 +235,9 @@ namespace HoodExporter
         }
     }
 
-
     class AsYesNoDefn : ExtensionFunctionDefinition
     {
-        public override QName FunctionName => new QName("http://picknmixmods.com/Sims2Tools/SaxonExtns", "asYesNo");
+        public override QName FunctionName => new QName(HoodExporterTransformer.extnUri, "asYesNo");
         public override int MinimumNumberOfArguments => 0;
         public override int MaximumNumberOfArguments => 2;
         public override XdmSequenceType[] ArgumentTypes => new XdmSequenceType[] { new XdmSequenceType(XdmAtomicType.BuiltInAtomicType(QName.XS_STRING), XdmSequenceType.ZERO_OR_ONE), new XdmSequenceType(XdmAtomicType.BuiltInAtomicType(QName.XS_INTEGER), XdmSequenceType.ZERO_OR_ONE) };
@@ -296,6 +300,59 @@ namespace HoodExporter
             {
                 return EmptyEnumerator<XdmItem>.INSTANCE;
             }
+        }
+    }
+
+    class AsObjectNameDefn : ExtensionFunctionDefinition
+    {
+        public override QName FunctionName => new QName(HoodExporterTransformer.extnUri, "asObjectName");
+        public override int MinimumNumberOfArguments => 1;
+        public override int MaximumNumberOfArguments => 1;
+        public override XdmSequenceType[] ArgumentTypes => new XdmSequenceType[] { new XdmSequenceType(XdmAtomicType.BuiltInAtomicType(QName.XS_STRING), XdmSequenceType.ONE) };
+        public override bool TrustResultType => true;
+        public override XdmSequenceType ResultType(XdmSequenceType[] ArgumentTypes) => new XdmSequenceType(XdmAtomicType.BuiltInAtomicType(QName.XS_STRING), XdmSequenceType.ONE);
+        public override ExtensionFunctionCall MakeFunctionCall() => new AsObjectNameCall();
+    }
+
+    class AsObjectNameCall : ExtensionFunctionCall
+    {
+        public override IEnumerator<XdmItem> Call(IEnumerator<XdmItem>[] arguments, DynamicContext context)
+        {
+            if (arguments.Length == 1)
+            {
+                uint guid = 0;
+
+                if (arguments[0].MoveNext())
+                {
+                    string str = (String)((XdmAtomicValue)arguments[0].Current).Value;
+
+                    try
+                    {
+                        if (str.StartsWith("0x"))
+                        {
+                            guid = UInt32.Parse(str.Substring(2), NumberStyles.HexNumber);
+                        }
+                        else
+                        {
+                            guid = UInt32.Parse(str);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+
+                TypeGUID GUID = (TypeGUID)guid;
+
+                if (GameData.globalObjectsByGUID.ContainsKey(GUID))
+                {
+                    return new XdmAtomicValue(GameData.globalObjectsByGUID[GUID]).GetEnumerator();
+                }
+
+                return new XdmAtomicValue(GUID.ToString()).GetEnumerator();
+            }
+
+            return EmptyEnumerator<XdmItem>.INSTANCE;
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿/*
  * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -11,18 +11,14 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
-using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
-using Sims2Tools.DBPF.Images.THUB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
-using Sims2Tools.DBPF.XFLR;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
-using Sims2Tools.DBPF.XROF;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
@@ -31,6 +27,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
 #endregion
@@ -44,11 +41,12 @@ namespace ObjectRelocator
         private static readonly ushort QuarterTileOn = 0x0023;
         private static readonly ushort QuarterTileOff = 0x0001;
 
+        private readonly RelocatorDbpfCache packageCache = new RelocatorDbpfCache();
+
         private MruList MyMruList;
         private Updater MyUpdater;
 
-        private DBPFFile thumbCacheBuyMode = null;
-        private DBPFFile thumbCacheBuildMode = null;
+        private readonly ThumbnailCache thumbCache;
 
         private readonly TypeTypeID[] buyModeResources = new TypeTypeID[] { Objd.TYPE };
         private readonly TypeTypeID[] buildModeResources = new TypeTypeID[] { Objd.TYPE, Xfnc.TYPE, Xobj.TYPE };
@@ -134,6 +132,8 @@ namespace ObjectRelocator
             InitializeComponent();
             this.Text = $"{ObjectRelocatorApp.AppName} - {(IsBuyMode ? "Buy" : "Build")} Mode";
 
+            ObjectDbpfData.SetCache(packageCache);
+
             selectPathDialog = new CommonOpenFileDialog
             {
                 IsFolderPicker = true
@@ -145,26 +145,12 @@ namespace ObjectRelocator
 
             gridViewResources.DataSource = dataTableResources;
 
-            if (Sims2ToolsLib.IsSims2HomePathSet)
-            {
-                thumbCacheBuyMode = new DBPFFile($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\ObjectThumbnails.package");
-                thumbCacheBuildMode = new DBPFFile($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\BuildModeThumbnails.package");
-            }
+            thumbCache = new ThumbnailCache();
         }
 
         public new void Dispose()
         {
-            if (thumbCacheBuyMode != null)
-            {
-                thumbCacheBuyMode.Close();
-                thumbCacheBuyMode = null;
-            }
-
-            if (thumbCacheBuildMode != null)
-            {
-                thumbCacheBuildMode.Close();
-                thumbCacheBuildMode = null;
-            }
+            thumbCache.Close();
 
             base.Dispose();
         }
@@ -176,7 +162,7 @@ namespace ObjectRelocator
             RegistryTools.LoadAppSettings(ObjectRelocatorApp.RegistryKey, ObjectRelocatorApp.AppVersionMajor, ObjectRelocatorApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(ObjectRelocatorApp.RegistryKey, this);
 
-            MyMruList = new MruList(ObjectRelocatorApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize);
+            MyMruList = new MruList(ObjectRelocatorApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FolderSelected;
 
             buyMode = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemBuyMode.Name, 1) != 0);
@@ -204,11 +190,12 @@ namespace ObjectRelocator
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            if (IsAnyDirty())
+            if (IsAnyDirty() || IsThumbCacheDirty())
             {
                 string qualifier = IsAnyHiddenDirty() ? " HIDDEN" : "";
+                string type = (IsAnyDirty() ? (IsThumbCacheDirty() ? "object and thumbnail" : "object") : "thumbnail");
 
-                if (MsgBox.Show($"There are{qualifier} unsaved changes, do you really want to exit?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                if (MsgBox.Show($"There are{qualifier} unsaved {type} changes, do you really want to exit?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
                     e.Cancel = true;
                     return;
@@ -330,7 +317,7 @@ namespace ObjectRelocator
                 {
                     sender.VisualMode = ProgressBarDisplayMode.Percentage;
 
-                    using (DBPFFile package = new DBPFFile(packagePath))
+                    using (RelocatorDbpfFile package = packageCache.GetOrOpen(packagePath))
                     {
                         foreach (TypeTypeID type in (IsBuyMode ? buyModeResources : buildModeResources))
                         {
@@ -484,6 +471,11 @@ namespace ObjectRelocator
         #endregion
 
         #region Form State
+        private bool IsThumbCacheDirty()
+        {
+            return thumbCache.IsDirty;
+        }
+
         private bool IsAnyDirty()
         {
             foreach (DataRow row in dataTableResources.Rows)
@@ -510,37 +502,34 @@ namespace ObjectRelocator
             return false;
         }
 
-        private bool IsVisibleObject(DBPFResource res)
+        private bool IsVisibleObject(ObjectDbpfData objectData)
         {
-            if (menuItemHideLocals.Checked && res.GroupID == DBPFData.GROUP_LOCAL) return false;
+            if (menuItemHideLocals.Checked && objectData.GroupID == DBPFData.GROUP_LOCAL) return false;
 
-            if (menuItemHideNonLocals.Checked && res.GroupID != DBPFData.GROUP_LOCAL) return false;
+            if (menuItemHideNonLocals.Checked && objectData.GroupID != DBPFData.GROUP_LOCAL) return false;
 
-            if (res is Objd)
+            if (objectData.IsObjd)
             {
-                Objd objd = res as Objd;
-
                 // Exclude hidden objects?
                 if (menuItemExcludeHidden.Checked)
                 {
                     if (IsBuyMode)
                     {
-                        return !(objd.GetRawData(ObjdIndex.RoomSortFlags) == 0 && objd.GetRawData(ObjdIndex.FunctionSortFlags) == 0 /* && objd.GetRawData(ObjdIndex.FunctionSubSort) == 0 */ && objd.GetRawData(ObjdIndex.CommunitySort) == 0);
+                        return !(objectData.GetRawData(ObjdIndex.RoomSortFlags) == 0 && objectData.GetRawData(ObjdIndex.FunctionSortFlags) == 0 /* && objectData.GetRawData(ObjdIndex.FunctionSubSort) == 0 */ && objectData.GetRawData(ObjdIndex.CommunitySort) == 0);
                     }
                     else
                     {
-                        return !(objd.GetRawData(ObjdIndex.BuildModeType) == 0 /* && objd.GetRawData(ObjdIndex.BuildModeSubsort) == 0*/);
+                        return !(objectData.GetRawData(ObjdIndex.BuildModeType) == 0 /* && objectData.GetRawData(ObjdIndex.BuildModeSubsort) == 0*/);
                     }
                 }
             }
             else
             {
-                Cpf cpf = res as Cpf;
-                string type = cpf.GetItem("type").StringValue;
+                string type = objectData.GetStrItem("type");
 
-                if (cpf is Xfnc && !type.Equals("fence")) return false;
+                if (objectData.IsXfnc && !type.Equals("fence")) return false;
 
-                if (cpf is Xobj && !(type.Equals("floor") || type.Equals("wall"))) return false;
+                if (objectData.IsXobj && !(type.Equals("floor") || type.Equals("wall"))) return false;
             }
 
             return true;
@@ -554,30 +543,33 @@ namespace ObjectRelocator
 
             updatingFormState = true;
 
-            btnSave.Enabled = false;
+            menuItemSaveAll.Enabled = btnSave.Enabled = false;
 
             // Update the visibility in the underlying DataTable, do NOT use the Visible property of the DataGridView rows!!!
             foreach (DataRow row in dataTableResources.Rows)
             {
-                DBPFResource res = (row["ObjectData"] as ObjectDbpfData).Resource;
-
-                row["Visible"] = IsVisibleObject(res) ? "Yes" : "No";
+                row["Visible"] = IsVisibleObject(row["ObjectData"] as ObjectDbpfData) ? "Yes" : "No";
             }
 
             // Update the highlight state of the rows in the DataGridView
             foreach (DataGridViewRow row in gridViewResources.Rows)
             {
-                DBPFResource res = (row.Cells["colObjectData"].Value as ObjectDbpfData).Resource;
+                ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
-                if (res.IsDirty)
+                if (objectData.IsDirty)
                 {
-                    btnSave.Enabled = true;
+                    menuItemSaveAll.Enabled = btnSave.Enabled = true;
                     row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
                 }
                 else
                 {
                     row.DefaultCellStyle.BackColor = Color.Empty;
                 }
+            }
+
+            if (IsThumbCacheDirty())
+            {
+                menuItemSaveAll.Enabled = btnSave.Enabled = true;
             }
 
             updatingFormState = false;
@@ -735,7 +727,7 @@ namespace ObjectRelocator
             gridViewResources.Columns["colRooms"].Visible = IsBuyMode;
             gridViewResources.Columns["colCommunity"].Visible = IsBuyMode;
             gridViewResources.Columns["colUse"].Visible = IsBuyMode;
-            gridViewResources.Columns["colQuarterTile"].Visible = IsBuyMode;
+            // TODO - gridViewResources.Columns["colQuarterTile"].Visible = IsBuyMode;
             gridViewResources.Columns["colDepreciation"].Visible = IsBuyMode;
             gridViewResources.Columns["colFunction"].HeaderText = IsBuyMode ? "Function" : "Build";
 
@@ -758,6 +750,7 @@ namespace ObjectRelocator
                 if (index < dataTableResources.Rows.Count)
                 {
                     DataGridViewRow row = gridViewResources.Rows[index];
+                    ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
                     if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colTitle"))
                     {
@@ -767,29 +760,29 @@ namespace ObjectRelocator
                     {
                         if (menuItemShowGuids.Checked)
                         {
-                            e.ToolTipText = (row.Cells["colObjectData"].Value as ObjectDbpfData).PackagePath;
+                            e.ToolTipText = objectData.PackagePath;
                         }
                         else
                         {
-                            e.ToolTipText = $"{row.Cells["ColGuid"].Value} - {(row.Cells["colObjectData"].Value as ObjectDbpfData).PackagePath}";
+                            e.ToolTipText = $"{row.Cells["ColGuid"].Value} - {objectData.PackagePath}";
                         }
                     }
                     else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colGuid"))
                     {
-                        e.ToolTipText = (row.Cells["colObjectData"].Value as ObjectDbpfData).Resource.ToString();
+                        e.ToolTipText = objectData.ToString();
                     }
                     else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colFunction"))
                     {
-                        if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Resource is Objd objd)
+                        if (objectData.IsObjd)
                         {
                             if (IsBuyMode)
-                                e.ToolTipText = $"{Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.FunctionSortFlags))} - {Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.FunctionSubSort))}";
+                                e.ToolTipText = $"{Helper.Hex4PrefixString(objectData.GetRawData(ObjdIndex.FunctionSortFlags))} - {Helper.Hex4PrefixString(objectData.GetRawData(ObjdIndex.FunctionSubSort))}";
                             else
-                                e.ToolTipText = $"{Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.BuildModeType))} - {Helper.Hex4PrefixString(objd.GetRawData(ObjdIndex.BuildModeSubsort))}";
+                                e.ToolTipText = $"{Helper.Hex4PrefixString(objectData.GetRawData(ObjdIndex.BuildModeType))} - {Helper.Hex4PrefixString(objectData.GetRawData(ObjdIndex.BuildModeSubsort))}";
                         }
-                        else if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Resource is Xobj xobj)
+                        else if (objectData.IsXobj)
                         {
-                            e.ToolTipText = $"{xobj.GetItem("type")?.StringValue} - {xobj.GetItem("subsort")?.StringValue}";
+                            e.ToolTipText = $"{objectData.GetStrItem("type")} - {objectData.GetStrItem("subsort")}";
                         }
                     }
                     else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colDepreciation"))
@@ -802,136 +795,9 @@ namespace ObjectRelocator
 
         private Image GetThumbnail(DataGridViewRow row)
         {
-            Image thumbnail = null;
-
-            ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
-
-            if (objectData.Resource is Objd objd)
-            {
-                if (thumbCacheBuyMode != null) thumbnail = GetThumbnail(objectData.PackagePath, objd);
-            }
-            else if (objectData.Resource is Cpf cpf)
-            {
-                if (thumbCacheBuyMode != null) thumbnail = GetThumbnail(objectData.PackagePath, cpf);
-            }
-
-            return thumbnail;
+            return thumbCache.GetThumbnail(packageCache, row.Cells["colObjectData"].Value as ObjectDbpfData, IsBuyMode);
         }
 
-        private Image GetThumbnail(string packagePath, Objd objd)
-        {
-            Image thumbnail = null;
-
-            using (DBPFFile package = new DBPFFile(packagePath))
-            {
-                if (package != null)
-                {
-                    try
-                    {
-                        Str str = (Str)package.GetResourceByTGIR(Hash.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
-
-                        if (str != null)
-                        {
-                            int modelIndex = objd.GetRawData(ObjdIndex.DefaultGraphic);
-                            string cresname = str.LanguageItems(MetaData.Languages.English)[modelIndex].Title;
-                            TypeGroupID groupId = objd.GroupID;
-
-                            if (groupId == DBPFData.GROUP_LOCAL)
-                            {
-                                FileInfo fi = new FileInfo(packagePath);
-                                groupId = Hashes.GroupHash(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
-                            }
-
-                            TypeInstanceID thumbInstanceID = (TypeInstanceID)Hashes.ThumbnailHash(groupId, cresname);
-                            TypeResourceID thumbResourceID = (TypeResourceID)groupId.AsUInt();
-                            int hash = Hash.TGIRHash(thumbInstanceID, thumbResourceID, Thub.TYPES[(int)Thub.ThubTypeIndex.Object], DBPFData.GROUP_LOCAL);
-
-                            Thub thub = (Thub)thumbCacheBuyMode.GetResourceByTGIR(hash);
-                            if (thub == null)
-                            {
-                                thub = (Thub)thumbCacheBuildMode.GetResourceByTGIR(hash);
-                            }
-
-                            thumbnail = thub?.Image;
-                        }
-                    }
-                    finally
-                    {
-                        package.Close();
-                    }
-                }
-            }
-
-            return thumbnail;
-        }
-
-        private Image GetThumbnail(string packagePath, Cpf cpf)
-        {
-            Image thumbnail = null;
-
-            using (DBPFFile package = new DBPFFile(packagePath))
-            {
-                if (package != null)
-                {
-                    try
-                    {
-                        TypeGroupID groupId = cpf.GroupID;
-
-                        TypeTypeID thumbTypeID = DBPFData.Type_NULL;
-                        TypeInstanceID thumbInstanceID = (TypeInstanceID)cpf.GetItem("guid").UIntegerValue;
-                        TypeResourceID thumbResourceID = (TypeResourceID)groupId.AsUInt();
-                        // How to get a Build Mode thumbnail? As thumbInstanceID & thumbResourceID are garbage!
-
-                        string cpfType = cpf.GetItem("type").StringValue;
-                        if (cpf is Xobj && cpfType.Equals("floor"))
-                        {
-                            // Floor Coverings
-                            thumbTypeID = Thub.TYPES[(int)Thub.ThubTypeIndex.Floor];
-                        }
-                        else if (cpf is Xobj && cpfType.Equals("wall"))
-                        {
-                            // Wall Coverings
-                            thumbTypeID = Thub.TYPES[(int)Thub.ThubTypeIndex.Wall];
-                        }
-                        else if (cpf is Xrof && cpfType.Equals("roof"))
-                        {
-                            // Roof Tiles
-                            thumbTypeID = Thub.TYPES[(int)Thub.ThubTypeIndex.Roof];
-                        }
-                        else if (cpf is Xfnc && cpfType.Equals("fence"))
-                        {
-                            // Fence or Halfwall
-                            thumbTypeID = Thub.TYPES[(int)Thub.ThubTypeIndex.FenceOrHalfwall];
-                        }
-                        else if (cpf is Xflr && cpfType.Equals("terrainPaint"))
-                        {
-                            // Terrain Paint
-                            thumbTypeID = Thub.TYPES[(int)Thub.ThubTypeIndex.Terrain];
-
-                            if (cpf.GetItem("texturetname") != null)
-                                thumbInstanceID = (TypeInstanceID)Hashes.ThumbnailHash(Hashes.StripHashFromName(cpf.GetItem("texturetname").StringValue));
-                        }
-
-                        if (thumbTypeID != DBPFData.Type_NULL)
-                        {
-                            Thub thub = (Thub)thumbCacheBuildMode.GetResourceByTGIR(Hash.TGIRHash(thumbInstanceID, thumbResourceID, thumbTypeID, DBPFData.GROUP_LOCAL));
-                            if (thub == null)
-                                thub = (Thub)thumbCacheBuildMode.GetResourceByTGIR(Hash.TGIRHash(thumbInstanceID, DBPFData.RESOURCE_NULL, thumbTypeID, DBPFData.GROUP_LOCAL));
-                            if (thub == null)
-                                thub = (Thub)thumbCacheBuildMode.GetResourceByTGIR(Hash.TGIRHash(thumbInstanceID, (TypeResourceID)0xFFFFFFFF, thumbTypeID, DBPFData.GROUP_LOCAL));
-
-                            thumbnail = thub?.Image;
-                        }
-                    }
-                    finally
-                    {
-                        package.Close();
-                    }
-                }
-            }
-
-            return thumbnail;
-        }
         #endregion
 
         #region Grid Management
@@ -946,7 +812,7 @@ namespace ObjectRelocator
                 bool append = false;
                 foreach (DataGridViewRow row in gridViewResources.SelectedRows)
                 {
-                    UpdateEditor((row.Cells["colObjectData"].Value as ObjectDbpfData).Resource, append);
+                    UpdateEditor((row.Cells["colObjectData"].Value as ObjectDbpfData), append);
                     append = true;
                 }
             }
@@ -962,7 +828,7 @@ namespace ObjectRelocator
         #endregion
 
         #region Grid Row Fill
-        private DataRow FillRow(DBPFFile package, DataRow row, DBPFResource res)
+        private DataRow FillRow(RelocatorDbpfFile package, DataRow row, DBPFResource res)
         {
             row["Path"] = BuildPathString(package.PackagePath);
 
@@ -972,56 +838,42 @@ namespace ObjectRelocator
                 return FillBuildModeRow(package, row, res);
         }
 
-        private DataRow FillBuyModeRow(DBPFFile package, DataRow row, DBPFResource res)
+        private DataRow FillBuyModeRow(RelocatorDbpfFile package, DataRow row, DBPFResource res)
         {
-            Objd objd = res as Objd;
+            ObjectDbpfData objectData = ObjectDbpfData.Create(package, res);
 
             row["Visible"] = "Yes";
-            row["ObjectData"] = new ObjectDbpfData(package.PackagePath, objd);
+            row["ObjectData"] = objectData;
 
-            DBPFEntry ctssEntry = package.GetEntryByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
+            row["Title"] = objectData.Title;
+            row["Description"] = objectData.Title;
 
-            if (ctssEntry != null)
-            {
-                Ctss ctss = (Ctss)package.GetResourceByEntry(ctssEntry);
+            row["Name"] = objectData.KeyName;
+            row["Guid"] = objectData.Guid;
 
-                if (ctss != null)
-                {
-                    StrItemList strs = ctss.LanguageItems(MetaData.Languages.English);
+            row["Rooms"] = BuildRoomsString(objectData);
+            row["Function"] = BuildFunctionString(objectData);
+            row["Community"] = BuildCommunityString(objectData);
+            row["Use"] = BuildUseString(objectData);
 
-                    if (strs != null)
-                    {
-                        row["Title"] = strs[0]?.Title;
-                        row["Description"] = strs[1]?.Title;
-                    }
-                }
-            }
+            row["QuarterTile"] = BuildQuarterTileString(objectData);
 
-            row["Name"] = objd.KeyName;
-            row["Guid"] = objd.Guid;
-
-            row["Rooms"] = BuildRoomsString(objd);
-            row["Function"] = BuildFunctionString(objd);
-            row["Community"] = BuildCommunityString(objd);
-            row["Use"] = BuildUseString(objd);
-
-            row["QuarterTile"] = BuildQuarterTileString(objd);
-
-            row["Price"] = objd.GetRawData(ObjdIndex.Price);
-            row["Depreciation"] = $"{objd.GetRawData(ObjdIndex.DepreciationLimit)}, {objd.GetRawData(ObjdIndex.InitialDepreciation)}, {objd.GetRawData(ObjdIndex.DailyDepreciation)}, {objd.GetRawData(ObjdIndex.SelfDepreciating)}";
+            row["Price"] = objectData.GetRawData(ObjdIndex.Price);
+            row["Depreciation"] = $"{objectData.GetRawData(ObjdIndex.DepreciationLimit)}, {objectData.GetRawData(ObjdIndex.InitialDepreciation)}, {objectData.GetRawData(ObjdIndex.DailyDepreciation)}, {objectData.GetRawData(ObjdIndex.SelfDepreciating)}";
 
             return row;
         }
 
-        private DataRow FillBuildModeRow(DBPFFile package, DataRow row, DBPFResource res)
+        private DataRow FillBuildModeRow(RelocatorDbpfFile package, DataRow row, DBPFResource res)
         {
+            ObjectDbpfData objectData = ObjectDbpfData.Create(package, res);
+
             row["Visible"] = "Yes";
+            row["ObjectData"] = objectData;
 
-            if (res is Objd objd)
+            if (objectData.IsObjd)
             {
-                row["ObjectData"] = new ObjectDbpfData(package.PackagePath, objd);
-
-                DBPFEntry ctssEntry = package.GetEntryByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
+                DBPFEntry ctssEntry = package.GetEntryByKey(new DBPFKey(Ctss.TYPE, objectData.GroupID, (TypeInstanceID)objectData.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
 
                 if (ctssEntry != null)
                 {
@@ -1039,26 +891,29 @@ namespace ObjectRelocator
                     }
                 }
 
-                row["Name"] = objd.KeyName;
-                row["Guid"] = objd.Guid;
+                row["Name"] = objectData.KeyName;
+                row["Guid"] = objectData.Guid;
 
-                row["Function"] = BuildBuildString(objd);
+                row["Title"] = objectData.Title;
+                row["Description"] = objectData.Title;
 
-                row["Price"] = objd.GetRawData(ObjdIndex.Price);
+                row["Function"] = BuildBuildString(objectData);
+
+                row["QuarterTile"] = BuildQuarterTileString(objectData);
+
+                row["Price"] = objectData.GetRawData(ObjdIndex.Price);
             }
-            else if (res is Cpf cpf)
+            else if (objectData.IsCpf)
             {
-                row["ObjectData"] = new ObjectDbpfData(package.PackagePath, cpf);
+                row["Title"] = objectData.GetStrItem("name");
+                row["Description"] = objectData.GetStrItem("description");
 
-                row["Title"] = cpf.GetItem("name").StringValue;
-                row["Description"] = cpf.GetItem("description").StringValue;
+                row["Name"] = objectData.KeyName;
+                row["Guid"] = objectData.Guid;
 
-                row["Name"] = cpf.KeyName;
-                row["Guid"] = Helper.Hex8PrefixString(cpf.GetItem("guid").UIntegerValue);
+                row["Function"] = BuildBuildString(objectData);
 
-                row["Function"] = BuildBuildString(cpf);
-
-                row["Price"] = cpf.GetItem("cost").UIntegerValue;
+                row["Price"] = objectData.GetUIntItem("cost");
             }
 
             return row;
@@ -1069,9 +924,10 @@ namespace ObjectRelocator
             return new FileInfo(packagePath).FullName.Substring(folder.Length + 1);
         }
 
-        private string BuildRoomsString(Objd objd)
+        private string BuildRoomsString(ObjectDbpfData objectData)
         {
-            ushort roomFlags = objd.GetRawData(ObjdIndex.RoomSortFlags);
+            ushort roomFlags = objectData.GetRawData(ObjdIndex.RoomSortFlags);
+
             string rooms = "";
             if ((roomFlags & 0x0004) == 0x0004) rooms += " ,Bathroom";
             if ((roomFlags & 0x0002) == 0x0002) rooms += " ,Bedroom";
@@ -1086,10 +942,10 @@ namespace ObjectRelocator
             return rooms.Length > 0 ? rooms.Substring(2) : "";
         }
 
-        private string BuildFunctionString(Objd objd)
+        private string BuildFunctionString(ObjectDbpfData objectData)
         {
-            ushort funcFlags = objd.GetRawData(ObjdIndex.FunctionSortFlags);
-            ushort subFuncFlags = objd.GetRawData(ObjdIndex.FunctionSubSort);
+            ushort funcFlags = objectData.GetRawData(ObjdIndex.FunctionSortFlags);
+            ushort subFuncFlags = objectData.GetRawData(ObjdIndex.FunctionSubSort);
 
             if (funcFlags != 0 || subFuncFlags != 0)
             {
@@ -1207,12 +1063,12 @@ namespace ObjectRelocator
             return "";
         }
 
-        private string BuildBuildString(DBPFResource res)
+        private string BuildBuildString(ObjectDbpfData objectData)
         {
-            if (res is Objd objd)
+            if (objectData.IsObjd)
             {
-                ushort buildFlags = objd.GetRawData(ObjdIndex.BuildModeType);
-                ushort subBuildFlags = objd.GetRawData(ObjdIndex.BuildModeSubsort);
+                ushort buildFlags = objectData.GetRawData(ObjdIndex.BuildModeType);
+                ushort subBuildFlags = objectData.GetRawData(ObjdIndex.BuildModeSubsort);
 
                 if (buildFlags != 0 || subBuildFlags != 0)
                 {
@@ -1278,15 +1134,13 @@ namespace ObjectRelocator
             }
             else
             {
-                Cpf cpf = res as Cpf;
-
-                if (cpf is Xobj)
+                if (objectData.IsXobj)
                 {
-                    return $"{CapitaliseString(cpf.GetItem("type").StringValue)} - {CapitaliseString(cpf.GetItem("subsort").StringValue)}";
+                    return $"{CapitaliseString(objectData.GetStrItem("type"))} - {CapitaliseString(objectData.GetStrItem("subsort"))}";
                 }
                 else
                 {
-                    if (cpf.GetItem("ishalfwall") != null && cpf.GetItem("ishalfwall").UIntegerValue != 0)
+                    if (objectData.GetUIntItem("ishalfwall") != 0)
                         return "Walls - Halfwall";
                     else
                         return "Other - Fence";
@@ -1297,9 +1151,10 @@ namespace ObjectRelocator
             return "";
         }
 
-        private string BuildUseString(Objd objd)
+        private string BuildUseString(ObjectDbpfData objectData)
         {
-            ushort useFlags = objd.GetRawData(ObjdIndex.CatalogUseFlags);
+            ushort useFlags = objectData.GetRawData(ObjdIndex.CatalogUseFlags);
+
             string use = "";
             if ((useFlags & 0x0020) == 0x0020) use += " ,Toddlers";
             if ((useFlags & 0x0002) == 0x0002) use += " ,Children";
@@ -1311,9 +1166,10 @@ namespace ObjectRelocator
             return use.Length > 0 ? use.Substring(2) : "";
         }
 
-        private string BuildCommunityString(Objd objd)
+        private string BuildCommunityString(ObjectDbpfData objectData)
         {
-            ushort commFlags = objd.GetRawData(ObjdIndex.CommunitySort);
+            ushort commFlags = objectData.GetRawData(ObjdIndex.CommunitySort);
+
             string community = "";
             if ((commFlags & 0x0001) == 0x0001) community += " ,Dining";
             if ((commFlags & 0x0080) == 0x0080) community += " ,Misc";
@@ -1324,11 +1180,16 @@ namespace ObjectRelocator
             return community.Length > 0 ? community.Substring(2) : "";
         }
 
-        private string BuildQuarterTileString(Objd objd)
+        private string BuildQuarterTileString(ObjectDbpfData objectData)
         {
-            ushort quarterTile = objd.GetRawData(ObjdIndex.IgnoreQuarterTilePlacement);
+            if (objectData.IsObjd)
+            {
+                ushort quarterTile = objectData.GetRawData(ObjdIndex.IgnoreQuarterTilePlacement);
 
-            return (quarterTile == QuarterTileOn) ? "Yes" : "No";
+                return (quarterTile == QuarterTileOff) ? "No" : "Yes";
+            }
+
+            return "";
         }
 
         private string CapitaliseString(string s)
@@ -1357,15 +1218,13 @@ namespace ObjectRelocator
                     bool oldDataLoading = dataLoading;
                     dataLoading = true;
 
-                    Objd objd = selectedObject.Resource as Objd;
-
-                    row.Cells["colRooms"].Value = BuildRoomsString(objd);
-                    row.Cells["colFunction"].Value = BuildFunctionString(objd);
-                    row.Cells["colCommunity"].Value = BuildCommunityString(objd);
-                    row.Cells["colUse"].Value = BuildUseString(objd);
-                    row.Cells["colQuarterTile"].Value = BuildQuarterTileString(objd);
-                    row.Cells["colPrice"].Value = objd.GetRawData(ObjdIndex.Price);
-                    row.Cells["colDepreciation"].Value = $"{objd.GetRawData(ObjdIndex.DepreciationLimit)}, {objd.GetRawData(ObjdIndex.InitialDepreciation)}, {objd.GetRawData(ObjdIndex.DailyDepreciation)}, {objd.GetRawData(ObjdIndex.SelfDepreciating)}";
+                    row.Cells["colRooms"].Value = BuildRoomsString(selectedObject);
+                    row.Cells["colFunction"].Value = BuildFunctionString(selectedObject);
+                    row.Cells["colCommunity"].Value = BuildCommunityString(selectedObject);
+                    row.Cells["colUse"].Value = BuildUseString(selectedObject);
+                    row.Cells["colQuarterTile"].Value = BuildQuarterTileString(selectedObject);
+                    row.Cells["colPrice"].Value = selectedObject.GetRawData(ObjdIndex.Price);
+                    row.Cells["colDepreciation"].Value = $"{selectedObject.GetRawData(ObjdIndex.DepreciationLimit)}, {selectedObject.GetRawData(ObjdIndex.InitialDepreciation)}, {selectedObject.GetRawData(ObjdIndex.DailyDepreciation)}, {selectedObject.GetRawData(ObjdIndex.SelfDepreciating)}";
 
                     dataLoading = oldDataLoading;
                     return;
@@ -1382,17 +1241,16 @@ namespace ObjectRelocator
                     bool oldDataLoading = dataLoading;
                     dataLoading = true;
 
-                    DBPFResource res = selectedObject.Resource;
+                    row.Cells["colFunction"].Value = BuildBuildString(selectedObject);
+                    row.Cells["colQuarterTile"].Value = BuildQuarterTileString(selectedObject);
 
-                    row.Cells["colFunction"].Value = BuildBuildString(res);
-
-                    if (res is Objd objd)
+                    if (selectedObject.IsObjd)
                     {
-                        row.Cells["colPrice"].Value = objd.GetRawData(ObjdIndex.Price);
+                        row.Cells["colPrice"].Value = selectedObject.GetRawData(ObjdIndex.Price);
                     }
                     else
                     {
-                        row.Cells["colPrice"].Value = (res as Cpf).GetItem("cost").UIntegerValue;
+                        row.Cells["colPrice"].Value = selectedObject.GetUIntItem("cost");
                     }
 
                     dataLoading = oldDataLoading;
@@ -1416,7 +1274,7 @@ namespace ObjectRelocator
 
             foreach (ObjectDbpfData selectedObject in selectedData)
             {
-                if (selectedObject.Resource is Objd)
+                if (selectedObject.IsObjd)
                 {
                     UpdateObjdData(selectedObject, index, (ushort)nv.Value);
                 }
@@ -1448,7 +1306,7 @@ namespace ObjectRelocator
 
             foreach (ObjectDbpfData selectedObject in selectedData)
             {
-                if (selectedObject.Resource is Objd)
+                if (selectedObject.IsObjd)
                 {
                     UpdateObjdData(selectedObject, index, data);
                 }
@@ -1493,9 +1351,7 @@ namespace ObjectRelocator
 
             foreach (ObjectDbpfData selectedObject in selectedData)
             {
-                Objd objd = selectedObject.Resource as Objd;
-
-                ushort data = objd.GetRawData(index);
+                ushort data = selectedObject.GetRawData(index);
 
                 if (state)
                 {
@@ -1518,7 +1374,7 @@ namespace ObjectRelocator
         {
             if (ignoreEdits) return;
 
-            (selectedObject.Resource as Objd).SetRawData(index, data);
+            selectedObject.SetRawData(index, data);
 
             UpdateGridRow(selectedObject);
         }
@@ -1527,7 +1383,7 @@ namespace ObjectRelocator
         {
             if (ignoreEdits) return;
 
-            (selectedObject.Resource as Cpf).GetItem(itemName).UIntegerValue = data;
+            selectedObject.SetUIntItem(itemName, data);
 
             UpdateGridRow(selectedObject);
         }
@@ -1536,7 +1392,7 @@ namespace ObjectRelocator
         {
             if (ignoreEdits) return;
 
-            (selectedObject.Resource as Cpf).GetItem(itemName).StringValue = value;
+            selectedObject.SetStrItem(itemName, value);
 
             UpdateGridRow(selectedObject);
         }
@@ -1585,7 +1441,7 @@ namespace ObjectRelocator
             ckbUseElders.Checked = false;
             ckbUseGroupActivity.Checked = false;
 
-            ckbQuarterTile.Checked = false;
+            ckbBuyQuarterTile.Checked = false;
 
             textBuyPrice.Text = "";
 
@@ -1597,26 +1453,26 @@ namespace ObjectRelocator
 
         private void ClearBuildModeEditor()
         {
+            ckbBuildQuarterTile.Checked = false;
+
             textBuildPrice.Text = "";
         }
 
-        private void UpdateEditor(DBPFResource res, bool append)
+        private void UpdateEditor(ObjectDbpfData objectData, bool append)
         {
             ignoreEdits = true;
 
             if (IsBuyMode)
-                UpdateBuyModeEditor(res, append);
+                UpdateBuyModeEditor(objectData, append);
             else
-                UpdateBuildModeEditor(res, append);
+                UpdateBuildModeEditor(objectData, append);
 
             ignoreEdits = false;
         }
 
-        private void UpdateBuyModeEditor(DBPFResource res, bool append)
+        private void UpdateBuyModeEditor(ObjectDbpfData objectData, bool append)
         {
-            Objd objd = res as Objd;
-
-            ushort newRoomFlags = objd.GetRawData(ObjdIndex.RoomSortFlags);
+            ushort newRoomFlags = objectData.GetRawData(ObjdIndex.RoomSortFlags);
             if (append)
             {
                 if (cachedRoomFlags != newRoomFlags)
@@ -1648,14 +1504,14 @@ namespace ObjectRelocator
 
             if (append)
             {
-                if (cachedFunctionFlags != objd.GetRawData(ObjdIndex.FunctionSortFlags))
+                if (cachedFunctionFlags != objectData.GetRawData(ObjdIndex.FunctionSortFlags))
                 {
                     comboFunction.SelectedIndex = -1;
                     comboSubfunction.SelectedIndex = -1;
                 }
                 else
                 {
-                    if (cachedSubfunctionFlags != objd.GetRawData(ObjdIndex.FunctionSubSort))
+                    if (cachedSubfunctionFlags != objectData.GetRawData(ObjdIndex.FunctionSubSort))
                     {
                         comboSubfunction.SelectedIndex = -1;
                     }
@@ -1663,8 +1519,8 @@ namespace ObjectRelocator
             }
             else
             {
-                cachedFunctionFlags = objd.GetRawData(ObjdIndex.FunctionSortFlags);
-                cachedSubfunctionFlags = objd.GetRawData(ObjdIndex.FunctionSubSort);
+                cachedFunctionFlags = objectData.GetRawData(ObjdIndex.FunctionSortFlags);
+                cachedSubfunctionFlags = objectData.GetRawData(ObjdIndex.FunctionSubSort);
                 foreach (object o in comboFunction.Items)
                 {
                     if ((o as NamedValue).Value == cachedFunctionFlags)
@@ -1676,7 +1532,7 @@ namespace ObjectRelocator
                 }
             }
 
-            ushort newUseFlags = objd.GetRawData(ObjdIndex.CatalogUseFlags);
+            ushort newUseFlags = objectData.GetRawData(ObjdIndex.CatalogUseFlags);
             if (append)
             {
                 if (cachedUseFlags != newUseFlags)
@@ -1700,7 +1556,7 @@ namespace ObjectRelocator
                 if ((cachedUseFlags & 0x0004) == 0x0004) ckbUseGroupActivity.Checked = true;
             }
 
-            ushort newCommFlags = objd.GetRawData(ObjdIndex.CommunitySort);
+            ushort newCommFlags = objectData.GetRawData(ObjdIndex.CommunitySort);
             if (append)
             {
                 if ((cachedCommunityFlags & 0x0001) != (newCommFlags & 0x0001)) ckbCommDining.CheckState = CheckState.Indeterminate;
@@ -1719,74 +1575,74 @@ namespace ObjectRelocator
                 if ((cachedCommunityFlags & 0x0008) == 0x0008) ckbCommStreet.Checked = true;
             }
 
-            ushort newQuarterTile = objd.GetRawData(ObjdIndex.IgnoreQuarterTilePlacement);
+            ushort newQuarterTile = objectData.GetRawData(ObjdIndex.IgnoreQuarterTilePlacement);
             if (append)
             {
-                if (cachedQuarterTile != newQuarterTile)
+                if ((cachedQuarterTile == QuarterTileOff && newQuarterTile != QuarterTileOff) || (cachedQuarterTile != QuarterTileOff && newQuarterTile == QuarterTileOff))
                 {
-                    ckbQuarterTile.CheckState = CheckState.Indeterminate;
+                    ckbBuyQuarterTile.CheckState = CheckState.Indeterminate;
                 }
             }
             else
             {
                 cachedQuarterTile = newQuarterTile;
-                ckbQuarterTile.Checked = (cachedQuarterTile == QuarterTileOn);
+                ckbBuyQuarterTile.Checked = (cachedQuarterTile != QuarterTileOff);
             }
 
             if (append)
             {
-                if (!textBuyPrice.Text.Equals(objd.GetRawData(ObjdIndex.Price).ToString()))
+                if (!textBuyPrice.Text.Equals(objectData.GetRawData(ObjdIndex.Price).ToString()))
                 {
                     textBuyPrice.Text = "";
                 }
             }
             else
             {
-                textBuyPrice.Text = objd.GetRawData(ObjdIndex.Price).ToString();
+                textBuyPrice.Text = objectData.GetRawData(ObjdIndex.Price).ToString();
             }
 
             if (append)
             {
-                if (!textDepLimit.Text.Equals(objd.GetRawData(ObjdIndex.DepreciationLimit).ToString()))
+                if (!textDepLimit.Text.Equals(objectData.GetRawData(ObjdIndex.DepreciationLimit).ToString()))
                 {
                     textDepLimit.Text = "";
                 }
-                if (!textDepInitial.Text.Equals(objd.GetRawData(ObjdIndex.InitialDepreciation).ToString()))
+                if (!textDepInitial.Text.Equals(objectData.GetRawData(ObjdIndex.InitialDepreciation).ToString()))
                 {
                     textDepInitial.Text = "";
                 }
-                if (!textDepDaily.Text.Equals(objd.GetRawData(ObjdIndex.DailyDepreciation).ToString()))
+                if (!textDepDaily.Text.Equals(objectData.GetRawData(ObjdIndex.DailyDepreciation).ToString()))
                 {
                     textDepDaily.Text = "";
                 }
-                if (ckbDepSelf.Checked != ((objd.GetRawData(ObjdIndex.SelfDepreciating) != 0)))
+                if (ckbDepSelf.Checked != ((objectData.GetRawData(ObjdIndex.SelfDepreciating) != 0)))
                 {
                     ckbDepSelf.CheckState = CheckState.Indeterminate;
                 }
             }
             else
             {
-                textDepLimit.Text = objd.GetRawData(ObjdIndex.DepreciationLimit).ToString();
-                textDepInitial.Text = objd.GetRawData(ObjdIndex.InitialDepreciation).ToString();
-                textDepDaily.Text = objd.GetRawData(ObjdIndex.DailyDepreciation).ToString();
-                ckbDepSelf.Checked = (objd.GetRawData(ObjdIndex.SelfDepreciating) != 0);
+                textDepLimit.Text = objectData.GetRawData(ObjdIndex.DepreciationLimit).ToString();
+                textDepInitial.Text = objectData.GetRawData(ObjdIndex.InitialDepreciation).ToString();
+                textDepDaily.Text = objectData.GetRawData(ObjdIndex.DailyDepreciation).ToString();
+                ckbDepSelf.Checked = (objectData.GetRawData(ObjdIndex.SelfDepreciating) != 0);
             }
         }
 
-        private void UpdateBuildModeEditor(DBPFResource res, bool append)
+        private void UpdateBuildModeEditor(ObjectDbpfData objectData, bool append)
         {
-            if (res is Objd objd)
+            if (objectData.IsObjd)
             {
                 if (append)
                 {
-                    if (cachedBuildFlags != objd.GetRawData(ObjdIndex.BuildModeType))
+                    if (cachedBuildFlags != objectData.GetRawData(ObjdIndex.BuildModeType))
                     {
                         comboBuild.SelectedIndex = -1;
                         comboSubbuild.SelectedIndex = -1;
                     }
                     else
                     {
-                        if (cachedSubbuildFlags != objd.GetRawData(ObjdIndex.BuildModeSubsort))
+                        if (cachedSubbuildFlags != objectData.GetRawData(ObjdIndex.BuildModeSubsort))
                         {
                             comboSubbuild.SelectedIndex = -1;
                         }
@@ -1794,8 +1650,8 @@ namespace ObjectRelocator
                 }
                 else
                 {
-                    cachedBuildFlags = objd.GetRawData(ObjdIndex.BuildModeType);
-                    cachedSubbuildFlags = objd.GetRawData(ObjdIndex.BuildModeSubsort);
+                    cachedBuildFlags = objectData.GetRawData(ObjdIndex.BuildModeType);
+                    cachedSubbuildFlags = objectData.GetRawData(ObjdIndex.BuildModeSubsort);
                     foreach (object o in comboBuild.Items)
                     {
                         if ((o as NamedValue).Value == cachedBuildFlags)
@@ -1807,33 +1663,45 @@ namespace ObjectRelocator
                     }
                 }
 
+                ushort newQuarterTile = objectData.GetRawData(ObjdIndex.IgnoreQuarterTilePlacement);
                 if (append)
                 {
-                    if (!textBuildPrice.Text.Equals(objd.GetRawData(ObjdIndex.Price).ToString()))
+                    if ((cachedQuarterTile == QuarterTileOff && newQuarterTile != QuarterTileOff) || (cachedQuarterTile != QuarterTileOff && newQuarterTile == QuarterTileOff))
+                    {
+                        ckbBuildQuarterTile.CheckState = CheckState.Indeterminate;
+                    }
+                }
+                else
+                {
+                    cachedQuarterTile = newQuarterTile;
+                    ckbBuildQuarterTile.Checked = (cachedQuarterTile != QuarterTileOff);
+                }
+
+                if (append)
+                {
+                    if (!textBuildPrice.Text.Equals(objectData.GetRawData(ObjdIndex.Price).ToString()))
                     {
                         textBuildPrice.Text = "";
                     }
                 }
                 else
                 {
-                    textBuildPrice.Text = objd.GetRawData(ObjdIndex.Price).ToString();
+                    textBuildPrice.Text = objectData.GetRawData(ObjdIndex.Price).ToString();
                 }
             }
             else
             {
-                Cpf cpf = res as Cpf;
-
                 ushort fakeBuildSort;
                 ushort fakeBuildSubsort = 0x0000;
 
-                if (cpf is Xfnc)
+                if (objectData.IsXfnc)
                 {
-                    fakeBuildSort = (ushort)((cpf.GetItem("ishalfwall") != null && cpf.GetItem("ishalfwall").UIntegerValue != 0) ? 0x1000 : 0x0001);
+                    fakeBuildSort = (ushort)((objectData.GetUIntItem("ishalfwall") != 0) ? 0x1000 : 0x0001);
                     fakeBuildSubsort = 0x8000;
                 }
                 else
                 {
-                    if (cpf.GetItem("type").StringValue.Equals("floor"))
+                    if (objectData.GetStrItem("type").Equals("floor"))
                     {
                         fakeBuildSort = 0x1000;
                     }
@@ -1842,7 +1710,7 @@ namespace ObjectRelocator
                         fakeBuildSort = 0x2000;
                     }
 
-                    string s = cpf.GetItem("subsort").StringValue;
+                    string s = objectData.GetStrItem("subsort");
 
                     foreach (NamedValue nv in coveringSubsortItems)
                     {
@@ -1885,16 +1753,18 @@ namespace ObjectRelocator
                     }
                 }
 
+                ckbBuildQuarterTile.CheckState = CheckState.Indeterminate;
+
                 if (append)
                 {
-                    if (!textBuildPrice.Text.Equals(cpf.GetItem("cost").UIntegerValue.ToString()))
+                    if (!textBuildPrice.Text.Equals(objectData.GetUIntItem("cost").ToString()))
                     {
                         textBuildPrice.Text = "";
                     }
                 }
                 else
                 {
-                    textBuildPrice.Text = cpf.GetItem("cost").UIntegerValue.ToString();
+                    textBuildPrice.Text = objectData.GetUIntItem("cost").ToString();
                 }
             }
         }
@@ -2242,9 +2112,14 @@ namespace ObjectRelocator
             if (IsAutoUpdate) UpdateSelectedRows(ckbUseGroupActivity.Checked, ObjdIndex.CatalogUseFlags, 0x0004);
         }
 
-        private void OnQuarterTileClicked(object sender, EventArgs e)
+        private void OnBuyQuarterTileClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbQuarterTile.Checked ? QuarterTileOn : QuarterTileOff, ObjdIndex.IgnoreQuarterTilePlacement);
+            if (IsAutoUpdate) UpdateSelectedRows(ckbBuyQuarterTile.Checked ? QuarterTileOn : QuarterTileOff, ObjdIndex.IgnoreQuarterTilePlacement);
+        }
+
+        private void OnBuildQuarterTileClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbBuildQuarterTile.Checked ? QuarterTileOn : QuarterTileOff, ObjdIndex.IgnoreQuarterTilePlacement);
         }
 
         private void OnDepreciationSelfClicked(object sender, EventArgs e)
@@ -2411,41 +2286,55 @@ namespace ObjectRelocator
                 return;
             }
 
-            bool proceed = false;
-
-            // Was the mouse right-click over a selected row?
-            foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
+            // Mouse has to be over a selected row
+            foreach (DataGridViewRow mouseRow in gridViewResources.SelectedRows)
             {
-                if (mouseLocation.RowIndex == selectedRow.Index)
+                if (mouseLocation.RowIndex == mouseRow.Index)
                 {
-                    proceed = true;
+                    menuItemContextMoveFiles.Enabled = true;
 
-                    break;
+                    menuItemContextRowRestore.Enabled = false;
+
+                    foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
+                    {
+                        if ((selectedRow.Cells["colObjectData"].Value as ObjectDbpfData).IsDirty)
+                        {
+                            menuItemContextRowRestore.Enabled = true;
+                            menuItemContextMoveFiles.Enabled = false;
+
+                            break;
+                        }
+                    }
+
+
+                    if (gridViewResources.SelectedRows.Count == 1)
+                    {
+                        ObjectDbpfData objectData = mouseRow.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                        menuItemContextEditTitleDesc.Enabled = objectData.HasTitleAndDescription;
+
+                        Image thumbnail = thumbCache.GetThumbnail(packageCache, objectData, IsBuyMode);
+                        menuContextSaveThumb.Enabled = (thumbnail != null);
+                        menuContextReplaceThumb.Enabled = menuContextDeleteThumb.Enabled = (thumbnail != null) && !menuItemMakeReplacements.Checked;
+                    }
+                    else
+                    {
+                        menuItemContextEditTitleDesc.Enabled = false;
+
+                        menuContextSaveThumb.Enabled = menuContextReplaceThumb.Enabled = menuContextDeleteThumb.Enabled = false;
+                    }
+
+                    return;
                 }
             }
 
-            if (!proceed)
-            {
-                e.Cancel = true;
-                return;
-            }
+            e.Cancel = true;
+            return;
+        }
 
-            menuItemContextEditTitleDesc.Enabled = (gridViewResources.SelectedRows.Count == 1);
-            menuItemContextRowRestore.Enabled = false;
-            menuItemContextMoveFiles.Enabled = true;
-
-            foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
-            {
-                if ((selectedRow.Cells["colObjectData"].Value as ObjectDbpfData).IsDirty)
-                {
-                    menuItemContextRowRestore.Enabled = true;
-                    menuItemContextMoveFiles.Enabled = false;
-
-                    break;
-                }
-            }
-
-            menuItemContextEditTitleDesc.Enabled = false; // TODO - ObjReloc - Title & Desc
+        private void OnContextMenuOpened(object sender, EventArgs e)
+        {
+            thumbBox.Visible = false;
         }
 
         private void OnContextMenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
@@ -2484,23 +2373,23 @@ namespace ObjectRelocator
                 }
             }
 
-            foreach (ObjectDbpfData selectedObject in selectedData)
+            foreach (ObjectDbpfData objectData in selectedData)
             {
                 foreach (DataGridViewRow row in gridViewResources.Rows)
                 {
-                    ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
-
-                    if (objectData.Equals(selectedObject))
+                    if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Equals(objectData))
                     {
-                        using (DBPFFile package = new DBPFFile(objectData.PackagePath))
-                        {
-                            DBPFResource originalRes = package.GetResourceByKey(objectData.Resource);
+                        packageCache.SetClean(objectData.PackagePath);
 
-                            objectData.Resource = originalRes;
+                        using (RelocatorDbpfFile package = packageCache.GetOrOpen(objectData.PackagePath))
+                        {
+                            ObjectDbpfData originalData = ObjectDbpfData.Create(package, objectData);
+
+                            row.Cells["colObjectData"].Value = originalData;
 
                             package.Close();
 
-                            UpdateGridRow(objectData);
+                            UpdateGridRow(originalData);
                         }
                     }
                 }
@@ -2509,60 +2398,105 @@ namespace ObjectRelocator
             UpdateFormState();
         }
 
+        private void OnSaveThumbClicked(object sender, EventArgs e)
+        {
+            DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+            ObjectDbpfData objectData = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
+
+            saveThumbnailDialog.DefaultExt = "png";
+            saveThumbnailDialog.Filter = $"PNG file|*.png|JPG file|*.jpg|All files|*.*";
+            saveThumbnailDialog.FileName = $"{objectData.PackageNameNoExtn}.png";
+
+            saveThumbnailDialog.ShowDialog();
+
+            if (saveThumbnailDialog.FileName != "")
+            {
+                using (Stream stream = saveThumbnailDialog.OpenFile())
+                {
+                    Image thumbnail = thumbCache.GetThumbnail(packageCache, objectData, IsBuyMode);
+
+                    thumbnail?.Save(stream, (saveThumbnailDialog.FileName.EndsWith("jpg") ? ImageFormat.Jpeg : ImageFormat.Png));
+
+                    stream.Close();
+                }
+            }
+        }
+
+        private void OnReplaceThumbClicked(object sender, EventArgs e)
+        {
+            DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+            ObjectDbpfData objectData = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
+
+            if (openThumbnailDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    Image newThumbnail = Image.FromFile(openThumbnailDialog.FileName);
+
+                    thumbCache.ReplaceThumbnail(packageCache, objectData, IsBuyMode, newThumbnail);
+
+                    if (IsThumbCacheDirty())
+                    {
+                        menuItemSaveAll.Enabled = btnSave.Enabled = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn(ex);
+                    MsgBox.Show($"Unable to open/read {openThumbnailDialog.FileName}", "Thumbnail Error");
+                }
+            }
+        }
+
+        private void OnDeleteThumbClicked(object sender, EventArgs e)
+        {
+            DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+            ObjectDbpfData objectData = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
+
+            if (objectData?.ThumbnailOwner != null)
+            {
+                thumbCache.DeleteThumbnail(packageCache, objectData, IsBuyMode);
+
+                if (IsThumbCacheDirty())
+                {
+                    menuItemSaveAll.Enabled = btnSave.Enabled = true;
+                }
+            }
+        }
+
         private void OnMoveFilesClicked(object sender, EventArgs e)
         {
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                string destPath = selectPathDialog.FileName;
-                HashSet<string> filesToMove = new HashSet<string>();
-                Dictionary<string, string> filesThatMoved = new Dictionary<string, string>();
-
-                foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+                foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
                 {
-                    string srcFile = (row.Cells["colObjectData"].Value as ObjectDbpfData).PackagePath;
+                    string fromPackagePath = selectedRow.Cells["colPackagePath"].Value as string;
+                    string toPackagePath = $"{selectPathDialog.FileName}\\{new DirectoryInfo(fromPackagePath).Name}";
 
-                    if (!(new FileInfo(srcFile).Directory.FullName.Equals(destPath)))
+                    if (File.Exists(toPackagePath))
                     {
-                        filesToMove.Add(srcFile);
+                        MsgBox.Show($"Name clash, {selectPathDialog.FileName} already exists in the selected folder", "Package Move Error");
+                        return;
                     }
                 }
 
-                foreach (String srcFile in filesToMove)
+                foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
                 {
-                    string destFile = $"{destPath}\\{new FileInfo(srcFile).Name}";
+                    string fromPackagePath = selectedRow.Cells["colPackagePath"].Value as string;
+                    string toPackagePath = $"{selectPathDialog.FileName}\\{new DirectoryInfo(fromPackagePath).Name}";
 
-                    if (!File.Exists(destFile))
+                    try
                     {
-                        try
-                        {
-                            File.Move(srcFile, destFile);
-                            filesThatMoved.Add(srcFile, destFile);
-                        }
-                        catch (Exception)
-                        {
-                            MsgBox.Show($"Error trying to move {srcFile} to {destFile}", "File Move Error!");
-                        }
+                        File.Move(fromPackagePath, toPackagePath);
                     }
-                    else
+                    catch (Exception)
                     {
-                        MsgBox.Show($"Cannot move {srcFile} to {destFile} as file already exists", "File Move Conflict!");
+                        MsgBox.Show($"Error trying to move {fromPackagePath} to {toPackagePath}", "File Move Error!");
                     }
                 }
 
-                foreach (DataGridViewRow row in gridViewResources.Rows)
-                {
-                    ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+                DoWork_FillGrid(folder, false);
 
-                    string rowFile = objectData.PackagePath;
-
-                    if (filesThatMoved.ContainsKey(rowFile))
-                    {
-                        string newPath = filesThatMoved[rowFile];
-
-                        objectData.PackagePath = newPath;
-                        row.Cells["colPath"].Value = BuildPathString(newPath);
-                    }
-                }
             }
         }
         #endregion
@@ -2584,12 +2518,25 @@ namespace ObjectRelocator
                 Save();
             }
 
+            if (IsThumbCacheDirty())
+            {
+                try
+                {
+                    thumbCache.Update(menuItemAutoBackup.Checked);
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn("Error trying to update cigen.package", ex);
+                    MsgBox.Show("Error trying to update cigen.package", "Package Update Error!");
+                }
+            }
+
             UpdateFormState();
         }
 
         private void Save()
         {
-            Dictionary<string, List<DBPFResource>> dirtyResourceByPackage = new Dictionary<string, List<DBPFResource>>();
+            Dictionary<string, List<ObjectDbpfData>> dirtyObjectsByPackage = new Dictionary<string, List<ObjectDbpfData>>();
 
             foreach (DataGridViewRow row in gridViewResources.Rows)
             {
@@ -2599,24 +2546,22 @@ namespace ObjectRelocator
                 {
                     String packageFile = objectData.PackagePath;
 
-                    if (!dirtyResourceByPackage.ContainsKey(packageFile))
+                    if (!dirtyObjectsByPackage.ContainsKey(packageFile))
                     {
-                        dirtyResourceByPackage.Add(packageFile, new List<DBPFResource>());
+                        dirtyObjectsByPackage.Add(packageFile, new List<ObjectDbpfData>());
                     }
 
-                    dirtyResourceByPackage[packageFile].Add(objectData.Resource);
+                    dirtyObjectsByPackage[packageFile].Add(objectData);
                 }
             }
 
-            foreach (string packageFile in dirtyResourceByPackage.Keys)
+            foreach (string packageFile in dirtyObjectsByPackage.Keys)
             {
-                using (DBPFFile dbpfPackage = new DBPFFile(packageFile))
+                using (RelocatorDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
                 {
-                    foreach (DBPFResource editedObjd in dirtyResourceByPackage[packageFile])
+                    foreach (ObjectDbpfData editedObject in dirtyObjectsByPackage[packageFile])
                     {
-                        dbpfPackage.Commit(editedObjd);
-
-                        editedObjd.SetClean();
+                        editedObject.SetClean();
                     }
 
                     try
@@ -2635,7 +2580,7 @@ namespace ObjectRelocator
 
         private void SaveAs(string packageFile)
         {
-            using (DBPFFile dbpfPackage = new DBPFFile(packageFile))
+            using (RelocatorDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
             {
                 foreach (DataGridViewRow row in gridViewResources.Rows)
                 {
@@ -2643,7 +2588,7 @@ namespace ObjectRelocator
 
                     if (editedObject.IsDirty)
                     {
-                        dbpfPackage.Commit(editedObject.Resource);
+                        editedObject.CopyTo(dbpfPackage);
 
                         editedObject.SetClean();
                     }

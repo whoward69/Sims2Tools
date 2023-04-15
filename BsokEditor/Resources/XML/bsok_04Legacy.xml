@@ -1,0 +1,582 @@
+<?xml version="1.0"?>
+<bsok>
+	<genre name="Legacy BSOK">
+		<style name="Body Shapes">
+			<group name="Curvy Sizes" gender="female">
+				<shape name="Classic Pin-Up" icon="CP" creator="Warlokk">
+					<role name="All" code="0x0000007D"/>
+				</shape>
+				<shape name="Rio" icon="RO" creator="Warlokk">
+					<role name="All" code="0x00000096"/>
+				</shape>
+				<shape name="FitChick" icon="FC" creator="Poppeboy">
+					<role name="All" code="0x000000B1"/>
+				</shape>
+				<shape name="Voluptuous Gal" icon="VO" creator="Warlokk">
+					<role name="All" code="0x0000006D"/>
+				</shape>
+				<shape name="Booty Cutie" icon="BC" creator="Mia_studios">
+					<role name="All" code="0x00000067"/>
+				</shape>
+				<shape name="Sussi" icon="SS" creator="Sussi">
+					<role name="All" code="0x0000009A"/>
+				</shape>
+				<shape name="Kurvy K" icon="KK" creator="FrannySims">
+					<role name="All" code="0x00000090"/>
+				</shape>
+				<shape name="Made of Dreams" icon="MD" creator="BobbyTH">
+					<role name="All" code="0x0000009F"/>
+				</shape>
+				<shape name="Inebriant 34C SexyBum" icon="IS" creator="DOEreoh">
+					<role name="All" code="0x000000B7"/>
+				</shape>
+				<shape name="Midwest Farmer's Daughter" icon="FD" creator="Vanity_Demise">
+					<role name="All" code="0x00000086"/>
+				</shape>
+				<shape name="Bootylicious DD" icon="BD" creator="BobbyTH">
+					<role name="All" code="0x0000009B"/>
+				</shape>
+				<shape name="Bootylicious" icon="BY" creator="BobbyTH">
+					<role name="All" code="0x0000009D"/>
+				</shape>
+				<shape name="Bootylicious C" icon="BC" creator="BobbyTH">
+					<role name="All" code="0x0000009E"/>
+				</shape>
+				<shape name="Bootylicious G" icon="BG" creator="BobbyTH">
+					<role name="All" code="0x00000099"/>
+				</shape>
+				<shape name="Girl Next Door" icon="GN" creator="BobbyTH">
+					<role name="All" code="0x00000094"/>
+				</shape>
+				<shape name="Statuesque" icon="ST" creator="Jaccirocker">
+					<role name="All" code="0x0000008E"/>
+				</shape>
+				<shape name="Hourglass" icon="HG" creator="DLMulsow">
+					<role name="All" code="0x0000009C"/>
+				</shape>
+				<shape name="Fantasy Girl" icon="FY" creator="Rising_Sun">
+					<role name="All" code="0x000000A3"/>
+				</shape>
+				<shape name="Dream Girl" icon="DM" creator="Rising_Sun">
+					<role name="All" code="0x000000AF"/>
+				</shape>
+				<shape name="Rubens" icon="RB" creator="Bloom">
+					<role name="All" code="0x00000098"/>
+				</shape>
+			</group>
+			<group name="Muscly Sizes" gender="female">
+				<shape name="Athletic Girl" icon="AG" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000008B"/>
+				</shape>
+				<shape name="Bodybuilder Girl" icon="BB" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x00000076"/>
+				</shape>
+				<shape name="Amazonian" icon="AZ" creator="Ocelotekatl">
+					<role name="All" code="0x00000057"/>
+				</shape>
+				<shape name="Death by Snu-Snu" icon="SN" creator="Ocelotekatl">
+					<role name="All" code="0x00000059"/>
+				</shape>
+				<shape name="Xenos Heroine" icon="XH" creator="Xenos">
+					<role name="All" code="0x00000074"/>
+				</shape>
+				<shape name="Cyclist" icon="CycF" creator="Ocelotekatl">
+					<role name="All" code="0x0000008D"/>
+				</shape>
+			</group>
+			<group name="Slim Sizes" gender="female">
+				<shape name="Fashion Model" icon="FM" creator="Warlokk">
+					<role name="All" code="0x000000BA"/>
+				</shape>
+				<shape name="Faerie Gal" icon="FE" creator="Warlokk">
+					<role name="All" code="0x000000BE"/>
+				</shape>
+				<shape name="Androgyny" icon="AY" creator="Gothplague">
+					<role name="All" code="0x000000BC"/>
+				</shape>
+				<shape name="Miana" icon="MI" creator="Gothplague">
+					<role name="All" code="0x000000C0"/>
+				</shape>
+				<shape name="Lifa's MtF Transgender" icon="AfTr" creator="Lifa">
+					<role name="All" code="0x000000BB"/>
+				</shape>
+				<shape name="Milla J" icon="MJ" creator="Warlokk">
+					<role name="All" code="0x000000FB"/>
+				</shape>
+				<shape name="Slim Family" icon="SF" creator="Melodie9">
+					<role name="All" code="0x000000C1"/>
+				</shape>
+			</group>
+			<group name="Body Realism Sizes" gender="female">
+				<shape name="Renaissance Gal" icon="RG" creator="Warlokk">
+					<role name="All" code="0x00000069"/>
+				</shape>
+				<shape name="Momma Lisa" icon="ML" creator="FrannySims">
+					<role name="All" code="0x00000063"/>
+				</shape>
+				<shape name="Well-Rounded Sim" icon="WR" creator="Dr. Pixel">
+					<role name="All" code="0x0000006F"/>
+				</shape>
+				<shape name="Lady Apple" icon="LA" creator="spider+rugs">
+					<role name="All" code="0x00000064"/>
+				</shape>
+				<shape name="MartaXL" icon="MX" creator="Martaxl">
+					<role name="All" code="0x0000005F"/>
+				</shape>
+				<shape name="Fat Family" icon="FF" creator="Melodie9">
+					<role name="All" code="0x00000061"/>
+				</shape>
+				<shape name="Big Girl" icon="NB" creator="Netra">
+					<role name="All" code="0x00000060"/>
+				</shape>
+				<shape name="Thick Madam" icon="TM" creator="Netra">
+					<role name="All" code="0x00000062"/>
+				</shape>
+				<shape name="Buxom Wench" icon="BW" creator="Cynnix">
+					<role name="All" code="0x0000006C"/>
+				</shape>
+			</group>
+			<group name="Body Surrealism Sizes" gender="female">
+				<shape name="Toon Gal" icon="TG" creator="Warlokk">
+					<role name="All" code="0x00000092"/>
+				</shape>
+				<shape name="Power Girl" icon="PG" creator="Warlokk">
+					<role name="All" code="0x00000072"/>
+				</shape>
+				<shape name="Booty Gal" icon="BG" creator="Warlokk">
+					<role name="All" code="0x00000065"/>
+				</shape>
+				<shape name="Busty Gal" icon="BT" creator="LizCrea">
+					<role name="All" code="0x000000A4"/>
+				</shape>
+				<shape name="Hyper Busty" icon="HY" creator="Bloom">
+					<role name="All" code="0x0000005D"/>
+				</shape>
+				<shape name="Monster Jugs" icon="MJ" creator="Bloom">
+					<role name="All" code="0x0000005C"/>
+				</shape>
+			</group>
+			<group name="Warlokk Adult Combos" gender="female">
+				<shape name="DDD-40" icon="F0" creator="Warlokk">
+					<role name="All" code="0x000000D2"/>
+				</shape>
+				<shape name="DDD-38" icon="F8" creator="Warlokk">
+					<role name="All" code="0x000000D3"/>
+				</shape>
+				<shape name="DDD-36" icon="F6" creator="Warlokk">
+					<role name="All" code="0x000000D4"/>
+				</shape>
+				<shape name="DDD-34" icon="F4" creator="Warlokk">
+					<role name="All" code="0x000000D5"/>
+				</shape>
+				<shape name="DD-40" icon="E0" creator="Warlokk">
+					<role name="All" code="0x000000D6"/>
+				</shape>
+				<shape name="DD-38" icon="E8" creator="Warlokk">
+					<role name="All" code="0x000000D7"/>
+				</shape>
+				<shape name="DD-36" icon="E6" creator="Warlokk">
+					<role name="All" code="0x000000D8"/>
+				</shape>
+				<shape name="DD-34" icon="E4" creator="Warlokk">
+					<role name="All" code="0x000000D9"/>
+				</shape>
+				<shape name="D-40" icon="D0" creator="Warlokk">
+					<role name="All" code="0x000000DA"/>
+				</shape>
+				<shape name="D-38" icon="D8" creator="Warlokk">
+					<role name="All" code="0x000000DB"/>
+				</shape>
+				<shape name="D-36" icon="D6" creator="Warlokk">
+					<role name="All" code="0x000000DC"/>
+				</shape>
+				<shape name="D-34" icon="D4" creator="Warlokk">
+					<role name="All" code="0x000000DD"/>
+				</shape>
+				<shape name="D-32" icon="D2" creator="Warlokk">
+					<role name="All" code="0x000000DE"/>
+				</shape>
+				<shape name="C-40" icon="C0" creator="Warlokk">
+					<role name="All" code="0x000000DF"/>
+				</shape>
+				<shape name="C-38" icon="C8" creator="Warlokk">
+					<role name="All" code="0x000000E0"/>
+				</shape>
+				<shape name="C-36" icon="C6" creator="Warlokk">
+					<role name="All" code="0x000000E1"/>
+				</shape>
+				<shape name="C-34" icon="C4" creator="Warlokk">
+					<role name="All" code="0x000000E2"/>
+				</shape>
+				<shape name="C-32" icon="C2" creator="Warlokk">
+					<role name="All" code="0x000000E3"/>
+				</shape>
+				<shape name="B-40" icon="B0" creator="Warlokk">
+					<role name="All" code="0x000000E4"/>
+				</shape>
+				<shape name="B-38" icon="B8" creator="Warlokk">
+					<role name="All" code="0x000000E5"/>
+				</shape>
+				<shape name="B-36" icon="B6" creator="Warlokk">
+					<role name="All" code="0x000000E6"/>
+				</shape>
+				<shape name="B-32" icon="B2" creator="Warlokk">
+					<role name="All" code="0x000000E7"/>
+				</shape>
+				<shape name="A-40" icon="A0" creator="Warlokk">
+					<role name="All" code="0x000000E8"/>
+				</shape>
+				<shape name="A-38" icon="A8" creator="Warlokk">
+					<role name="All" code="0x000000E9"/>
+				</shape>
+				<shape name="A-36" icon="A6" creator="Warlokk">
+					<role name="All" code="0x000000EA"/>
+				</shape>
+				<shape name="A-34" icon="A4" creator="Warlokk">
+					<role name="All" code="0x000000EB"/>
+				</shape>
+				<shape name="A-32" icon="A2" creator="Warlokk">
+					<role name="All" code="0x000000EC"/>
+				</shape>
+			</group>
+			<group name="Warlokk Tops" gender="female">
+				<shape name="DDD" icon="F" creator="Warlokk">
+					<role name="All" code="0x000000F7"/>
+				</shape>
+				<shape name="DD" icon="E" creator="Warlokk">
+					<role name="All" code="0x000000F8"/>
+				</shape>
+				<shape name="D" icon="D" creator="Warlokk">
+					<role name="All" code="0x000000F9"/>
+				</shape>
+				<shape name="C" icon="C" creator="Warlokk">
+					<role name="All" code="0x000000FA"/>
+				</shape>
+				<shape name="A" icon="A" creator="Warlokk">
+					<role name="All" code="0x000000FC"/>
+				</shape>
+			</group>
+			<group name="Warlokk Adult Bottoms" gender="female">
+				<shape name="Adult 40" icon="40" creator="Warlokk">
+					<role name="All" code="0x000000F2"/>
+				</shape>
+				<shape name="Adult 38" icon="38" creator="Warlokk">
+					<role name="All" code="0x000000F3"/>
+				</shape>
+				<shape name="Adult 36" icon="36" creator="Warlokk">
+					<role name="All" code="0x000000F4"/>
+				</shape>
+				<shape name="Adult 32" icon="32" creator="Warlokk">
+					<role name="All" code="0x000000F5"/>
+				</shape>
+			</group>
+			<group name="Warlokk Teen Combos" gender="female">
+				<shape name="Teen D X-Large" icon="DX" creator="Warlokk">
+					<role name="All" code="0x000000C3"/>
+				</shape>
+				<shape name="Teen D Large" icon="DL" creator="Warlokk">
+					<role name="All" code="0x000000C4"/>
+				</shape>
+				<shape name="Teen D Medium" icon="DM" creator="Warlokk">
+					<role name="All" code="0x000000C5"/>
+				</shape>
+				<shape name="Teen C X-Large" icon="CX" creator="Warlokk">
+					<role name="All" code="0x000000C6"/>
+				</shape>
+				<shape name="Teen C Large" icon="CL" creator="Warlokk">
+					<role name="All" code="0x000000C7"/>
+				</shape>
+				<shape name="Teen C Medium" icon="CM" creator="Warlokk">
+					<role name="All" code="0x000000C8"/>
+				</shape>
+				<shape name="Teen C Small" icon="CS" creator="Warlokk">
+					<role name="All" code="0x000000C9"/>
+				</shape>
+				<shape name="Teen B X-Large" icon="BX" creator="Warlokk">
+					<role name="All" code="0x000000CA"/>
+				</shape>
+				<shape name="Teen B Large" icon="BL" creator="Warlokk">
+					<role name="All" code="0x000000CB"/>
+				</shape>
+				<shape name="Teen B Small" icon="BS" creator="Warlokk">
+					<role name="All" code="0x000000CC"/>
+				</shape>
+				<shape name="Teen A X-Large" icon="AX" creator="Warlokk">
+					<role name="All" code="0x000000CD"/>
+				</shape>
+				<shape name="Teen A Large" icon="AL" creator="Warlokk">
+					<role name="All" code="0x000000CE"/>
+				</shape>
+				<shape name="Teen A Medium" icon="AM" creator="Warlokk">
+					<role name="All" code="0x000000CF"/>
+				</shape>
+				<shape name="Teen A Small" icon="AS" creator="Warlokk">
+					<role name="All" code="0x000000D0"/>
+				</shape>
+			</group>
+			<group name="Warlokk Teen Bottoms" gender="female">
+				<shape name="Teen X-Large" icon="XL" creator="Warlokk">
+					<role name="All" code="0x000000EE"/>
+				</shape>
+				<shape name="Teen Large" icon="LG" creator="Warlokk">
+					<role name="All" code="0x000000EF"/>
+				</shape>
+				<shape name="Teen Small" icon="SM" creator="Warlokk">
+					<role name="All" code="0x000000F0"/>
+				</shape>
+			</group>
+			<group name="Pierre Sizes" gender="female">
+				<shape name="Teresa" icon="TR" creator="Pierre">
+					<role name="All" code="0x0000006B"/>
+				</shape>
+				<shape name="Nichon" icon="NC" creator="Pierre">
+					<role name="All" code="0x00000079"/>
+				</shape>
+				<shape name="Divine" icon="DV" creator="Pierre">
+					<role name="All" code="0x0000007B"/>
+				</shape>
+				<shape name="Amour" icon="AM" creator="Pierre">
+					<role name="All" code="0x0000007F"/>
+				</shape>
+				<shape name="Beaute" icon="BT" creator="Pierre">
+					<role name="All" code="0x00000081"/>
+				</shape>
+				<shape name="Cherie" icon="CR" creator="Pierre">
+					<role name="All" code="0x00000083"/>
+				</shape>
+				<shape name="Olympe" icon="OL" creator="Pierre">
+					<role name="All" code="0x00000089"/>
+				</shape>
+				<shape name="Modele" icon="ML" creator="Pierre">
+					<role name="All" code="0x000000A6"/>
+				</shape>
+				<shape name="Poupee" icon="PP" creator="Pierre">
+					<role name="All" code="0x000000A8"/>
+				</shape>
+				<shape name="Chaton" icon="CT" creator="Pierre">
+					<role name="All" code="0x000000AA"/>
+				</shape>
+				<shape name="Darling" icon="DL" creator="Pierre">
+					<role name="All" code="0x000000AD"/>
+				</shape>
+				<shape name="Petite" icon="PT" creator="Pierre">
+					<role name="All" code="0x000000B4"/>
+				</shape>
+			</group>
+			<group name="Muscly Sizes" gender="male">
+				<shape name="Slim Bodybuilder" icon="SBB" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x00000045"/>
+				</shape>
+				<shape name="Lean Bodybuilder" icon="LBB" creator="SynapticSim">
+					<role name="All" code="0x0000004B"/>
+				</shape>
+				<shape name="Bodybuilder" icon="BB" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x00000043"/>
+				</shape>
+				<shape name="Huge Bodybuilder" icon="HBB" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x00000041"/>
+				</shape>
+				<shape name="Massive Bodybuilder" icon="MBB" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x0000003D"/>
+				</shape>
+				<shape name="Bear Bodybuilder" icon="BR" creator="Montoto">
+					<role name="All" code="0x0000003F"/>
+				</shape>
+				<shape name="Athlete" icon="AT" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x00000049"/>
+				</shape>
+				<shape name="Neanderthal" icon="NT" creator="Bloom">
+					<role name="All" code="0x00000047"/>
+				</shape>
+				<shape name="Superhero" icon="SR" creator="">
+					<role name="All" code="0x00000040"/>
+				</shape>
+				<shape name="Runner" icon="RN" creator="Jaccirocker">
+					<role name="All" code="0x00000046"/>
+				</shape>
+				<shape name="Cyclist" icon="CycM" creator="Ocelotekatl">
+					<role name="All" code="0x00000048"/>
+				</shape>
+			</group>
+			<group name="Slim Sizes" gender="male">
+				<shape name="Harem Dude" icon="HD" creator="G-Knee">
+					<role name="All" code="0x00000050"/>
+				</shape>
+				<shape name="Punk Junkie" icon="PJ" creator="Corinne">
+					<role name="All" code="0x0000004D"/>
+				</shape>
+				<shape name="Slim Male" icon="SM" creator="July77">
+					<role name="All" code="0x0000004E"/>
+				</shape>
+				<shape name="Slim Family Male" icon="SF" creator="Melodie9">
+					<role name="All" code="0x0000004F"/>
+				</shape>
+				<shape name="Lifa's FtM Transgender" icon="AfTr" creator="Lifa">
+					<role name="All" code="0x0000004A"/>
+				</shape>
+				<shape name="Transgender B-Cup" icon="TB" creator="">
+					<role name="All" code="0x0000004C"/>
+				</shape>
+			</group>
+			<group name="Body Realism Sizes" gender="male">
+				<shape name="MartaXL" icon="MX" creator="Martaxl">
+					<role name="All" code="0x00000037"/>
+				</shape>
+				<shape name="Consort's Fat Male" icon="CF" creator="Consort">
+					<role name="All" code="0x0000003B"/>
+				</shape>
+				<shape name="Fat Family Male" icon="FF" creator="Melodie9">
+					<role name="All" code="0x00000039"/>
+				</shape>
+				<shape name="Chubby Guy" icon="CG" creator="Netra">
+					<role name="All" code="0x0000003A"/>
+				</shape>
+				<shape name="Trans Momma Lisa" icon="TrML" creator="Kaluxsims">
+					<role name="All" code="0x0000003C"/>
+				</shape>
+			</group>
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis original" icon="EA" creator="(Maxis)">
+					<role name="All" code="0x0000001E"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Supernatural">
+			<group name="Creatures/Misc" gender="unisex">
+				<shape name="Dryad / Tree" icon="" creator="">
+					<role name="All" code="0x0000002C"/>
+				</shape>
+				<shape name="Syn's Werewolves" icon="SW" creator="SynapticSim">
+					<role name="All" code="0x0000002D"/>
+				</shape>
+				<shape name="Lizard" icon="" creator="">
+					<role name="All" code="0x0000002E"/>
+				</shape>
+				<shape name="Satyrs" icon="SR" creator="SavantInamorata">
+					<role name="All" code="0x0000002F"/>
+				</shape>
+				<shape name="Centaurs" icon="CR" creator="Pierre">
+					<role name="All" code="0x00000030"/>
+				</shape>
+				<shape name="Mermaid / Merman" icon="MM" creator="Beosboxboy/Marvine">
+					<role name="All" code="0x00000031"/>
+				</shape>
+				<shape name="Outdoor Adventures" icon="OA" creator="">
+					<role name="All" code="0x00000032"/>
+				</shape>
+				<shape name="Huge Body Builder Beast" icon="H3" creator="SynapticSim">
+					<role name="All" code="0x00000033"/>
+				</shape>
+				<shape name="Naga" icon="" creator="WickedSims">
+					<role name="All" code="0x00000034"/>
+				</shape>
+				<shape name="Nightcrawler / Nocturne" icon="NN" creator="SynapticSim">
+					<role name="All" code="0x00000035"/>
+				</shape>
+				<shape name="Quarians" icon="" creator="Ken Murikumo">
+					<role name="All" code="0x00000036"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Categories / Sites">
+			<group name="Categories / Sites" gender="unisex">
+				<shape name="Holiday (NEEDS ICON)" icon="" creator="">
+					<role name="All" code="0x0000001F"/>
+				</shape>
+				<shape name="Goth / Garden of Shadows" icon="" creator="">
+					<role name="All" code="0x00000020"/>
+				</shape>
+				<shape name="Steampunk" icon="" creator="">
+					<role name="All" code="0x00000021"/>
+				</shape>
+				<shape name="Medieval" icon="" creator="">
+					<role name="All" code="0x00000022"/>
+				</shape>
+				<shape name="Stone Age (NEEDS ICON)" icon="" creator="">
+					<role name="All" code="0x00000023"/>
+				</shape>
+				<shape name="Pirates" icon="" creator="">
+					<role name="All" code="0x00000024"/>
+				</shape>
+				<shape name="XXX (OLD BHSA ICON)" icon="" creator="">
+					<role name="All" code="0x00000025"/>
+				</shape>
+				<shape name="Grungy / Worn clothing" icon="" creator="">
+					<role name="All" code="0x00000026"/>
+				</shape>
+				<shape name="Castaway (NEEDS ICON)" icon="" creator="">
+					<role name="All" code="0x00000027"/>
+				</shape>
+				<shape name="Superhero / SynapticSim's Lair" icon="" creator="">
+					<role name="All" code="0x00000029"/>
+				</shape>
+				<shape name="Starfleet" icon="" creator="">
+					<role name="All" code="0x0000002A"/>
+				</shape>
+				<shape name="Klingon" icon="" creator="">
+					<role name="All" code="0x0000002B"/>
+				</shape>
+			</group>
+		</style>
+		<style name="Hair / Eyebrows">
+			<group name="Pooklet Unnatural Color Glyphs" gender="unisex">
+				<shape name="Tntsium (Purple)" icon="" creator="">
+					<role name="All" code="0x000006E1"/>
+				</shape>
+				<shape name="Tetrylene (Red)" icon="" creator="">
+					<role name="All" code="0x000006E2"/>
+				</shape>
+				<shape name="Powderlite (Pink)" icon="" creator="">
+					<role name="All" code="0x000006E3"/>
+				</shape>
+				<shape name="Torpedosphine (Yellow)" icon="" creator="">
+					<role name="All" code="0x000006E4"/>
+				</shape>
+				<shape name="Semtexigen (Green)" icon="" creator="">
+					<role name="All" code="0x000006E5"/>
+				</shape>
+				<shape name="Pyrodechelon (Teal)" icon="" creator="">
+					<role name="All" code="0x000006E6"/>
+				</shape>
+				<shape name="Shatterwave (Cyan)" icon="" creator="">
+					<role name="All" code="0x000006E7"/>
+				</shape>
+				<shape name="Napardx (Medium blue)" icon="" creator="">
+					<role name="All" code="0x000006E8"/>
+				</shape>
+				<shape name="Diazogenorate (Light blue)" icon="" creator="">
+					<role name="All" code="0x000006E9"/>
+				</shape>
+				<shape name="Cannogentmx (Dark blue)" icon="" creator="">
+					<role name="All" code="0x000006EA"/>
+				</shape>
+				<shape name="Afterathian (Lilac)" icon="" creator="">
+					<role name="All" code="0x000006EB"/>
+				</shape>
+				<shape name="Ethiosamyl (Lavender)" icon="" creator="">
+					<role name="All" code="0x000006EC"/>
+				</shape>
+				<shape name="Timesillade (White)" icon="" creator="">
+					<role name="All" code="0x000006ED"/>
+				</shape>
+				<shape name="Selezardium (Black)" icon="" creator="">
+					<role name="All" code="0x000006EE"/>
+				</shape>
+			</group>
+			<group name="Fia Natural Color Glyphs" gender="unisex">
+				<shape name="Black" icon="" creator="">
+					<role name="All" code="0x000007E4"/>
+				</shape>
+				<shape name="Brown" icon="" creator="">
+					<role name="All" code="0x000007E3"/>
+				</shape>
+				<shape name="Blonde" icon="" creator="">
+					<role name="All" code="0x000007E2"/>
+				</shape>
+				<shape name="Red" icon="" creator="">
+					<role name="All" code="0x000007E1"/>
+				</shape>
+			</group>
+		</style>
+	</genre>
+</bsok>

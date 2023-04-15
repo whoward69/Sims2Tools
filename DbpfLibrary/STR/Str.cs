@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -91,9 +91,7 @@ namespace Sims2Tools.DBPF.STR
         public StrItemList LanguageItems(MetaData.Languages l)
         {
 
-            StrItemList items = (StrItemList)lines[(byte)l];
-            if (items == null) items = new StrItemList();
-
+            StrItemList items = (StrItemList)lines[(byte)l] ?? new StrItemList();
             return items;
         }
 
@@ -154,7 +152,7 @@ namespace Sims2Tools.DBPF.STR
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateResElement(parent, NAME);
+            XmlElement element = XmlHelper.CreateResElement(parent, NAME, this);
 
             AddXmlItems(element);
 
@@ -197,7 +195,7 @@ namespace Sims2Tools.DBPF.STR
 
         private void AddXmlLang(XmlElement parent, StrLanguage strlng)
         {
-            XmlElement lang = CreateElement(parent, "language");
+            XmlElement lang = XmlHelper.CreateElement(parent, "language");
             lang.SetAttribute("id", Helper.Hex2PrefixString(strlng.Id));
             if (strlng.Name != strlng.Id.ToString()) lang.SetAttribute("name", strlng.Name);
 
@@ -207,11 +205,11 @@ namespace Sims2Tools.DBPF.STR
             {
                 StrItem stritem = stritems[i];
 
-                XmlElement ele = CreateElement(lang, "item");
+                XmlElement ele = XmlHelper.CreateElement(lang, "item");
                 ele.SetAttribute("index", Helper.Hex4PrefixString(i));
 
-                CreateCDataElement(ele, "text", stritem.Title);
-                CreateCDataElement(ele, "desc", stritem.Description);
+                XmlHelper.CreateCDataElement(ele, "text", stritem.Title);
+                XmlHelper.CreateCDataElement(ele, "desc", stritem.Description);
             }
         }
     }

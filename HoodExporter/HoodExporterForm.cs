@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -946,7 +946,7 @@ namespace HoodExporter
             textHoodPath.Text = RegistryTools.GetSetting(HoodExporterApp.RegistryKey, textHoodPath.Name, "") as String;
             textSavePath.Text = RegistryTools.GetSetting(HoodExporterApp.RegistryKey, textSavePath.Name, "") as String;
 
-            MyMruList = new MruList(HoodExporterApp.RegistryKey, selectRecentHoodsToolStripMenuItem, Properties.Settings.Default.MruSize);
+            MyMruList = new MruList(HoodExporterApp.RegistryKey, selectRecentHoodsToolStripMenuItem, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FileSelected;
 
             menuItemLots.Checked = ((int)RegistryTools.GetSetting(HoodExporterApp.RegistryKey + @"\Resources", menuItemLots.Name, 1) != 0); OnLotsClicked(menuItemLots, null);

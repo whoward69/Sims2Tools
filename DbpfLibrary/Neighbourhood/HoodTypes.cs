@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -108,20 +108,34 @@ namespace Sims2Tools.DBPF.Neighbourhood
         YoungAdult = 0x40
     }
 
+    public enum LifeStateFlags : uint
+    {
+        Zombie = 0x0001,
+        Vampire = 0x0004,
+        NPC = 0x0010,
+        Werewolf = 0x0020,
+        Plantsim = 0x0100,
+        Witch = 0x0400
+
+        //Bigfoot = 0x0A
+        //Servo
+        //Alien
+    }
+
     public enum ZodiacSigns : ushort
     {
-        Aries = 0x01,        //de: Widder
+        Aries = 0x01,
         Taurus = 0x02,
         Gemini = 0x03,
         Cancer = 0x04,
         Leo = 0x05,
-        Virgo = 0x06,        //de: Jungfrau
-        Libra = 0x07,        //de: Waage
+        Virgo = 0x06,
+        Libra = 0x07,
         Scorpio = 0x08,
-        Sagittarius = 0x09,  //de: Schütze
-        Capricorn = 0x0A,    //de: Steinbock
+        Sagittarius = 0x09,
+        Capricorn = 0x0A,
         Aquarius = 0x0B,
-        Pisces = 0x0C        //de: Fische
+        Pisces = 0x0C
     }
 
     public enum AspirationTypes : ushort

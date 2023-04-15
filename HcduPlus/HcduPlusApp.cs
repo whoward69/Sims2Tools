@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -19,7 +19,7 @@ namespace HcduPlus
         public static string AppName = "HCDU Plus";
 
         public static int AppVersionMajor = 2;
-        public static int AppVersionMinor = 3;
+        public static int AppVersionMinor = 4;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;

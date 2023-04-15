@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from http://csharphelper.com/blog/2018/06/build-an-mru-list-in-c/
  *
@@ -19,6 +19,8 @@ namespace Sims2Tools.Utils.Persistence
     {
         private readonly string AppRegKey;
 
+        private readonly bool AllowFiles, AllowDirs;
+
         private readonly int NumFiles;
         private readonly List<FileInfo> FileInfos;
 
@@ -28,11 +30,13 @@ namespace Sims2Tools.Utils.Persistence
         public delegate void FileSelectedEventHandler(string filename);
         public event FileSelectedEventHandler FileSelected;
 
-        public MruList(string appRegKey, ToolStripMenuItem menu, int num_files)
+        public MruList(string appRegKey, ToolStripMenuItem menu, int num_files, bool allowFiles, bool allowDirs)
         {
             AppRegKey = appRegKey;
             MyMenu = menu;
             NumFiles = num_files;
+            AllowFiles = allowFiles;
+            AllowDirs = allowDirs;
             FileInfos = new List<FileInfo>();
 
             MenuItems = new ToolStripMenuItem[NumFiles + 1];
@@ -53,10 +57,13 @@ namespace Sims2Tools.Utils.Persistence
         {
             for (int i = 0; i < NumFiles; i++)
             {
-                string file_name = (string)RegistryTools.GetSetting(AppRegKey, $"FilePath{i}", "");
-                if (file_name != "")
+                string fileName = (string)RegistryTools.GetSetting(AppRegKey, $"FilePath{i}", "");
+                if (fileName != "")
                 {
-                    FileInfos.Add(new FileInfo(file_name));
+                    if ((AllowFiles && File.Exists(fileName)) || (AllowDirs && Directory.Exists(fileName)))
+                    {
+                        FileInfos.Add(new FileInfo(fileName));
+                    }
                 }
             }
         }

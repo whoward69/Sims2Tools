@@ -1,0 +1,289 @@
+<?xml version="1.0"?>
+<bsok>
+	<genre name="nuBSOK">
+		<style name="">
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis Original" icon="EA" creator="Maxis">
+					<role name="Civilian / All" code="0x00000DFF"/>
+					<role name="Enlisted / Security" code="0x00000DFD"/>
+					<role name="Officer / Command" code="0x00000DFB"/>
+					<role name="Tech / Engineering" code="0x00000DF9"/>
+					<role name="Medical / Science" code="0x00000DF7"/>
+					<role name="Rebel / Outlaw" code="0x00000DF5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DF4"/>
+					<role name="Media / Action News" code="0x00000DF3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DF2"/>
+				</shape>
+			</group>
+			<group name="Curvy Sizes" gender="female">
+				<shape name="FitChick" icon="FC" creator="Poppeboy">
+					<role name="Civilian / All" code="0x00000DEF"/>
+					<role name="Enlisted / Security" code="0x00000DED"/>
+					<role name="Officer / Command" code="0x00000DEB"/>
+					<role name="Tech / Engineering" code="0x00000DE9"/>
+					<role name="Medical / Science" code="0x00000DE7"/>
+					<role name="Rebel / Outlaw" code="0x00000DE5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DE4"/>
+					<role name="Media / Action News" code="0x00000DE3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DE2"/>
+				</shape>
+				<shape name="Rio" icon="RO" creator="Warlokk">
+					<role name="Civilian / All" code="0x00000DDF"/>
+					<role name="Enlisted / Security" code="0x00000DDD"/>
+					<role name="Officer / Command" code="0x00000DDB"/>
+					<role name="Tech / Engineering" code="0x00000DD9"/>
+					<role name="Medical / Science" code="0x00000DD7"/>
+					<role name="Rebel / Outlaw" code="0x00000DD5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DD4"/>
+					<role name="Media / Action News" code="0x00000DD3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DD2"/>
+				</shape>
+				<shape name="Classic Pinup (CPU)" icon="CP" creator="Warlokk">
+					<role name="Civilian / All" code="0x00000DCF"/>
+					<role name="Enlisted / Security" code="0x00000DCD"/>
+					<role name="Officer / Command" code="0x00000DCB"/>
+					<role name="Tech / Engineering" code="0x00000DC9"/>
+					<role name="Medical / Science" code="0x00000DC7"/>
+					<role name="Rebel / Outlaw" code="0x00000DC5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DC4"/>
+					<role name="Media / Action News" code="0x00000DC3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DC2"/>
+				</shape>
+				<shape name="Voluptouos Gal (VolGal)" icon="VO" creator="Warlokk">
+					<role name="Civilian / All" code="0x00000DBF"/>
+					<role name="Enlisted / Security" code="0x00000DBD"/>
+					<role name="Officer / Command" code="0x00000DBB"/>
+					<role name="Tech / Engineering" code="0x00000DB9"/>
+					<role name="Medical / Science" code="0x00000DB7"/>
+					<role name="Rebel / Outlaw" code="0x00000DB5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DB4"/>
+					<role name="Media / Action News" code="0x00000DB3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DB2"/>
+				</shape>
+			</group>
+			<group name="Muscly Sizes" gender="female">
+				<shape name="Athletic Girl (AG)" icon="AG" creator="Marvine">
+					<role name="Civilian / All" code="0x00000DAF"/>
+					<role name="Enlisted / Security" code="0x00000DAD"/>
+					<role name="Officer / Command" code="0x00000DAB"/>
+					<role name="Tech / Engineering" code="0x00000DA9"/>
+					<role name="Medical / Science" code="0x00000DA7"/>
+					<role name="Rebel / Outlaw" code="0x00000DA5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DA4"/>
+					<role name="Media / Action News" code="0x00000DA3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DA2"/>
+				</shape>
+				<shape name="Bodybuilder Girl (BBG)" icon="BBG" creator="Marvine">
+					<role name="Civilian / All" code="0x00000D9F"/>
+					<role name="Enlisted / Security" code="0x00000D9D"/>
+					<role name="Officer / Command" code="0x00000D9B"/>
+					<role name="Tech / Engineering" code="0x00000D99"/>
+					<role name="Medical / Science" code="0x00000D97"/>
+					<role name="Rebel / Outlaw" code="0x00000D95"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D94"/>
+					<role name="Media / Action News" code="0x00000D93"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D92"/>
+				</shape>
+				<shape name="Amazonian" icon="AZ" creator="Ocelotekatl">
+					<role name="Civilian / All" code="0x00000D8F"/>
+					<role name="Enlisted / Security" code="0x00000D8D"/>
+					<role name="Officer / Command" code="0x00000D8B"/>
+					<role name="Tech / Engineering" code="0x00000D89"/>
+					<role name="Medical / Science" code="0x00000D87"/>
+					<role name="Rebel / Outlaw" code="0x00000D85"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D84"/>
+					<role name="Media / Action News" code="0x00000D83"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D82"/>
+				</shape>
+				<shape name="Death by Snu-Snu" icon="SN" creator="Ocelotekatl">
+					<role name="Civilian / All" code="0x00000D7F"/>
+					<role name="Enlisted / Security" code="0x00000D7D"/>
+					<role name="Officer / Command" code="0x00000D7B"/>
+					<role name="Tech / Engineering" code="0x00000D79"/>
+					<role name="Medical / Science" code="0x00000D77"/>
+					<role name="Rebel / Outlaw" code="0x00000D75"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D74"/>
+					<role name="Media / Action News" code="0x00000D73"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D72"/>
+				</shape>
+			</group>
+			<group name="Body Realism Sizes" gender="female">
+				<shape name="Well-Rounded Sim (WRS)" icon="WR" creator="Dr. Pixel">
+					<role name="Civilian / All" code="0x00000D6F"/>
+					<role name="Enlisted / Security" code="0x00000D6D"/>
+					<role name="Officer / Command" code="0x00000D6B"/>
+					<role name="Tech / Engineering" code="0x00000D69"/>
+					<role name="Medical / Science" code="0x00000D67"/>
+					<role name="Rebel / Outlaw" code="0x00000D65"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D64"/>
+					<role name="Media / Action News" code="0x00000D63"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D62"/>
+				</shape>
+				<shape name="Momma Lisa" icon="ML" creator="FrannySims">
+					<role name="Civilian / All" code="0x00000D5F"/>
+					<role name="Enlisted / Security" code="0x00000D5D"/>
+					<role name="Officer / Command" code="0x00000D5B"/>
+					<role name="Tech / Engineering" code="0x00000D59"/>
+					<role name="Medical / Science" code="0x00000D57"/>
+					<role name="Rebel / Outlaw" code="0x00000D55"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D54"/>
+					<role name="Media / Action News" code="0x00000D53"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D52"/>
+				</shape>
+			</group>
+			<group name="Misc Sizes" gender="female">
+				<shape name="Fashion Model" icon="FM" creator="Warlokk">
+					<role name="Civilian / All" code="0x00000D4F"/>
+					<role name="Enlisted / Security" code="0x00000D4D"/>
+					<role name="Officer / Command" code="0x00000D4B"/>
+					<role name="Tech / Engineering" code="0x00000D49"/>
+					<role name="Medical / Science" code="0x00000D47"/>
+					<role name="Rebel / Outlaw" code="0x00000D45"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D44"/>
+					<role name="Media / Action News" code="0x00000D43"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D42"/>
+				</shape>
+				<shape name="Sussi" icon="SS" creator="SussiSoGoodSims">
+					<role name="Civilian / All" code="0x00000D3F"/>
+					<role name="Enlisted / Security" code="0x00000D3D"/>
+					<role name="Officer / Command" code="0x00000D3B"/>
+					<role name="Tech / Engineering" code="0x00000D39"/>
+					<role name="Medical / Science" code="0x00000D37"/>
+					<role name="Rebel / Outlaw" code="0x00000D35"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D34"/>
+					<role name="Media / Action News" code="0x00000D33"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D32"/>
+				</shape>
+				<shape name="Bootylicious" icon="BY" creator="BobbiTheHacker">
+					<role name="Civilian / All" code="0x00000D2F"/>
+					<role name="Enlisted / Security" code="0x00000D2D"/>
+					<role name="Officer / Command" code="0x00000D2B"/>
+					<role name="Tech / Engineering" code="0x00000D29"/>
+					<role name="Medical / Science" code="0x00000D27"/>
+					<role name="Rebel / Outlaw" code="0x00000D25"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D24"/>
+					<role name="Media / Action News" code="0x00000D23"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D22"/>
+				</shape>
+				<shape name="Sassy Curvy" icon="SC" creator="Grizzelda">
+					<role name="Civilian / All" code="0x00000D1F"/>
+					<role name="Enlisted / Security" code="0x00000D1D"/>
+					<role name="Officer / Command" code="0x00000D1B"/>
+					<role name="Tech / Engineering" code="0x00000D19"/>
+					<role name="Medical / Science" code="0x00000D17"/>
+					<role name="Rebel / Outlaw" code="0x00000D15"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D14"/>
+					<role name="Media / Action News" code="0x00000D13"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D12"/>
+				</shape>
+				<shape name="Dummy Thicc" icon="DT" creator="Digi">
+					<role name="Civilian / All" code="0x00000D0F"/>
+					<role name="Enlisted / Security" code="0x00000D0D"/>
+					<role name="Officer / Command" code="0x00000D0B"/>
+					<role name="Tech / Engineering" code="0x00000D09"/>
+					<role name="Medical / Science" code="0x00000D07"/>
+					<role name="Rebel / Outlaw" code="0x00000D05"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D04"/>
+					<role name="Media / Action News" code="0x00000D03"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D02"/>
+				</shape>
+			</group>
+			<group name="Muscly Sizes" gender="male">
+				<shape name="Lean Bodybuilder" icon="LB" creator="SynapticSim">
+					<role name="Civilian / All" code="0x00000CFF"/>
+					<role name="Enlisted / Security" code="0x00000CFD"/>
+					<role name="Officer / Command" code="0x00000CFB"/>
+					<role name="Tech / Engineering" code="0x00000CF9"/>
+					<role name="Medical / Science" code="0x00000CF7"/>
+					<role name="Rebel / Outlaw" code="0x00000CF5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000CF4"/>
+					<role name="Media / Action News" code="0x00000CF3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000CF2"/>
+				</shape>
+				<shape name="Slim Bodybuilder" icon="SB" creator="SynapticSim">
+					<role name="Civilian / All" code="0x00000CEF"/>
+					<role name="Enlisted / Security" code="0x00000CED"/>
+					<role name="Officer / Command" code="0x00000CEB"/>
+					<role name="Tech / Engineering" code="0x00000CE9"/>
+					<role name="Medical / Science" code="0x00000CE7"/>
+					<role name="Rebel / Outlaw" code="0x00000CE5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000CE4"/>
+					<role name="Media / Action News" code="0x00000CE3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000CE2"/>
+				</shape>
+				<shape name="Bodybuilder" icon="BB" creator="Marvine">
+					<role name="Civilian / All" code="0x00000CDF"/>
+					<role name="Enlisted / Security" code="0x00000CDD"/>
+					<role name="Officer / Command" code="0x00000CDB"/>
+					<role name="Tech / Engineering" code="0x00000CD9"/>
+					<role name="Medical / Science" code="0x00000CD7"/>
+					<role name="Rebel / Outlaw" code="0x00000CD5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000CD4"/>
+					<role name="Media / Action News" code="0x00000CD3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000CD2"/>
+				</shape>
+				<shape name="Huge Bodybuilder " icon="HBB" creator="Marvine">
+					<role name="Civilian / All" code="0x00000CCF"/>
+					<role name="Enlisted / Security" code="0x00000CCD"/>
+					<role name="Officer / Command" code="0x00000CCB"/>
+					<role name="Tech / Engineering" code="0x00000CC9"/>
+					<role name="Medical / Science" code="0x00000CC7"/>
+					<role name="Rebel / Outlaw" code="0x00000CC5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000CC4"/>
+					<role name="Media / Action News" code="0x00000CC3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000CC2"/>
+				</shape>
+			</group>
+			<group name="Body Realism Sizes" gender="male">
+				<shape name="Slim Male" icon="SM" creator="July77">
+					<role name="Civilian / All" code="0x00000CBF"/>
+					<role name="Enlisted / Security" code="0x00000CBD"/>
+					<role name="Officer / Command" code="0x00000CBB"/>
+					<role name="Tech / Engineering" code="0x00000CB9"/>
+					<role name="Medical / Science" code="0x00000CB7"/>
+					<role name="Rebel / Outlaw" code="0x00000CB5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000CB4"/>
+					<role name="Media / Action News" code="0x00000CB3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000CB2"/>
+				</shape>
+				<shape name="Bear Bodybuilder" icon="BR" creator="Mototo">
+					<role name="Civilian / All" code="0x00000CAF"/>
+					<role name="Enlisted / Security" code="0x00000CAD"/>
+					<role name="Officer / Command" code="0x00000CAB"/>
+					<role name="Tech / Engineering" code="0x00000CA9"/>
+					<role name="Medical / Science" code="0x00000CA7"/>
+					<role name="Rebel / Outlaw" code="0x00000CA5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000CA4"/>
+					<role name="Media / Action News" code="0x00000CA3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000CA2"/>
+				</shape>
+			</group>
+			<group name="Misc Body Realism Sizes" gender="male">
+				<shape name="Consort Heavy Male" icon="CF" creator="Consort">
+					<role name="Civilian / All" code="0x00000C8F"/>
+					<role name="Enlisted / Security" code="0x00000C8D"/>
+					<role name="Officer / Command" code="0x00000C8B"/>
+					<role name="Tech / Engineering" code="0x00000C89"/>
+					<role name="Medical / Science" code="0x00000C87"/>
+					<role name="Rebel / Outlaw" code="0x00000C85"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000C84"/>
+					<role name="Media / Action News" code="0x00000C83"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000C82"/>
+				</shape>
+			</group>
+			<group name="Misc Body Realism Sizes (Unisex)" gender="unisex">
+				<shape name="Melodie9 Fat Family" icon="FF" creator="Melodie9">
+					<role name="Civilian / All" code="0x00000C7F"/>
+					<role name="Enlisted / Security" code="0x00000C7D"/>
+					<role name="Officer / Command" code="0x00000C7B"/>
+					<role name="Tech / Engineering" code="0x00000C79"/>
+					<role name="Medical / Science" code="0x00000C77"/>
+					<role name="Rebel / Outlaw" code="0x00000C75"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000C74"/>
+					<role name="Media / Action News" code="0x00000C73"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000C72"/>
+				</shape>
+			</group>
+		</style>
+	</genre>
+</bsok>

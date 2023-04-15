@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -23,7 +23,6 @@ using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
-using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph
 {
@@ -143,13 +142,6 @@ namespace Sims2Tools.DBPF.SceneGraph
         }
 
         public abstract SgResourceList SgNeededResources();
-
-        public override XmlElement AddXml(XmlElement parent)
-        {
-            CreateComment(parent, $"{SgHash} - '{SgName}'");
-
-            return null;
-        }
     }
 
     public interface ISgRefResource : ISgResource
@@ -181,13 +173,6 @@ namespace Sims2Tools.DBPF.SceneGraph
         }
 
         public abstract SgResourceList SgNeededResources();
-
-        public override XmlElement AddXml(XmlElement parent)
-        {
-            CreateComment(parent, $"{SgHash} - '{SgName}'");
-
-            return null;
-        }
     }
 
     public abstract class SgRefCpf : SgCpf, ISgRefResource

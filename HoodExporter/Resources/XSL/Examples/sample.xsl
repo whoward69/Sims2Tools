@@ -16,9 +16,10 @@
 	  asHexNoPrefix(int) - convert an int into a 8 digit hex number, eg asHex(10) returns 0000000A
 	  asHexNoPrefix(int, digits)- convert an int into an N digit hex number, eg asHex(10, 2) 0A
 	  asBinary(int) - convert an int into a 8 digit binary number, eg asBinary(10) returns 00001010
-	  asBinary(int, digits)- convert an int into an N digit hex number with an 0x prefix, eg asHex(10, 4) returns 1010
+	  asBinary(int, digits)- convert an int into an N digit hex number with an 0x prefix, eg asBinary(10, 4) returns 1010
 	  asYesNo(string) - if string is null, empty, "No", "N" or will parse as zero (eg, 0, 0x00, etc) returns No, otherwise returns Yes
 	  asYesNo(string, 1) - returns only the first character (N or Y) from asYesNo(string)
+	  asObjectName(guid) - if guid is an object, returns its name, otherwise asHex(guid)
   -->
 
   <!-- Convert any simId attribute to an int -->

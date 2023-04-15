@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -51,7 +51,7 @@ namespace Sims2Tools.DBPF.BHAV
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateResElement(parent, NAME);
+            XmlElement element = XmlHelper.CreateResElement(parent, NAME, this);
             element.SetAttribute("format", Helper.Hex4PrefixString(Header.Format));
             element.SetAttribute("params", Helper.Hex2PrefixString(Header.ArgCount));
             element.SetAttribute("locals", Helper.Hex2PrefixString(Header.LocalVarCount));
@@ -64,7 +64,7 @@ namespace Sims2Tools.DBPF.BHAV
             {
                 Instruction item = Instructions[i];
 
-                XmlElement inst = CreateElement(element, "instruction");
+                XmlElement inst = XmlHelper.CreateElement(element, "instruction");
                 inst.SetAttribute("nodeVersion", Helper.Hex4PrefixString(item.NodeVersion));
                 inst.SetAttribute("opCode", Helper.Hex4PrefixString(item.OpCode));
                 inst.SetAttribute("trueTarget", GetTarget(i, item.TrueTarget));
@@ -72,7 +72,7 @@ namespace Sims2Tools.DBPF.BHAV
                 // inst.SetAttribute("trueTarget", Helper.Hex4PrefixString(item.TrueTarget));
                 // inst.SetAttribute("falseTarget", Helper.Hex4PrefixString(item.FalseTarget));
 
-                XmlElement ops = CreateElement(inst, "operands");
+                XmlElement ops = XmlHelper.CreateElement(inst, "operands");
                 for (int j = 0; j < 16; j++)
                 {
                     ops.SetAttribute($"operand{j}", Helper.Hex2PrefixString(item.Operands[j]));

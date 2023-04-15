@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -216,6 +216,13 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             set { lifesection = value; }
         }
 
+        private LifeStateFlags lifestate;
+        public LifeStateFlags LifeState
+        {
+            get { return lifestate; }
+            set { lifestate = value; }
+        }
+
 
         private ushort age;
         public ushort Age
@@ -268,6 +275,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         {
             parent.SetAttribute("gender", Gender.ToString());
             parent.SetAttribute("lifestage", LifeSection.ToString());
+            parent.SetAttribute("lifestate", LifeState.ToString());
             parent.SetAttribute("age", Age.ToString());
             parent.SetAttribute("ageDuration", AgeDuration.ToString());
             parent.SetAttribute("agePrevDays", PrevAgeDays.ToString());

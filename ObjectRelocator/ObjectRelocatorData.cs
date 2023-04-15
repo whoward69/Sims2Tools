@@ -1,13 +1,11 @@
 ﻿/*
  * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF;
-using System;
 using System.Data;
 
 namespace ObjectRelocator
@@ -41,50 +39,6 @@ namespace ObjectRelocator
         public void Append(DataRow row)
         {
             this.Rows.Add(row);
-        }
-    }
-
-    public class ObjectDbpfData : IEquatable<ObjectDbpfData>
-    {
-        private string packagePath;
-        private DBPFResource res;
-
-        public string PackagePath
-        {
-            get => packagePath;
-            set => packagePath = value;
-        }
-
-        public DBPFResource Resource
-        {
-            get => res;
-            set => res = value;
-        }
-
-        public string Title
-        {
-            get => ""; // TODO - ObjReloc - Title & Desc
-            set { } // TODO - ObjReloc - Title & Desc
-        }
-
-        public string Description
-        {
-            get => ""; // TODO - ObjReloc - Title & Desc
-            set { } // TODO - ObjReloc - Title & Desc
-        }
-
-        public bool IsDirty => res.IsDirty;
-        public void SetClean() => res.SetClean();
-
-        public ObjectDbpfData(string packagePath, DBPFResource res)
-        {
-            this.packagePath = packagePath;
-            this.res = res;
-        }
-
-        public bool Equals(ObjectDbpfData other)
-        {
-            return this.packagePath.Equals(other.packagePath) && this.res.Equals(other.res);
         }
     }
 }

@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -45,8 +45,9 @@ namespace OutfitOrganiser
         private string packageName;
 
         private readonly Binx binx;
-        private readonly Idr idr;
+        private readonly Idr idrForBinx;
         private readonly Cpf cpf;
+        private readonly Idr idrForCpf;
         private readonly Str str;
 
         private readonly bool isAccessory = false;
@@ -59,22 +60,26 @@ namespace OutfitOrganiser
         public string PackageNameNoExtn => packageNameNoExtn;
         public string PackageName => packageName;
 
-        public DBPFKey BinxKey => binx;
-
         public bool IsAccessory => isAccessory;
         public bool IsClothing => isClothing;
         public bool IsHair => isHair;
         public bool IsMakeUp => isMakeUp;
         public bool HasShoe => hasShoe;
 
-        public bool IsDirty => (cpf.IsDirty || str.IsDirty || binx.IsDirty || idr.IsDirty);
+        public bool IsDirty => (cpf.IsDirty || str.IsDirty || idrForCpf.IsDirty || binx.IsDirty || idrForBinx.IsDirty);
 
         public void SetClean()
         {
             cpf.SetClean();
             str.SetClean();
+            idrForCpf.SetClean();
             binx.SetClean();
-            idr.SetClean();
+            idrForBinx.SetClean();
+        }
+
+        public static OutfitDbpfData Create(OrganiserDbpfFile package, OutfitDbpfData outfitData)
+        {
+            return Create(package, package.GetEntryByKey(outfitData.binx));
         }
 
         public static OutfitDbpfData Create(OrganiserDbpfFile package, DBPFKey binxKey)
@@ -90,33 +95,42 @@ namespace OutfitOrganiser
 
             if (binx != null)
             {
-                Idr idr = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
+                Idr idrForBinx = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
 
-                if (idr != null)
+                if (idrForBinx != null)
                 {
-                    DBPFResource res = package.GetResourceByKey(idr.GetItem(binx.GetItem("objectidx").UIntegerValue));
+                    DBPFResource res = package.GetResourceByKey(idrForBinx.GetItem(binx.GetItem("objectidx").UIntegerValue));
 
                     if (res != null)
                     {
                         if (res is Gzps || res is Xmol || res is Xtol)
                         {
                             Cpf cpf = res as Cpf;
+                            Idr idrForCpf = idrForBinx;
 
-                            // if (cpf.GetItem("outfit")?.UIntegerValue == cpf.GetItem("parts")?.UIntegerValue)
+                            if (res is Xtol)
                             {
-                                if (cpf.GetItem("species").UIntegerValue == 0x00000001)
-                                {
-                                    outfitData = new OutfitDbpfData(package, binx, idr, cpf);
-                                }
-                                else
-                                {
-                                    // Non-human, eg dog or cat, what should we do with these?
-                                }
+                                idrForCpf = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(cpf.InstanceID, cpf.ResourceID, Idr.TYPE, cpf.GroupID));
                             }
-                            /* else
+
+                            if (idrForCpf != null)
                             {
-                                // Report this Pets EP 'eff up!
-                            } */
+                                // if (cpf.GetItem("outfit")?.UIntegerValue == cpf.GetItem("parts")?.UIntegerValue)
+                                {
+                                    if (cpf.GetItem("species").UIntegerValue == 0x00000001)
+                                    {
+                                        outfitData = new OutfitDbpfData(package, binx, idrForBinx, cpf, idrForCpf);
+                                    }
+                                    else
+                                    {
+                                        // Non-human, eg dog or cat, what should we do with these?
+                                    }
+                                }
+                                /* else
+                                {
+                                    // Report this Pets EP 'eff up!
+                                } */
+                            }
                         }
                     }
                 }
@@ -125,17 +139,18 @@ namespace OutfitOrganiser
             return outfitData;
         }
 
-        private OutfitDbpfData(OrganiserDbpfFile package, Binx binx, Idr idr, Cpf cpf)
+        private OutfitDbpfData(OrganiserDbpfFile package, Binx binx, Idr idrForBinx, Cpf cpf, Idr idrForCpf)
         {
             this.packagePath = package.PackagePath;
             this.packageNameNoExtn = package.PackageNameNoExtn;
             this.packageName = package.PackageName;
 
             this.binx = binx;
-            this.idr = idr;
+            this.idrForBinx = idrForBinx;
             this.cpf = cpf;
+            this.idrForCpf = idrForCpf;
 
-            this.str = (Str)package.GetResourceByKey(idr.GetItem(binx.GetItem("stringsetidx").UIntegerValue));
+            this.str = (Str)package.GetResourceByKey(idrForBinx.GetItem(binx.GetItem("stringsetidx").UIntegerValue));
 
             uint outfit = Outfit;
             isAccessory = (outfit == 0x20);
@@ -161,7 +176,7 @@ namespace OutfitOrganiser
 
                     if (iconidx != null)
                     {
-                        thumbnail = ((Img)package.GetResourceByKey(idr.GetItem(iconidx.UIntegerValue)))?.Image;
+                        thumbnail = ((Img)package.GetResourceByKey(idrForBinx.GetItem(iconidx.UIntegerValue)))?.Image;
                     }
 
                     package.Close();
@@ -183,9 +198,10 @@ namespace OutfitOrganiser
         private void UpdatePackage()
         {
             if (binx.IsDirty) cache.GetOrAdd(packagePath).Commit(binx);
-            if (idr.IsDirty) cache.GetOrAdd(packagePath).Commit(idr);
+            if (idrForBinx.IsDirty) cache.GetOrAdd(packagePath).Commit(idrForBinx);
             if (cpf.IsDirty) cache.GetOrAdd(packagePath).Commit(cpf);
             if (str.IsDirty) cache.GetOrAdd(packagePath).Commit(str);
+            if (idrForCpf.IsDirty) cache.GetOrAdd(packagePath).Commit(idrForCpf);
         }
 
         public uint Product
@@ -375,7 +391,7 @@ namespace OutfitOrganiser
                         cpf.GetItem("subtype").UIntegerValue = 0x00000005;
                         cpf.GetItem("bin").UIntegerValue = Properties.Settings.Default.AccessoryBin;
 
-                        idr.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_COLLECTIONS, DBPFData.INSTANCE_COLLECTIONS, DBPFData.RESOURCE_NULL));
+                        idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_COLLECTIONS, DBPFData.INSTANCE_COLLECTIONS, DBPFData.RESOURCE_NULL));
                     }
                     else
                     {
@@ -385,7 +401,7 @@ namespace OutfitOrganiser
                         cpf.GetItem("subtype").UIntegerValue = 0x00000008;
                         cpf.GetItem("bin").UIntegerValue = value;
 
-                        idr.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_BONVOYAGE, (TypeInstanceID)Destination, DBPFData.RESOURCE_NULL));
+                        idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_BONVOYAGE, (TypeInstanceID)Destination, DBPFData.RESOURCE_NULL));
                     }
 
                     UpdatePackage();
@@ -404,7 +420,7 @@ namespace OutfitOrganiser
                 CpfItem binidx = binx.GetItem("binidx");
                 if (binidx != null)
                 {
-                    DBPFKey binKey = idr.GetItem(binidx.UIntegerValue);
+                    DBPFKey binKey = idrForBinx.GetItem(binidx.UIntegerValue);
                     return binKey.InstanceID.AsUInt();
                 }
                 else
@@ -419,11 +435,11 @@ namespace OutfitOrganiser
                 {
                     if (value == 0)
                     {
-                        idr.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_COLLECTIONS, DBPFData.INSTANCE_COLLECTIONS, DBPFData.RESOURCE_NULL));
+                        idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_COLLECTIONS, DBPFData.INSTANCE_COLLECTIONS, DBPFData.RESOURCE_NULL));
                     }
                     else
                     {
-                        idr.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_BONVOYAGE, (TypeInstanceID)value, DBPFData.RESOURCE_NULL));
+                        idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_BONVOYAGE, (TypeInstanceID)value, DBPFData.RESOURCE_NULL));
                     }
 
                     UpdatePackage();
@@ -474,11 +490,13 @@ namespace OutfitOrganiser
         {
             get
             {
+                if (cpf is Xtol) return null;
+
                 CpfItem cresidx = cpf.GetItem("resourcekeyidx");
 
                 if (cresidx != null)
                 {
-                    return idr.GetItem(cresidx.UIntegerValue);
+                    return idrForCpf.GetItem(cresidx.UIntegerValue);
                 }
 
                 return null;
@@ -489,11 +507,13 @@ namespace OutfitOrganiser
         {
             get
             {
+                if (cpf is Xtol) return null;
+
                 CpfItem shpeidx = cpf.GetItem("shapekeyidx");
 
                 if (shpeidx != null)
                 {
-                    return idr.GetItem(shpeidx.UIntegerValue);
+                    return idrForCpf.GetItem(shpeidx.UIntegerValue);
                 }
 
                 return null;
@@ -506,21 +526,32 @@ namespace OutfitOrganiser
             {
                 List<DBPFKey> txmtKeys = new List<DBPFKey>();
 
-                CpfItem numOverrides = cpf.GetItem("numoverrides");
-
-                if (numOverrides != null)
+                if (cpf is Xtol)
                 {
-                    for (int i = 0; i < numOverrides.UIntegerValue; ++i)
-                    {
-                        CpfItem txmtidx = cpf.GetItem($"override{i}resourcekeyidx");
+                    CpfItem txmtidx = cpf.GetItem("materialkeyidx");
 
-                        if (txmtidx != null)
+                    if (txmtidx != null)
+                    {
+                        txmtKeys.Add(idrForCpf.GetItem(txmtidx.UIntegerValue));
+                    }
+                }
+                else
+                {
+                    CpfItem numOverrides = cpf.GetItem("numoverrides");
+
+                    if (numOverrides != null)
+                    {
+                        for (int i = 0; i < numOverrides.UIntegerValue; ++i)
                         {
-                            txmtKeys.Add(idr.GetItem(txmtidx.UIntegerValue));
+                            CpfItem txmtidx = cpf.GetItem($"override{i}resourcekeyidx");
+
+                            if (txmtidx != null)
+                            {
+                                txmtKeys.Add(idrForCpf.GetItem(txmtidx.UIntegerValue));
+                            }
                         }
                     }
                 }
-
 
                 return txmtKeys;
             }

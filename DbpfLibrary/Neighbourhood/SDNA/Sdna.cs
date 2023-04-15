@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.Utils;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SDNA
@@ -42,10 +43,10 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDNA
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateInstElement(parent, NAME, "simId");
+            XmlElement element = XmlHelper.CreateInstElement(parent, NAME, "simId", InstanceID);
 
-            Dominant.AddXml(CreateElement(element, "dominant"));
-            Recessive.AddXml(CreateElement(element, "recessive"));
+            Dominant.AddXml(XmlHelper.CreateElement(element, "dominant"));
+            Recessive.AddXml(XmlHelper.CreateElement(element, "recessive"));
 
             return element;
         }

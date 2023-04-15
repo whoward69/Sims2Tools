@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -231,7 +231,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
 
         public override XmlElement AddXml(XmlElement parent)
         {
-            XmlElement element = CreateInstElement(parent, NAME, "lotId");
+            XmlElement element = XmlHelper.CreateInstElement(parent, NAME, "lotId", InstanceID);
 
             element.SetAttribute("type", type.ToString());
             element.SetAttribute("roads", roads.ToString());
@@ -243,13 +243,13 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
             element.SetAttribute("left", loc.X.ToString());
             element.SetAttribute("ownerId", Helper.Hex8PrefixString(owner));
 
-            CreateCDataElement(element, "name", lotname);
-            if (description.Length > 0) CreateCDataElement(element, "description", description);
+            XmlHelper.CreateCDataElement(element, "name", lotname);
+            if (description.Length > 0) XmlHelper.CreateCDataElement(element, "description", description);
             // CreateCDataElement(element, "texture", texture);
 
             if (subLots.Count > 0)
             {
-                XmlElement eleApartments = CreateElement(element, "apartments");
+                XmlElement eleApartments = XmlHelper.CreateElement(element, "apartments");
 
                 foreach (SubLot sublot in subLots)
                 {

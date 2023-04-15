@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -232,11 +232,11 @@ namespace Sims2Tools.DBPF.CPF
 
         protected XmlElement AddXml(XmlElement parent, string name)
         {
-            XmlElement element = CreateResElement(parent, name);
+            XmlElement element = XmlHelper.CreateResElement(parent, name, this);
 
             foreach (CpfItem item in Items)
             {
-                XmlElement ele = CreateTextElement(element, "item", item.StringValue);
+                XmlElement ele = XmlHelper.CreateTextElement(element, "item", item.StringValue);
                 ele.SetAttribute("name", item.Name);
                 ele.SetAttribute("datatypeId", Helper.Hex8PrefixString((uint)item.DataType));
                 ele.SetAttribute("datatypeName", item.DataType.ToString());
@@ -250,8 +250,7 @@ namespace Sims2Tools.DBPF.CPF
             if (items != null)
             {
                 for (int i = items.Length - 1; i >= 0; i--)
-                    if (items[i] != null)
-                        items[i].Dispose();
+                    items[i]?.Dispose();
             }
 
             items = new CpfItem[0];

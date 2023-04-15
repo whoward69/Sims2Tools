@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -65,6 +65,7 @@ namespace HcduPlus
             this.menuResources = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBcon = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBhav = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemColl = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCtss = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGlob = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGzps = new System.Windows.Forms.ToolStripMenuItem();
@@ -97,21 +98,21 @@ namespace HcduPlus
             this.tabConflicts = new System.Windows.Forms.TabControl();
             this.tabByPackage = new System.Windows.Forms.TabPage();
             this.gridByPackage = new System.Windows.Forms.DataGridView();
+            this.colHcduPackageA = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHcduPackageB = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemAddAsKnownConflict = new System.Windows.Forms.ToolStripMenuItem();
             this.tabByResource = new System.Windows.Forms.TabPage();
             this.gridByResource = new System.Windows.Forms.DataGridView();
-            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.btnSelectScanPath = new System.Windows.Forms.Button();
-            this.textScanPath = new System.Windows.Forms.TextBox();
-            this.lblScanPath = new System.Windows.Forms.Label();
             this.colHcduType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHcduGroup = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHcduInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHcduName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHcduPackages = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHcduPackageA = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHcduPackageB = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.btnSelectScanPath = new System.Windows.Forms.Button();
+            this.textScanPath = new System.Windows.Forms.TextBox();
+            this.lblScanPath = new System.Windows.Forms.Label();
             this.menuMain.SuspendLayout();
             this.tabConflicts.SuspendLayout();
             this.tabByPackage.SuspendLayout();
@@ -250,6 +251,7 @@ namespace HcduPlus
             this.menuResources.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemBcon,
             this.menuItemBhav,
+            this.menuItemColl,
             this.menuItemCtss,
             this.menuItemGlob,
             this.menuItemGzps,
@@ -281,6 +283,14 @@ namespace HcduPlus
             this.menuItemBhav.Size = new System.Drawing.Size(101, 22);
             this.menuItemBhav.Text = "Bhav";
             this.menuItemBhav.Click += new System.EventHandler(this.OnBhavClicked);
+            // 
+            // menuItemColl
+            // 
+            this.menuItemColl.CheckOnClick = true;
+            this.menuItemColl.Name = "menuItemColl";
+            this.menuItemColl.Size = new System.Drawing.Size(101, 22);
+            this.menuItemColl.Text = "Coll";
+            this.menuItemColl.Click += new System.EventHandler(this.OnCollClicked);
             // 
             // menuItemCtss
             // 
@@ -593,6 +603,22 @@ namespace HcduPlus
             this.gridByPackage.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridByPackage.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
             // 
+            // colHcduPackageA
+            // 
+            this.colHcduPackageA.DataPropertyName = "Loads Earlier";
+            this.colHcduPackageA.HeaderText = "Loads Earlier";
+            this.colHcduPackageA.Name = "colHcduPackageA";
+            this.colHcduPackageA.ReadOnly = true;
+            this.colHcduPackageA.Width = 445;
+            // 
+            // colHcduPackageB
+            // 
+            this.colHcduPackageB.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colHcduPackageB.DataPropertyName = "Loads Later";
+            this.colHcduPackageB.HeaderText = "Loads Later";
+            this.colHcduPackageB.Name = "colHcduPackageB";
+            this.colHcduPackageB.ReadOnly = true;
+            // 
             // menuContextGrid
             // 
             this.menuContextGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -661,44 +687,6 @@ namespace HcduPlus
             this.gridByResource.TabStop = false;
             this.gridByResource.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.DefaultExt = "txt";
-            this.saveFileDialog.Filter = "Normal text file|*.txt|All files|*.*";
-            this.saveFileDialog.Title = "Save As";
-            // 
-            // btnSelectScanPath
-            // 
-            this.btnSelectScanPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectScanPath.Location = new System.Drawing.Point(775, 68);
-            this.btnSelectScanPath.Name = "btnSelectScanPath";
-            this.btnSelectScanPath.Size = new System.Drawing.Size(143, 30);
-            this.btnSelectScanPath.TabIndex = 10;
-            this.btnSelectScanPath.Text = "&Scan Folder...";
-            this.btnSelectScanPath.UseVisualStyleBackColor = true;
-            this.btnSelectScanPath.Click += new System.EventHandler(this.OnSelectScanPathClicked);
-            // 
-            // textScanPath
-            // 
-            this.textScanPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textScanPath.Location = new System.Drawing.Point(126, 73);
-            this.textScanPath.Name = "textScanPath";
-            this.textScanPath.Size = new System.Drawing.Size(643, 21);
-            this.textScanPath.TabIndex = 9;
-            this.textScanPath.TabStop = false;
-            this.textScanPath.WordWrap = false;
-            this.textScanPath.TextChanged += new System.EventHandler(this.OnPathsChanged);
-            // 
-            // lblScanPath
-            // 
-            this.lblScanPath.AutoSize = true;
-            this.lblScanPath.Location = new System.Drawing.Point(10, 76);
-            this.lblScanPath.Name = "lblScanPath";
-            this.lblScanPath.Size = new System.Drawing.Size(76, 15);
-            this.lblScanPath.TabIndex = 8;
-            this.lblScanPath.Text = "Scan Folder:";
-            // 
             // colHcduType
             // 
             this.colHcduType.DataPropertyName = "Type";
@@ -739,21 +727,43 @@ namespace HcduPlus
             this.colHcduPackages.Name = "colHcduPackages";
             this.colHcduPackages.ReadOnly = true;
             // 
-            // colHcduPackageA
+            // saveFileDialog
             // 
-            this.colHcduPackageA.DataPropertyName = "Loads Earlier";
-            this.colHcduPackageA.HeaderText = "Loads Earlier";
-            this.colHcduPackageA.Name = "colHcduPackageA";
-            this.colHcduPackageA.ReadOnly = true;
-            this.colHcduPackageA.Width = 445;
+            this.saveFileDialog.DefaultExt = "txt";
+            this.saveFileDialog.Filter = "Normal text file|*.txt|All files|*.*";
+            this.saveFileDialog.Title = "Save As";
             // 
-            // colHcduPackageB
+            // btnSelectScanPath
             // 
-            this.colHcduPackageB.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colHcduPackageB.DataPropertyName = "Loads Later";
-            this.colHcduPackageB.HeaderText = "Loads Later";
-            this.colHcduPackageB.Name = "colHcduPackageB";
-            this.colHcduPackageB.ReadOnly = true;
+            this.btnSelectScanPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelectScanPath.Location = new System.Drawing.Point(775, 68);
+            this.btnSelectScanPath.Name = "btnSelectScanPath";
+            this.btnSelectScanPath.Size = new System.Drawing.Size(143, 30);
+            this.btnSelectScanPath.TabIndex = 10;
+            this.btnSelectScanPath.Text = "&Scan Folder...";
+            this.btnSelectScanPath.UseVisualStyleBackColor = true;
+            this.btnSelectScanPath.Click += new System.EventHandler(this.OnSelectScanPathClicked);
+            // 
+            // textScanPath
+            // 
+            this.textScanPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textScanPath.Location = new System.Drawing.Point(126, 73);
+            this.textScanPath.Name = "textScanPath";
+            this.textScanPath.Size = new System.Drawing.Size(643, 21);
+            this.textScanPath.TabIndex = 9;
+            this.textScanPath.TabStop = false;
+            this.textScanPath.WordWrap = false;
+            this.textScanPath.TextChanged += new System.EventHandler(this.OnPathsChanged);
+            // 
+            // lblScanPath
+            // 
+            this.lblScanPath.AutoSize = true;
+            this.lblScanPath.Location = new System.Drawing.Point(10, 76);
+            this.lblScanPath.Name = "lblScanPath";
+            this.lblScanPath.Size = new System.Drawing.Size(76, 15);
+            this.lblScanPath.TabIndex = 8;
+            this.lblScanPath.Text = "Scan Folder:";
             // 
             // HcduPlusForm
             // 
@@ -832,6 +842,7 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuResources;
         private System.Windows.Forms.ToolStripMenuItem menuItemBcon;
         private System.Windows.Forms.ToolStripMenuItem menuItemBhav;
+        private System.Windows.Forms.ToolStripMenuItem menuItemColl;
         private System.Windows.Forms.ToolStripMenuItem menuItemCtss;
         private System.Windows.Forms.ToolStripMenuItem menuItemGlob;
         private System.Windows.Forms.ToolStripMenuItem menuItemGzps;

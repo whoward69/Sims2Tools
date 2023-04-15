@@ -21,4 +21,44 @@
     <earlier>InTeenimater_FlavorPak_.*\.package</earlier>
     <later>_InTeen\.package</later>
   </conflict>
+
+  <!-- Ignore Driving Licence known conflicts -->
+  <conflict>
+    <earlier>WH_DrivingLicence_Core_.*\.package</earlier>
+    <later>WH_DrivingLicence_Option_.*\.package</later>
+  </conflict>
+  <conflict>
+    <earlier>WH_DrivingLicence_Option_.*\.package</earlier>
+    <later>WH_DrivingLicence_Option_.*\.package</later>
+  </conflict>
+  <conflict>
+    <earlier>InTeenimater_B\.package</earlier>
+    <later>WH_DrivingLicence_Core_.*\.package</later>
+  </conflict>
+  <conflict>
+    <earlier>CJ-VariableBookcases\.package</earlier>
+    <later>WH_DrivingLicence_Option_Theory_Book\.package</later>
+  </conflict>
+  <conflict>
+    <earlier>WH_AutoWalkToSchool_NotificationChanges\.package</earlier>
+    <later>WH_DrivingLicence_Core_PrivateLessons_CarMods\.package</later>
+  </conflict>
+  <conflict>
+    <earlier>canmyfriendcometoohack\.package</earlier>
+    <later>WH_DrivingLicence_Option_RiskySneakOut\.package</later>
+  </conflict>
+  <conflict>
+    <earlier>InTeenimater_FlavorPak_BackToSchool\.package</earlier>
+    <later>WH_DrivingLicence_Core_PrivateLessons_CarMods\.package</later>
+  </conflict>
+  <conflict>
+    <earlier>phonehack\.package</earlier>
+    <later>WH_DrivingLicence_Option_RiskySneakOut\.package</later>
+  </conflict>
+
+  <!-- PuraVerga expansion packs -->
+  <conflict>
+    <earlier>PuraVerga_cock\.package</earlier>
+    <later>PuraVerga_cock_.*\.package</later>
+  </conflict>
 </conflicts>

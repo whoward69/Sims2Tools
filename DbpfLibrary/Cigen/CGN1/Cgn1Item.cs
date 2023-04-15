@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2022
+ * William Howard - 2020-2023
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
 
     public class Cgn1Dictionary : IEnumerable<Cgn1Item>
     {
-        private Dictionary<DBPFKey, Cgn1List> theDictionary;
+        private readonly Dictionary<DBPFKey, Cgn1List> theDictionary;
 
         public Cgn1Dictionary()
         {
@@ -97,7 +97,7 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
 
     public class Cgn1DictionaryEnum : IEnumerator<Cgn1Item>
     {
-        private Dictionary<DBPFKey, Cgn1List> theDictionary;
+        private readonly Dictionary<DBPFKey, Cgn1List> theDictionary;
         private Dictionary<DBPFKey, Cgn1List>.Enumerator dictionaryEnum;
         private Cgn1ListEnum listEnum;
 
@@ -148,7 +148,7 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
 
     public class Cgn1List : IEnumerable<Cgn1Item>
     {
-        private List<Cgn1Item> theList;
+        private readonly List<Cgn1Item> theList;
 
         public Cgn1List()
         {
@@ -180,7 +180,7 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
 
     public class Cgn1ListEnum : IEnumerator<Cgn1Item>
     {
-        private List<Cgn1Item> theList;
+        private readonly List<Cgn1Item> theList;
         private List<Cgn1Item>.Enumerator listEnum;
 
         public Cgn1ListEnum(List<Cgn1Item> theList)
