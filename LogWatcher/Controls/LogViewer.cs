@@ -72,6 +72,8 @@ namespace LogWatcher.Controls
         private String logFilePath;
         private String tabName;
 
+        private LogXml logXml;
+
         private bool incPropIndex;
 
         public bool IncPropIndex
@@ -111,7 +113,7 @@ namespace LogWatcher.Controls
 
             try
             {
-                LogXml logXml = new LogXml(logFilePath);
+                logXml = new LogXml(logFilePath);
 
                 treeView.Nodes.Clear();
                 TreeNode root = treeView.Nodes.Add(logFileInfo.Name.Substring(0, logFileInfo.Name.Length - 4));
@@ -358,6 +360,36 @@ namespace LogWatcher.Controls
         public void FindNext(String text)
         {
             lastSearchPos = textBox.Find(text, lastSearchPos + 1, RichTextBoxFinds.None);
+        }
+
+        private void OnTextBoxMouseMove(object sender, MouseEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(textBox.Text))
+            {
+                int pos = textBox.GetCharIndexFromPosition(e.Location);
+                char c = textBox.Text[pos];
+
+                if (char.IsDigit(c))
+                {
+                    int prevSpacePos = textBox.Text.LastIndexOf(" ", pos);
+                    if (prevSpacePos == -1) prevSpacePos = 0; else prevSpacePos += 1;
+                    int nextSpacePos = textBox.Text.IndexOf(" ", pos);
+                    if (nextSpacePos == -1) nextSpacePos = textBox.Text.Length - 1; else nextSpacePos -= 1;
+
+                    string s = textBox.Text.Substring(prevSpacePos, nextSpacePos - prevSpacePos + 1);
+                    s = s.Replace("\n", "");
+
+                    XmlNode node = logXml.Root.SelectSingleNode($"lotObjects/lotobj[@oid='{s}']");
+
+                    if (node != null)
+                    {
+                        toolTipTextBox.Show(node.Attributes.GetNamedItem("object")?.Value, textBox, e.X, e.Y + 10);
+                        return;
+                    }
+                }
+            }
+
+            toolTipTextBox.Hide(textBox);
         }
     }
 }

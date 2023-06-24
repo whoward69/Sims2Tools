@@ -75,6 +75,7 @@ namespace ObjectRelocator
             this.colTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colGuid = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colRooms = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -432,6 +433,7 @@ namespace ObjectRelocator
             this.colTitle,
             this.colDescription,
             this.colName,
+            this.colPackagePath,
             this.colPath,
             this.colGuid,
             this.colRooms,
@@ -488,6 +490,14 @@ namespace ObjectRelocator
             this.colName.MinimumWidth = 50;
             this.colName.Name = "colName";
             this.colName.ReadOnly = true;
+            // 
+            // colPackagePath
+            // 
+            this.colPackagePath.DataPropertyName = "PackagePath";
+            this.colPackagePath.HeaderText = "PackagePath";
+            this.colPackagePath.Name = "colPackagePath";
+            this.colPackagePath.ReadOnly = true;
+            this.colPackagePath.Visible = false;
             // 
             // colPath
             // 
@@ -1391,6 +1401,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.DataGridViewTextBoxColumn colTitle;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDescription;
         private System.Windows.Forms.DataGridViewTextBoxColumn colName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colPackagePath;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPath;
         private System.Windows.Forms.DataGridViewTextBoxColumn colGuid;
         private System.Windows.Forms.DataGridViewTextBoxColumn colRooms;

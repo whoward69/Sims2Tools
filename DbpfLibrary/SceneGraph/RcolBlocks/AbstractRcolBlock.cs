@@ -110,7 +110,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         {
             XmlHelper.CreateComment(parent, $"{BlockName}");
 
-            // TODO - dump the contents of the rcol block
+            // Dump the contents of the rcol block
 
             return null;
         }

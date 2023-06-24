@@ -530,8 +530,8 @@ namespace BhavFinder
             }
             else
             {
-                Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal = null;
-                Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal = null;
+                strLookupByIndexGlobal = null;
+                strLookupByIndexLocal = null;
 
                 UpdateLocalObjects();
 
@@ -553,20 +553,19 @@ namespace BhavFinder
 
                     try
                     {
-                        Regex regex = new Regex(textUsingRegex.Text);
-                        int operand = Convert.ToInt32(comboUsingOperand.Text, 10);
+                        usingRegex = new Regex(textUsingRegex.Text);
                         Match m = HexInstanceRegex.Match(comboUsingSTR.Text);
-                        TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(m.Groups[2].ToString(), 16);
+                        usingInstance = (TypeInstanceID)Convert.ToUInt32(m.Groups[2].ToString(), 16);
 
                         String sims2Path = Sims2ToolsLib.Sims2Path;
                         if (sims2Path.Length > 0)
                         {
-                            strLookupByIndexGlobal = BuildStrLookupTable(sims2Path + GameData.objectsSubPath, instance, regex);
+                            strLookupByIndexGlobal = BuildStrLookupTable(sims2Path + GameData.objectsSubPath, usingInstance, usingRegex);
                         }
 
                         if (File.Exists(textFilePath.Text))
                         {
-                            strLookupByIndexLocal = BuildStrLookupTable(textFilePath.Text, instance, regex);
+                            strLookupByIndexLocal = BuildStrLookupTable(textFilePath.Text, usingInstance, usingRegex);
                         }
                     }
                     catch (Exception ex)
@@ -578,9 +577,7 @@ namespace BhavFinder
                     }
                 }
 
-                BhavFilter filter = GetFilters(strLookupByIndexLocal, strLookupByIndexGlobal);
-
-                bhavFinderWorker.RunWorkerAsync(filter);
+                bhavFinderWorker.RunWorkerAsync(GetFilters());
             }
         }
 
@@ -599,6 +596,21 @@ namespace BhavFinder
 
                 foreach (String packageFile in packageFiles)
                 {
+                    if (strLookupByIndexGlobal != null)
+                    {
+                        try
+                        {
+                            strLookupByIndexLocal = BuildStrLookupTable(packageFile, usingInstance, usingRegex);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Error(ex.Message);
+                            logger.Info(ex.StackTrace);
+
+                            MsgBox.Show($"Unable to build STR# lookup table for {packageFile}", "Error!", MessageBoxButtons.OK);
+                        }
+                    }
+
                     found = ProcessPackage(worker, e, packageFile, filter, found, false);
 
                     int percentComplete = (int)((++done / (float)packageFiles.Count) * 100.0);

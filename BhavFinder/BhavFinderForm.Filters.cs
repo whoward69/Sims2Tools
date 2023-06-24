@@ -20,7 +20,12 @@ namespace BhavFinder
 {
     public partial class BhavFinderForm
     {
-        private BhavFilter GetFilters(Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal, Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal)
+        private static Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal = null;
+        private static Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal = null;
+        private Regex usingRegex;
+        private TypeInstanceID usingInstance;
+
+        private BhavFilter GetFilters()
         {
             BhavFilter filter = new TrueFilter();
 
@@ -114,9 +119,9 @@ namespace BhavFinder
                 }
             }
 
-            if (strLookupByIndexLocal != null && strLookupByIndexGlobal != null)
+            if (strLookupByIndexGlobal != null)
             {
-                InstructionFilter strFilter = new StrIndexFilter(Convert.ToInt32(comboUsingOperand.Text, 10), strLookupByIndexLocal, strLookupByIndexGlobal);
+                InstructionFilter strFilter = new StrIndexFilter(Convert.ToInt32(comboUsingOperand.Text, 10));
 
                 if (filter.InstFilter != null)
                 {
@@ -250,19 +255,15 @@ namespace BhavFinder
         private class StrIndexFilter : InstructionFilter
         {
             private readonly int operand;
-            private readonly Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal;
-            private readonly Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal;
 
-            public StrIndexFilter(int operand, Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal, Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal)
+            public StrIndexFilter(int operand)
             {
                 this.operand = operand;
-                this.strLookupByIndexLocal = strLookupByIndexLocal;
-                this.strLookupByIndexGlobal = strLookupByIndexGlobal;
             }
 
             public override Boolean Wanted(TypeGroupID group, Instruction inst)
             {
-                int index = inst.Operands[operand];
+                int index = GetIndex(inst, operand);
 
                 if (strLookupByIndexLocal != null && strLookupByIndexLocal.TryGetValue(index, out HashSet<TypeGroupID> groups))
                 {
@@ -286,6 +287,19 @@ namespace BhavFinder
                 }
 
                 return false;
+            }
+
+            private int GetIndex(Instruction inst, int operand)
+            {
+                int index = inst.Operands[operand];
+
+                // Some primitives use 1-based indexing (eg 0x001C RTBN, 0x0024 Dialog, and possibly others)
+                if (inst.OpCode == 0x001C || inst.OpCode == 0x0024)
+                {
+                    --index;
+                }
+
+                return index;
             }
         }
     }

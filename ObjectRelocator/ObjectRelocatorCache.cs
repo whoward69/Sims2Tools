@@ -44,7 +44,8 @@ namespace ObjectRelocator
         private string packageName;
 
         private readonly DBPFResource res = null;
-        private readonly Ctss ctss = null;
+        private readonly Str strings = null;
+        private readonly Objd leadtile = null;
 
         public string PackagePath => packagePath;
         public string PackageNameNoExtn => packageNameNoExtn;
@@ -55,21 +56,36 @@ namespace ObjectRelocator
         public bool IsXobj => (res is Xobj);
         public bool IsXfnc => (res is Xfnc);
 
-        public bool HasTitleAndDescription => (ctss != null);
+        public bool HasTitleAndDescription => (strings != null);
 
         public TypeGroupID GroupID => res.GroupID;
 
-        public bool IsDirty => (res.IsDirty || (ctss != null && ctss.IsDirty));
+        public bool IsDirty => (res.IsDirty || (strings != null && strings.IsDirty) || (leadtile != null && leadtile.IsDirty));
+
+        public bool IsMultiTile
+        {
+            get
+            {
+                if (res is Objd objd)
+                {
+                    return (objd.GetRawData(ObjdIndex.MultiTileMasterId) != 0x0000 && objd.GetRawData(ObjdIndex.MultiTileSubIndex) == 0xFFFF);
+                }
+
+                return false;
+            }
+        }
 
         public void SetClean()
         {
             res.SetClean();
-            ctss?.SetClean();
+            strings?.SetClean();
+            leadtile?.SetClean();
         }
 
         public static ObjectDbpfData Create(RelocatorDbpfFile package, ObjectDbpfData objectData)
         {
-            return new ObjectDbpfData(package, objectData.res);
+            // This is correct, we want the original (clean) resource from the package using the old (dirty) resource as the key
+            return Create(package, package.GetResourceByKey(objectData.res));
         }
 
         public static ObjectDbpfData Create(RelocatorDbpfFile package, DBPFResource res)
@@ -91,10 +107,35 @@ namespace ObjectRelocator
 
                 if (ctssEntry != null)
                 {
-                    this.ctss = (Ctss)package.GetResourceByEntry(ctssEntry);
+                    this.strings = (Ctss)package.GetResourceByEntry(ctssEntry);
                 }
 
-                // TODO - if a multi-tile object, find the lead tile (as this is needed for quarter tile placement)
+                if (IsMultiTile)
+                {
+                    foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
+                    {
+                        if (entry.GroupID == objd.GroupID && entry.InstanceID != objd.InstanceID)
+                        {
+                            Objd mtObjd = (Objd)package.GetResourceByEntry(entry);
+
+                            if (mtObjd.GetRawData(ObjdIndex.MultiTileLeadObject) != 0x0000)
+                            {
+                                this.leadtile = mtObjd;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (res is Cpf cpf)
+            {
+                if (cpf is Xfnc || cpf is Xobj)
+                {
+                    TypeGroupID strGroupId = (TypeGroupID)cpf.GetItem("stringsetgroupid").UIntegerValue;
+                    TypeInstanceID strInstanceId = (TypeInstanceID)cpf.GetItem("stringsetid").UIntegerValue;
+
+                    this.strings = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, strGroupId, strInstanceId, DBPFData.RESOURCE_NULL));
+                }
             }
         }
 
@@ -112,21 +153,23 @@ namespace ObjectRelocator
         public void CopyTo(RelocatorDbpfFile dbpfPackage)
         {
             if (res.IsDirty) dbpfPackage.Commit(res);
-            if (ctss != null && ctss.IsDirty) dbpfPackage.Commit(ctss);
+            if (strings != null && strings.IsDirty) dbpfPackage.Commit(strings);
+            if (leadtile != null && leadtile.IsDirty) dbpfPackage.Commit(leadtile);
         }
 
         private void UpdatePackage()
         {
             if (res.IsDirty) cache.GetOrAdd(packagePath).Commit(res);
-            if (ctss != null && ctss.IsDirty) cache.GetOrAdd(packagePath).Commit(ctss);
+            if (strings != null && strings.IsDirty) cache.GetOrAdd(packagePath).Commit(strings);
+            if (leadtile != null && leadtile.IsDirty) cache.GetOrAdd(packagePath).Commit(leadtile);
         }
 
 
         public ushort GetRawData(ObjdIndex objdIndex)
         {
-            if (IsObjd)
+            if (res is Objd objd)
             {
-                return (res as Objd).GetRawData(objdIndex);
+                return objd.GetRawData(objdIndex);
             }
 
             return 0;
@@ -134,18 +177,24 @@ namespace ObjectRelocator
 
         public void SetRawData(ObjdIndex objdIndex, ushort data)
         {
-            if (IsObjd)
+            if (res is Objd objd)
             {
-                (res as Objd).SetRawData(objdIndex, data);
+                objd.SetRawData(objdIndex, data);
+
+                if (objdIndex == ObjdIndex.IgnoreQuarterTilePlacement)
+                {
+                    leadtile?.SetRawData(objdIndex, data);
+                }
+
                 UpdatePackage();
             }
         }
 
         public uint GetUIntItem(string itemName)
         {
-            if (IsCpf)
+            if (res is Cpf cpf)
             {
-                CpfItem item = (res as Cpf).GetItem(itemName);
+                CpfItem item = cpf.GetItem(itemName);
                 return (item != null) ? item.UIntegerValue : 0;
             }
 
@@ -154,18 +203,27 @@ namespace ObjectRelocator
 
         public void SetUIntItem(string itemName, uint value)
         {
-            if (IsCpf)
+            if (res is Cpf cpf)
             {
-                (res as Cpf).GetItem(itemName).UIntegerValue = value;
+                cpf.GetItem(itemName).UIntegerValue = value;
+
+                if (strings != null)
+                {
+                    if (itemName.Equals("cost"))
+                    {
+                        strings.LanguageItems(MetaData.Languages.Default)[2].Title = value.ToString();
+                    }
+                }
+
                 UpdatePackage();
             }
         }
 
         public string GetStrItem(string itemName)
         {
-            if (IsCpf)
+            if (res is Cpf cpf)
             {
-                CpfItem item = (res as Cpf).GetItem(itemName);
+                CpfItem item = cpf.GetItem(itemName);
                 return (item != null) ? item.StringValue : "";
             }
 
@@ -174,9 +232,50 @@ namespace ObjectRelocator
 
         public void SetStrItem(string itemName, string value)
         {
-            if (IsCpf)
+            if (itemName.Equals("Title"))
             {
-                (res as Cpf).GetItem(itemName).StringValue = value;
+                if (HasTitleAndDescription)
+                {
+                    StrItemList strs = strings?.LanguageItems(MetaData.Languages.English);
+
+                    if (strs?[0] != null)
+                    {
+                        strs[0].Title = value;
+                    }
+                }
+
+                if (res is Cpf cpf)
+                {
+                    cpf.GetItem("name").StringValue = value;
+                    cpf.KeyName = value;
+                }
+
+                UpdatePackage();
+            }
+            else if (itemName.Equals("Description"))
+            {
+                if (HasTitleAndDescription)
+                {
+                    StrItemList strs = strings.LanguageItems(MetaData.Languages.Default);
+
+                    if (strs?[1] != null)
+                    {
+                        strs[1].Title = value;
+                    }
+                }
+
+                if (res is Cpf cpf)
+                {
+                    CpfItem desc = cpf.GetItem("description");
+
+                    if (desc != null) desc.StringValue = value;
+                }
+
+                UpdatePackage();
+            }
+            else if (res is Cpf cpf)
+            {
+                cpf.GetItem(itemName).StringValue = value;
                 UpdatePackage();
             }
         }
@@ -185,9 +284,9 @@ namespace ObjectRelocator
         {
             get
             {
-                if (IsObjd)
+                if (HasTitleAndDescription)
                 {
-                    StrItemList strs = ctss?.LanguageItems(MetaData.Languages.English);
+                    StrItemList strs = strings?.LanguageItems(MetaData.Languages.English);
 
                     if (strs?[0] != null)
                     {
@@ -201,32 +300,15 @@ namespace ObjectRelocator
 
                 return "";
             }
-
-            set
-            {
-                if (IsObjd)
-                {
-                    StrItemList strs = ctss?.LanguageItems(MetaData.Languages.English);
-
-                    if (strs?[0] != null)
-                    {
-                        strs[0].Title = value;
-                    }
-                }
-                else if (IsCpf)
-                {
-                    SetStrItem("name", value);
-                }
-            }
         }
 
         public string Description
         {
             get
             {
-                if (IsObjd)
+                if (HasTitleAndDescription)
                 {
-                    StrItemList strs = ctss?.LanguageItems(MetaData.Languages.Default);
+                    StrItemList strs = strings.LanguageItems(MetaData.Languages.Default);
 
                     if (strs?[1] != null)
                     {
@@ -235,19 +317,6 @@ namespace ObjectRelocator
                 }
 
                 return "";
-            }
-
-            set
-            {
-                if (IsObjd)
-                {
-                    StrItemList strs = ctss?.LanguageItems(MetaData.Languages.Default);
-
-                    if (strs?[1] != null)
-                    {
-                        strs[1].Title = value;
-                    }
-                }
             }
         }
 

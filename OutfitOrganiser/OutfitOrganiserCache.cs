@@ -79,6 +79,7 @@ namespace OutfitOrganiser
 
         public static OutfitDbpfData Create(OrganiserDbpfFile package, OutfitDbpfData outfitData)
         {
+            // This is correct, we want the original (clean) resources from the package using the old (dirty) resource as the key
             return Create(package, package.GetEntryByKey(outfitData.binx));
         }
 

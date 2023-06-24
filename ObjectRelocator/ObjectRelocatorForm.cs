@@ -11,11 +11,8 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
-using Sims2Tools.DBPF.CTSS;
-using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
-using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
@@ -294,6 +291,8 @@ namespace ObjectRelocator
                     panelBuildModeEditor.Enabled = true;
 
                     UpdateFormState();
+
+                    OnGridSelectionChanged(gridViewResources, null);
                 }
             }
         }
@@ -727,7 +726,6 @@ namespace ObjectRelocator
             gridViewResources.Columns["colRooms"].Visible = IsBuyMode;
             gridViewResources.Columns["colCommunity"].Visible = IsBuyMode;
             gridViewResources.Columns["colUse"].Visible = IsBuyMode;
-            // TODO - gridViewResources.Columns["colQuarterTile"].Visible = IsBuyMode;
             gridViewResources.Columns["colDepreciation"].Visible = IsBuyMode;
             gridViewResources.Columns["colFunction"].HeaderText = IsBuyMode ? "Function" : "Build";
 
@@ -771,6 +769,13 @@ namespace ObjectRelocator
                     {
                         e.ToolTipText = objectData.ToString();
                     }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colRooms"))
+                    {
+                        if (IsBuyMode)
+                        {
+                            e.ToolTipText = BuildRoomsString(objectData);
+                        }
+                    }
                     else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colFunction"))
                     {
                         if (objectData.IsObjd)
@@ -783,6 +788,27 @@ namespace ObjectRelocator
                         else if (objectData.IsXobj)
                         {
                             e.ToolTipText = $"{objectData.GetStrItem("type")} - {objectData.GetStrItem("subsort")}";
+                        }
+                    }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colCommunity"))
+                    {
+                        if (IsBuyMode)
+                        {
+                            e.ToolTipText = BuildCommunityString(objectData);
+                        }
+                    }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colUse"))
+                    {
+                        if (IsBuyMode)
+                        {
+                            e.ToolTipText = BuildUseString(objectData);
+                        }
+                    }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colPrice"))
+                    {
+                        if (objectData.IsObjd)
+                        {
+                            e.ToolTipText = BuildDepreciationString(objectData);
                         }
                     }
                     else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colDepreciation"))
@@ -830,6 +856,7 @@ namespace ObjectRelocator
         #region Grid Row Fill
         private DataRow FillRow(RelocatorDbpfFile package, DataRow row, DBPFResource res)
         {
+            row["PackagePath"] = package.PackagePath;
             row["Path"] = BuildPathString(package.PackagePath);
 
             if (IsBuyMode)
@@ -846,7 +873,7 @@ namespace ObjectRelocator
             row["ObjectData"] = objectData;
 
             row["Title"] = objectData.Title;
-            row["Description"] = objectData.Title;
+            row["Description"] = objectData.Description;
 
             row["Name"] = objectData.KeyName;
             row["Guid"] = objectData.Guid;
@@ -859,7 +886,7 @@ namespace ObjectRelocator
             row["QuarterTile"] = BuildQuarterTileString(objectData);
 
             row["Price"] = objectData.GetRawData(ObjdIndex.Price);
-            row["Depreciation"] = $"{objectData.GetRawData(ObjdIndex.DepreciationLimit)}, {objectData.GetRawData(ObjdIndex.InitialDepreciation)}, {objectData.GetRawData(ObjdIndex.DailyDepreciation)}, {objectData.GetRawData(ObjdIndex.SelfDepreciating)}";
+            row["Depreciation"] = BuildDepreciationString(objectData);
 
             return row;
         }
@@ -871,32 +898,14 @@ namespace ObjectRelocator
             row["Visible"] = "Yes";
             row["ObjectData"] = objectData;
 
+            row["Title"] = objectData.Title;
+            row["Description"] = objectData.Description;
+
+            row["Name"] = objectData.KeyName;
+            row["Guid"] = objectData.Guid;
+
             if (objectData.IsObjd)
             {
-                DBPFEntry ctssEntry = package.GetEntryByKey(new DBPFKey(Ctss.TYPE, objectData.GroupID, (TypeInstanceID)objectData.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
-
-                if (ctssEntry != null)
-                {
-                    Ctss ctss = (Ctss)package.GetResourceByEntry(ctssEntry);
-
-                    if (ctss != null)
-                    {
-                        StrItemList strs = ctss.LanguageItems(MetaData.Languages.English);
-
-                        if (strs != null)
-                        {
-                            row["Title"] = strs[0]?.Title;
-                            row["Description"] = strs[1]?.Title;
-                        }
-                    }
-                }
-
-                row["Name"] = objectData.KeyName;
-                row["Guid"] = objectData.Guid;
-
-                row["Title"] = objectData.Title;
-                row["Description"] = objectData.Title;
-
                 row["Function"] = BuildBuildString(objectData);
 
                 row["QuarterTile"] = BuildQuarterTileString(objectData);
@@ -905,12 +914,6 @@ namespace ObjectRelocator
             }
             else if (objectData.IsCpf)
             {
-                row["Title"] = objectData.GetStrItem("name");
-                row["Description"] = objectData.GetStrItem("description");
-
-                row["Name"] = objectData.KeyName;
-                row["Guid"] = objectData.Guid;
-
                 row["Function"] = BuildBuildString(objectData);
 
                 row["Price"] = objectData.GetUIntItem("cost");
@@ -1192,6 +1195,16 @@ namespace ObjectRelocator
             return "";
         }
 
+        private string BuildDepreciationString(ObjectDbpfData objectData)
+        {
+            if (objectData.IsObjd)
+            {
+                return $"{objectData.GetRawData(ObjdIndex.DepreciationLimit)}, {objectData.GetRawData(ObjdIndex.InitialDepreciation)}, {objectData.GetRawData(ObjdIndex.DailyDepreciation)}, {objectData.GetRawData(ObjdIndex.SelfDepreciating)}";
+            }
+
+            return "";
+        }
+
         private string CapitaliseString(string s)
         {
             if (string.IsNullOrWhiteSpace(s) || s.Length == 1) return s;
@@ -1218,13 +1231,16 @@ namespace ObjectRelocator
                     bool oldDataLoading = dataLoading;
                     dataLoading = true;
 
+                    row.Cells["colTitle"].Value = selectedObject.Title;
+                    row.Cells["colDescription"].Value = selectedObject.Description;
+
                     row.Cells["colRooms"].Value = BuildRoomsString(selectedObject);
                     row.Cells["colFunction"].Value = BuildFunctionString(selectedObject);
                     row.Cells["colCommunity"].Value = BuildCommunityString(selectedObject);
                     row.Cells["colUse"].Value = BuildUseString(selectedObject);
                     row.Cells["colQuarterTile"].Value = BuildQuarterTileString(selectedObject);
                     row.Cells["colPrice"].Value = selectedObject.GetRawData(ObjdIndex.Price);
-                    row.Cells["colDepreciation"].Value = $"{selectedObject.GetRawData(ObjdIndex.DepreciationLimit)}, {selectedObject.GetRawData(ObjdIndex.InitialDepreciation)}, {selectedObject.GetRawData(ObjdIndex.DailyDepreciation)}, {selectedObject.GetRawData(ObjdIndex.SelfDepreciating)}";
+                    row.Cells["colDepreciation"].Value = BuildDepreciationString(selectedObject);
 
                     dataLoading = oldDataLoading;
                     return;
@@ -1240,6 +1256,11 @@ namespace ObjectRelocator
                 {
                     bool oldDataLoading = dataLoading;
                     dataLoading = true;
+
+                    row.Cells["colTitle"].Value = selectedObject.Title;
+                    row.Cells["colDescription"].Value = selectedObject.Description;
+
+                    row.Cells["colName"].Value = selectedObject.KeyName;
 
                     row.Cells["colFunction"].Value = BuildBuildString(selectedObject);
                     row.Cells["colQuarterTile"].Value = BuildQuarterTileString(selectedObject);
@@ -2347,16 +2368,20 @@ namespace ObjectRelocator
 
         private void OnEditTitleDescClicked(object sender, EventArgs e)
         {
-            ObjectDbpfData objectData = gridViewResources.SelectedRows[0].Cells["colObjectData"].Value as ObjectDbpfData;
+            DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+            ObjectDbpfData selectedObject = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
-            Sims2ToolsTitleAndDescEntryDialog dialog = new Sims2ToolsTitleAndDescEntryDialog(objectData.Title, objectData.Description);
+            Sims2ToolsTitleAndDescEntryDialog dialog = new Sims2ToolsTitleAndDescEntryDialog(selectedObject.Title, selectedObject.Description);
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                objectData.Title = dialog.Title;
-                objectData.Description = dialog.Description;
-            }
+                selectedObject.SetStrItem("Title", dialog.Title);
+                selectedObject.SetStrItem("Description", dialog.Description);
 
+                UpdateGridRow(selectedObject);
+
+                ReselectRows(new List<ObjectDbpfData>(1) { selectedObject });
+            }
         }
 
         private void OnRowRevertClicked(object sender, EventArgs e)
@@ -2468,21 +2493,27 @@ namespace ObjectRelocator
         {
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
+                HashSet<string> fromPaths = new HashSet<string>();
+
                 foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
                 {
                     string fromPackagePath = selectedRow.Cells["colPackagePath"].Value as string;
                     string toPackagePath = $"{selectPathDialog.FileName}\\{new DirectoryInfo(fromPackagePath).Name}";
 
-                    if (File.Exists(toPackagePath))
+                    if (!fromPaths.Contains(fromPackagePath))
                     {
-                        MsgBox.Show($"Name clash, {selectPathDialog.FileName} already exists in the selected folder", "Package Move Error");
-                        return;
+                        fromPaths.Add(fromPackagePath);
+
+                        if (File.Exists(toPackagePath))
+                        {
+                            MsgBox.Show($"Name clash, {selectPathDialog.FileName} already exists in the selected folder", "Package Move Error");
+                            return;
+                        }
                     }
                 }
 
-                foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
+                foreach (string fromPackagePath in fromPaths)
                 {
-                    string fromPackagePath = selectedRow.Cells["colPackagePath"].Value as string;
                     string toPackagePath = $"{selectPathDialog.FileName}\\{new DirectoryInfo(fromPackagePath).Name}";
 
                     try

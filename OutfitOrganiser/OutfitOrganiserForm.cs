@@ -532,7 +532,7 @@ namespace OutfitOrganiser
                     {
                         using (OrganiserDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
                         {
-                            foreach (DBPFEntry entry in package.GetEntriesByType(Binx.TYPE))
+                            foreach (DBPFEntry binxEntry in package.GetEntriesByType(Binx.TYPE))
                             {
                                 if (sender.CancellationPending)
                                 {
@@ -540,7 +540,7 @@ namespace OutfitOrganiser
                                     return;
                                 }
 
-                                OutfitDbpfData outfitData = OutfitDbpfData.Create(package, entry);
+                                OutfitDbpfData outfitData = OutfitDbpfData.Create(package, binxEntry);
 
                                 if (outfitData != null)
                                 {

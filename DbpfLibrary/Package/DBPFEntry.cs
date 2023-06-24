@@ -14,7 +14,9 @@ namespace Sims2Tools.DBPF.Package
 {
     public class DBPFEntry : DBPFKey
     {
+#if DEBUG
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+#endif
 
         private uint fileOffset;
         private uint fileSize;
@@ -44,11 +46,13 @@ namespace Sims2Tools.DBPF.Package
             get { return uncompressedSize; }
             set
             {
+#if DEBUG
                 // Some apps leave an entry in the CLST resource where the compressed size is the same as the data size, ie the data is NOT compressed. But we'll let the decompressor take care of it.
                 if (dataSize != value)
                 {
-                    logger.Debug($"Uncompressed size is the same as the data size for {this}");
+                    // logger.Debug($"Uncompressed size is the same as the data size for {this}");
                 }
+#endif
 
                 dataSize = uncompressedSize = value;
             }

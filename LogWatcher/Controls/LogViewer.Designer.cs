@@ -29,6 +29,7 @@ namespace LogWatcher.Controls
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.treeView = new System.Windows.Forms.TreeView();
             this.panelMultiView = new System.Windows.Forms.Panel();
@@ -43,6 +44,7 @@ namespace LogWatcher.Controls
             this.colAttrIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAttrKey = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAttrValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.toolTipTextBox = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -99,6 +101,7 @@ namespace LogWatcher.Controls
             this.textBox.TabIndex = 0;
             this.textBox.Text = "";
             this.textBox.WordWrap = false;
+            this.textBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnTextBoxMouseMove);
             // 
             // gridLotObjects
             // 
@@ -235,5 +238,6 @@ namespace LogWatcher.Controls
         private System.Windows.Forms.DataGridViewTextBoxColumn colAttrIndex;
         private System.Windows.Forms.DataGridViewTextBoxColumn colAttrKey;
         private System.Windows.Forms.DataGridViewTextBoxColumn colAttrValue;
+        private System.Windows.Forms.ToolTip toolTipTextBox;
     }
 }

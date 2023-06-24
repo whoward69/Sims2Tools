@@ -21,6 +21,7 @@ namespace ObjectRelocator
             this.Columns.Add(new DataColumn("Title", typeof(string)));
             this.Columns.Add(new DataColumn("Description", typeof(string)));
             this.Columns.Add(new DataColumn("Name", typeof(string)));
+            this.Columns.Add(new DataColumn("PackagePath", typeof(string)));
             this.Columns.Add(new DataColumn("Path", typeof(string)));
             this.Columns.Add(new DataColumn("Guid", typeof(string)));
             this.Columns.Add(new DataColumn("Rooms", typeof(string)));

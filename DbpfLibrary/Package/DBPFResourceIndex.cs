@@ -33,6 +33,10 @@ namespace Sims2Tools.DBPF.Package
 
         private DBPFEntry clstEntry = null;
 
+        private bool isDirty = false;
+
+        public bool IsDirty => (isDirty || resourceCache.IsDirty);
+
         private uint IndexEntrySize => (uint)(indexMinorVersion >= 2 ? 24 : 20);
 
         internal uint Count
@@ -238,7 +242,14 @@ namespace Sims2Tools.DBPF.Package
 
         internal bool Remove(DBPFResource resource)
         {
-            return (entryByKey.Remove(resource) && resourceCache.Remove(resource));
+            if (entryByKey.Remove(resource))
+            {
+                isDirty = true;
+
+                return resourceCache.Remove(resource);
+            }
+
+            return false;
         }
 
         #region Clst Handling

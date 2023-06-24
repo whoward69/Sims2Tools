@@ -87,6 +87,8 @@ namespace Sims2Tools.DBPF.CPF
 
                 UnserializeXml(reader, len);
             }
+
+            this.KeyName = GetSaveItem("name").StringValue;
         }
 
         protected void UnserializeXml(DbpfReader reader, int len)

@@ -91,7 +91,7 @@ namespace Sims2Tools.DBPF.Package
 
         public uint ResourceCount => header.ResourceIndexCount;
 
-        public bool IsDirty => resourceCache.IsDirty;
+        public bool IsDirty => resourceIndex.IsDirty;
 
         public DBPFFile(string packagePath)
         {
