@@ -45,7 +45,7 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
         }
 
         /* Other known item names for use with this.GetSaveItem(itemName)
-         * iconidx (uint) - should reference ???? by TGIR
+         * iconidx (uint) - should reference IMG by TGIR
          * binidx (uint) - should reference a COLL by TGIR
          * creatorid (string)
          * sortindex (int)

@@ -25,6 +25,7 @@ namespace Sims2Tools
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         static public String objectsSubPath = @"\TSData\Res\Objects\objects.package";
+        static public String wantsSubDir = @"\TSData\Res\Wants";
 
         static public String base3dPath = @"\TSData\Res\Sims3D";
         static public String ep3dPath = @"\TSData\Res\3D";

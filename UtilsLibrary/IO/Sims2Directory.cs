@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Sims2Tools.Files
 {
@@ -17,13 +16,13 @@ namespace Sims2Tools.Files
     {
         // Replacement for Directory.GetFiles() that honours Sims2 directory/file processing sequence ...
         // ... which is case-insensitive alphabetical on full path name
-        public static string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
+        public static SortedSet<string> GetFiles(string path, string searchPattern, SearchOption searchOption)
         {
             if (path == null) throw new ArgumentNullException("path");
             if (searchPattern == null) throw new ArgumentNullException("searchPattern");
             if (searchOption != 0 && searchOption != SearchOption.AllDirectories) throw new ArgumentOutOfRangeException("searchOption");
 
-            return (new SortedSet<string>(Directory.GetFiles(path, searchPattern, searchOption), new Sims2PathComparer(path))).ToArray();
+            return new SortedSet<string>(Directory.GetFiles(path, searchPattern, searchOption), new Sims2PathComparer(path));
         }
     }
 

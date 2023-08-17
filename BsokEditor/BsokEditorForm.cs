@@ -72,35 +72,7 @@ namespace BsokEditor
             {
                 dataLoading = true;
 
-                XmlDocument bsokXmlDoc = new XmlDocument();
-
-                string[] bsokXmlFiles = Directory.GetFiles("Resources/XML", "bsok_*.xml", SearchOption.TopDirectoryOnly);
-
-                if (bsokXmlFiles.Length > 0)
-                {
-                    bsokXmlDoc.Load(bsokXmlFiles[0]);
-
-                    bsokXml = bsokXmlDoc.DocumentElement;
-
-                    for (int i = 1; i < bsokXmlFiles.Length; ++i)
-                    {
-                        XmlDocument bsokDoc = new XmlDocument();
-                        bsokDoc.Load(bsokXmlFiles[i]);
-
-                        XmlElement rootElement = bsokDoc.DocumentElement;
-
-                        foreach (XmlNode genreNode in rootElement.ChildNodes)
-                        {
-                            bsokXml.AppendChild(bsokXmlDoc.ImportNode(genreNode, true));
-                        }
-                    }
-                }
-                else
-                {
-                    bsokXmlDoc.Load("Resources/XML/bsok.xml");
-
-                    bsokXml = bsokXmlDoc.DocumentElement;
-                }
+                bsokXml = ProcessConfig()?.DocumentElement;
 
                 LoadBsokProductComboBoxes();
 
@@ -146,6 +118,111 @@ namespace BsokEditor
         }
         #endregion
 
+        #region XML Config
+        private XmlDocument ProcessConfig()
+        {
+            string[] bsokXmlFiles = Directory.GetFiles("Resources/XML", "bsok_*.xml", SearchOption.TopDirectoryOnly);
+
+            if (bsokXmlFiles.Length > 0)
+            {
+                return MergeAllConfigs(bsokXmlFiles);
+            }
+            else
+            {
+                return LoadConfigFile("Resources/XML/bsok.xml");
+            }
+
+        }
+
+        private XmlDocument MergeAllConfigs(string[] bsokXmlFiles)
+        {
+            XmlDocument bsokXmlDoc = LoadConfigFile(bsokXmlFiles[0]);
+
+            if (bsokXmlDoc.DocumentElement != null)
+            {
+                for (int i = 1; i < bsokXmlFiles.Length; ++i)
+                {
+                    MergeConfig(bsokXmlDoc, bsokXmlFiles[i]);
+                }
+            }
+
+            return bsokXmlDoc;
+        }
+
+        private void MergeConfig(XmlDocument bsokXmlDoc, string bsokXmlFile)
+        {
+            XmlDocument bsokDoc = LoadConfigFile(bsokXmlFile); ;
+
+            if (bsokDoc.DocumentElement != null)
+            {
+                foreach (XmlNode genreNode in bsokDoc.DocumentElement.ChildNodes)
+                {
+                    foreach (XmlNode styleNode in genreNode.ChildNodes)
+                    {
+                        foreach (XmlNode groupNode in styleNode.ChildNodes)
+                        {
+                            foreach (XmlNode shapeNode in groupNode.ChildNodes)
+                            {
+                                MergeNode(bsokXmlDoc, genreNode, styleNode, groupNode, shapeNode);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void MergeNode(XmlDocument bsokXmlDoc, XmlNode genreNode, XmlNode styleNode, XmlNode groupNode, XmlNode shapeNode)
+        {
+            XmlNode mergeGenreNode = GetOrAddNode(bsokXmlDoc, bsokXmlDoc.DocumentElement, genreNode);
+            XmlNode mergeStyleNode = GetOrAddNode(bsokXmlDoc, mergeGenreNode, styleNode);
+            XmlNode mergeGroupNode = GetOrAddNode(bsokXmlDoc, mergeStyleNode, groupNode);
+
+            XmlNode node = mergeGroupNode.SelectSingleNode($"./{shapeNode.LocalName}[@name='{shapeNode.Attributes.GetNamedItem("name")}']");
+
+            if (node != null)
+            {
+                logger.Warn($"Genre:{genreNode.Attributes.GetNamedItem("name")}, Style:{styleNode.Attributes.GetNamedItem("name")}, Group:{groupNode.Attributes.GetNamedItem("name")} already defines Shape:{shapeNode.Attributes.GetNamedItem("name")}");
+            }
+
+            mergeGroupNode.AppendChild(bsokXmlDoc.ImportNode(shapeNode, true));
+        }
+
+        private XmlNode GetOrAddNode(XmlDocument bsokXmlDoc, XmlNode parent, XmlNode child)
+        {
+            string predicate = $"@name='{child.Attributes.GetNamedItem("name").Value}'";
+
+            string gender = child.Attributes.GetNamedItem("gender")?.Value;
+
+            if (gender != null)
+            {
+                predicate = $"{predicate} and @gender='{gender}'";
+            }
+
+            string xpath = $"./{child.LocalName}[{predicate}]";
+
+            XmlNode node = parent.SelectSingleNode(xpath) ?? parent.AppendChild(bsokXmlDoc.ImportNode(child, false));
+
+            return node;
+        }
+
+        private XmlDocument LoadConfigFile(string bsokXmlFile)
+        {
+            XmlDocument bsokXmlDoc = new XmlDocument();
+
+            try
+            {
+                bsokXmlDoc.Load(bsokXmlFile);
+                logger.Info($"Loaded config {bsokXmlFile}");
+            }
+            catch (Exception e)
+            {
+                logger.Warn($"Config {bsokXmlFile} is invalid!", e);
+            }
+
+            return bsokXmlDoc;
+        }
+        #endregion
+
         #region Form Management
         private void OnLoad(object sender, EventArgs e)
         {
@@ -156,6 +233,7 @@ namespace BsokEditor
             MyMruList.FileSelected += MyMruList_FolderSelected;
 
             menuItemExcludeUnknown.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemExcludeUnknown.Name, 0) != 0);
+            menuItemShowNakedCategory.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowNakedCategory.Name, 0) != 0); OnShowNakedCategoryClicked(menuItemShowNakedCategory, null);
             menuItemShowCategoryShoe.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowCategoryShoe.Name, 0) != 0); OnShowCategoryAndShoeClicked(menuItemShowCategoryShoe, null);
             menuItemShowGenderAge.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowGenderAge.Name, 0) != 0); OnShowGenderAndAgeClicked(menuItemShowGenderAge, null);
 
@@ -184,6 +262,7 @@ namespace BsokEditor
             RegistryTools.SaveFormSettings(BsokEditorApp.RegistryKey, this);
 
             RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemExcludeUnknown.Name, menuItemExcludeUnknown.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowNakedCategory.Name, menuItemShowNakedCategory.Checked ? 1 : 0);
             RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowCategoryShoe.Name, menuItemShowCategoryShoe.Checked ? 1 : 0);
             RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowGenderAge.Name, menuItemShowGenderAge.Checked ? 1 : 0);
 
@@ -420,12 +499,15 @@ namespace BsokEditor
 
             comboBsokGenre.Items.Clear();
 
-            foreach (XmlNode node in bsokXml.ChildNodes)
+            if (bsokXml != null)
             {
-                if (node is XmlElement element) comboBsokGenre.Items.Add(new XmlValue(element.GetAttribute("name"), element));
-            }
+                foreach (XmlNode node in bsokXml.ChildNodes)
+                {
+                    if (node is XmlElement element) comboBsokGenre.Items.Add(new XmlValue(element.GetAttribute("name"), element));
+                }
 
-            comboBsokGenre.SelectedIndex = 0;
+                comboBsokGenre.SelectedIndex = 0;
+            }
 
             cachedBsokValue = "";
 
@@ -567,6 +649,11 @@ namespace BsokEditor
             grpCategory.Visible = menuItemShowCategoryShoe.Checked;
             grpShoe.Visible = menuItemShowCategoryShoe.Checked;
         }
+
+        private void OnShowNakedCategoryClicked(object sender, EventArgs e)
+        {
+            ckbCatNaked.Visible = menuItemShowNakedCategory.Checked;
+        }
         #endregion
 
         #region Mode Menu Actions
@@ -637,10 +724,10 @@ namespace BsokEditor
 
             if (cpfItem == null) return bsok;
 
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(bsokXml.OwnerDocument.NameTable);
-            nsmgr.AddNamespace("bsok", "urn:bsok-schema");
+            // XmlNamespaceManager nsmgr = new XmlNamespaceManager(bsokXml.OwnerDocument.NameTable);
+            // nsmgr.AddNamespace("bsok", "urn:bsok-schema");
 
-            XmlNode node = bsokXml.SelectSingleNode($"//*[@code='{cpfItem.StringValue}']");
+            XmlNode node = bsokXml?.SelectSingleNode($"//*[@code='{cpfItem.StringValue}']");
 
             if (node != null)
             {
@@ -728,9 +815,9 @@ namespace BsokEditor
                 if ((categoryFlags & 0x0008) == 0x0008) category += " ,Swimwear";
                 if ((categoryFlags & 0x0040) == 0x0040) category += " ,Underwear";
 
-                if ((categoryFlags & 0x0080) == 0x0080) category += " ,Skin";
+                if ((categoryFlags & 0x0080) == 0x0080) category += " ,Naked";
                 if ((categoryFlags & 0x0400) == 0x0400) category += " ,Try On";
-                if ((categoryFlags & 0x0800) == 0x0800) category += " ,Naked";
+                if ((categoryFlags & 0x0800) == 0x0800) category += " ,NakedOverlay";
             }
 
             return category.Length > 0 ? category.Substring(2) : "";
@@ -977,7 +1064,7 @@ namespace BsokEditor
             {
                 cachedBsokValue = newBsokValue;
 
-                XmlNode node = bsokXml.SelectSingleNode($"//*[@code='{newBsokValue}']");
+                XmlNode node = bsokXml?.SelectSingleNode($"//*[@code='{newBsokValue}']");
 
                 if (node != null)
                 {
@@ -1357,6 +1444,11 @@ namespace BsokEditor
             if (IsAutoUpdate) UpdateSelectedRows(ckbCatPJs.Checked, "category", 0x0010);
         }
 
+        private void OnCatNakedClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbCatNaked.Checked, "category", 0x0080);
+        }
+
         private void OnCatSwimwearClicked(object sender, EventArgs e)
         {
             if (IsAutoUpdate) UpdateSelectedRows(ckbCatSwimwear.Checked, "category", 0x0008);
@@ -1389,12 +1481,12 @@ namespace BsokEditor
 
         private void OnAgeYoungAdultsClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeYoungAdults.Checked, "age", 0x0008);
+            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeYoungAdults.Checked, "age", 0x0040);
         }
 
         private void OnAgeAdultsClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeAdults.Checked, "age", 0x0040);
+            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeAdults.Checked, "age", 0x0008);
         }
 
         private void OnAgeEldersClicked(object sender, EventArgs e)

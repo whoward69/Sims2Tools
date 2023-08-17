@@ -40,8 +40,8 @@ namespace BhavFinder
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BhavFinderForm));
             this.lblFilePath = new System.Windows.Forms.Label();
             this.textFilePath = new System.Windows.Forms.TextBox();
@@ -118,12 +118,16 @@ namespace BhavFinder
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSelectPackage = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemRecentPackages = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemSaveResultsToClipboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSaveResultsAs = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveResultsDialog = new System.Windows.Forms.SaveFileDialog();
             this.bhavFinderWorker = new System.ComponentModel.BackgroundWorker();
             this.menuContextOperands.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridFoundBhavs)).BeginInit();
@@ -871,14 +875,14 @@ namespace BhavFinder
             this.gridFoundBhavs.AllowUserToDeleteRows = false;
             this.gridFoundBhavs.AllowUserToResizeRows = false;
             this.gridFoundBhavs.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridFoundBhavs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridFoundBhavs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.gridFoundBhavs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridFoundBhavs.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colBhavPackage,
@@ -890,9 +894,9 @@ namespace BhavFinder
             this.gridFoundBhavs.Name = "gridFoundBhavs";
             this.gridFoundBhavs.ReadOnly = true;
             this.gridFoundBhavs.RowHeadersVisible = false;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridFoundBhavs.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridFoundBhavs.RowsDefaultCellStyle = dataGridViewCellStyle6;
             this.gridFoundBhavs.ShowCellErrors = false;
             this.gridFoundBhavs.ShowEditingIcon = false;
             this.gridFoundBhavs.Size = new System.Drawing.Size(1063, 386);
@@ -979,6 +983,9 @@ namespace BhavFinder
             this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemSelectPackage,
             this.menuItemRecentPackages,
+            this.menuItemSeparator3,
+            this.menuItemSaveResultsToClipboard,
+            this.menuItemSaveResultsAs,
             this.menuItemSeparator1,
             this.menuItemConfiguration,
             this.menuItemSeparator2,
@@ -986,43 +993,66 @@ namespace BhavFinder
             this.menuFile.Name = "menuFile";
             this.menuFile.Size = new System.Drawing.Size(37, 20);
             this.menuFile.Text = "&File";
+            this.menuFile.DropDownOpening += new System.EventHandler(this.OnFileOpening);
             // 
             // menuItemSelectPackage
             // 
             this.menuItemSelectPackage.Name = "menuItemSelectPackage";
             this.menuItemSelectPackage.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.menuItemSelectPackage.Size = new System.Drawing.Size(204, 22);
+            this.menuItemSelectPackage.Size = new System.Drawing.Size(248, 22);
             this.menuItemSelectPackage.Text = "&Select Package...";
             this.menuItemSelectPackage.Click += new System.EventHandler(this.OnSelectClicked);
             // 
             // menuItemRecentPackages
             // 
             this.menuItemRecentPackages.Name = "menuItemRecentPackages";
-            this.menuItemRecentPackages.Size = new System.Drawing.Size(204, 22);
+            this.menuItemRecentPackages.Size = new System.Drawing.Size(248, 22);
             this.menuItemRecentPackages.Text = "Recent Packages...";
+            // 
+            // menuItemSeparator3
+            // 
+            this.menuItemSeparator3.Name = "menuItemSeparator3";
+            this.menuItemSeparator3.Size = new System.Drawing.Size(245, 6);
+            // 
+            // menuItemSaveResultsToClipboard
+            // 
+            this.menuItemSaveResultsToClipboard.Name = "menuItemSaveResultsToClipboard";
+            this.menuItemSaveResultsToClipboard.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this.menuItemSaveResultsToClipboard.Size = new System.Drawing.Size(248, 22);
+            this.menuItemSaveResultsToClipboard.Text = "Save Results To &Clipboard";
+            this.menuItemSaveResultsToClipboard.Click += new System.EventHandler(this.OnSaveResultsToClipboardClicked);
+            // 
+            // menuItemSaveResultsAs
+            // 
+            this.menuItemSaveResultsAs.Name = "menuItemSaveResultsAs";
+            this.menuItemSaveResultsAs.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.S)));
+            this.menuItemSaveResultsAs.Size = new System.Drawing.Size(248, 22);
+            this.menuItemSaveResultsAs.Text = "Save Results &As...";
+            this.menuItemSaveResultsAs.Click += new System.EventHandler(this.OnSaveResultsAsClicked);
             // 
             // menuItemSeparator1
             // 
             this.menuItemSeparator1.Name = "menuItemSeparator1";
-            this.menuItemSeparator1.Size = new System.Drawing.Size(201, 6);
+            this.menuItemSeparator1.Size = new System.Drawing.Size(245, 6);
             // 
             // menuItemConfiguration
             // 
             this.menuItemConfiguration.Name = "menuItemConfiguration";
-            this.menuItemConfiguration.Size = new System.Drawing.Size(204, 22);
+            this.menuItemConfiguration.Size = new System.Drawing.Size(248, 22);
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigClicked);
             // 
             // menuItemSeparator2
             // 
             this.menuItemSeparator2.Name = "menuItemSeparator2";
-            this.menuItemSeparator2.Size = new System.Drawing.Size(201, 6);
+            this.menuItemSeparator2.Size = new System.Drawing.Size(245, 6);
             // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
             this.menuItemExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.menuItemExit.Size = new System.Drawing.Size(204, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(248, 22);
             this.menuItemExit.Text = "E&xit";
             this.menuItemExit.Click += new System.EventHandler(this.OnExitClicked);
             // 
@@ -1043,6 +1073,12 @@ namespace BhavFinder
             this.menuItemAbout.Size = new System.Drawing.Size(135, 22);
             this.menuItemAbout.Text = "About...";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
+            // 
+            // saveResultsDialog
+            // 
+            this.saveResultsDialog.DefaultExt = "txt";
+            this.saveResultsDialog.Filter = "Text files|*.txt|All files|*.*";
+            this.saveResultsDialog.Title = "Save Results As...";
             // 
             // bhavFinderWorker
             // 
@@ -1214,6 +1250,9 @@ namespace BhavFinder
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemConfiguration;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSaveResultsToClipboard;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSaveResultsAs;
+        private System.Windows.Forms.ToolStripSeparator menuItemSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuItemExit;
         private System.Windows.Forms.ToolStripMenuItem menuHelp;
         private System.Windows.Forms.ToolStripMenuItem menuItemAbout;
@@ -1221,6 +1260,7 @@ namespace BhavFinder
         private System.Windows.Forms.ToolStripMenuItem menuItemPasteGUID;
         private System.Windows.Forms.ToolTip toolTipOperands;
         private System.Windows.Forms.OpenFileDialog selectFileDialog;
+        private System.Windows.Forms.SaveFileDialog saveResultsDialog;
         private System.ComponentModel.BackgroundWorker bhavFinderWorker;
     }
 }

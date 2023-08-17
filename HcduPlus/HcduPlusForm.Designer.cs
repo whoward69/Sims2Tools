@@ -86,7 +86,10 @@ namespace HcduPlus
             this.menuItemStoreVersionConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCastawaysConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemIncludeKnownConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemKnownConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOptionNoLoad = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTipGridByPackage = new System.Windows.Forms.ToolTip(this.components);
             this.hcduWorker = new System.ComponentModel.BackgroundWorker();
             this.lblModsPath = new System.Windows.Forms.Label();
@@ -113,6 +116,8 @@ namespace HcduPlus
             this.btnSelectScanPath = new System.Windows.Forms.Button();
             this.textScanPath = new System.Windows.Forms.TextBox();
             this.lblScanPath = new System.Windows.Forms.Label();
+            this.checkModsSavedSims = new System.Windows.Forms.CheckBox();
+            this.checkScanSavedSims = new System.Windows.Forms.CheckBox();
             this.menuMain.SuspendLayout();
             this.tabConflicts.SuspendLayout();
             this.tabByPackage.SuspendLayout();
@@ -128,7 +133,8 @@ namespace HcduPlus
             this.menuFile,
             this.menuHelp,
             this.menuResources,
-            this.menuConflicts});
+            this.menuConflicts,
+            this.menuOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -398,6 +404,7 @@ namespace HcduPlus
             this.menuItemStoreVersionConflicts,
             this.menuItemCastawaysConflicts,
             this.toolStripSeparator3,
+            this.menuItemIncludeKnownConflicts,
             this.menuItemKnownConflicts});
             this.menuConflicts.Name = "menuConflicts";
             this.menuConflicts.Size = new System.Drawing.Size(66, 20);
@@ -458,6 +465,14 @@ namespace HcduPlus
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(227, 6);
             // 
+            // menuItemIncludeKnownConflicts
+            // 
+            this.menuItemIncludeKnownConflicts.CheckOnClick = true;
+            this.menuItemIncludeKnownConflicts.Name = "menuItemIncludeKnownConflicts";
+            this.menuItemIncludeKnownConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemIncludeKnownConflicts.Text = "Include Known Conflicts";
+            this.menuItemIncludeKnownConflicts.Click += new System.EventHandler(this.OnIncludeKnownConflictsClicked);
+            // 
             // menuItemKnownConflicts
             // 
             this.menuItemKnownConflicts.Name = "menuItemKnownConflicts";
@@ -465,6 +480,22 @@ namespace HcduPlus
             this.menuItemKnownConflicts.Size = new System.Drawing.Size(230, 22);
             this.menuItemKnownConflicts.Text = "&Known Conflicts...";
             this.menuItemKnownConflicts.Click += new System.EventHandler(this.OnKnownConflictsClicked);
+            // 
+            // menuOptions
+            // 
+            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemOptionNoLoad});
+            this.menuOptions.Name = "menuOptions";
+            this.menuOptions.Size = new System.Drawing.Size(61, 20);
+            this.menuOptions.Text = "&Options";
+            // 
+            // menuItemOptionNoLoad
+            // 
+            this.menuItemOptionNoLoad.CheckOnClick = true;
+            this.menuItemOptionNoLoad.Name = "menuItemOptionNoLoad";
+            this.menuItemOptionNoLoad.Size = new System.Drawing.Size(208, 22);
+            this.menuItemOptionNoLoad.Text = "Include .noload packages";
+            this.menuItemOptionNoLoad.Click += new System.EventHandler(this.OnNoLoads);
             // 
             // hcduWorker
             // 
@@ -489,7 +520,7 @@ namespace HcduPlus
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textModsPath.Location = new System.Drawing.Point(126, 38);
             this.textModsPath.Name = "textModsPath";
-            this.textModsPath.Size = new System.Drawing.Size(643, 21);
+            this.textModsPath.Size = new System.Drawing.Size(534, 21);
             this.textModsPath.TabIndex = 2;
             this.textModsPath.TabStop = false;
             this.textModsPath.WordWrap = false;
@@ -750,7 +781,7 @@ namespace HcduPlus
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textScanPath.Location = new System.Drawing.Point(126, 73);
             this.textScanPath.Name = "textScanPath";
-            this.textScanPath.Size = new System.Drawing.Size(643, 21);
+            this.textScanPath.Size = new System.Drawing.Size(534, 21);
             this.textScanPath.TabIndex = 9;
             this.textScanPath.TabStop = false;
             this.textScanPath.WordWrap = false;
@@ -765,11 +796,37 @@ namespace HcduPlus
             this.lblScanPath.TabIndex = 8;
             this.lblScanPath.Text = "Scan Folder:";
             // 
+            // checkModsSavedSims
+            // 
+            this.checkModsSavedSims.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkModsSavedSims.AutoSize = true;
+            this.checkModsSavedSims.Location = new System.Drawing.Point(666, 40);
+            this.checkModsSavedSims.Name = "checkModsSavedSims";
+            this.checkModsSavedSims.Size = new System.Drawing.Size(107, 19);
+            this.checkModsSavedSims.TabIndex = 11;
+            this.checkModsSavedSims.Text = "Inc SavedSims";
+            this.checkModsSavedSims.UseVisualStyleBackColor = true;
+            this.checkModsSavedSims.Click += new System.EventHandler(this.OnSavedSimsDownloads);
+            // 
+            // checkScanSavedSims
+            // 
+            this.checkScanSavedSims.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkScanSavedSims.AutoSize = true;
+            this.checkScanSavedSims.Location = new System.Drawing.Point(666, 75);
+            this.checkScanSavedSims.Name = "checkScanSavedSims";
+            this.checkScanSavedSims.Size = new System.Drawing.Size(107, 19);
+            this.checkScanSavedSims.TabIndex = 12;
+            this.checkScanSavedSims.Text = "Inc SavedSims";
+            this.checkScanSavedSims.UseVisualStyleBackColor = true;
+            this.checkScanSavedSims.Click += new System.EventHandler(this.OnSavedSimsScan);
+            // 
             // HcduPlusForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(933, 572);
+            this.Controls.Add(this.checkScanSavedSims);
+            this.Controls.Add(this.checkModsSavedSims);
             this.Controls.Add(this.btnSelectScanPath);
             this.Controls.Add(this.textScanPath);
             this.Controls.Add(this.lblScanPath);
@@ -857,6 +914,7 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemVers;
         private System.Windows.Forms.ToolStripMenuItem menuConflicts;
         private System.Windows.Forms.ToolStripMenuItem menuItemInternalConflicts;
+        private System.Windows.Forms.ToolStripMenuItem menuItemIncludeKnownConflicts;
         private System.Windows.Forms.ToolStripMenuItem menuItemKnownConflicts;
         private System.Windows.Forms.ToolStripMenuItem menuItemHomeCrafterConflicts;
         private System.Windows.Forms.ToolStripMenuItem menuItemStoreVersionConflicts;
@@ -871,6 +929,10 @@ namespace HcduPlus
         private System.Windows.Forms.DataGridViewTextBoxColumn colHcduInstance;
         private System.Windows.Forms.DataGridViewTextBoxColumn colHcduName;
         private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackages;
+        private System.Windows.Forms.CheckBox checkModsSavedSims;
+        private System.Windows.Forms.CheckBox checkScanSavedSims;
+        private System.Windows.Forms.ToolStripMenuItem menuOptions;
+        private System.Windows.Forms.ToolStripMenuItem menuItemOptionNoLoad;
     }
 }
 

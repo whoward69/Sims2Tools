@@ -8,6 +8,7 @@
 
 using LogWatcher.Controls;
 using Sims2Tools;
+using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -92,8 +93,8 @@ namespace LogWatcher
 
         private void OnFileOpening(object sender, EventArgs e)
         {
-            menuItemCloseTab.Enabled = tabControl.SelectedTab != null;
-            menuItemCloseTabAndDelete.Enabled = tabControl.SelectedTab != null;
+            menuItemCloseTab.Enabled = menuItemCloseAndDeleteTab.Enabled = (tabControl.SelectedTab != null);
+            menuItemCloseAllTabs.Enabled = menuItemCloseAndDeleteAllTabs.Enabled = (tabControl.TabPages.Count > 0);
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -212,7 +213,73 @@ namespace LogWatcher
             }
         }
 
-        private void OnCloseTab(object sender, EventArgs e)
+        private void OnDoubleClick(object sender, EventArgs e)
+        {
+            OnRenameTab(sender, e);
+        }
+
+        private void OnRenameTab(object sender, EventArgs e)
+        {
+            if (tabControl.SelectedTab is LogTab logTab)
+            {
+                FileInfo fiOld = new FileInfo(logTab.LogFilePath);
+
+                Rectangle tabRect = tabControl.GetTabRect(tabControl.SelectedIndex);
+                Rectangle textRect = this.RectangleToClient(tabControl.RectangleToScreen(tabRect));
+
+                TextBox textBox = new TextBox()
+                {
+                    Left = textRect.Left,
+                    Top = textRect.Top,
+                    Width = textRect.Width,
+                    Height = textRect.Height,
+                    Text = logTab.Text,
+                    BorderStyle = BorderStyle.FixedSingle,
+                    Font = tabControl.Font
+                };
+
+                textBox.KeyDown += delegate (object obj, KeyEventArgs args)
+                {
+                    if (args.KeyCode == Keys.Enter)
+                    {
+                        logTab.Focus();
+                    }
+                };
+
+                textBox.Leave += delegate
+                {
+                    string newName = textBox.Text;
+
+                    textBox.Dispose();
+                    textBox = null;
+
+                    FileInfo fiNew = new FileInfo($"{fiOld.DirectoryName}/{newName}");
+
+                    if (!fiOld.Name.Equals(newName))
+                    {
+                        if (fiNew.Exists)
+                        {
+                            MsgBox.Show("File already exists", "Error!", MessageBoxButtons.OK);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                Microsoft.VisualBasic.FileIO.FileSystem.RenameFile(fiOld.FullName, fiNew.Name);
+                                MyMruList.RemoveFile(fiOld.FullName);
+                            }
+                            catch (Exception) { }
+                        }
+                    }
+                };
+
+                this.Controls.Add(textBox);
+                textBox.BringToFront();
+                textBox.Focus();
+            }
+        }
+
+        private void OnCloseCurrentTab(object sender, EventArgs e)
         {
             if (tabControl.SelectedTab != null)
             {
@@ -220,7 +287,7 @@ namespace LogWatcher
             }
         }
 
-        private void OnCloseTabAndDelete(object sender, EventArgs e)
+        private void OnCloseAndDeleteCurrentTab(object sender, EventArgs e)
         {
             if (tabControl.SelectedTab != null)
             {
@@ -242,6 +309,20 @@ namespace LogWatcher
                     }
                     catch (Exception) { }
                 }
+            }
+        }
+
+        private void OnCloseAllTabs(object sender, EventArgs e)
+        {
+            tabControl.TabPages.Clear(); ;
+        }
+
+        private void OnCloseAndDeleteAllTabs(object sender, EventArgs e)
+        {
+            while (tabControl.TabPages.Count > 0)
+            {
+                tabControl.SelectedIndex = 0;
+                OnCloseAndDeleteCurrentTab(sender, e);
             }
         }
 
@@ -306,7 +387,18 @@ namespace LogWatcher
 
         private void OnLogFileRenamed(object sender, RenamedEventArgs e)
         {
-            // Do what with a renamed file?
+            foreach (TabPage tabPage in tabControl.TabPages)
+            {
+                if (tabPage is LogTab logTab)
+                {
+                    if (logTab.LogFilePath.Equals(e.OldFullPath))
+                    {
+                        logTab.LogFilePath = e.FullPath;
+
+                        break;
+                    }
+                }
+            }
         }
 
         private void OnAutoOpenClicked(object sender, EventArgs e)

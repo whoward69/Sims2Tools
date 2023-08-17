@@ -9,6 +9,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using CsvHelper;
 using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
@@ -24,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -405,6 +407,11 @@ namespace BhavFinder
             e.Handled = true;
         }
 
+        private void OnFileOpening(object sender, EventArgs e)
+        {
+            menuItemSaveResultsToClipboard.Enabled = menuItemSaveResultsAs.Enabled = bhavFoundData.HasResults;
+        }
+
         private void OnExitClicked(object sender, EventArgs e)
         {
             this.Close();
@@ -413,6 +420,66 @@ namespace BhavFinder
         private void OnHelpClicked(object sender, EventArgs e)
         {
             new Sims2ToolsAboutDialog(BhavFinderApp.AppProduct).ShowDialog();
+        }
+
+        private void OnSaveResultsToClipboardClicked(object sender, EventArgs e)
+        {
+            String xml = GetResultsAsCSV();
+
+            if (xml != null)
+            {
+                Clipboard.SetText(xml);
+            }
+        }
+
+        private String GetResultsAsCSV()
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (CsvWriter csvWriter = new CsvWriter(new StreamWriter(ms), CultureInfo.InvariantCulture))
+                {
+                    var records = new List<object>();
+
+                    foreach (DataGridViewRow row in gridFoundBhavs.Rows)
+                    {
+                        records.Add(new
+                        {
+                            PackageName = row.Cells["colBhavPackage"].Value as string,
+                            Instance = row.Cells["colBhavInstance"].Value as string,
+                            Name = row.Cells["colBhavName"].Value as string,
+                            Group = row.Cells["colBhavGroupInstance"].Value as string,
+                            Object = row.Cells["colBhavGroupName"].Value as string
+                        });
+                    }
+
+                    csvWriter.WriteRecords(records);
+                    csvWriter.Flush();
+
+                    ms.Position = 0;
+
+                    using (StreamReader sr = new StreamReader(ms))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+        }
+
+        private void OnSaveResultsAsClicked(object sender, EventArgs e)
+        {
+            saveResultsDialog.ShowDialog();
+
+            if (saveResultsDialog.FileName != "")
+            {
+                String xml = GetResultsAsCSV();
+
+                if (xml != null)
+                {
+                    StreamWriter writer = new StreamWriter(saveResultsDialog.OpenFile());
+                    writer.WriteLine(xml);
+                    writer.Close();
+                }
+            }
         }
 
         private void OnGroupChanged(object sender, EventArgs e)

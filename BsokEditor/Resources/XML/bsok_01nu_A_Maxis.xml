@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<bsok>
+	<genre name="nuBSOK">
+		<style name="">
+			<group name="Maxis" gender="unisex">
+				<shape name="Maxis Original" icon="EA" creator="Maxis">
+					<role name="Civilian / All" code="0x00000DFF"/>
+					<role name="Enlisted / Security" code="0x00000DFD"/>
+					<role name="Officer / Command" code="0x00000DFB"/>
+					<role name="Tech / Engineering" code="0x00000DF9"/>
+					<role name="Medical / Science" code="0x00000DF7"/>
+					<role name="Rebel / Outlaw" code="0x00000DF5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DF4"/>
+					<role name="Media / Action News" code="0x00000DF3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DF2"/>
+					<role name="Barbarian / Fantasy" code="0x00000DF1"/>
+				</shape>
+			</group>
+		</style>
+	</genre>
+</bsok>

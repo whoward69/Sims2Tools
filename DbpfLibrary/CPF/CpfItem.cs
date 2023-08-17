@@ -110,7 +110,7 @@ namespace Sims2Tools.DBPF.CPF
                             return Convert.ToUInt32(AsSingle());
                         }
                     case MetaData.DataTypes.dtInteger:
-                    case Data.MetaData.DataTypes.dtUInteger:
+                    case MetaData.DataTypes.dtUInteger:
                         {
                             return AsUInteger();
                         }

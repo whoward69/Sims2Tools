@@ -78,7 +78,7 @@ namespace ObjectRelocator
             };
 
         private readonly NamedValue[] buildSortItems = {
-                new NamedValue("", 0x00),
+                new NamedValue("", 0x0000),
                 new NamedValue("Doors & Windows", 0x0008),
                 new NamedValue("Floor Coverings", 0x1000),
                 new NamedValue("Garden Centre", 0x0004),
@@ -87,20 +87,35 @@ namespace ObjectRelocator
                 new NamedValue("Walls", 0x4000)
             };
 
+        // These are "fake" values
+        private readonly NamedValue[] surfacetypeItems = {
+                new NamedValue("",       0x0000),
+                new NamedValue("cment",  0x0001),
+                new NamedValue("cpet",   0x0002),
+                new NamedValue("grass",  0x0004),
+                new NamedValue("gravel", 0x0008),
+                new NamedValue("lino",   0x0010),
+                new NamedValue("marble", 0x0020),
+                new NamedValue("wdeck",  0x0040),
+                new NamedValue("wood",   0x0080)
+            };
+
+        // These are "fake" values
         private readonly NamedValue[] coveringSubsortItems = {
-                new NamedValue("", 0x0000),
-                new NamedValue("brick", 0x0001),
-                new NamedValue("carpet", 0x0002),
-                new NamedValue("lino", 0x0004),
-                new NamedValue("masonry", 0x0008),
-                new NamedValue("paint", 0x0010),
-                new NamedValue("paneling", 0x0020),
-                new NamedValue("poured", 0x0040),
-                new NamedValue("siding", 0x0080),
-                new NamedValue("stone", 0x0100),
-                new NamedValue("tile", 0x0200),
-                new NamedValue("wallpaper", 0x0400),
-                new NamedValue("wood", 0x0800)
+                new NamedValue("",          0x0000),
+                new NamedValue("brick",     0x0001),
+                new NamedValue("carpet",    0x0002),
+                new NamedValue("lino",      0x0004),
+                new NamedValue("masonry",   0x0008),
+                new NamedValue("other",     0x0010),
+                new NamedValue("paint",     0x0020),
+                new NamedValue("paneling",  0x0040),
+                new NamedValue("poured",    0x0080),
+                new NamedValue("siding",    0x0100),
+                new NamedValue("stone",     0x0200),
+                new NamedValue("tile",      0x0400),
+                new NamedValue("wallpaper", 0x0800),
+                new NamedValue("wood",      0x1000)
             };
 
         private enum CoveringSubsortIndex
@@ -110,6 +125,7 @@ namespace ObjectRelocator
             Carpet,
             Lino,
             Masonry,
+            Other,
             Paint,
             Paneling,
             Poured,
@@ -139,6 +155,7 @@ namespace ObjectRelocator
             comboFunction.Items.AddRange(functionSortItems);
 
             comboBuild.Items.AddRange(buildSortItems);
+            comboSurfacetype.Items.AddRange(surfacetypeItems);
 
             gridViewResources.DataSource = dataTableResources;
 
@@ -162,10 +179,6 @@ namespace ObjectRelocator
             MyMruList = new MruList(ObjectRelocatorApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FolderSelected;
 
-            buyMode = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemBuyMode.Name, 1) != 0);
-            // As we're simulating a click to change mode, we need to change mode first!
-            buyMode = !buyMode; OnBuyBuildModeClicked(null, null);
-
             menuItemExcludeHidden.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemExcludeHidden.Name, 1) != 0);
             menuItemHideNonLocals.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemHideNonLocals.Name, 0) != 0); OnHideNonLocalsClicked(menuItemHideNonLocals, null);
             menuItemHideLocals.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemHideLocals.Name, 0) != 0); OnHideLocalsClicked(menuItemHideLocals, null);
@@ -178,6 +191,10 @@ namespace ObjectRelocator
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
 
             menuItemMakeReplacements.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemMakeReplacements.Name, 0) != 0); OnMakeReplcementsClicked(menuItemMakeReplacements, null);
+
+            buyMode = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemBuyMode.Name, 1) != 0);
+            // As we're simulating a click to change mode, we need to change mode first!
+            buyMode = !buyMode; OnBuyBuildModeClicked(null, null);
 
             UpdateFormState();
 
@@ -1139,7 +1156,10 @@ namespace ObjectRelocator
             {
                 if (objectData.IsXobj)
                 {
-                    return $"{CapitaliseString(objectData.GetStrItem("type"))} - {CapitaliseString(objectData.GetStrItem("subsort"))}";
+                    string type = objectData.GetStrItem("type");
+                    string surface = type.Equals("floor") ? $" ({objectData.GetStrItem("surfacetype")})" : "";
+
+                    return $"{CapitaliseString(type)} - {CapitaliseString(objectData.GetStrItem("subsort"))}{surface}";
                 }
                 else
                 {
@@ -1297,7 +1317,7 @@ namespace ObjectRelocator
             {
                 if (selectedObject.IsObjd)
                 {
-                    UpdateObjdData(selectedObject, index, (ushort)nv.Value);
+                    if (index != ObjdIndex.NONE) UpdateObjdData(selectedObject, index, (ushort)nv.Value);
                 }
                 else
                 {
@@ -1420,7 +1440,7 @@ namespace ObjectRelocator
         #endregion
 
         #region Editor
-        ushort cachedRoomFlags, cachedFunctionFlags, cachedSubfunctionFlags, cachedUseFlags, cachedCommunityFlags, cachedQuarterTile, cachedBuildFlags, cachedSubbuildFlags;
+        ushort cachedRoomFlags, cachedFunctionFlags, cachedSubfunctionFlags, cachedUseFlags, cachedCommunityFlags, cachedQuarterTile, cachedBuildFlags, cachedSubbuildFlags, cachedSurfacetype;
 
         private void ClearEditor()
         {
@@ -1684,6 +1704,8 @@ namespace ObjectRelocator
                     }
                 }
 
+                comboSurfacetype.SelectedIndex = -1;
+
                 ushort newQuarterTile = objectData.GetRawData(ObjdIndex.IgnoreQuarterTilePlacement);
                 if (append)
                 {
@@ -1714,6 +1736,7 @@ namespace ObjectRelocator
             {
                 ushort fakeBuildSort;
                 ushort fakeBuildSubsort = 0x0000;
+                ushort fakeSurfacetype = 0x0000;
 
                 if (objectData.IsXfnc)
                 {
@@ -1725,6 +1748,17 @@ namespace ObjectRelocator
                     if (objectData.GetStrItem("type").Equals("floor"))
                     {
                         fakeBuildSort = 0x1000;
+
+                        string st = objectData.GetStrItem("surfacetype");
+
+                        foreach (NamedValue nv in surfacetypeItems)
+                        {
+                            if (nv.Name.Equals(st))
+                            {
+                                fakeSurfacetype = (ushort)nv.Value;
+                                break;
+                            }
+                        }
                     }
                     else
                     {
@@ -1757,6 +1791,11 @@ namespace ObjectRelocator
                             comboSubbuild.SelectedIndex = -1;
                         }
                     }
+
+                    if (cachedSurfacetype != fakeSurfacetype)
+                    {
+                        comboSurfacetype.SelectedIndex = -1;
+                    }
                 }
                 else
                 {
@@ -1769,6 +1808,17 @@ namespace ObjectRelocator
                         {
                             comboBuild.SelectedItem = o;
                             UpdateBuildSubsortItems(cachedSubbuildFlags);
+                            break;
+                        }
+                    }
+
+                    cachedSurfacetype = fakeSurfacetype;
+
+                    foreach (object o in comboSurfacetype.Items)
+                    {
+                        if ((o as NamedValue).Value == cachedSurfacetype)
+                        {
+                            comboSurfacetype.SelectedItem = o;
                             break;
                         }
                     }
@@ -1998,6 +2048,7 @@ namespace ObjectRelocator
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Brick]);
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Carpet]);
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Lino]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Other]);
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Poured]);
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Stone]);
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Tile]);
@@ -2006,6 +2057,7 @@ namespace ObjectRelocator
                 case 0x2000: // Wall Coverings
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Brick]);
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Masonry]);
+                    comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Other]);
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Paint]);
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Paneling]);
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Poured]);
@@ -2030,6 +2082,15 @@ namespace ObjectRelocator
                 }
             }
         }
+
+        private void OnBuildSurfacetypeChanged(object sender, EventArgs e)
+        {
+            if (comboSurfacetype.SelectedIndex != -1)
+            {
+                UpdateSelectedRows(comboSurfacetype.SelectedItem as NamedValue, ObjdIndex.NONE, "surfacetype");
+            }
+        }
+
         #endregion
 
         #region Checkbox Events
@@ -2557,8 +2618,8 @@ namespace ObjectRelocator
                 }
                 catch (Exception ex)
                 {
-                    logger.Warn("Error trying to update cigen.package", ex);
-                    MsgBox.Show("Error trying to update cigen.package", "Package Update Error!");
+                    logger.Warn("Error trying to update thumbnail cache", ex);
+                    MsgBox.Show("Error trying to update thumbnail cache", "Package Update Error!");
                 }
             }
 

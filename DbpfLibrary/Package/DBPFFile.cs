@@ -64,6 +64,7 @@ using Sims2Tools.DBPF.XFLR;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DBPF.XROF;
+using Sims2Tools.DBPF.XWNT;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -362,6 +363,10 @@ namespace Sims2Tools.DBPF.Package
             else if (entry.TypeID == Xrof.TYPE)
             {
                 res = new Xrof(entry, this.GetDbpfReader(entry));
+            }
+            else if (entry.TypeID == Xwnt.TYPE)
+            {
+                res = new Xwnt(entry, this.GetDbpfReader(entry));
             }
             //
             // Image resources

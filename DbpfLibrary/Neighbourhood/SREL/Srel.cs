@@ -22,55 +22,37 @@ namespace Sims2Tools.DBPF.Neighbourhood.SREL
     {
         public RelationshipFlags(ushort flags) : base(flags) { }
 
-        public bool IsEnemy
-        {
-            get { return GetBit((byte)RelationshipStateBits.Enemy); }
-        }
+        public bool IsEnemy => GetBit((byte)RelationshipStateBits.Enemy);
 
-        public bool IsFriend
-        {
-            get { return GetBit((byte)RelationshipStateBits.Friends); }
-        }
+        public bool IsFriend => GetBit((byte)RelationshipStateBits.Friends);
 
-        public bool IsBuddie
-        {
-            get { return GetBit((byte)RelationshipStateBits.Buddies); }
-        }
+        public bool IsBuddie => GetBit((byte)RelationshipStateBits.Buddies);
 
-        public bool HasCrush
-        {
-            get { return GetBit((byte)RelationshipStateBits.Crush); }
-        }
+        public bool HasCrush => GetBit((byte)RelationshipStateBits.Crush);
 
-        public bool InLove
-        {
-            get { return GetBit((byte)RelationshipStateBits.Love); }
-        }
+        public bool InLove => GetBit((byte)RelationshipStateBits.Love);
 
-        public bool GoSteady
-        {
-            get { return GetBit((byte)RelationshipStateBits.Steady); }
-        }
+        public bool GoSteady => GetBit((byte)RelationshipStateBits.Steady);
 
-        public bool IsEngaged
-        {
-            get { return GetBit((byte)RelationshipStateBits.Engaged); }
-        }
+        public bool IsEngaged => GetBit((byte)RelationshipStateBits.Engaged);
 
-        public bool IsMarried
-        {
-            get { return GetBit((byte)RelationshipStateBits.Married); }
-        }
+        public bool IsMarried => GetBit((byte)RelationshipStateBits.Married);
 
-        public bool IsFamilyMember
-        {
-            get { return GetBit((byte)RelationshipStateBits.Family); }
-        }
+        public bool IsContact => GetBit((byte)RelationshipStateBits.Contact);
 
-        public bool IsKnown
-        {
-            get { return GetBit((byte)RelationshipStateBits.Known); }
-        }
+        public bool IsPackMember => GetBit((byte)RelationshipStateBits.Pack);
+
+        public bool IsMaster => GetBit((byte)RelationshipStateBits.Master);
+
+        public bool IsMine => GetBit((byte)RelationshipStateBits.Mine);
+
+        public bool IsPetFriend => GetBit((byte)RelationshipStateBits.PetFriend);
+
+        public bool IsPetBuddies => GetBit((byte)RelationshipStateBits.PetBuddies);
+
+        public bool IsFamilyMember => GetBit((byte)RelationshipStateBits.Family);
+
+        public bool IsKnown => GetBit((byte)RelationshipStateBits.Known);
     }
 
     public class UIFlags2 : FlagBase
@@ -181,6 +163,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.SREL
             if (RelationState.IsFriend) element.SetAttribute("friend", "true");
             if (RelationState.IsKnown) element.SetAttribute("known", "true");
             if (RelationState.IsMarried) element.SetAttribute("married", "true");
+            if (RelationState.IsContact) element.SetAttribute("contact", "true");
+            if (RelationState.IsPackMember) element.SetAttribute("pack", "true");
+            if (RelationState.IsMaster) element.SetAttribute("master", "true");
+            if (RelationState.IsMine) element.SetAttribute("mine", "true");
+            if (RelationState.IsPetFriend) element.SetAttribute("petFriend", "true");
+            if (RelationState.IsPetBuddies) element.SetAttribute("petBuddie", "true");
             if (RelationState2.IsBFF) element.SetAttribute("bff", "true");
 
             if (RelationState.IsFamilyMember) element.SetAttribute("relFamily", FamilyRelation.ToString());

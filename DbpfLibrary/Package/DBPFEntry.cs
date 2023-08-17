@@ -15,7 +15,7 @@ namespace Sims2Tools.DBPF.Package
     public class DBPFEntry : DBPFKey
     {
 #if DEBUG
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        // private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 #endif
 
         private uint fileOffset;

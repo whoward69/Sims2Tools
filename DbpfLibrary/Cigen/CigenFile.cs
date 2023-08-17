@@ -46,6 +46,11 @@ namespace Sims2Tools.DBPF.Cigen
             return (cigenIndex != null) ? cigenIndex.GetImageKeys(ownerKey) : new List<DBPFKey>(0);
         }
 
+        public bool HasThumbnail(DBPFKey ownerKey)
+        {
+            return GetImageKeys(ownerKey).Count > 0;
+        }
+
         public Image GetThumbnail(DBPFKey ownerKey)
         {
             List<DBPFKey> imageKeys = GetImageKeys(ownerKey);

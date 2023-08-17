@@ -42,13 +42,15 @@ namespace HcduPlus
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HcduPlusKnownDialog));
             this.gridKnownConflicts = new System.Windows.Forms.DataGridView();
+            this.colLoadsEarlier = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colLoadsLater = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuConflictGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemRemove = new System.Windows.Forms.ToolStripMenuItem();
             this.btnKnownCancel = new System.Windows.Forms.Button();
             this.btnKnownOk = new System.Windows.Forms.Button();
             this.btnReset = new System.Windows.Forms.Button();
-            this.colLoadsEarlier = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colLoadsLater = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemPaste = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.gridKnownConflicts)).BeginInit();
             this.menuConflictGrid.SuspendLayout();
             this.SuspendLayout();
@@ -73,20 +75,38 @@ namespace HcduPlus
             this.gridKnownConflicts.TabIndex = 0;
             this.gridKnownConflicts.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridKnownConflicts.RowValidating += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.OnRowValidating);
+            this.gridKnownConflicts.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnKeyDown);
+            // 
+            // colLoadsEarlier
+            // 
+            this.colLoadsEarlier.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colLoadsEarlier.DataPropertyName = "Loads Earlier";
+            this.colLoadsEarlier.HeaderText = "Loads Earlier";
+            this.colLoadsEarlier.Name = "colLoadsEarlier";
+            this.colLoadsEarlier.Width = 105;
+            // 
+            // colLoadsLater
+            // 
+            this.colLoadsLater.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colLoadsLater.DataPropertyName = "Loads Later";
+            this.colLoadsLater.HeaderText = "Loads Later";
+            this.colLoadsLater.Name = "colLoadsLater";
             // 
             // menuConflictGrid
             // 
             this.menuConflictGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemRemove});
+            this.menuItemRemove,
+            this.toolStripSeparator1,
+            this.menuItemPaste});
             this.menuConflictGrid.Name = "menuConflictGrid";
-            this.menuConflictGrid.Size = new System.Drawing.Size(118, 26);
+            this.menuConflictGrid.Size = new System.Drawing.Size(181, 76);
             this.menuConflictGrid.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnConflictMenuClosing);
             this.menuConflictGrid.Opening += new System.ComponentModel.CancelEventHandler(this.OnConflictMenuOpening);
             // 
             // menuItemRemove
             // 
             this.menuItemRemove.Name = "menuItemRemove";
-            this.menuItemRemove.Size = new System.Drawing.Size(117, 22);
+            this.menuItemRemove.Size = new System.Drawing.Size(180, 22);
             this.menuItemRemove.Text = "Remove";
             this.menuItemRemove.Click += new System.EventHandler(this.OnRemoveKnownConflictClicked);
             // 
@@ -128,20 +148,18 @@ namespace HcduPlus
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.OnResetClicked);
             // 
-            // colLoadsEarlier
+            // toolStripSeparator1
             // 
-            this.colLoadsEarlier.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colLoadsEarlier.DataPropertyName = "Loads Earlier";
-            this.colLoadsEarlier.HeaderText = "Loads Earlier";
-            this.colLoadsEarlier.Name = "colLoadsEarlier";
-            this.colLoadsEarlier.Width = 105;
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
-            // colLoadsLater
+            // menuItemPaste
             // 
-            this.colLoadsLater.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colLoadsLater.DataPropertyName = "Loads Later";
-            this.colLoadsLater.HeaderText = "Loads Later";
-            this.colLoadsLater.Name = "colLoadsLater";
+            this.menuItemPaste.Name = "menuItemPaste";
+            this.menuItemPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
+            this.menuItemPaste.Size = new System.Drawing.Size(180, 22);
+            this.menuItemPaste.Text = "Paste";
+            this.menuItemPaste.Click += new System.EventHandler(this.OnPasteKnownConflictClicked);
             // 
             // HcduPlusKnownDialog
             // 
@@ -174,5 +192,7 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemRemove;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsEarlier;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsLater;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPaste;
     }
 }

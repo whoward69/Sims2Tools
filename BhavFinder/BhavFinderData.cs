@@ -31,6 +31,8 @@ namespace BhavFinder
             this.Columns.Add(colGroupName);
         }
 
+        public bool HasResults => (this.Rows.Count > 0);
+
         public void Append(DataRow row)
         {
             this.Rows.Add(row);

@@ -46,6 +46,7 @@ namespace ObjectRelocator
         private readonly DBPFResource res = null;
         private readonly Str strings = null;
         private readonly Objd leadtile = null;
+        private readonly Objd diagonaltile = null;
 
         public string PackagePath => packagePath;
         public string PackageNameNoExtn => packageNameNoExtn;
@@ -60,7 +61,7 @@ namespace ObjectRelocator
 
         public TypeGroupID GroupID => res.GroupID;
 
-        public bool IsDirty => (res.IsDirty || (strings != null && strings.IsDirty) || (leadtile != null && leadtile.IsDirty));
+        public bool IsDirty => (res.IsDirty || (strings != null && strings.IsDirty) || (leadtile != null && leadtile.IsDirty) || (diagonaltile != null && diagonaltile.IsDirty));
 
         public bool IsMultiTile
         {
@@ -75,11 +76,25 @@ namespace ObjectRelocator
             }
         }
 
+        public bool HasDiagonal
+        {
+            get
+            {
+                if (res is Objd objd)
+                {
+                    return !(objd.DiagonalGuid.AsInt() == 0x00000000 || objd.DiagonalGuid.AsInt() == 0x00010000);
+                }
+
+                return false;
+            }
+        }
+
         public void SetClean()
         {
             res.SetClean();
             strings?.SetClean();
             leadtile?.SetClean();
+            diagonaltile?.SetClean();
         }
 
         public static ObjectDbpfData Create(RelocatorDbpfFile package, ObjectDbpfData objectData)
@@ -126,6 +141,20 @@ namespace ObjectRelocator
                         }
                     }
                 }
+
+                if (HasDiagonal)
+                {
+                    foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
+                    {
+                        Objd diagObjd = (Objd)package.GetResourceByEntry(entry);
+
+                        if (diagObjd.Guid == objd.DiagonalGuid)
+                        {
+                            this.diagonaltile = diagObjd;
+                            break;
+                        }
+                    }
+                }
             }
             else if (res is Cpf cpf)
             {
@@ -155,6 +184,7 @@ namespace ObjectRelocator
             if (res.IsDirty) dbpfPackage.Commit(res);
             if (strings != null && strings.IsDirty) dbpfPackage.Commit(strings);
             if (leadtile != null && leadtile.IsDirty) dbpfPackage.Commit(leadtile);
+            if (diagonaltile != null && diagonaltile.IsDirty) dbpfPackage.Commit(diagonaltile);
         }
 
         private void UpdatePackage()
@@ -162,6 +192,7 @@ namespace ObjectRelocator
             if (res.IsDirty) cache.GetOrAdd(packagePath).Commit(res);
             if (strings != null && strings.IsDirty) cache.GetOrAdd(packagePath).Commit(strings);
             if (leadtile != null && leadtile.IsDirty) cache.GetOrAdd(packagePath).Commit(leadtile);
+            if (diagonaltile != null && diagonaltile.IsDirty) cache.GetOrAdd(packagePath).Commit(diagonaltile);
         }
 
 
@@ -184,6 +215,11 @@ namespace ObjectRelocator
                 if (objdIndex == ObjdIndex.IgnoreQuarterTilePlacement)
                 {
                     leadtile?.SetRawData(objdIndex, data);
+                }
+
+                if (objdIndex == ObjdIndex.Price)
+                {
+                    diagonaltile?.SetRawData(objdIndex, data);
                 }
 
                 UpdatePackage();
@@ -514,11 +550,9 @@ namespace ObjectRelocator
                             TypeResourceID thumbResourceID = (TypeResourceID)groupId.AsUInt();
                             int hash = Hash.TGIRHash(thumbInstanceID, thumbResourceID, Thub.TYPES[(int)Thub.ThubTypeIndex.Object], DBPFData.GROUP_LOCAL);
 
-                            if (buyMode)
-                            {
-                                thub = (Thub)thumbCacheBuyMode?.GetResourceByTGIR(hash);
-                            }
-                            else
+                            thub = (Thub)thumbCacheBuyMode?.GetResourceByTGIR(hash);
+
+                            if (thub == null && !buyMode)
                             {
                                 thub = (Thub)thumbCacheBuildMode?.GetResourceByTGIR(hash);
                             }

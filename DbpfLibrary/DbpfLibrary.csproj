@@ -237,6 +237,7 @@
     <Compile Include="XFNC\Xfnc.cs" />
     <Compile Include="XOBJ\Xobj.cs" />
     <Compile Include="XROF\Xrof.cs" />
+    <Compile Include="XWNT\Xwnt.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

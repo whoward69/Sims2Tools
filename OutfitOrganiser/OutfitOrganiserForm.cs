@@ -745,11 +745,11 @@ namespace OutfitOrganiser
             gridResources.Columns["colShoe"].Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
             grpShoe.Visible = gridResources.Columns["colShoe"].Visible;
 
-            gridResources.Columns["colTownie"].Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
-
             gridResources.Columns["colJewelry"].Visible = menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
             gridResources.Columns["colDestination"].Visible = gridResources.Columns["colJewelry"].Visible;
             grpJewelry.Visible = gridResources.Columns["colJewelry"].Visible;
+
+            gridResources.Columns["colTownie"].Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
 
             if (IsCigenDirty())
             {

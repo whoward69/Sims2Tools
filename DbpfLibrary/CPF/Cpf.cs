@@ -111,49 +111,56 @@ namespace Sims2Tools.DBPF.CPF
 
                             foreach (XmlNode subnode in node)
                             {
-                                try
+                                if (subnode.NodeType == XmlNodeType.Comment)
                                 {
-                                    CpfItem item = new CpfItem(subnode.Attributes["key"].Value);
-
-                                    if (subnode.LocalName.Trim().ToLower() == "anyuint32")
-                                    {
-                                        item.DataType = Data.MetaData.DataTypes.dtUInteger;
-                                        if (subnode.InnerText.IndexOf("-") != -1) item.UIntegerValue = (uint)Convert.ToInt32(subnode.InnerText);
-                                        else if (subnode.InnerText.IndexOf("0x") == -1) item.UIntegerValue = Convert.ToUInt32(subnode.InnerText);
-                                        else item.UIntegerValue = Convert.ToUInt32(subnode.InnerText, 16);
-                                    }
-                                    else if ((subnode.LocalName.Trim().ToLower() == "anyint32") || (subnode.LocalName.Trim().ToLower() == "anysint32"))
-                                    {
-                                        item.DataType = Data.MetaData.DataTypes.dtInteger;
-                                        if (subnode.InnerText.IndexOf("0x") == -1) item.IntegerValue = Convert.ToInt32(subnode.InnerText);
-                                        else item.IntegerValue = Convert.ToInt32(subnode.InnerText, 16);
-                                    }
-                                    else if (subnode.LocalName.Trim().ToLower() == "anystring")
-                                    {
-                                        item.DataType = Data.MetaData.DataTypes.dtString;
-                                        item.StringValue = subnode.InnerText;
-                                    }
-                                    else if (subnode.LocalName.Trim().ToLower() == "anyfloat32")
-                                    {
-                                        item.DataType = Data.MetaData.DataTypes.dtSingle;
-                                        item.SingleValue = Convert.ToSingle(subnode.InnerText, System.Globalization.CultureInfo.InvariantCulture);
-                                    }
-                                    else if (subnode.LocalName.Trim().ToLower() == "anyboolean")
-                                    {
-                                        item.DataType = Data.MetaData.DataTypes.dtBoolean;
-                                        if (subnode.InnerText.Trim().ToLower() == "true") item.BooleanValue = true;
-                                        else if (subnode.InnerText.Trim().ToLower() == "false") item.BooleanValue = false;
-                                        else item.BooleanValue = (Convert.ToInt32(subnode.InnerText) != 0);
-                                    }
-                                    else if (subnode.LocalName.Trim().ToLower() == "#comment")
-                                    {
-                                        continue;
-                                    }
-
-                                    item.SetClean();
-                                    list.Add(item);
+                                    // Do anything with comments - usually found in XWNT resources
                                 }
-                                catch { }
+                                else
+                                {
+                                    try
+                                    {
+                                        CpfItem item = new CpfItem(subnode.Attributes["key"].Value);
+
+                                        if (subnode.LocalName.Trim().ToLower() == "anyuint32")
+                                        {
+                                            item.DataType = Data.MetaData.DataTypes.dtUInteger;
+                                            if (subnode.InnerText.IndexOf("-") != -1) item.UIntegerValue = (uint)Convert.ToInt32(subnode.InnerText);
+                                            else if (subnode.InnerText.IndexOf("0x") == -1) item.UIntegerValue = Convert.ToUInt32(subnode.InnerText);
+                                            else item.UIntegerValue = Convert.ToUInt32(subnode.InnerText, 16);
+                                        }
+                                        else if ((subnode.LocalName.Trim().ToLower() == "anyint32") || (subnode.LocalName.Trim().ToLower() == "anysint32"))
+                                        {
+                                            item.DataType = Data.MetaData.DataTypes.dtInteger;
+                                            if (subnode.InnerText.IndexOf("0x") == -1) item.IntegerValue = Convert.ToInt32(subnode.InnerText);
+                                            else item.IntegerValue = Convert.ToInt32(subnode.InnerText, 16);
+                                        }
+                                        else if (subnode.LocalName.Trim().ToLower() == "anystring")
+                                        {
+                                            item.DataType = Data.MetaData.DataTypes.dtString;
+                                            item.StringValue = subnode.InnerText;
+                                        }
+                                        else if (subnode.LocalName.Trim().ToLower() == "anyfloat32")
+                                        {
+                                            item.DataType = Data.MetaData.DataTypes.dtSingle;
+                                            item.SingleValue = Convert.ToSingle(subnode.InnerText, System.Globalization.CultureInfo.InvariantCulture);
+                                        }
+                                        else if (subnode.LocalName.Trim().ToLower() == "anyboolean")
+                                        {
+                                            item.DataType = Data.MetaData.DataTypes.dtBoolean;
+                                            if (subnode.InnerText.Trim().ToLower() == "true") item.BooleanValue = true;
+                                            else if (subnode.InnerText.Trim().ToLower() == "false") item.BooleanValue = false;
+                                            else item.BooleanValue = (Convert.ToInt32(subnode.InnerText) != 0);
+                                        }
+                                        else if (subnode.LocalName.Trim().ToLower() == "#comment")
+                                        {
+                                            continue;
+                                        }
+
+                                        item.SetClean();
+                                        list.Add(item);
+                                    }
+                                    catch { }
+                                }
                             }
                         }
 

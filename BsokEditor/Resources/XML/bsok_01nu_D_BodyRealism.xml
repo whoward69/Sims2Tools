@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<bsok>
+	<genre name="nuBSOK">
+		<style name="">
+			<group name="Body Realism Sizes" gender="female">
+				<shape name="Well-Rounded Sim (WRS)" icon="WR" creator="Dr. Pixel">
+					<role name="Civilian / All" code="0x00000D6F"/>
+					<role name="Enlisted / Security" code="0x00000D6D"/>
+					<role name="Officer / Command" code="0x00000D6B"/>
+					<role name="Tech / Engineering" code="0x00000D69"/>
+					<role name="Medical / Science" code="0x00000D67"/>
+					<role name="Rebel / Outlaw" code="0x00000D65"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D64"/>
+					<role name="Media / Action News" code="0x00000D63"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D62"/>
+					<role name="Barbarian / Fantasy" code="0x00000D61"/>
+				</shape>
+				<shape name="Momma Lisa" icon="ML" creator="FrannySims">
+					<role name="Civilian / All" code="0x00000D5F"/>
+					<role name="Enlisted / Security" code="0x00000D5D"/>
+					<role name="Officer / Command" code="0x00000D5B"/>
+					<role name="Tech / Engineering" code="0x00000D59"/>
+					<role name="Medical / Science" code="0x00000D57"/>
+					<role name="Rebel / Outlaw" code="0x00000D55"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000D54"/>
+					<role name="Media / Action News" code="0x00000D53"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000D52"/>
+					<role name="Barbarian / Fantasy" code="0x00000D51"/>
+				</shape>
+			</group>
+			<group name="Body Realism Sizes" gender="male">
+				<shape name="Slim Male" icon="SM" creator="July77">
+					<role name="Civilian / All" code="0x00000CBF"/>
+					<role name="Enlisted / Security" code="0x00000CBD"/>
+					<role name="Officer / Command" code="0x00000CBB"/>
+					<role name="Tech / Engineering" code="0x00000CB9"/>
+					<role name="Medical / Science" code="0x00000CB7"/>
+					<role name="Rebel / Outlaw" code="0x00000CB5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000CB4"/>
+					<role name="Media / Action News" code="0x00000CB3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000CB2"/>
+					<role name="Barbarian / Fantasy" code="0x00000CB1"/>
+				</shape>
+				<shape name="Bear Bodybuilder" icon="BR" creator="Mototo">
+					<role name="Civilian / All" code="0x00000CAF"/>
+					<role name="Enlisted / Security" code="0x00000CAD"/>
+					<role name="Officer / Command" code="0x00000CAB"/>
+					<role name="Tech / Engineering" code="0x00000CA9"/>
+					<role name="Medical / Science" code="0x00000CA7"/>
+					<role name="Rebel / Outlaw" code="0x00000CA5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000CA4"/>
+					<role name="Media / Action News" code="0x00000CA3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000CA2"/>
+					<role name="Barbarian / Fantasy" code="0x00000CA1"/>
+				</shape>
+				<shape name="NuAM" icon="BR" creator="SynapticSim">
+					<role name="Civilian / All" code="0x00000C9F"/>
+					<role name="Enlisted / Security" code="0x00000C9D"/>
+					<role name="Officer / Command" code="0x00000C9B"/>
+					<role name="Tech / Engineering" code="0x00000C99"/>
+					<role name="Medical / Science" code="0x00000C97"/>
+					<role name="Rebel / Outlaw" code="0x00000C95"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000C94"/>
+					<role name="Media / Action News" code="0x00000C93"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000C92"/>
+					<role name="Barbarian / Fantasy" code="0x00000C91"/>
+				</shape>
+			</group>
+			<group name="Misc Body Realism Sizes" gender="male">
+				<shape name="Consort Heavy Male" icon="CF" creator="Consort">
+					<role name="Civilian / All" code="0x00000C8F"/>
+					<role name="Enlisted / Security" code="0x00000C8D"/>
+					<role name="Officer / Command" code="0x00000C8B"/>
+					<role name="Tech / Engineering" code="0x00000C89"/>
+					<role name="Medical / Science" code="0x00000C87"/>
+					<role name="Rebel / Outlaw" code="0x00000C85"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000C84"/>
+					<role name="Media / Action News" code="0x00000C83"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000C82"/>
+					<role name="Barbarian / Fantasy" code="0x00000C81"/>
+				</shape>
+			</group>
+			<group name="Misc Body Realism Sizes (Unisex)" gender="unisex">
+				<shape name="Melodie9 Fat Family" icon="FF" creator="Melodie9">
+					<role name="Civilian / All" code="0x00000C7F"/>
+					<role name="Enlisted / Security" code="0x00000C7D"/>
+					<role name="Officer / Command" code="0x00000C7B"/>
+					<role name="Tech / Engineering" code="0x00000C79"/>
+					<role name="Medical / Science" code="0x00000C77"/>
+					<role name="Rebel / Outlaw" code="0x00000C75"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000C74"/>
+					<role name="Media / Action News" code="0x00000C73"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000C72"/>
+					<role name="Barbarian / Fantasy" code="0x00000D71"/>
+				</shape>
+			</group>
+		</style>
+	</genre>
+</bsok>

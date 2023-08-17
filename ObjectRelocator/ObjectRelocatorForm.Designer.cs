@@ -100,6 +100,7 @@ namespace ObjectRelocator
             this.comboSubfunction = new System.Windows.Forms.ComboBox();
             this.comboBuild = new System.Windows.Forms.ComboBox();
             this.comboSubbuild = new System.Windows.Forms.ComboBox();
+            this.comboSurfacetype = new System.Windows.Forms.ComboBox();
             this.textBuyPrice = new System.Windows.Forms.TextBox();
             this.textBuildPrice = new System.Windows.Forms.TextBox();
             this.lblDepLimit = new System.Windows.Forms.Label();
@@ -145,6 +146,7 @@ namespace ObjectRelocator
             this.ckbBuildQuarterTile = new System.Windows.Forms.CheckBox();
             this.grpBuild = new System.Windows.Forms.GroupBox();
             this.grpSubbuild = new System.Windows.Forms.GroupBox();
+            this.grpBuildSurfaceType = new System.Windows.Forms.GroupBox();
             this.grpBuildPrice = new System.Windows.Forms.GroupBox();
             this.panelBuildModeEditor = new System.Windows.Forms.Panel();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
@@ -166,6 +168,7 @@ namespace ObjectRelocator
             this.grpBuildPlacement.SuspendLayout();
             this.grpBuild.SuspendLayout();
             this.grpSubbuild.SuspendLayout();
+            this.grpBuildSurfaceType.SuspendLayout();
             this.grpBuildPrice.SuspendLayout();
             this.panelBuildModeEditor.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
@@ -699,6 +702,16 @@ namespace ObjectRelocator
             this.comboSubbuild.TabIndex = 7;
             this.comboSubbuild.SelectedIndexChanged += new System.EventHandler(this.OnBuildSubsortChanged);
             // 
+            // comboSurfacetype
+            // 
+            this.comboSurfacetype.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSurfacetype.FormattingEnabled = true;
+            this.comboSurfacetype.Location = new System.Drawing.Point(5, 20);
+            this.comboSurfacetype.Name = "comboSurfacetype";
+            this.comboSurfacetype.Size = new System.Drawing.Size(102, 23);
+            this.comboSurfacetype.TabIndex = 8;
+            this.comboSurfacetype.SelectedIndexChanged += new System.EventHandler(this.OnBuildSurfacetypeChanged);
+            // 
             // textBuyPrice
             // 
             this.textBuyPrice.Location = new System.Drawing.Point(5, 20);
@@ -1195,6 +1208,16 @@ namespace ObjectRelocator
             this.grpSubbuild.TabStop = false;
             this.grpSubbuild.Text = "Build Subsort:";
             // 
+            // grpBuildSurfaceType
+            // 
+            this.grpBuildSurfaceType.Controls.Add(this.comboSurfacetype);
+            this.grpBuildSurfaceType.Location = new System.Drawing.Point(390, 0);
+            this.grpBuildSurfaceType.Name = "grpBuildSurfaceType";
+            this.grpBuildSurfaceType.Size = new System.Drawing.Size(115, 100);
+            this.grpBuildSurfaceType.TabIndex = 7;
+            this.grpBuildSurfaceType.TabStop = false;
+            this.grpBuildSurfaceType.Text = "Surface Type:";
+            // 
             // grpBuildPrice
             // 
             this.grpBuildPrice.Controls.Add(this.textBuildPrice);
@@ -1211,6 +1234,7 @@ namespace ObjectRelocator
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelBuildModeEditor.Controls.Add(this.grpBuild);
             this.panelBuildModeEditor.Controls.Add(this.grpSubbuild);
+            this.panelBuildModeEditor.Controls.Add(this.grpBuildSurfaceType);
             this.panelBuildModeEditor.Controls.Add(this.grpBuildPlacement);
             this.panelBuildModeEditor.Controls.Add(this.grpBuildPrice);
             this.panelBuildModeEditor.Enabled = false;
@@ -1255,8 +1279,8 @@ namespace ObjectRelocator
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.thumbBox);
             this.Controls.Add(this.gridViewResources);
-            this.Controls.Add(this.panelBuyModeEditor);
             this.Controls.Add(this.panelBuildModeEditor);
+            this.Controls.Add(this.panelBuyModeEditor);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
@@ -1289,6 +1313,7 @@ namespace ObjectRelocator
             this.grpBuildPlacement.PerformLayout();
             this.grpBuild.ResumeLayout(false);
             this.grpSubbuild.ResumeLayout(false);
+            this.grpBuildSurfaceType.ResumeLayout(false);
             this.grpBuildPrice.ResumeLayout(false);
             this.grpBuildPrice.PerformLayout();
             this.panelBuildModeEditor.ResumeLayout(false);
@@ -1327,6 +1352,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.GroupBox grpSubfunction;
         private System.Windows.Forms.GroupBox grpBuild;
         private System.Windows.Forms.GroupBox grpSubbuild;
+        private System.Windows.Forms.GroupBox grpBuildSurfaceType;
         private System.Windows.Forms.GroupBox grpCommunity;
         private System.Windows.Forms.GroupBox grpUse;
         private System.Windows.Forms.GroupBox grpBuyPrice;
@@ -1341,6 +1367,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.ComboBox comboSubfunction;
         private System.Windows.Forms.ComboBox comboBuild;
         private System.Windows.Forms.ComboBox comboSubbuild;
+        private System.Windows.Forms.ComboBox comboSurfacetype;
         private System.Windows.Forms.CheckBox ckbRoomNursery;
         private System.Windows.Forms.CheckBox ckbRoomStudy;
         private System.Windows.Forms.CheckBox ckbRoomOutside;

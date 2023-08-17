@@ -30,8 +30,10 @@ namespace Sims2Tools.DBPF.OBJD
         private ObjdType type;
 
         private TypeGUID guid;
-        private TypeGUID proxyguid;
-        private TypeGUID originalguid;
+        private TypeGUID proxyGuid;
+        private TypeGUID originalGuid;
+        private TypeGUID diagonalGuid;
+        private TypeGUID gridGuid;
 
         private ushort[] data = null;
 
@@ -46,13 +48,17 @@ namespace Sims2Tools.DBPF.OBJD
             sgName = SgHelper.SgName(this);
         }
 
-        public ObjdType Type => this.type;
+        public ObjdType Type => type;
 
-        public TypeGUID Guid => this.guid;
+        public TypeGUID Guid => guid;
 
-        public TypeGUID OriginalGuid => this.originalguid;
+        public TypeGUID OriginalGuid => originalGuid;
 
-        public TypeGUID ProxyGuid => this.proxyguid;
+        public TypeGUID ProxyGuid => proxyGuid;
+
+        public TypeGUID DiagonalGuid => diagonalGuid;
+
+        public TypeGUID GridGuid => gridGuid;
 
         public bool IsRawDataValid(int index)
         {
@@ -111,19 +117,33 @@ namespace Sims2Tools.DBPF.OBJD
             }
             else guid = (TypeGUID)0x00000000;
 
+            if (length >= 0x6E)
+            {
+                reader.Seek(SeekOrigin.Begin, startPos + 0x6A);
+                diagonalGuid = reader.ReadGuid();
+            }
+            else diagonalGuid = (TypeGUID)0x00010000;
+
+            if (length >= 0x72)
+            {
+                reader.Seek(SeekOrigin.Begin, startPos + 0x6E);
+                gridGuid = reader.ReadGuid();
+            }
+            else gridGuid = (TypeGUID)0x00000000;
+
             if (length >= 0x7E)
             {
                 reader.Seek(SeekOrigin.Begin, startPos + 0x7A);
-                proxyguid = reader.ReadGuid();
+                proxyGuid = reader.ReadGuid();
             }
-            else proxyguid = (TypeGUID)0x00000000;
+            else proxyGuid = (TypeGUID)0x00000000;
 
             if (length >= 0xD0)
             {
                 reader.Seek(SeekOrigin.Begin, startPos + 0xCC);
-                originalguid = reader.ReadGuid();
+                originalGuid = reader.ReadGuid();
             }
-            else originalguid = (TypeGUID)0x00000000;
+            else originalGuid = (TypeGUID)0x00000000;
 
             reader.Seek(SeekOrigin.Begin, startPos + 0x40);
 

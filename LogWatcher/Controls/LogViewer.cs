@@ -95,7 +95,7 @@ namespace LogWatcher.Controls
             set
             {
                 logFilePath = value;
-                tabName = (new FileInfo(logFilePath)).Name;
+                tabName = new FileInfo(logFilePath).Name;
 
                 Reload();
             }

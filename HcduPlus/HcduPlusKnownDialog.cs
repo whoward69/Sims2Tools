@@ -99,6 +99,8 @@ namespace HcduPlus
             {
                 highlightRow = null;
             }
+
+            menuItemPaste.Enabled = Clipboard.ContainsText(TextDataFormat.Text);
         }
 
         private void OnConflictMenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
@@ -114,6 +116,19 @@ namespace HcduPlus
             if (mouseLocation.RowIndex >= 0)
             {
                 gridKnownConflicts.Rows.RemoveAt(mouseLocation.RowIndex);
+            }
+        }
+
+        private void OnPasteKnownConflictClicked(object sender, EventArgs e)
+        {
+            data.Paste();
+        }
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.V && e.Control)
+            {
+                data.Paste();
             }
         }
     }

@@ -326,6 +326,7 @@ namespace Sims2Tools.DBPF.Neighbourhood
         Spouses = 0x09
     }
 
+    // See BCON 0x011C
     public enum RelationshipStateBits : byte
     {
         Crush = 0x00,
@@ -336,6 +337,12 @@ namespace Sims2Tools.DBPF.Neighbourhood
         Buddies = 0x05,
         Steady = 0x06,
         Enemy = 0x07,
+        Contact = 0x08,
+        Pack = 0x09,
+        Master = 0x0A,
+        Mine = 0x0B,
+        PetFriend = 0x0C,
+        PetBuddies = 0x0D,
         Family = 0x0E,
         Known = 0x0F,
     }

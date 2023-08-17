@@ -2,6 +2,7 @@
 {
     public enum ObjdIndex
     {
+        NONE = -1,
         Version1,
         Version2,
         InitialStackSize,

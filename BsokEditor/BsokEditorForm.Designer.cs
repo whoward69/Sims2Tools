@@ -55,6 +55,7 @@ namespace BsokEditor
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemShowGenderAge = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowCategoryShoe = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemShowNakedCategory = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewResources = new System.Windows.Forms.DataGridView();
@@ -75,6 +76,7 @@ namespace BsokEditor
             this.comboGender = new System.Windows.Forms.ComboBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.grpCategory = new System.Windows.Forms.GroupBox();
+            this.ckbCatNaked = new System.Windows.Forms.CheckBox();
             this.ckbCatSwimwear = new System.Windows.Forms.CheckBox();
             this.ckbCatUnderwear = new System.Windows.Forms.CheckBox();
             this.ckbCatPJs = new System.Windows.Forms.CheckBox();
@@ -206,7 +208,8 @@ namespace BsokEditor
             this.menuItemExcludeUnknown,
             this.menuItemSeparator4,
             this.menuItemShowGenderAge,
-            this.menuItemShowCategoryShoe});
+            this.menuItemShowCategoryShoe,
+            this.menuItemShowNakedCategory});
             this.menuOptions.Name = "menuOptions";
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
@@ -239,6 +242,14 @@ namespace BsokEditor
             this.menuItemShowCategoryShoe.Size = new System.Drawing.Size(191, 22);
             this.menuItemShowCategoryShoe.Text = "Show &Category / Shoe";
             this.menuItemShowCategoryShoe.Click += new System.EventHandler(this.OnShowCategoryAndShoeClicked);
+            // 
+            // menuItemShowNakedCategory
+            // 
+            this.menuItemShowNakedCategory.CheckOnClick = true;
+            this.menuItemShowNakedCategory.Name = "menuItemShowNakedCategory";
+            this.menuItemShowNakedCategory.Size = new System.Drawing.Size(191, 22);
+            this.menuItemShowNakedCategory.Text = "Show &Naked Category";
+            this.menuItemShowNakedCategory.Click += new System.EventHandler(this.OnShowNakedCategoryClicked);
             // 
             // menuMode
             // 
@@ -423,7 +434,7 @@ namespace BsokEditor
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(817, 143);
+            this.btnSave.Location = new System.Drawing.Point(817, 145);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(88, 26);
             this.btnSave.TabIndex = 23;
@@ -433,6 +444,7 @@ namespace BsokEditor
             // 
             // grpCategory
             // 
+            this.grpCategory.Controls.Add(this.ckbCatNaked);
             this.grpCategory.Controls.Add(this.ckbCatSwimwear);
             this.grpCategory.Controls.Add(this.ckbCatUnderwear);
             this.grpCategory.Controls.Add(this.ckbCatPJs);
@@ -441,17 +453,27 @@ namespace BsokEditor
             this.grpCategory.Controls.Add(this.ckbCatGym);
             this.grpCategory.Controls.Add(this.ckbCatFormal);
             this.grpCategory.Controls.Add(this.ckbCatEveryday);
-            this.grpCategory.Location = new System.Drawing.Point(600, 0);
+            this.grpCategory.Location = new System.Drawing.Point(599, 0);
             this.grpCategory.Name = "grpCategory";
-            this.grpCategory.Size = new System.Drawing.Size(95, 170);
+            this.grpCategory.Size = new System.Drawing.Size(98, 171);
             this.grpCategory.TabIndex = 24;
             this.grpCategory.TabStop = false;
             this.grpCategory.Text = "Category:";
             // 
+            // ckbCatNaked
+            // 
+            this.ckbCatNaked.AutoSize = true;
+            this.ckbCatNaked.Location = new System.Drawing.Point(10, 150);
+            this.ckbCatNaked.Name = "ckbCatNaked";
+            this.ckbCatNaked.Size = new System.Drawing.Size(62, 19);
+            this.ckbCatNaked.TabIndex = 9;
+            this.ckbCatNaked.Text = "Naked";
+            this.ckbCatNaked.UseVisualStyleBackColor = true;
+            // 
             // ckbCatSwimwear
             // 
             this.ckbCatSwimwear.AutoSize = true;
-            this.ckbCatSwimwear.Location = new System.Drawing.Point(10, 117);
+            this.ckbCatSwimwear.Location = new System.Drawing.Point(10, 116);
             this.ckbCatSwimwear.Name = "ckbCatSwimwear";
             this.ckbCatSwimwear.Size = new System.Drawing.Size(84, 19);
             this.ckbCatSwimwear.TabIndex = 8;
@@ -462,7 +484,7 @@ namespace BsokEditor
             // ckbCatUnderwear
             // 
             this.ckbCatUnderwear.AutoSize = true;
-            this.ckbCatUnderwear.Location = new System.Drawing.Point(10, 134);
+            this.ckbCatUnderwear.Location = new System.Drawing.Point(10, 133);
             this.ckbCatUnderwear.Name = "ckbCatUnderwear";
             this.ckbCatUnderwear.Size = new System.Drawing.Size(87, 19);
             this.ckbCatUnderwear.TabIndex = 6;
@@ -473,7 +495,7 @@ namespace BsokEditor
             // ckbCatPJs
             // 
             this.ckbCatPJs.AutoSize = true;
-            this.ckbCatPJs.Location = new System.Drawing.Point(10, 100);
+            this.ckbCatPJs.Location = new System.Drawing.Point(10, 99);
             this.ckbCatPJs.Name = "ckbCatPJs";
             this.ckbCatPJs.Size = new System.Drawing.Size(46, 19);
             this.ckbCatPJs.TabIndex = 5;
@@ -484,7 +506,7 @@ namespace BsokEditor
             // ckbCatOuterwear
             // 
             this.ckbCatOuterwear.AutoSize = true;
-            this.ckbCatOuterwear.Location = new System.Drawing.Point(10, 83);
+            this.ckbCatOuterwear.Location = new System.Drawing.Point(10, 82);
             this.ckbCatOuterwear.Name = "ckbCatOuterwear";
             this.ckbCatOuterwear.Size = new System.Drawing.Size(83, 19);
             this.ckbCatOuterwear.TabIndex = 4;
@@ -495,7 +517,7 @@ namespace BsokEditor
             // ckbCatMaternity
             // 
             this.ckbCatMaternity.AutoSize = true;
-            this.ckbCatMaternity.Location = new System.Drawing.Point(10, 66);
+            this.ckbCatMaternity.Location = new System.Drawing.Point(10, 65);
             this.ckbCatMaternity.Name = "ckbCatMaternity";
             this.ckbCatMaternity.Size = new System.Drawing.Size(76, 19);
             this.ckbCatMaternity.TabIndex = 3;
@@ -506,7 +528,7 @@ namespace BsokEditor
             // ckbCatGym
             // 
             this.ckbCatGym.AutoSize = true;
-            this.ckbCatGym.Location = new System.Drawing.Point(10, 49);
+            this.ckbCatGym.Location = new System.Drawing.Point(10, 48);
             this.ckbCatGym.Name = "ckbCatGym";
             this.ckbCatGym.Size = new System.Drawing.Size(51, 19);
             this.ckbCatGym.TabIndex = 2;
@@ -517,7 +539,7 @@ namespace BsokEditor
             // ckbCatFormal
             // 
             this.ckbCatFormal.AutoSize = true;
-            this.ckbCatFormal.Location = new System.Drawing.Point(10, 32);
+            this.ckbCatFormal.Location = new System.Drawing.Point(10, 31);
             this.ckbCatFormal.Name = "ckbCatFormal";
             this.ckbCatFormal.Size = new System.Drawing.Size(65, 19);
             this.ckbCatFormal.TabIndex = 1;
@@ -528,7 +550,7 @@ namespace BsokEditor
             // ckbCatEveryday
             // 
             this.ckbCatEveryday.AutoSize = true;
-            this.ckbCatEveryday.Location = new System.Drawing.Point(10, 15);
+            this.ckbCatEveryday.Location = new System.Drawing.Point(10, 14);
             this.ckbCatEveryday.Name = "ckbCatEveryday";
             this.ckbCatEveryday.Size = new System.Drawing.Size(74, 19);
             this.ckbCatEveryday.TabIndex = 0;
@@ -547,9 +569,9 @@ namespace BsokEditor
             this.panelEditor.Controls.Add(this.grpAge);
             this.panelEditor.Controls.Add(this.btnSave);
             this.panelEditor.Enabled = false;
-            this.panelEditor.Location = new System.Drawing.Point(4, 347);
+            this.panelEditor.Location = new System.Drawing.Point(4, 346);
             this.panelEditor.Name = "panelEditor";
-            this.panelEditor.Size = new System.Drawing.Size(905, 169);
+            this.panelEditor.Size = new System.Drawing.Size(905, 170);
             this.panelEditor.TabIndex = 25;
             // 
             // grpBsok
@@ -564,7 +586,7 @@ namespace BsokEditor
             this.grpBsok.Controls.Add(this.comboBsokGenre);
             this.grpBsok.Location = new System.Drawing.Point(0, 0);
             this.grpBsok.Name = "grpBsok";
-            this.grpBsok.Size = new System.Drawing.Size(370, 170);
+            this.grpBsok.Size = new System.Drawing.Size(370, 171);
             this.grpBsok.TabIndex = 0;
             this.grpBsok.TabStop = false;
             this.grpBsok.Text = "BSOK Product:";
@@ -642,9 +664,9 @@ namespace BsokEditor
             // grpGender
             // 
             this.grpGender.Controls.Add(this.comboGender);
-            this.grpGender.Location = new System.Drawing.Point(395, 0);
+            this.grpGender.Location = new System.Drawing.Point(393, 0);
             this.grpGender.Name = "grpGender";
-            this.grpGender.Size = new System.Drawing.Size(75, 170);
+            this.grpGender.Size = new System.Drawing.Size(75, 171);
             this.grpGender.TabIndex = 6;
             this.grpGender.TabStop = false;
             this.grpGender.Text = "Gender:";
@@ -652,9 +674,9 @@ namespace BsokEditor
             // grpShoe
             // 
             this.grpShoe.Controls.Add(this.comboShoe);
-            this.grpShoe.Location = new System.Drawing.Point(700, 0);
+            this.grpShoe.Location = new System.Drawing.Point(702, 0);
             this.grpShoe.Name = "grpShoe";
-            this.grpShoe.Size = new System.Drawing.Size(110, 170);
+            this.grpShoe.Size = new System.Drawing.Size(110, 171);
             this.grpShoe.TabIndex = 1;
             this.grpShoe.TabStop = false;
             this.grpShoe.Text = "Shoe:";
@@ -678,9 +700,9 @@ namespace BsokEditor
             this.grpAge.Controls.Add(this.ckbAgeAdults);
             this.grpAge.Controls.Add(this.ckbAgeTeens);
             this.grpAge.Controls.Add(this.ckbAgeChildren);
-            this.grpAge.Location = new System.Drawing.Point(475, 0);
+            this.grpAge.Location = new System.Drawing.Point(473, 0);
             this.grpAge.Name = "grpAge";
-            this.grpAge.Size = new System.Drawing.Size(105, 170);
+            this.grpAge.Size = new System.Drawing.Size(108, 171);
             this.grpAge.TabIndex = 1;
             this.grpAge.TabStop = false;
             this.grpAge.Text = "Age:";
@@ -688,7 +710,7 @@ namespace BsokEditor
             // ckbAgeYoungAdults
             // 
             this.ckbAgeYoungAdults.AutoSize = true;
-            this.ckbAgeYoungAdults.Location = new System.Drawing.Point(10, 83);
+            this.ckbAgeYoungAdults.Location = new System.Drawing.Point(10, 82);
             this.ckbAgeYoungAdults.Name = "ckbAgeYoungAdults";
             this.ckbAgeYoungAdults.Size = new System.Drawing.Size(97, 19);
             this.ckbAgeYoungAdults.TabIndex = 8;
@@ -699,7 +721,7 @@ namespace BsokEditor
             // ckbAgeBabies
             // 
             this.ckbAgeBabies.AutoSize = true;
-            this.ckbAgeBabies.Location = new System.Drawing.Point(10, 15);
+            this.ckbAgeBabies.Location = new System.Drawing.Point(10, 14);
             this.ckbAgeBabies.Name = "ckbAgeBabies";
             this.ckbAgeBabies.Size = new System.Drawing.Size(64, 19);
             this.ckbAgeBabies.TabIndex = 7;
@@ -710,7 +732,7 @@ namespace BsokEditor
             // ckbAgeToddlers
             // 
             this.ckbAgeToddlers.AutoSize = true;
-            this.ckbAgeToddlers.Location = new System.Drawing.Point(10, 32);
+            this.ckbAgeToddlers.Location = new System.Drawing.Point(10, 31);
             this.ckbAgeToddlers.Name = "ckbAgeToddlers";
             this.ckbAgeToddlers.Size = new System.Drawing.Size(74, 19);
             this.ckbAgeToddlers.TabIndex = 6;
@@ -721,7 +743,7 @@ namespace BsokEditor
             // ckbAgeElders
             // 
             this.ckbAgeElders.AutoSize = true;
-            this.ckbAgeElders.Location = new System.Drawing.Point(10, 117);
+            this.ckbAgeElders.Location = new System.Drawing.Point(10, 116);
             this.ckbAgeElders.Name = "ckbAgeElders";
             this.ckbAgeElders.Size = new System.Drawing.Size(61, 19);
             this.ckbAgeElders.TabIndex = 4;
@@ -732,7 +754,7 @@ namespace BsokEditor
             // ckbAgeAdults
             // 
             this.ckbAgeAdults.AutoSize = true;
-            this.ckbAgeAdults.Location = new System.Drawing.Point(10, 100);
+            this.ckbAgeAdults.Location = new System.Drawing.Point(10, 99);
             this.ckbAgeAdults.Name = "ckbAgeAdults";
             this.ckbAgeAdults.Size = new System.Drawing.Size(59, 19);
             this.ckbAgeAdults.TabIndex = 3;
@@ -743,7 +765,7 @@ namespace BsokEditor
             // ckbAgeTeens
             // 
             this.ckbAgeTeens.AutoSize = true;
-            this.ckbAgeTeens.Location = new System.Drawing.Point(10, 66);
+            this.ckbAgeTeens.Location = new System.Drawing.Point(10, 65);
             this.ckbAgeTeens.Name = "ckbAgeTeens";
             this.ckbAgeTeens.Size = new System.Drawing.Size(60, 19);
             this.ckbAgeTeens.TabIndex = 2;
@@ -754,7 +776,7 @@ namespace BsokEditor
             // ckbAgeChildren
             // 
             this.ckbAgeChildren.AutoSize = true;
-            this.ckbAgeChildren.Location = new System.Drawing.Point(10, 49);
+            this.ckbAgeChildren.Location = new System.Drawing.Point(10, 48);
             this.ckbAgeChildren.Name = "ckbAgeChildren";
             this.ckbAgeChildren.Size = new System.Drawing.Size(72, 19);
             this.ckbAgeChildren.TabIndex = 1;
@@ -831,6 +853,7 @@ namespace BsokEditor
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator4;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowGenderAge;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowCategoryShoe;
+        private System.Windows.Forms.ToolStripMenuItem menuItemShowNakedCategory;
         private System.Windows.Forms.ToolStripMenuItem menuMode;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoBackup;
         private CommonOpenFileDialog selectPathDialog;
@@ -866,6 +889,7 @@ namespace BsokEditor
         private System.Windows.Forms.CheckBox ckbCatPJs;
         private System.Windows.Forms.CheckBox ckbCatSwimwear;
         private System.Windows.Forms.CheckBox ckbCatUnderwear;
+        private System.Windows.Forms.CheckBox ckbCatNaked;
         private System.Windows.Forms.ComboBox comboShoe;
         private System.Windows.Forms.ContextMenuStrip menuContextGrid;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextRowRestore;

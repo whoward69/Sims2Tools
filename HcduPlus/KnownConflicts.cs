@@ -87,6 +87,26 @@ namespace HcduPlus.Conflict
             reKnownConflicts.Add(new ConflictRegexPair(reA, reB));
         }
 
+        public void Paste()
+        {
+            if (Clipboard.ContainsText(TextDataFormat.Text))
+            {
+                string[] lines = Clipboard.GetText(TextDataFormat.Text).Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                Regex re = new Regex("^\\s*(.*?\\.package)\\s+(.*?\\.package)");
+
+                foreach (string line in lines)
+                {
+                    Match m = re.Match(line);
+
+                    if (m.Success)
+                    {
+                        Add(m.Groups[1].Value, m.Groups[2].Value);
+                    }
+                }
+            }
+        }
+
         public bool IsKnown(ConflictPair cp)
         {
             foreach (ConflictRegexPair reKnown in reKnownConflicts)

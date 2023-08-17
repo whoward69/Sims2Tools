@@ -46,15 +46,18 @@ namespace LogWatcher
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemCloseTab = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemCloseTabAndDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCloseAndDeleteTab = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemCloseAllTabs = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCloseAndDeleteAllTabs = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOpenAll = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOpenRecent = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAutoClose = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAutoUpdate = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,8 +69,13 @@ namespace LogWatcher
             this.tabControl = new System.Windows.Forms.TabControl();
             this.logDirWatcher = new System.IO.FileSystemWatcher();
             this.menuContextTab = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.closeDeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.renameContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sep1ContextMenuItem = new System.Windows.Forms.ToolStripSeparator();
+            this.closeContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sep2ContextMenuItem = new System.Windows.Forms.ToolStripSeparator();
+            this.closeAllContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteAllContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.textPleaseWait = new System.Windows.Forms.TextBox();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.logDirWatcher)).BeginInit();
@@ -98,8 +106,11 @@ namespace LogWatcher
             this.menuItemConfiguration,
             this.toolStripSeparator1,
             this.menuItemCloseTab,
-            this.menuItemCloseTabAndDelete,
+            this.menuItemCloseAndDeleteTab,
             this.toolStripSeparator2,
+            this.menuItemCloseAllTabs,
+            this.menuItemCloseAndDeleteAllTabs,
+            this.toolStripSeparator3,
             this.menuItemExit});
             this.menuFile.Name = "menuFile";
             this.menuFile.Size = new System.Drawing.Size(37, 20);
@@ -143,21 +154,40 @@ namespace LogWatcher
             this.menuItemCloseTab.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
             this.menuItemCloseTab.Size = new System.Drawing.Size(251, 22);
             this.menuItemCloseTab.Text = "&Close Tab";
-            this.menuItemCloseTab.Click += new System.EventHandler(this.OnCloseTab);
+            this.menuItemCloseTab.Click += new System.EventHandler(this.OnCloseCurrentTab);
             // 
-            // menuItemCloseTabAndDelete
+            // menuItemCloseAndDeleteTab
             // 
-            this.menuItemCloseTabAndDelete.Name = "menuItemCloseTabAndDelete";
-            this.menuItemCloseTabAndDelete.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            this.menuItemCloseAndDeleteTab.Name = "menuItemCloseAndDeleteTab";
+            this.menuItemCloseAndDeleteTab.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.F4)));
-            this.menuItemCloseTabAndDelete.Size = new System.Drawing.Size(251, 22);
-            this.menuItemCloseTabAndDelete.Text = "Close Tab && &Delete";
-            this.menuItemCloseTabAndDelete.Click += new System.EventHandler(this.OnCloseTabAndDelete);
+            this.menuItemCloseAndDeleteTab.Size = new System.Drawing.Size(251, 22);
+            this.menuItemCloseAndDeleteTab.Text = "Close && &Delete Tab";
+            this.menuItemCloseAndDeleteTab.Click += new System.EventHandler(this.OnCloseAndDeleteCurrentTab);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(248, 6);
+            // 
+            // menuItemCloseAllTabs
+            // 
+            this.menuItemCloseAllTabs.Name = "menuItemCloseAllTabs";
+            this.menuItemCloseAllTabs.Size = new System.Drawing.Size(251, 22);
+            this.menuItemCloseAllTabs.Text = "Close &All Tabs";
+            this.menuItemCloseAllTabs.Click += new System.EventHandler(this.OnCloseAllTabs);
+            // 
+            // menuItemCloseAndDeleteAllTabs
+            // 
+            this.menuItemCloseAndDeleteAllTabs.Name = "menuItemCloseAndDeleteAllTabs";
+            this.menuItemCloseAndDeleteAllTabs.Size = new System.Drawing.Size(251, 22);
+            this.menuItemCloseAndDeleteAllTabs.Text = "Close && Delete All Tabs";
+            this.menuItemCloseAndDeleteAllTabs.Click += new System.EventHandler(this.OnCloseAndDeleteAllTabs);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(248, 6);
             // 
             // menuItemExit
             // 
@@ -189,7 +219,7 @@ namespace LogWatcher
             this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemOpenAll,
             this.menuItemOpenRecent,
-            this.toolStripSeparator3,
+            this.toolStripSeparator4,
             this.menuItemAutoOpen,
             this.menuItemAutoClose,
             this.menuItemAutoUpdate});
@@ -213,10 +243,10 @@ namespace LogWatcher
             this.menuItemOpenRecent.Text = "Open &Recent Logs At Start";
             this.menuItemOpenRecent.Click += new System.EventHandler(this.OnOpenRecentClicked);
             // 
-            // toolStripSeparator3
+            // toolStripSeparator4
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(209, 6);
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(209, 6);
             // 
             // menuItemAutoOpen
             // 
@@ -292,6 +322,7 @@ namespace LogWatcher
             this.tabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.OnTabChanged);
             this.tabControl.DragDrop += new System.Windows.Forms.DragEventHandler(this.LogWatcher_DragDrop);
             this.tabControl.DragEnter += new System.Windows.Forms.DragEventHandler(this.LogWatcher_DragEnter);
+            this.tabControl.DoubleClick += new System.EventHandler(this.OnDoubleClick);
             this.tabControl.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnTabControlMouseClick);
             // 
             // logDirWatcher
@@ -307,26 +338,62 @@ namespace LogWatcher
             // menuContextTab
             // 
             this.menuContextTab.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.closeToolStripMenuItem,
-            this.closeDeleteToolStripMenuItem});
+            this.renameContextMenuItem,
+            this.sep1ContextMenuItem,
+            this.closeContextMenuItem,
+            this.deleteContextMenuItem,
+            this.sep2ContextMenuItem,
+            this.closeAllContextMenuItem,
+            this.deleteAllContextMenuItem});
             this.menuContextTab.Name = "menuContextTab";
-            this.menuContextTab.Size = new System.Drawing.Size(153, 48);
+            this.menuContextTab.Size = new System.Drawing.Size(170, 126);
             this.menuContextTab.Text = "Tab Options";
             this.menuContextTab.Opening += new System.ComponentModel.CancelEventHandler(this.OnTabContextMenuOpening);
             // 
-            // closeToolStripMenuItem
+            // renameContextMenuItem
             // 
-            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.closeToolStripMenuItem.Text = "&Close";
-            this.closeToolStripMenuItem.Click += new System.EventHandler(this.OnCloseTab);
+            this.renameContextMenuItem.Name = "renameContextMenuItem";
+            this.renameContextMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.renameContextMenuItem.Text = "&Rename...";
+            this.renameContextMenuItem.Click += new System.EventHandler(this.OnRenameTab);
             // 
-            // closeDeleteToolStripMenuItem
+            // sep1ContextMenuItem
             // 
-            this.closeDeleteToolStripMenuItem.Name = "closeDeleteToolStripMenuItem";
-            this.closeDeleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.closeDeleteToolStripMenuItem.Text = "Close && &Delete";
-            this.closeDeleteToolStripMenuItem.Click += new System.EventHandler(this.OnCloseTabAndDelete);
+            this.sep1ContextMenuItem.Name = "sep1ContextMenuItem";
+            this.sep1ContextMenuItem.Size = new System.Drawing.Size(166, 6);
+            // 
+            // closeContextMenuItem
+            // 
+            this.closeContextMenuItem.Name = "closeContextMenuItem";
+            this.closeContextMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.closeContextMenuItem.Text = "&Close";
+            this.closeContextMenuItem.Click += new System.EventHandler(this.OnCloseCurrentTab);
+            // 
+            // deleteContextMenuItem
+            // 
+            this.deleteContextMenuItem.Name = "deleteContextMenuItem";
+            this.deleteContextMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.deleteContextMenuItem.Text = "Close && &Delete";
+            this.deleteContextMenuItem.Click += new System.EventHandler(this.OnCloseAndDeleteCurrentTab);
+            // 
+            // sep2ContextMenuItem
+            // 
+            this.sep2ContextMenuItem.Name = "sep2ContextMenuItem";
+            this.sep2ContextMenuItem.Size = new System.Drawing.Size(166, 6);
+            // 
+            // closeAllContextMenuItem
+            // 
+            this.closeAllContextMenuItem.Name = "closeAllContextMenuItem";
+            this.closeAllContextMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.closeAllContextMenuItem.Text = "Close &All";
+            this.closeAllContextMenuItem.Click += new System.EventHandler(this.OnCloseAllTabs);
+            // 
+            // deleteAllContextMenuItem
+            // 
+            this.deleteAllContextMenuItem.Name = "deleteAllContextMenuItem";
+            this.deleteAllContextMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.deleteAllContextMenuItem.Text = "Close && Delete All";
+            this.deleteAllContextMenuItem.Click += new System.EventHandler(this.OnCloseAndDeleteAllTabs);
             // 
             // textPleaseWait
             // 
@@ -385,22 +452,30 @@ namespace LogWatcher
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.ToolStripMenuItem menuItemCloseTab;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCloseAndDeleteTab;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCloseAllTabs;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCloseAndDeleteAllTabs;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuOptions;
         private System.Windows.Forms.ToolStripMenuItem menuItemOpenAll;
         private System.Windows.Forms.ToolStripMenuItem menuItemOpenRecent;
-        private System.Windows.Forms.ToolStripMenuItem menuItemCloseTabAndDelete;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.IO.FileSystemWatcher logDirWatcher;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoOpen;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoUpdate;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoClose;
         private System.Windows.Forms.ContextMenuStrip menuContextTab;
-        private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem closeDeleteToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem closeContextMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteContextMenuItem;
         private System.Windows.Forms.ToolStripTextBox textSearchTerm;
         private System.Windows.Forms.ToolStripMenuItem menuSettings;
         private System.Windows.Forms.ToolStripMenuItem menuItemIncPropIndex;
         private System.Windows.Forms.TextBox textPleaseWait;
+        private System.Windows.Forms.ToolStripMenuItem renameContextMenuItem;
+        private System.Windows.Forms.ToolStripSeparator sep1ContextMenuItem;
+        private System.Windows.Forms.ToolStripSeparator sep2ContextMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem closeAllContextMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteAllContextMenuItem;
     }
 }

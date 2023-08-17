@@ -17,7 +17,7 @@ namespace LogWatcher
         public static String AppName = "Log Watcher";
 
         public static int AppVersionMajor = 1;
-        public static int AppVersionMinor = 5;
+        public static int AppVersionMinor = 6;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;

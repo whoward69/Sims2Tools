@@ -2,7 +2,8 @@
   "profiles": {
     "DpbfLister": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\Users\\William\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads\\zzzTestStuff\\WH__ClipboardOfTasks.package\""
+      "commandLineArgs": " >dbpflister.txt",
+      "workingDirectory": "C:\\Users\\whowa\\Documents"
     }
   }
 }

@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DbpfLibrary\DbpfLibrary.csproj" />
+    <ProjectReference Include="..\UtilsLibrary\UtilsLibrary.csproj" />
   </ItemGroup>
 
 </Project>

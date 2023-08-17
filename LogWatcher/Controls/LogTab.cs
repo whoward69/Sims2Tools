@@ -7,11 +7,14 @@ namespace LogWatcher.Controls
     public class LogTab : TabPage, ISearcher
     {
         private readonly LogViewer logViewer;
-        private readonly String logFilePath;
 
         private readonly ISearcher searcher;
 
-        public String LogFilePath => logFilePath;
+        public string LogFilePath
+        {
+            get => logViewer.LogFilePath;
+            set { logViewer.LogFilePath = value; this.Text = logViewer.TabName; }
+        }
 
         public bool IncPropIndex
         {
@@ -22,7 +25,6 @@ namespace LogWatcher.Controls
         public LogTab(ISearcher searcher, String logFilePath, bool incPropIndex)
         {
             this.searcher = searcher;
-            this.logFilePath = logFilePath;
 
             logViewer = new LogViewer()
             {
@@ -33,7 +35,7 @@ namespace LogWatcher.Controls
                 Size = new System.Drawing.Size(919, 461),
                 TabIndex = 0,
 
-                LogFilePath = LogFilePath,
+                LogFilePath = logFilePath,
                 IncPropIndex = incPropIndex
             };
 

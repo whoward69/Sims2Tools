@@ -28,6 +28,12 @@ namespace Sims2Tools.Updates
         private readonly ToolStripMenuItem menuItemUpdatesMonthly;
         private readonly ToolStripMenuItem menuItemUpdatesNever;
 
+        public bool Enabled
+        {
+            get => menuItemUpdatesNow.Enabled;
+            set => menuItemUpdatesNow.Enabled = value;
+        }
+
         public Updater(string appRegKey, ToolStripMenuItem parentMenu)
         {
             AppRegKey = appRegKey;

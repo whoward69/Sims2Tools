@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<bsok>
+	<genre name="nuBSOK">
+		<style name="">
+			<group name="Curvy Sizes" gender="female">
+				<shape name="FitChick" icon="FC" creator="Poppeboy">
+					<role name="Civilian / All" code="0x00000DEF"/>
+					<role name="Enlisted / Security" code="0x00000DED"/>
+					<role name="Officer / Command" code="0x00000DEB"/>
+					<role name="Tech / Engineering" code="0x00000DE9"/>
+					<role name="Medical / Science" code="0x00000DE7"/>
+					<role name="Rebel / Outlaw" code="0x00000DE5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DE4"/>
+					<role name="Media / Action News" code="0x00000DE3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DE2"/>
+					<role name="Barbarian / Fantasy" code="0x00000DE1"/>
+				</shape>
+				<shape name="Rio" icon="RO" creator="Warlokk">
+					<role name="Civilian / All" code="0x00000DDF"/>
+					<role name="Enlisted / Security" code="0x00000DDD"/>
+					<role name="Officer / Command" code="0x00000DDB"/>
+					<role name="Tech / Engineering" code="0x00000DD9"/>
+					<role name="Medical / Science" code="0x00000DD7"/>
+					<role name="Rebel / Outlaw" code="0x00000DD5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DD4"/>
+					<role name="Media / Action News" code="0x00000DD3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DD2"/>
+					<role name="Barbarian / Fantasy" code="0x00000DD1"/>
+				</shape>
+				<shape name="Classic Pinup (CPU)" icon="CP" creator="Warlokk">
+					<role name="Civilian / All" code="0x00000DCF"/>
+					<role name="Enlisted / Security" code="0x00000DCD"/>
+					<role name="Officer / Command" code="0x00000DCB"/>
+					<role name="Tech / Engineering" code="0x00000DC9"/>
+					<role name="Medical / Science" code="0x00000DC7"/>
+					<role name="Rebel / Outlaw" code="0x00000DC5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DC4"/>
+					<role name="Media / Action News" code="0x00000DC3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DC2"/>
+					<role name="Barbarian / Fantasy" code="0x00000DC1"/>
+				</shape>
+				<shape name="Voluptouos Gal (VolGal)" icon="VO" creator="Warlokk">
+					<role name="Civilian / All" code="0x00000DBF"/>
+					<role name="Enlisted / Security" code="0x00000DBD"/>
+					<role name="Officer / Command" code="0x00000DBB"/>
+					<role name="Tech / Engineering" code="0x00000DB9"/>
+					<role name="Medical / Science" code="0x00000DB7"/>
+					<role name="Rebel / Outlaw" code="0x00000DB5"/>
+					<role name="Entertainment / Merrie Minstrels" code="0x00000DB4"/>
+					<role name="Media / Action News" code="0x00000DB3"/>
+					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000DB2"/>
+					<role name="Barbarian / Fantasy" code="0x00000DB1"/>
+				</shape>
+			</group>
+		</style>
+	</genre>
+</bsok>

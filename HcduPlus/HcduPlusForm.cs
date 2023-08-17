@@ -62,6 +62,8 @@ namespace HcduPlus
 
         private readonly bool megaMindMode = false;
 
+        private bool formUpdates = true;
+
         public HcduPlusForm()
         {
             logger.Info(HcduPlusApp.AppProduct);
@@ -103,14 +105,22 @@ namespace HcduPlus
             String modsFolder = textModsPath.Text;
             String scanFolder = textScanPath.Text;
 
-            if (scanFolder.Length == 0)
+            bool modsSavedSims = checkModsSavedSims.Checked;
+            bool scanSavedSims = checkScanSavedSims.Checked;
+
+            string savedSimsFolder = $"{Sims2ToolsLib.Sims2HomePath}\\SavedSims";
+
+            if (scanFolder.Length == 0 && !scanSavedSims)
             {
                 scanFolder = modsFolder;
                 modsFolder = "";
+
+                scanSavedSims = modsSavedSims;
+                modsSavedSims = false;
             }
 
-            List<String> modsFiles;
-            List<String> scanFiles;
+            SortedSet<string> modsFiles = null;
+            SortedSet<string> scanFiles = null;
 
 #if DEBUG
             logger.Debug("Starting Downloads Folder .package search");
@@ -119,7 +129,15 @@ namespace HcduPlus
             {
                 if (Directory.Exists(modsFolder))
                 {
-                    modsFiles = new List<string>(Sims2Directory.GetFiles(modsFolder, "*.package", SearchOption.AllDirectories));
+                    modsFiles = Sims2Directory.GetFiles(modsFolder, "*.package", SearchOption.AllDirectories);
+
+                    if (menuItemOptionNoLoad.Checked)
+                    {
+                        foreach (string modsNoLoad in Sims2Directory.GetFiles(modsFolder, "*.noload", SearchOption.AllDirectories))
+                        {
+                            modsFiles.Add(modsNoLoad);
+                        }
+                    }
                 }
                 else
                 {
@@ -127,10 +145,36 @@ namespace HcduPlus
                     return;
                 }
             }
-            else
+
+            if (modsSavedSims)
             {
-                modsFiles = new List<string>();
+#if DEBUG
+                logger.Debug($"Adding SavedSims to the Downloads list");
+#endif
+                if (Directory.Exists(savedSimsFolder))
+                {
+                    SortedSet<string> savedSims = Sims2Directory.GetFiles(savedSimsFolder, "*.package", SearchOption.AllDirectories);
+
+                    if (scanFiles != null)
+                    {
+                        foreach (string savedSim in savedSims)
+                        {
+                            modsFiles.Add(savedSim);
+                        }
+                    }
+                    else
+                    {
+                        modsFiles = savedSims;
+                    }
+                }
+                else
+                {
+                    MsgBox.Show("The SavedSims directory cannot be found!", "Invalid Directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
             }
+
+            if (modsFiles == null) modsFiles = new SortedSet<string>();
 #if DEBUG
             logger.Debug($"Finished Downloads Folder .package search - found {modsFiles.Count}");
 #endif
@@ -140,13 +184,51 @@ namespace HcduPlus
 #endif
             if (Directory.Exists(scanFolder))
             {
-                scanFiles = new List<string>(Sims2Directory.GetFiles(scanFolder, "*.package", SearchOption.AllDirectories));
+                scanFiles = Sims2Directory.GetFiles(scanFolder, "*.package", SearchOption.AllDirectories);
+
+                if (menuItemOptionNoLoad.Checked)
+                {
+                    foreach (string scanNoLoad in Sims2Directory.GetFiles(scanFolder, "*.noload", SearchOption.AllDirectories))
+                    {
+                        scanFiles.Add(scanNoLoad);
+                    }
+                }
             }
             else
             {
                 MsgBox.Show("The selected Scan directory does not exist!", "Invalid Directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+
+            if (scanSavedSims)
+            {
+#if DEBUG
+                logger.Debug($"Adding SavedSims to the Scan list");
+#endif
+                if (Directory.Exists(savedSimsFolder))
+                {
+                    SortedSet<string> savedSims = Sims2Directory.GetFiles(savedSimsFolder, "*.package", SearchOption.AllDirectories);
+
+                    if (scanFiles != null)
+                    {
+                        foreach (string savedSim in savedSims)
+                        {
+                            scanFiles.Add(savedSim);
+                        }
+                    }
+                    else
+                    {
+                        scanFiles = savedSims;
+                    }
+                }
+                else
+                {
+                    MsgBox.Show("The SavedSims directory cannot be found!", "Invalid Directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+
+            if (scanFiles == null) scanFiles = new SortedSet<string>();
 #if DEBUG
             logger.Debug($"Finished Scan Folder .package search - found {scanFiles.Count}");
 #endif
@@ -161,8 +243,8 @@ namespace HcduPlus
 
             if (scanFiles.Count > 0)
             {
-                if (modsFiles.Count > 0) done = ProcessFolder(worker, e, modsFolder, modsFiles, @"~\", total, done, modsDataStore);
-                done = ProcessFolder(worker, e, scanFolder, scanFiles, "", total, done, scanDataStore);
+                if (modsFiles.Count > 0) done = ProcessFolder(worker, e, modsFolder, new List<string>(modsFiles), @"~\", total, done, modsDataStore);
+                done = ProcessFolder(worker, e, scanFolder, new List<string>(scanFiles), "", total, done, scanDataStore);
             }
 
 #if DEBUG
@@ -206,7 +288,7 @@ namespace HcduPlus
                                                     ConflictPair cpNew = new ConflictPair(scanPackages[i], scanPackages[i + 1]);
 
                                                     // Ignore known conflicts
-                                                    if (!knownConflicts.IsKnown(cpNew))
+                                                    if (menuItemIncludeKnownConflicts.Checked || !knownConflicts.IsKnown(cpNew))
                                                     {
                                                         if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
                                                         {
@@ -256,7 +338,7 @@ namespace HcduPlus
                                     ConflictPair cpNew = new ConflictPair(thisScanPackage, nextScanPackage);
 
                                     // Ignore known conflicts
-                                    if (!knownConflicts.IsKnown(cpNew))
+                                    if (menuItemIncludeKnownConflicts.Checked || !knownConflicts.IsKnown(cpNew))
                                     {
                                         if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
                                         {
@@ -433,6 +515,10 @@ namespace HcduPlus
             }
 
             btnGO.Text = "S&CAN";
+            menuFile.Enabled = menuResources.Enabled = menuConflicts.Enabled = menuOptions.Enabled = true;
+            MyUpdater.Enabled = true;
+            textModsPath.Enabled = checkModsSavedSims.Enabled = btnSelectModsPath.Enabled = true;
+            textScanPath.Enabled = checkScanSavedSims.Enabled = btnSelectScanPath.Enabled = true;
         }
 
         private void OnGoClicked(object sender, System.EventArgs e)
@@ -451,6 +537,10 @@ namespace HcduPlus
                 dataByPackage.Clear();
                 dataByResource.Clear();
                 btnGO.Text = "Cancel";
+                menuFile.Enabled = menuResources.Enabled = menuConflicts.Enabled = menuOptions.Enabled = false;
+                MyUpdater.Enabled = false;
+                textModsPath.Enabled = checkModsSavedSims.Enabled = btnSelectModsPath.Enabled = false;
+                textScanPath.Enabled = checkScanSavedSims.Enabled = btnSelectScanPath.Enabled = false;
 
                 lblProgress.Text = "Progress:";
                 lblProgress.Visible = true;
@@ -480,40 +570,57 @@ namespace HcduPlus
 
         private void OnLoad(object sender, System.EventArgs e)
         {
-            RegistryTools.LoadAppSettings(HcduPlusApp.RegistryKey, HcduPlusApp.AppVersionMajor, HcduPlusApp.AppVersionMinor);
-            RegistryTools.LoadFormSettings(HcduPlusApp.RegistryKey, this);
-            textModsPath.Text = RegistryTools.GetSetting(HcduPlusApp.RegistryKey, textModsPath.Name, "") as String;
-            textScanPath.Text = RegistryTools.GetSetting(HcduPlusApp.RegistryKey, textScanPath.Name, "") as String;
+            try
+            {
+                formUpdates = false;
 
-            knownConflicts.LoadRegexs();
+                RegistryTools.LoadAppSettings(HcduPlusApp.RegistryKey, HcduPlusApp.AppVersionMajor, HcduPlusApp.AppVersionMinor);
+                RegistryTools.LoadFormSettings(HcduPlusApp.RegistryKey, this);
+                textModsPath.Text = RegistryTools.GetSetting(HcduPlusApp.RegistryKey, textModsPath.Name, "") as String;
+                textScanPath.Text = RegistryTools.GetSetting(HcduPlusApp.RegistryKey, textScanPath.Name, "") as String;
 
-            MyMruList = new MruList(HcduPlusApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
-            MyMruList.FileSelected += MyMruList_FileSelected;
+                menuItemIncludeKnownConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemIncludeKnownConflicts.Name, 0) != 0); OnIncludeKnownConflictsClicked(menuItemIncludeKnownConflicts, null);
+                knownConflicts.LoadRegexs();
 
-            menuItemBcon.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Bcon.NAME, 1) != 0); OnBconClicked(menuItemBcon, null);
-            menuItemBhav.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Bhav.NAME, 1) != 0); OnBhavClicked(menuItemBhav, null);
-            menuItemColl.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Coll.NAME, 0) != 0); OnCollClicked(menuItemColl, null);
-            menuItemCtss.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ctss.NAME, 0) != 0); OnCtssClicked(menuItemCtss, null);
-            menuItemGlob.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Glob.NAME, 1) != 0); OnGlobClicked(menuItemGlob, null);
-            menuItemGzps.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Gzps.NAME, 1) != 0); OnGzpsClicked(menuItemGzps, null);
-            menuItemObjd.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objd.NAME, 1) != 0); OnObjdClicked(menuItemObjd, null);
-            menuItemObjf.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objf.NAME, 1) != 0); OnObjfClicked(menuItemObjf, null);
-            menuItemSlot.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Slot.NAME, 1) != 0); OnSlotClicked(menuItemSlot, null);
-            menuItemStr.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Str.NAME, 1) != 0); OnStrClicked(menuItemStr, null);
-            menuItemTprp.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Tprp.NAME, 0) != 0); OnTprpClicked(menuItemTprp, null);
-            menuItemTrcn.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Trcn.NAME, 0) != 0); OnTrcnClicked(menuItemTrcn, null);
-            menuItemTtab.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttab.NAME, 1) != 0); OnTtabClicked(menuItemTtab, null);
-            menuItemTtas.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttas.NAME, 1) != 0); OnTtasClicked(menuItemTtas, null);
-            menuItemVers.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Vers.NAME, 0) != 0); OnVersClicked(menuItemVers, null);
+                MyMruList = new MruList(HcduPlusApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
+                MyMruList.FileSelected += MyMruList_FileSelected;
 
-            menuItemGuidConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, 1) != 0);
-            menuItemInternalConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, 1) != 0);
-            menuItemHomeCrafterConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, 1) != 0);
-            menuItemStoreVersionConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, 1) != 0);
-            menuItemCastawaysConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemCastawaysConflicts.Name, 1) != 0);
+                menuItemBcon.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Bcon.NAME, 1) != 0); OnBconClicked(menuItemBcon, null);
+                menuItemBhav.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Bhav.NAME, 1) != 0); OnBhavClicked(menuItemBhav, null);
+                menuItemColl.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Coll.NAME, 0) != 0); OnCollClicked(menuItemColl, null);
+                menuItemCtss.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ctss.NAME, 0) != 0); OnCtssClicked(menuItemCtss, null);
+                menuItemGlob.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Glob.NAME, 1) != 0); OnGlobClicked(menuItemGlob, null);
+                menuItemGzps.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Gzps.NAME, 1) != 0); OnGzpsClicked(menuItemGzps, null);
+                menuItemObjd.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objd.NAME, 1) != 0); OnObjdClicked(menuItemObjd, null);
+                menuItemObjf.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objf.NAME, 1) != 0); OnObjfClicked(menuItemObjf, null);
+                menuItemSlot.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Slot.NAME, 1) != 0); OnSlotClicked(menuItemSlot, null);
+                menuItemStr.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Str.NAME, 1) != 0); OnStrClicked(menuItemStr, null);
+                menuItemTprp.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Tprp.NAME, 0) != 0); OnTprpClicked(menuItemTprp, null);
+                menuItemTrcn.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Trcn.NAME, 0) != 0); OnTrcnClicked(menuItemTrcn, null);
+                menuItemTtab.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttab.NAME, 1) != 0); OnTtabClicked(menuItemTtab, null);
+                menuItemTtas.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttas.NAME, 1) != 0); OnTtasClicked(menuItemTtas, null);
+                menuItemVers.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Vers.NAME, 0) != 0); OnVersClicked(menuItemVers, null);
 
-            MyUpdater = new Updater(HcduPlusApp.RegistryKey, menuHelp);
-            MyUpdater.CheckForUpdates();
+                menuItemGuidConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, 1) != 0);
+                menuItemInternalConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, 1) != 0);
+                menuItemHomeCrafterConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, 1) != 0);
+                menuItemStoreVersionConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, 1) != 0);
+                menuItemCastawaysConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemCastawaysConflicts.Name, 1) != 0);
+
+                checkModsSavedSims.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", checkModsSavedSims.Name, 0) != 0);
+                checkScanSavedSims.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", checkScanSavedSims.Name, 0) != 0);
+
+                menuItemOptionNoLoad.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionNoLoad.Name, 0) != 0);
+
+                MyUpdater = new Updater(HcduPlusApp.RegistryKey, menuHelp);
+                MyUpdater.CheckForUpdates();
+            }
+            finally
+            {
+                formUpdates = true;
+            }
+
+            UpdateForm();
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -523,17 +630,32 @@ namespace HcduPlus
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
+            if (hcduWorker.IsBusy)
+            {
+                Debug.Assert(hcduWorker.WorkerSupportsCancellation == true);
+
+                // Cancel the asynchronous operation.
+                hcduWorker.CancelAsync();
+            }
+
             RegistryTools.SaveAppSettings(HcduPlusApp.RegistryKey, HcduPlusApp.AppVersionMajor, HcduPlusApp.AppVersionMinor);
             RegistryTools.SaveFormSettings(HcduPlusApp.RegistryKey, this);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey, textModsPath.Name, textModsPath.Text);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey, textScanPath.Name, textScanPath.Text);
 
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemIncludeKnownConflicts.Name, menuItemIncludeKnownConflicts.Checked ? 1 : 0);
             knownConflicts.SaveRegexs();
+
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, menuItemGuidConflicts.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, menuItemInternalConflicts.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, menuItemHomeCrafterConflicts.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, menuItemStoreVersionConflicts.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemCastawaysConflicts.Name, menuItemCastawaysConflicts.Checked ? 1 : 0);
+
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", checkModsSavedSims.Name, checkModsSavedSims.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", checkScanSavedSims.Name, checkScanSavedSims.Checked ? 1 : 0);
+
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionNoLoad.Name, menuItemOptionNoLoad.Checked ? 1 : 0);
         }
 
         private void OnSelectModsClicked(object sender, EventArgs e)
@@ -563,10 +685,21 @@ namespace HcduPlus
 
         private void UpdateForm()
         {
-            btnGO.Enabled = ((textModsPath.Text.Length + textScanPath.Text.Length) > 0);
-            dataByPackage.Clear();
-            dataByResource.Clear();
-            lblProgress.Visible = false;
+            if (!formUpdates) return;
+
+            try
+            {
+                formUpdates = false;
+
+                btnGO.Enabled = ((textModsPath.Text.Length + textScanPath.Text.Length) > 0);
+                dataByPackage.Clear();
+                dataByResource.Clear();
+                lblProgress.Visible = false;
+            }
+            finally
+            {
+                formUpdates = true;
+            }
         }
 
         private void OnHelpClicked(object sender, EventArgs e)
@@ -581,6 +714,13 @@ namespace HcduPlus
             if (config.ShowDialog() == DialogResult.OK)
             {
             }
+        }
+
+        private void OnIncludeKnownConflictsClicked(object sender, EventArgs e)
+        {
+            menuItemKnownConflicts.Enabled = !menuItemIncludeKnownConflicts.Checked;
+
+            UpdateForm();
         }
 
         private void OnKnownConflictsClicked(object sender, EventArgs e)
@@ -603,6 +743,8 @@ namespace HcduPlus
                 e.Cancel = true;
                 return;
             }
+
+            menuItemAddAsKnownConflict.Enabled = !menuItemIncludeKnownConflicts.Checked;
 
             if (mouseLocation.RowIndex != gridByPackage.SelectedRows[0].Index)
             {
@@ -884,6 +1026,43 @@ namespace HcduPlus
                 enabledResources.Remove(Vers.TYPE);
 
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Vers.NAME, enabled ? 1 : 0);
+        }
+
+        private void OnSavedSimsDownloads(object sender, EventArgs e)
+        {
+            try
+            {
+                formUpdates = false;
+
+                if (checkModsSavedSims.Checked) checkScanSavedSims.Checked = false;
+            }
+            finally
+            {
+                formUpdates = true;
+            }
+
+            UpdateForm();
+        }
+
+        private void OnSavedSimsScan(object sender, EventArgs e)
+        {
+            try
+            {
+                formUpdates = false;
+
+                if (checkScanSavedSims.Checked) checkModsSavedSims.Checked = false;
+            }
+            finally
+            {
+                formUpdates = true;
+            }
+
+            UpdateForm();
+        }
+
+        private void OnNoLoads(object sender, EventArgs e)
+        {
+            UpdateForm();
         }
     }
 }

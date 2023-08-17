@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30717.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfLibrary", "DbpfLibrary\DbpfLibrary.csproj", "{FBECABCD-0403-4B7E-9992-01562A62DB83}"
 EndProject
@@ -28,6 +28,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DpbfLister", "DpbfLister\DpbfLister.csproj", "{F02D953B-C88F-4DAD-A377-4E1BB8564642}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutfitOrganiser", "OutfitOrganiser\OutfitOrganiser.csproj", "{B614D104-69D7-4C7F-9AF7-19DB3CE7991D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticsChanger", "GeneticsChanger\GeneticsChanger.csproj", "{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -141,6 +143,14 @@ Global
 		{B614D104-69D7-4C7F-9AF7-19DB3CE7991D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B614D104-69D7-4C7F-9AF7-19DB3CE7991D}.Release|x64.ActiveCfg = Release|Any CPU
 		{B614D104-69D7-4C7F-9AF7-19DB3CE7991D}.Release|x64.Build.0 = Release|Any CPU
+		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Debug|x64.Build.0 = Debug|Any CPU
+		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Release|x64.ActiveCfg = Release|Any CPU
+		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
