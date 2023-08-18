@@ -312,6 +312,7 @@ namespace Sims2Tools.DBPF.Neighbourhood
         Winter = 3
     }
 
+    // While it is tempting to fix these typos - Gradparent, Nice - there are transforms that rely on them!
     public enum RelationshipTypes : uint
     {
         Unset_Unknown = 0x00,

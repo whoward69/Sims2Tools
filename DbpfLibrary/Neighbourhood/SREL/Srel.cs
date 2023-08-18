@@ -156,7 +156,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SREL
             if (RelationState.GoSteady) element.SetAttribute("steady", "true");
             if (RelationState.HasCrush) element.SetAttribute("crush", "true");
             if (RelationState.InLove) element.SetAttribute("love", "true");
-            if (RelationState.IsBuddie) element.SetAttribute("buddie", "true");
+            if (RelationState.IsBuddie) element.SetAttribute("buddie", "true"); // While it is tempting to change this to 'buddy' there are transforms that would disagree!
             if (RelationState.IsEnemy) element.SetAttribute("enemy", "true");
             if (RelationState.IsEngaged) element.SetAttribute("engaged", "true");
             if (RelationState.IsFamilyMember) element.SetAttribute("family", "true");
