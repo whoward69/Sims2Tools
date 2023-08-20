@@ -15,12 +15,12 @@
     <xsl:apply-templates select="@*|node()"/>
   </xsl:template>
 
-  <!-- Create the Census.txt file -->
+  <!-- Create the Census.csv file -->
   <xsl:template match="main" priority="1">
     <xsl:variable name="hoodCode" select="./idno/@ownerName"/>
     <xsl:variable name="hoodName" select="./ctss/language[1]/item[@index='0x0000']/text"/>
 
-    <xsl:result-document format="csv" href="Census.txt">
+    <xsl:result-document format="csv" href="Census.csv">
       <xsl:text>"Sim GUID","Sim ID","Family Name","Given Name","Species","Gender","Life Stage","Family ID","Family Group","Lot ID","Hood","Address","Phone"</xsl:text>
       <xsl:value-of select="$newLine"/>
 

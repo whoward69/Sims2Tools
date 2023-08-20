@@ -15,13 +15,13 @@
     <xsl:apply-templates select="@*|node()"/>
   </xsl:template>
 
-  <!-- Create the Memories.txt file -->
+  <!-- Create the Memories.csv file -->
   <xsl:template match="main" priority="1">
     <xsl:variable name="hoodCode" select="./idno/@ownerName"/>
     <xsl:variable name="hoodName" select="./ctss/language[1]/item[@index='0x0000']/text"/>
 
-    <xsl:result-document format="csv" href="Memories.txt">
-      <xsl:text>"Memory GUID","Memory Name","Owner ID","Owner Name","About GUID","About Name"</xsl:text>
+    <xsl:result-document format="csv" href="Memories.csv">
+      <xsl:text>"Memory GUID","Memory Name","Memory Title","Owner ID","Owner Name","About GUID","About Name"</xsl:text>
       <xsl:value-of select="$newLine"/>
 
       <xsl:apply-templates select="./ngbh/sims/tokens/standard/item[@flags='0x0003']" mode="memories">
@@ -38,6 +38,11 @@
     <xsl:value-of select="$separator"/>
     <xsl:value-of select="$quote"/>
     <xsl:value-of select="sims2tools:asObjectName(@guid)"/>
+    <xsl:value-of select="$quote"/>
+
+    <xsl:value-of select="$separator"/>
+    <xsl:value-of select="$quote"/>
+    <xsl:value-of select="sims2tools:asObjectTitle(@guid)"/>
     <xsl:value-of select="$quote"/>
 
     <xsl:value-of select="$separator"/>

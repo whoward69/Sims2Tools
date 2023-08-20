@@ -1,6 +1,22 @@
-﻿using Saxon.Api;
+﻿/*
+ * Hood Exporter - a utility for exporting a Sims 2 'hood as XML
+ *               - see http://www.picknmixmods.com/Sims2/Notes/HoodExporter/HoodExporter.html
+ *
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
+ *
+ * William Howard - 2020-2023
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Saxon.Api;
 using Sims2Tools;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.CTSS;
+using Sims2Tools.DBPF.Data;
+using Sims2Tools.DBPF.OBJD;
+using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
@@ -18,8 +34,17 @@ namespace HoodExporter
 
         // See https://www.saxonica.com/html/documentation10/dotnetdoc/Saxon/Api/Processor.html
         private readonly Processor processor;
-        readonly Dictionary<QName, XdmValue> xsltParams = new Dictionary<QName, XdmValue>(2);
-        readonly XsltCompiler compiler;
+        private readonly Dictionary<QName, XdmValue> xsltParams = new Dictionary<QName, XdmValue>(2);
+        private readonly XsltCompiler compiler;
+
+        private List<Serializer> resultDocs;
+
+        private static DBPFFile objectsPackage = null;
+
+        public static void Shutdown()
+        {
+            objectsPackage?.Close();
+        }
 
         public HoodExporterTransformer(String exportPath)
         {
@@ -34,6 +59,8 @@ namespace HoodExporter
             processor.RegisterExtensionFunction(new AsHexNoPrefixDefn());
             processor.RegisterExtensionFunction(new AsYesNoDefn());
             processor.RegisterExtensionFunction(new AsObjectNameDefn());
+            processor.RegisterExtensionFunction(new AsObjectTitleDefn());
+            processor.RegisterExtensionFunction(new AsObjectDescDefn());
 
             compiler = processor.NewXsltCompiler();
             compiler.BaseUri = baseUri;
@@ -44,21 +71,69 @@ namespace HoodExporter
             DocumentBuilder builder = processor.NewDocumentBuilder();
             XdmNode input = builder.Build(new XmlNodeReader(rootElement));
 
-            DomDestination serializer = new DomDestination();
+            DomDestination output = new DomDestination();
+
+            resultDocs = new List<Serializer>();
 
             Xslt30Transformer transformer30 = compiler.Compile(new XmlTextReader(File.OpenRead(xslPath))).Load30();
             transformer30.SetStylesheetParameters(xsltParams);
             transformer30.BaseOutputURI = baseUri.ToString();
 
             transformer30.ResultDocumentHandler = this;
-            transformer30.ApplyTemplates(input, serializer);
+            transformer30.ApplyTemplates(input, output);
 
-            return serializer.XmlDocument?.DocumentElement;
+            XmlElement ele = output.XmlDocument?.DocumentElement;
+
+            foreach (Serializer resultDoc in resultDocs)
+            {
+                if (resultDoc.GetOutputDestination() is java.io.Closeable c)
+                {
+                    c.close();
+                }
+
+                resultDoc.Close();
+            }
+
+            output.Close();
+
+            return ele;
         }
 
         public XmlDestination HandleResultDocument(string href, Uri baseUri)
         {
-            return processor.NewSerializer(new FileStream($"{baseUri.AbsolutePath}/{href}", FileMode.Create, FileAccess.Write));
+            Serializer s = processor.NewSerializer(new FileStream($"{baseUri.AbsolutePath}/{href}", FileMode.Create, FileAccess.Write));
+
+            resultDocs.Add(s);
+
+            return s;
+        }
+
+        private static StrItemList GetObjectCatalog(TypeGUID guid)
+        {
+            if (GameData.globalObjectsTgirHashByGUID.ContainsKey(guid))
+            {
+                if (objectsPackage == null)
+                {
+                    objectsPackage = new DBPFFile(Sims2ToolsLib.Sims2Path + GameData.objectsSubPath);
+                }
+
+                Objd objd = (Objd)objectsPackage.GetResourceByTGIR(GameData.globalObjectsTgirHashByGUID[guid]);
+                Ctss ctss = (Ctss)objectsPackage.GetResourceByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
+
+                return ctss?.LanguageItems(MetaData.Languages.Default);
+            }
+
+            return null;
+        }
+
+        public static string GetObjectTitle(TypeGUID guid)
+        {
+            return GetObjectCatalog(guid)?[0]?.Title;
+        }
+
+        public static string GetObjectDesc(TypeGUID guid)
+        {
+            return GetObjectCatalog(guid)?[1]?.Title;
         }
     }
 
@@ -303,19 +378,19 @@ namespace HoodExporter
         }
     }
 
-    class AsObjectNameDefn : ExtensionFunctionDefinition
+    abstract class AsObjectDefn : ExtensionFunctionDefinition
     {
-        public override QName FunctionName => new QName(HoodExporterTransformer.extnUri, "asObjectName");
         public override int MinimumNumberOfArguments => 1;
         public override int MaximumNumberOfArguments => 1;
         public override XdmSequenceType[] ArgumentTypes => new XdmSequenceType[] { new XdmSequenceType(XdmAtomicType.BuiltInAtomicType(QName.XS_STRING), XdmSequenceType.ONE) };
         public override bool TrustResultType => true;
         public override XdmSequenceType ResultType(XdmSequenceType[] ArgumentTypes) => new XdmSequenceType(XdmAtomicType.BuiltInAtomicType(QName.XS_STRING), XdmSequenceType.ONE);
-        public override ExtensionFunctionCall MakeFunctionCall() => new AsObjectNameCall();
     }
 
-    class AsObjectNameCall : ExtensionFunctionCall
+    abstract class AsObjectCall : ExtensionFunctionCall
     {
+        public abstract string GetValueFromGuid(TypeGUID guid);
+
         public override IEnumerator<XdmItem> Call(IEnumerator<XdmItem>[] arguments, DynamicContext context)
         {
             if (arguments.Length == 1)
@@ -344,9 +419,11 @@ namespace HoodExporter
 
                 TypeGUID GUID = (TypeGUID)guid;
 
-                if (GameData.globalObjectsByGUID.ContainsKey(GUID))
+                string value = GetValueFromGuid(GUID);
+
+                if (value != null)
                 {
-                    return new XdmAtomicValue(GameData.globalObjectsByGUID[GUID]).GetEnumerator();
+                    return new XdmAtomicValue(value).GetEnumerator();
                 }
 
                 return new XdmAtomicValue(GUID.ToString()).GetEnumerator();
@@ -354,5 +431,46 @@ namespace HoodExporter
 
             return EmptyEnumerator<XdmItem>.INSTANCE;
         }
+    }
+
+    class AsObjectNameDefn : AsObjectDefn
+    {
+        public override QName FunctionName => new QName(HoodExporterTransformer.extnUri, "asObjectName");
+        public override ExtensionFunctionCall MakeFunctionCall() => new AsObjectNameCall();
+    }
+
+    class AsObjectNameCall : AsObjectCall
+    {
+        public override string GetValueFromGuid(TypeGUID guid)
+        {
+            if (GameData.globalObjectsByGUID.ContainsKey(guid))
+            {
+                return GameData.globalObjectsByGUID[guid];
+            }
+
+            return null;
+        }
+    }
+
+    class AsObjectTitleDefn : AsObjectDefn
+    {
+        public override QName FunctionName => new QName(HoodExporterTransformer.extnUri, "asObjectTitle");
+        public override ExtensionFunctionCall MakeFunctionCall() => new AsObjectTitleCall();
+    }
+
+    class AsObjectTitleCall : AsObjectCall
+    {
+        public override string GetValueFromGuid(TypeGUID guid) => HoodExporterTransformer.GetObjectTitle(guid);
+    }
+
+    class AsObjectDescDefn : AsObjectDefn
+    {
+        public override QName FunctionName => new QName(HoodExporterTransformer.extnUri, "asObjectDesc");
+        public override ExtensionFunctionCall MakeFunctionCall() => new AsObjectDescCall();
+    }
+
+    class AsObjectDescCall : AsObjectCall
+    {
+        public override string GetValueFromGuid(TypeGUID guid) => HoodExporterTransformer.GetObjectDesc(guid);
     }
 }

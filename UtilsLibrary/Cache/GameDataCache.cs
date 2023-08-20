@@ -183,5 +183,52 @@ namespace Sims2Tools.Cache
                 return false;
             }
         }
+
+        public static bool Serialize(Dictionary<TypeGUID, int> data, String cacheName)
+        {
+            try
+            {
+                using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Create))
+                {
+                    new BinaryFormatter().Serialize(fs, data);
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    File.Delete($"{cacheBase}/{cacheName}.bin");
+                }
+                catch (Exception) { }
+
+                return false;
+            }
+        }
+
+        public static bool Deserialize(out Dictionary<TypeGUID, int> data, String cacheName)
+        {
+            try
+            {
+                using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Open))
+                {
+                    data = (Dictionary<TypeGUID, int>)new BinaryFormatter().Deserialize(fs);
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    File.Delete($"{cacheBase}/{cacheName}.bin");
+                }
+                catch (Exception) { }
+
+                data = new Dictionary<TypeGUID, int>();
+                return false;
+            }
+        }
     }
 }

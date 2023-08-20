@@ -65,12 +65,11 @@ namespace Sims2Tools.DBPF.BHAV
                 Instruction item = Instructions[i];
 
                 XmlElement inst = XmlHelper.CreateElement(element, "instruction");
-                inst.SetAttribute("nodeVersion", Helper.Hex4PrefixString(item.NodeVersion));
+                // inst.SetAttribute("entry", i.ToString()); // Adding this back in makes using WinDiff/BeyondCompare very hard!
                 inst.SetAttribute("opCode", Helper.Hex4PrefixString(item.OpCode));
+                inst.SetAttribute("nodeVersion", Helper.Hex4PrefixString(item.NodeVersion));
                 inst.SetAttribute("trueTarget", GetTarget(i, item.TrueTarget));
                 inst.SetAttribute("falseTarget", GetTarget(i, item.FalseTarget));
-                // inst.SetAttribute("trueTarget", Helper.Hex4PrefixString(item.TrueTarget));
-                // inst.SetAttribute("falseTarget", Helper.Hex4PrefixString(item.FalseTarget));
 
                 XmlElement ops = XmlHelper.CreateElement(inst, "operands");
                 for (int j = 0; j < 16; j++)
@@ -95,6 +94,7 @@ namespace Sims2Tools.DBPF.BHAV
                 default:
                     int delta = target - inst;
                     return $"{delta:+#;-#;0}";
+                    // return Helper.Hex4PrefixString(target); // Using the absolute target makes using WinDiff/BeyondCompare very hard!
             }
         }
     }

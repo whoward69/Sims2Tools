@@ -76,10 +76,11 @@ namespace HoodExporter
         private SimDataCache simCache;
 
         private String xsltPath = "";
-        bool isRufio = false;
+        private bool isRufio = false;
+        private bool reuseExport = false;
 
-        String hoodCode;
-        String exportPath;
+        private String hoodCode;
+        private String exportPath;
 
         // MUST total 100!
         private const int processSimImagesPercent = 15;
@@ -89,7 +90,9 @@ namespace HoodExporter
         private const int processUniversityHoodsPercent = 5;
         private const int processDowntownHoodsPercent = 5;
         private const int processVactionHoodsPercent = 5;
-        private const int processMainHoodPercent = 50;
+        private const int processMainHoodPercent = 40;
+        private const int transformPercent = 5;
+        private const int outputPercent = 5;
 
         private int startingPercent;
 
@@ -242,12 +245,9 @@ namespace HoodExporter
         private void HoodWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs args)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
-            XmlElement eleHood = args.Argument as XmlElement;
 
             DirectoryInfo hoodDirInfo = new DirectoryInfo(textHoodPath.Text);
             String hoodDirPath = hoodDirInfo.FullName;
-
-            eleHood.SetAttribute("path", hoodDirPath);
 
 #if !DEBUG
             try
@@ -274,48 +274,87 @@ namespace HoodExporter
                     throw new Exception("Can't output under the neighborhood directory");
                 }
 
-                Directory.CreateDirectory(exportPath);
-
-                simCache = new SimDataCache();
-
-                startingPercent = 0;
-
-                if (!ProcessCharacterFiles(worker, processSimImagesPercent, hoodDirPath, exportPath) ||
-                    !ProcessLotFiles(worker, processLotImagesPercent, hoodDirPath, exportPath) ||
-                    !ProcessMainHood(worker, processMainHoodPercent, hoodDirInfo, hoodPackagePath, eleHood, "main", isRufio ? rufioTypes : mainTypes) ||
-                    !ProcessSubHoods(worker, processSuburbHoodsPercent, hoodDirInfo, $"{hoodCode}_Suburb*.package", eleHood, "suburb", suburbTypes) ||
-                    !ProcessSubHoods(worker, processUniversityHoodsPercent, hoodDirInfo, $"{hoodCode}_University*.package", eleHood, "university", universityTypes) ||
-                    !ProcessSubHoods(worker, processDowntownHoodsPercent, hoodDirInfo, $"{hoodCode}_Downtown*.package", eleHood, "downtown", downtownTypes) ||
-                    !ProcessSubHoods(worker, processVactionHoodsPercent, hoodDirInfo, $"{hoodCode}_Vacation*.package", eleHood, "vacation", vacationTypes) ||
-                    !ProcessFamilyThumbnails(worker, processFamiyImagesPercent, hoodDirPath, exportPath)
-                    )
+                if (reuseExport && File.Exists(xsltPath) && !isRufio && File.Exists($"{exportPath}/{hoodCode}.xml"))
                 {
-                    args.Cancel = true;
-                    return;
-                }
+                    // Reuse the previously exported .xml file
+                    XmlDocument doc = new XmlDocument();
+                    doc.Load($"{exportPath}/{hoodCode}.xml");
+                    worker.ReportProgress(50);
 
-                if (File.Exists(xsltPath))
-                {
+                    // Run the transform
                     HoodExporterTransformer transformer = new HoodExporterTransformer(exportPath);
-                    XmlElement eleXform = transformer.Transform(eleHood, xsltPath);
-
-                    if (eleXform != null) eleHood = eleXform;
+                    transformer.Transform((XmlElement)doc.DocumentElement.SelectSingleNode("/hood"), xsltPath);
+                    worker.ReportProgress(100);
                 }
-
-                if (!isRufio)
+                else
                 {
-                    using (StreamWriter writer = new StreamWriter($"{exportPath}/{hoodCode}.xml", false))
+                    // Create the .xml file
+                    Directory.CreateDirectory(exportPath);
+
+                    simCache = new SimDataCache();
+
+                    startingPercent = 0;
+
+                    XmlDocument doc = new XmlDocument();
+
+                    XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+                    XmlElement root = doc.DocumentElement;
+                    doc.InsertBefore(xmlDeclaration, root);
+
+                    DateTime now = DateTime.Now;
+                    doc.AppendChild(doc.CreateComment($"{now.ToShortDateString()} {now.ToShortTimeString()}"));
+
+                    XmlElement eleHood = doc.CreateElement(string.Empty, "hood", string.Empty);
+                    doc.AppendChild(eleHood);
+
+                    eleHood.SetAttribute("path", hoodDirPath);
+
+                    if (!ProcessCharacterFiles(worker, processSimImagesPercent, hoodDirPath, exportPath) ||
+                        !ProcessLotFiles(worker, processLotImagesPercent, hoodDirPath, exportPath) ||
+                        !ProcessMainHood(worker, processMainHoodPercent, hoodDirInfo, hoodPackagePath, eleHood, "main", isRufio ? rufioTypes : mainTypes) ||
+                        !ProcessSubHoods(worker, processSuburbHoodsPercent, hoodDirInfo, $"{hoodCode}_Suburb*.package", eleHood, "suburb", suburbTypes) ||
+                        !ProcessSubHoods(worker, processUniversityHoodsPercent, hoodDirInfo, $"{hoodCode}_University*.package", eleHood, "university", universityTypes) ||
+                        !ProcessSubHoods(worker, processDowntownHoodsPercent, hoodDirInfo, $"{hoodCode}_Downtown*.package", eleHood, "downtown", downtownTypes) ||
+                        !ProcessSubHoods(worker, processVactionHoodsPercent, hoodDirInfo, $"{hoodCode}_Vacation*.package", eleHood, "vacation", vacationTypes) ||
+                        !ProcessFamilyThumbnails(worker, processFamiyImagesPercent, hoodDirPath, exportPath)
+                        )
                     {
-                        if (menuItemPrettyPrint.Checked)
-                        {
-                            writer.WriteLine(XDocument.Parse(eleHood.OwnerDocument.OuterXml).ToString());
-                        }
-                        else
-                        {
-                            writer.WriteLine(eleHood.OwnerDocument.OuterXml);
-                        }
-                        writer.Close();
+                        args.Cancel = true;
+                        return;
                     }
+
+                    // Run any transform
+                    if (File.Exists(xsltPath))
+                    {
+                        HoodExporterTransformer transformer = new HoodExporterTransformer(exportPath);
+                        XmlElement eleXform = transformer.Transform(eleHood, xsltPath);
+
+                        if (eleXform != null) eleHood = eleXform;
+                    }
+
+                    startingPercent += transformPercent;
+                    worker.ReportProgress(startingPercent);
+
+                    // Save the output
+                    if (!isRufio)
+                    {
+                        using (StreamWriter writer = new StreamWriter($"{exportPath}/{hoodCode}.xml", false))
+                        {
+                            if (menuItemPrettyPrint.Checked)
+                            {
+                                writer.WriteLine(XDocument.Parse(eleHood.OwnerDocument.OuterXml).ToString());
+                            }
+                            else
+                            {
+                                writer.WriteLine(eleHood.OwnerDocument.OuterXml);
+                            }
+                            writer.Close();
+                        }
+                    }
+
+                    startingPercent += outputPercent;
+                    worker.ReportProgress(startingPercent);
+
                 }
             }
 #if !DEBUG
@@ -910,6 +949,8 @@ namespace HoodExporter
             }
             else
             {
+                reuseExport = ((Control.ModifierKeys & Keys.Shift) == Keys.Shift);
+
                 // This is the Export action
                 btnGO.Text = "Cancel";
 
@@ -918,19 +959,7 @@ namespace HoodExporter
                 progressBar.Visible = true;
                 progressBar.Value = 0;
 
-                XmlDocument doc = new XmlDocument();
-
-                XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-                XmlElement root = doc.DocumentElement;
-                doc.InsertBefore(xmlDeclaration, root);
-
-                DateTime now = DateTime.Now;
-                doc.AppendChild(doc.CreateComment($"{now.ToShortDateString()} {now.ToShortTimeString()}"));
-
-                XmlElement eleDbpf = doc.CreateElement(string.Empty, "hood", string.Empty);
-                doc.AppendChild(eleDbpf);
-
-                hoodWorker.RunWorkerAsync(eleDbpf);
+                hoodWorker.RunWorkerAsync();
             }
         }
 
@@ -986,6 +1015,8 @@ namespace HoodExporter
             RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemSimImages.Name, menuItemSimImages.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemLotImages.Name, menuItemLotImages.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemFamilyImages.Name, menuItemFamilyImages.Checked ? 1 : 0);
+
+            HoodExporterTransformer.Shutdown();
         }
 
         private void OnSelectHoodPathClicked(object sender, EventArgs e)

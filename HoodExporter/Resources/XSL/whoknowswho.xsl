@@ -23,9 +23,9 @@
     <xsl:apply-templates select="@*|node()"/>
   </xsl:template>
 
-  <!-- Create the WhoKnowsWho.txt file -->
+  <!-- Create the WhoKnowsWho.csv file -->
   <xsl:template match="main" priority="1">
-    <xsl:result-document format="csv" href="WhoKnowsWho.txt">
+    <xsl:result-document format="csv" href="WhoKnowsWho.csv">
       <xsl:text>"From Sim GUID","From Sim ID","From Family ID","From Family Group","From Family Name","From Given Name"</xsl:text>
       <xsl:text>,"To Sim GUID","To Sim ID","To Family ID","To Family Group","To Family Name","To Given Name"</xsl:text>
       <xsl:text>,"STR","LTR","Relation","Friend","Romance","Pet Friend","Pack"</xsl:text>
