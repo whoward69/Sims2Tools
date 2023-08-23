@@ -74,6 +74,28 @@ namespace OutfitOrganiser
             new UintNamedValue("No", 1)
         };
 
+        private readonly UintNamedValue[] productItems = {
+            new UintNamedValue("", 0xFFFF),
+            new UintNamedValue("*Custom Content", 0x0000),
+            new UintNamedValue("Apartment Life", 0x0011),
+            new UintNamedValue("Base Game", 0x0001),
+            new UintNamedValue("Bon Voyage", 0x000B),
+            new UintNamedValue("Celebration!", 0x0009),
+            new UintNamedValue("Family Fun", 0x0005),
+            new UintNamedValue("FreeTime", 0x000E),
+            new UintNamedValue("Glamour Life", 0x0006),
+            new UintNamedValue("H&M Fashion", 0x000A),
+            new UintNamedValue("IKEA Home", 0x0010),
+            new UintNamedValue("K&B Design", 0x000F),
+            new UintNamedValue("Nightlife", 0x0003),
+            new UintNamedValue("Open For Business", 0x0004),
+            new UintNamedValue("Pets", 0x0007),
+            new UintNamedValue("Seasons", 0x0008),
+            new UintNamedValue("Store Edition", 0x000D),
+            new UintNamedValue("Teen Style", 0x000C),
+            new UintNamedValue("University", 0x0002)
+        };
+
         private readonly UintNamedValue[] shoeItems = {
             new UintNamedValue("", 0),
             new UintNamedValue("Armour", 7),
@@ -150,6 +172,9 @@ namespace OutfitOrganiser
 
                 comboShown.Items.Clear();
                 comboShown.Items.AddRange(shownItems);
+
+                comboProduct.Items.Clear();
+                comboProduct.Items.AddRange(productItems);
 
                 comboShoe.Items.Clear();
                 comboShoe.Items.AddRange(shoeItems);
@@ -602,6 +627,7 @@ namespace OutfitOrganiser
                                     row["Gender"] = BuildGenderString(outfitData.Gender);
                                     row["Age"] = BuildAgeString(outfitData.Age);
                                     row["Category"] = BuildCategoryString(outfitData.Category);
+                                    row["Product"] = BuildProductString(outfitData.Product);
 
                                     row["Sort"] = outfitData.SortIndex;
 
@@ -1430,6 +1456,71 @@ namespace OutfitOrganiser
             return category.Length > 0 ? category.Substring(2) : "";
         }
 
+        private string BuildProductString(uint value)
+        {
+            string product = "unknown";
+
+            switch (value)
+            {
+                case 0x0000:
+                    product = "*Custom Content";
+                    break;
+                case 0x0001:
+                    product = "Base Game";
+                    break;
+                case 0x0002:
+                    product = "University";
+                    break;
+                case 0x0003:
+                    product = "Nightlife";
+                    break;
+                case 0x0004:
+                    product = "Open For Business";
+                    break;
+                case 0x0005:
+                    product = "Family Fun";
+                    break;
+                case 0x0006:
+                    product = "Glamour Life";
+                    break;
+                case 0x0007:
+                    product = "Pets";
+                    break;
+                case 0x0008:
+                    product = "Seasons";
+                    break;
+                case 0x0009:
+                    product = "Celebration!";
+                    break;
+                case 0x000A:
+                    product = "H&M Fashion";
+                    break;
+                case 0x000B:
+                    product = "Bon Voyage";
+                    break;
+                case 0x000C:
+                    product = "Teen Style";
+                    break;
+                case 0x000D:
+                    product = "Store Edition";
+                    break;
+                case 0x000E:
+                    product = "FreeTime";
+                    break;
+                case 0x000F:
+                    product = "K&B Design";
+                    break;
+                case 0x0010:
+                    product = "IKEA Home";
+                    break;
+                case 0x0011:
+                    product = "Apartment Life";
+                    break;
+            }
+
+            return product;
+        }
+
         private string BuildShoeString(uint value)
         {
             string shoe = "None";
@@ -1609,6 +1700,9 @@ namespace OutfitOrganiser
                         case "N":
                             tooltip += outfitData.PackageName;
                             break;
+                        case "P":
+                            tooltip += BuildProductString(outfitData.Product);
+                            break;
                         case "S":
                             tooltip += BuildShoeString(outfitData.Shoe);
                             break;
@@ -1648,8 +1742,9 @@ namespace OutfitOrganiser
 
                     row.Cells["colGender"].Value = BuildGenderString(outfitData.Gender);
                     row.Cells["colAge"].Value = BuildAgeString(outfitData.Age);
-
                     row.Cells["colCategory"].Value = BuildCategoryString(outfitData.Category);
+                    row.Cells["colProduct"].Value = BuildProductString(outfitData.Product);
+
                     if (outfitData.HasShoe) row.Cells["colShoe"].Value = BuildShoeString(outfitData.Shoe);
 
                     if (outfitData.IsHair) row.Cells["colHairtone"].Value = BuildHairString(outfitData.Hairtone);
@@ -1769,6 +1864,10 @@ namespace OutfitOrganiser
                 case "jewelry":
                     if (outfitData.IsAccessory) outfitData.Jewelry = data;
                     break;
+                case "product":
+                    outfitData.Product = data;
+                    if (data != 0x0000) outfitData.Creator = "00000000-0000-0000-0000-000000000000";
+                    break;
                 case "shoe":
                     if (outfitData.HasShoe) outfitData.Shoe = data;
                     break;
@@ -1806,7 +1905,7 @@ namespace OutfitOrganiser
         #endregion
 
         #region Editor
-        private uint cachedShownValue, cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedShoeValue, cachedJewelryValue, cachedDestinationValue, cachedSortValue;
+        private uint cachedShownValue, cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedProductValue, cachedShoeValue, cachedJewelryValue, cachedDestinationValue, cachedSortValue;
         // private string cachedHairtoneValue;
 
         private void ClearEditor()
@@ -1832,6 +1931,8 @@ namespace OutfitOrganiser
             ckbCatPJs.Checked = false;
             ckbCatSwimwear.Checked = false;
             ckbCatUnderwear.Checked = false;
+
+            comboProduct.SelectedIndex = -1;
 
             comboShoe.SelectedIndex = -1;
             // comboHairtone.SelectedIndex = -1;
@@ -1952,6 +2053,28 @@ namespace OutfitOrganiser
                 if ((cachedCategoryFlags & 0x0010) == 0x0010) ckbCatPJs.Checked = true;
                 if ((cachedCategoryFlags & 0x0008) == 0x0008) ckbCatSwimwear.Checked = true;
                 if ((cachedCategoryFlags & 0x0040) == 0x0040) ckbCatUnderwear.Checked = true;
+            }
+
+            uint newProductValue = outfitData.Product;
+            if (append)
+            {
+                if (cachedProductValue != newProductValue)
+                {
+                    comboProduct.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                cachedProductValue = newProductValue;
+
+                foreach (Object o in comboProduct.Items)
+                {
+                    if ((o as UintNamedValue).Value == cachedProductValue)
+                    {
+                        comboProduct.SelectedItem = o;
+                        break;
+                    }
+                }
             }
 
             uint newShoeValue = outfitData.Shoe;
@@ -2093,6 +2216,14 @@ namespace OutfitOrganiser
             if (comboGender.SelectedIndex != -1)
             {
                 if (IsAutoUpdate) UpdateSelectedRows((comboGender.SelectedItem as UintNamedValue).Value, "gender");
+            }
+        }
+
+        private void OnProductChanged(object sender, EventArgs e)
+        {
+            if (comboProduct.SelectedIndex != -1)
+            {
+                if (IsAutoUpdate) UpdateSelectedRows((comboProduct.SelectedItem as UintNamedValue).Value, "product");
             }
         }
 

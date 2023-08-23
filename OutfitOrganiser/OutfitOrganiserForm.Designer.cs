@@ -93,6 +93,7 @@ namespace OutfitOrganiser
             this.menuContextPkgMerge = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.panelEditor = new System.Windows.Forms.Panel();
+            this.btnTownify = new System.Windows.Forms.Button();
             this.btnMeshes = new System.Windows.Forms.Button();
             this.grpSort = new System.Windows.Forms.GroupBox();
             this.textSort = new System.Windows.Forms.TextBox();
@@ -111,6 +112,8 @@ namespace OutfitOrganiser
             this.comboGender = new System.Windows.Forms.ComboBox();
             this.grpShown = new System.Windows.Forms.GroupBox();
             this.comboShown = new System.Windows.Forms.ComboBox();
+            this.grpProduct = new System.Windows.Forms.GroupBox();
+            this.comboProduct = new System.Windows.Forms.ComboBox();
             this.grpShoe = new System.Windows.Forms.GroupBox();
             this.comboShoe = new System.Windows.Forms.ComboBox();
             this.grpJewelry = new System.Windows.Forms.GroupBox();
@@ -133,6 +136,7 @@ namespace OutfitOrganiser
             this.colGender = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colProduct = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colShoe = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHairtone = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colJewelry = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -157,7 +161,6 @@ namespace OutfitOrganiser
             this.menuContextDirDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
-            this.btnTownify = new System.Windows.Forms.Button();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -183,6 +186,7 @@ namespace OutfitOrganiser
             this.menuContextResources.SuspendLayout();
             this.grpHairtone.SuspendLayout();
             this.menuContextFolders.SuspendLayout();
+            this.grpProduct.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -641,6 +645,7 @@ namespace OutfitOrganiser
             // 
             this.panelEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelEditor.Controls.Add(this.grpProduct);
             this.panelEditor.Controls.Add(this.btnTownify);
             this.panelEditor.Controls.Add(this.btnMeshes);
             this.panelEditor.Controls.Add(this.grpSort);
@@ -657,6 +662,17 @@ namespace OutfitOrganiser
             this.panelEditor.Name = "panelEditor";
             this.panelEditor.Size = new System.Drawing.Size(984, 154);
             this.panelEditor.TabIndex = 26;
+            // 
+            // btnTownify
+            // 
+            this.btnTownify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTownify.Location = new System.Drawing.Point(708, 128);
+            this.btnTownify.Name = "btnTownify";
+            this.btnTownify.Size = new System.Drawing.Size(88, 26);
+            this.btnTownify.TabIndex = 28;
+            this.btnTownify.Text = "Townify";
+            this.btnTownify.UseVisualStyleBackColor = true;
+            this.btnTownify.Click += new System.EventHandler(this.OnTownifyClicked);
             // 
             // btnMeshes
             // 
@@ -855,10 +871,30 @@ namespace OutfitOrganiser
             this.comboShown.TabIndex = 7;
             this.comboShown.SelectedIndexChanged += new System.EventHandler(this.OnShownChanged);
             // 
+            // grpProduct
+            // 
+            this.grpProduct.Controls.Add(this.comboProduct);
+            this.grpProduct.Location = new System.Drawing.Point(310, 0);
+            this.grpProduct.Name = "grpProduct";
+            this.grpProduct.Size = new System.Drawing.Size(135, 50);
+            this.grpProduct.TabIndex = 9;
+            this.grpProduct.TabStop = false;
+            this.grpProduct.Text = "Product:";
+            // 
+            // comboProduct
+            // 
+            this.comboProduct.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboProduct.FormattingEnabled = true;
+            this.comboProduct.Location = new System.Drawing.Point(5, 20);
+            this.comboProduct.Name = "comboProduct";
+            this.comboProduct.Size = new System.Drawing.Size(125, 23);
+            this.comboProduct.TabIndex = 8;
+            this.comboProduct.SelectedIndexChanged += new System.EventHandler(this.OnProductChanged);
+            // 
             // grpShoe
             // 
             this.grpShoe.Controls.Add(this.comboShoe);
-            this.grpShoe.Location = new System.Drawing.Point(310, 0);
+            this.grpShoe.Location = new System.Drawing.Point(310, 55);
             this.grpShoe.Name = "grpShoe";
             this.grpShoe.Size = new System.Drawing.Size(135, 50);
             this.grpShoe.TabIndex = 1;
@@ -879,7 +915,7 @@ namespace OutfitOrganiser
             // 
             this.grpJewelry.Controls.Add(this.comboJewelry);
             this.grpJewelry.Controls.Add(this.comboDestination);
-            this.grpJewelry.Location = new System.Drawing.Point(310, 0);
+            this.grpJewelry.Location = new System.Drawing.Point(310, 55);
             this.grpJewelry.Name = "grpJewelry";
             this.grpJewelry.Size = new System.Drawing.Size(135, 80);
             this.grpJewelry.TabIndex = 1;
@@ -1029,6 +1065,7 @@ namespace OutfitOrganiser
             this.colGender,
             this.colAge,
             this.colCategory,
+            this.colProduct,
             this.colShoe,
             this.colHairtone,
             this.colJewelry,
@@ -1104,6 +1141,13 @@ namespace OutfitOrganiser
             this.colCategory.HeaderText = "Category";
             this.colCategory.Name = "colCategory";
             this.colCategory.ReadOnly = true;
+            // 
+            // colProduct
+            // 
+            this.colProduct.DataPropertyName = "Product";
+            this.colProduct.HeaderText = "Product";
+            this.colProduct.Name = "colProduct";
+            this.colProduct.ReadOnly = true;
             // 
             // colShoe
             // 
@@ -1288,17 +1332,6 @@ namespace OutfitOrganiser
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
             // 
-            // btnTownify
-            // 
-            this.btnTownify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTownify.Location = new System.Drawing.Point(708, 128);
-            this.btnTownify.Name = "btnTownify";
-            this.btnTownify.Size = new System.Drawing.Size(88, 26);
-            this.btnTownify.TabIndex = 28;
-            this.btnTownify.Text = "Townify";
-            this.btnTownify.UseVisualStyleBackColor = true;
-            this.btnTownify.Click += new System.EventHandler(this.OnTownifyClicked);
-            // 
             // OutfitOrganiserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1347,6 +1380,7 @@ namespace OutfitOrganiser
             this.menuContextResources.ResumeLayout(false);
             this.grpHairtone.ResumeLayout(false);
             this.menuContextFolders.ResumeLayout(false);
+            this.grpProduct.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1393,6 +1427,8 @@ namespace OutfitOrganiser
         private System.Windows.Forms.CheckBox ckbCatEveryday;
         private System.Windows.Forms.GroupBox grpGender;
         private System.Windows.Forms.ComboBox comboGender;
+        private System.Windows.Forms.GroupBox grpProduct;
+        private System.Windows.Forms.ComboBox comboProduct;
         private System.Windows.Forms.GroupBox grpShoe;
         private System.Windows.Forms.ComboBox comboShoe;
         private System.Windows.Forms.GroupBox grpJewelry;
@@ -1442,22 +1478,6 @@ namespace OutfitOrganiser
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoBackup;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemSaveAll;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colVisible;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colType;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colTitle;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colFilename;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colGender;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAge;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colCategory;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colShoe;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHairtone;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colJewelry;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colDestination;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colSort;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colShown;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colTownie;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colTooltip;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colOutfitData;
         private System.Windows.Forms.Button btnMeshes;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuItemPreloadMeshes;
@@ -1469,6 +1489,23 @@ namespace OutfitOrganiser
         private System.Windows.Forms.SaveFileDialog saveThumbnailDialog;
         private System.Windows.Forms.OpenFileDialog openThumbnailDialog;
         private System.Windows.Forms.Button btnTownify;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colVisible;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colType;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colTitle;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colFilename;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colGender;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAge;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCategory;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colProduct;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colShoe;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHairtone;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colJewelry;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colDestination;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colSort;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colShown;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colTownie;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colTooltip;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colOutfitData;
     }
 }
 

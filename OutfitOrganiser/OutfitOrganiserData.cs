@@ -40,6 +40,7 @@ namespace OutfitOrganiser
             this.Columns.Add(new DataColumn("Gender", typeof(string)));
             this.Columns.Add(new DataColumn("Age", typeof(string)));
             this.Columns.Add(new DataColumn("Category", typeof(string)));
+            this.Columns.Add(new DataColumn("Product", typeof(string)));
             this.Columns.Add(new DataColumn("Shoe", typeof(string)));
             this.Columns.Add(new DataColumn("Hairtone", typeof(string)));
             this.Columns.Add(new DataColumn("Jewelry", typeof(string)));
