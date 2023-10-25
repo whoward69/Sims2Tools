@@ -57,7 +57,7 @@ namespace BhavFinder
             logger.Info(BhavFinderApp.AppProduct);
 
             InitializeComponent();
-            this.Text = BhavFinderApp.AppName;
+            this.Text = BhavFinderApp.AppTitle;
 
             operands[0] = textOperand0;
             operands[1] = textOperand1;

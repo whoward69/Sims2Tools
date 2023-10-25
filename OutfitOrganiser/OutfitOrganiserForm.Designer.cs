@@ -73,6 +73,10 @@ namespace OutfitOrganiser
             this.menuItemOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowResTitle = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowResFilename = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemShowResProduct = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemAutosetLayer = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAutosetBin = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemPreloadMeshes = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemLoadMeshesNow = new System.Windows.Forms.ToolStripMenuItem();
@@ -93,6 +97,12 @@ namespace OutfitOrganiser
             this.menuContextPkgMerge = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.panelEditor = new System.Windows.Forms.Panel();
+            this.grpMakeup = new System.Windows.Forms.GroupBox();
+            this.comboMakeupSubtype = new System.Windows.Forms.ComboBox();
+            this.comboMakeupLayer = new System.Windows.Forms.ComboBox();
+            this.textMakeupBin = new System.Windows.Forms.TextBox();
+            this.grpProduct = new System.Windows.Forms.GroupBox();
+            this.comboProduct = new System.Windows.Forms.ComboBox();
             this.btnTownify = new System.Windows.Forms.Button();
             this.btnMeshes = new System.Windows.Forms.Button();
             this.grpSort = new System.Windows.Forms.GroupBox();
@@ -112,13 +122,6 @@ namespace OutfitOrganiser
             this.comboGender = new System.Windows.Forms.ComboBox();
             this.grpShown = new System.Windows.Forms.GroupBox();
             this.comboShown = new System.Windows.Forms.ComboBox();
-            this.grpProduct = new System.Windows.Forms.GroupBox();
-            this.comboProduct = new System.Windows.Forms.ComboBox();
-            this.grpShoe = new System.Windows.Forms.GroupBox();
-            this.comboShoe = new System.Windows.Forms.ComboBox();
-            this.grpJewelry = new System.Windows.Forms.GroupBox();
-            this.comboJewelry = new System.Windows.Forms.ComboBox();
-            this.comboDestination = new System.Windows.Forms.ComboBox();
             this.grpAge = new System.Windows.Forms.GroupBox();
             this.ckbAgeYoungAdults = new System.Windows.Forms.CheckBox();
             this.ckbAgeBabies = new System.Windows.Forms.CheckBox();
@@ -128,6 +131,11 @@ namespace OutfitOrganiser
             this.ckbAgeTeens = new System.Windows.Forms.CheckBox();
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.btnSaveAll = new System.Windows.Forms.Button();
+            this.grpShoe = new System.Windows.Forms.GroupBox();
+            this.comboShoe = new System.Windows.Forms.ComboBox();
+            this.grpJewelry = new System.Windows.Forms.GroupBox();
+            this.comboJewelry = new System.Windows.Forms.ComboBox();
+            this.comboDestination = new System.Windows.Forms.ComboBox();
             this.gridResources = new System.Windows.Forms.DataGridView();
             this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -141,12 +149,16 @@ namespace OutfitOrganiser
             this.colHairtone = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colJewelry = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDestination = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMakeupSubtype = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMakeupLayer = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMakeupBin = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSort = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colShown = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTownie = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTooltip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colOutfitData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextResources = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextResRepair = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextResRestore = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuContextResSaveThumb = new System.Windows.Forms.ToolStripMenuItem();
@@ -174,19 +186,20 @@ namespace OutfitOrganiser
             ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).BeginInit();
             this.menuContextPackages.SuspendLayout();
             this.panelEditor.SuspendLayout();
+            this.grpMakeup.SuspendLayout();
+            this.grpProduct.SuspendLayout();
             this.grpSort.SuspendLayout();
             this.grpTooltip.SuspendLayout();
             this.grpCategory.SuspendLayout();
             this.grpGender.SuspendLayout();
             this.grpShown.SuspendLayout();
+            this.grpAge.SuspendLayout();
             this.grpShoe.SuspendLayout();
             this.grpJewelry.SuspendLayout();
-            this.grpAge.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).BeginInit();
             this.menuContextResources.SuspendLayout();
             this.grpHairtone.SuspendLayout();
             this.menuContextFolders.SuspendLayout();
-            this.grpProduct.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -306,7 +319,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitClothing.CheckOnClick = true;
             this.menuItemOutfitClothing.Name = "menuItemOutfitClothing";
             this.menuItemOutfitClothing.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.menuItemOutfitClothing.Size = new System.Drawing.Size(154, 22);
+            this.menuItemOutfitClothing.Size = new System.Drawing.Size(180, 22);
             this.menuItemOutfitClothing.Text = "&Clothing";
             this.menuItemOutfitClothing.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -315,7 +328,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitHair.CheckOnClick = true;
             this.menuItemOutfitHair.Name = "menuItemOutfitHair";
             this.menuItemOutfitHair.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.menuItemOutfitHair.Size = new System.Drawing.Size(154, 22);
+            this.menuItemOutfitHair.Size = new System.Drawing.Size(180, 22);
             this.menuItemOutfitHair.Text = "&Hair";
             this.menuItemOutfitHair.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -324,7 +337,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitAccessory.CheckOnClick = true;
             this.menuItemOutfitAccessory.Name = "menuItemOutfitAccessory";
             this.menuItemOutfitAccessory.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this.menuItemOutfitAccessory.Size = new System.Drawing.Size(154, 22);
+            this.menuItemOutfitAccessory.Size = new System.Drawing.Size(180, 22);
             this.menuItemOutfitAccessory.Text = "&Accessories";
             this.menuItemOutfitAccessory.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -333,7 +346,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitMakeUp.CheckOnClick = true;
             this.menuItemOutfitMakeUp.Name = "menuItemOutfitMakeUp";
             this.menuItemOutfitMakeUp.ShortcutKeys = System.Windows.Forms.Keys.F7;
-            this.menuItemOutfitMakeUp.Size = new System.Drawing.Size(154, 22);
+            this.menuItemOutfitMakeUp.Size = new System.Drawing.Size(180, 22);
             this.menuItemOutfitMakeUp.Text = "&Make-Up";
             this.menuItemOutfitMakeUp.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -422,6 +435,10 @@ namespace OutfitOrganiser
             this.menuItemOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemShowResTitle,
             this.menuItemShowResFilename,
+            this.menuItemShowResProduct,
+            this.toolStripSeparator5,
+            this.menuItemAutosetLayer,
+            this.menuItemAutosetBin,
             this.toolStripSeparator3,
             this.menuItemPreloadMeshes,
             this.menuItemLoadMeshesNow});
@@ -434,7 +451,7 @@ namespace OutfitOrganiser
             // 
             this.menuItemShowResTitle.CheckOnClick = true;
             this.menuItemShowResTitle.Name = "menuItemShowResTitle";
-            this.menuItemShowResTitle.Size = new System.Drawing.Size(205, 22);
+            this.menuItemShowResTitle.Size = new System.Drawing.Size(258, 22);
             this.menuItemShowResTitle.Text = "Show Resource &Title";
             this.menuItemShowResTitle.Click += new System.EventHandler(this.OnShowResTitleClicked);
             // 
@@ -442,28 +459,55 @@ namespace OutfitOrganiser
             // 
             this.menuItemShowResFilename.CheckOnClick = true;
             this.menuItemShowResFilename.Name = "menuItemShowResFilename";
-            this.menuItemShowResFilename.Size = new System.Drawing.Size(205, 22);
+            this.menuItemShowResFilename.Size = new System.Drawing.Size(258, 22);
             this.menuItemShowResFilename.Text = "Show Resource &Filename";
             this.menuItemShowResFilename.Click += new System.EventHandler(this.OnShowResFilenameClicked);
+            // 
+            // menuItemShowResProduct
+            // 
+            this.menuItemShowResProduct.CheckOnClick = true;
+            this.menuItemShowResProduct.Name = "menuItemShowResProduct";
+            this.menuItemShowResProduct.Size = new System.Drawing.Size(258, 22);
+            this.menuItemShowResProduct.Text = "Show Resource &Product";
+            this.menuItemShowResProduct.Click += new System.EventHandler(this.OnShowResProductClicked);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(255, 6);
+            // 
+            // menuItemAutosetLayer
+            // 
+            this.menuItemAutosetLayer.CheckOnClick = true;
+            this.menuItemAutosetLayer.Name = "menuItemAutosetLayer";
+            this.menuItemAutosetLayer.Size = new System.Drawing.Size(258, 22);
+            this.menuItemAutosetLayer.Text = "Auto-set &Layer on Subtype Change";
+            // 
+            // menuItemAutosetBin
+            // 
+            this.menuItemAutosetBin.CheckOnClick = true;
+            this.menuItemAutosetBin.Name = "menuItemAutosetBin";
+            this.menuItemAutosetBin.Size = new System.Drawing.Size(258, 22);
+            this.menuItemAutosetBin.Text = "Auto-set &Bin on Layer Change";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(202, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(255, 6);
             // 
             // menuItemPreloadMeshes
             // 
             this.menuItemPreloadMeshes.CheckOnClick = true;
             this.menuItemPreloadMeshes.Name = "menuItemPreloadMeshes";
-            this.menuItemPreloadMeshes.Size = new System.Drawing.Size(205, 22);
-            this.menuItemPreloadMeshes.Text = "&Preload Meshes";
+            this.menuItemPreloadMeshes.Size = new System.Drawing.Size(258, 22);
+            this.menuItemPreloadMeshes.Text = "Preload &Meshes";
             this.menuItemPreloadMeshes.Click += new System.EventHandler(this.OnPreloadMeshesClicked);
             // 
             // menuItemLoadMeshesNow
             // 
             this.menuItemLoadMeshesNow.Name = "menuItemLoadMeshesNow";
-            this.menuItemLoadMeshesNow.Size = new System.Drawing.Size(205, 22);
-            this.menuItemLoadMeshesNow.Text = "Load &Meshes Now";
+            this.menuItemLoadMeshesNow.Size = new System.Drawing.Size(258, 22);
+            this.menuItemLoadMeshesNow.Text = "Load Meshes &Now";
             this.menuItemLoadMeshesNow.Click += new System.EventHandler(this.OnLoadMeshesNowClicked);
             // 
             // menuItemMode
@@ -653,15 +697,78 @@ namespace OutfitOrganiser
             this.panelEditor.Controls.Add(this.grpCategory);
             this.panelEditor.Controls.Add(this.grpGender);
             this.panelEditor.Controls.Add(this.grpShown);
-            this.panelEditor.Controls.Add(this.grpShoe);
-            this.panelEditor.Controls.Add(this.grpJewelry);
             this.panelEditor.Controls.Add(this.grpAge);
             this.panelEditor.Controls.Add(this.btnSaveAll);
+            this.panelEditor.Controls.Add(this.grpMakeup);
+            this.panelEditor.Controls.Add(this.grpShoe);
+            this.panelEditor.Controls.Add(this.grpJewelry);
             this.panelEditor.Enabled = false;
             this.panelEditor.Location = new System.Drawing.Point(0, 155);
             this.panelEditor.Name = "panelEditor";
             this.panelEditor.Size = new System.Drawing.Size(984, 154);
             this.panelEditor.TabIndex = 26;
+            // 
+            // grpMakeup
+            // 
+            this.grpMakeup.Controls.Add(this.comboMakeupSubtype);
+            this.grpMakeup.Controls.Add(this.comboMakeupLayer);
+            this.grpMakeup.Controls.Add(this.textMakeupBin);
+            this.grpMakeup.Location = new System.Drawing.Point(310, 0);
+            this.grpMakeup.Name = "grpMakeup";
+            this.grpMakeup.Size = new System.Drawing.Size(135, 105);
+            this.grpMakeup.TabIndex = 1;
+            this.grpMakeup.TabStop = false;
+            this.grpMakeup.Text = "Makeup:";
+            // 
+            // comboMakeupSubtype
+            // 
+            this.comboMakeupSubtype.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMakeupSubtype.FormattingEnabled = true;
+            this.comboMakeupSubtype.Location = new System.Drawing.Point(5, 20);
+            this.comboMakeupSubtype.Name = "comboMakeupSubtype";
+            this.comboMakeupSubtype.Size = new System.Drawing.Size(125, 23);
+            this.comboMakeupSubtype.TabIndex = 8;
+            this.comboMakeupSubtype.SelectedIndexChanged += new System.EventHandler(this.OnMakeupSubtypeChanged);
+            // 
+            // comboMakeupLayer
+            // 
+            this.comboMakeupLayer.FormattingEnabled = true;
+            this.comboMakeupLayer.Location = new System.Drawing.Point(5, 49);
+            this.comboMakeupLayer.Name = "comboMakeupLayer";
+            this.comboMakeupLayer.Size = new System.Drawing.Size(125, 23);
+            this.comboMakeupLayer.TabIndex = 8;
+            this.comboMakeupLayer.SelectedIndexChanged += new System.EventHandler(this.OnMakeupLayerChanged);
+            this.comboMakeupLayer.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.comboMakeupLayer.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnMakeupLayerKeyUp);
+            // 
+            // textMakeupBin
+            // 
+            this.textMakeupBin.Location = new System.Drawing.Point(5, 78);
+            this.textMakeupBin.Name = "textMakeupBin";
+            this.textMakeupBin.Size = new System.Drawing.Size(123, 21);
+            this.textMakeupBin.TabIndex = 0;
+            this.textMakeupBin.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.textMakeupBin.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnMakeupBinKeyUp);
+            // 
+            // grpProduct
+            // 
+            this.grpProduct.Controls.Add(this.comboProduct);
+            this.grpProduct.Location = new System.Drawing.Point(595, 55);
+            this.grpProduct.Name = "grpProduct";
+            this.grpProduct.Size = new System.Drawing.Size(135, 50);
+            this.grpProduct.TabIndex = 9;
+            this.grpProduct.TabStop = false;
+            this.grpProduct.Text = "Product:";
+            // 
+            // comboProduct
+            // 
+            this.comboProduct.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboProduct.FormattingEnabled = true;
+            this.comboProduct.Location = new System.Drawing.Point(5, 20);
+            this.comboProduct.Name = "comboProduct";
+            this.comboProduct.Size = new System.Drawing.Size(125, 23);
+            this.comboProduct.TabIndex = 8;
+            this.comboProduct.SelectedIndexChanged += new System.EventHandler(this.OnProductChanged);
             // 
             // btnTownify
             // 
@@ -871,77 +978,6 @@ namespace OutfitOrganiser
             this.comboShown.TabIndex = 7;
             this.comboShown.SelectedIndexChanged += new System.EventHandler(this.OnShownChanged);
             // 
-            // grpProduct
-            // 
-            this.grpProduct.Controls.Add(this.comboProduct);
-            this.grpProduct.Location = new System.Drawing.Point(310, 0);
-            this.grpProduct.Name = "grpProduct";
-            this.grpProduct.Size = new System.Drawing.Size(135, 50);
-            this.grpProduct.TabIndex = 9;
-            this.grpProduct.TabStop = false;
-            this.grpProduct.Text = "Product:";
-            // 
-            // comboProduct
-            // 
-            this.comboProduct.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboProduct.FormattingEnabled = true;
-            this.comboProduct.Location = new System.Drawing.Point(5, 20);
-            this.comboProduct.Name = "comboProduct";
-            this.comboProduct.Size = new System.Drawing.Size(125, 23);
-            this.comboProduct.TabIndex = 8;
-            this.comboProduct.SelectedIndexChanged += new System.EventHandler(this.OnProductChanged);
-            // 
-            // grpShoe
-            // 
-            this.grpShoe.Controls.Add(this.comboShoe);
-            this.grpShoe.Location = new System.Drawing.Point(310, 55);
-            this.grpShoe.Name = "grpShoe";
-            this.grpShoe.Size = new System.Drawing.Size(135, 50);
-            this.grpShoe.TabIndex = 1;
-            this.grpShoe.TabStop = false;
-            this.grpShoe.Text = "Shoe:";
-            // 
-            // comboShoe
-            // 
-            this.comboShoe.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboShoe.FormattingEnabled = true;
-            this.comboShoe.Location = new System.Drawing.Point(5, 20);
-            this.comboShoe.Name = "comboShoe";
-            this.comboShoe.Size = new System.Drawing.Size(125, 23);
-            this.comboShoe.TabIndex = 8;
-            this.comboShoe.SelectedIndexChanged += new System.EventHandler(this.OnShoeChanged);
-            // 
-            // grpJewelry
-            // 
-            this.grpJewelry.Controls.Add(this.comboJewelry);
-            this.grpJewelry.Controls.Add(this.comboDestination);
-            this.grpJewelry.Location = new System.Drawing.Point(310, 55);
-            this.grpJewelry.Name = "grpJewelry";
-            this.grpJewelry.Size = new System.Drawing.Size(135, 80);
-            this.grpJewelry.TabIndex = 1;
-            this.grpJewelry.TabStop = false;
-            this.grpJewelry.Text = "Jewelry:";
-            // 
-            // comboJewelry
-            // 
-            this.comboJewelry.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboJewelry.FormattingEnabled = true;
-            this.comboJewelry.Location = new System.Drawing.Point(5, 20);
-            this.comboJewelry.Name = "comboJewelry";
-            this.comboJewelry.Size = new System.Drawing.Size(125, 23);
-            this.comboJewelry.TabIndex = 8;
-            this.comboJewelry.SelectedIndexChanged += new System.EventHandler(this.OnJewelryChanged);
-            // 
-            // comboDestination
-            // 
-            this.comboDestination.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboDestination.FormattingEnabled = true;
-            this.comboDestination.Location = new System.Drawing.Point(5, 49);
-            this.comboDestination.Name = "comboDestination";
-            this.comboDestination.Size = new System.Drawing.Size(125, 23);
-            this.comboDestination.TabIndex = 8;
-            this.comboDestination.SelectedIndexChanged += new System.EventHandler(this.OnDestinationChanged);
-            // 
             // grpAge
             // 
             this.grpAge.Controls.Add(this.ckbAgeYoungAdults);
@@ -1046,6 +1082,57 @@ namespace OutfitOrganiser
             this.btnSaveAll.UseVisualStyleBackColor = true;
             this.btnSaveAll.Click += new System.EventHandler(this.OnSaveAllClicked);
             // 
+            // grpShoe
+            // 
+            this.grpShoe.Controls.Add(this.comboShoe);
+            this.grpShoe.Location = new System.Drawing.Point(310, 0);
+            this.grpShoe.Name = "grpShoe";
+            this.grpShoe.Size = new System.Drawing.Size(135, 50);
+            this.grpShoe.TabIndex = 1;
+            this.grpShoe.TabStop = false;
+            this.grpShoe.Text = "Shoe:";
+            // 
+            // comboShoe
+            // 
+            this.comboShoe.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboShoe.FormattingEnabled = true;
+            this.comboShoe.Location = new System.Drawing.Point(5, 20);
+            this.comboShoe.Name = "comboShoe";
+            this.comboShoe.Size = new System.Drawing.Size(125, 23);
+            this.comboShoe.TabIndex = 8;
+            this.comboShoe.SelectedIndexChanged += new System.EventHandler(this.OnShoeChanged);
+            // 
+            // grpJewelry
+            // 
+            this.grpJewelry.Controls.Add(this.comboJewelry);
+            this.grpJewelry.Controls.Add(this.comboDestination);
+            this.grpJewelry.Location = new System.Drawing.Point(310, 0);
+            this.grpJewelry.Name = "grpJewelry";
+            this.grpJewelry.Size = new System.Drawing.Size(135, 80);
+            this.grpJewelry.TabIndex = 1;
+            this.grpJewelry.TabStop = false;
+            this.grpJewelry.Text = "Jewelry:";
+            // 
+            // comboJewelry
+            // 
+            this.comboJewelry.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboJewelry.FormattingEnabled = true;
+            this.comboJewelry.Location = new System.Drawing.Point(5, 20);
+            this.comboJewelry.Name = "comboJewelry";
+            this.comboJewelry.Size = new System.Drawing.Size(125, 23);
+            this.comboJewelry.TabIndex = 8;
+            this.comboJewelry.SelectedIndexChanged += new System.EventHandler(this.OnJewelryChanged);
+            // 
+            // comboDestination
+            // 
+            this.comboDestination.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboDestination.FormattingEnabled = true;
+            this.comboDestination.Location = new System.Drawing.Point(5, 49);
+            this.comboDestination.Name = "comboDestination";
+            this.comboDestination.Size = new System.Drawing.Size(125, 23);
+            this.comboDestination.TabIndex = 8;
+            this.comboDestination.SelectedIndexChanged += new System.EventHandler(this.OnDestinationChanged);
+            // 
             // gridResources
             // 
             this.gridResources.AllowUserToAddRows = false;
@@ -1070,6 +1157,9 @@ namespace OutfitOrganiser
             this.colHairtone,
             this.colJewelry,
             this.colDestination,
+            this.colMakeupSubtype,
+            this.colMakeupLayer,
+            this.colMakeupBin,
             this.colSort,
             this.colShown,
             this.colTownie,
@@ -1177,6 +1267,27 @@ namespace OutfitOrganiser
             this.colDestination.Name = "colDestination";
             this.colDestination.ReadOnly = true;
             // 
+            // colMakeupSubtype
+            // 
+            this.colMakeupSubtype.DataPropertyName = "Subtype";
+            this.colMakeupSubtype.HeaderText = "Subtype";
+            this.colMakeupSubtype.Name = "colMakeupSubtype";
+            this.colMakeupSubtype.ReadOnly = true;
+            // 
+            // colMakeupLayer
+            // 
+            this.colMakeupLayer.DataPropertyName = "Layer";
+            this.colMakeupLayer.HeaderText = "Layer";
+            this.colMakeupLayer.Name = "colMakeupLayer";
+            this.colMakeupLayer.ReadOnly = true;
+            // 
+            // colMakeupBin
+            // 
+            this.colMakeupBin.DataPropertyName = "Bin";
+            this.colMakeupBin.HeaderText = "Bin";
+            this.colMakeupBin.Name = "colMakeupBin";
+            this.colMakeupBin.ReadOnly = true;
+            // 
             // colSort
             // 
             this.colSort.DataPropertyName = "Sort";
@@ -1217,15 +1328,23 @@ namespace OutfitOrganiser
             // menuContextResources
             // 
             this.menuContextResources.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuContextResRepair,
             this.menuContextResRestore,
             this.toolStripSeparator4,
             this.menuContextResSaveThumb,
             this.menuContextResReplaceThumb,
             this.menuContextResDeleteThumb});
             this.menuContextResources.Name = "menuContextResources";
-            this.menuContextResources.Size = new System.Drawing.Size(195, 98);
+            this.menuContextResources.Size = new System.Drawing.Size(195, 120);
             this.menuContextResources.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuResourcesOpening);
             this.menuContextResources.Opened += new System.EventHandler(this.OnContextMenuResourcesOpened);
+            // 
+            // menuContextResRepair
+            // 
+            this.menuContextResRepair.Name = "menuContextResRepair";
+            this.menuContextResRepair.Size = new System.Drawing.Size(194, 22);
+            this.menuContextResRepair.Text = "Repair";
+            this.menuContextResRepair.Click += new System.EventHandler(this.OnResRepairClicked);
             // 
             // menuContextResRestore
             // 
@@ -1364,6 +1483,9 @@ namespace OutfitOrganiser
             ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).EndInit();
             this.menuContextPackages.ResumeLayout(false);
             this.panelEditor.ResumeLayout(false);
+            this.grpMakeup.ResumeLayout(false);
+            this.grpMakeup.PerformLayout();
+            this.grpProduct.ResumeLayout(false);
             this.grpSort.ResumeLayout(false);
             this.grpSort.PerformLayout();
             this.grpTooltip.ResumeLayout(false);
@@ -1372,15 +1494,14 @@ namespace OutfitOrganiser
             this.grpCategory.PerformLayout();
             this.grpGender.ResumeLayout(false);
             this.grpShown.ResumeLayout(false);
-            this.grpShoe.ResumeLayout(false);
-            this.grpJewelry.ResumeLayout(false);
             this.grpAge.ResumeLayout(false);
             this.grpAge.PerformLayout();
+            this.grpShoe.ResumeLayout(false);
+            this.grpJewelry.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).EndInit();
             this.menuContextResources.ResumeLayout(false);
             this.grpHairtone.ResumeLayout(false);
             this.menuContextFolders.ResumeLayout(false);
-            this.grpProduct.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1434,6 +1555,10 @@ namespace OutfitOrganiser
         private System.Windows.Forms.GroupBox grpJewelry;
         private System.Windows.Forms.ComboBox comboJewelry;
         private System.Windows.Forms.ComboBox comboDestination;
+        private System.Windows.Forms.GroupBox grpMakeup;
+        private System.Windows.Forms.ComboBox comboMakeupSubtype;
+        private System.Windows.Forms.ComboBox comboMakeupLayer;
+        private System.Windows.Forms.TextBox textMakeupBin;
         private System.Windows.Forms.GroupBox grpAge;
         private System.Windows.Forms.CheckBox ckbAgeYoungAdults;
         private System.Windows.Forms.CheckBox ckbAgeBabies;
@@ -1471,6 +1596,10 @@ namespace OutfitOrganiser
         private System.Windows.Forms.ToolStripMenuItem menuItemOptions;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowResTitle;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowResFilename;
+        private System.Windows.Forms.ToolStripMenuItem menuItemShowResProduct;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAutosetLayer;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAutosetBin;
         private System.Windows.Forms.DataGridViewTextBoxColumn colName;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPackagePath;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPackageIcon;
@@ -1501,11 +1630,15 @@ namespace OutfitOrganiser
         private System.Windows.Forms.DataGridViewTextBoxColumn colHairtone;
         private System.Windows.Forms.DataGridViewTextBoxColumn colJewelry;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDestination;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupSubtype;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupLayer;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupBin;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSort;
         private System.Windows.Forms.DataGridViewTextBoxColumn colShown;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTownie;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTooltip;
         private System.Windows.Forms.DataGridViewTextBoxColumn colOutfitData;
+        private System.Windows.Forms.ToolStripMenuItem menuContextResRepair;
     }
 }
 

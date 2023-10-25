@@ -93,7 +93,7 @@ namespace GeneticsChanger
             logger.Info(GeneticsChangerApp.AppProduct);
 
             InitializeComponent();
-            this.Text = GeneticsChangerApp.AppName;
+            this.Text = GeneticsChangerApp.AppTitle;
 
             GeneticDbpfData.SetCache(packageCache);
 
@@ -242,7 +242,7 @@ namespace GeneticsChanger
                 genetics = " - NOTHING";
             }
 
-            this.Text = $"{GeneticsChangerApp.AppName}{genetics}{displayPath}";
+            this.Text = $"{GeneticsChangerApp.AppTitle}{genetics}{displayPath}";
         }
 
         private void OnExitClicked(object sender, EventArgs e)

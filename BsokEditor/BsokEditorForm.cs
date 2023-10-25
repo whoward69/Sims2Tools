@@ -62,7 +62,7 @@ namespace BsokEditor
             logger.Info(BsokEditorApp.AppProduct);
 
             InitializeComponent();
-            this.Text = BsokEditorApp.AppName;
+            this.Text = BsokEditorApp.AppTitle;
 
             selectPathDialog = new CommonOpenFileDialog
             {
@@ -297,7 +297,7 @@ namespace BsokEditor
 
             this.folder = folder;
 
-            this.Text = $"{BsokEditorApp.AppName} - {(new DirectoryInfo(folder)).FullName}";
+            this.Text = $"{BsokEditorApp.AppTitle} - {(new DirectoryInfo(folder)).FullName}";
             menuItemSelectFolder.Enabled = false;
             menuItemRecentFolders.Enabled = false;
 

@@ -143,7 +143,7 @@ namespace ObjectRelocator
             logger.Info(ObjectRelocatorApp.AppProduct);
 
             InitializeComponent();
-            this.Text = $"{ObjectRelocatorApp.AppName} - {(IsBuyMode ? "Buy" : "Build")} Mode";
+            this.Text = $"{ObjectRelocatorApp.AppTitle} - {(IsBuyMode ? "Buy" : "Build")} Mode";
 
             ObjectDbpfData.SetCache(packageCache);
 
@@ -263,7 +263,7 @@ namespace ObjectRelocator
 
             this.folder = folder;
 
-            this.Text = $"{ObjectRelocatorApp.AppName} - {(IsBuyMode ? "Buy" : "Build")} Mode - {(new DirectoryInfo(folder)).FullName}";
+            this.Text = $"{ObjectRelocatorApp.AppTitle} - {(IsBuyMode ? "Buy" : "Build")} Mode - {(new DirectoryInfo(folder)).FullName}";
             menuItemSelectFolder.Enabled = false;
             menuItemRecentFolders.Enabled = false;
 
@@ -730,7 +730,7 @@ namespace ObjectRelocator
 
             buyMode = !buyMode;
 
-            this.Text = $"{ObjectRelocatorApp.AppName} - {(IsBuyMode ? "Buy" : "Build")} Mode";
+            this.Text = $"{ObjectRelocatorApp.AppTitle} - {(IsBuyMode ? "Buy" : "Build")} Mode";
 
             menuItemBuildMode.Checked = IsBuildMode;
             menuItemBuyMode.Checked = IsBuyMode;

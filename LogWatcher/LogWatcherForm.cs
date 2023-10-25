@@ -32,7 +32,7 @@ namespace LogWatcher
             logger.Info(LogWatcherApp.AppProduct);
 
             InitializeComponent();
-            this.Text = LogWatcherApp.AppName;
+            this.Text = LogWatcherApp.AppTitle;
         }
 
         private void OnLoad(object sender, EventArgs e)
@@ -158,11 +158,11 @@ namespace LogWatcher
         {
             if (tabControl.SelectedTab == null)
             {
-                this.Text = $"{LogWatcherApp.AppName}";
+                this.Text = $"{LogWatcherApp.AppTitle}";
             }
             else
             {
-                this.Text = $"{LogWatcherApp.AppName} - {tabControl.SelectedTab.Text}";
+                this.Text = $"{LogWatcherApp.AppTitle} - {tabControl.SelectedTab.Text}";
             }
         }
 

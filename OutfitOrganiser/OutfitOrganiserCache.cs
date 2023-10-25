@@ -153,11 +153,12 @@ namespace OutfitOrganiser
 
             this.str = (Str)package.GetResourceByKey(idrForBinx.GetItem(binx.GetItem("stringsetidx").UIntegerValue));
 
-            uint outfit = Outfit;
+            uint outfit = OutfitOrParts;
+            uint subtype = Subtype;
             isAccessory = (outfit == 0x20);
             isClothing = (outfit == 0x04 || outfit == 0x08 || outfit == 0x10);
             isHair = (outfit == 0x01);
-            isMakeUp = (outfit == 0x02);
+            isMakeUp = (outfit == 0x02) && (subtype <= 0x07 && subtype != 0x05);
             hasShoe = (outfit == 0x08 || outfit == 0x10);
         }
 
@@ -280,9 +281,31 @@ namespace OutfitOrganiser
             get
             {
                 CpfItem cpfItem = cpf.GetItem("outfit");
-                uint val = (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
+                return (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
+            }
+            set
+            {
+                cpf.GetOrAddItem("outfit", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
+                UpdatePackage();
+            }
+        }
 
-                if (val == 0 && cpf is Xmol) val = 0x20;
+        public uint Parts
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("parts");
+                return (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
+            }
+        }
+
+        public uint OutfitOrParts
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("outfit") ?? cpf.GetItem("parts");
+
+                uint val = (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
 
                 return val;
             }
@@ -449,6 +472,48 @@ namespace OutfitOrganiser
                 {
                     logger.Warn($"No 'binidx' entry for {cpf}");
                 }
+            }
+        }
+
+        public uint Subtype
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("subtype");
+                return (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
+            }
+            set
+            {
+                cpf.GetOrAddItem("subtype", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
+                UpdatePackage();
+            }
+        }
+
+        public uint Layer
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("layer");
+                return (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
+            }
+            set
+            {
+                cpf.GetOrAddItem("layer", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
+                UpdatePackage();
+            }
+        }
+
+        public uint Bin
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("bin");
+                return (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
+            }
+            set
+            {
+                cpf.GetOrAddItem("bin", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
+                UpdatePackage();
             }
         }
 

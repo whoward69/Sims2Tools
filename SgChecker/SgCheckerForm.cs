@@ -78,7 +78,7 @@ namespace SgChecker
             logger.Info(SgCheckerApp.AppProduct);
 
             InitializeComponent();
-            this.Text = SgCheckerApp.AppName;
+            this.Text = SgCheckerApp.AppTitle;
 
             selectPathDialog = new CommonOpenFileDialog
             {

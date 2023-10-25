@@ -69,7 +69,7 @@ namespace HcduPlus
             logger.Info(HcduPlusApp.AppProduct);
 
             InitializeComponent();
-            this.Text = HcduPlusApp.AppName;
+            this.Text = HcduPlusApp.AppTitle;
 
             selectPathDialog = new CommonOpenFileDialog
             {

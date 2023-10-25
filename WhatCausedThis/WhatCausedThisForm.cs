@@ -57,7 +57,7 @@ namespace WhatCausedThis
             logger.Info(WhatCausedThisApp.AppProduct);
 
             InitializeComponent();
-            this.Text = WhatCausedThisApp.AppName;
+            this.Text = WhatCausedThisApp.AppTitle;
 
             selectPathDialog = new CommonOpenFileDialog
             {

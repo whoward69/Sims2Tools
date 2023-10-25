@@ -103,7 +103,7 @@ namespace HoodExporter
             logger.Info(HoodExporterApp.AppProduct);
 
             InitializeComponent();
-            this.Text = HoodExporterApp.AppName;
+            this.Text = HoodExporterApp.AppTitle;
 
             selectPathDialog = new CommonOpenFileDialog
             {
@@ -1185,11 +1185,11 @@ namespace HoodExporter
 
             if (menuItem == menuItemXsltNone)
             {
-                this.Text = $"{HoodExporterApp.AppName}";
+                this.Text = $"{HoodExporterApp.AppTitle}";
             }
             else
             {
-                this.Text = $"{HoodExporterApp.AppName} - {menuItem.Text}";
+                this.Text = $"{HoodExporterApp.AppTitle} - {menuItem.Text}";
             }
         }
     }

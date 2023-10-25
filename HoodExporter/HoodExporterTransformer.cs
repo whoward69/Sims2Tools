@@ -30,8 +30,6 @@ namespace HoodExporter
     {
         public static string extnUri = "http://picknmixmods.com/Sims2Tools/SaxonExtns";
 
-        private readonly Uri baseUri;
-
         // See https://www.saxonica.com/html/documentation10/dotnetdoc/Saxon/Api/Processor.html
         private readonly Processor processor;
         private readonly Dictionary<QName, XdmValue> xsltParams = new Dictionary<QName, XdmValue>(2);
@@ -48,8 +46,6 @@ namespace HoodExporter
 
         public HoodExporterTransformer(String exportPath)
         {
-            baseUri = new Uri($"file:////{exportPath}");
-
             processor = new Processor();
             // String saxonEd = processor.Edition;
 
@@ -63,7 +59,7 @@ namespace HoodExporter
             processor.RegisterExtensionFunction(new AsObjectDescDefn());
 
             compiler = processor.NewXsltCompiler();
-            compiler.BaseUri = baseUri;
+            compiler.BaseUri = new Uri($"file:////{exportPath}");
         }
 
         public XmlElement Transform(XmlElement rootElement, string xslPath)
@@ -77,7 +73,7 @@ namespace HoodExporter
 
             Xslt30Transformer transformer30 = compiler.Compile(new XmlTextReader(File.OpenRead(xslPath))).Load30();
             transformer30.SetStylesheetParameters(xsltParams);
-            transformer30.BaseOutputURI = baseUri.ToString();
+            transformer30.BaseOutputURI = compiler.BaseUri.ToString().Replace(" ", "%20");
 
             transformer30.ResultDocumentHandler = this;
             transformer30.ApplyTemplates(input, output);
@@ -101,7 +97,9 @@ namespace HoodExporter
 
         public XmlDestination HandleResultDocument(string href, Uri baseUri)
         {
-            Serializer s = processor.NewSerializer(new FileStream($"{baseUri.AbsolutePath}/{href}", FileMode.Create, FileAccess.Write));
+            string fullpath = $"{baseUri.LocalPath}\\{href}";
+
+            Serializer s = processor.NewSerializer(new FileStream(fullpath, FileMode.Create, FileAccess.Write));
 
             resultDocs.Add(s);
 

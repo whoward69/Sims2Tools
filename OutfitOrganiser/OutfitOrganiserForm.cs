@@ -142,6 +142,27 @@ namespace OutfitOrganiser
             new UintNamedValue("Mountain", 0xD327EED6),
             new UintNamedValue("Collectible", 0xB343967F)
         };
+
+        private readonly UintNamedValue[] makeupSubtypeItems = {
+            new UintNamedValue("Facial Hair", 0x00000000),
+            new UintNamedValue("Eyebrows", 0x00000001),
+            new UintNamedValue("Lipstick", 0x00000002),
+            new UintNamedValue("Eye Colours", 0x00000003),
+            new UintNamedValue("Face Paint", 0x00000004),
+            new UintNamedValue("Blush", 0x00000006),
+            new UintNamedValue("Eyeshadow", 0x00000007)
+        };
+
+        private readonly UintNamedValue[] makeupLayerItems = {
+            new UintNamedValue("Lipstick", 0x00000000),
+            new UintNamedValue("Blush", 0x00000014),
+            new UintNamedValue("Eyeshadow", 0x0000001E),
+            new UintNamedValue("Eyeliner", 0x00000028),
+            new UintNamedValue("Face Paint", 0x00000032),
+            new UintNamedValue("Stubble", 0x0000003C),
+            new UintNamedValue("Beard", 0x00000046),
+            new UintNamedValue("Eyebrows", 0x00000050)
+        };
         #endregion
 
         private bool dataLoading = false;
@@ -155,7 +176,7 @@ namespace OutfitOrganiser
             logger.Info(OutfitOrganiserApp.AppProduct);
 
             InitializeComponent();
-            this.Text = OutfitOrganiserApp.AppName;
+            this.Text = OutfitOrganiserApp.AppTitle;
 
             OutfitDbpfData.SetCache(packageCache);
 
@@ -187,6 +208,12 @@ namespace OutfitOrganiser
 
                 comboDestination.Items.Clear();
                 comboDestination.Items.AddRange(destinationItems);
+
+                comboMakeupSubtype.Items.Clear();
+                comboMakeupSubtype.Items.AddRange(makeupSubtypeItems);
+
+                comboMakeupLayer.Items.Clear();
+                comboMakeupLayer.Items.AddRange(makeupLayerItems);
 
                 dataLoading = false;
             }
@@ -223,8 +250,12 @@ namespace OutfitOrganiser
             menuItemOutfitAccessory.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitAccessory.Name, 0) != 0);
             menuItemOutfitMakeUp.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitMakeUp.Name, 0) != 0);
 
-            menuItemShowResTitle.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, 1) != 0); OnShowResTitleClicked(menuItemShowResFilename, null);
+            menuItemShowResTitle.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, 1) != 0); OnShowResTitleClicked(menuItemShowResTitle, null);
             menuItemShowResFilename.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, 1) != 0); OnShowResFilenameClicked(menuItemShowResFilename, null);
+            menuItemShowResProduct.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResProduct.Name, 1) != 0); OnShowResProductClicked(menuItemShowResProduct, null);
+
+            menuItemAutosetLayer.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetLayer.Name, 1) != 0);
+            menuItemAutosetBin.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetBin.Name, 1) != 0);
 
             menuItemPreloadMeshes.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, 0) != 0);
 
@@ -290,6 +321,10 @@ namespace OutfitOrganiser
 
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResProduct.Name, menuItemShowResProduct.Checked ? 1 : 0);
+
+            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetLayer.Name, menuItemAutosetLayer.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetBin.Name, menuItemAutosetBin.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
 
@@ -329,7 +364,7 @@ namespace OutfitOrganiser
                 outfits = " - NOTHING";
             }
 
-            this.Text = $"{OutfitOrganiserApp.AppName}{outfits}{displayPath}";
+            this.Text = $"{OutfitOrganiserApp.AppTitle}{outfits}{displayPath}";
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -577,35 +612,37 @@ namespace OutfitOrganiser
                                     row["Hairtone"] = "";
                                     row["Jewelry"] = "";
                                     row["Destination"] = "";
+                                    row["Subtype"] = "";
+                                    row["Layer"] = "";
+                                    row["Bin"] = "";
 
-                                    switch (outfitData.Outfit)
+                                    row["Type"] = BuildTypeString(outfitData);
+
+                                    switch (outfitData.OutfitOrParts)
                                     {
                                         case 0x01:
-                                            row["Type"] = "Hair";
                                             row["Visible"] = menuItemOutfitHair.Checked ? "Yes" : "No";
                                             row["Hairtone"] = BuildHairString(outfitData.Hairtone);
                                             break;
                                         case 0x02:
-                                            row["Type"] = "Make-Up";
                                             row["Visible"] = menuItemOutfitMakeUp.Checked ? "Yes" : "No";
+                                            row["Subtype"] = BuildMakeupSubtypeString(outfitData.Subtype);
+                                            row["Layer"] = BuildMakeupLayerString(outfitData.Layer);
+                                            row["Bin"] = outfitData.Bin;
                                             break;
                                         case 0x04:
-                                            row["Type"] = "Clothes - Top";
                                             row["Visible"] = menuItemOutfitClothing.Checked ? "Yes" : "No";
                                             row["Shoe"] = "N/A";
                                             break;
                                         case 0x08:
-                                            row["Type"] = "Clothes - Full";
                                             row["Visible"] = menuItemOutfitClothing.Checked ? "Yes" : "No";
                                             row["Shoe"] = BuildShoeString(outfitData.Shoe);
                                             break;
                                         case 0x10:
-                                            row["Type"] = "Clothes - Bottom";
                                             row["Visible"] = menuItemOutfitClothing.Checked ? "Yes" : "No";
                                             row["Shoe"] = BuildShoeString(outfitData.Shoe);
                                             break;
                                         case 0x20:
-                                            row["Type"] = "Accessory";
                                             row["Visible"] = menuItemOutfitAccessory.Checked ? "Yes" : "No";
                                             row["Jewelry"] = BuildJewelryString(outfitData.Jewelry);
                                             row["Destination"] = BuildDestinationString(outfitData.Destination);
@@ -774,6 +811,11 @@ namespace OutfitOrganiser
             gridResources.Columns["colJewelry"].Visible = menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
             gridResources.Columns["colDestination"].Visible = gridResources.Columns["colJewelry"].Visible;
             grpJewelry.Visible = gridResources.Columns["colJewelry"].Visible;
+
+            gridResources.Columns["colMakeupSubtype"].Visible = menuItemOutfitMakeUp.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitAccessory.Checked;
+            gridResources.Columns["colMakeupLayer"].Visible = gridResources.Columns["colMakeupSubtype"].Visible;
+            gridResources.Columns["colMakeupBin"].Visible = gridResources.Columns["colMakeupSubtype"].Visible;
+            grpMakeup.Visible = gridResources.Columns["colMakeupSubtype"].Visible;
 
             gridResources.Columns["colTownie"].Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
 
@@ -1211,6 +1253,12 @@ namespace OutfitOrganiser
             gridResources.Columns["colFilename"].Visible = menuItemShowResFilename.Checked;
         }
 
+        private void OnShowResProductClicked(object sender, EventArgs e)
+        {
+            gridResources.Columns["colProduct"].Visible = menuItemShowResProduct.Checked;
+            grpProduct.Visible = menuItemShowResProduct.Checked;
+        }
+
         private void OnLoadMeshesNowClicked(object sender, EventArgs e)
         {
             CacheMeshes();
@@ -1350,6 +1398,40 @@ namespace OutfitOrganiser
         #endregion
 
         #region Resource Grid Row Fill
+        private string BuildTypeString(OutfitDbpfData outfitData)
+        {
+            string type = "";
+
+            switch (outfitData.OutfitOrParts)
+            {
+                case 0x01:
+                    type = "Hair";
+                    break;
+                case 0x02:
+                    type = "Make-Up";
+                    break;
+                case 0x04:
+                    type = "Clothes - Top";
+                    break;
+                case 0x08:
+                    type = "Clothes - Full";
+                    break;
+                case 0x10:
+                    type = "Clothes - Bottom";
+                    break;
+                case 0x20:
+                    type = "Accessory";
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(type) && outfitData.Outfit == 0)
+            {
+                type = $"{type}!!!";
+            }
+
+            return type;
+        }
+
         private string BuildTownieString(OutfitDbpfData outfitData)
         {
             string townie = "No";
@@ -1661,6 +1743,79 @@ namespace OutfitOrganiser
             return destination;
         }
 
+        private string BuildMakeupSubtypeString(uint value)
+        {
+            string subtype;
+
+            switch (value)
+            {
+                case 0x00000000:
+                    subtype = "Facial Hair";
+                    break;
+                case 0x00000001:
+                    subtype = "Eyebrows";
+                    break;
+                case 0x00000002:
+                    subtype = "Lipstick";
+                    break;
+                case 0x00000003:
+                    subtype = "Eye Colours";
+                    break;
+                case 0x00000004:
+                    subtype = "Face Paint";
+                    break;
+                case 0x00000006:
+                    subtype = "Blush";
+                    break;
+                case 0x00000007:
+                    subtype = "Eyeshadow";
+                    break;
+                default:
+                    subtype = Helper.Hex4PrefixString(value);
+                    break;
+            }
+
+            return subtype;
+        }
+
+        private string BuildMakeupLayerString(uint value)
+        {
+            string layer;
+
+            switch (value)
+            {
+                case 0x00000000:
+                    layer = "Lipstick";
+                    break;
+                case 0x00000014:
+                    layer = "Blush";
+                    break;
+                case 0x0000001E:
+                    layer = "Eyeshadow";
+                    break;
+                case 0x00000028:
+                    layer = "Eyeliner";
+                    break;
+                case 0x00000032:
+                    layer = "Face Paint";
+                    break;
+                case 0x0000003C:
+                    layer = "Stubble";
+                    break;
+                case 0x00000046:
+                    layer = "Beard";
+                    break;
+                case 0x00000050:
+                    layer = "Eyebrows";
+                    break;
+                default:
+                    layer = value.ToString();
+                    break;
+            }
+
+            return layer;
+        }
+
         private string BuildTooltipString(OutfitDbpfData outfitData, string data)
         {
             string tooltip = "";
@@ -1736,6 +1891,8 @@ namespace OutfitOrganiser
             {
                 if ((row.Cells["colOutfitData"].Value as OutfitDbpfData).Equals(outfitData))
                 {
+                    row.Cells["colType"].Value = BuildTypeString(outfitData);
+
                     row.Cells["colShown"].Value = BuildShownString(outfitData.Shown);
 
                     row.Cells["colTownie"].Value = BuildTownieString(outfitData);
@@ -1753,6 +1910,13 @@ namespace OutfitOrganiser
                     {
                         row.Cells["colJewelry"].Value = BuildJewelryString(outfitData.Jewelry);
                         row.Cells["colDestination"].Value = BuildDestinationString(outfitData.Destination);
+                    }
+
+                    if (outfitData.IsMakeUp)
+                    {
+                        row.Cells["colMakeupSubtype"].Value = BuildMakeupSubtypeString(outfitData.Subtype);
+                        row.Cells["colMakeupLayer"].Value = BuildMakeupLayerString(outfitData.Layer);
+                        row.Cells["colMakeupBin"].Value = outfitData.Bin;
                     }
 
                     row.Cells["colTooltip"].Value = outfitData.Tooltip;
@@ -1852,6 +2016,9 @@ namespace OutfitOrganiser
                 case "age":
                     outfitData.Age = data;
                     break;
+                case "bin":
+                    if (outfitData.IsMakeUp) outfitData.Bin = data;
+                    break;
                 case "category":
                     outfitData.Category = data;
                     break;
@@ -1863,6 +2030,12 @@ namespace OutfitOrganiser
                     break;
                 case "jewelry":
                     if (outfitData.IsAccessory) outfitData.Jewelry = data;
+                    break;
+                case "layer":
+                    if (outfitData.IsMakeUp) outfitData.Layer = data;
+                    break;
+                case "outfit":
+                    outfitData.Outfit = data;
                     break;
                 case "product":
                     outfitData.Product = data;
@@ -1877,8 +2050,16 @@ namespace OutfitOrganiser
                 case "sortindex":
                     outfitData.SortIndex = data;
                     break;
+                case "subtype":
+                    if (outfitData.IsMakeUp) outfitData.Subtype = data;
+                    break;
                 default:
                     throw new ArgumentException($"Unknown uint named value '{name}'={data}");
+            }
+
+            if (outfitData.Outfit == 0)
+            {
+                outfitData.Outfit = outfitData.Parts;
             }
 
             UpdateGridRow(outfitData);
@@ -1905,7 +2086,7 @@ namespace OutfitOrganiser
         #endregion
 
         #region Editor
-        private uint cachedShownValue, cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedProductValue, cachedShoeValue, cachedJewelryValue, cachedDestinationValue, cachedSortValue;
+        private uint cachedShownValue, cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedProductValue, cachedShoeValue, cachedJewelryValue, cachedDestinationValue, cachedMakeupSubtypeValue, cachedMakeupLayerValue, cachedMakeupBinValue, cachedSortValue;
         // private string cachedHairtoneValue;
 
         private void ClearEditor()
@@ -1938,6 +2119,9 @@ namespace OutfitOrganiser
             // comboHairtone.SelectedIndex = -1;
             comboJewelry.SelectedIndex = -1;
             comboDestination.SelectedIndex = -1;
+            comboMakeupSubtype.SelectedIndex = -1;
+            comboMakeupLayer.SelectedIndex = -1;
+            textMakeupBin.Text = "";
 
             textTooltip.Text = "";
             textSort.Text = "";
@@ -2171,6 +2355,68 @@ namespace OutfitOrganiser
                 }
             }
 
+            uint newMakeupSubtypeValue = outfitData.Subtype;
+            if (append)
+            {
+                if (cachedMakeupSubtypeValue != newMakeupSubtypeValue)
+                {
+                    comboMakeupSubtype.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                cachedMakeupSubtypeValue = newMakeupSubtypeValue;
+                comboMakeupSubtype.SelectedIndex = 0;
+
+                foreach (Object o in comboMakeupSubtype.Items)
+                {
+                    if ((o as UintNamedValue).Value == cachedMakeupSubtypeValue)
+                    {
+                        comboMakeupSubtype.SelectedItem = o;
+                        break;
+                    }
+                }
+            }
+
+            uint newMakeupLayerValue = outfitData.Layer;
+            if (append)
+            {
+                if (cachedMakeupLayerValue != newMakeupLayerValue)
+                {
+                    comboMakeupLayer.SelectedIndex = -1;
+                }
+            }
+            else
+            {
+                cachedMakeupLayerValue = newMakeupLayerValue;
+                comboMakeupLayer.SelectedIndex = -1;
+                comboMakeupLayer.Text = newMakeupLayerValue.ToString();
+
+                foreach (Object o in comboMakeupLayer.Items)
+                {
+                    if ((o as UintNamedValue).Value == cachedMakeupLayerValue)
+                    {
+                        comboMakeupLayer.SelectedItem = o;
+                        break;
+                    }
+                }
+            }
+
+            uint newMakeupBinValue = outfitData.Bin;
+            if (append)
+            {
+                if (cachedMakeupBinValue != newMakeupBinValue)
+                {
+                    textMakeupBin.Text = "";
+                }
+            }
+            else
+            {
+                cachedMakeupBinValue = newMakeupBinValue;
+
+                textMakeupBin.Text = newMakeupBinValue.ToString();
+            }
+
             if (append)
             {
                 if (!textTooltip.Text.Equals(outfitData.Tooltip))
@@ -2265,6 +2511,98 @@ namespace OutfitOrganiser
             }
         }
 
+        private void OnMakeupSubtypeChanged(object sender, EventArgs e)
+        {
+            if (comboMakeupSubtype.SelectedIndex != -1)
+            {
+                if (IsAutoUpdate)
+                {
+                    uint subtype = (comboMakeupSubtype.SelectedItem as UintNamedValue).Value;
+                    UpdateSelectedRows(subtype, "subtype");
+
+                    if (menuItemAutosetLayer.Checked)
+                    {
+                        int layerIndex = -1;
+                        switch (subtype)
+                        {
+                            case 0x00000000: // Facial Hair
+                                layerIndex = 5;
+                                break;
+                            case 0x00000001: // Eyebrows
+                                layerIndex = 7;
+                                break;
+                            case 0x00000002: // Lipstick
+                                layerIndex = 0;
+                                break;
+                            case 0x00000003: // Eye Colors
+                                             // Ummmmm ...
+                                break;
+                            case 0x00000004: // Face Paint
+                                layerIndex = 4;
+                                break;
+                            case 0x00000006: // Blush
+                                layerIndex = 1;
+                                break;
+                            case 0x00000007: // Eyeshadow
+                                layerIndex = 2;
+                                break;
+                        }
+
+                        comboMakeupLayer.SelectedIndex = layerIndex;
+                    }
+                }
+            }
+        }
+
+        private void OnMakeupLayerChanged(object sender, EventArgs e)
+        {
+            if (comboMakeupLayer.SelectedIndex != -1)
+            {
+                if (IsAutoUpdate)
+                {
+                    uint layer = (comboMakeupLayer.SelectedItem as UintNamedValue).Value;
+                    UpdateSelectedRows(layer, "layer");
+
+                    if (menuItemAutosetBin.Checked)
+                    {
+                        uint bin = 0x00;
+                        switch (layer)
+                        {
+                            case 0x00000000: // Lipstick
+                                bin = 0x0A;
+                                break;
+                            case 0x00000014: // Blush
+                                bin = 0x08;
+                                break;
+                            case 0x0000001E: // Eyeshadow
+                                bin = 0x07;
+                                break;
+                            case 0x00000028: // Eyeliner
+                                bin = 0x06;
+                                break;
+                            case 0x00000032: // Face Paint
+                                bin = 0x14;
+                                break;
+                            case 0x0000003C: // Stubble
+                                bin = 0x01;
+                                break;
+                            case 0x00000046: // Beard
+                                bin = 0x02;
+                                break;
+                            case 0x00000050: // Eyebrows
+                                bin = 0x03;
+                                break;
+                        }
+
+                        if (bin != 0x00)
+                        {
+                            textMakeupBin.Text = bin.ToString();
+                            UpdateSelectedRows(bin, "bin");
+                        }
+                    }
+                }
+            }
+        }
         #endregion
 
         #region Checkbox Events
@@ -2376,6 +2714,58 @@ namespace OutfitOrganiser
                 }
 
                 if (IsAutoUpdate && textSort.Text.Length > 0) UpdateSelectedRows(data, "sortindex");
+
+                e.Handled = true;
+            }
+        }
+
+        private void OnMakeupLayerKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (IsAutoUpdate)
+                {
+                    if (comboMakeupLayer.SelectedItem == null)
+                    {
+                        uint data = 0;
+
+                        if (!(comboMakeupLayer.Text.Length > 0 && UInt32.TryParse(comboMakeupLayer.Text, out data)))
+                        {
+                            comboMakeupLayer.Text = data.ToString();
+                        }
+
+                        foreach (UintNamedValue item in makeupLayerItems)
+                        {
+                            if (item.Value == data)
+                            {
+                                comboMakeupLayer.SelectedItem = item;
+
+                                e.Handled = true;
+                                return;
+                            }
+                        }
+
+                        UpdateSelectedRows(data, "layer");
+                    }
+                }
+
+                e.Handled = true;
+            }
+        }
+
+        private void OnMakeupBinKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                uint data = 0;
+
+                if (textMakeupBin.Text.Length > 0 && !UInt32.TryParse(textMakeupBin.Text, out data))
+                {
+                    textMakeupBin.Text = "0";
+                    data = 0;
+                }
+
+                if (IsAutoUpdate && textMakeupBin.Text.Length > 0) UpdateSelectedRows(data, "bin");
 
                 e.Handled = true;
             }
@@ -2546,14 +2936,22 @@ namespace OutfitOrganiser
 
                     menuContextResSaveThumb.Enabled = menuContextResReplaceThumb.Enabled = menuContextResDeleteThumb.Enabled = ((cigenCache != null) && (gridResources.SelectedRows.Count == 1) && (thumbnail != null));
 
+                    menuContextResRepair.Enabled = false;
                     menuContextResRestore.Enabled = false;
 
                     foreach (DataGridViewRow selectedRow in gridResources.SelectedRows)
                     {
-                        if ((selectedRow.Cells["colOutfitData"].Value as OutfitDbpfData).IsDirty)
+                        if (selectedRow.Cells["colOutfitData"].Value is OutfitDbpfData rowOutfitData)
                         {
-                            menuContextResRestore.Enabled = true;
-                            break;
+                            if (rowOutfitData.Outfit == 0)
+                            {
+                                menuContextResRepair.Enabled = true;
+                            }
+
+                            if (rowOutfitData.IsDirty)
+                            {
+                                menuContextResRestore.Enabled = true;
+                            }
                         }
                     }
 
@@ -2568,6 +2966,35 @@ namespace OutfitOrganiser
         private void OnContextMenuResourcesOpened(object sender, EventArgs e)
         {
             thumbBox.Visible = false;
+        }
+
+        private void OnResRepairClicked(object sender, EventArgs e)
+        {
+            List<OutfitDbpfData> selectedData = new List<OutfitDbpfData>();
+
+            foreach (DataGridViewRow row in gridResources.SelectedRows)
+            {
+                OutfitDbpfData outfitData = row.Cells["colOutfitData"].Value as OutfitDbpfData;
+
+                if (outfitData.Outfit == 0)
+                {
+                    selectedData.Add(outfitData);
+                }
+            }
+
+            foreach (OutfitDbpfData outfitData in selectedData)
+            {
+                foreach (DataGridViewRow row in gridResources.Rows)
+                {
+                    if ((row.Cells["colOutfitData"].Value as OutfitDbpfData).Equals(outfitData))
+                    {
+                        UpdateOutfitData(outfitData, "outfit", outfitData.Parts);
+                    }
+
+                }
+            }
+
+            ReselectResourceRows(selectedData);
         }
 
         private void OnResRevertClicked(object sender, EventArgs e)
@@ -2605,6 +3032,8 @@ namespace OutfitOrganiser
                     }
                 }
             }
+
+            ReselectResourceRows(selectedData);
         }
 
         private void OnResSaveThumbClicked(object sender, EventArgs e)
@@ -2822,7 +3251,7 @@ namespace OutfitOrganiser
                     {
                         if (package.Update(menuItemAutoBackup.Checked) == null)
                         {
-                            MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!", "Package Update Error!");
+                            MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!\n\nChanges are in the associated .temp file.", "Package Update Error!");
                         }
 
                         // Do this regardless, as the failed Update() will have written a temp/backup file and re-opened the locked file.

@@ -64,7 +64,7 @@ namespace DbpfViewer
             logger.Info(DbpfViewerApp.AppProduct);
 
             InitializeComponent();
-            this.Text = DbpfViewerApp.AppName;
+            this.Text = DbpfViewerApp.AppTitle;
 
             gridResources.DataSource = dbpfData;
         }
@@ -453,7 +453,7 @@ namespace DbpfViewer
         {
             this.packageFile = packageFile;
 
-            this.Text = $"{DbpfViewerApp.AppName} - {(new FileInfo(packageFile)).Name}";
+            this.Text = $"{DbpfViewerApp.AppTitle} - {(new FileInfo(packageFile)).Name}";
             menuItemReloadPackage.Enabled = false;
             menuItemSelectPackage.Enabled = false;
             menuItemRecentPackages.Enabled = false;
