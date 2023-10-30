@@ -233,7 +233,7 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
             unknown1 = reader.ReadUInt16();
             unknown2 = reader.ReadUInt16();
 
-            // TGIR of the owning resource, have seen AGED (skins) and GZPS (clothing) types, but probably more
+            // TGIR of the owning resource, have seen AGED (skins), GZPS (clothing), XTOL (hair) and XMOL (makeup) types, but probably more
             ownerKey = new DBPFKey(reader.ReadTypeId(), reader.ReadGroupId(), reader.ReadInstanceId(), reader.ReadResourceId());
 
             // We're expecting an IMG resource now

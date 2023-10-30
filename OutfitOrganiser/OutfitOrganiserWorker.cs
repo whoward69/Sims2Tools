@@ -26,10 +26,10 @@ namespace OutfitOrganiser
         public bool UpdatePackages => updatePackages;
         public bool UpdateResources => updateResources;
 
-        public WorkerPackage(string folder, bool updateFolder, bool updatePackages, bool updateResources)
+        public WorkerPackage(string folder, bool updateFolders, bool updatePackages, bool updateResources)
         {
             this.folder = folder;
-            this.updateFolders = updateFolder;
+            this.updateFolders = updateFolders;
             this.updatePackages = updatePackages;
             this.updateResources = updateResources;
         }

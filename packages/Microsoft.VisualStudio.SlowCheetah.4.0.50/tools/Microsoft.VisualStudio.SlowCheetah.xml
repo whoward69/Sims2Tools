@@ -1,0 +1,446 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.VisualStudio.SlowCheetah</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.TransformTask">
+            <summary>
+            Task that performs the transformation of the XML file.
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.TransformTask.Source">
+            <summary>
+            Gets or sets the source file path for the transformation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.TransformTask.Transform">
+            <summary>
+            Gets or sets the transformation file path.
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.TransformTask.Destination">
+            <summary>
+            Gets or sets the destination path for the transformation.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformTask.Execute">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.Exceptions.TransformFailedException">
+            <summary>
+            Exception thrown on transformation failure.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.Exceptions.TransformFailedException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.Exceptions.TransformFailedException" /> class.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.Exceptions.TransformFailedException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.Exceptions.TransformFailedException" /> class.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+            <param name="inner">The exception that is the cause of the current exception, or a null reference if no inner exception is specified.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.Exceptions.TransformFailedException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.Exceptions.TransformFailedException" /> class.
+            </summary>
+            <param name="info">The System.Runtime.Serialization.SerializationInfo that holds the serialized object data about the exception being thrown.</param>
+            <param name="context">The System.Runtime.Serialization.StreamingContext that contains contextual information about the source or destination.</param>
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.LogMessageImportance">
+            <summary>
+            Importance of a message.
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.SlowCheetah.LogMessageImportance.High">
+            <summary>
+            High importace. Prioritize
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.SlowCheetah.LogMessageImportance.Normal">
+            <summary>
+            Normal importance.
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.SlowCheetah.LogMessageImportance.Low">
+            <summary>
+            Low Importance. Do not show if unnecessary
+            </summary>
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.ITransformationLogger">
+            <summary>
+            Interface for using an internal logger in an <see cref="T:Microsoft.VisualStudio.SlowCheetah.ITransformer" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformationLogger.LogError(System.String,System.Object[])">
+            <summary>
+            Log an error.
+            </summary>
+            <param name="message">The error message.</param>
+            <param name="messageArgs">Optional message arguments.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformationLogger.LogError(System.String,System.Int32,System.Int32,System.String,System.Object[])">
+            <summary>
+            Log an error specifying the file, line and position.
+            </summary>
+            <param name="file">The file containing the error.</param>
+            <param name="lineNumber">Line of the error.</param>
+            <param name="linePosition">Position of the error.</param>
+            <param name="message">The error message.</param>
+            <param name="messageArgs">Optional message arguments.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformationLogger.LogErrorFromException(System.Exception)">
+            <summary>
+            Logs an error from an exception.
+            </summary>
+            <param name="ex">The exception.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformationLogger.LogErrorFromException(System.Exception,System.String,System.Int32,System.Int32)">
+            <summary>
+            Logs an error from an exception specifying the file, line number and position.
+            </summary>
+            <param name="ex">The exception.</param>
+            <param name="file">The file containing the error.</param>
+            <param name="lineNumber">Line of the error.</param>
+            <param name="linePosition">Position of the error.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformationLogger.LogMessage(Microsoft.VisualStudio.SlowCheetah.LogMessageImportance,System.String,System.Object[])">
+            <summary>
+            Log a message.
+            </summary>
+            <param name="importance">Importance of the message.</param>
+            <param name="message">The message.</param>
+            <param name="messageArgs">Optional message arguments.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformationLogger.LogWarning(System.String,System.Object[])">
+            <summary>
+            Log a warning.
+            </summary>
+            <param name="message">The warning message.</param>
+            <param name="messageArgs">Optional message arguments.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformationLogger.LogWarning(System.String,System.Int32,System.Int32,System.String,System.Object[])">
+            <summary>
+            Log a warning specifying the file, line and position.
+            </summary>
+            <param name="file">The file containing the warning.</param>
+            <param name="lineNumber">Line of the warning.</param>
+            <param name="linePosition">Position of the error.</param>
+            <param name="message">The warning message.</param>
+            <param name="messageArgs">Optional message arguments.</param>
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger">
+            <summary>
+            Shim for using <see cref="T:Microsoft.VisualStudio.SlowCheetah.ITransformationLogger" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger.#ctor(Microsoft.VisualStudio.SlowCheetah.ITransformationLogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger" /> class.
+            </summary>
+            <param name="logger">Our own logger.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger.LogError(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger.LogError(System.String,System.String,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger.LogErrorFromException(System.Exception)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger.LogErrorFromException(System.Exception,System.String,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger.LogMessage(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger.LogMessage(System.String,System.String,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger.LogWarning(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger.LogWarning(System.String,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonShimLogger.LogWarning(System.String,System.String,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.TransformationTaskLogger">
+            <summary>
+            Shim for using MSBuild logger in <see cref="T:Microsoft.VisualStudio.SlowCheetah.ITransformer" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformationTaskLogger.#ctor(Microsoft.Build.Utilities.TaskLoggingHelper)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.TransformationTaskLogger" /> class.
+            </summary>
+            <param name="logger">The MSBuild logger.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformationTaskLogger.LogError(System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformationTaskLogger.LogError(System.String,System.Int32,System.Int32,System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformationTaskLogger.LogErrorFromException(System.Exception)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformationTaskLogger.LogErrorFromException(System.Exception,System.String,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformationTaskLogger.LogMessage(Microsoft.VisualStudio.SlowCheetah.LogMessageImportance,System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformationTaskLogger.LogWarning(System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformationTaskLogger.LogWarning(System.String,System.Int32,System.Int32,System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger">
+            <summary>
+            Shim for using an <see cref="T:Microsoft.VisualStudio.SlowCheetah.ITransformationLogger" /> as a <see cref="T:Microsoft.Web.XmlTransform.IXmlTransformationLogger" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.#ctor(Microsoft.VisualStudio.SlowCheetah.ITransformationLogger,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger" /> class.
+            </summary>
+            <param name="logger">Our own logger.</param>
+            <param name="useSections">Wheter or not to use sections.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogError(System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogError(System.String,System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogError(System.String,System.Int32,System.Int32,System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogErrorFromException(System.Exception)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogErrorFromException(System.Exception,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogErrorFromException(System.Exception,System.String,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogMessage(System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogMessage(Microsoft.Web.XmlTransform.MessageType,System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogWarning(System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogWarning(System.String,System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.LogWarning(System.String,System.Int32,System.Int32,System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.StartSection(System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.StartSection(Microsoft.Web.XmlTransform.MessageType,System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.EndSection(System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlShimLogger.EndSection(Microsoft.Web.XmlTransform.MessageType,System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.Resources.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.Resources.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.Resources.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.Resources.Resources.ErrorMessage_FileNotFound">
+            <summary>
+              Looks up a localized string similar to File not found.
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.Resources.Resources.ErrorMessage_SourceFileNotFound">
+            <summary>
+              Looks up a localized string similar to File to transform not found.
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.Resources.Resources.ErrorMessage_TransformFileNotFound">
+            <summary>
+              Looks up a localized string similar to Transform file not found.
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.Resources.Resources.ErrorMessage_UnsupportedFile">
+            <summary>
+              Looks up a localized string similar to {0} is not a supported file type for transformation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.Resources.Resources.JsonTransform_TransformFileContents">
+             <summary>
+               Looks up a localized string similar to {
+            }
+            .
+             </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.SlowCheetah.Resources.Resources.XmlTransform_ContentInfo">
+            <summary>
+              Looks up a localized string similar to For more information on using transformations see the web.config examples at http://go.microsoft.com/fwlink/?LinkId=214134. .
+            </summary>
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.ITransformer">
+            <summary>
+            Interface for file tranformers.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformer.WithLogger(Microsoft.VisualStudio.SlowCheetah.ITransformationLogger)">
+            <summary>
+            Returns an instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.ITransformer" /> with the given logger.
+            </summary>
+            <param name="logger">The external logger. Can be null.</param>
+            <returns>A new instance of the transformer.</returns>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformer.Transform(System.String,System.String,System.String)">
+            <summary>
+            Main method that tranforms a source file according to a transformation file and puts it in a destination file.
+            </summary>
+            <param name="sourcePath">Path to source file.</param>
+            <param name="transformPath">Path to tranformation file.</param>
+            <param name="destinationPath">Path to destination of transformed file.</param>
+            <returns>True if the transform succeeded.</returns>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformer.IsFileSupported(System.String)">
+            <summary>
+            Verifies if a given file is supported by this transformer.
+            </summary>
+            <param name="filePath">The path to the file.</param>
+            <returns>True if the file can be transformed by this transformer.</returns>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.ITransformer.CreateTransformFile(System.String,System.String,System.Boolean)">
+            <summary>
+            Creates the appropriate transform file in the given path.
+            </summary>
+            <param name="sourcePath">Path to the source file.</param>
+            <param name="transformPath">Path to the transform file to be created.</param>
+            <param name="overwrite">Wether an an existing transform file should be overwritten.</param>
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.JsonTransformer">
+            <summary>
+            Transforms JSON files using JSON Document Transformations.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonTransformer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.JsonTransformer" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonTransformer.#ctor(Microsoft.VisualStudio.SlowCheetah.ITransformationLogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.JsonTransformer" /> class with an external logger.
+            </summary>
+            <param name="logger">The external logger.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonTransformer.CreateTransformFile(System.String,System.String,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonTransformer.IsFileSupported(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonTransformer.Transform(System.String,System.String,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.JsonTransformer.WithLogger(Microsoft.VisualStudio.SlowCheetah.ITransformationLogger)">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.TransformerFactory">
+            <summary>
+            Factory for <see cref="T:Microsoft.VisualStudio.SlowCheetah.ITransformer" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformerFactory.GetTransformer(System.String,Microsoft.VisualStudio.SlowCheetah.ITransformationLogger)">
+            <summary>
+            Gets the appropriate <see cref="T:Microsoft.VisualStudio.SlowCheetah.ITransformer" /> for the given transformation.
+            </summary>
+            <param name="source">Path to the file to be transformed.</param>
+            <param name="logger">Logger to be used in the transformer.</param>
+            <returns>The appropriate transformer for the given file.</returns>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformerFactory.IsSupportedFile(System.String)">
+            <summary>
+            Verifies if a file is of a supported format.
+            </summary>
+            <param name="filePath">Full path to the file.</param>
+            <returns>True is the file type is supported.</returns>
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.TransformUtilities">
+            <summary>
+            Utilities for transformations.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformUtilities.GetEncoding(System.String)">
+            <summary>
+            Determines a text file's encoding by analyzing its byte order mark (BOM).
+            Defaults to ASCII when detection of the text file's endianness fails.
+            </summary>
+            <param name="filename">The text file to analyze.</param>
+            <returns>The detected encoding.</returns>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.TransformUtilities.GetEncoding(System.IO.Stream)">
+            <summary>
+            Determines a stream's encoding by analyzing its byte order mark (BOM).
+            Defaults to ASCII when detection of the text file's endianness fails.
+            </summary>
+            <param name="stream">The stream to analyze.</param>
+            <returns>The detected encoding.</returns>
+        </member>
+        <member name="T:Microsoft.VisualStudio.SlowCheetah.XmlTransformer">
+            <summary>
+            Transforms XML files utilizing Microsoft Web XmlTransform library.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlTransformer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.XmlTransformer" /> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlTransformer.#ctor(Microsoft.VisualStudio.SlowCheetah.ITransformationLogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.SlowCheetah.XmlTransformer" /> class with an external logger.
+            </summary>
+            <param name="logger">The external logger.</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlTransformer.CreateTransformFile(System.String,System.String,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlTransformer.IsFileSupported(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlTransformer.Transform(System.String,System.String,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.VisualStudio.SlowCheetah.XmlTransformer.WithLogger(Microsoft.VisualStudio.SlowCheetah.ITransformationLogger)">
+            <inheritdoc />
+        </member>
+    </members>
+<Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" /><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256" /><DigestValue>kW+UjcMmYvfXC6sbuHeg+GsDzxdwiZoH1ZsbTwPbISA=</DigestValue></Reference></SignedInfo><SignatureValue>PWNeBOfP4p0rWbFX3sGIhv7/pkAWwT3RpOoqoFlBIwRt7gyLzFPnnGNstsfMswXt2pKr6YaxFcVWnJNUg2/Dk16cfTiIqbi+9DRUQonyO/X0TCqvd3vhjdNc8vh7F4BFsjvYj5+uC6ahy33evo18yGqdVczvvP9l2VwBy2J/dK7nkNjBGQq2Zw2SYpGbUXV1f0wv65Th2c+Ddxsh6565ynpKHP3ZPpoqE1NACREFSSi6qGpeUtl85PPZJubAl8hINIxJyQQ2IYg1XC9I8yrB2dg8dujC3O4cnNwh/3Vat8V0Mt3KkseL84jk+ED4fLZEFnyyZuLmd9X77JB741WRJw==</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>3QiojSOiARVrryVJn+lnTiamZiMGLORuwCQ+VG3C+rbAvhATw269+qRRqNW7FKed50chWJ53KDIPBStHfIy5cNJYHsQw6+4InH9szgRVqn7/50i8MyRTT+VtNwxf9daGddq0hahpZvjuOnEY0wxQaTEQmWRnXWZUQY4r28tHiNVYEw9U7wHXwWEHvNn4ZlkJGEf5VpgCvr1v9fmzu4x2sV0zQsSyAVtOxfDwY1HMBcccn23tphweIdS+FNDn2vh1/2kREO0qmGc+fbFzNskjn72MiI56kjvNDRgWs+Q78yBvPCdPgTYTrto5eg33Ko2ELNR/zzEkCCuhO5Vw10qV8w==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>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</X509Certificate><X509Certificate>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</X509Certificate><X509Certificate>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</X509Certificate></X509Data></KeyInfo><Object Id="ts-countersig"><X509Data><X509Certificate>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</X509Certificate><X509Certificate>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</X509Certificate></X509Data><CounterSignature ts-format="cms-timestamp-message" xmlns="http://schemas.microsoft.com/xmldsig/timestamp/2003">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</CounterSignature></Object></Signature></doc>
