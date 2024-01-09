@@ -165,7 +165,16 @@ namespace LogWatcher.Controls
         {
             if (e.Node.Nodes.Count > 0)
             {
-                textBox.Text = "";
+                if (e.Node.Level == 0)
+                {
+                    FileInfo logFileInfo = new FileInfo(logFilePath);
+
+                    textBox.Text = $"Occured: {logFileInfo.LastWriteTime.ToLongDateString()} {logFileInfo.LastWriteTime.ToLongTimeString()}";
+                }
+                else
+                {
+                    textBox.Text = "";
+                }
             }
             else
             {
@@ -190,30 +199,31 @@ namespace LogWatcher.Controls
                 {
                     gridAttributes.Rows.Clear();
                     gridAttributes.Columns["colAttrIndex"].Visible = true;
+                    gridAttributes.Columns["colAttrValueHex"].Visible = true;
 
                     int index = 0;
 
                     foreach (XmlElement attr in nodeData.ChildNodes)
                     {
-                        String key = "";
                         if (nodeData.Name.Equals("globals"))
                         {
-                            key = dataGlobal[index];
+                            gridAttributes.Rows.Add(index, dataGlobal[index], GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
                         }
                         else if (nodeData.Name.Equals("general"))
                         {
-                            key = dataGeneral[index];
+                            gridAttributes.Rows.Add(index, dataGeneral[index], GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
                         }
                         else if (nodeData.Name.Equals("person"))
                         {
-                            key = dataPerson[index];
+                            gridAttributes.Rows.Add(index, dataPerson[index], GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
                         }
                         else if (nodeData.Name.Equals("motives"))
                         {
-                            key = dataMotive[index];
+                            gridAttributes.Rows.Add(index, dataMotive[index], GetNumAttr(attr, "value"), null);
+                            gridAttributes.Columns["colAttrValueHex"].Visible = false;
                         }
 
-                        gridAttributes.Rows.Add(index++, key, GetNumAttr(attr, "value"));
+                        ++index;
                     }
 
                     gridAttributes.Sort(gridAttributes.Columns["colAttrIndex"], ListSortDirection.Ascending);
@@ -223,10 +233,11 @@ namespace LogWatcher.Controls
                 {
                     gridAttributes.Rows.Clear();
                     gridAttributes.Columns["colAttrIndex"].Visible = true;
+                    gridAttributes.Columns["colAttrValueHex"].Visible = true;
 
                     foreach (XmlElement attr in nodeData.ChildNodes)
                     {
-                        gridAttributes.Rows.Add(GetIntAttr(attr, "index"), attr.GetAttribute("key"), GetIntAttr(attr, "value"));
+                        gridAttributes.Rows.Add(GetIntAttr(attr, "index"), attr.GetAttribute("key"), GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
                     }
 
                     gridAttributes.Sort(gridAttributes.Columns["colAttrIndex"], ListSortDirection.Ascending);
@@ -247,10 +258,11 @@ namespace LogWatcher.Controls
                 {
                     gridAttributes.Rows.Clear();
                     gridAttributes.Columns["colAttrIndex"].Visible = false;
+                    gridAttributes.Columns["colAttrValueHex"].Visible = false;
 
                     foreach (XmlElement cheat in nodeData.ChildNodes)
                     {
-                        gridAttributes.Rows.Add("", cheat.GetAttribute("key"), cheat.GetAttribute("value"));
+                        gridAttributes.Rows.Add("", cheat.GetAttribute("key"), cheat.GetAttribute("value"), null);
                     }
 
                     gridAttributes.Sort(gridAttributes.Columns["colAttrKey"], ListSortDirection.Ascending);
@@ -333,6 +345,22 @@ namespace LogWatcher.Controls
             return null;
         }
 
+        private Object GetIntAttrAsHex(XmlElement element, String attrName)
+        {
+            try
+            {
+                String value = element.GetAttribute(attrName);
+
+                if (value.Length > 0)
+                {
+                    return Helper.Hex4PrefixString(Int32.Parse(value));
+                }
+            }
+            catch (Exception) { }
+
+            return null;
+        }
+
         private Object GetNumAttr(XmlElement element, String attrName)
         {
             try
@@ -379,11 +407,18 @@ namespace LogWatcher.Controls
                     string s = textBox.Text.Substring(prevSpacePos, nextSpacePos - prevSpacePos + 1);
                     s = s.Replace("\n", "");
 
-                    XmlNode node = logXml.Root.SelectSingleNode($"lotObjects/lotobj[@oid='{s}']");
-
-                    if (node != null)
+                    if (Int16.TryParse(s, out short i))
                     {
-                        toolTipTextBox.Show(node.Attributes.GetNamedItem("object")?.Value, textBox, e.X, e.Y + 10);
+                        string tt = Helper.Hex4PrefixString(i);
+
+                        XmlNode node = logXml.Root.SelectSingleNode($"lotObjects/lotobj[@oid='{s}']");
+
+                        if (node != null)
+                        {
+                            tt = $"{tt} - {node.Attributes.GetNamedItem("object")?.Value}";
+                        }
+
+                        toolTipTextBox.Show(tt, textBox, e.X, e.Y + 10);
                         return;
                     }
                 }

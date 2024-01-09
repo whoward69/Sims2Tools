@@ -63,6 +63,9 @@ namespace HcduPlus
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.menuResources = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemNone = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemBcon = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBhav = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemColl = new System.Windows.Forms.ToolStripMenuItem();
@@ -255,6 +258,9 @@ namespace HcduPlus
             // menuResources
             // 
             this.menuResources.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAll,
+            this.menuItemNone,
+            this.toolStripSeparator4,
             this.menuItemBcon,
             this.menuItemBhav,
             this.menuItemColl,
@@ -274,11 +280,30 @@ namespace HcduPlus
             this.menuResources.Size = new System.Drawing.Size(72, 20);
             this.menuResources.Text = "&Resources";
             // 
+            // menuItemAll
+            // 
+            this.menuItemAll.Name = "menuItemAll";
+            this.menuItemAll.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAll.Text = "&All";
+            this.menuItemAll.Click += new System.EventHandler(this.OnAllClicked);
+            // 
+            // menuItemNone
+            // 
+            this.menuItemNone.Name = "menuItemNone";
+            this.menuItemNone.Size = new System.Drawing.Size(180, 22);
+            this.menuItemNone.Text = "&None";
+            this.menuItemNone.Click += new System.EventHandler(this.OnNoneClicked);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
+            // 
             // menuItemBcon
             // 
             this.menuItemBcon.CheckOnClick = true;
             this.menuItemBcon.Name = "menuItemBcon";
-            this.menuItemBcon.Size = new System.Drawing.Size(101, 22);
+            this.menuItemBcon.Size = new System.Drawing.Size(180, 22);
             this.menuItemBcon.Text = "Bcon";
             this.menuItemBcon.Click += new System.EventHandler(this.OnBconClicked);
             // 
@@ -286,7 +311,7 @@ namespace HcduPlus
             // 
             this.menuItemBhav.CheckOnClick = true;
             this.menuItemBhav.Name = "menuItemBhav";
-            this.menuItemBhav.Size = new System.Drawing.Size(101, 22);
+            this.menuItemBhav.Size = new System.Drawing.Size(180, 22);
             this.menuItemBhav.Text = "Bhav";
             this.menuItemBhav.Click += new System.EventHandler(this.OnBhavClicked);
             // 
@@ -294,7 +319,7 @@ namespace HcduPlus
             // 
             this.menuItemColl.CheckOnClick = true;
             this.menuItemColl.Name = "menuItemColl";
-            this.menuItemColl.Size = new System.Drawing.Size(101, 22);
+            this.menuItemColl.Size = new System.Drawing.Size(180, 22);
             this.menuItemColl.Text = "Coll";
             this.menuItemColl.Click += new System.EventHandler(this.OnCollClicked);
             // 
@@ -302,7 +327,7 @@ namespace HcduPlus
             // 
             this.menuItemCtss.CheckOnClick = true;
             this.menuItemCtss.Name = "menuItemCtss";
-            this.menuItemCtss.Size = new System.Drawing.Size(101, 22);
+            this.menuItemCtss.Size = new System.Drawing.Size(180, 22);
             this.menuItemCtss.Text = "Ctss";
             this.menuItemCtss.Click += new System.EventHandler(this.OnCtssClicked);
             // 
@@ -310,7 +335,7 @@ namespace HcduPlus
             // 
             this.menuItemGlob.CheckOnClick = true;
             this.menuItemGlob.Name = "menuItemGlob";
-            this.menuItemGlob.Size = new System.Drawing.Size(101, 22);
+            this.menuItemGlob.Size = new System.Drawing.Size(180, 22);
             this.menuItemGlob.Text = "Glob";
             this.menuItemGlob.Click += new System.EventHandler(this.OnGlobClicked);
             // 
@@ -318,7 +343,7 @@ namespace HcduPlus
             // 
             this.menuItemGzps.CheckOnClick = true;
             this.menuItemGzps.Name = "menuItemGzps";
-            this.menuItemGzps.Size = new System.Drawing.Size(101, 22);
+            this.menuItemGzps.Size = new System.Drawing.Size(180, 22);
             this.menuItemGzps.Text = "Gzps";
             this.menuItemGzps.Click += new System.EventHandler(this.OnGzpsClicked);
             // 
@@ -326,7 +351,7 @@ namespace HcduPlus
             // 
             this.menuItemObjd.CheckOnClick = true;
             this.menuItemObjd.Name = "menuItemObjd";
-            this.menuItemObjd.Size = new System.Drawing.Size(101, 22);
+            this.menuItemObjd.Size = new System.Drawing.Size(180, 22);
             this.menuItemObjd.Text = "Objd";
             this.menuItemObjd.Click += new System.EventHandler(this.OnObjdClicked);
             // 
@@ -334,7 +359,7 @@ namespace HcduPlus
             // 
             this.menuItemObjf.CheckOnClick = true;
             this.menuItemObjf.Name = "menuItemObjf";
-            this.menuItemObjf.Size = new System.Drawing.Size(101, 22);
+            this.menuItemObjf.Size = new System.Drawing.Size(180, 22);
             this.menuItemObjf.Text = "Objf";
             this.menuItemObjf.Click += new System.EventHandler(this.OnObjfClicked);
             // 
@@ -342,7 +367,7 @@ namespace HcduPlus
             // 
             this.menuItemSlot.CheckOnClick = true;
             this.menuItemSlot.Name = "menuItemSlot";
-            this.menuItemSlot.Size = new System.Drawing.Size(101, 22);
+            this.menuItemSlot.Size = new System.Drawing.Size(180, 22);
             this.menuItemSlot.Text = "Slot";
             this.menuItemSlot.Click += new System.EventHandler(this.OnSlotClicked);
             // 
@@ -350,7 +375,7 @@ namespace HcduPlus
             // 
             this.menuItemStr.CheckOnClick = true;
             this.menuItemStr.Name = "menuItemStr";
-            this.menuItemStr.Size = new System.Drawing.Size(101, 22);
+            this.menuItemStr.Size = new System.Drawing.Size(180, 22);
             this.menuItemStr.Text = "Str";
             this.menuItemStr.Click += new System.EventHandler(this.OnStrClicked);
             // 
@@ -358,7 +383,7 @@ namespace HcduPlus
             // 
             this.menuItemTprp.CheckOnClick = true;
             this.menuItemTprp.Name = "menuItemTprp";
-            this.menuItemTprp.Size = new System.Drawing.Size(101, 22);
+            this.menuItemTprp.Size = new System.Drawing.Size(180, 22);
             this.menuItemTprp.Text = "Tprp";
             this.menuItemTprp.Click += new System.EventHandler(this.OnTprpClicked);
             // 
@@ -366,7 +391,7 @@ namespace HcduPlus
             // 
             this.menuItemTrcn.CheckOnClick = true;
             this.menuItemTrcn.Name = "menuItemTrcn";
-            this.menuItemTrcn.Size = new System.Drawing.Size(101, 22);
+            this.menuItemTrcn.Size = new System.Drawing.Size(180, 22);
             this.menuItemTrcn.Text = "Trcn";
             this.menuItemTrcn.Click += new System.EventHandler(this.OnTrcnClicked);
             // 
@@ -374,7 +399,7 @@ namespace HcduPlus
             // 
             this.menuItemTtab.CheckOnClick = true;
             this.menuItemTtab.Name = "menuItemTtab";
-            this.menuItemTtab.Size = new System.Drawing.Size(101, 22);
+            this.menuItemTtab.Size = new System.Drawing.Size(180, 22);
             this.menuItemTtab.Text = "Ttab";
             this.menuItemTtab.Click += new System.EventHandler(this.OnTtabClicked);
             // 
@@ -382,7 +407,7 @@ namespace HcduPlus
             // 
             this.menuItemTtas.CheckOnClick = true;
             this.menuItemTtas.Name = "menuItemTtas";
-            this.menuItemTtas.Size = new System.Drawing.Size(101, 22);
+            this.menuItemTtas.Size = new System.Drawing.Size(180, 22);
             this.menuItemTtas.Text = "Ttas";
             this.menuItemTtas.Click += new System.EventHandler(this.OnTtasClicked);
             // 
@@ -390,7 +415,7 @@ namespace HcduPlus
             // 
             this.menuItemVers.CheckOnClick = true;
             this.menuItemVers.Name = "menuItemVers";
-            this.menuItemVers.Size = new System.Drawing.Size(101, 22);
+            this.menuItemVers.Size = new System.Drawing.Size(180, 22);
             this.menuItemVers.Text = "Vers";
             this.menuItemVers.Click += new System.EventHandler(this.OnVersClicked);
             // 
@@ -933,6 +958,9 @@ namespace HcduPlus
         private System.Windows.Forms.CheckBox checkScanSavedSims;
         private System.Windows.Forms.ToolStripMenuItem menuOptions;
         private System.Windows.Forms.ToolStripMenuItem menuItemOptionNoLoad;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAll;
+        private System.Windows.Forms.ToolStripMenuItem menuItemNone;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
     }
 }
 

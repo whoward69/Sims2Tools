@@ -286,6 +286,7 @@ namespace Sims2Tools.DBPF.Package
                     TypeResourceID ResourceID = (indexMinorVersion >= 2) ? reader.ReadResourceId() : DBPFData.RESOURCE_NULL;
                     uint uncompressedSize = reader.ReadUInt32();
 
+                    // TODO - just because there is no CLST resource (or no entry in the CLST) does NOT mean the data isn't compressed!
                     // Just because there is an entry in the CLST resource does NOT mean the data is compressed! But we'll let the decompressor take care of it.
                     DBPFKey key = new DBPFKey(TypeID, GroupID, InstanceID, ResourceID);
                     if (entryByKey.ContainsKey(key))

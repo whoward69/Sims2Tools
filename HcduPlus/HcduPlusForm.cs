@@ -848,6 +848,45 @@ namespace HcduPlus
                 writer.Close();
             }
         }
+
+        private void OnAllClicked(object sender, EventArgs e)
+        {
+            if (!menuItemBcon.Checked) { menuItemBcon.Checked = true; OnBconClicked(menuItemBcon, null); }
+            if (!menuItemBhav.Checked) { menuItemBhav.Checked = true; OnBhavClicked(menuItemBhav, null); }
+            if (!menuItemColl.Checked) { menuItemColl.Checked = true; OnCollClicked(menuItemColl, null); }
+            if (!menuItemCtss.Checked) { menuItemCtss.Checked = true; OnCtssClicked(menuItemCtss, null); }
+            if (!menuItemGlob.Checked) { menuItemGlob.Checked = true; OnGlobClicked(menuItemGlob, null); }
+            if (!menuItemGzps.Checked) { menuItemGzps.Checked = true; OnGzpsClicked(menuItemGzps, null); }
+            if (!menuItemObjd.Checked) { menuItemObjd.Checked = true; OnObjdClicked(menuItemObjd, null); }
+            if (!menuItemObjf.Checked) { menuItemObjf.Checked = true; OnObjfClicked(menuItemObjf, null); }
+            if (!menuItemSlot.Checked) { menuItemSlot.Checked = true; OnSlotClicked(menuItemSlot, null); }
+            if (!menuItemStr.Checked) { menuItemStr.Checked = true; OnStrClicked(menuItemStr, null); }
+            if (!menuItemTprp.Checked) { menuItemTprp.Checked = true; OnTprpClicked(menuItemTprp, null); }
+            if (!menuItemTrcn.Checked) { menuItemTrcn.Checked = true; OnTrcnClicked(menuItemTrcn, null); }
+            if (!menuItemTtab.Checked) { menuItemTtab.Checked = true; OnTtabClicked(menuItemTtab, null); }
+            if (!menuItemTtas.Checked) { menuItemTtas.Checked = true; OnTtasClicked(menuItemTtas, null); }
+            if (!menuItemVers.Checked) { menuItemVers.Checked = true; OnVersClicked(menuItemVers, null); }
+        }
+
+        private void OnNoneClicked(object sender, EventArgs e)
+        {
+            if (menuItemBcon.Checked) { menuItemBcon.Checked = false; OnBconClicked(menuItemBcon, null); }
+            if (menuItemBhav.Checked) { menuItemBhav.Checked = false; OnBhavClicked(menuItemBhav, null); }
+            if (menuItemColl.Checked) { menuItemColl.Checked = false; OnCollClicked(menuItemColl, null); }
+            if (menuItemCtss.Checked) { menuItemCtss.Checked = false; OnCtssClicked(menuItemCtss, null); }
+            if (menuItemGlob.Checked) { menuItemGlob.Checked = false; OnGlobClicked(menuItemGlob, null); }
+            if (menuItemGzps.Checked) { menuItemGzps.Checked = false; OnGzpsClicked(menuItemGzps, null); }
+            if (menuItemObjd.Checked) { menuItemObjd.Checked = false; OnObjdClicked(menuItemObjd, null); }
+            if (menuItemObjf.Checked) { menuItemObjf.Checked = false; OnObjfClicked(menuItemObjf, null); }
+            if (menuItemSlot.Checked) { menuItemSlot.Checked = false; OnSlotClicked(menuItemSlot, null); }
+            if (menuItemStr.Checked) { menuItemStr.Checked = false; OnStrClicked(menuItemStr, null); }
+            if (menuItemTprp.Checked) { menuItemTprp.Checked = false; OnTprpClicked(menuItemTprp, null); }
+            if (menuItemTrcn.Checked) { menuItemTrcn.Checked = false; OnTrcnClicked(menuItemTrcn, null); }
+            if (menuItemTtab.Checked) { menuItemTtab.Checked = false; OnTtabClicked(menuItemTtab, null); }
+            if (menuItemTtas.Checked) { menuItemTtas.Checked = false; OnTtasClicked(menuItemTtas, null); }
+            if (menuItemVers.Checked) { menuItemVers.Checked = false; OnVersClicked(menuItemVers, null); }
+        }
+
         private void OnBconClicked(object sender, EventArgs e)
         {
             bool enabled = ((ToolStripMenuItem)sender).Checked;

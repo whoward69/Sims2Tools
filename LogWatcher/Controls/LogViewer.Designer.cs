@@ -41,10 +41,11 @@ namespace LogWatcher.Controls
             this.colLotContainer = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colLotSlot = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.gridAttributes = new System.Windows.Forms.DataGridView();
+            this.toolTipTextBox = new System.Windows.Forms.ToolTip(this.components);
             this.colAttrIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAttrKey = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAttrValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.toolTipTextBox = new System.Windows.Forms.ToolTip(this.components);
+            this.colAttrValueDec = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAttrValueHex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -172,7 +173,8 @@ namespace LogWatcher.Controls
             this.gridAttributes.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colAttrIndex,
             this.colAttrKey,
-            this.colAttrValue});
+            this.colAttrValueDec,
+            this.colAttrValueHex});
             this.gridAttributes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gridAttributes.Location = new System.Drawing.Point(0, 0);
             this.gridAttributes.Name = "gridAttributes";
@@ -198,12 +200,19 @@ namespace LogWatcher.Controls
             this.colAttrKey.ReadOnly = true;
             this.colAttrKey.Width = 60;
             // 
-            // colAttrValue
+            // colAttrValueDec
             // 
-            this.colAttrValue.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colAttrValue.HeaderText = "Value";
-            this.colAttrValue.Name = "colAttrValue";
-            this.colAttrValue.ReadOnly = true;
+            this.colAttrValueDec.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colAttrValueDec.HeaderText = "Value";
+            this.colAttrValueDec.Name = "colAttrValueDec";
+            this.colAttrValueDec.ReadOnly = true;
+            // 
+            // colAttrValueHex
+            // 
+            this.colAttrValueHex.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colAttrValueHex.HeaderText = "Hex";
+            this.colAttrValueHex.Name = "colAttrValueHex";
+            this.colAttrValueHex.ReadOnly = true;
             // 
             // LogViewer
             // 
@@ -235,9 +244,10 @@ namespace LogWatcher.Controls
         private System.Windows.Forms.DataGridViewTextBoxColumn colLotContainer;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLotSlot;
         private System.Windows.Forms.DataGridView gridAttributes;
+        private System.Windows.Forms.ToolTip toolTipTextBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn colAttrIndex;
         private System.Windows.Forms.DataGridViewTextBoxColumn colAttrKey;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAttrValue;
-        private System.Windows.Forms.ToolTip toolTipTextBox;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAttrValueDec;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAttrValueHex;
     }
 }
