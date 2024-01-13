@@ -574,7 +574,7 @@ namespace HoodExporter
                                     tokenElement.SetAttribute(tokenData.AttributeName, tokenValue.ToString());
                                 }
 
-                                if (isRufio)
+                                if (isRufio && Directory.Exists($"{exportPath}/SimImage"))
                                 {
                                     foreach (String simImage in Directory.GetFiles($"{exportPath}/SimImage", $"{sdsc.SimGuid}*"))
                                     {

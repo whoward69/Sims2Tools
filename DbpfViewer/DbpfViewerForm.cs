@@ -523,7 +523,7 @@ namespace DbpfViewer
 
                     foreach (TypeTypeID type in DBPFData.AllTypes)
                     {
-                        // if (enabledResources.Contains(type))
+                        if (enabledResources.Contains(type))
                         {
                             List<DBPFEntry> resources = package.GetEntriesByType(type);
 
@@ -600,7 +600,7 @@ namespace DbpfViewer
 
                     foreach (TypeTypeID type in DBPFData.AllTypes)
                     {
-                        // if (enabledResources.Contains(type))
+                        if (enabledResources.Contains(type))
                         {
                             List<DBPFEntry> resources = package.GetEntriesByType(type);
                             SortedDictionary<DBPFKey, DBPFEntry> sortedResources = new SortedDictionary<DBPFKey, DBPFEntry>();
