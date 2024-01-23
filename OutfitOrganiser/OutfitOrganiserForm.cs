@@ -87,6 +87,7 @@ namespace OutfitOrganiser
             new UintNamedValue("H&M Fashion", 0x000A),
             new UintNamedValue("IKEA Home", 0x0010),
             new UintNamedValue("K&B Design", 0x000F),
+            new UintNamedValue("Mansion & Gardens", 0x0012),
             new UintNamedValue("Nightlife", 0x0003),
             new UintNamedValue("Open For Business", 0x0004),
             new UintNamedValue("Pets", 0x0007),
@@ -254,6 +255,7 @@ namespace OutfitOrganiser
             menuItemShowResFilename.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, 1) != 0); OnShowResFilenameClicked(menuItemShowResFilename, null);
             menuItemShowResProduct.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResProduct.Name, 1) != 0); OnShowResProductClicked(menuItemShowResProduct, null);
 
+            menuItemNumericLayer.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemNumericLayer.Name, 0) != 0); OnNumericLayerClicked(menuItemNumericLayer, null);
             menuItemAutosetLayer.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetLayer.Name, 1) != 0);
             menuItemAutosetBin.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetBin.Name, 1) != 0);
 
@@ -323,6 +325,7 @@ namespace OutfitOrganiser
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResProduct.Name, menuItemShowResProduct.Checked ? 1 : 0);
 
+            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemNumericLayer.Name, menuItemNumericLayer.Checked ? 1 : 0);
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetLayer.Name, menuItemAutosetLayer.Checked ? 1 : 0);
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetBin.Name, menuItemAutosetBin.Checked ? 1 : 0);
 
@@ -613,8 +616,9 @@ namespace OutfitOrganiser
                                     row["Jewelry"] = "";
                                     row["Destination"] = "";
                                     row["Subtype"] = "";
-                                    row["Layer"] = "";
-                                    row["Bin"] = "";
+                                    row["LayerStr"] = "";
+                                    row["LayerInt"] = 0;
+                                    row["Bin"] = 0;
 
                                     row["Type"] = BuildTypeString(outfitData);
 
@@ -627,7 +631,8 @@ namespace OutfitOrganiser
                                         case 0x02:
                                             row["Visible"] = menuItemOutfitMakeUp.Checked ? "Yes" : "No";
                                             row["Subtype"] = BuildMakeupSubtypeString(outfitData.Subtype);
-                                            row["Layer"] = BuildMakeupLayerString(outfitData.Layer);
+                                            row["LayerStr"] = BuildMakeupLayerString(outfitData.Layer);
+                                            row["LayerInt"] = outfitData.Layer;
                                             row["Bin"] = outfitData.Bin;
                                             break;
                                         case 0x04:
@@ -813,7 +818,8 @@ namespace OutfitOrganiser
             grpJewelry.Visible = gridResources.Columns["colJewelry"].Visible;
 
             gridResources.Columns["colMakeupSubtype"].Visible = menuItemOutfitMakeUp.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitAccessory.Checked;
-            gridResources.Columns["colMakeupLayer"].Visible = gridResources.Columns["colMakeupSubtype"].Visible;
+            gridResources.Columns["colMakeupLayerStr"].Visible = gridResources.Columns["colMakeupSubtype"].Visible && !menuItemNumericLayer.Checked;
+            gridResources.Columns["colMakeupLayerInt"].Visible = gridResources.Columns["colMakeupSubtype"].Visible && menuItemNumericLayer.Checked;
             gridResources.Columns["colMakeupBin"].Visible = gridResources.Columns["colMakeupSubtype"].Visible;
             grpMakeup.Visible = gridResources.Columns["colMakeupSubtype"].Visible;
 
@@ -1259,6 +1265,26 @@ namespace OutfitOrganiser
             grpProduct.Visible = menuItemShowResProduct.Checked;
         }
 
+        private void OnNumericLayerClicked(object sender, EventArgs e)
+        {
+            if (menuItemNumericLayer.Checked)
+            {
+                gridResources.Columns["colMakeupLayerInt"].Visible = true;
+                textMakeupLayer.Visible = true;
+
+                gridResources.Columns["colMakeupLayerStr"].Visible = false;
+                comboMakeupLayer.Visible = false;
+            }
+            else
+            {
+                gridResources.Columns["colMakeupLayerStr"].Visible = true;
+                comboMakeupLayer.Visible = true;
+
+                gridResources.Columns["colMakeupLayerInt"].Visible = false;
+                textMakeupLayer.Visible = false;
+            }
+        }
+
         private void OnLoadMeshesNowClicked(object sender, EventArgs e)
         {
             CacheMeshes();
@@ -1598,6 +1624,9 @@ namespace OutfitOrganiser
                 case 0x0011:
                     product = "Apartment Life";
                     break;
+                case 0x0012:
+                    product = "Mansion & Gardens";
+                    break;
             }
 
             return product;
@@ -1915,7 +1944,8 @@ namespace OutfitOrganiser
                     if (outfitData.IsMakeUp)
                     {
                         row.Cells["colMakeupSubtype"].Value = BuildMakeupSubtypeString(outfitData.Subtype);
-                        row.Cells["colMakeupLayer"].Value = BuildMakeupLayerString(outfitData.Layer);
+                        row.Cells["colMakeupLayerStr"].Value = BuildMakeupLayerString(outfitData.Layer);
+                        row.Cells["colMakeupLayerInt"].Value = outfitData.Layer;
                         row.Cells["colMakeupBin"].Value = outfitData.Bin;
                     }
 
@@ -2121,6 +2151,7 @@ namespace OutfitOrganiser
             comboDestination.SelectedIndex = -1;
             comboMakeupSubtype.SelectedIndex = -1;
             comboMakeupLayer.SelectedIndex = -1;
+            textMakeupLayer.Text = "";
             textMakeupBin.Text = "";
 
             textTooltip.Text = "";
@@ -2384,6 +2415,7 @@ namespace OutfitOrganiser
                 if (cachedMakeupLayerValue != newMakeupLayerValue)
                 {
                     comboMakeupLayer.SelectedIndex = -1;
+                    textMakeupLayer.Text = "";
                 }
             }
             else
@@ -2400,6 +2432,8 @@ namespace OutfitOrganiser
                         break;
                     }
                 }
+
+                textMakeupLayer.Text = newMakeupLayerValue.ToString();
             }
 
             uint newMakeupBinValue = outfitData.Bin;
@@ -2554,7 +2588,7 @@ namespace OutfitOrganiser
             }
         }
 
-        private void OnMakeupLayerChanged(object sender, EventArgs e)
+        private void OnMakeupLayerStrChanged(object sender, EventArgs e)
         {
             if (comboMakeupLayer.SelectedIndex != -1)
             {
@@ -2719,7 +2753,7 @@ namespace OutfitOrganiser
             }
         }
 
-        private void OnMakeupLayerKeyUp(object sender, KeyEventArgs e)
+        private void OnMakeupLayerStrKeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
@@ -2748,6 +2782,24 @@ namespace OutfitOrganiser
                         UpdateSelectedRows(data, "layer");
                     }
                 }
+
+                e.Handled = true;
+            }
+        }
+
+        private void OnMakeupLayerIntKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                uint data = 0;
+
+                if (textMakeupLayer.Text.Length > 0 && !UInt32.TryParse(textMakeupLayer.Text, out data))
+                {
+                    textMakeupLayer.Text = "0";
+                    data = 0;
+                }
+
+                if (IsAutoUpdate && textMakeupLayer.Text.Length > 0) UpdateSelectedRows(data, "layer");
 
                 e.Handled = true;
             }

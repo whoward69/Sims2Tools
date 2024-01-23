@@ -58,6 +58,7 @@ using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
 using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
+using Sims2Tools.DBPF.UI;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.VERS;
 using Sims2Tools.DBPF.XFLR;
@@ -268,7 +269,14 @@ namespace Sims2Tools.DBPF.Package
 
         public String GetFilenameByEntry(DBPFEntry entry)
         {
-            return Helper.ToString(this.GetDbpfReader(entry).ReadBytes(Math.Min((int)entry.FileSize, 0x40)));
+            if (entry.TypeID == Ui.TYPE)
+            {
+                return "";
+            }
+            else
+            {
+                return Helper.ToString(this.GetDbpfReader(entry).ReadBytes(Math.Min((int)entry.FileSize, 0x40)));
+            }
         }
 
         public DBPFResource GetResourceByTGIR(int tgir)

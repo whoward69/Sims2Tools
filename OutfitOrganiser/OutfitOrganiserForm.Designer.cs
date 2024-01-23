@@ -75,6 +75,7 @@ namespace OutfitOrganiser
             this.menuItemShowResFilename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowResProduct = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemNumericLayer = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAutosetLayer = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAutosetBin = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -97,10 +98,6 @@ namespace OutfitOrganiser
             this.menuContextPkgMerge = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.panelEditor = new System.Windows.Forms.Panel();
-            this.grpMakeup = new System.Windows.Forms.GroupBox();
-            this.comboMakeupSubtype = new System.Windows.Forms.ComboBox();
-            this.comboMakeupLayer = new System.Windows.Forms.ComboBox();
-            this.textMakeupBin = new System.Windows.Forms.TextBox();
             this.grpProduct = new System.Windows.Forms.GroupBox();
             this.comboProduct = new System.Windows.Forms.ComboBox();
             this.btnTownify = new System.Windows.Forms.Button();
@@ -131,6 +128,11 @@ namespace OutfitOrganiser
             this.ckbAgeTeens = new System.Windows.Forms.CheckBox();
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.btnSaveAll = new System.Windows.Forms.Button();
+            this.grpMakeup = new System.Windows.Forms.GroupBox();
+            this.comboMakeupSubtype = new System.Windows.Forms.ComboBox();
+            this.comboMakeupLayer = new System.Windows.Forms.ComboBox();
+            this.textMakeupLayer = new System.Windows.Forms.TextBox();
+            this.textMakeupBin = new System.Windows.Forms.TextBox();
             this.grpShoe = new System.Windows.Forms.GroupBox();
             this.comboShoe = new System.Windows.Forms.ComboBox();
             this.grpJewelry = new System.Windows.Forms.GroupBox();
@@ -150,7 +152,8 @@ namespace OutfitOrganiser
             this.colJewelry = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDestination = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colMakeupSubtype = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMakeupLayer = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMakeupLayerStr = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMakeupLayerInt = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colMakeupBin = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSort = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colShown = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -186,7 +189,6 @@ namespace OutfitOrganiser
             ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).BeginInit();
             this.menuContextPackages.SuspendLayout();
             this.panelEditor.SuspendLayout();
-            this.grpMakeup.SuspendLayout();
             this.grpProduct.SuspendLayout();
             this.grpSort.SuspendLayout();
             this.grpTooltip.SuspendLayout();
@@ -194,6 +196,7 @@ namespace OutfitOrganiser
             this.grpGender.SuspendLayout();
             this.grpShown.SuspendLayout();
             this.grpAge.SuspendLayout();
+            this.grpMakeup.SuspendLayout();
             this.grpShoe.SuspendLayout();
             this.grpJewelry.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).BeginInit();
@@ -319,7 +322,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitClothing.CheckOnClick = true;
             this.menuItemOutfitClothing.Name = "menuItemOutfitClothing";
             this.menuItemOutfitClothing.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.menuItemOutfitClothing.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitClothing.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitClothing.Text = "&Clothing";
             this.menuItemOutfitClothing.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -328,7 +331,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitHair.CheckOnClick = true;
             this.menuItemOutfitHair.Name = "menuItemOutfitHair";
             this.menuItemOutfitHair.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.menuItemOutfitHair.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitHair.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitHair.Text = "&Hair";
             this.menuItemOutfitHair.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -337,7 +340,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitAccessory.CheckOnClick = true;
             this.menuItemOutfitAccessory.Name = "menuItemOutfitAccessory";
             this.menuItemOutfitAccessory.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this.menuItemOutfitAccessory.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitAccessory.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitAccessory.Text = "&Accessories";
             this.menuItemOutfitAccessory.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -346,7 +349,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitMakeUp.CheckOnClick = true;
             this.menuItemOutfitMakeUp.Name = "menuItemOutfitMakeUp";
             this.menuItemOutfitMakeUp.ShortcutKeys = System.Windows.Forms.Keys.F7;
-            this.menuItemOutfitMakeUp.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitMakeUp.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitMakeUp.Text = "&Make-Up";
             this.menuItemOutfitMakeUp.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -437,6 +440,7 @@ namespace OutfitOrganiser
             this.menuItemShowResFilename,
             this.menuItemShowResProduct,
             this.toolStripSeparator5,
+            this.menuItemNumericLayer,
             this.menuItemAutosetLayer,
             this.menuItemAutosetBin,
             this.toolStripSeparator3,
@@ -475,6 +479,14 @@ namespace OutfitOrganiser
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
             this.toolStripSeparator5.Size = new System.Drawing.Size(255, 6);
+            // 
+            // menuItemNumericLayer
+            // 
+            this.menuItemNumericLayer.CheckOnClick = true;
+            this.menuItemNumericLayer.Name = "menuItemNumericLayer";
+            this.menuItemNumericLayer.Size = new System.Drawing.Size(258, 22);
+            this.menuItemNumericLayer.Text = "&Numeric Layers Only";
+            this.menuItemNumericLayer.Click += new System.EventHandler(this.OnNumericLayerClicked);
             // 
             // menuItemAutosetLayer
             // 
@@ -708,54 +720,12 @@ namespace OutfitOrganiser
             this.panelEditor.Size = new System.Drawing.Size(984, 154);
             this.panelEditor.TabIndex = 26;
             // 
-            // grpMakeup
-            // 
-            this.grpMakeup.Controls.Add(this.comboMakeupSubtype);
-            this.grpMakeup.Controls.Add(this.comboMakeupLayer);
-            this.grpMakeup.Controls.Add(this.textMakeupBin);
-            this.grpMakeup.Location = new System.Drawing.Point(310, 0);
-            this.grpMakeup.Name = "grpMakeup";
-            this.grpMakeup.Size = new System.Drawing.Size(135, 105);
-            this.grpMakeup.TabIndex = 1;
-            this.grpMakeup.TabStop = false;
-            this.grpMakeup.Text = "Makeup:";
-            // 
-            // comboMakeupSubtype
-            // 
-            this.comboMakeupSubtype.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboMakeupSubtype.FormattingEnabled = true;
-            this.comboMakeupSubtype.Location = new System.Drawing.Point(5, 20);
-            this.comboMakeupSubtype.Name = "comboMakeupSubtype";
-            this.comboMakeupSubtype.Size = new System.Drawing.Size(125, 23);
-            this.comboMakeupSubtype.TabIndex = 8;
-            this.comboMakeupSubtype.SelectedIndexChanged += new System.EventHandler(this.OnMakeupSubtypeChanged);
-            // 
-            // comboMakeupLayer
-            // 
-            this.comboMakeupLayer.FormattingEnabled = true;
-            this.comboMakeupLayer.Location = new System.Drawing.Point(5, 49);
-            this.comboMakeupLayer.Name = "comboMakeupLayer";
-            this.comboMakeupLayer.Size = new System.Drawing.Size(125, 23);
-            this.comboMakeupLayer.TabIndex = 8;
-            this.comboMakeupLayer.SelectedIndexChanged += new System.EventHandler(this.OnMakeupLayerChanged);
-            this.comboMakeupLayer.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
-            this.comboMakeupLayer.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnMakeupLayerKeyUp);
-            // 
-            // textMakeupBin
-            // 
-            this.textMakeupBin.Location = new System.Drawing.Point(5, 78);
-            this.textMakeupBin.Name = "textMakeupBin";
-            this.textMakeupBin.Size = new System.Drawing.Size(123, 21);
-            this.textMakeupBin.TabIndex = 0;
-            this.textMakeupBin.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
-            this.textMakeupBin.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnMakeupBinKeyUp);
-            // 
             // grpProduct
             // 
             this.grpProduct.Controls.Add(this.comboProduct);
             this.grpProduct.Location = new System.Drawing.Point(595, 55);
             this.grpProduct.Name = "grpProduct";
-            this.grpProduct.Size = new System.Drawing.Size(135, 50);
+            this.grpProduct.Size = new System.Drawing.Size(150, 50);
             this.grpProduct.TabIndex = 9;
             this.grpProduct.TabStop = false;
             this.grpProduct.Text = "Product:";
@@ -766,7 +736,7 @@ namespace OutfitOrganiser
             this.comboProduct.FormattingEnabled = true;
             this.comboProduct.Location = new System.Drawing.Point(5, 20);
             this.comboProduct.Name = "comboProduct";
-            this.comboProduct.Size = new System.Drawing.Size(125, 23);
+            this.comboProduct.Size = new System.Drawing.Size(140, 23);
             this.comboProduct.TabIndex = 8;
             this.comboProduct.SelectedIndexChanged += new System.EventHandler(this.OnProductChanged);
             // 
@@ -1082,6 +1052,58 @@ namespace OutfitOrganiser
             this.btnSaveAll.UseVisualStyleBackColor = true;
             this.btnSaveAll.Click += new System.EventHandler(this.OnSaveAllClicked);
             // 
+            // grpMakeup
+            // 
+            this.grpMakeup.Controls.Add(this.comboMakeupSubtype);
+            this.grpMakeup.Controls.Add(this.comboMakeupLayer);
+            this.grpMakeup.Controls.Add(this.textMakeupLayer);
+            this.grpMakeup.Controls.Add(this.textMakeupBin);
+            this.grpMakeup.Location = new System.Drawing.Point(310, 0);
+            this.grpMakeup.Name = "grpMakeup";
+            this.grpMakeup.Size = new System.Drawing.Size(135, 105);
+            this.grpMakeup.TabIndex = 1;
+            this.grpMakeup.TabStop = false;
+            this.grpMakeup.Text = "Makeup:";
+            // 
+            // comboMakeupSubtype
+            // 
+            this.comboMakeupSubtype.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMakeupSubtype.FormattingEnabled = true;
+            this.comboMakeupSubtype.Location = new System.Drawing.Point(5, 20);
+            this.comboMakeupSubtype.Name = "comboMakeupSubtype";
+            this.comboMakeupSubtype.Size = new System.Drawing.Size(125, 23);
+            this.comboMakeupSubtype.TabIndex = 8;
+            this.comboMakeupSubtype.SelectedIndexChanged += new System.EventHandler(this.OnMakeupSubtypeChanged);
+            // 
+            // comboMakeupLayer
+            // 
+            this.comboMakeupLayer.FormattingEnabled = true;
+            this.comboMakeupLayer.Location = new System.Drawing.Point(5, 49);
+            this.comboMakeupLayer.Name = "comboMakeupLayer";
+            this.comboMakeupLayer.Size = new System.Drawing.Size(125, 23);
+            this.comboMakeupLayer.TabIndex = 8;
+            this.comboMakeupLayer.SelectedIndexChanged += new System.EventHandler(this.OnMakeupLayerStrChanged);
+            this.comboMakeupLayer.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.comboMakeupLayer.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnMakeupLayerStrKeyUp);
+            // 
+            // textMakeupLayer
+            // 
+            this.textMakeupLayer.Location = new System.Drawing.Point(5, 49);
+            this.textMakeupLayer.Name = "textMakeupLayer";
+            this.textMakeupLayer.Size = new System.Drawing.Size(123, 21);
+            this.textMakeupLayer.TabIndex = 0;
+            this.textMakeupLayer.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.textMakeupLayer.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnMakeupLayerIntKeyUp);
+            // 
+            // textMakeupBin
+            // 
+            this.textMakeupBin.Location = new System.Drawing.Point(5, 78);
+            this.textMakeupBin.Name = "textMakeupBin";
+            this.textMakeupBin.Size = new System.Drawing.Size(123, 21);
+            this.textMakeupBin.TabIndex = 0;
+            this.textMakeupBin.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.textMakeupBin.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnMakeupBinKeyUp);
+            // 
             // grpShoe
             // 
             this.grpShoe.Controls.Add(this.comboShoe);
@@ -1158,7 +1180,8 @@ namespace OutfitOrganiser
             this.colJewelry,
             this.colDestination,
             this.colMakeupSubtype,
-            this.colMakeupLayer,
+            this.colMakeupLayerStr,
+            this.colMakeupLayerInt,
             this.colMakeupBin,
             this.colSort,
             this.colShown,
@@ -1274,12 +1297,19 @@ namespace OutfitOrganiser
             this.colMakeupSubtype.Name = "colMakeupSubtype";
             this.colMakeupSubtype.ReadOnly = true;
             // 
-            // colMakeupLayer
+            // colMakeupLayerStr
             // 
-            this.colMakeupLayer.DataPropertyName = "Layer";
-            this.colMakeupLayer.HeaderText = "Layer";
-            this.colMakeupLayer.Name = "colMakeupLayer";
-            this.colMakeupLayer.ReadOnly = true;
+            this.colMakeupLayerStr.DataPropertyName = "LayerStr";
+            this.colMakeupLayerStr.HeaderText = "Layer";
+            this.colMakeupLayerStr.Name = "colMakeupLayerStr";
+            this.colMakeupLayerStr.ReadOnly = true;
+            // 
+            // colMakeupLayerInt
+            // 
+            this.colMakeupLayerInt.DataPropertyName = "LayerInt";
+            this.colMakeupLayerInt.HeaderText = "Layer";
+            this.colMakeupLayerInt.Name = "colMakeupLayerInt";
+            this.colMakeupLayerInt.ReadOnly = true;
             // 
             // colMakeupBin
             // 
@@ -1483,8 +1513,6 @@ namespace OutfitOrganiser
             ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).EndInit();
             this.menuContextPackages.ResumeLayout(false);
             this.panelEditor.ResumeLayout(false);
-            this.grpMakeup.ResumeLayout(false);
-            this.grpMakeup.PerformLayout();
             this.grpProduct.ResumeLayout(false);
             this.grpSort.ResumeLayout(false);
             this.grpSort.PerformLayout();
@@ -1496,6 +1524,8 @@ namespace OutfitOrganiser
             this.grpShown.ResumeLayout(false);
             this.grpAge.ResumeLayout(false);
             this.grpAge.PerformLayout();
+            this.grpMakeup.ResumeLayout(false);
+            this.grpMakeup.PerformLayout();
             this.grpShoe.ResumeLayout(false);
             this.grpJewelry.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).EndInit();
@@ -1558,6 +1588,7 @@ namespace OutfitOrganiser
         private System.Windows.Forms.GroupBox grpMakeup;
         private System.Windows.Forms.ComboBox comboMakeupSubtype;
         private System.Windows.Forms.ComboBox comboMakeupLayer;
+        private System.Windows.Forms.TextBox textMakeupLayer;
         private System.Windows.Forms.TextBox textMakeupBin;
         private System.Windows.Forms.GroupBox grpAge;
         private System.Windows.Forms.CheckBox ckbAgeYoungAdults;
@@ -1598,6 +1629,7 @@ namespace OutfitOrganiser
         private System.Windows.Forms.ToolStripMenuItem menuItemShowResFilename;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowResProduct;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem menuItemNumericLayer;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutosetLayer;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutosetBin;
         private System.Windows.Forms.DataGridViewTextBoxColumn colName;
@@ -1631,7 +1663,8 @@ namespace OutfitOrganiser
         private System.Windows.Forms.DataGridViewTextBoxColumn colJewelry;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDestination;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupSubtype;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupLayer;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupLayerStr;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupLayerInt;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupBin;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSort;
         private System.Windows.Forms.DataGridViewTextBoxColumn colShown;

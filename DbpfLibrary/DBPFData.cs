@@ -61,6 +61,7 @@ using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
 using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
+using Sims2Tools.DBPF.UI;
 using Sims2Tools.DBPF.VERS;
 using Sims2Tools.DBPF.XFLR;
 using Sims2Tools.DBPF.XFNC;
@@ -121,6 +122,7 @@ namespace Sims2Tools.DBPF
             ModTypeNames.Add(Trcn.TYPE, Trcn.NAME);
             ModTypeNames.Add(Ttab.TYPE, Ttab.NAME);
             ModTypeNames.Add(Ttas.TYPE, Ttas.NAME);
+            ModTypeNames.Add(Ui.TYPE, Ui.NAME);
             ModTypeNames.Add(Vers.TYPE, Vers.NAME);
 
             ImgTypeNames.Add(Img.TYPE, Img.NAME);

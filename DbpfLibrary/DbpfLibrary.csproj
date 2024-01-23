@@ -97,6 +97,7 @@
     <Compile Include="Images\TgaLoader.cs" />
     <Compile Include="IO\ByteOrder.cs" />
     <Compile Include="IO\DbpfWriter.cs" />
+    <Compile Include="UI\Ui.cs" />
     <Compile Include="Utils\Decompressor.cs" />
     <Compile Include="IO\DbpfReader.cs" />
     <Compile Include="Neighbourhood\BNFO\Bnfo.cs" />
