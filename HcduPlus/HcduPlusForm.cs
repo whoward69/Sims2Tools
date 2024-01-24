@@ -18,6 +18,7 @@ using Sims2Tools.DBPF.BCON;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
+using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
@@ -29,6 +30,7 @@ using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
 using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
+using Sims2Tools.DBPF.UI;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.VERS;
 using Sims2Tools.Dialogs;
@@ -404,27 +406,24 @@ namespace HcduPlus
                         {
                             foreach (TypeTypeID type in enabledResources)
                             {
-                                // if (enabledResources.Contains(type))
+                                foreach (DBPFEntry entry in package.GetEntriesByType(type))
                                 {
-                                    foreach (DBPFEntry entry in package.GetEntriesByType(type))
+                                    if (type == Objd.TYPE && menuItemGuidConflicts.Checked)
                                     {
-                                        if (type == Objd.TYPE && menuItemGuidConflicts.Checked)
+                                        Objd objd = (Objd)package.GetResourceByEntry(entry);
+
+                                        dataStore.SeenGuidsAdd(objd.Guid, entry, fileIndex);
+
+                                        dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
+                                    }
+
+                                    if (entry.GroupID != DBPFData.GROUP_LOCAL)
+                                    {
+                                        dataStore.SeenResourcesAdd(entry, fileIndex);
+
+                                        if (!dataStore.NamesByTgiContains(entry))
                                         {
-                                            Objd objd = (Objd)package.GetResourceByEntry(entry);
-
-                                            dataStore.SeenGuidsAdd(objd.Guid, entry, fileIndex);
-
                                             dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
-                                        }
-
-                                        if (entry.GroupID != DBPFData.GROUP_LOCAL)
-                                        {
-                                            dataStore.SeenResourcesAdd(entry, fileIndex);
-
-                                            if (!dataStore.NamesByTgiContains(entry))
-                                            {
-                                                dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
-                                            }
                                         }
                                     }
                                 }
@@ -591,6 +590,7 @@ namespace HcduPlus
                 menuItemCtss.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ctss.NAME, 0) != 0); OnCtssClicked(menuItemCtss, null);
                 menuItemGlob.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Glob.NAME, 1) != 0); OnGlobClicked(menuItemGlob, null);
                 menuItemGzps.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Gzps.NAME, 1) != 0); OnGzpsClicked(menuItemGzps, null);
+                menuItemImg.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Img.NAME, 1) != 0); OnImgClicked(menuItemImg, null);
                 menuItemObjd.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objd.NAME, 1) != 0); OnObjdClicked(menuItemObjd, null);
                 menuItemObjf.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objf.NAME, 1) != 0); OnObjfClicked(menuItemObjf, null);
                 menuItemSlot.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Slot.NAME, 1) != 0); OnSlotClicked(menuItemSlot, null);
@@ -599,6 +599,7 @@ namespace HcduPlus
                 menuItemTrcn.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Trcn.NAME, 0) != 0); OnTrcnClicked(menuItemTrcn, null);
                 menuItemTtab.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttab.NAME, 1) != 0); OnTtabClicked(menuItemTtab, null);
                 menuItemTtas.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttas.NAME, 1) != 0); OnTtasClicked(menuItemTtas, null);
+                menuItemUi.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ui.NAME, 1) != 0); OnUiClicked(menuItemUi, null);
                 menuItemVers.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Vers.NAME, 0) != 0); OnVersClicked(menuItemVers, null);
 
                 menuItemGuidConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, 1) != 0);
@@ -857,6 +858,7 @@ namespace HcduPlus
             if (!menuItemCtss.Checked) { menuItemCtss.Checked = true; OnCtssClicked(menuItemCtss, null); }
             if (!menuItemGlob.Checked) { menuItemGlob.Checked = true; OnGlobClicked(menuItemGlob, null); }
             if (!menuItemGzps.Checked) { menuItemGzps.Checked = true; OnGzpsClicked(menuItemGzps, null); }
+            if (!menuItemImg.Checked) { menuItemImg.Checked = true; OnImgClicked(menuItemImg, null); }
             if (!menuItemObjd.Checked) { menuItemObjd.Checked = true; OnObjdClicked(menuItemObjd, null); }
             if (!menuItemObjf.Checked) { menuItemObjf.Checked = true; OnObjfClicked(menuItemObjf, null); }
             if (!menuItemSlot.Checked) { menuItemSlot.Checked = true; OnSlotClicked(menuItemSlot, null); }
@@ -865,6 +867,7 @@ namespace HcduPlus
             if (!menuItemTrcn.Checked) { menuItemTrcn.Checked = true; OnTrcnClicked(menuItemTrcn, null); }
             if (!menuItemTtab.Checked) { menuItemTtab.Checked = true; OnTtabClicked(menuItemTtab, null); }
             if (!menuItemTtas.Checked) { menuItemTtas.Checked = true; OnTtasClicked(menuItemTtas, null); }
+            if (!menuItemUi.Checked) { menuItemUi.Checked = true; OnUiClicked(menuItemUi, null); }
             if (!menuItemVers.Checked) { menuItemVers.Checked = true; OnVersClicked(menuItemVers, null); }
         }
 
@@ -876,6 +879,7 @@ namespace HcduPlus
             if (menuItemCtss.Checked) { menuItemCtss.Checked = false; OnCtssClicked(menuItemCtss, null); }
             if (menuItemGlob.Checked) { menuItemGlob.Checked = false; OnGlobClicked(menuItemGlob, null); }
             if (menuItemGzps.Checked) { menuItemGzps.Checked = false; OnGzpsClicked(menuItemGzps, null); }
+            if (menuItemImg.Checked) { menuItemImg.Checked = false; OnImgClicked(menuItemImg, null); }
             if (menuItemObjd.Checked) { menuItemObjd.Checked = false; OnObjdClicked(menuItemObjd, null); }
             if (menuItemObjf.Checked) { menuItemObjf.Checked = false; OnObjfClicked(menuItemObjf, null); }
             if (menuItemSlot.Checked) { menuItemSlot.Checked = false; OnSlotClicked(menuItemSlot, null); }
@@ -884,6 +888,7 @@ namespace HcduPlus
             if (menuItemTrcn.Checked) { menuItemTrcn.Checked = false; OnTrcnClicked(menuItemTrcn, null); }
             if (menuItemTtab.Checked) { menuItemTtab.Checked = false; OnTtabClicked(menuItemTtab, null); }
             if (menuItemTtas.Checked) { menuItemTtas.Checked = false; OnTtasClicked(menuItemTtas, null); }
+            if (menuItemUi.Checked) { menuItemUi.Checked = false; OnUiClicked(menuItemUi, null); }
             if (menuItemVers.Checked) { menuItemVers.Checked = false; OnVersClicked(menuItemVers, null); }
         }
 
@@ -957,6 +962,18 @@ namespace HcduPlus
                 enabledResources.Remove(Gzps.TYPE);
 
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Gzps.NAME, enabled ? 1 : 0);
+        }
+
+        private void OnImgClicked(object sender, EventArgs e)
+        {
+            bool enabled = ((ToolStripMenuItem)sender).Checked;
+
+            if (enabled)
+                enabledResources.Add(Img.TYPE);
+            else
+                enabledResources.Remove(Img.TYPE);
+
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Img.NAME, enabled ? 1 : 0);
         }
 
         private void OnObjdClicked(object sender, EventArgs e)
@@ -1053,6 +1070,18 @@ namespace HcduPlus
                 enabledResources.Remove(Ttas.TYPE);
 
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttas.NAME, enabled ? 1 : 0);
+        }
+
+        private void OnUiClicked(object sender, EventArgs e)
+        {
+            bool enabled = ((ToolStripMenuItem)sender).Checked;
+
+            if (enabled)
+                enabledResources.Add(Ui.TYPE);
+            else
+                enabledResources.Remove(Ui.TYPE);
+
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Ui.NAME, enabled ? 1 : 0);
         }
 
         private void OnVersClicked(object sender, EventArgs e)

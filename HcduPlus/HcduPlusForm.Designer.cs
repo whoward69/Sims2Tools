@@ -72,6 +72,7 @@ namespace HcduPlus
             this.menuItemCtss = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGlob = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGzps = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemImg = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemObjd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemObjf = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSlot = new System.Windows.Forms.ToolStripMenuItem();
@@ -80,6 +81,7 @@ namespace HcduPlus
             this.menuItemTrcn = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemTtab = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemTtas = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemUi = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemVers = new System.Windows.Forms.ToolStripMenuItem();
             this.menuConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGuidConflicts = new System.Windows.Forms.ToolStripMenuItem();
@@ -267,6 +269,7 @@ namespace HcduPlus
             this.menuItemCtss,
             this.menuItemGlob,
             this.menuItemGzps,
+            this.menuItemImg,
             this.menuItemObjd,
             this.menuItemObjf,
             this.menuItemSlot,
@@ -275,6 +278,7 @@ namespace HcduPlus
             this.menuItemTrcn,
             this.menuItemTtab,
             this.menuItemTtas,
+            this.menuItemUi,
             this.menuItemVers});
             this.menuResources.Name = "menuResources";
             this.menuResources.Size = new System.Drawing.Size(72, 20);
@@ -347,6 +351,14 @@ namespace HcduPlus
             this.menuItemGzps.Text = "Gzps";
             this.menuItemGzps.Click += new System.EventHandler(this.OnGzpsClicked);
             // 
+            // menuItemImg
+            // 
+            this.menuItemImg.CheckOnClick = true;
+            this.menuItemImg.Name = "menuItemImg";
+            this.menuItemImg.Size = new System.Drawing.Size(180, 22);
+            this.menuItemImg.Text = "Img";
+            this.menuItemImg.Click += new System.EventHandler(this.OnImgClicked);
+            // 
             // menuItemObjd
             // 
             this.menuItemObjd.CheckOnClick = true;
@@ -410,6 +422,14 @@ namespace HcduPlus
             this.menuItemTtas.Size = new System.Drawing.Size(180, 22);
             this.menuItemTtas.Text = "Ttas";
             this.menuItemTtas.Click += new System.EventHandler(this.OnTtasClicked);
+            // 
+            // menuItemUi
+            // 
+            this.menuItemUi.CheckOnClick = true;
+            this.menuItemUi.Name = "menuItemUi";
+            this.menuItemUi.Size = new System.Drawing.Size(180, 22);
+            this.menuItemUi.Text = "UI";
+            this.menuItemUi.Click += new System.EventHandler(this.OnUiClicked);
             // 
             // menuItemVers
             // 
@@ -928,6 +948,7 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemCtss;
         private System.Windows.Forms.ToolStripMenuItem menuItemGlob;
         private System.Windows.Forms.ToolStripMenuItem menuItemGzps;
+        private System.Windows.Forms.ToolStripMenuItem menuItemImg;
         private System.Windows.Forms.ToolStripMenuItem menuItemObjd;
         private System.Windows.Forms.ToolStripMenuItem menuItemObjf;
         private System.Windows.Forms.ToolStripMenuItem menuItemSlot;
@@ -936,6 +957,7 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemTrcn;
         private System.Windows.Forms.ToolStripMenuItem menuItemTtab;
         private System.Windows.Forms.ToolStripMenuItem menuItemTtas;
+        private System.Windows.Forms.ToolStripMenuItem menuItemUi;
         private System.Windows.Forms.ToolStripMenuItem menuItemVers;
         private System.Windows.Forms.ToolStripMenuItem menuConflicts;
         private System.Windows.Forms.ToolStripMenuItem menuItemInternalConflicts;

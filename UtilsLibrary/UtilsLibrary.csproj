@@ -93,6 +93,7 @@
     <Compile Include="Dialogs\Sims2ToolsTextEntryDialog.Designer.cs">
       <DependentUpon>Sims2ToolsTextEntryDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IO\Sims2Directory.cs" />
     <Compile Include="SimpeData.cs" />
     <Compile Include="GameData.cs" />

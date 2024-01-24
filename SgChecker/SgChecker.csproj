@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DuplicatePackages.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="SgCheckerApp.cs" />
     <Compile Include="SgCheckerData.cs" />
     <Compile Include="SgCheckerForm.cs">

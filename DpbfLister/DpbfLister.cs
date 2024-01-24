@@ -32,6 +32,7 @@ namespace DpbfLister
 
         private static void DoComplexStuff()
         {
+#pragma warning disable IDE0063 // Use simple 'using' statement
             using (DBPFFile package = new DBPFFile($"{Sims2ToolsLib.Sims2Path}{GameData.objectsSubPath}"))
             {
                 foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
@@ -40,7 +41,7 @@ namespace DpbfLister
 
                     Glob glob = (Glob)package.GetResourceByKey(new DBPFKey(Glob.TYPE, objd.GroupID, (TypeInstanceID)0x00000001, DBPFData.RESOURCE_NULL));
 
-                    if (glob == null) glob = (Glob)package.GetResourceByKey(new DBPFKey(Glob.TYPE, objd.GroupID, (TypeInstanceID)0x00000080, DBPFData.RESOURCE_NULL));
+                    glob ??= (Glob)package.GetResourceByKey(new DBPFKey(Glob.TYPE, objd.GroupID, (TypeInstanceID)0x00000080, DBPFData.RESOURCE_NULL));
 
                     if (glob?.SemiGlobalGroup == (TypeGroupID)0x7F67DD1B)
                     {
@@ -56,6 +57,7 @@ namespace DpbfLister
                     }
                 }
             }
+#pragma warning restore IDE0063 // Use simple 'using' statement
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
