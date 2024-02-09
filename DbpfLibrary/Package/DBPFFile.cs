@@ -32,6 +32,7 @@ using Sims2Tools.DBPF.Neighbourhood.SWAF;
 using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
+using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.CRES;
@@ -224,6 +225,13 @@ namespace Sims2Tools.DBPF.Package
         {
             m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
 
+            // TODO - just because there is no CLST resource (or no entry in the CLST) does NOT mean the data isn't compressed!
+            // TODO - Try to guess if this is compressed data
+            // If entry.FileSize > 9 we could have compressed data
+            //   Read the first 4 bytes as a DWORD, if the value is the same as entry.FileSize it can still be compressed data
+            //   Read the next 2 bytes as a WORD, if the value is 0xFB10 it probably is compressed data
+            //   Read the next 3 bytes as a big-endian 24-bit value, would this make sense as a uncompressed data size?
+
             if (entry.UncompressedSize != 0)
             {
                 try
@@ -277,6 +285,11 @@ namespace Sims2Tools.DBPF.Package
             {
                 return Helper.ToString(this.GetDbpfReader(entry).ReadBytes(Math.Min((int)entry.FileSize, 0x40)));
             }
+        }
+
+        public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName)
+        {
+            return GetResourceByKey(SgHelper.KeyFromQualifiedName(sgName, typeId, DBPFData.GROUP_SG_MAXIS));
         }
 
         public DBPFResource GetResourceByTGIR(int tgir)

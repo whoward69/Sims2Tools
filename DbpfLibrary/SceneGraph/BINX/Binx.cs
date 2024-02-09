@@ -29,6 +29,10 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
             get => "Binary Index";
         }
 
+        public Binx(DBPFEntry entry) : base(entry)
+        {
+        }
+
         public Binx(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgIdrIndexes.Add(ObjectIdx);

@@ -953,7 +953,7 @@ namespace GeneticsChanger
                     using (DBPFFile package = new DBPFFile(fromPackagePath))
                     {
                         FileInfo fi = new FileInfo(fromPackagePath);
-                        TypeGroupID groupId = Hashes.GroupHash(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
+                        TypeGroupID groupId = Hashes.GroupIDHash(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
 
                         foreach (DBPFEntry entry in package.GetAllEntries())
                         {
@@ -2284,6 +2284,7 @@ namespace GeneticsChanger
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         private void OnResDeleteThumbClicked(object sender, EventArgs e)
         {
             DataGridViewRow selectedRow = gridResources.SelectedRows[0];

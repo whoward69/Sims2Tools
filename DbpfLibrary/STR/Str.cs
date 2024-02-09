@@ -14,7 +14,8 @@ using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
-using System.Collections;
+using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
@@ -30,18 +31,27 @@ namespace Sims2Tools.DBPF.STR
 
         private MetaData.FormatCode format;
 
-        Hashtable lines;
+        Dictionary<byte, StrItemList> languages;
+
+        #region Constructors
+        public Str(DBPFEntry entry) : base(entry)
+        {
+            format = MetaData.FormatCode.normal;
+            languages = new Dictionary<byte, StrItemList>();
+        }
 
         public Str(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader /*, entry.DataSize*/);
         }
+        #endregion
 
+        #region Clean/Dirty State
         public override bool IsDirty
         {
             get
             {
-                foreach (StrItemList strItems in lines.Values)
+                foreach (StrItemList strItems in languages.Values)
                 {
                     foreach (StrItem strItem in strItems)
                     {
@@ -55,7 +65,7 @@ namespace Sims2Tools.DBPF.STR
 
         public override void SetClean()
         {
-            foreach (StrItemList strItems in lines.Values)
+            foreach (StrItemList strItems in languages.Values)
             {
                 foreach (StrItem strItem in strItems)
                 {
@@ -63,7 +73,9 @@ namespace Sims2Tools.DBPF.STR
                 }
             }
         }
+        #endregion
 
+        #region Properties
         public MetaData.Languages PrefLid
         {
             get => onlyLid;
@@ -75,29 +87,67 @@ namespace Sims2Tools.DBPF.STR
             get
             {
                 StrLanguageList lngs = new StrLanguageList();
-                foreach (byte k in lines.Keys) lngs.Add(k);
+                foreach (byte k in languages.Keys) lngs.Add(k);
                 lngs.Sort();
 
                 return lngs;
             }
         }
+        #endregion
 
-        public StrItemList LanguageItems(StrLanguage l)
+        public void DefLanguageOnly()
         {
-            if (l == null) return new StrItemList();
-            return LanguageItems((MetaData.Languages)l.Id);
+            StrItemList defLang = LanguageItems(MetaData.Languages.Default);
+
+            foreach (StrItem item in defLang)
+            {
+                item.Description = "";
+            }
+
+            languages.Clear();
+            languages.Add((byte)MetaData.Languages.Default, defLang);
+
+            _isDirty = true;
         }
 
         public StrItemList LanguageItems(MetaData.Languages l)
         {
 
-            StrItemList items = (StrItemList)lines[(byte)l] ?? new StrItemList();
+            StrItemList items = languages[(byte)l] ?? new StrItemList();
             return items;
         }
 
+        public void AddLanguages(Dictionary<byte, StrItemList> newLanguages)
+        {
+            foreach (byte lid in newLanguages.Keys)
+            {
+                if (!languages.ContainsKey(lid))
+                {
+                    languages.Add(lid, newLanguages[lid]);
+                }
+                else
+                {
+                    throw new ArgumentException($"Duplicate language key {lid}");
+                }
+            }
+        }
+
+        public Dictionary<byte, StrItemList> CloneLanguages()
+        {
+            Dictionary<byte, StrItemList> clone = new Dictionary<byte, StrItemList>(languages.Count);
+
+            foreach (byte lid in languages.Keys)
+            {
+                clone.Add(lid, languages[lid].CloneStrings());
+            }
+
+            return clone;
+        }
+
+        #region Serialization
         protected void Unserialize(DbpfReader reader /*, uint length*/)
         {
-            lines = new Hashtable();
+            languages = new Dictionary<byte, StrItemList>();
             // Why? Some resources have a declared length less than the actual amount of data in them!
             // if (length <= 0x40) return;
 
@@ -109,7 +159,7 @@ namespace Sims2Tools.DBPF.STR
             ushort count = reader.ReadUInt16();
             for (int i = 0; i < count; i++)
             {
-                StrItem.Unserialize(reader, lines);
+                StrItem.Unserialize(reader, languages);
             }
         }
 
@@ -119,7 +169,7 @@ namespace Sims2Tools.DBPF.STR
             {
                 uint size = 0x40 + 2 + 2;
 
-                foreach (StrItemList strItems in lines.Values)
+                foreach (StrItemList strItems in languages.Values)
                 {
                     foreach (StrItem strItem in strItems)
                     {
@@ -138,10 +188,10 @@ namespace Sims2Tools.DBPF.STR
             writer.WriteUInt16((ushort)format);
 
             int count = 0;
-            foreach (StrItemList strItems in lines.Values) count += strItems.Count;
+            foreach (StrItemList strItems in languages.Values) count += strItems.Count;
             writer.WriteUInt16((ushort)count);
 
-            foreach (StrItemList strItems in lines.Values)
+            foreach (StrItemList strItems in languages.Values)
             {
                 foreach (StrItem strItem in strItems)
                 {
@@ -149,7 +199,9 @@ namespace Sims2Tools.DBPF.STR
                 }
             }
         }
+        #endregion
 
+        #region Xml Output
         public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = XmlHelper.CreateResElement(parent, NAME, this);
@@ -199,7 +251,7 @@ namespace Sims2Tools.DBPF.STR
             lang.SetAttribute("id", Helper.Hex2PrefixString(strlng.Id));
             if (strlng.Name != strlng.Id.ToString()) lang.SetAttribute("name", strlng.Name);
 
-            StrItemList stritems = LanguageItems(strlng);
+            StrItemList stritems = LanguageItems((MetaData.Languages)strlng.Id);
 
             for (int i = 0; i < stritems.Count; ++i)
             {
@@ -212,5 +264,6 @@ namespace Sims2Tools.DBPF.STR
                 XmlHelper.CreateCDataElement(ele, "desc", stritem.Description);
             }
         }
+        #endregion
     }
 }

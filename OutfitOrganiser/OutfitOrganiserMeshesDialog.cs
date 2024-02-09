@@ -109,9 +109,9 @@ namespace OutfitOrganiser
                                             {
                                                 if (gmndName.Equals(gmnd.SgName, StringComparison.OrdinalIgnoreCase))
                                                 {
-                                                    foreach (DBPFKey gmndKey in gmnd.GmdcKeys)
+                                                    foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
                                                     {
-                                                        Gmdc gmdc = (Gmdc)package.GetResourceByKey(gmndKey);
+                                                        Gmdc gmdc = (Gmdc)package.GetResourceByKey(gmdcKey);
 
                                                         if (gmdc != null)
                                                         {

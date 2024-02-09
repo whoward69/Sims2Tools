@@ -56,6 +56,14 @@ namespace Sims2Tools.DBPF.Utils
             // Check that this is actually compressed data, as some apps leave incorrect entries in the CLST resource
             if (Data.Length > HEADER_SIZE && Data[4] == HEADER_SIGNATURE_LO && Data[5] == HEADER_SIGNATURE_HI)
             {
+                // Header bytes 0 thru 3 are a 32-bit value giving the size of the compressed data (little-endian)
+                Int32 headerCompressedSize = ((Data[3] * 256 + Data[2]) * 256 + Data[1]) * 256 + Data[0];
+                // Header bytes 6 thru 8 are a 24-bit value giving the size of the decompressed data (big-endian)
+                Int32 headerUncompressedSize = (Data[6] * 256 + Data[7]) * 256 + Data[8];
+
+                // TODO - Should we be checking the compressed/uncompressed sizes in the header against those passed?
+                // That is Data.Length == headerCompressedSize && UncompressedFileSize == headerUncompressedSize
+
                 byte[] DecompressedData = new byte[(int)UncompressedFileSize];
                 int DataPos = 0;
 

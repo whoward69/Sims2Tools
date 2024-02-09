@@ -46,6 +46,11 @@ namespace Sims2Tools.DBPF.CPF
             this.datatype = datatype;
         }
 
+        public CpfItem(DbpfReader reader) : this()
+        {
+            Unserialize(reader);
+        }
+
         public string Name
         {
             get => name;
@@ -61,6 +66,16 @@ namespace Sims2Tools.DBPF.CPF
         {
             get => val;
             set { val = value; }
+        }
+
+        public CpfItem Clone()
+        {
+            CpfItem clone = new CpfItem(name, datatype)
+            {
+                Value = (byte[])val.Clone()
+            };
+
+            return clone;
         }
 
         public string StringValue

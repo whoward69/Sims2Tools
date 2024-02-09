@@ -15,6 +15,11 @@ using System;
 
 namespace Sims2Tools.DBPF
 {
+    class TypeRng
+    {
+        internal static Random RNG = new Random();
+    }
+
     /*
      * Data type for strong typing of GUIDs
      */
@@ -94,6 +99,8 @@ namespace Sims2Tools.DBPF
         public String IntString() => Helper.IntString(id);
 
         public uint AsUInt() => id;
+
+        public static TypeGroupID RandomID => (TypeGroupID)(uint)TypeRng.RNG.Next();
     }
 
     public readonly struct TypeInstanceID : IComparable<TypeInstanceID>
@@ -118,6 +125,8 @@ namespace Sims2Tools.DBPF
         public String IntString() => Helper.IntString(id);
 
         public uint AsUInt() => id;
+
+        public static TypeInstanceID RandomID => (TypeInstanceID)(uint)TypeRng.RNG.Next();
     }
 
     public readonly struct TypeResourceID : IComparable<TypeResourceID>
@@ -142,6 +151,8 @@ namespace Sims2Tools.DBPF
         public String IntString() => Helper.IntString(id);
 
         public uint AsUInt() => id;
+
+        public static TypeResourceID RandomID => (TypeResourceID)(uint)TypeRng.RNG.Next();
     }
 
     /*

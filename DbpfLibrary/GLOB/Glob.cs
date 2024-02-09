@@ -32,7 +32,7 @@ namespace Sims2Tools.DBPF.GLOB
 
         public TypeGroupID SemiGlobalGroup
         {
-            get => Hashes.GroupHash(SemiGlobalName);
+            get => Hashes.GroupIDHash(SemiGlobalName);
         }
 
         public Glob(DBPFEntry entry, DbpfReader reader) : base(entry)

@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}</ProjectGuid>
+    <ProjectGuid>{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>BsokEditor</RootNamespace>
-    <AssemblyName>BsokEditor</AssemblyName>
+    <RootNamespace>RepositoryWizard</RootNamespace>
+    <AssemblyName>RepositoryWizard</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -39,13 +39,14 @@
     <ApplicationIcon>Sims2Tools.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <StartupObject>RepositoryWizard.RepositoryWizardApp</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomMarshalers" />
     <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.5.0, Culture=neutral, PublicKeyToken=8985beaab7ea3f04, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft-WindowsAPICodePack-Core.1.1.5\lib\net48\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
@@ -55,12 +56,9 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime" />
-    <Reference Include="System.Runtime.InteropServices" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -76,30 +74,31 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="XmlValue.cs" />
     <Compile Include="NamedValue.cs" />
-    <Compile Include="BsokEditorApp.cs" />
-    <Compile Include="BsokEditorData.cs" />
-    <Compile Include="BsokEditorForm.cs">
+    <Compile Include="RepositoryWizardApp.cs" />
+    <Compile Include="RepositoryWizardCache.cs" />
+    <Compile Include="RepositoryWizardWorker.cs" />
+    <Compile Include="RepositoryWizardData.cs" />
+    <Compile Include="RepositoryWizardForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BsokEditorForm.Designer.cs">
-      <DependentUpon>BsokEditorForm.cs</DependentUpon>
+    <Compile Include="RepositoryWizardForm.Designer.cs">
+      <DependentUpon>RepositoryWizardForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="BsokEditorForm.resx">
-      <DependentUpon>BsokEditorForm.cs</DependentUpon>
+    <EmbeddedResource Include="RepositoryWizardForm.resx">
+      <DependentUpon>RepositoryWizardForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <None Include="App.Debug.config">
       <DependentUpon>App.config</DependentUpon>
       <IsTransformFile>true</IsTransformFile>
@@ -125,40 +124,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Padlock_locked_16.png" />
-    <None Include="Resources\Padlock_locked_gray_16.png" />
-    <None Include="Resources\Padlock_unlocked_16.png" />
-    <None Include="Resources\Padlock_unlocked_gray_16.png" />
-    <Content Include="Resources\XML\bsok_01nu_B_Curvy.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\XML\bsok_01nu_E_Misc.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\XML\bsok_01nu_D_BodyRealism.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\XML\bsok_01nu_C_Muscly.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\XML\bsok_03mfFantasy.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\XML\bsok_04Legacy.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\XML\bsok_02mfMedieval.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\XML\bsok_01nu_A_Maxis.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\XML\bsok_05cccasok.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Sims2Tools.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\DbpfLibrary\DbpfLibrary.csproj">
       <Project>{fbecabcd-0403-4b7e-9992-01562a62db83}</Project>
       <Name>DbpfLibrary</Name>
@@ -168,12 +133,9 @@
       <Name>UtilsLibrary</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Sims2Tools.ico" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Microsoft.VisualStudio.SlowCheetah.4.0.50\build\Microsoft.VisualStudio.SlowCheetah.targets" Condition="Exists('..\packages\Microsoft.VisualStudio.SlowCheetah.4.0.50\build\Microsoft.VisualStudio.SlowCheetah.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.VisualStudio.SlowCheetah.4.0.50\build\Microsoft.VisualStudio.SlowCheetah.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.VisualStudio.SlowCheetah.4.0.50\build\Microsoft.VisualStudio.SlowCheetah.targets'))" />
-  </Target>
 </Project>

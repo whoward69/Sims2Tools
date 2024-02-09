@@ -22,7 +22,6 @@ using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DBPF.XROF;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -31,7 +30,7 @@ namespace ObjectRelocator
 {
     public class ObjectDbpfData : IEquatable<ObjectDbpfData>
     {
-        // private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static RelocatorDbpfCache cache;
         public static void SetCache(RelocatorDbpfCache cache)
@@ -39,9 +38,9 @@ namespace ObjectRelocator
             ObjectDbpfData.cache = cache;
         }
 
-        private string packagePath;
-        private string packageNameNoExtn;
-        private string packageName;
+        private readonly string packagePath;
+        private readonly string packageNameNoExtn;
+        private readonly string packageName;
 
         private readonly DBPFResource res = null;
         private readonly Str strings = null;
@@ -59,9 +58,45 @@ namespace ObjectRelocator
 
         public bool HasTitleAndDescription => (strings != null);
 
-        public TypeGroupID GroupID => res.GroupID;
+        public string Title
+        {
+            get
+            {
+                if (HasTitleAndDescription)
+                {
+                    StrItemList strs = strings?.LanguageItems(MetaData.Languages.English);
 
-        public bool IsDirty => (res.IsDirty || (strings != null && strings.IsDirty) || (leadtile != null && leadtile.IsDirty) || (diagonaltile != null && diagonaltile.IsDirty));
+                    if (strs?[0] != null)
+                    {
+                        return strs[0].Title;
+                    }
+                }
+                else if (IsCpf)
+                {
+                    return GetStrItem("name");
+                }
+
+                return "";
+            }
+        }
+
+        public string Description
+        {
+            get
+            {
+                if (HasTitleAndDescription)
+                {
+                    StrItemList strs = strings.LanguageItems(MetaData.Languages.Default);
+
+                    if (strs?[1] != null)
+                    {
+                        return strs[1].Title;
+                    }
+                }
+
+                return "";
+            }
+        }
 
         public bool IsMultiTile
         {
@@ -88,6 +123,14 @@ namespace ObjectRelocator
                 return false;
             }
         }
+
+        public TypeGroupID GroupID => res.GroupID;
+
+        public string KeyName => res.KeyName;
+
+        public string Guid => (IsObjd) ? (res as Objd).Guid.ToString() : (IsCpf ? Helper.Hex8PrefixString(GetUIntItem("guid")) : "");
+
+        public bool IsDirty => (res.IsDirty || (strings != null && strings.IsDirty) || (leadtile != null && leadtile.IsDirty) || (diagonaltile != null && diagonaltile.IsDirty));
 
         public void SetClean()
         {
@@ -170,15 +213,6 @@ namespace ObjectRelocator
 
         public DBPFResource ThumbnailOwner => res;
 
-        public void Rename(string fromPackagePath, string toPackagePath)
-        {
-            Debug.Assert(packagePath.Equals(fromPackagePath));
-
-            packagePath = toPackagePath;
-            packageName = new FileInfo(packagePath).Name;
-            packageNameNoExtn = packageName.Substring(0, packageName.LastIndexOf('.'));
-        }
-
         public void CopyTo(RelocatorDbpfFile dbpfPackage)
         {
             if (res.IsDirty) dbpfPackage.Commit(res);
@@ -194,7 +228,6 @@ namespace ObjectRelocator
             if (leadtile != null && leadtile.IsDirty) cache.GetOrAdd(packagePath).Commit(leadtile);
             if (diagonaltile != null && diagonaltile.IsDirty) cache.GetOrAdd(packagePath).Commit(diagonaltile);
         }
-
 
         public ushort GetRawData(ObjdIndex objdIndex)
         {
@@ -243,11 +276,23 @@ namespace ObjectRelocator
             {
                 cpf.GetItem(itemName).UIntegerValue = value;
 
-                if (strings != null)
+                if (itemName.Equals("cost"))
                 {
-                    if (itemName.Equals("cost"))
+                    if (strings != null)
                     {
-                        strings.LanguageItems(MetaData.Languages.Default)[2].Title = value.ToString();
+                        StrItemList defLangStrings = strings.LanguageItems(MetaData.Languages.Default);
+
+                        // Add any missing strings, [0]=name, [1]=author, [2]=cost
+                        while (defLangStrings.Count < 3)
+                        {
+                            defLangStrings.Append((byte)MetaData.Languages.Default, "", "");
+                        }
+
+                        defLangStrings[2].Title = value.ToString();
+                    }
+                    else
+                    {
+                        logger.Warn($"Can't set 'cost' to {value} for {cpf} as no associated STR# resource available");
                     }
                 }
 
@@ -277,6 +322,7 @@ namespace ObjectRelocator
                     if (strs?[0] != null)
                     {
                         strs[0].Title = value;
+                        strs[0].Description = "";
                     }
                 }
 
@@ -297,6 +343,7 @@ namespace ObjectRelocator
                     if (strs?[1] != null)
                     {
                         strs[1].Title = value;
+                        strs[1].Description = "";
                     }
                 }
 
@@ -316,49 +363,10 @@ namespace ObjectRelocator
             }
         }
 
-        public string Title
+        public void DefLanguageOnly()
         {
-            get
-            {
-                if (HasTitleAndDescription)
-                {
-                    StrItemList strs = strings?.LanguageItems(MetaData.Languages.English);
-
-                    if (strs?[0] != null)
-                    {
-                        return strs[0].Title;
-                    }
-                }
-                else if (IsCpf)
-                {
-                    return GetStrItem("name");
-                }
-
-                return "";
-            }
+            strings?.DefLanguageOnly();
         }
-
-        public string Description
-        {
-            get
-            {
-                if (HasTitleAndDescription)
-                {
-                    StrItemList strs = strings.LanguageItems(MetaData.Languages.Default);
-
-                    if (strs?[1] != null)
-                    {
-                        return strs[1].Title;
-                    }
-                }
-
-                return "";
-            }
-        }
-
-        public string KeyName => res.KeyName;
-
-        public string Guid => (IsObjd) ? (res as Objd).Guid.ToString() : (IsCpf ? Helper.Hex8PrefixString(GetUIntItem("guid")) : "");
 
         public bool Equals(ObjectDbpfData other)
         {
@@ -543,7 +551,7 @@ namespace ObjectRelocator
                             if (groupId == DBPFData.GROUP_LOCAL)
                             {
                                 FileInfo fi = new FileInfo(objectData.PackagePath);
-                                groupId = Hashes.GroupHash(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
+                                groupId = Hashes.GroupIDHash(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
                             }
 
                             TypeInstanceID thumbInstanceID = (TypeInstanceID)Hashes.ThumbnailHash(groupId, cresname);
@@ -580,7 +588,7 @@ namespace ObjectRelocator
                     {
                         TypeGroupID groupId = cpf.GroupID;
 
-                        TypeTypeID thumbTypeID = DBPFData.Type_NULL;
+                        TypeTypeID thumbTypeID = DBPFData.TYPE_NULL;
                         TypeInstanceID thumbInstanceID = (TypeInstanceID)cpf.GetItem("guid").UIntegerValue;
                         TypeResourceID thumbResourceID = (TypeResourceID)groupId.AsUInt();
                         // How to get a Build Mode thumbnail? As thumbInstanceID & thumbResourceID are garbage!
@@ -615,7 +623,7 @@ namespace ObjectRelocator
                                 thumbInstanceID = (TypeInstanceID)Hashes.ThumbnailHash(Hashes.StripHashFromName(cpf.GetItem("texturetname").StringValue));
                         }
 
-                        if (thumbTypeID != DBPFData.Type_NULL)
+                        if (thumbTypeID != DBPFData.TYPE_NULL)
                         {
                             thub = GetBuildThumbnailByTGIR(thumbTypeID, DBPFData.GROUP_LOCAL, thumbInstanceID, thumbResourceID);
                         }

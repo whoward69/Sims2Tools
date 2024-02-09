@@ -188,6 +188,8 @@ namespace ObjectRelocator
             menuItemShowGuids.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowGuids.Name, 0) != 0); OnShowHideGuids(menuItemShowGuids, null);
             menuItemShowDepreciation.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowDepreciation.Name, 0) != 0); OnShowHideDepreciation(menuItemShowDepreciation, null);
 
+            menuItemRecurse.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, 1) != 0);
+
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
 
             menuItemMakeReplacements.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemMakeReplacements.Name, 0) != 0); OnMakeReplcementsClicked(menuItemMakeReplacements, null);
@@ -229,6 +231,8 @@ namespace ObjectRelocator
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowPath.Name, menuItemShowPath.Checked ? 1 : 0);
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowGuids.Name, menuItemShowGuids.Checked ? 1 : 0);
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowDepreciation.Name, menuItemShowDepreciation.Checked ? 1 : 0);
+
+            RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, menuItemRecurse.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
 
@@ -321,7 +325,7 @@ namespace ObjectRelocator
             sender.VisualMode = ProgressBarDisplayMode.CustomText;
             sender.SetProgress(0, "Loading Objects");
 
-            string[] packages = Directory.GetFiles(folder, "*.package", SearchOption.AllDirectories);
+            string[] packages = Directory.GetFiles(folder, "*.package", (menuItemRecurse.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
 
             uint total = (uint)packages.Length;
             uint done = 0;
@@ -2388,7 +2392,6 @@ namespace ObjectRelocator
                         }
                     }
 
-
                     if (gridViewResources.SelectedRows.Count == 1)
                     {
                         ObjectDbpfData objectData = mouseRow.Cells["colObjectData"].Value as ObjectDbpfData;
@@ -2405,6 +2408,8 @@ namespace ObjectRelocator
 
                         menuContextSaveThumb.Enabled = menuContextReplaceThumb.Enabled = menuContextDeleteThumb.Enabled = false;
                     }
+
+                    menuItemContextStripCTSSCrap.Enabled = (gridViewResources.SelectedRows.Count > 0);
 
                     return;
                 }
@@ -2443,6 +2448,42 @@ namespace ObjectRelocator
 
                 ReselectRows(new List<ObjectDbpfData>(1) { selectedObject });
             }
+        }
+
+        private void OnStripCTSSCrapClicked(object sender, EventArgs e)
+        {
+            List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            {
+                ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                if (objectData.IsObjd || objectData.IsXfnc)
+                {
+                    selectedData.Add(objectData);
+                }
+            }
+
+            foreach (ObjectDbpfData objectData in selectedData)
+            {
+                foreach (DataGridViewRow row in gridViewResources.Rows)
+                {
+                    if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Equals(objectData))
+                    {
+                        // Clear out the crap from the CTSS resource (probably left behind by "Sims 2 Categorizer")
+                        objectData.DefLanguageOnly();
+
+                        // We'll also mark the OBJD as dirty, as that probably also has a bad CLST entry as well!
+                        ushort ctssId = objectData.GetRawData(ObjdIndex.CatalogueStringsId);
+                        objectData.SetRawData(ObjdIndex.CatalogueStringsId, 0); // We have to do this to circumvent the new_data != old_data check
+                        objectData.SetRawData(ObjdIndex.CatalogueStringsId, ctssId);
+
+                        UpdateGridRow(objectData);
+                    }
+                }
+            }
+
+            ReselectRows(selectedData);
         }
 
         private void OnRowRevertClicked(object sender, EventArgs e)

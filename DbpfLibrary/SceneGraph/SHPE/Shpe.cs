@@ -55,6 +55,29 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
             }
         }
 
+        public List<string> Subsets
+        {
+            get
+            {
+                List<string> subsets = new List<string>();
+
+                foreach (IRcolBlock block in Blocks)
+                {
+                    if (block.BlockID == CShape.TYPE)
+                    {
+                        CShape cShape = block as CShape;
+
+                        foreach (ShapePart part in cShape.Parts)
+                        {
+                            subsets.Add(part.Subset);
+                        }
+                    }
+                }
+
+                return subsets;
+            }
+        }
+
 
         public override SgResourceList SgNeededResources()
         {
@@ -70,7 +93,7 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
                     {
                         if (item.FileName.StartsWith($"##0x", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            needed.Add(SgHelper.SgHash(SgHelper.TGIRFromQualifiedName(item.FileName, Gmnd.TYPE, DBPFData.GROUP_SG)));
+                            needed.Add(SgHelper.SgHash(SgHelper.KeyFromQualifiedName(item.FileName, Gmnd.TYPE, DBPFData.GROUP_SG_LOCAL)));
                         }
                         else
                         {

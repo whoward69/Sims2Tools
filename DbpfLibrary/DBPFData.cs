@@ -74,7 +74,7 @@ namespace Sims2Tools.DBPF
 {
     public class DBPFData
     {
-        public static TypeTypeID Type_NULL = (TypeTypeID)0x00000000;
+        public static TypeTypeID TYPE_NULL = (TypeTypeID)0x00000000; // Technically this is type UI
 
         public static TypeGroupID GROUP_GLOBALS = (TypeGroupID)0x7FD46CD0;
         public static String NAME_GLOBALS = "Globals";
@@ -85,16 +85,13 @@ namespace Sims2Tools.DBPF
         public static TypeGroupID GROUP_LOCAL = (TypeGroupID)0xFFFFFFFF;
         public static String NAME_LOCAL = "Local";
 
-        public static TypeGroupID GROUP_SG = (TypeGroupID)0x1C050000;
-
+        public static TypeGroupID GROUP_SG_MAXIS = (TypeGroupID)0x1C0532FA;
+        public static TypeGroupID GROUP_SG_LOCAL = (TypeGroupID)0x1C050000;
         public static TypeGroupID GROUP_COLLECTIONS = (TypeGroupID)0x0FFEFEFE;
-
         public static TypeGroupID GROUP_BONVOYAGE = (TypeGroupID)0x4F184AA9;
-
 
         public static TypeInstanceID INSTANCE_OBJD_DEFAULT = (TypeInstanceID)0x41A7;
         public static TypeInstanceID INSTANCE_NULL = (TypeInstanceID)0x00000000;
-
         public static TypeInstanceID INSTANCE_COLLECTIONS = (TypeInstanceID)0x0FFE0010;
 
         public static TypeResourceID RESOURCE_NULL = (TypeResourceID)0x00000000;

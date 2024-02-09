@@ -67,6 +67,8 @@ namespace ObjectRelocator
             this.menuMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBuyMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBuildMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemRecurse = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMakeReplacements = new System.Windows.Forms.ToolStripMenuItem();
@@ -153,6 +155,7 @@ namespace ObjectRelocator
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
+            this.menuItemContextStripCTSSCrap = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextObjects.SuspendLayout();
@@ -375,6 +378,8 @@ namespace ObjectRelocator
             this.menuMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemBuyMode,
             this.menuItemBuildMode,
+            this.toolStripSeparator4,
+            this.menuItemRecurse,
             this.menuItemSeparator5,
             this.menuItemAutoBackup,
             this.menuItemMakeReplacements});
@@ -399,6 +404,18 @@ namespace ObjectRelocator
             this.menuItemBuildMode.Size = new System.Drawing.Size(180, 22);
             this.menuItemBuildMode.Text = "Build Mode";
             this.menuItemBuildMode.Click += new System.EventHandler(this.OnBuyBuildModeClicked);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
+            // 
+            // menuItemRecurse
+            // 
+            this.menuItemRecurse.CheckOnClick = true;
+            this.menuItemRecurse.Name = "menuItemRecurse";
+            this.menuItemRecurse.Size = new System.Drawing.Size(180, 22);
+            this.menuItemRecurse.Text = "Include &Sub-Folders";
             // 
             // menuItemSeparator5
             // 
@@ -591,6 +608,7 @@ namespace ObjectRelocator
             // 
             this.menuContextObjects.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemContextEditTitleDesc,
+            this.menuItemContextStripCTSSCrap,
             this.toolStripSeparator1,
             this.menuItemContextRowRestore,
             this.menuItemSeparator6,
@@ -600,7 +618,7 @@ namespace ObjectRelocator
             this.toolStripSeparator3,
             this.menuItemContextMoveFiles});
             this.menuContextObjects.Name = "menuContextGrid";
-            this.menuContextObjects.Size = new System.Drawing.Size(227, 154);
+            this.menuContextObjects.Size = new System.Drawing.Size(227, 198);
             this.menuContextObjects.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextObjects.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             this.menuContextObjects.Opened += new System.EventHandler(this.OnContextMenuOpened);
@@ -1270,6 +1288,13 @@ namespace ObjectRelocator
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
             // 
+            // menuItemContextStripCTSSCrap
+            // 
+            this.menuItemContextStripCTSSCrap.Name = "menuItemContextStripCTSSCrap";
+            this.menuItemContextStripCTSSCrap.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextStripCTSSCrap.Text = "&Tidy Catalog Entries";
+            this.menuItemContextStripCTSSCrap.Click += new System.EventHandler(this.OnStripCTSSCrapClicked);
+            // 
             // ObjectRelocatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1341,6 +1366,8 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuItemExcludeHidden;
         private System.Windows.Forms.ToolStripMenuItem menuMode;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem menuItemRecurse;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoBackup;
         private System.Windows.Forms.ToolStripMenuItem menuItemMakeReplacements;
         private CommonOpenFileDialog selectPathDialog;
@@ -1439,5 +1466,6 @@ namespace ObjectRelocator
         private System.Windows.Forms.DataGridViewTextBoxColumn colPrice;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDepreciation;
         private System.Windows.Forms.DataGridViewTextBoxColumn colObjectData;
+        private System.Windows.Forms.ToolStripMenuItem menuItemContextStripCTSSCrap;
     }
 }

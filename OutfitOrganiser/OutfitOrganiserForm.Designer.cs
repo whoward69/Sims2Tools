@@ -176,6 +176,7 @@ namespace OutfitOrganiser
             this.menuContextDirDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
+            this.lblNoOutfitSelected = new System.Windows.Forms.Label();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -1481,6 +1482,21 @@ namespace OutfitOrganiser
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
             // 
+            // lblNoOutfitSelected
+            // 
+            this.lblNoOutfitSelected.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lblNoOutfitSelected.AutoSize = true;
+            this.lblNoOutfitSelected.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lblNoOutfitSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNoOutfitSelected.ForeColor = System.Drawing.Color.Red;
+            this.lblNoOutfitSelected.Location = new System.Drawing.Point(393, 300);
+            this.lblNoOutfitSelected.Name = "lblNoOutfitSelected";
+            this.lblNoOutfitSelected.Size = new System.Drawing.Size(197, 26);
+            this.lblNoOutfitSelected.TabIndex = 27;
+            this.lblNoOutfitSelected.Text = "No Outfits Selected!";
+            this.lblNoOutfitSelected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblNoOutfitSelected.Visible = false;
+            // 
             // OutfitOrganiserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1488,6 +1504,7 @@ namespace OutfitOrganiser
             this.ClientSize = new System.Drawing.Size(984, 561);
             this.Controls.Add(this.menuMain);
             this.Controls.Add(this.thumbBox);
+            this.Controls.Add(this.lblNoOutfitSelected);
             this.Controls.Add(this.splitTopBottom);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -1672,6 +1689,7 @@ namespace OutfitOrganiser
         private System.Windows.Forms.DataGridViewTextBoxColumn colTooltip;
         private System.Windows.Forms.DataGridViewTextBoxColumn colOutfitData;
         private System.Windows.Forms.ToolStripMenuItem menuContextResRepair;
+        private System.Windows.Forms.Label lblNoOutfitSelected;
     }
 }
 

@@ -26,18 +26,17 @@ namespace Sims2Tools.DBPF.CPF
     {
         private static readonly byte[] SIGNATURE = { 0xE0, 0x50, 0xE7, 0xCB, 0x02, 0x00 };
 
-        private CpfItem[] items;
+        private Boolean isDirty = false;
 
-        public CpfItem[] Items
-        {
-            get => items;
-        }
+        private List<CpfItem> items;
 
         public override bool IsDirty
         {
             get
             {
                 if (base.IsDirty) return true;
+
+                if (isDirty) return true;
 
                 foreach (CpfItem item in items)
                 {
@@ -52,15 +51,22 @@ namespace Sims2Tools.DBPF.CPF
         {
             base.SetClean();
 
+            this.isDirty = false;
+
             foreach (CpfItem item in items)
             {
                 item.SetClean();
             }
         }
 
+        public Cpf(DBPFEntry entry) : base(entry)
+        {
+            items = new List<CpfItem>();
+        }
+
         public Cpf(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
-            items = new CpfItem[0];
+            items = new List<CpfItem>();
 
             Unserialize(reader, (int)entry.DataSize);
         }
@@ -73,12 +79,13 @@ namespace Sims2Tools.DBPF.CPF
 
             if (Enumerable.SequenceEqual(id, SIGNATURE))
             {
-                items = new CpfItem[reader.ReadUInt32()];
+                uint entries = reader.ReadUInt32();
 
-                for (int i = 0; i < items.Length; i++)
+                items = new List<CpfItem>((int)entries);
+
+                for (int i = 0; i < entries; i++)
                 {
-                    items[i] = new CpfItem();
-                    items[i].Unserialize(reader);
+                    items.Add(new CpfItem(reader));
                 }
             }
             else
@@ -103,7 +110,7 @@ namespace Sims2Tools.DBPF.CPF
                         xmlfile.Load(strr);
 
                         XmlNodeList XMLData = xmlfile.GetElementsByTagName("cGZPropertySetString");
-                        List<CpfItem> list = new List<CpfItem>();
+                        items = new List<CpfItem>();
 
                         for (int i = 0; i < XMLData.Count; i++)
                         {
@@ -157,15 +164,12 @@ namespace Sims2Tools.DBPF.CPF
                                         }
 
                                         item.SetClean();
-                                        list.Add(item);
+                                        items.Add(item);
                                     }
                                     catch { }
                                 }
                             }
                         }
-
-                        items = new CpfItem[list.Count];
-                        list.CopyTo(items);
 
                         strr.Close();
                     }
@@ -184,7 +188,7 @@ namespace Sims2Tools.DBPF.CPF
                 uint size = (uint)SIGNATURE.Length;
                 size += 4; // Count of entries as UInt32
 
-                for (int i = 0; i < items.Length; i++)
+                for (int i = 0; i < items.Count; i++)
                 {
                     size += items[i].FileSize;
                 }
@@ -197,11 +201,31 @@ namespace Sims2Tools.DBPF.CPF
         {
             writer.WriteBytes(SIGNATURE);
 
-            writer.WriteUInt32((uint)items.Length);
+            writer.WriteUInt32((uint)items.Count);
 
-            for (int i = 0; i < items.Length; i++)
+            for (int i = 0; i < items.Count; i++)
             {
                 items[i].Serialize(writer);
+            }
+        }
+
+        public List<CpfItem> CloneItems()
+        {
+            List<CpfItem> cloneItems = new List<CpfItem>(items.Count);
+
+            for (int i = 0; i < items.Count; ++i)
+            {
+                cloneItems.Add(items[i].Clone());
+            }
+
+            return cloneItems;
+        }
+
+        public void AddItems(List<CpfItem> newItems)
+        {
+            foreach (CpfItem newItem in newItems)
+            {
+                AddItem(newItem);
             }
         }
 
@@ -209,7 +233,8 @@ namespace Sims2Tools.DBPF.CPF
         {
             if (item != null)
             {
-                items = (CpfItem[])Helper.Add(items, item);
+                items.Add(item);
+                isDirty = true;
             }
 
             return item;
@@ -243,7 +268,7 @@ namespace Sims2Tools.DBPF.CPF
         {
             XmlElement element = XmlHelper.CreateResElement(parent, name, this);
 
-            foreach (CpfItem item in Items)
+            foreach (CpfItem item in items)
             {
                 XmlElement ele = XmlHelper.CreateTextElement(element, "item", item.StringValue);
                 ele.SetAttribute("name", item.Name);
@@ -258,11 +283,10 @@ namespace Sims2Tools.DBPF.CPF
         {
             if (items != null)
             {
-                for (int i = items.Length - 1; i >= 0; i--)
+                for (int i = items.Count - 1; i >= 0; i--)
                     items[i]?.Dispose();
             }
 
-            items = new CpfItem[0];
             items = null;
         }
     }

@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
@@ -45,7 +46,7 @@ namespace Sims2Tools.DBPF.SceneGraph
 #endif
 
 #if DEBUG
-        private static readonly List<TypeTypeID> ImmuneTypes = new List<TypeTypeID>(new TypeTypeID[] { Cres.TYPE, Gmdc.TYPE, Gmnd.TYPE, Shpe.TYPE, Txmt.TYPE, Txtr.TYPE });
+        private static readonly List<TypeTypeID> ImmuneTypes = new List<TypeTypeID>(new TypeTypeID[] { Objd.TYPE, Cres.TYPE, Gmdc.TYPE, Gmnd.TYPE, Shpe.TYPE, Txmt.TYPE, Txtr.TYPE });
 #endif
 
         public static String SgHash(TypeTypeID typeID, TypeGroupID groupID, TypeResourceID resourceID, TypeInstanceID instanceID)
@@ -103,10 +104,10 @@ namespace Sims2Tools.DBPF.SceneGraph
             return SgName(namedKey.TypeID, namedKey.GroupID, namedKey.KeyName);
         }
 
-        public static DBPFKey TGIRFromQualifiedName(string fileName, TypeTypeID typeId, TypeGroupID defGroupId)
+        public static DBPFKey KeyFromQualifiedName(string fileName, TypeTypeID typeId, TypeGroupID defGroupId)
         {
             String name = Hashes.StripHashFromName(fileName);
-            return new DBPFKey(typeId, Hashes.GetHashGroupFromName(fileName, defGroupId), Hashes.InstanceHash(name), Hashes.SubTypeHash(name));
+            return new DBPFKey(typeId, Hashes.GetHashGroupFromName(fileName, defGroupId), Hashes.InstanceIDHash(name), Hashes.ResourceIDHash(name));
         }
     }
 
@@ -166,6 +167,12 @@ namespace Sims2Tools.DBPF.SceneGraph
         public String SgHash => sgHash;
         public String SgName => sgName;
 
+        public SgCpf(DBPFEntry entry) : base(entry)
+        {
+            sgHash = SgHelper.SgHash(this);
+            sgName = SgHelper.SgName(this);
+        }
+
         public SgCpf(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgHash = SgHelper.SgHash(this);
@@ -179,6 +186,11 @@ namespace Sims2Tools.DBPF.SceneGraph
     {
         protected readonly SgResourceList sgResourceList = new SgResourceList(1);
         protected readonly List<uint> sgIdrIndexes = new List<uint>(1);
+
+        public SgRefCpf(DBPFEntry entry) : base(entry)
+        {
+            sgResourceList.Add(SgHelper.SgHash(Idr.TYPE, this.GroupID, this.ResourceID, this.InstanceID));
+        }
 
         public SgRefCpf(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

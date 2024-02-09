@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutfitOrganiser", "OutfitOr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneticsChanger", "GeneticsChanger\GeneticsChanger.csproj", "{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoryWizard", "RepositoryWizard\RepositoryWizard.csproj", "{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -151,6 +153,14 @@ Global
 		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Release|x64.ActiveCfg = Release|Any CPU
 		{B614D104-69D7-4C7F-9AF7-19DB3CE7991E}.Release|x64.Build.0 = Release|Any CPU
+		{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}.Debug|x64.Build.0 = Debug|Any CPU
+		{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}.Release|x64.ActiveCfg = Release|Any CPU
+		{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

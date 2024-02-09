@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.IO;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.STR
 {
@@ -77,23 +78,30 @@ namespace Sims2Tools.DBPF.STR
     }
 
 
-    public class StrLanguageList : ArrayList
+    public class StrLanguageList : IEnumerable
     {
-        public new StrLanguage this[int index]
+        private readonly ArrayList _list = new ArrayList();
+
+        public StrLanguage this[int index]
         {
-            get => ((StrLanguage)base[index]);
-            set => base[index] = value;
+            get => index < _list.Count ? ((StrLanguage)_list[index]) : null;
+            set => _list[index] = value;
         }
 
         public int Add(StrLanguage strlng)
         {
-            return base.Add(strlng);
+            return _list.Add(strlng);
         }
 
-        public override void Sort()
+        public void Sort()
         {
             StrLanguage sl = new StrLanguage(0);
-            base.Sort(sl);
+            _list.Sort(sl);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _list.GetEnumerator();
         }
     }
 
@@ -104,17 +112,19 @@ namespace Sims2Tools.DBPF.STR
         private string title;
         private string desc;
 
-        private bool isDirty = false;
+        private bool _dirty = false;
 
-        public bool IsDirty => isDirty;
-        public void SetClean() { isDirty = false; }
+        public bool IsDirty => _dirty;
+        public void SetClean() { _dirty = false; }
 
-        public StrItem(int index, byte lid, string title, string desc)
+        public StrItem(int index, byte lid, string title, string desc, bool dirty = false)
         {
             this.index = index;
             this.lid = new StrLanguage(lid);
             this.title = title;
             this.desc = desc;
+            this._dirty = dirty;
+
         }
 
         public int Index
@@ -133,7 +143,7 @@ namespace Sims2Tools.DBPF.STR
             set
             {
                 title = value ?? "";
-                isDirty = true;
+                _dirty = true;
             }
         }
 
@@ -143,19 +153,19 @@ namespace Sims2Tools.DBPF.STR
             set
             {
                 desc = value ?? "";
-                isDirty = true;
+                _dirty = true;
             }
         }
 
-        internal static void Unserialize(DbpfReader reader, Hashtable lines)
+        internal static void Unserialize(DbpfReader reader, Dictionary<byte, StrItemList> languages)
         {
             StrLanguage lid = new StrLanguage(reader.ReadByte());
             string title = reader.ReadPChar();
             string desc = reader.ReadPChar();
 
-            if (lines[lid.Id] == null) lines[lid.Id] = new StrItemList();
+            if (!languages.ContainsKey(lid.Id)) languages.Add(lid.Id, new StrItemList());
 
-            ((StrItemList)lines[lid.Id]).Add(new StrItem(((StrItemList)lines[lid.Id]).Count, lid, title, desc));
+            ((StrItemList)languages[lid.Id]).Add(new StrItem(((StrItemList)languages[lid.Id]).Count, lid, title, desc));
         }
 
         public uint FileSize => (uint)(1 + title.Length + 1 + desc.Length + 1);
@@ -167,23 +177,56 @@ namespace Sims2Tools.DBPF.STR
             writer.WritePChar(desc);
         }
 
+        internal StrItem Clone()
+        {
+            StrItem clone = new StrItem(index, lid.Id, title, desc);
+
+            return clone;
+        }
+
         public override string ToString()
         {
             return "{Helper.Hex4PrefixString((uint)index)} - {this.Title}";
         }
     }
 
-    public class StrItemList : ArrayList
+    public class StrItemList : IEnumerable
     {
-        public new StrItem this[int index]
+        private readonly ArrayList _list = new ArrayList();
+
+        public int Count => _list.Count;
+
+        public StrItem this[int index]
         {
-            get => index < base.Count ? ((StrItem)base[index]) : null;
-            set => base[index] = value;
+            get => index < _list.Count ? ((StrItem)_list[index]) : null;
+            set => _list[index] = value;
         }
 
-        public int Add(StrItem strItem)
+        internal int Add(StrItem strItem)
         {
-            return base.Add(strItem);
+            return _list.Add(strItem);
+        }
+
+        public void Append(byte lid, string title, string desc)
+        {
+            Add(new StrItem(_list.Count, lid, title, desc, true));
+        }
+
+        public StrItemList CloneStrings()
+        {
+            StrItemList clone = new StrItemList();
+
+            foreach (StrItem item in _list)
+            {
+                clone.Add(item.Clone());
+            }
+
+            return clone;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _list.GetEnumerator();
         }
     }
 }

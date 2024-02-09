@@ -33,7 +33,7 @@ namespace Sims2Tools.DBPF.Utils
             return (uint)ret;
         }
 
-        public static TypeGroupID GroupHash(string name)
+        public static TypeGroupID GroupIDHash(string name)
         {
             name = name.Trim().ToLower();
             byte[] rt = crc24.ComputeHash(Helper.ToBytes(name, 0));
@@ -41,7 +41,7 @@ namespace Sims2Tools.DBPF.Utils
             return (TypeGroupID)(ToUInt(rt) | 0x7F000000);
         }
 
-        public static TypeInstanceID InstanceHash(string filename)
+        public static TypeInstanceID InstanceIDHash(string filename)
         {
             filename = filename.Trim().ToLower();
             byte[] rt = crc24.ComputeHash(Helper.ToBytes(filename, 0));
@@ -49,7 +49,7 @@ namespace Sims2Tools.DBPF.Utils
             return (TypeInstanceID)(ToUInt(rt) | 0xff000000);
         }
 
-        public static TypeResourceID SubTypeHash(string filename)
+        public static TypeResourceID ResourceIDHash(string filename)
         {
             filename = filename.Trim().ToLower();
             byte[] rt = crc32.ComputeHash(Helper.ToBytes(filename, 0));

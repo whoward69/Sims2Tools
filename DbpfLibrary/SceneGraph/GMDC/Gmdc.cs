@@ -59,6 +59,31 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
             }
         }
 
+        public List<string> Subsets
+        {
+            get
+            {
+                HashSet<string> subsets = new HashSet<string>();
+
+                foreach (IRcolBlock block in Blocks)
+                {
+                    if (block.BlockID == CGeometryDataContainer.TYPE)
+                    {
+                        CGeometryDataContainer gmdcBlock = (CGeometryDataContainer)block;
+
+                        GmdcGroups groups = gmdcBlock.Groups;
+
+                        foreach (GmdcGroup group in groups)
+                        {
+                            subsets.Add(group.Name);
+                        }
+                    }
+                }
+
+                return new List<string>(subsets);
+            }
+        }
+
         public override SgResourceList SgNeededResources()
         {
             return new SgResourceList();

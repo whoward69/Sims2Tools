@@ -23,6 +23,9 @@ namespace Sims2Tools
 
         private static readonly String SimPeKey = @"Ambertation\SimPe\Settings";
 
+        private static readonly String CreatorNickNameKey = "CreatorNickName";
+        private static readonly String CreatorGuidKey = "CreatorGUID";
+
         public static String Sims2Path
         {
             get
@@ -97,6 +100,43 @@ namespace Sims2Tools
                 else
                 {
                     RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.SimPePathKey, value);
+                }
+            }
+        }
+        public static String CreatorNickName
+        {
+            get
+            {
+                return RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.CreatorNickNameKey, "") as String;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    RegistryTools.DeleteSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.CreatorNickNameKey);
+                }
+                else
+                {
+                    RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.CreatorNickNameKey, value);
+                }
+            }
+        }
+
+        public static String CreatorGUID
+        {
+            get
+            {
+                return RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.CreatorGuidKey, "00000000-0000-0000-0000-000000000000") as String;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    RegistryTools.DeleteSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.CreatorGuidKey);
+                }
+                else
+                {
+                    RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.CreatorGuidKey, value);
                 }
             }
         }

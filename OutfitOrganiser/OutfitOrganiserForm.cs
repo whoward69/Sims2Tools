@@ -361,10 +361,12 @@ namespace OutfitOrganiser
             if (outfits.Length > 0)
             {
                 outfits = $" - {outfits.Substring(2)}";
+                lblNoOutfitSelected.Visible = false;
             }
             else
             {
-                outfits = " - NOTHING";
+                outfits = " - NO OUTFITS SELECTED";
+                lblNoOutfitSelected.Visible = true;
             }
 
             this.Text = $"{OutfitOrganiserApp.AppTitle}{outfits}{displayPath}";
@@ -1123,7 +1125,7 @@ namespace OutfitOrganiser
                     using (DBPFFile package = new DBPFFile(fromPackagePath))
                     {
                         FileInfo fi = new FileInfo(fromPackagePath);
-                        TypeGroupID groupId = Hashes.GroupHash(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
+                        TypeGroupID groupId = Hashes.GroupIDHash(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
 
                         foreach (DBPFEntry entry in package.GetAllEntries())
                         {
@@ -3264,21 +3266,24 @@ namespace OutfitOrganiser
         {
             if (e.Button == MouseButtons.Left)
             {
-                List<string> packages = new List<string>();
-
-                if (gridPackageFiles.CurrentRow.Selected)
+                if (gridPackageFiles.CurrentRow != null)
                 {
-                    foreach (DataGridViewRow row in gridPackageFiles.SelectedRows)
+                    List<string> packages = new List<string>();
+
+                    if (gridPackageFiles.CurrentRow.Selected)
                     {
-                        packages.Add(row.Cells["colPackagePath"].Value as string);
+                        foreach (DataGridViewRow row in gridPackageFiles.SelectedRows)
+                        {
+                            packages.Add(row.Cells["colPackagePath"].Value as string);
+                        }
                     }
-                }
-                else
-                {
-                    packages.Add(gridPackageFiles.CurrentRow.Cells["colPackagePath"].Value as string);
-                }
+                    else
+                    {
+                        packages.Add(gridPackageFiles.CurrentRow.Cells["colPackagePath"].Value as string);
+                    }
 
-                gridPackageFiles.DoDragDrop(packages, DragDropEffects.Copy);
+                    gridPackageFiles.DoDragDrop(packages, DragDropEffects.Copy);
+                }
             }
         }
         #endregion
