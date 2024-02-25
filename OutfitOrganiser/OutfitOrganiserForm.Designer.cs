@@ -42,6 +42,7 @@ namespace OutfitOrganiser
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OutfitOrganiserForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -128,6 +129,10 @@ namespace OutfitOrganiser
             this.ckbAgeTeens = new System.Windows.Forms.CheckBox();
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.btnSaveAll = new System.Windows.Forms.Button();
+            this.grpJewelry = new System.Windows.Forms.GroupBox();
+            this.comboJewelry = new System.Windows.Forms.ComboBox();
+            this.comboDestination = new System.Windows.Forms.ComboBox();
+            this.textAccessoryBin = new System.Windows.Forms.TextBox();
             this.grpMakeup = new System.Windows.Forms.GroupBox();
             this.comboMakeupSubtype = new System.Windows.Forms.ComboBox();
             this.comboMakeupLayer = new System.Windows.Forms.ComboBox();
@@ -135,31 +140,7 @@ namespace OutfitOrganiser
             this.textMakeupBin = new System.Windows.Forms.TextBox();
             this.grpShoe = new System.Windows.Forms.GroupBox();
             this.comboShoe = new System.Windows.Forms.ComboBox();
-            this.grpJewelry = new System.Windows.Forms.GroupBox();
-            this.comboJewelry = new System.Windows.Forms.ComboBox();
-            this.comboDestination = new System.Windows.Forms.ComboBox();
             this.gridResources = new System.Windows.Forms.DataGridView();
-            this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colFilename = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colGender = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colProduct = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colShoe = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHairtone = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colJewelry = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colDestination = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMakeupSubtype = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMakeupLayerStr = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMakeupLayerInt = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMakeupBin = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colSort = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colShown = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colTownie = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colTooltip = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colOutfitData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextResources = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuContextResRepair = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextResRestore = new System.Windows.Forms.ToolStripMenuItem();
@@ -177,6 +158,28 @@ namespace OutfitOrganiser
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
             this.lblNoOutfitSelected = new System.Windows.Forms.Label();
+            this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colFilename = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colGender = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colProduct = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colShoe = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHairtone = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colJewelry = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDestination = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAccessoryBin = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMakeupSubtype = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMakeupLayerStr = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMakeupLayerInt = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMakeupBin = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colSort = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colShown = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colTownie = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colTooltip = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colOutfitData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -197,9 +200,9 @@ namespace OutfitOrganiser
             this.grpGender.SuspendLayout();
             this.grpShown.SuspendLayout();
             this.grpAge.SuspendLayout();
+            this.grpJewelry.SuspendLayout();
             this.grpMakeup.SuspendLayout();
             this.grpShoe.SuspendLayout();
-            this.grpJewelry.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).BeginInit();
             this.menuContextResources.SuspendLayout();
             this.grpHairtone.SuspendLayout();
@@ -712,9 +715,9 @@ namespace OutfitOrganiser
             this.panelEditor.Controls.Add(this.grpShown);
             this.panelEditor.Controls.Add(this.grpAge);
             this.panelEditor.Controls.Add(this.btnSaveAll);
+            this.panelEditor.Controls.Add(this.grpJewelry);
             this.panelEditor.Controls.Add(this.grpMakeup);
             this.panelEditor.Controls.Add(this.grpShoe);
-            this.panelEditor.Controls.Add(this.grpJewelry);
             this.panelEditor.Enabled = false;
             this.panelEditor.Location = new System.Drawing.Point(0, 155);
             this.panelEditor.Name = "panelEditor";
@@ -1053,6 +1056,47 @@ namespace OutfitOrganiser
             this.btnSaveAll.UseVisualStyleBackColor = true;
             this.btnSaveAll.Click += new System.EventHandler(this.OnSaveAllClicked);
             // 
+            // grpJewelry
+            // 
+            this.grpJewelry.Controls.Add(this.comboJewelry);
+            this.grpJewelry.Controls.Add(this.comboDestination);
+            this.grpJewelry.Controls.Add(this.textAccessoryBin);
+            this.grpJewelry.Location = new System.Drawing.Point(310, 0);
+            this.grpJewelry.Name = "grpJewelry";
+            this.grpJewelry.Size = new System.Drawing.Size(135, 105);
+            this.grpJewelry.TabIndex = 1;
+            this.grpJewelry.TabStop = false;
+            this.grpJewelry.Text = "Jewelry:";
+            // 
+            // comboJewelry
+            // 
+            this.comboJewelry.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboJewelry.FormattingEnabled = true;
+            this.comboJewelry.Location = new System.Drawing.Point(5, 20);
+            this.comboJewelry.Name = "comboJewelry";
+            this.comboJewelry.Size = new System.Drawing.Size(125, 23);
+            this.comboJewelry.TabIndex = 8;
+            this.comboJewelry.SelectedIndexChanged += new System.EventHandler(this.OnJewelryChanged);
+            // 
+            // comboDestination
+            // 
+            this.comboDestination.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboDestination.FormattingEnabled = true;
+            this.comboDestination.Location = new System.Drawing.Point(5, 49);
+            this.comboDestination.Name = "comboDestination";
+            this.comboDestination.Size = new System.Drawing.Size(125, 23);
+            this.comboDestination.TabIndex = 8;
+            this.comboDestination.SelectedIndexChanged += new System.EventHandler(this.OnDestinationChanged);
+            // 
+            // textAccessoryBin
+            // 
+            this.textAccessoryBin.Location = new System.Drawing.Point(5, 78);
+            this.textAccessoryBin.Name = "textAccessoryBin";
+            this.textAccessoryBin.Size = new System.Drawing.Size(123, 21);
+            this.textAccessoryBin.TabIndex = 0;
+            this.textAccessoryBin.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.textAccessoryBin.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnAccessoryBinKeyUp);
+            // 
             // grpMakeup
             // 
             this.grpMakeup.Controls.Add(this.comboMakeupSubtype);
@@ -1125,37 +1169,6 @@ namespace OutfitOrganiser
             this.comboShoe.TabIndex = 8;
             this.comboShoe.SelectedIndexChanged += new System.EventHandler(this.OnShoeChanged);
             // 
-            // grpJewelry
-            // 
-            this.grpJewelry.Controls.Add(this.comboJewelry);
-            this.grpJewelry.Controls.Add(this.comboDestination);
-            this.grpJewelry.Location = new System.Drawing.Point(310, 0);
-            this.grpJewelry.Name = "grpJewelry";
-            this.grpJewelry.Size = new System.Drawing.Size(135, 80);
-            this.grpJewelry.TabIndex = 1;
-            this.grpJewelry.TabStop = false;
-            this.grpJewelry.Text = "Jewelry:";
-            // 
-            // comboJewelry
-            // 
-            this.comboJewelry.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboJewelry.FormattingEnabled = true;
-            this.comboJewelry.Location = new System.Drawing.Point(5, 20);
-            this.comboJewelry.Name = "comboJewelry";
-            this.comboJewelry.Size = new System.Drawing.Size(125, 23);
-            this.comboJewelry.TabIndex = 8;
-            this.comboJewelry.SelectedIndexChanged += new System.EventHandler(this.OnJewelryChanged);
-            // 
-            // comboDestination
-            // 
-            this.comboDestination.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboDestination.FormattingEnabled = true;
-            this.comboDestination.Location = new System.Drawing.Point(5, 49);
-            this.comboDestination.Name = "comboDestination";
-            this.comboDestination.Size = new System.Drawing.Size(125, 23);
-            this.comboDestination.TabIndex = 8;
-            this.comboDestination.SelectedIndexChanged += new System.EventHandler(this.OnDestinationChanged);
-            // 
             // gridResources
             // 
             this.gridResources.AllowUserToAddRows = false;
@@ -1166,6 +1179,14 @@ namespace OutfitOrganiser
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gridResources.BackgroundColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridResources.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.gridResources.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridResources.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colVisible,
@@ -1180,6 +1201,7 @@ namespace OutfitOrganiser
             this.colHairtone,
             this.colJewelry,
             this.colDestination,
+            this.colAccessoryBin,
             this.colMakeupSubtype,
             this.colMakeupLayerStr,
             this.colMakeupLayerInt,
@@ -1203,158 +1225,6 @@ namespace OutfitOrganiser
             this.gridResources.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnResourceToolTipTextNeeded);
             this.gridResources.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
             this.gridResources.SelectionChanged += new System.EventHandler(this.OnResourceSelectionChanged);
-            // 
-            // colVisible
-            // 
-            this.colVisible.DataPropertyName = "Visible";
-            this.colVisible.HeaderText = "Visible";
-            this.colVisible.Name = "colVisible";
-            this.colVisible.ReadOnly = true;
-            this.colVisible.Visible = false;
-            // 
-            // colType
-            // 
-            this.colType.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colType.DataPropertyName = "Type";
-            this.colType.HeaderText = "Type";
-            this.colType.Name = "colType";
-            this.colType.ReadOnly = true;
-            this.colType.Width = 58;
-            // 
-            // colTitle
-            // 
-            this.colTitle.DataPropertyName = "Title";
-            this.colTitle.HeaderText = "Title";
-            this.colTitle.Name = "colTitle";
-            this.colTitle.ReadOnly = true;
-            // 
-            // colFilename
-            // 
-            this.colFilename.DataPropertyName = "Filename";
-            this.colFilename.HeaderText = "Filename";
-            this.colFilename.Name = "colFilename";
-            this.colFilename.ReadOnly = true;
-            // 
-            // colGender
-            // 
-            this.colGender.DataPropertyName = "Gender";
-            this.colGender.HeaderText = "Gender";
-            this.colGender.Name = "colGender";
-            this.colGender.ReadOnly = true;
-            // 
-            // colAge
-            // 
-            this.colAge.DataPropertyName = "Age";
-            this.colAge.HeaderText = "Age";
-            this.colAge.Name = "colAge";
-            this.colAge.ReadOnly = true;
-            // 
-            // colCategory
-            // 
-            this.colCategory.DataPropertyName = "Category";
-            this.colCategory.HeaderText = "Category";
-            this.colCategory.Name = "colCategory";
-            this.colCategory.ReadOnly = true;
-            // 
-            // colProduct
-            // 
-            this.colProduct.DataPropertyName = "Product";
-            this.colProduct.HeaderText = "Product";
-            this.colProduct.Name = "colProduct";
-            this.colProduct.ReadOnly = true;
-            // 
-            // colShoe
-            // 
-            this.colShoe.DataPropertyName = "Shoe";
-            this.colShoe.HeaderText = "Shoe";
-            this.colShoe.Name = "colShoe";
-            this.colShoe.ReadOnly = true;
-            // 
-            // colHairtone
-            // 
-            this.colHairtone.DataPropertyName = "Hairtone";
-            this.colHairtone.HeaderText = "Hairtone";
-            this.colHairtone.Name = "colHairtone";
-            this.colHairtone.ReadOnly = true;
-            // 
-            // colJewelry
-            // 
-            this.colJewelry.DataPropertyName = "Jewelry";
-            this.colJewelry.HeaderText = "Jewelry";
-            this.colJewelry.Name = "colJewelry";
-            this.colJewelry.ReadOnly = true;
-            // 
-            // colDestination
-            // 
-            this.colDestination.DataPropertyName = "Destination";
-            this.colDestination.HeaderText = "Destination";
-            this.colDestination.Name = "colDestination";
-            this.colDestination.ReadOnly = true;
-            // 
-            // colMakeupSubtype
-            // 
-            this.colMakeupSubtype.DataPropertyName = "Subtype";
-            this.colMakeupSubtype.HeaderText = "Subtype";
-            this.colMakeupSubtype.Name = "colMakeupSubtype";
-            this.colMakeupSubtype.ReadOnly = true;
-            // 
-            // colMakeupLayerStr
-            // 
-            this.colMakeupLayerStr.DataPropertyName = "LayerStr";
-            this.colMakeupLayerStr.HeaderText = "Layer";
-            this.colMakeupLayerStr.Name = "colMakeupLayerStr";
-            this.colMakeupLayerStr.ReadOnly = true;
-            // 
-            // colMakeupLayerInt
-            // 
-            this.colMakeupLayerInt.DataPropertyName = "LayerInt";
-            this.colMakeupLayerInt.HeaderText = "Layer";
-            this.colMakeupLayerInt.Name = "colMakeupLayerInt";
-            this.colMakeupLayerInt.ReadOnly = true;
-            // 
-            // colMakeupBin
-            // 
-            this.colMakeupBin.DataPropertyName = "Bin";
-            this.colMakeupBin.HeaderText = "Bin";
-            this.colMakeupBin.Name = "colMakeupBin";
-            this.colMakeupBin.ReadOnly = true;
-            // 
-            // colSort
-            // 
-            this.colSort.DataPropertyName = "Sort";
-            this.colSort.HeaderText = "Sort";
-            this.colSort.Name = "colSort";
-            this.colSort.ReadOnly = true;
-            // 
-            // colShown
-            // 
-            this.colShown.DataPropertyName = "Shown";
-            this.colShown.HeaderText = "Shown";
-            this.colShown.Name = "colShown";
-            this.colShown.ReadOnly = true;
-            // 
-            // colTownie
-            // 
-            this.colTownie.DataPropertyName = "Townie";
-            this.colTownie.HeaderText = "Townie";
-            this.colTownie.Name = "colTownie";
-            this.colTownie.ReadOnly = true;
-            // 
-            // colTooltip
-            // 
-            this.colTooltip.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colTooltip.DataPropertyName = "Tooltip";
-            this.colTooltip.HeaderText = "Tooltip";
-            this.colTooltip.Name = "colTooltip";
-            this.colTooltip.ReadOnly = true;
-            // 
-            // colOutfitData
-            // 
-            this.colOutfitData.DataPropertyName = "OutfitData";
-            this.colOutfitData.HeaderText = "OutfitData";
-            this.colOutfitData.Name = "colOutfitData";
-            this.colOutfitData.ReadOnly = true;
-            this.colOutfitData.Visible = false;
             // 
             // menuContextResources
             // 
@@ -1497,6 +1367,165 @@ namespace OutfitOrganiser
             this.lblNoOutfitSelected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblNoOutfitSelected.Visible = false;
             // 
+            // colVisible
+            // 
+            this.colVisible.DataPropertyName = "Visible";
+            this.colVisible.HeaderText = "Visible";
+            this.colVisible.Name = "colVisible";
+            this.colVisible.ReadOnly = true;
+            this.colVisible.Visible = false;
+            // 
+            // colType
+            // 
+            this.colType.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colType.DataPropertyName = "Type";
+            this.colType.HeaderText = "Type";
+            this.colType.Name = "colType";
+            this.colType.ReadOnly = true;
+            this.colType.Width = 58;
+            // 
+            // colTitle
+            // 
+            this.colTitle.DataPropertyName = "Title";
+            this.colTitle.HeaderText = "Title";
+            this.colTitle.Name = "colTitle";
+            this.colTitle.ReadOnly = true;
+            // 
+            // colFilename
+            // 
+            this.colFilename.DataPropertyName = "Filename";
+            this.colFilename.HeaderText = "Filename";
+            this.colFilename.Name = "colFilename";
+            this.colFilename.ReadOnly = true;
+            // 
+            // colGender
+            // 
+            this.colGender.DataPropertyName = "Gender";
+            this.colGender.HeaderText = "Gender";
+            this.colGender.Name = "colGender";
+            this.colGender.ReadOnly = true;
+            // 
+            // colAge
+            // 
+            this.colAge.DataPropertyName = "Age";
+            this.colAge.HeaderText = "Age";
+            this.colAge.Name = "colAge";
+            this.colAge.ReadOnly = true;
+            // 
+            // colCategory
+            // 
+            this.colCategory.DataPropertyName = "Category";
+            this.colCategory.HeaderText = "Category";
+            this.colCategory.Name = "colCategory";
+            this.colCategory.ReadOnly = true;
+            // 
+            // colProduct
+            // 
+            this.colProduct.DataPropertyName = "Product";
+            this.colProduct.HeaderText = "Product";
+            this.colProduct.Name = "colProduct";
+            this.colProduct.ReadOnly = true;
+            // 
+            // colShoe
+            // 
+            this.colShoe.DataPropertyName = "Shoe";
+            this.colShoe.HeaderText = "Shoe";
+            this.colShoe.Name = "colShoe";
+            this.colShoe.ReadOnly = true;
+            // 
+            // colHairtone
+            // 
+            this.colHairtone.DataPropertyName = "Hairtone";
+            this.colHairtone.HeaderText = "Hairtone";
+            this.colHairtone.Name = "colHairtone";
+            this.colHairtone.ReadOnly = true;
+            // 
+            // colJewelry
+            // 
+            this.colJewelry.DataPropertyName = "Jewelry";
+            this.colJewelry.HeaderText = "Jewelry";
+            this.colJewelry.Name = "colJewelry";
+            this.colJewelry.ReadOnly = true;
+            // 
+            // colDestination
+            // 
+            this.colDestination.DataPropertyName = "Destination";
+            this.colDestination.HeaderText = "Destination";
+            this.colDestination.Name = "colDestination";
+            this.colDestination.ReadOnly = true;
+            // 
+            // colAccessoryBin
+            // 
+            this.colAccessoryBin.DataPropertyName = "AccessoryBin";
+            this.colAccessoryBin.HeaderText = "Accessory Bin";
+            this.colAccessoryBin.Name = "colAccessoryBin";
+            this.colAccessoryBin.ReadOnly = true;
+            // 
+            // colMakeupSubtype
+            // 
+            this.colMakeupSubtype.DataPropertyName = "Subtype";
+            this.colMakeupSubtype.HeaderText = "Subtype";
+            this.colMakeupSubtype.Name = "colMakeupSubtype";
+            this.colMakeupSubtype.ReadOnly = true;
+            // 
+            // colMakeupLayerStr
+            // 
+            this.colMakeupLayerStr.DataPropertyName = "LayerStr";
+            this.colMakeupLayerStr.HeaderText = "Layer";
+            this.colMakeupLayerStr.Name = "colMakeupLayerStr";
+            this.colMakeupLayerStr.ReadOnly = true;
+            // 
+            // colMakeupLayerInt
+            // 
+            this.colMakeupLayerInt.DataPropertyName = "LayerInt";
+            this.colMakeupLayerInt.HeaderText = "Layer";
+            this.colMakeupLayerInt.Name = "colMakeupLayerInt";
+            this.colMakeupLayerInt.ReadOnly = true;
+            // 
+            // colMakeupBin
+            // 
+            this.colMakeupBin.DataPropertyName = "MakeupBin";
+            this.colMakeupBin.HeaderText = "Makeup Bin";
+            this.colMakeupBin.Name = "colMakeupBin";
+            this.colMakeupBin.ReadOnly = true;
+            // 
+            // colSort
+            // 
+            this.colSort.DataPropertyName = "Sort";
+            this.colSort.HeaderText = "Sort";
+            this.colSort.Name = "colSort";
+            this.colSort.ReadOnly = true;
+            // 
+            // colShown
+            // 
+            this.colShown.DataPropertyName = "Shown";
+            this.colShown.HeaderText = "Shown";
+            this.colShown.Name = "colShown";
+            this.colShown.ReadOnly = true;
+            // 
+            // colTownie
+            // 
+            this.colTownie.DataPropertyName = "Townie";
+            this.colTownie.HeaderText = "Townie";
+            this.colTownie.Name = "colTownie";
+            this.colTownie.ReadOnly = true;
+            // 
+            // colTooltip
+            // 
+            this.colTooltip.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colTooltip.DataPropertyName = "Tooltip";
+            this.colTooltip.HeaderText = "Tooltip";
+            this.colTooltip.Name = "colTooltip";
+            this.colTooltip.ReadOnly = true;
+            // 
+            // colOutfitData
+            // 
+            this.colOutfitData.DataPropertyName = "OutfitData";
+            this.colOutfitData.HeaderText = "OutfitData";
+            this.colOutfitData.Name = "colOutfitData";
+            this.colOutfitData.ReadOnly = true;
+            this.colOutfitData.Visible = false;
+            // 
             // OutfitOrganiserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1541,10 +1570,11 @@ namespace OutfitOrganiser
             this.grpShown.ResumeLayout(false);
             this.grpAge.ResumeLayout(false);
             this.grpAge.PerformLayout();
+            this.grpJewelry.ResumeLayout(false);
+            this.grpJewelry.PerformLayout();
             this.grpMakeup.ResumeLayout(false);
             this.grpMakeup.PerformLayout();
             this.grpShoe.ResumeLayout(false);
-            this.grpJewelry.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).EndInit();
             this.menuContextResources.ResumeLayout(false);
             this.grpHairtone.ResumeLayout(false);
@@ -1602,6 +1632,7 @@ namespace OutfitOrganiser
         private System.Windows.Forms.GroupBox grpJewelry;
         private System.Windows.Forms.ComboBox comboJewelry;
         private System.Windows.Forms.ComboBox comboDestination;
+        private System.Windows.Forms.TextBox textAccessoryBin;
         private System.Windows.Forms.GroupBox grpMakeup;
         private System.Windows.Forms.ComboBox comboMakeupSubtype;
         private System.Windows.Forms.ComboBox comboMakeupLayer;
@@ -1667,6 +1698,8 @@ namespace OutfitOrganiser
         private System.Windows.Forms.SaveFileDialog saveThumbnailDialog;
         private System.Windows.Forms.OpenFileDialog openThumbnailDialog;
         private System.Windows.Forms.Button btnTownify;
+        private System.Windows.Forms.ToolStripMenuItem menuContextResRepair;
+        private System.Windows.Forms.Label lblNoOutfitSelected;
         private System.Windows.Forms.DataGridViewTextBoxColumn colVisible;
         private System.Windows.Forms.DataGridViewTextBoxColumn colType;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTitle;
@@ -1679,6 +1712,7 @@ namespace OutfitOrganiser
         private System.Windows.Forms.DataGridViewTextBoxColumn colHairtone;
         private System.Windows.Forms.DataGridViewTextBoxColumn colJewelry;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDestination;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAccessoryBin;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupSubtype;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupLayerStr;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupLayerInt;
@@ -1688,8 +1722,6 @@ namespace OutfitOrganiser
         private System.Windows.Forms.DataGridViewTextBoxColumn colTownie;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTooltip;
         private System.Windows.Forms.DataGridViewTextBoxColumn colOutfitData;
-        private System.Windows.Forms.ToolStripMenuItem menuContextResRepair;
-        private System.Windows.Forms.Label lblNoOutfitSelected;
     }
 }
 

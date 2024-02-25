@@ -40,12 +40,12 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
 
         public uint ObjectIdx
         {
-            get { return this.GetSaveItem("objectidx").UIntegerValue; }
+            get { return this.GetItem("objectidx").UIntegerValue; }
         }
 
         public uint StringSetIdx
         {
-            get { return this.GetSaveItem("stringsetidx").UIntegerValue; }
+            get { return this.GetItem("stringsetidx").UIntegerValue; }
         }
 
         /* Other known item names for use with this.GetSaveItem(itemName)

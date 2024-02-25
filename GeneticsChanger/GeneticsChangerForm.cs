@@ -252,7 +252,7 @@ namespace GeneticsChanger
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(GeneticsChangerApp.AppProduct).ShowDialog();
+            new AboutDialog(GeneticsChangerApp.AppProduct).ShowDialog();
         }
 
         private void OnFormKeyUp(object sender, KeyEventArgs e)
@@ -266,7 +266,7 @@ namespace GeneticsChanger
                     menuItemGeneticEyes.Checked = false;
                     e.Handled = true;
                 }
-                /* TODO - Hair
+                /* TODO - _genetics_changer - Hair
                 else if (e.KeyCode == Keys.F5)
                 {
                     menuItemGeneticSkins.Checked = false;
@@ -356,9 +356,9 @@ namespace GeneticsChanger
                     lastFolder = null;
                 }
 
-                Sims2ToolsProgressDialog progressDialog = new Sims2ToolsProgressDialog(new WorkerPackage(folder, updateFolders, updatePackages, updateResources));
-                progressDialog.DoWork += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessFoldersOrPackagesOrResources);
-                progressDialog.DoData += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_DoTask);
+                ProgressDialog progressDialog = new ProgressDialog(new WorkerPackage(folder, updateFolders, updatePackages, updateResources));
+                progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessFoldersOrPackagesOrResources);
+                progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_DoTask);
 
                 DialogResult result = progressDialog.ShowDialog();
 
@@ -412,7 +412,7 @@ namespace GeneticsChanger
             }
         }
 
-        private void DoAsyncWork_ProcessFoldersOrPackagesOrResources(Sims2ToolsProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_ProcessFoldersOrPackagesOrResources(ProgressDialog sender, DoWorkEventArgs args)
         {
             WorkerPackage workPackage = args.Argument as WorkerPackage; // As passed to the Sims2ToolsProgressDialog constructor
 
@@ -536,7 +536,7 @@ namespace GeneticsChanger
             }
         }
 
-        private void DoAsyncWork_DoTask(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        private void DoAsyncWork_DoTask(ProgressDialog sender, DoWorkEventArgs e)
         {
             if (InvokeRequired)
             {
@@ -551,7 +551,7 @@ namespace GeneticsChanger
         #endregion
 
         #region Worker Helpers
-        private bool PopulateChildNodes(Sims2ToolsProgressDialog sender, TreeNode parent, string baseDir)
+        private bool PopulateChildNodes(ProgressDialog sender, TreeNode parent, string baseDir)
         {
             foreach (string subDir in Directory.GetDirectories(baseDir, "*", SearchOption.TopDirectoryOnly))
             {
@@ -694,7 +694,7 @@ namespace GeneticsChanger
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -744,7 +744,7 @@ namespace GeneticsChanger
                 return;
             }
 
-            Sims2ToolsTextEntryDialog rename = new Sims2ToolsTextEntryDialog("Folder Rename", "Please enter a new name for the folder", new FileInfo(fromFolderPath).Name);
+            TextEntryDialog rename = new TextEntryDialog("Folder Rename", "Please enter a new name for the folder", new FileInfo(fromFolderPath).Name);
 
             if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
             {
@@ -776,7 +776,7 @@ namespace GeneticsChanger
 
             string baseFolderPath = treeFolders.SelectedNode.Name;
 
-            Sims2ToolsTextEntryDialog rename = new Sims2ToolsTextEntryDialog("New Folder", "Please enter the name for the new folder", "");
+            TextEntryDialog rename = new TextEntryDialog("New Folder", "Please enter the name for the new folder", "");
 
             if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
             {
@@ -1026,7 +1026,7 @@ namespace GeneticsChanger
             bool wasRenamed = false;
             string fromPackagePath = packageRow.Cells["colPackagePath"].Value as string;
 
-            Sims2ToolsTextEntryDialog rename = new Sims2ToolsTextEntryDialog("Package Rename", "Please enter a new name for the package", new FileInfo(fromPackagePath).Name);
+            TextEntryDialog rename = new TextEntryDialog("Package Rename", "Please enter a new name for the package", new FileInfo(fromPackagePath).Name);
 
             if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
             {
@@ -2259,7 +2259,7 @@ namespace GeneticsChanger
                         }
                     }
                 }
-                /* TODO - Hair
+                /* TODO - _genetics_changer - Hair
                 else if (geneticData.HasThumbnail(cigenCache))
                 {
                     if (openThumbnailDialog.ShowDialog() == DialogResult.OK)
@@ -2291,7 +2291,7 @@ namespace GeneticsChanger
 
             if (selectedRow.Cells["colGeneticData"].Value is GeneticDbpfData geneticData)
             {
-                // TODO - Hair
+                // TODO - _genetics_changer - Hair
                 //cigenCache.DeleteThumbnail(geneticData.ThumbnailOwner);
 
                 if (IsCigenDirty())

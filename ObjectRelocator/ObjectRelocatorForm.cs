@@ -246,7 +246,7 @@ namespace ObjectRelocator
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(ObjectRelocatorApp.AppProduct).ShowDialog();
+            new AboutDialog(ObjectRelocatorApp.AppProduct).ShowDialog();
         }
         #endregion
 
@@ -278,9 +278,9 @@ namespace ObjectRelocator
             panelBuyModeEditor.Enabled = false;
             panelBuildModeEditor.Enabled = false;
 
-            Sims2ToolsProgressDialog progressDialog = new Sims2ToolsProgressDialog();
-            progressDialog.DoWork += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid);
-            progressDialog.DoData += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid_Data);
+            ProgressDialog progressDialog = new ProgressDialog();
+            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid);
+            progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid_Data);
 
             DialogResult result = progressDialog.ShowDialog();
 
@@ -318,7 +318,7 @@ namespace ObjectRelocator
             }
         }
 
-        private void DoAsyncWork_FillGrid(Sims2ToolsProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_FillGrid(ProgressDialog sender, DoWorkEventArgs args)
         {
             // object myArgument = args.Argument; // As passed to the Sims2ToolsProgressDialog constructor
 
@@ -333,7 +333,11 @@ namespace ObjectRelocator
 
             foreach (string packagePath in packages)
             {
+#if !DEBUG
                 try
+#else
+                logger.Debug($"Processing: {packagePath}");
+#endif
                 {
                     sender.VisualMode = ProgressBarDisplayMode.Percentage;
 
@@ -368,6 +372,7 @@ namespace ObjectRelocator
                         args.Result = found;
                     }
                 }
+#if !DEBUG
                 catch (Exception ex)
                 {
                     logger.Error(ex.Message);
@@ -378,10 +383,11 @@ namespace ObjectRelocator
                         throw ex;
                     }
                 }
+#endif
             }
         }
 
-        private void DoAsyncWork_FillGrid_Data(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        private void DoAsyncWork_FillGrid_Data(ProgressDialog sender, DoWorkEventArgs e)
         {
             if (InvokeRequired)
             {
@@ -624,7 +630,7 @@ namespace ObjectRelocator
 
         private void OnConfigurationClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -2437,7 +2443,7 @@ namespace ObjectRelocator
             DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
             ObjectDbpfData selectedObject = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
-            Sims2ToolsTitleAndDescEntryDialog dialog = new Sims2ToolsTitleAndDescEntryDialog(selectedObject.Title, selectedObject.Description);
+            TitleAndDescEntryDialog dialog = new TitleAndDescEntryDialog(selectedObject.Title, selectedObject.Description);
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {

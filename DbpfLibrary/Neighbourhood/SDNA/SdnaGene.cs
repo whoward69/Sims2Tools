@@ -28,14 +28,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDNA
         private string GetName(uint line)
         {
             line += offset;
-            //if (offset == 0x10000005) offset = 4;
-            //if (offset == 0x10000007) offset = 10;
             return line.ToString();
         }
 
         private string GetItem(uint line)
         {
-            return dna.GetSaveItem(GetName(line)).StringValue;
+            return dna.GetItem(GetName(line))?.StringValue;
         }
 
         public string Hair

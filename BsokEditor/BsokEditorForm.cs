@@ -276,7 +276,7 @@ namespace BsokEditor
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(BsokEditorApp.AppProduct).ShowDialog();
+            new AboutDialog(BsokEditorApp.AppProduct).ShowDialog();
         }
         #endregion
 
@@ -307,9 +307,9 @@ namespace BsokEditor
             dataTableResources.Clear();
             panelEditor.Enabled = false;
 
-            Sims2ToolsProgressDialog progressDialog = new Sims2ToolsProgressDialog();
-            progressDialog.DoWork += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid);
-            progressDialog.DoData += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid_Data);
+            ProgressDialog progressDialog = new ProgressDialog();
+            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid);
+            progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid_Data);
 
             DialogResult result = progressDialog.ShowDialog();
 
@@ -343,7 +343,7 @@ namespace BsokEditor
             }
         }
 
-        private void DoAsyncWork_FillGrid(Sims2ToolsProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_FillGrid(ProgressDialog sender, DoWorkEventArgs args)
         {
             // object myArgument = args.Argument; // As passed to the Sims2ToolsProgressDialog constructor
 
@@ -461,7 +461,7 @@ namespace BsokEditor
             }
         }
 
-        private void DoAsyncWork_FillGrid_Data(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        private void DoAsyncWork_FillGrid_Data(ProgressDialog sender, DoWorkEventArgs e)
         {
             if (InvokeRequired)
             {
@@ -617,7 +617,7 @@ namespace BsokEditor
 
         private void OnConfigurationClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {

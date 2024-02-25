@@ -22,65 +22,28 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xAC4F8687;
         public static String NAME = "cGeometryDataContainer";
 
+        private readonly GmdcElements elements;
+        private readonly GmdcLinks links;
+        private readonly GmdcGroups groups;
+        private readonly GmdcModel model;
+        private readonly GmdcJoints joints;
 
+        public GmdcElements Elements => elements;
 
-        GmdcElements elements;
-        /// <summary>
-        /// Returns a List of stored Elements
-        /// </summary>
-        public GmdcElements Elements
-        {
-            get { return elements; }
-            set { elements = value; }
-        }
+        public GmdcLinks Links => links;
 
-        GmdcLinks links;
-        /// <summary>
-        /// Returns a List of stored Links
-        /// </summary>
-        public GmdcLinks Links
-        {
-            get { return links; }
-            set { links = value; }
-        }
+        public GmdcGroups Groups => groups;
 
-        GmdcGroups groups;
-        /// <summary>
-        /// Returns a List of stored Groups
-        /// </summary>
-        public GmdcGroups Groups
-        {
-            get { return groups; }
-            set { groups = value; }
-        }
+        public GmdcModel Model => model;
 
-        GmdcModel model;
-        /// <summary>
-        /// Returns the stored Model
-        /// </summary>
-        public GmdcModel Model
-        {
-            get { return model; }
-            set { model = value; }
-        }
-
-        GmdcJoints joints;
-        /// <summary>
-        /// Returns a List of stored Joints
-        /// </summary>
-        public GmdcJoints Joints
-        {
-            get { return joints; }
-            set { joints = value; }
-        }
+        public GmdcJoints Joints => joints;
 
         // Needed by reflection to create the class
         public CGeometryDataContainer(Rcol parent) : base(parent)
         {
-            sgres = new SGResource(null);
-
             version = 0x04;
             BlockID = TYPE;
+            BlockName = NAME;
 
             elements = new GmdcElements();
             links = new GmdcLinks();
@@ -91,61 +54,131 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             joints = new GmdcJoints();
         }
 
+        public bool HasSubset(string subset) => groups.HasGroup(subset);
+
+        public void RenameSubset(string oldName, string newName)
+        {
+            groups.RenameGroup(oldName, newName);
+
+            isDirty = true;
+        }
+
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
 
-            /* string name = */
-            reader.ReadString();
-            TypeBlockID myid = reader.ReadBlockId();
-            sgres.Unserialize(reader);
-            sgres.BlockID = myid;
+            string blkName = reader.ReadString();
+            TypeBlockID blkId = reader.ReadBlockId();
 
-            /* if (true)
-            {
-                elements.Clear();
-                links.Clear();
-                groups.Clear();
-                joints.Clear();
-                return;
-            } */
+            NameResource.Unserialize(reader);
+            NameResource.BlockName = blkName;
+            NameResource.BlockID = blkId;
 
             int count = reader.ReadInt32();
-            elements.Clear();
             for (int i = 0; i < count; i++)
             {
                 GmdcElement e = new GmdcElement(this);
                 e.Unserialize(reader);
-                elements.Add(e);
+                elements.AddItem(e);
             }
 
             count = reader.ReadInt32();
-            links.Clear();
             for (int i = 0; i < count; i++)
             {
                 GmdcLink l = new GmdcLink(this);
                 l.Unserialize(reader);
-                links.Add(l);
+                links.AddItem(l);
             }
 
             count = reader.ReadInt32();
-            groups.Clear();
             for (int i = 0; i < count; i++)
             {
                 GmdcGroup g = new GmdcGroup(this);
                 g.Unserialize(reader);
-                groups.Add(g);
+                groups.AddItem(g);
             }
 
             model.Unserialize(reader);
 
             count = reader.ReadInt32();
-            joints.Clear();
             for (int i = 0; i < count; i++)
             {
                 GmdcJoint s = new GmdcJoint(this);
                 s.Unserialize(reader);
-                joints.Add(s);
+                joints.AddItem(s);
+            }
+        }
+
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4;
+
+                size += (NameResource.BlockName.Length + 1) + 4 + NameResource.FileSize;
+
+                size += 4;
+                foreach (GmdcElement element in elements)
+                {
+                    size += element.FileSize;
+                }
+
+                size += 4;
+                foreach (GmdcLink link in links)
+                {
+                    size += link.FileSize;
+                }
+
+                size += 4;
+                foreach (GmdcGroup group in groups)
+                {
+                    size += group.FileSize;
+                }
+
+                size += model.FileSize;
+
+                size += 4;
+                foreach (GmdcJoint joint in joints)
+                {
+                    size += joint.FileSize;
+                }
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(version);
+
+            writer.WriteString(NameResource.BlockName);
+            writer.WriteBlockId(NameResource.BlockID);
+            NameResource.Serialize(writer);
+
+            writer.WriteInt32(elements.Length);
+            foreach (GmdcElement element in elements)
+            {
+                element.Serialize(writer);
+            }
+
+            writer.WriteInt32(links.Length);
+            foreach (GmdcLink link in links)
+            {
+                link.Serialize(writer);
+            }
+
+            writer.WriteInt32(groups.Length);
+            foreach (GmdcGroup group in groups)
+            {
+                group.Serialize(writer);
+            }
+
+            model.Serialize(writer);
+
+            writer.WriteInt32(joints.Length);
+            foreach (GmdcJoint joint in joints)
+            {
+                joint.Serialize(writer);
             }
         }
 

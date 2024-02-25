@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
@@ -54,8 +55,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return typecode; }
         }
 
-        ObjectGraphNode ogn;
-        public ObjectGraphNode GraphNode
+        CObjectGraphNode ogn;
+        public CObjectGraphNode GraphNode
         {
             get { return ogn; }
         }
@@ -75,14 +76,14 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         // Needed by reflection to create the class
         public CResourceNode(Rcol parent) : base(parent)
         {
-            sgres = new SGResource(null);
-            ogn = new ObjectGraphNode(null);
+            ogn = new CObjectGraphNode(null);
             ctn = new CompositionTreeNode(null);
             items = new ResourceNodeItem[0];
 
             version = 0x07;
             typecode = 0x01;
             BlockID = TYPE;
+            BlockName = NAME;
         }
 
 
@@ -121,8 +122,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             if (typecode == 0x01)
             {
-                sgres.Unserialize(reader);
-                sgres.BlockID = myid;
+                NameResource.Unserialize(reader);
+                NameResource.BlockID = myid;
 
                 _ = reader.ReadString();
                 myid = reader.ReadBlockId();
@@ -160,7 +161,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Dispose()
         {
-            sgres = null;
             ogn = null;
             ctn = null;
             items = new ResourceNodeItem[0];

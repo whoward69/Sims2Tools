@@ -189,33 +189,20 @@ namespace Sims2Tools.DBPF.SceneGraph
             this.parent = parent;
         }
 
-        /// <summary>
-        /// Read the value from the Stream
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <returns></returns>
         protected int ReadValue(DbpfReader reader)
         {
             if (parent.Version == 0x04) return reader.ReadInt16();
             else return reader.ReadInt32();
         }
 
-        /// <summary>
-        /// Write the value to the Stream
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="val"></param>
-        protected void WriteValue(System.IO.BinaryWriter writer, int val)
+        protected uint ValueSize => (uint)((parent.Version == 0x04) ? 2 : 4);
+
+        protected void WriteValue(DbpfWriter writer, int val)
         {
-            if (parent.Version == 0x04) writer.Write((short)val);
-            else writer.Write(val);
+            if (parent.Version == 0x04) writer.WriteInt16((short)val);
+            else writer.WriteInt32(val);
         }
 
-        /// <summary>
-        /// Read a Link Block
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="items"></param>
         protected void ReadBlock(DbpfReader reader, List<int> items)
         {
             int count = reader.ReadInt32();
@@ -223,17 +210,15 @@ namespace Sims2Tools.DBPF.SceneGraph
             for (int i = 0; i < count; i++) items.Add(ReadValue(reader)); ;
         }
 
-        /// <summary>
-        /// Write a Link Block
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="items"></param>
-        protected void WriteBlock(System.IO.BinaryWriter writer, List<int> items)
+        protected uint BlockSize(List<int> items)
         {
-            writer.Write(items.Count);
+            return (uint)(4 + items.Count * ValueSize);
+        }
+
+        protected void WriteBlock(DbpfWriter writer, List<int> items)
+        {
+            writer.WriteInt32(items.Count);
             for (int i = 0; i < items.Count; i++) WriteValue(writer, items[i]);
         }
     }
-
-
 }

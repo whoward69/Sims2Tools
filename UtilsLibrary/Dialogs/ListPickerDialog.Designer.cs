@@ -10,7 +10,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Sims2Tools
 {
-    partial class Sims2ToolsTitleAndDescEntryDialog
+    partial class ListPickerDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -38,36 +38,27 @@ namespace Sims2Tools
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Sims2ToolsTitleAndDescEntryDialog));
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.textTitle = new System.Windows.Forms.TextBox();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ListPickerDialog));
+            this.lblPrompt = new System.Windows.Forms.Label();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.lblDesc = new System.Windows.Forms.Label();
-            this.textDescription = new System.Windows.Forms.TextBox();
+            this.comboPicker = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
-            // lblTitle
+            // lblPrompt
             // 
-            this.lblTitle.AutoSize = true;
-            this.lblTitle.Location = new System.Drawing.Point(10, 15);
-            this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(33, 15);
-            this.lblTitle.TabIndex = 0;
-            this.lblTitle.Text = "Title:";
-            // 
-            // textTitle
-            // 
-            this.textTitle.Location = new System.Drawing.Point(13, 37);
-            this.textTitle.Name = "textTitle";
-            this.textTitle.Size = new System.Drawing.Size(527, 21);
-            this.textTitle.TabIndex = 1;
+            this.lblPrompt.AutoSize = true;
+            this.lblPrompt.Location = new System.Drawing.Point(10, 15);
+            this.lblPrompt.Name = "lblPrompt";
+            this.lblPrompt.Size = new System.Drawing.Size(76, 15);
+            this.lblPrompt.TabIndex = 0;
+            this.lblPrompt.Text = "Text Prompt:";
             // 
             // btnOK
             // 
             this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnOK.Location = new System.Drawing.Point(397, 177);
+            this.btnOK.Location = new System.Drawing.Point(397, 72);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(143, 30);
             this.btnOK.TabIndex = 5;
@@ -77,54 +68,40 @@ namespace Sims2Tools
             // btnCancel
             // 
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(248, 177);
+            this.btnCancel.Location = new System.Drawing.Point(248, 72);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(143, 30);
-            this.btnCancel.TabIndex = 4;
+            this.btnCancel.TabIndex = 6;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // lblDesc
+            // comboPicker
             // 
-            this.lblDesc.AutoSize = true;
-            this.lblDesc.Location = new System.Drawing.Point(10, 70);
-            this.lblDesc.Name = "lblDesc";
-            this.lblDesc.Size = new System.Drawing.Size(72, 15);
-            this.lblDesc.TabIndex = 2;
-            this.lblDesc.Text = "Description:";
+            this.comboPicker.FormattingEnabled = true;
+            this.comboPicker.Location = new System.Drawing.Point(13, 37);
+            this.comboPicker.Name = "comboPicker";
+            this.comboPicker.Size = new System.Drawing.Size(527, 23);
+            this.comboPicker.TabIndex = 7;
             // 
-            // textDesc
-            // 
-            this.textDescription.AcceptsReturn = true;
-            this.textDescription.Location = new System.Drawing.Point(13, 92);
-            this.textDescription.Multiline = true;
-            this.textDescription.Name = "textDesc";
-            this.textDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textDescription.Size = new System.Drawing.Size(527, 79);
-            this.textDescription.TabIndex = 3;
-            this.textDescription.WordWrap = false;
-            // 
-            // Sims2ToolsTitleAndDescEntryDialog
+            // Sims2ToolsListPickerDialog
             // 
             this.AcceptButton = this.btnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(552, 219);
-            this.Controls.Add(this.textDescription);
-            this.Controls.Add(this.lblDesc);
+            this.ClientSize = new System.Drawing.Size(552, 114);
             this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.lblTitle);
-            this.Controls.Add(this.textTitle);
+            this.Controls.Add(this.lblPrompt);
             this.Controls.Add(this.btnOK);
+            this.Controls.Add(this.comboPicker);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Sims2ToolsTitleAndDescEntryDialog";
+            this.Name = "Sims2ToolsListPickerDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Change Title And Description";
+            this.Text = "Select Value";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -132,11 +109,9 @@ namespace Sims2Tools
 
         #endregion
 
-        private System.Windows.Forms.Label lblTitle;
-        private System.Windows.Forms.TextBox textTitle;
-        private System.Windows.Forms.TextBox textDescription;
+        private System.Windows.Forms.Label lblPrompt;
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.Label lblDesc;
+        private System.Windows.Forms.ComboBox comboPicker;
     }
 }

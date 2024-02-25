@@ -121,7 +121,7 @@ namespace DbpfViewer
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(DbpfViewerApp.AppProduct).ShowDialog();
+            new AboutDialog(DbpfViewerApp.AppProduct).ShowDialog();
         }
 
         private void OnSaveXmlToClipboardClicked(object sender, EventArgs e)
@@ -166,8 +166,8 @@ namespace DbpfViewer
             doc.AppendChild(eleDbpf);
             eleDbpf.SetAttribute("file", packageFile);
 
-            Sims2ToolsProgressDialog progressDialog = new Sims2ToolsProgressDialog(eleDbpf);
-            progressDialog.DoWork += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_GetXml);
+            ProgressDialog progressDialog = new ProgressDialog(eleDbpf);
+            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_GetXml);
 
             DialogResult result = progressDialog.ShowDialog();
 
@@ -198,7 +198,7 @@ namespace DbpfViewer
 
         private void OnConfigurationClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -460,9 +460,9 @@ namespace DbpfViewer
 
             dbpfData.Clear();
 
-            Sims2ToolsProgressDialog progressDialog = new Sims2ToolsProgressDialog();
-            progressDialog.DoWork += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid);
-            progressDialog.DoData += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid_Data);
+            ProgressDialog progressDialog = new ProgressDialog();
+            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid);
+            progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid_Data);
 
             DialogResult result = progressDialog.ShowDialog();
 
@@ -492,7 +492,7 @@ namespace DbpfViewer
             }
         }
 
-        private void DoAsyncWork_FillGrid(Sims2ToolsProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_FillGrid(ProgressDialog sender, DoWorkEventArgs args)
         {
             // object myArgument = args.Argument; // As passed to the Sims2ToolsProgressDialog constructor
 
@@ -573,7 +573,7 @@ namespace DbpfViewer
             }
         }
 
-        private void DoAsyncWork_FillGrid_Data(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        private void DoAsyncWork_FillGrid_Data(ProgressDialog sender, DoWorkEventArgs e)
         {
             if (InvokeRequired)
             {
@@ -585,7 +585,7 @@ namespace DbpfViewer
             dbpfData.Append(e.Argument as DataRow);
         }
 
-        private void DoAsyncWork_GetXml(Sims2ToolsProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_GetXml(ProgressDialog sender, DoWorkEventArgs args)
         {
             XmlElement eleDbpf = args.Argument as XmlElement;
 

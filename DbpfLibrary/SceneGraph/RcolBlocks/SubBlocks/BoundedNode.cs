@@ -13,7 +13,7 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 
-namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
+namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class BoundedNode : AbstractRcolBlock
     {
@@ -26,6 +26,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
+        }
+
+        public override uint FileSize => (uint)4;
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(version);
         }
 
         public override void Dispose()

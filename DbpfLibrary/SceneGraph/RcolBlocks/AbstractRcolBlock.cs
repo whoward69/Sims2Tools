@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Xml;
@@ -20,30 +21,32 @@ namespace Sims2Tools.DBPF.SceneGraph
 {
     public abstract class AbstractRcolBlock : IRcolBlock
     {
+        private TypeBlockID blockid;
+        private string blockname = null;
+
+        protected readonly SGResource sgres = null;
+        protected uint version;
+        protected readonly Rcol parent = null;
+
         protected bool isDirty = false;
 
         public virtual bool IsDirty => isDirty;
         public virtual void SetClean() => isDirty = false;
 
-        protected SGResource sgres;
         public SGResource NameResource
         {
             get { return sgres; }
         }
 
-        protected uint version;
         public uint Version
         {
             get { return version; }
         }
 
-        protected Rcol parent;
         public Rcol Parent
         {
             get { return parent; }
         }
-
-        TypeBlockID blockid;
 
         public TypeBlockID BlockID
         {
@@ -51,7 +54,6 @@ namespace Sims2Tools.DBPF.SceneGraph
             set { blockid = value; }
         }
 
-        protected string blockname = null;
         public virtual string BlockName
         {
             get
@@ -68,17 +70,14 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public AbstractRcolBlock()
         {
-            sgres = null;
             blockid = TypeBlockID.NULL;
             version = 0;
         }
 
-        public AbstractRcolBlock(Rcol parent)
+        public AbstractRcolBlock(Rcol parent) : this()
         {
             this.parent = parent;
-            sgres = null;
-            blockid = TypeBlockID.NULL;
-            version = 0;
+            sgres = new SGResource();
         }
 
         private static IRcolBlock Create(Type type, Rcol parent)
@@ -99,11 +98,11 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public abstract void Unserialize(DbpfReader reader);
 
-        public virtual uint FileSize => throw new NotImplementedException();
+        public virtual uint FileSize => throw new NotImplementedException($"{BlockID} does not implement FileSize");
 
         public virtual void Serialize(DbpfWriter writer)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException($"{BlockID} does not implement Serialize");
         }
 
         public virtual XmlElement AddXml(XmlElement parent)

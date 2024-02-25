@@ -44,6 +44,11 @@ namespace RepositoryWizard
             this.Columns.Add(new DataColumn("Product", typeof(string)));
             this.Columns.Add(new DataColumn("Shoe", typeof(string)));
             this.Columns.Add(new DataColumn("Sort", typeof(uint)));
+            this.Columns.Add(new DataColumn("Model", typeof(string)));
+            this.Columns.Add(new DataColumn("ShpeSubsets", typeof(string)));
+            this.Columns.Add(new DataColumn("GmdcSubsets", typeof(string)));
+            this.Columns.Add(new DataColumn("DesignMode", typeof(string)));
+            this.Columns.Add(new DataColumn("MaterialsMesh", typeof(string)));
             this.Columns.Add(new DataColumn("Tooltip", typeof(string)));
 
             this.Columns.Add(new DataColumn("repoWizardData", typeof(object)));

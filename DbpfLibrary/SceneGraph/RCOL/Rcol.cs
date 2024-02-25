@@ -47,37 +47,46 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             BlockClasses.Add(CViewerRefNodeRecursive.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CViewerRefNodeRecursive", true));
         }
 
-        uint[] index;
+        private uint[] index;
+        private IPackedFileDescriptor[] reffiles;
+        private List<IRcolBlock> blocks;
+        private uint count;
+        private byte[] oversize;
 
-        IPackedFileDescriptor[] reffiles;
+        private bool duff = false;
+
         protected IPackedFileDescriptor[] ReferencedFiles
         {
             get { return duff ? new IPackedFileDescriptor[0] : reffiles; }
         }
 
-        IRcolBlock[] blocks;
-        public IRcolBlock[] Blocks
+        public List<IRcolBlock> Blocks
         {
-            get { return duff ? new IRcolBlock[0] : blocks; }
+            get { return duff ? new List<IRcolBlock>(0) : blocks; }
         }
 
-        uint count;
         public uint Count
         {
             get { return count; }
         }
 
-        byte[] oversize;
-
-        bool duff = false;
-        public bool Duff { get { return duff; } }
-
         public override string KeyName
         {
             get
             {
-                if (duff) return "Invalid Rcol";
-                if (blocks.Length > 0) if (blocks[0].NameResource != null) return blocks[0].NameResource.FileName;
+                if (duff)
+                {
+                    return "Invalid Rcol";
+                }
+
+                if (blocks.Count > 0)
+                {
+                    if (blocks[0].NameResource != null)
+                    {
+                        return blocks[0].NameResource.FileName;
+                    }
+                }
+
                 return "";
             }
         }
@@ -85,6 +94,15 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
         public Rcol(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader, entry.DataSize);
+        }
+
+        public void AddBlock(IRcolBlock block)
+        {
+            if (duff) return;
+
+            blocks.Add(block);
+
+            _isDirty = true;
         }
 
         internal IRcolBlock ReadBlock(TypeBlockID expectedId, DbpfReader reader)
@@ -160,12 +178,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                 index = new uint[reader.ReadUInt32()];
                 for (int i = 0; i < index.Length; i++) index[i] = reader.ReadUInt32();
 
-                blocks = new IRcolBlock[index.Length];
+                blocks = new List<IRcolBlock>(index.Length);
                 for (int i = 0; i < index.Length; i++)
                 {
                     IRcolBlock blk = ReadBlock((TypeBlockID)index[i], reader);
                     if (blk == null) break;
-                    blocks[i] = blk;
+                    blocks.Add(blk);
                 }
 
                 long size = dataSize - (reader.Position - startPos);
@@ -196,7 +214,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
                 size += 4 + (reffiles.Length * ((count == 0xffff0001) ? 16 : 12));
 
-                size += 4 + (blocks.Length * 4);
+                size += 4 + (blocks.Count * 4);
 
                 foreach (IRcolBlock blk in blocks) size += BlockSize(blk);
 
@@ -222,7 +240,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                 writer.WriteTypeId(pfd.Type);
             }
 
-            writer.WriteUInt32((uint)blocks.Length);
+            writer.WriteUInt32((uint)blocks.Count);
             foreach (IRcolBlock blk in blocks) writer.WriteBlockId(blk.BlockID);
             foreach (IRcolBlock blk in blocks) WriteBlock(blk, writer);
 
@@ -243,7 +261,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                 ele.SetAttribute("resource", reffiles[idx].SubType.ToString());
             }
 
-            for (uint idx = 0; idx < blocks.Length; ++idx)
+            for (int idx = 0; idx < blocks.Count; ++idx)
             {
                 XmlElement ele = XmlHelper.CreateElement(element, "block");
                 ele.SetAttribute("index", idx.ToString());
@@ -255,7 +273,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
             return element;
         }
-
 
         public void Dispose()
         {

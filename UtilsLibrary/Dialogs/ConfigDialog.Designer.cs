@@ -10,7 +10,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Sims2Tools
 {
-    partial class Sims2ToolsConfigDialog
+    partial class ConfigDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -38,7 +38,7 @@ namespace Sims2Tools
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Sims2ToolsConfigDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigDialog));
             this.lblSims2Path = new System.Windows.Forms.Label();
             this.textSims2Path = new System.Windows.Forms.TextBox();
             this.btnSims2Select = new System.Windows.Forms.Button();
@@ -49,6 +49,7 @@ namespace Sims2Tools
             this.lblSimsHomePath = new System.Windows.Forms.Label();
             this.textSims2HomePath = new System.Windows.Forms.TextBox();
             this.btnSimsHomeSelect = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblSims2Path
@@ -144,12 +145,23 @@ namespace Sims2Tools
             this.btnSimsHomeSelect.UseVisualStyleBackColor = true;
             this.btnSimsHomeSelect.Click += new System.EventHandler(this.OnSelectSim2HomePathClicked);
             // 
+            // btnCancel
+            // 
+            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnCancel.Location = new System.Drawing.Point(514, 127);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(143, 30);
+            this.btnCancel.TabIndex = 9;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            // 
             // Sims2ToolsConfigDialog
             // 
             this.AcceptButton = this.btnConfigOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(820, 169);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.lblSims2Path);
             this.Controls.Add(this.textSims2Path);
             this.Controls.Add(this.btnSims2Select);
@@ -187,5 +199,6 @@ namespace Sims2Tools
         private System.Windows.Forms.Label lblSimsHomePath;
         private System.Windows.Forms.TextBox textSims2HomePath;
         private System.Windows.Forms.Button btnSimsHomeSelect;
+        private System.Windows.Forms.Button btnCancel;
     }
 }

@@ -31,8 +31,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         // Needed by reflection to create the class
         public CImageData(Rcol parent) : base(parent)
         {
-            sgres = new SGResource(null);
             BlockID = TYPE;
+            BlockName = NAME;
             this.version = 0x09;
         }
 

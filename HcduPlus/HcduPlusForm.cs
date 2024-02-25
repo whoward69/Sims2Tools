@@ -705,12 +705,12 @@ namespace HcduPlus
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(HcduPlusApp.AppProduct).ShowDialog();
+            new AboutDialog(HcduPlusApp.AppProduct).ShowDialog();
         }
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {

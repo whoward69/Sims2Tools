@@ -24,18 +24,8 @@ namespace Sims2Tools.DBPF.SceneGraph.XSTN
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4C158081;
         public const String NAME = "XSTN";
 
-        public override string KeyName
-        {
-            get => Name;
-        }
-
         public Xstn(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
-        }
-
-        public string Name
-        {
-            get { return this.GetSaveItem("name").StringValue; }
         }
 
         public override XmlElement AddXml(XmlElement parent)

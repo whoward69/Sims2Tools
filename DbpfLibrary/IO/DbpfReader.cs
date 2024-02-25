@@ -10,6 +10,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.IO;
@@ -19,17 +20,19 @@ namespace Sims2Tools.DBPF.IO
 {
     public class DbpfReader : IDisposable
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly Stream m_stream;
         private readonly BinaryReader m_reader;
         private long m_length;
         private ByteOrder m_byteOrder = ByteOrder.BIG_ENDIAN;
 
-        public Stream MyStream => m_stream;
+        internal Stream MyStream => m_stream;
 
         private DbpfReader(Stream stream)
         {
             this.m_stream = stream;
-            this.m_reader = new BinaryReader(stream);
+            this.m_reader = new BinaryReader(stream, DBPFFile.Encoding, false);
         }
 
         public static DbpfReader FromStream(Stream stream)
@@ -173,11 +176,25 @@ namespace Sims2Tools.DBPF.IO
         {
             string s = "";
 
-            char b = m_reader.ReadChar();
-            while (b != 0 && m_reader.BaseStream.Position <= m_reader.BaseStream.Length)
+            try
             {
-                s += b;
-                b = m_reader.ReadChar();
+                char b = m_reader.ReadChar();
+
+                while (b != 0 && m_reader.BaseStream.Position < m_reader.BaseStream.Length)
+                {
+                    s += b;
+                    b = m_reader.ReadChar();
+                }
+            }
+            // We need this catch block to allow for an error we introduced over the number of bytes in strings containing accented characters.  My bad!
+            catch (EndOfStreamException)
+            {
+                logger.Warn("Attempt to read beyond end-of-stream, probably due to accented characters.");
+            }
+            // We need this catch block to allow for running off the end of the written data and encountering bad bytes in the UTF-8 stream.  Also my bad!
+            catch (DecoderFallbackException ex)
+            {
+                logger.Warn(ex.Message);
             }
 
             return s;

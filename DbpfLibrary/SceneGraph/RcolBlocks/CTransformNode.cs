@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.Geometry;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections;
@@ -88,16 +89,18 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
 
         CompositionTreeNode ctn;
-        ObjectGraphNode ogn;
+        CObjectGraphNode ogn;
 
         TransformNodeItems items;
+        VectorTransformation trans;
+        int unknown;
+
         public TransformNodeItems Items
         {
             get { return items; }
-            set { items = value; }
         }
 
-        public ObjectGraphNode ObjectGraphNode
+        public CObjectGraphNode ObjectGraphNode
         {
             get { return ogn; }
         }
@@ -107,13 +110,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return ctn; }
         }
 
-        VectorTransformation trans;
         public VectorTransformation Transformation
         {
             get { return trans; }
-            set { trans = value; }
         }
-        int unknown;
 
         public Vector3f Translation
         {
@@ -123,51 +123,42 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public float TransformX
         {
             get { return (float)trans.Translation.X; }
-            set { trans.Translation.X = value; }
         }
         public float TransformY
         {
             get { return (float)trans.Translation.Y; }
-            set { trans.Translation.Y = value; }
         }
         public float TransformZ
         {
             get { return (float)trans.Translation.Z; }
-            set { trans.Translation.Z = value; }
         }
 
 
         public float RotationX
         {
             get { return (float)trans.Rotation.X; }
-            set { trans.Rotation.X = value; }
         }
         public float RotationY
         {
             get { return (float)trans.Rotation.Y; }
-            set { trans.Rotation.Y = value; }
         }
         public float RotationZ
         {
             get { return (float)trans.Rotation.Z; }
-            set { trans.Rotation.Z = value; }
         }
         public float RotationW
         {
             get { return (float)trans.Rotation.W; }
-            set { trans.Rotation.W = value; }
         }
 
         public Quaternion Rotation
         {
             get { return trans.Rotation; }
-            set { trans.Rotation = value; }
         }
 
         public int JointReference
         {
             get { return unknown; }
-            set { unknown = value; }
         }
 
 
@@ -175,14 +166,15 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public CTransformNode(Rcol parent) : base(parent)
         {
             ctn = new CompositionTreeNode(parent);
-            ogn = new ObjectGraphNode(parent);
+            ogn = new CObjectGraphNode(parent);
 
             items = new TransformNodeItems();
 
-            trans = new VectorTransformation(VectorTransformation.TransformOrder.TranslateRotate);
+            trans = new VectorTransformation(VectorTransformation.TransformOrder.TranslateThenRotate);
 
             version = 0x07;
             BlockID = TYPE;
+            BlockName = NAME;
 
             unknown = NO_JOINT;
         }
@@ -191,9 +183,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             return ogn.FileName;
         }
-        /// <summary>
-        /// Returns a List of all Child Blocks referenced by this Element
-        /// </summary>
+
         public override List<int> ChildBlocks
         {
             get
@@ -207,10 +197,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             }
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
@@ -219,13 +205,14 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             TypeBlockID myid = reader.ReadBlockId();
             ctn.Unserialize(reader);
             ctn.BlockID = myid;
+            ctn.BlockName = name;
 
             name = reader.ReadString();
             myid = reader.ReadBlockId();
             ogn.Unserialize(reader);
             ogn.BlockID = myid;
+            ogn.BlockName = name;
 
-            //items = new TransformNodeItem[];
             uint count = reader.ReadUInt32();
             items.Clear();
             for (int i = 0; i < count; i++)
@@ -235,22 +222,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 items.Add(tni);
             }
 
-            trans.Order = VectorTransformation.TransformOrder.TranslateRotate;
+            trans.Order = VectorTransformation.TransformOrder.TranslateThenRotate;
             trans.Unserialize(reader);
-#if DEBUG
-            trans.Name = this.ogn.FileName;
-#endif
-            //trans.Rotation = Quaternion.FromAxisAngle(trans.Rotation.X, trans.Rotation.Y, trans.Rotation.Z, Quaternion.DegToRad(trans.Rotation.W));
-
 
             unknown = reader.ReadInt32();
         }
 
-
-
-        /// <summary>
-        /// You can use this to setop the Controls on a TabPage befor it is dispplayed
-        /// </summary>
         public bool RemoveChild(int index)
         {
             for (int i = 0; i < Items.Length; i++)

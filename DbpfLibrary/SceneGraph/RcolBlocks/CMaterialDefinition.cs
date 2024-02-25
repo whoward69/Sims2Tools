@@ -71,6 +71,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             get
             {
+                if (base.IsDirty) return true;
+
                 foreach (MaterialDefinitionProperty mfd in properties)
                 {
                     if (mfd.IsDirty) return true;
@@ -94,7 +96,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public CMaterialDefinition(Rcol parent) : base(parent)
         {
             BlockID = TYPE;
-            sgres = new SGResource(null);
+            BlockName = NAME;
 
             fldsc = "";
             mattype = "";
@@ -110,9 +112,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             string blkName = reader.ReadString();
             TypeBlockID blkId = reader.ReadBlockId();
 
-            sgres.Unserialize(reader);
-            sgres.BlockName = blkName;
-            sgres.BlockID = blkId;
+            NameResource.Unserialize(reader);
+            NameResource.BlockName = blkName;
+            NameResource.BlockID = blkId;
 
             fldsc = reader.ReadString();
             mattype = reader.ReadString();
@@ -167,14 +169,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             }
         }
 
-
         public override void Serialize(DbpfWriter writer)
         {
             writer.WriteUInt32(version);
 
-            writer.WriteString(sgres.BlockName);
-            writer.WriteBlockId(sgres.BlockID);
-            sgres.Serialize(writer);
+            writer.WriteString(NameResource.BlockName);
+            writer.WriteBlockId(NameResource.BlockID);
+            NameResource.Serialize(writer);
 
             writer.WriteString(fldsc);
             writer.WriteString(mattype);

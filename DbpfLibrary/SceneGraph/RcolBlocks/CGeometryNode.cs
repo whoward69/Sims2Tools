@@ -21,77 +21,53 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x7BA3838C;
         public static String NAME = "cGeometryNode";
 
+        private readonly CObjectGraphNode ogn;
+        private IRcolBlock[] data;
 
-        ObjectGraphNode ogn;
+        private short unknown1;
+        private short unknown2;
+        private byte unknown3;
 
-        public ObjectGraphNode ObjectGraphNode
-        {
-            get { return ogn; }
-            set { ogn = value; }
-        }
+        public CObjectGraphNode ObjectGraphNode => ogn;
 
-        short unknown1;
-        public short Unknown1
-        {
-            get { return unknown1; }
-            set { unknown1 = value; }
-        }
-
-        short unknown2;
-        public short Unknown2
-        {
-            get { return unknown2; }
-            set { unknown2 = value; }
-        }
-
-        byte unknown3;
-        public byte Unknown3
-        {
-            get { return unknown3; }
-            set { unknown3 = value; }
-        }
-
-        IRcolBlock[] data;
-        public int Count
-        {
-            get { return data.Length; }
-        }
         public IRcolBlock[] Blocks
         {
             get { return data; }
-            set { data = value; }
         }
 
+        public short Unknown1 => unknown1;
+        public short Unknown2 => unknown2;
+        public byte Unknown3 => unknown3;
 
         // Needed by reflection to create the class
         public CGeometryNode(Rcol parent) : base(parent)
         {
-            ogn = new ObjectGraphNode(null);
-            this.sgres = new SGResource(null);
+            ogn = new CObjectGraphNode(null);
 
             version = 0x0c;
             BlockID = TYPE;
+            BlockName = NAME;
 
             data = new IRcolBlock[0];
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
 
-            reader.ReadString();
-            TypeBlockID myid = reader.ReadBlockId();
-            ogn.Unserialize(reader);
-            ogn.BlockID = myid;
+            string blkName = reader.ReadString();
+            TypeBlockID blkId = reader.ReadBlockId();
 
-            reader.ReadString();
-            myid = reader.ReadBlockId();
-            sgres.Unserialize(reader);
-            sgres.BlockID = myid;
+            ogn.Unserialize(reader);
+            ogn.BlockName = blkName;
+            ogn.BlockID = blkId;
+
+            blkName = reader.ReadString();
+            blkId = reader.ReadBlockId();
+
+            NameResource.Unserialize(reader);
+            NameResource.BlockName = blkName;
+            NameResource.BlockID = blkId;
 
             if (version == 0x0b)
             {
@@ -108,14 +84,75 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             data = new IRcolBlock[count];
             for (int i = 0; i < count; i++)
             {
-                TypeBlockID id = reader.ReadBlockId();
-                data[i] = Parent.ReadBlock(id, reader);
+                blkId = reader.ReadBlockId();
+                data[i] = Parent.ReadBlock(blkId, reader);
+
                 if (data[i] == null) break;
             }
         }
 
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4;
 
+                size += (ogn.BlockName.Length + 1) + 4 + ogn.FileSize;
 
+                size += (NameResource.BlockName.Length + 1) + 4 + NameResource.FileSize;
+
+                if (version == 0x0b)
+                {
+                    size += 2;
+                }
+
+                if ((version == 0x0b) || (version == 0x0c))
+                {
+                    size += 2 + 1;
+                }
+
+                size += 4;
+
+                for (int i = 0; i < data.Length; i++)
+                {
+                    size += 4 + data[i].FileSize;
+                }
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(version);
+
+            writer.WriteString(ogn.BlockName);
+            writer.WriteBlockId(ogn.BlockID);
+            ogn.Serialize(writer);
+
+            writer.WriteString(NameResource.BlockName);
+            writer.WriteBlockId(NameResource.BlockID);
+            NameResource.Serialize(writer);
+
+            if (version == 0x0b)
+            {
+                writer.WriteInt16(unknown1);
+            }
+
+            if ((version == 0x0b) || (version == 0x0c))
+            {
+                writer.WriteInt16(unknown2);
+                writer.WriteByte(unknown3);
+            }
+
+            writer.WriteInt32(data.Length);
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                writer.WriteBlockId(data[i].BlockID);
+                data[i].Serialize(writer);
+            }
+        }
 
         public override void Dispose()
         {

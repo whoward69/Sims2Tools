@@ -27,8 +27,36 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xAC4F8687;
         public const String NAME = "GMDC";
 
+#if !DEBUG
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+#endif
+
+        private readonly CGeometryDataContainer cGeometryDataContainer = null;
+        public CGeometryDataContainer GeometryDataContainer => cGeometryDataContainer;
+
+        public override bool IsDirty => base.IsDirty || (cGeometryDataContainer != null && cGeometryDataContainer.IsDirty);
+
+
         public Gmdc(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
+            foreach (IRcolBlock block in Blocks)
+            {
+                if (block.BlockID == CGeometryDataContainer.TYPE)
+                {
+                    if (cGeometryDataContainer == null)
+                    {
+                        cGeometryDataContainer = block as CGeometryDataContainer;
+                    }
+                    else
+                    {
+#if DEBUG
+                        throw new Exception($"2nd cGeometryDataContainer found in {this}");
+#else
+                        logger.Warn($"2nd cGeometryDataContainer found in {this}");
+#endif
+                    }
+                }
+            }
         }
 
         public List<string> BotMorphs
@@ -37,15 +65,13 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
             {
                 List<string> morphs = new List<string>();
 
-                foreach (IRcolBlock block in Blocks)
+                // foreach (IRcolBlock block in Blocks)
                 {
-                    if (block.BlockID == CGeometryDataContainer.TYPE)
+                    // if (block.BlockID == CGeometryDataContainer.TYPE)
                     {
-                        CGeometryDataContainer gmdcBlock = (CGeometryDataContainer)block;
+                        // CGeometryDataContainer cGeometryDataContainer = (CGeometryDataContainer)block;
 
-                        GmdcNamePairs botmorphs = gmdcBlock.Model.BlendGroupDefinition;
-
-                        foreach (GmdcNamePair botmorph in botmorphs)
+                        foreach (GmdcNamePair botmorph in cGeometryDataContainer.Model.BlendGroupDefinition)
                         {
                             if (botmorph.BlendGroupName.Equals("botmorphs"))
                             {
@@ -65,15 +91,13 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
             {
                 HashSet<string> subsets = new HashSet<string>();
 
-                foreach (IRcolBlock block in Blocks)
+                // foreach (IRcolBlock block in Blocks)
                 {
-                    if (block.BlockID == CGeometryDataContainer.TYPE)
+                    // if (block.BlockID == CGeometryDataContainer.TYPE)
                     {
-                        CGeometryDataContainer gmdcBlock = (CGeometryDataContainer)block;
+                        // CGeometryDataContainer cGeometryDataContainer = (CGeometryDataContainer)block;
 
-                        GmdcGroups groups = gmdcBlock.Groups;
-
-                        foreach (GmdcGroup group in groups)
+                        foreach (GmdcGroup group in cGeometryDataContainer.Groups)
                         {
                             subsets.Add(group.Name);
                         }
@@ -83,6 +107,10 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
                 return new List<string>(subsets);
             }
         }
+
+        public bool HasSubset(string subset) => cGeometryDataContainer.HasSubset(subset);
+
+        public void RenameSubset(string oldName, string newName) => cGeometryDataContainer.RenameSubset(oldName, newName);
 
         public override SgResourceList SgNeededResources()
         {

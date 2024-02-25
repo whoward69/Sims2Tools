@@ -10,6 +10,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.Package;
 using System;
 using System.IO;
 
@@ -114,19 +115,9 @@ namespace Sims2Tools.DBPF.Utils
             return ret;
         }
 
-        public static Array Add(Array source, object item, System.Type elementType)
+        public static int PLength(string value)
         {
-
-            Array a = Array.CreateInstance(elementType, source.Length + 1);
-            source.CopyTo(a, 0);
-            a.SetValue(item, a.Length - 1);
-            return a;
-        }
-
-        public static Array Add(Array source, object item)
-        {
-
-            return Add(source, item, item.GetType());
+            return DBPFFile.Encoding.GetBytes(value.ToCharArray()).Length;
         }
     }
 }

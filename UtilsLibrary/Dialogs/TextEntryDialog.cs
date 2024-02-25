@@ -10,11 +10,11 @@ using System.Windows.Forms;
 
 namespace Sims2Tools
 {
-    public partial class Sims2ToolsTextEntryDialog : Form
+    public partial class TextEntryDialog : Form
     {
         public string TextEntry => textEntry.Text;
 
-        public Sims2ToolsTextEntryDialog(string title, string prompt, string text)
+        public TextEntryDialog(string title, string prompt, string text)
         {
             InitializeComponent();
 

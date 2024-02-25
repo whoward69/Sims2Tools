@@ -24,24 +24,14 @@ namespace Sims2Tools.DBPF.SceneGraph.XFCH
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x8C93E35C;
         public const String NAME = "XFCH";
 
-        public override string KeyName
-        {
-            get => Name;
-        }
-
         public Xfch(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgIdrIndexes.AddRange(ShpeIndexes);
         }
 
-        public string Name
-        {
-            get { return this.GetSaveItem("name").StringValue; }
-        }
-
         public string Type
         {
-            get { return this.GetSaveItem("type").StringValue; }
+            get { return this.GetItem("type").StringValue; }
         }
 
         public uint[] ShpeIndexes
@@ -50,7 +40,7 @@ namespace Sims2Tools.DBPF.SceneGraph.XFCH
             {
                 return new uint[]
                 {
-                    this.GetSaveItem("shapekeyidx").UIntegerValue,
+                    this.GetItem("shapekeyidx").UIntegerValue,
                 };
             }
         }

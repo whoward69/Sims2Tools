@@ -16,7 +16,9 @@ using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Cigen;
 using Sims2Tools.DBPF.CPF;
+using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
+using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.CRES;
@@ -24,7 +26,11 @@ using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.MMAT;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
+using Sims2Tools.DBPF.SceneGraph.TXMT;
+using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
@@ -107,6 +113,11 @@ namespace RepositoryWizard
         };
         #endregion
 
+        #region Object Repository Data
+        private string masterMeshName = null;
+        private List<Shpe> masterShpes = null;
+        #endregion
+
         private bool dataLoading = false;
 
         #region Constructor and Dispose
@@ -140,12 +151,13 @@ namespace RepositoryWizard
                 comboShoe.Items.AddRange(shoeItems);
 
                 dataLoading = false;
+
+                textMesh.Text = "";
+                textMaster.Text = "";
             }
 
             gridPackageFiles.DataSource = dataPackageFiles;
             gridResources.DataSource = dataResources;
-
-            textMesh.Text = "";
         }
 
         public new void Dispose()
@@ -171,11 +183,13 @@ namespace RepositoryWizard
             MyMruList = new MruList(RepositoryWizardApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FileSelected;
 
-            menuItemModeClothing.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothing.Name, 1) != 0);
-            menuItemModeObject.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeObject.Name, 0) != 0);
-            menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
+            menuItemModeClothing.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothing.Name, 0) != 0);
+            menuItemModeObject.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeObject.Name, 1) != 0);
+            // menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
+            menuItemAdvanced.Checked = false; OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
             menuItemAutoMerge.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoMerge.Name, 1) != 0);
+            menuItemDeleteLocalOrphans.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemDeleteLocalOrphans.Name, 1) != 0);
 
             menuItemShowResTitle.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, 1) != 0); OnShowResTitleClicked(menuItemShowResTitle, null);
             menuItemShowResFilename.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, 1) != 0); OnShowResFilenameClicked(menuItemShowResFilename, null);
@@ -239,6 +253,7 @@ namespace RepositoryWizard
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoMerge.Name, menuItemAutoMerge.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemDeleteLocalOrphans.Name, menuItemDeleteLocalOrphans.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
@@ -294,7 +309,7 @@ namespace RepositoryWizard
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(RepositoryWizardApp.AppProduct).ShowDialog();
+            new AboutDialog(RepositoryWizardApp.AppProduct).ShowDialog();
         }
 
         private void OnFormKeyUp(object sender, KeyEventArgs e)
@@ -363,7 +378,8 @@ namespace RepositoryWizard
 
                 dataLoading = !updateResources;
 
-                panelEditor.Enabled = false;
+                panelClothingEditor.Enabled = false;
+                panelObjectEditor.Enabled = false;
                 dataResources.Clear();
 
                 if (updateResources)
@@ -386,9 +402,9 @@ namespace RepositoryWizard
                     lastFolder = null;
                 }
 
-                Sims2ToolsProgressDialog progressDialog = new Sims2ToolsProgressDialog(new WorkerPackage(folder, updateFolders, updatePackages, updateResources));
-                progressDialog.DoWork += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessFoldersOrPackagesOrResources);
-                progressDialog.DoData += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_DoTask);
+                ProgressDialog progressDialog = new ProgressDialog(new WorkerPackage(folder, updateFolders, updatePackages, updateResources));
+                progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessFoldersOrPackagesOrResources);
+                progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_DoTask);
 
                 DialogResult result = progressDialog.ShowDialog();
 
@@ -426,7 +442,8 @@ namespace RepositoryWizard
                         {
                             if (dataResources.Rows.Count > 0)
                             {
-                                panelEditor.Enabled = true;
+                                panelClothingEditor.Enabled = true;
+                                panelObjectEditor.Enabled = true;
                             }
                         }
                     }
@@ -440,7 +457,7 @@ namespace RepositoryWizard
             }
         }
 
-        private void DoAsyncWork_ProcessFoldersOrPackagesOrResources(Sims2ToolsProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_ProcessFoldersOrPackagesOrResources(ProgressDialog sender, DoWorkEventArgs args)
         {
             WorkerPackage workPackage = args.Argument as WorkerPackage; // As passed to the Sims2ToolsProgressDialog constructor
 
@@ -491,7 +508,9 @@ namespace RepositoryWizard
                 {
                     using (RepoWizardDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
                     {
-                        foreach (DBPFEntry binxEntry in package.GetEntriesByType(Binx.TYPE))
+                        TypeTypeID repoTypeID = menuItemModeClothing.Checked ? Binx.TYPE : Objd.TYPE;
+
+                        foreach (DBPFEntry entry in package.GetEntriesByType(repoTypeID))
                         {
                             if (sender.CancellationPending)
                             {
@@ -499,7 +518,7 @@ namespace RepositoryWizard
                                 return;
                             }
 
-                            RepoWizardDbpfData repoWizardData = RepoWizardDbpfData.Create(package, binxEntry);
+                            RepoWizardDbpfData repoWizardData = RepoWizardDbpfData.Create(package, entry);
 
                             if (repoWizardData != null)
                             {
@@ -507,40 +526,50 @@ namespace RepositoryWizard
 
                                 row["repoWizardData"] = repoWizardData;
 
-                                row["Shoe"] = "";
-
                                 row["Type"] = BuildTypeString(repoWizardData);
-
-                                switch (repoWizardData.Outfit)
-                                {
-                                    case 0x04:
-                                        row["Visible"] = menuItemModeClothing.Checked ? "Yes" : "No";
-                                        row["Shoe"] = "N/A";
-                                        break;
-                                    case 0x08:
-                                        row["Visible"] = menuItemModeClothing.Checked ? "Yes" : "No";
-                                        row["Shoe"] = BuildShoeString(repoWizardData.Shoe);
-                                        break;
-                                    case 0x10:
-                                        row["Visible"] = menuItemModeClothing.Checked ? "Yes" : "No";
-                                        row["Shoe"] = BuildShoeString(repoWizardData.Shoe);
-                                        break;
-                                    default:
-                                        // Unsupported type
-                                        continue;
-                                }
 
                                 row["Filename"] = package.PackageNameNoExtn;
 
                                 row["Title"] = repoWizardData.Title;
                                 row["Tooltip"] = repoWizardData.Tooltip;
 
-                                row["Gender"] = BuildGenderString(repoWizardData.Gender);
-                                row["Age"] = BuildAgeString(repoWizardData.Age);
-                                row["Category"] = BuildCategoryString(repoWizardData.Category);
-                                row["Product"] = BuildProductString(repoWizardData.Product);
+                                if (menuItemModeClothing.Checked)
+                                {
+                                    row["Shoe"] = "";
 
-                                row["Sort"] = repoWizardData.SortIndex;
+                                    switch (repoWizardData.Outfit)
+                                    {
+                                        case 0x04:
+                                            row["Visible"] = menuItemModeClothing.Checked ? "Yes" : "No";
+                                            row["Shoe"] = "N/A";
+                                            break;
+                                        case 0x08:
+                                            row["Visible"] = menuItemModeClothing.Checked ? "Yes" : "No";
+                                            row["Shoe"] = BuildShoeString(repoWizardData.Shoe);
+                                            break;
+                                        case 0x10:
+                                            row["Visible"] = menuItemModeClothing.Checked ? "Yes" : "No";
+                                            row["Shoe"] = BuildShoeString(repoWizardData.Shoe);
+                                            break;
+                                        default:
+                                            // Unsupported type
+                                            continue;
+                                    }
+
+                                    row["Gender"] = BuildGenderString(repoWizardData.Gender);
+                                    row["Age"] = BuildAgeString(repoWizardData.Age);
+                                    row["Category"] = BuildCategoryString(repoWizardData.Category);
+                                    row["Product"] = BuildProductString(repoWizardData.Product);
+                                    row["Sort"] = repoWizardData.SortIndex;
+                                }
+                                else
+                                {
+                                    row["Model"] = repoWizardData.Model;
+                                    row["ShpeSubsets"] = repoWizardData.ShpeSubsets;
+                                    row["GmdcSubsets"] = repoWizardData.GmdcSubsets;
+                                    row["DesignMode"] = repoWizardData.DesignMode;
+                                    row["MaterialsMesh"] = repoWizardData.MaterialsMesh;
+                                }
 
                                 sender.SetData(new WorkerGridTask(dataResources, row));
                             }
@@ -563,7 +592,7 @@ namespace RepositoryWizard
 #endif
         }
 
-        private void DoAsyncWork_DoTask(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        private void DoAsyncWork_DoTask(ProgressDialog sender, DoWorkEventArgs e)
         {
             if (InvokeRequired)
             {
@@ -578,7 +607,7 @@ namespace RepositoryWizard
         #endregion
 
         #region Worker Helpers
-        private bool PopulateChildNodes(Sims2ToolsProgressDialog sender, TreeNode parent, string baseDir)
+        private bool PopulateChildNodes(ProgressDialog sender, TreeNode parent, string baseDir)
         {
             foreach (string subDir in Directory.GetDirectories(baseDir, "*", SearchOption.TopDirectoryOnly))
             {
@@ -631,30 +660,107 @@ namespace RepositoryWizard
 
             InUpdateFormState = true;
 
-            UpdateSaveAsState();
+            panelClothingEditor.Visible = false;
+            grpMesh.Visible = false;
 
-            foreach (DataRow row in dataResources.Rows)
+            panelObjectEditor.Visible = false;
+            grpMaster.Visible = false;
+
+            gridResources.Columns["colId"].Visible = false;
+            gridResources.Columns["colGender"].Visible = false;
+            gridResources.Columns["colAge"].Visible = false;
+            gridResources.Columns["colCategory"].Visible = false;
+            gridResources.Columns["colShoe"].Visible = false;
+            gridResources.Columns["colProduct"].Visible = false;
+            menuItemShowResProduct.Enabled = false;
+            gridResources.Columns["colSort"].Visible = false;
+            menuItemShowResSort.Enabled = false;
+
+            menuItemAutoMerge.Enabled = false;
+            menuItemVerifyShpeSubsets.Enabled = false;
+            menuItemVerifyGmdcSubsets.Enabled = false;
+
+            gridResources.Columns["colModel"].Visible = false;
+            gridResources.Columns["colShpeSubsets"].Visible = false;
+            gridResources.Columns["colGmdcSubsets"].Visible = false;
+            gridResources.Columns["colDesignMode"].Visible = false;
+            gridResources.Columns["colMaterialsMesh"].Visible = false;
+
+            menuItemDeleteLocalOrphans.Enabled = false;
+
+            if (menuItemModeClothing.Checked || menuItemModeObject.Checked)
             {
-                RepoWizardDbpfData repoWizardData = row["repoWizardData"] as RepoWizardDbpfData;
+                lblNoModeSelected.Visible = false;
 
-                row["Visible"] = (menuItemModeClothing.Checked && repoWizardData.IsClothing || menuItemModeObject.Checked && repoWizardData.IsObject) ? "Yes" : "No";
-            }
-
-            gridResources.Columns["colShoe"].Visible = menuItemModeClothing.Checked && !menuItemModeObject.Checked;
-            grpShoe.Visible = gridResources.Columns["colShoe"].Visible;
-
-            bool allBody = true;
-
-            foreach (DataGridViewRow row in gridResources.SelectedRows)
-            {
-                if ((row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData).Outfit != 0x08)
+                foreach (DataRow row in dataResources.Rows)
                 {
-                    allBody = false;
-                    break;
+                    RepoWizardDbpfData repoWizardData = row["repoWizardData"] as RepoWizardDbpfData;
+
+                    row["Visible"] = (menuItemModeClothing.Checked && repoWizardData.IsClothing || menuItemModeObject.Checked && repoWizardData.IsObject) ? "Yes" : "No";
+                }
+
+                UpdateSaveAsState();
+
+                if (menuItemModeClothing.Checked)
+                {
+                    btnSaveAs.Text = "&Save As";
+
+                    panelClothingEditor.Visible = true;
+                    grpMesh.Visible = true;
+
+                    gridResources.Columns["colId"].Visible = true;
+                    gridResources.Columns["colGender"].Visible = true;
+                    gridResources.Columns["colAge"].Visible = true;
+                    gridResources.Columns["colCategory"].Visible = true;
+
+                    gridResources.Columns["colShoe"].Visible = true;
+                    grpShoe.Visible = gridResources.Columns["colShoe"].Visible;
+
+                    gridResources.Columns["colProduct"].Visible = menuItemShowResProduct.Checked;
+                    menuItemShowResProduct.Enabled = true;
+
+                    gridResources.Columns["colSort"].Visible = menuItemShowResSort.Checked;
+                    menuItemShowResSort.Enabled = true;
+
+                    menuItemAutoMerge.Enabled = true;
+                    menuItemVerifyShpeSubsets.Enabled = true;
+                    menuItemVerifyGmdcSubsets.Enabled = true;
+
+                    bool allBody = true;
+
+                    foreach (DataGridViewRow row in gridResources.SelectedRows)
+                    {
+                        if ((row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData).Outfit != 0x08)
+                        {
+                            allBody = false;
+                            break;
+                        }
+                    }
+
+                    comboType.Enabled = allBody;
+                }
+                else
+                {
+                    btnSaveAs.Text = "&Repository";
+
+                    panelObjectEditor.Visible = true;
+                    grpMaster.Visible = true;
+
+                    gridResources.Columns["colModel"].Visible = true;
+                    gridResources.Columns["colShpeSubsets"].Visible = true;
+                    gridResources.Columns["colGmdcSubsets"].Visible = true;
+                    gridResources.Columns["colDesignMode"].Visible = true;
+                    gridResources.Columns["colMaterialsMesh"].Visible = true;
+
+                    menuItemDeleteLocalOrphans.Enabled = true;
                 }
             }
+            else
+            {
+                lblNoModeSelected.Visible = true;
 
-            comboType.Enabled = allBody;
+                menuItemSaveAs.Enabled = btnSaveAs.Enabled = false;
+            }
 
             InUpdateFormState = false;
         }
@@ -663,34 +769,70 @@ namespace RepositoryWizard
         {
             bool saveAs = false;
 
-            if (gridResources.SelectedRows.Count > 0)
+            if (menuItemModeClothing.Checked || menuItemModeObject.Checked)
             {
-                if (textName.Text.Length > 0)
-                {
-                    if (
-                        ckbAgeBabies.CheckState != CheckState.Indeterminate &&
-                        ckbAgeToddlers.CheckState != CheckState.Indeterminate &&
-                        ckbAgeChildren.CheckState != CheckState.Indeterminate &&
-                        ckbAgeTeens.CheckState != CheckState.Indeterminate &&
-                        ckbAgeYoungAdults.CheckState != CheckState.Indeterminate &&
-                        ckbAgeAdults.CheckState != CheckState.Indeterminate &&
-                        ckbAgeElders.CheckState != CheckState.Indeterminate &&
+                bool anySelected = false;
 
-                        ckbCatEveryday.CheckState != CheckState.Indeterminate &&
-                        ckbCatFormal.CheckState != CheckState.Indeterminate &&
-                        ckbCatGym.CheckState != CheckState.Indeterminate &&
-                        ckbCatMaternity.CheckState != CheckState.Indeterminate &&
-                        ckbCatOuterwear.CheckState != CheckState.Indeterminate &&
-                        ckbCatPJs.CheckState != CheckState.Indeterminate &&
-                        ckbCatSwimwear.CheckState != CheckState.Indeterminate &&
-                        ckbCatUnderwear.CheckState != CheckState.Indeterminate
-                        )
+                foreach (DataGridViewRow row in gridResources.SelectedRows)
+                {
+                    if ((row.Cells["colVisible"].Value as string).Equals("Yes"))
                     {
-                        if (EncodeAge() != 0x0000 && EncodeCategory() != 0x0000)
+                        anySelected = true;
+                        break;
+                    }
+                }
+
+                if (anySelected)
+                {
+                    if (menuItemModeClothing.Checked)
+                    {
+                        if (textName.Text.Length > 0)
                         {
-                            if (!String.IsNullOrEmpty(textMesh.Text))
+                            if (
+                                ckbAgeBabies.CheckState != CheckState.Indeterminate &&
+                                ckbAgeToddlers.CheckState != CheckState.Indeterminate &&
+                                ckbAgeChildren.CheckState != CheckState.Indeterminate &&
+                                ckbAgeTeens.CheckState != CheckState.Indeterminate &&
+                                ckbAgeYoungAdults.CheckState != CheckState.Indeterminate &&
+                                ckbAgeAdults.CheckState != CheckState.Indeterminate &&
+                                ckbAgeElders.CheckState != CheckState.Indeterminate &&
+
+                                ckbCatEveryday.CheckState != CheckState.Indeterminate &&
+                                ckbCatFormal.CheckState != CheckState.Indeterminate &&
+                                ckbCatGym.CheckState != CheckState.Indeterminate &&
+                                ckbCatMaternity.CheckState != CheckState.Indeterminate &&
+                                ckbCatOuterwear.CheckState != CheckState.Indeterminate &&
+                                ckbCatPJs.CheckState != CheckState.Indeterminate &&
+                                ckbCatSwimwear.CheckState != CheckState.Indeterminate &&
+                                ckbCatUnderwear.CheckState != CheckState.Indeterminate
+                                )
                             {
-                                saveAs = true;
+                                if (EncodeAge() != 0x0000 && EncodeCategory() != 0x0000)
+                                {
+                                    if (!String.IsNullOrEmpty(textMesh.Text))
+                                    {
+                                        saveAs = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!String.IsNullOrEmpty(textMaster.Text))
+                        {
+                            if (!String.IsNullOrEmpty(comboSlavePrimarySubset.SelectedItem as string))
+                            {
+                                if (!comboSlavePrimarySubset.SelectedItem.Equals(comboSlaveSecondarySubset.SelectedItem))
+                                {
+                                    if (!string.IsNullOrEmpty(comboMasterPrimarySubset.SelectedItem as string))
+                                    {
+                                        if (string.IsNullOrEmpty(comboSlaveSecondarySubset.SelectedItem as string) || (!string.IsNullOrEmpty(comboSlaveSecondarySubset.SelectedItem as string) && !string.IsNullOrEmpty(comboMasterSecondarySubset.SelectedItem as string)))
+                                        {
+                                            saveAs = true;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -700,9 +842,8 @@ namespace RepositoryWizard
             menuItemSaveAs.Enabled = btnSaveAs.Enabled = saveAs;
         }
 
-        private bool IsValidMesh(string meshPackagePath, bool showErrorMsg)
+        private bool IsValidClothingMesh(string meshPackagePath, bool showErrorMsg)
         {
-            // Validate the mesh (only one CRES, with only one SHPE)
             bool isCresValid = false;
             bool isShpeValid = false;
             bool isGmdcValid = !menuItemVerifyGmdcSubsets.Checked;
@@ -737,7 +878,7 @@ namespace RepositoryWizard
                                     }
                                     else
                                     {
-                                        logger.Debug("Mesh contains more than one GMDC resource.");
+                                        logger.Debug($"Mesh contains more than one GMDC resource - {meshPackagePath}");
 
                                         if (showErrorMsg)
                                         {
@@ -747,7 +888,7 @@ namespace RepositoryWizard
                                 }
                                 else
                                 {
-                                    logger.Debug("Mesh contains more than one GMND resource.");
+                                    logger.Debug($"Mesh contains more than one GMND resource - {meshPackagePath}");
 
                                     if (showErrorMsg)
                                     {
@@ -758,7 +899,7 @@ namespace RepositoryWizard
                         }
                         else
                         {
-                            logger.Debug("Mesh contains more than one SHPE resource.");
+                            logger.Debug($"Mesh contains more than one SHPE resource - {meshPackagePath}");
 
                             if (showErrorMsg)
                             {
@@ -768,11 +909,11 @@ namespace RepositoryWizard
                     }
                     else
                     {
-                        logger.Debug("Mesh package contains more than one CRES resource.");
+                        logger.Debug($"Package contains more than one CRES resource - {meshPackagePath}");
 
                         if (showErrorMsg)
                         {
-                            MsgBox.Show("Mesh package contains more than one CRES resource.", "Error!", MessageBoxButtons.OK);
+                            MsgBox.Show("Package contains more than one CRES resource.", "Error!", MessageBoxButtons.OK);
                         }
                     }
 
@@ -781,15 +922,193 @@ namespace RepositoryWizard
             }
             else
             {
-                logger.Debug("Mesh package not found.");
+                logger.Debug($"Package not found - {meshPackagePath}");
 
                 if (showErrorMsg)
                 {
-                    MsgBox.Show("Mesh package not found.", "Error!", MessageBoxButtons.OK);
+                    MsgBox.Show("Package not found.", "Error!", MessageBoxButtons.OK);
                 }
             }
 
             return isCresValid && isShpeValid && isGmdcValid;
+        }
+
+        private bool IsValidObjectMaster(string masterPackagePath)
+        {
+            bool isValid = false;
+            masterMeshName = null;
+            masterShpes = null;
+
+            comboMasterPrimarySubset.SelectedIndex = -1;
+            comboMasterPrimarySubset.Items.Clear();
+
+            comboMasterSecondarySubset.Items.Clear();
+            comboMasterSecondarySubset.Items.Add("");
+            comboMasterSecondarySubset.SelectedIndex = 0;
+
+            using (DBPFFile package = new DBPFFile(masterPackagePath))
+            {
+                Objd masterObjd = null;
+                PickerDialog treePicker = null;
+
+                foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
+                {
+                    Objd objd = (Objd)package.GetResourceByEntry(entry);
+
+                    if (RepoWizardDbpfData.IsPermittedObject(objd))
+                    {
+                        if (masterObjd == null)
+                        {
+                            masterObjd = objd;
+                        }
+                        else
+                        {
+                            if (treePicker == null)
+                            {
+                                treePicker = new TreePickerDialog("Multi-Object Master", "Select Master Object:");
+                                treePicker.AddItem(GetNamedObjd(package, masterObjd));
+                            }
+
+                            treePicker.AddItem(GetNamedObjd(package, objd));
+                        }
+                    }
+                }
+
+                if (treePicker != null)
+                {
+                    if (treePicker.ShowDialog() == DialogResult.OK)
+                    {
+                        masterObjd = (treePicker.SelectedItem as ObjdNamedValue).Value;
+                    }
+                    else
+                    {
+                        masterObjd = null;
+                    }
+                }
+
+                if (masterObjd != null)
+                {
+                    masterMeshName = GetObjectModelName(package, masterObjd);
+
+                    masterShpes = GetObjectShpes(package, GetObjectCres(package, masterMeshName, out string cresPackageDir), cresPackageDir);
+
+                    isValid = (masterShpes != null);
+                }
+
+                package.Close();
+            }
+
+            if (isValid)
+            {
+                foreach (Shpe shpe in masterShpes)
+                {
+                    foreach (string subset in shpe.Subsets)
+                    {
+                        if (!comboMasterPrimarySubset.Items.Contains(subset))
+                        {
+                            comboMasterPrimarySubset.Items.Add(subset);
+                            comboMasterSecondarySubset.Items.Add(subset);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                masterMeshName = null;
+                masterShpes = null;
+            }
+
+            return isValid;
+        }
+
+        private ObjdNamedValue GetNamedObjd(DBPFFile package, Objd objd)
+        {
+            Ctss ctss = (Ctss)package.GetResourceByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
+
+            string name = null;
+
+            if (ctss != null)
+            {
+                name = ctss.LanguageItems(MetaData.Languages.Default)[0]?.Title;
+            }
+
+            return new ObjdNamedValue(name ?? objd.KeyName, objd);
+        }
+
+        private string GetObjectModelName(DBPFFile package, Objd objd)
+        {
+            Str models = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, objd.GroupID, (TypeInstanceID)0x0085, DBPFData.RESOURCE_NULL));
+
+            if (models != null)
+            {
+                return models.LanguageItems(MetaData.Languages.Default)[objd.GetRawData(ObjdIndex.DefaultGraphic)]?.Title;
+            }
+
+            return null;
+        }
+
+        private Cres GetObjectCres(DBPFFile package, string cresName, out string cresPackageDir)
+        {
+            cresPackageDir = package.PackageDir;
+
+            if (cresName == null) return null;
+
+            Cres cres = (Cres)package.GetResourceByName(Cres.TYPE, cresName);
+
+            if (cres == null)
+            {
+                foreach (string gameFolder in GameData.gameFolders)
+                {
+                    string cresPackagePath = $"{gameFolder}\\Objects05.package";
+
+                    if (File.Exists(cresPackagePath))
+                    {
+                        using (DBPFFile cresPackage = new DBPFFile(cresPackagePath))
+                        {
+                            cres = (Cres)cresPackage.GetResourceByName(Cres.TYPE, cresName);
+
+                            if (cres != null) cresPackageDir = cresPackage.PackageDir;
+
+                            cresPackage.Close();
+                        }
+
+                        if (cres != null) break;
+                    }
+                }
+            }
+
+            return cres;
+        }
+
+        private List<Shpe> GetObjectShpes(DBPFFile package, Cres cres, string cresPackageDir)
+        {
+            if (cres == null || cres.ShpeKeys.Count < 1) return null;
+
+            List<Shpe> shpes = new List<Shpe>();
+
+            if (package.PackageDir.Equals(cresPackageDir))
+            {
+                foreach (DBPFKey shpeKey in cres.ShpeKeys)
+                {
+                    shpes.Add((Shpe)package.GetResourceByKey(shpeKey));
+                }
+            }
+            else
+            {
+                string shpePackagePath = $"{cresPackageDir}\\Objects06.package";
+
+                using (DBPFFile shpePackage = new DBPFFile(shpePackagePath))
+                {
+                    foreach (DBPFKey shpeKey in cres.ShpeKeys)
+                    {
+                        shpes.Add((Shpe)shpePackage.GetResourceByKey(shpeKey));
+                    }
+
+                    shpePackage.Close();
+                }
+            }
+
+            return shpes;
         }
         #endregion
 
@@ -811,7 +1130,7 @@ namespace RepositoryWizard
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -820,7 +1139,7 @@ namespace RepositoryWizard
 
         private void OnCreatorClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsCreatorEntryDialog();
+            Form config = new CreatorConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -885,7 +1204,7 @@ namespace RepositoryWizard
 
         private void OnVerifyMeshSubsetsClicked(object sender, EventArgs e)
         {
-            if ((sender as ToolStripMenuItem).Checked && !IsValidMesh(textMesh.Text, true))
+            if ((sender as ToolStripMenuItem).Checked && !IsValidClothingMesh(textMesh.Text, true))
             {
                 textMesh.Text = "";
             }
@@ -994,22 +1313,43 @@ namespace RepositoryWizard
         {
             string type = "";
 
-            switch (repoWizardData.Outfit)
+            if (menuItemModeClothing.Checked)
             {
-                case 0x04:
-                    type = "Clothes - Top";
-                    break;
-                case 0x08:
-                    type = "Clothes - Body";
-                    break;
-                case 0x10:
-                    type = "Clothes - Bottom";
-                    break;
-            }
+                switch (repoWizardData.Outfit)
+                {
+                    case 0x04:
+                        type = "Top";
+                        break;
+                    case 0x08:
+                        type = "Body";
+                        break;
+                    case 0x10:
+                        type = "Bottom";
+                        break;
+                }
 
-            if (!string.IsNullOrEmpty(type) && repoWizardData.Outfit == 0)
+                if (!string.IsNullOrEmpty(type) && repoWizardData.Outfit == 0)
+                {
+                    type = $"{type}!!!";
+                }
+            }
+            else
             {
-                type = $"{type}!!!";
+                switch (repoWizardData.Type)
+                {
+                    case ObjdType.Normal:
+                        type = "Normal";
+                        break;
+                    case ObjdType.Door:
+                        type = "Door";
+                        break;
+                    case ObjdType.Window:
+                        type = "Window";
+                        break;
+                    case ObjdType.ArchitecturalSupport:
+                        type = "Support";
+                        break;
+                }
             }
 
             return type;
@@ -1252,7 +1592,7 @@ namespace RepositoryWizard
                 {
                     string id = row.Cells["colId"].Value as string;
 
-                    if (string.IsNullOrEmpty(id)) id = row.Index.ToString();
+                    if (string.IsNullOrEmpty(id)) id = (row.Index + 1).ToString();
 
                     subst = id;
                 }
@@ -1367,156 +1707,179 @@ namespace RepositoryWizard
             comboProduct.SelectedIndex = -1;
 
             comboShoe.SelectedIndex = -1;
+
+            comboSlavePrimarySubset.SelectedIndex = -1;
+            comboSlavePrimarySubset.Items.Clear();
+
+            comboSlaveSecondarySubset.Items.Clear();
+            comboSlaveSecondarySubset.Items.Add("");
+            comboSlaveSecondarySubset.SelectedIndex = 0;
         }
 
         private void UpdateEditor(RepoWizardDbpfData repoWizardData, bool append)
         {
-            uint newTypeValue = repoWizardData.Outfit;
-            if (append)
+            if (menuItemModeClothing.Checked)
             {
-                if (cachedTypeValue != newTypeValue)
+                uint newTypeValue = repoWizardData.Outfit;
+                if (append)
                 {
-                    if (cachedTypeValue != 0x00)
+                    if (cachedTypeValue != newTypeValue)
                     {
-                        comboType.SelectedIndex = 0;
-                        cachedTypeValue = 0x00;
+                        if (cachedTypeValue != 0x00)
+                        {
+                            comboType.SelectedIndex = 0;
+                            cachedTypeValue = 0x00;
+                        }
+                    }
+                }
+                else
+                {
+                    cachedTypeValue = newTypeValue;
+
+                    foreach (Object o in comboType.Items)
+                    {
+                        if ((o as UintNamedValue).Value == cachedTypeValue)
+                        {
+                            comboType.SelectedItem = o;
+                            break;
+                        }
+                    }
+                }
+
+                uint newGenderValue = repoWizardData.Gender;
+                if (append)
+                {
+                    if (cachedGenderValue != newGenderValue)
+                    {
+                        if (cachedGenderValue != 0x00)
+                        {
+                            comboGender.SelectedIndex = 0;
+                            cachedGenderValue = 0x00;
+                        }
+                    }
+                }
+                else
+                {
+                    cachedGenderValue = newGenderValue;
+
+                    foreach (Object o in comboGender.Items)
+                    {
+                        if ((o as UintNamedValue).Value == cachedGenderValue)
+                        {
+                            comboGender.SelectedItem = o;
+                            break;
+                        }
+                    }
+                }
+
+                uint newAgeFlags = repoWizardData.Age;
+                if (append)
+                {
+                    if (cachedAgeFlags != newAgeFlags)
+                    {
+                        if ((cachedAgeFlags & 0x0020) != (newAgeFlags & 0x0020)) ckbAgeBabies.CheckState = CheckState.Indeterminate;
+                        if ((cachedAgeFlags & 0x0001) != (newAgeFlags & 0x0001)) ckbAgeToddlers.CheckState = CheckState.Indeterminate;
+                        if ((cachedAgeFlags & 0x0002) != (newAgeFlags & 0x0002)) ckbAgeChildren.CheckState = CheckState.Indeterminate;
+                        if ((cachedAgeFlags & 0x0004) != (newAgeFlags & 0x0004)) ckbAgeTeens.CheckState = CheckState.Indeterminate;
+                        if ((cachedAgeFlags & 0x0040) != (newAgeFlags & 0x0040)) ckbAgeYoungAdults.CheckState = CheckState.Indeterminate;
+                        if ((cachedAgeFlags & 0x0008) != (newAgeFlags & 0x0008)) ckbAgeAdults.CheckState = CheckState.Indeterminate;
+                        if ((cachedAgeFlags & 0x0010) != (newAgeFlags & 0x0010)) ckbAgeElders.CheckState = CheckState.Indeterminate;
+                    }
+                }
+                else
+                {
+                    cachedAgeFlags = newAgeFlags;
+                    if ((cachedAgeFlags & 0x0020) == 0x0020) ckbAgeBabies.Checked = true;
+                    if ((cachedAgeFlags & 0x0001) == 0x0001) ckbAgeToddlers.Checked = true;
+                    if ((cachedAgeFlags & 0x0002) == 0x0002) ckbAgeChildren.Checked = true;
+                    if ((cachedAgeFlags & 0x0004) == 0x0004) ckbAgeTeens.Checked = true;
+                    if ((cachedAgeFlags & 0x0040) == 0x0040) ckbAgeYoungAdults.Checked = true;
+                    if ((cachedAgeFlags & 0x0008) == 0x0008) ckbAgeAdults.Checked = true;
+                    if ((cachedAgeFlags & 0x0010) == 0x0010) ckbAgeElders.Checked = true;
+                }
+
+                uint newCategoryFlags = repoWizardData.Category;
+                if (append)
+                {
+                    if (cachedCategoryFlags != newCategoryFlags)
+                    {
+                        if ((cachedCategoryFlags & 0x0007) != (newCategoryFlags & 0x0007)) ckbCatEveryday.CheckState = CheckState.Indeterminate;
+                        if ((cachedCategoryFlags & 0x0020) != (newCategoryFlags & 0x0020)) ckbCatFormal.CheckState = CheckState.Indeterminate;
+                        if ((cachedCategoryFlags & 0x0200) != (newCategoryFlags & 0x0200)) ckbCatGym.CheckState = CheckState.Indeterminate;
+                        if ((cachedCategoryFlags & 0x0100) != (newCategoryFlags & 0x0100)) ckbCatMaternity.CheckState = CheckState.Indeterminate;
+                        if ((cachedCategoryFlags & 0x1000) != (newCategoryFlags & 0x1000)) ckbCatOuterwear.CheckState = CheckState.Indeterminate;
+                        if ((cachedCategoryFlags & 0x0010) != (newCategoryFlags & 0x0010)) ckbCatPJs.CheckState = CheckState.Indeterminate;
+                        if ((cachedCategoryFlags & 0x0008) != (newCategoryFlags & 0x0008)) ckbCatSwimwear.CheckState = CheckState.Indeterminate;
+                        if ((cachedCategoryFlags & 0x0040) != (newCategoryFlags & 0x0040)) ckbCatUnderwear.CheckState = CheckState.Indeterminate;
+                    }
+                }
+                else
+                {
+                    cachedCategoryFlags = newCategoryFlags;
+                    if ((cachedCategoryFlags & 0x0007) == 0x0007) ckbCatEveryday.Checked = true;
+                    if ((cachedCategoryFlags & 0x0020) == 0x0020) ckbCatFormal.Checked = true;
+                    if ((cachedCategoryFlags & 0x0200) == 0x0200) ckbCatGym.Checked = true;
+                    if ((cachedCategoryFlags & 0x0100) == 0x0100) ckbCatMaternity.Checked = true;
+                    if ((cachedCategoryFlags & 0x1000) == 0x1000) ckbCatOuterwear.Checked = true;
+                    if ((cachedCategoryFlags & 0x0010) == 0x0010) ckbCatPJs.Checked = true;
+                    if ((cachedCategoryFlags & 0x0008) == 0x0008) ckbCatSwimwear.Checked = true;
+                    if ((cachedCategoryFlags & 0x0040) == 0x0040) ckbCatUnderwear.Checked = true;
+                }
+
+                uint newProductValue = repoWizardData.Product;
+                if (append)
+                {
+                    if (cachedProductValue != newProductValue)
+                    {
+                        comboProduct.SelectedIndex = 0;
+                    }
+                }
+                else
+                {
+                    cachedProductValue = newProductValue;
+
+                    foreach (Object o in comboProduct.Items)
+                    {
+                        if ((o as UintNamedValue).Value == cachedProductValue)
+                        {
+                            comboProduct.SelectedItem = o;
+                            break;
+                        }
+                    }
+                }
+
+                uint newShoeValue = repoWizardData.Shoe;
+                if (append)
+                {
+                    if (cachedShoeValue != newShoeValue)
+                    {
+                        comboShoe.SelectedIndex = 0;
+                    }
+                }
+                else
+                {
+                    cachedShoeValue = newShoeValue;
+
+                    foreach (Object o in comboShoe.Items)
+                    {
+                        if ((o as UintNamedValue).Value == cachedShoeValue)
+                        {
+                            comboShoe.SelectedItem = o;
+                            break;
+                        }
                     }
                 }
             }
-            else
+            else if (menuItemModeObject.Checked)
             {
-                cachedTypeValue = newTypeValue;
-
-                foreach (Object o in comboType.Items)
+                foreach (string subset in repoWizardData.ShpeSubsets.Split(','))
                 {
-                    if ((o as UintNamedValue).Value == cachedTypeValue)
+                    string s = subset.Trim();
+
+                    if (!comboSlavePrimarySubset.Items.Contains(s))
                     {
-                        comboType.SelectedItem = o;
-                        break;
-                    }
-                }
-            }
-
-            uint newGenderValue = repoWizardData.Gender;
-            if (append)
-            {
-                if (cachedGenderValue != newGenderValue)
-                {
-                    if (cachedGenderValue != 0x00)
-                    {
-                        comboGender.SelectedIndex = 0;
-                        cachedGenderValue = 0x00;
-                    }
-                }
-            }
-            else
-            {
-                cachedGenderValue = newGenderValue;
-
-                foreach (Object o in comboGender.Items)
-                {
-                    if ((o as UintNamedValue).Value == cachedGenderValue)
-                    {
-                        comboGender.SelectedItem = o;
-                        break;
-                    }
-                }
-            }
-
-            uint newAgeFlags = repoWizardData.Age;
-            if (append)
-            {
-                if (cachedAgeFlags != newAgeFlags)
-                {
-                    if ((cachedAgeFlags & 0x0020) != (newAgeFlags & 0x0020)) ckbAgeBabies.CheckState = CheckState.Indeterminate;
-                    if ((cachedAgeFlags & 0x0001) != (newAgeFlags & 0x0001)) ckbAgeToddlers.CheckState = CheckState.Indeterminate;
-                    if ((cachedAgeFlags & 0x0002) != (newAgeFlags & 0x0002)) ckbAgeChildren.CheckState = CheckState.Indeterminate;
-                    if ((cachedAgeFlags & 0x0004) != (newAgeFlags & 0x0004)) ckbAgeTeens.CheckState = CheckState.Indeterminate;
-                    if ((cachedAgeFlags & 0x0040) != (newAgeFlags & 0x0040)) ckbAgeYoungAdults.CheckState = CheckState.Indeterminate;
-                    if ((cachedAgeFlags & 0x0008) != (newAgeFlags & 0x0008)) ckbAgeAdults.CheckState = CheckState.Indeterminate;
-                    if ((cachedAgeFlags & 0x0010) != (newAgeFlags & 0x0010)) ckbAgeElders.CheckState = CheckState.Indeterminate;
-                }
-            }
-            else
-            {
-                cachedAgeFlags = newAgeFlags;
-                if ((cachedAgeFlags & 0x0020) == 0x0020) ckbAgeBabies.Checked = true;
-                if ((cachedAgeFlags & 0x0001) == 0x0001) ckbAgeToddlers.Checked = true;
-                if ((cachedAgeFlags & 0x0002) == 0x0002) ckbAgeChildren.Checked = true;
-                if ((cachedAgeFlags & 0x0004) == 0x0004) ckbAgeTeens.Checked = true;
-                if ((cachedAgeFlags & 0x0040) == 0x0040) ckbAgeYoungAdults.Checked = true;
-                if ((cachedAgeFlags & 0x0008) == 0x0008) ckbAgeAdults.Checked = true;
-                if ((cachedAgeFlags & 0x0010) == 0x0010) ckbAgeElders.Checked = true;
-            }
-
-            uint newCategoryFlags = repoWizardData.Category;
-            if (append)
-            {
-                if (cachedCategoryFlags != newCategoryFlags)
-                {
-                    if ((cachedCategoryFlags & 0x0007) != (newCategoryFlags & 0x0007)) ckbCatEveryday.CheckState = CheckState.Indeterminate;
-                    if ((cachedCategoryFlags & 0x0020) != (newCategoryFlags & 0x0020)) ckbCatFormal.CheckState = CheckState.Indeterminate;
-                    if ((cachedCategoryFlags & 0x0200) != (newCategoryFlags & 0x0200)) ckbCatGym.CheckState = CheckState.Indeterminate;
-                    if ((cachedCategoryFlags & 0x0100) != (newCategoryFlags & 0x0100)) ckbCatMaternity.CheckState = CheckState.Indeterminate;
-                    if ((cachedCategoryFlags & 0x1000) != (newCategoryFlags & 0x1000)) ckbCatOuterwear.CheckState = CheckState.Indeterminate;
-                    if ((cachedCategoryFlags & 0x0010) != (newCategoryFlags & 0x0010)) ckbCatPJs.CheckState = CheckState.Indeterminate;
-                    if ((cachedCategoryFlags & 0x0008) != (newCategoryFlags & 0x0008)) ckbCatSwimwear.CheckState = CheckState.Indeterminate;
-                    if ((cachedCategoryFlags & 0x0040) != (newCategoryFlags & 0x0040)) ckbCatUnderwear.CheckState = CheckState.Indeterminate;
-                }
-            }
-            else
-            {
-                cachedCategoryFlags = newCategoryFlags;
-                if ((cachedCategoryFlags & 0x0007) == 0x0007) ckbCatEveryday.Checked = true;
-                if ((cachedCategoryFlags & 0x0020) == 0x0020) ckbCatFormal.Checked = true;
-                if ((cachedCategoryFlags & 0x0200) == 0x0200) ckbCatGym.Checked = true;
-                if ((cachedCategoryFlags & 0x0100) == 0x0100) ckbCatMaternity.Checked = true;
-                if ((cachedCategoryFlags & 0x1000) == 0x1000) ckbCatOuterwear.Checked = true;
-                if ((cachedCategoryFlags & 0x0010) == 0x0010) ckbCatPJs.Checked = true;
-                if ((cachedCategoryFlags & 0x0008) == 0x0008) ckbCatSwimwear.Checked = true;
-                if ((cachedCategoryFlags & 0x0040) == 0x0040) ckbCatUnderwear.Checked = true;
-            }
-
-            uint newProductValue = repoWizardData.Product;
-            if (append)
-            {
-                if (cachedProductValue != newProductValue)
-                {
-                    comboProduct.SelectedIndex = 0;
-                }
-            }
-            else
-            {
-                cachedProductValue = newProductValue;
-
-                foreach (Object o in comboProduct.Items)
-                {
-                    if ((o as UintNamedValue).Value == cachedProductValue)
-                    {
-                        comboProduct.SelectedItem = o;
-                        break;
-                    }
-                }
-            }
-
-            uint newShoeValue = repoWizardData.Shoe;
-            if (append)
-            {
-                if (cachedShoeValue != newShoeValue)
-                {
-                    comboShoe.SelectedIndex = 0;
-                }
-            }
-            else
-            {
-                cachedShoeValue = newShoeValue;
-
-                foreach (Object o in comboShoe.Items)
-                {
-                    if ((o as UintNamedValue).Value == cachedShoeValue)
-                    {
-                        comboShoe.SelectedItem = o;
-                        break;
+                        comboSlavePrimarySubset.Items.Add(s);
+                        comboSlaveSecondarySubset.Items.Add(s);
                     }
                 }
             }
@@ -1525,6 +1888,13 @@ namespace RepositoryWizard
 
         #region Checkbox Events
         private void OnCheckboxClicked(object sender, EventArgs e)
+        {
+            UpdateSaveAsState();
+        }
+        #endregion
+
+        #region Combobox Events
+        private void OnSubsetChanged(object sender, EventArgs e)
         {
             UpdateSaveAsState();
         }
@@ -1545,6 +1915,11 @@ namespace RepositoryWizard
         {
             UpdateSaveAsState();
         }
+
+        private void OnMasterTextChanged(object sender, EventArgs e)
+        {
+            UpdateSaveAsState();
+        }
         #endregion
 
         #region Button Events
@@ -1552,9 +1927,22 @@ namespace RepositoryWizard
         {
             if (openMeshDialog.ShowDialog() == DialogResult.OK)
             {
-                if (IsValidMesh(openMeshDialog.FileName, true))
+                if (IsValidClothingMesh(openMeshDialog.FileName, true))
                 {
                     textMesh.Text = openMeshDialog.FileName;
+                }
+
+                UpdateFormState();
+            }
+        }
+
+        private void OnMasterButtonClicked(object sender, EventArgs e)
+        {
+            if (openMasterDialog.ShowDialog() == DialogResult.OK)
+            {
+                if (IsValidObjectMaster(openMasterDialog.FileName))
+                {
+                    textMaster.Text = openMasterDialog.FileName;
                 }
 
                 UpdateFormState();
@@ -1647,20 +2035,29 @@ namespace RepositoryWizard
         #region Save Button
         private void OnSaveAsClicked(object sender, EventArgs e)
         {
-            if (saveAsFileDialog.ShowDialog() == DialogResult.OK)
+            if (menuItemModeClothing.Checked)
             {
-                if (!string.IsNullOrWhiteSpace(saveAsFileDialog.FileName))
+                if (saveAsFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    SaveAs(saveAsFileDialog.FileName);
-                }
+                    if (!string.IsNullOrWhiteSpace(saveAsFileDialog.FileName))
+                    {
+                        SaveAs(saveAsFileDialog.FileName);
+                    }
 
-                UpdateFormState();
+                    UpdateFormState();
+                }
+            }
+            else
+            {
+                SaveAs(null);
+
+                DoWork_FillResourceGrid(lastFolder);
             }
         }
 
         private void SaveAs(string packageFile)
         {
-            if (File.Exists(packageFile))
+            if (packageFile != null && File.Exists(packageFile))
             {
                 if (menuItemAutoBackup.Checked)
                 {
@@ -1701,73 +2098,50 @@ namespace RepositoryWizard
                 }
             }
 
-            DBPFKey newMeshCresKey;
-            Shpe newMeshShpe = null;
-            Gmdc newMeshGmdc = null;
-
-            using (DBPFFile meshPackage = new DBPFFile(textMesh.Text))
+            if (menuItemModeClothing.Checked)
             {
-                // We did all the verification that these resources exist when we opened the mesh
-                newMeshCresKey = meshPackage.GetEntriesByType(Cres.TYPE)[0];
-                Cres meshCres = (Cres)meshPackage.GetResourceByKey(newMeshCresKey);
-                newMeshShpe = (Shpe)meshPackage.GetResourceByKey(meshCres.ShpeKeys[0]);
+                DBPFKey newMeshCresKey;
+                Shpe newMeshShpe = null;
+                Gmdc newMeshGmdc = null;
 
-                if (menuItemVerifyGmdcSubsets.Checked)
+                using (DBPFFile meshPackage = new DBPFFile(textMesh.Text))
                 {
-                    Gmnd newMeshGmnd = (Gmnd)meshPackage.GetResourceByName(Gmnd.TYPE, newMeshShpe.GmndNames[0]);
-                    newMeshGmdc = (Gmdc)meshPackage.GetResourceByKey(newMeshGmnd.GmdcKeys[0]);
-                }
+                    // We did all the verification that these resources exist when we opened the mesh
+                    newMeshCresKey = meshPackage.GetEntriesByType(Cres.TYPE)[0];
+                    Cres meshCres = (Cres)meshPackage.GetResourceByKey(newMeshCresKey);
+                    newMeshShpe = (Shpe)meshPackage.GetResourceByKey(meshCres.ShpeKeys[0]);
 
-                meshPackage.Close();
-            }
-
-            if (menuItemAutoMerge.Checked)
-            {
-                using (RepoWizardDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
-                {
-                    bool anyUpdates = false;
-
-                    foreach (DataGridViewRow row in gridResources.SelectedRows)
+                    if (menuItemVerifyGmdcSubsets.Checked)
                     {
-                        int exitCode = SaveRow(dbpfPackage, row, newMeshCresKey, newMeshShpe, menuItemVerifyShpeSubsets.Checked, newMeshGmdc, menuItemVerifyGmdcSubsets.Checked);
-
-                        if (exitCode == 1)
-                        {
-                            anyUpdates = true;
-                        }
-                        else if (exitCode == -1)
-                        {
-                            anyUpdates = false;
-                            break;
-                        }
+                        Gmnd newMeshGmnd = (Gmnd)meshPackage.GetResourceByName(Gmnd.TYPE, newMeshShpe.GmndNames[0]);
+                        newMeshGmdc = (Gmdc)meshPackage.GetResourceByKey(newMeshGmnd.GmdcKeys[0]);
                     }
 
-                    if (anyUpdates)
-                    {
-                        try
-                        {
-                            dbpfPackage.Update(menuItemAutoBackup.Checked);
-                        }
-                        catch (Exception)
-                        {
-                            MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
-                        }
-                    }
-
-                    dbpfPackage.Close();
+                    meshPackage.Close();
                 }
-            }
-            else
-            {
-                FileInfo packageInfo = new FileInfo(packageFile);
 
-                foreach (DataGridViewRow row in gridResources.SelectedRows)
+                if (menuItemAutoMerge.Checked)
                 {
-                    string rowPackageFile = $"{packageInfo.FullName.Substring(0, packageInfo.FullName.Length - packageInfo.Extension.Length)}_{ExpandMacros(row, $"{{id}}", true)}{packageInfo.Extension}"; ;
-
-                    using (RepoWizardDbpfFile dbpfPackage = packageCache.GetOrOpen(rowPackageFile))
+                    using (RepoWizardDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
                     {
-                        if (SaveRow(dbpfPackage, row, newMeshCresKey, newMeshShpe, menuItemVerifyShpeSubsets.Checked, newMeshGmdc, menuItemVerifyGmdcSubsets.Checked) == 1)
+                        bool anyUpdates = false;
+
+                        foreach (DataGridViewRow row in gridResources.SelectedRows)
+                        {
+                            int exitCode = SaveClothingRow(dbpfPackage, row, newMeshCresKey, newMeshShpe, menuItemVerifyShpeSubsets.Checked, newMeshGmdc, menuItemVerifyGmdcSubsets.Checked);
+
+                            if (exitCode == 1)
+                            {
+                                anyUpdates = true;
+                            }
+                            else if (exitCode == -1)
+                            {
+                                anyUpdates = false;
+                                break;
+                            }
+                        }
+
+                        if (anyUpdates)
                         {
                             try
                             {
@@ -1782,10 +2156,248 @@ namespace RepositoryWizard
                         dbpfPackage.Close();
                     }
                 }
+                else
+                {
+                    int exitCode;
+                    FileInfo packageInfo = new FileInfo(packageFile);
+
+                    foreach (DataGridViewRow row in gridResources.SelectedRows)
+                    {
+                        string rowPackageFile = $"{packageInfo.FullName.Substring(0, packageInfo.FullName.Length - packageInfo.Extension.Length)}_{ExpandMacros(row, $"{{id}}", true)}{packageInfo.Extension}"; ;
+
+                        using (RepoWizardDbpfFile dbpfPackage = packageCache.GetOrOpen(rowPackageFile))
+                        {
+                            exitCode = SaveClothingRow(dbpfPackage, row, newMeshCresKey, newMeshShpe, menuItemVerifyShpeSubsets.Checked, newMeshGmdc, menuItemVerifyGmdcSubsets.Checked);
+
+                            if (exitCode == 1)
+                            {
+                                try
+                                {
+                                    dbpfPackage.Update(menuItemAutoBackup.Checked);
+                                }
+                                catch (Exception)
+                                {
+                                    MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
+                                }
+                            }
+
+                            dbpfPackage.Close();
+                        }
+
+                        if (exitCode == -1) break;
+                    }
+                }
+            }
+            else
+            {
+                if (masterMeshName != null && masterShpes != null)
+                {
+                    foreach (DataGridViewRow row in gridResources.SelectedRows)
+                    {
+                        RepoWizardDbpfData selectedResource = row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
+
+                        using (RepoWizardDbpfFile dbpfPackage = packageCache.GetOrOpen(selectedResource.PackagePath))
+                        {
+                            Objd slaveObjd = null;
+
+                            foreach (DBPFEntry entry in dbpfPackage.GetEntriesByType(Objd.TYPE))
+                            {
+                                Objd objd = (Objd)dbpfPackage.GetResourceByEntry(entry);
+
+                                if (RepoWizardDbpfData.IsPermittedObject(objd))
+                                {
+                                    slaveObjd = objd;
+                                    break;
+                                }
+                            }
+
+                            if (slaveObjd != null)
+                            {
+                                Str models = (Str)dbpfPackage.GetResourceByKey(new DBPFKey(Str.TYPE, slaveObjd.GroupID, (TypeInstanceID)0x0085, DBPFData.RESOURCE_NULL));
+
+                                if (models != null)
+                                {
+                                    string slaveCresName = models.LanguageItems(MetaData.Languages.Default)[slaveObjd.GetRawData(ObjdIndex.DefaultGraphic)].Title;
+
+                                    Cres cres = (Cres)dbpfPackage.GetResourceByName(Cres.TYPE, slaveCresName);
+
+                                    if (cres != null && cres.ShpeKeys.Count > 0)
+                                    {
+                                        List<Shpe> shpes = new List<Shpe>();
+
+                                        foreach (DBPFKey shpeKey in cres.ShpeKeys)
+                                        {
+                                            shpes.Add((Shpe)dbpfPackage.GetResourceByKey(shpeKey));
+                                        }
+
+                                        if (shpes.Count > 0)
+                                        {
+                                            List<Gmnd> gmnds = new List<Gmnd>();
+
+                                            foreach (Shpe shpe in shpes)
+                                            {
+                                                foreach (string gmndNames in shpe.GmndNames)
+                                                {
+                                                    gmnds.Add((Gmnd)dbpfPackage.GetResourceByName(Gmnd.TYPE, gmndNames));
+                                                }
+                                            }
+
+                                            if (gmnds.Count > 0)
+                                            {
+                                                List<Gmdc> gmdcs = new List<Gmdc>();
+
+                                                foreach (Gmnd gmnd in gmnds)
+                                                {
+                                                    foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
+                                                    {
+                                                        gmdcs.Add((Gmdc)dbpfPackage.GetResourceByKey(gmdcKey));
+                                                    }
+                                                }
+
+                                                if (gmdcs.Count > 0)
+                                                {
+                                                    ProcessSubset(dbpfPackage, slaveObjd.Guid, comboMasterPrimarySubset.SelectedItem as string, comboSlavePrimarySubset.SelectedItem as string, shpes, gmnds, gmdcs);
+
+                                                    if (!string.IsNullOrEmpty(comboSlaveSecondarySubset.SelectedItem as string))
+                                                    {
+                                                        ProcessSubset(dbpfPackage, slaveObjd.Guid, comboMasterSecondarySubset.SelectedItem as string, comboSlaveSecondarySubset.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                    }
+
+                                                    foreach (Shpe shpe in shpes)
+                                                    {
+                                                        dbpfPackage.Commit(shpe);
+                                                    }
+
+                                                    foreach (Gmnd gmnd in gmnds)
+                                                    {
+                                                        dbpfPackage.Commit(gmnd);
+                                                    }
+
+                                                    foreach (Gmdc gmdc in gmdcs)
+                                                    {
+                                                        dbpfPackage.Commit(gmdc);
+                                                    }
+
+                                                    dbpfPackage.Update(menuItemAutoBackup.Checked);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            dbpfPackage.Close();
+                        }
+                    }
+                }
             }
         }
 
-        private int SaveRow(RepoWizardDbpfFile dbpfPackage, DataGridViewRow row, DBPFKey newMeshCresKey, Shpe newMeshShpe, bool verifyShpeSubsets, Gmdc newMeshGmdc, bool verifyGmdcSubsets)
+        private void ProcessSubset(RepoWizardDbpfFile package, TypeGUID slaveGuid, string masterSubsetName, string slaveSubsetName, List<Shpe> shpes, List<Gmnd> gmnds, List<Gmdc> gmdcs)
+        {
+            string masterMaterialName = null;
+            List<string> slaveMaterialNames = new List<string>();
+
+            foreach (Shpe masterShpe in masterShpes)
+            {
+                masterMaterialName = masterShpe.GetSubsetMaterial(masterSubsetName);
+
+                if (masterMaterialName != null) break;
+            }
+
+            if (!masterSubsetName.Equals(slaveSubsetName))
+            {
+                foreach (Gmnd gmnd in gmnds)
+                {
+                    gmnd.RemoveDesignModeEnabled(slaveSubsetName);
+                }
+
+                foreach (Shpe shpe in shpes)
+                {
+                    shpe.RenameSubset(slaveSubsetName, masterSubsetName);
+                }
+
+                foreach (Gmdc gmdc in gmdcs)
+                {
+                    gmdc.RenameSubset(slaveSubsetName, masterSubsetName);
+                }
+            }
+
+            foreach (Shpe shpe in shpes)
+            {
+                string slavePrimaryMaterialName = shpe.GetSubsetMaterial(masterSubsetName);
+
+                if (slavePrimaryMaterialName != null)
+                {
+                    slaveMaterialNames.Add(slavePrimaryMaterialName);
+                    shpe.SetSubsetMaterial(masterSubsetName, masterMaterialName);
+                }
+            }
+
+            foreach (Gmnd gmnd in gmnds)
+            {
+                if (!(gmnd.AddDesignModeEnabled(masterSubsetName) &&
+                      gmnd.SetMaterialsMeshName(masterSubsetName, masterMeshName)))
+                {
+                    MsgBox.Show("Too many designable subsets!", "Repository Wizard - Object");
+                    throw new Exception("Too many designable subsets!");
+                }
+            }
+
+            // Delete associated MMATs
+            List<Mmat> toDelete = new List<Mmat>();
+
+            foreach (DBPFEntry entry in package.GetEntriesByType(Mmat.TYPE))
+            {
+                Mmat mmat = (Mmat)package.GetResourceByEntry(entry);
+
+                if (mmat.ObjectGUID == slaveGuid && mmat.SubsetName.Equals(slaveSubsetName))
+                {
+                    toDelete.Add(mmat);
+                }
+            }
+
+            foreach (Mmat mmat in toDelete)
+            {
+                package.Remove(mmat);
+            }
+
+            if (menuItemDeleteLocalOrphans.Checked)
+            {
+                // Delete unused TXMT and TXTR(s)
+                foreach (string slavePrimaryMaterialName in slaveMaterialNames)
+                {
+                    Txmt txmt = (Txmt)package.GetResourceByName(Txmt.TYPE, slavePrimaryMaterialName);
+
+                    if (IsLocalOrphan(package, txmt))
+                    {
+                        List<string> txtrNames = new List<string>
+                        {
+                            txmt.GetProperty("stdMatBaseTextureName"),
+                            txmt.GetProperty("stdMatNormalMapTextureName")
+                        };
+
+                        package.Remove(txmt);
+
+                        // Delete unused TXTR(s)
+                        foreach (string txtrName in txtrNames)
+                        {
+                            if (!string.IsNullOrEmpty(txtrName))
+                            {
+                                Txtr txtr = (Txtr)package.GetResourceByName(Txtr.TYPE, txtrName);
+
+                                if (IsLocalOrphan(package, txtr))
+                                {
+                                    package.Remove(txtr);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private int SaveClothingRow(RepoWizardDbpfFile dbpfPackage, DataGridViewRow row, DBPFKey newMeshCresKey, Shpe newMeshShpe, bool verifyShpeSubsets, Gmdc newMeshGmdc, bool verifyGmdcSubsets)
         {
             RepoWizardDbpfData selectedResource = row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
 
@@ -1910,6 +2522,57 @@ namespace RepositoryWizard
              */
 
             return 1;
+        }
+
+        private bool IsLocalOrphan(RepoWizardDbpfFile package, DBPFResource resource)
+        {
+            if (resource == null) return false;
+
+            if (resource is Txmt txmt)
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(Mmat.TYPE))
+                {
+                    Mmat mmat = (Mmat)package.GetResourceByEntry(entry);
+
+                    if (mmat.Name.Equals(txmt.KeyName))
+                    {
+                        return false;
+                    }
+                }
+
+                foreach (DBPFEntry entry in package.GetEntriesByType(Shpe.TYPE))
+                {
+                    Shpe shpe = (Shpe)package.GetResourceByEntry(entry);
+
+                    foreach (ShapePart part in shpe.Shape.Parts)
+                    {
+                        if (part.FileName.Equals(txmt.KeyName))
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+            else if (resource is Txtr txtr)
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(Txmt.TYPE))
+                {
+                    Txmt material = (Txmt)package.GetResourceByEntry(entry);
+
+                    string baseName = material.GetProperty("stdMatBaseTextureName") ?? "";
+                    string mapName = material.GetProperty("stdMatNormalMapTextureName") ?? "";
+                    if (baseName.Equals(txtr.KeyName) || mapName.Equals(txtr.KeyName))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            throw new ArgumentException($"Unsupported resource type: {DBPFData.TypeName(resource.TypeID)}");
         }
         #endregion
     }

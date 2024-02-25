@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
-    public abstract class AbstractCresChildren : AbstractRcolBlock, ICresChildren, IEnumerable, System.Collections.IEnumerator
+    public abstract class AbstractCresChildren : AbstractRcolBlock, ICresChildren, IEnumerable, IEnumerator
     {
         public abstract string GetName();
         /// <summary>
@@ -37,7 +37,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             if (Parent == null) return null;
 
             if (index < 0) return null;
-            if (index >= this.Parent.Blocks.Length) return null;
+            if (index >= this.Parent.Blocks.Count) return null;
 
             object o = Parent.Blocks[index];
 
@@ -55,20 +55,20 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get
             {
                 if (parent == null) return -1;
-                for (int i = 0; i < parent.Blocks.Length; i++)
+                for (int i = 0; i < parent.Blocks.Count; i++)
                     if (parent.Blocks[i] == this) return i;
                 return -1;
             }
         }
 
         /// <summary>
-        /// Get List of al parent Blocks
+        /// Get List of all parent Blocks
         /// </summary>
         /// <returns></returns>
         public List<int> GetParentBlocks()
         {
             List<int> l = new List<int>();
-            for (int i = 0; i < parent.Blocks.Length; i++)
+            for (int i = 0; i < parent.Blocks.Count; i++)
             {
                 IRcolBlock irb = parent.Blocks[i];
                 if (irb.GetType().GetInterface("ICresChildren", false) == typeof(ICresChildren))
@@ -124,7 +124,5 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             pos++;
             return (pos < this.ChildBlocks.Count);
         }
-
-
     }
 }

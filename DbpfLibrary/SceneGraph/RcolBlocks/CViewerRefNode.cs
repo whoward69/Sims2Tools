@@ -12,36 +12,36 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CViewerRefNode : AbstractRcolBlock
     {
-        public static readonly TypeBlockID TYPE = (TypeBlockID)0x7BA3838C;
+        public static readonly TypeBlockID TYPE = (TypeBlockID)0x7BA3838C; // NOTE: This could be wrong as same value as cGeometryNode (SimPe has same duplication)
         public static String NAME = "cViewerRefNode";
 
+        private readonly ViewerRefNodeBase vrnb;
+        private readonly RenderableNode rn;
+        private readonly BoundedNode bn;
+        private readonly CTransformNode tn;
 
-        readonly ViewerRefNodeBase vrnb;
-        readonly RenderableNode rn;
-        readonly BoundedNode bn;
-        readonly CTransformNode tn;
-
-        short unknown1;
+        private short unknown1;
         public short Unknown1
         {
             get { return unknown1; }
             set { unknown1 = value; }
         }
 
-        string[] names;
+        private string[] names;
         public string[] Names
         {
             get { return names; }
             set { names = value; }
         }
 
-        byte[] unknown2;
+        private byte[] unknown2;
         public byte[] Unknown2
         {
             get { return unknown2; }
@@ -62,6 +62,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             version = 0x0c;
             BlockID = TYPE;
+            BlockName = NAME;
         }
 
         /// <summary>
@@ -97,39 +98,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             for (int i = 0; i < names.Length; i++) names[i] = reader.ReadString();
 
             unknown2 = reader.ReadBytes(0xA0);
-        }
-
-
-
-        public override void Dispose()
-        {
-        }
-    }
-
-    public class ViewerRefNodeBase : AbstractRcolBlock
-    {
-
-
-
-
-
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public ViewerRefNodeBase(Rcol parent) : base(parent)
-        {
-            version = 0x5;
-            BlockID = TypeBlockID.NULL;
-        }
-
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
-        public override void Unserialize(DbpfReader reader)
-        {
-            version = reader.ReadUInt32();
         }
 
 

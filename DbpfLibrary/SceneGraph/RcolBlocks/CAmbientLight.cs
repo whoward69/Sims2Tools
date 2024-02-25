@@ -26,6 +26,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             version = 1;
             BlockID = TYPE;
+            BlockName = NAME;
         }
     }
 }

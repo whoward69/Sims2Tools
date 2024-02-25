@@ -13,37 +13,26 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 
-namespace Sims2Tools.DBPF.SceneGraph
+namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
-    public class SGResource : AbstractRcolBlock
+    public class ViewerRefNodeBase : AbstractRcolBlock
     {
-        string flname;
-
-        public string FileName
+        public ViewerRefNodeBase(Rcol parent) : base(parent)
         {
-            get { return flname; }
-            set { flname = value; }
-        }
-
-
-        public SGResource(Rcol parent) : base(parent)
-        {
-            version = 0x02;
-            flname = "";
+            version = 0x5;
+            BlockID = TypeBlockID.NULL;
         }
 
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
-            flname = reader.ReadString();
         }
 
-        public override uint FileSize => (uint)(4 + flname.Length + 1);
+        public override uint FileSize => (uint)4;
 
         public override void Serialize(DbpfWriter writer)
         {
             writer.WriteUInt32(version);
-            writer.WriteString(flname);
         }
 
         public override void Dispose()

@@ -137,6 +137,7 @@ namespace Sims2Tools.DBPF
         public DBPFNamedKey(IDBPFNamedKey namedKey) : this(namedKey, namedKey.KeyName)
         {
         }
+
         public override string ToString()
         {
             return $"{base.ToString()} '{KeyName}'";

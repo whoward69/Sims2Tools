@@ -58,9 +58,9 @@ namespace Sims2Tools.DBPF.Package
             return itemByKey[key];
         }
 
-        internal void Commit(DBPFResource resource)
+        internal void Commit(DBPFResource resource, bool ignoreDirty)
         {
-            if (resource.IsDirty)
+            if (ignoreDirty || resource.IsDirty)
             {
                 resourceByKey[resource] = resource;
             }

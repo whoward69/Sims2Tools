@@ -13,9 +13,9 @@ using System.Windows.Forms;
 
 namespace Sims2Tools
 {
-    public partial class Sims2ToolsConfigDialog : Form
+    public partial class ConfigDialog : Form
     {
-        public Sims2ToolsConfigDialog()
+        public ConfigDialog()
         {
             InitializeComponent();
 

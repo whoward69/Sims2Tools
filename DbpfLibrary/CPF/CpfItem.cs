@@ -451,18 +451,14 @@ namespace Sims2Tools.DBPF.CPF
             val = reader.ReadBytes(valuelength);
         }
 
-        internal uint FileSize => (uint)(4 + 4 + name.Length + ((datatype == MetaData.DataTypes.dtString) ? 4 : 0) + val.Length);
+        internal uint FileSize => (uint)(4 + 4 + Helper.ToBytes(name, 0).Length + ((datatype == MetaData.DataTypes.dtString) ? 4 : 0) + val.Length);
 
         internal void Serialize(DbpfWriter writer)
         {
-            // Store the type
             writer.WriteUInt32((uint)datatype);
 
-            //Store the Name 
-            writer.WriteUInt32((uint)name.Length);
-            writer.WriteChars(name.ToCharArray());
+            writer.WriteBytes(Helper.ToBytes(name, 0));
 
-            //Store the Value
             if (datatype == MetaData.DataTypes.dtString)
             {
                 writer.WriteUInt32((uint)val.Length);

@@ -9,6 +9,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.OBJD;
 using System;
 
 namespace RepositoryWizard
@@ -52,6 +53,31 @@ namespace RepositoryWizard
         public string Value => value;
 
         public bool Equals(StringNamedValue other)
+        {
+            return (this.value == other.value);
+        }
+
+        public override string ToString()
+        {
+            return name;
+        }
+    }
+
+    public class ObjdNamedValue : IEquatable<ObjdNamedValue>
+    {
+        private readonly Objd value;
+        private readonly string name;
+
+        public ObjdNamedValue(string name, Objd value)
+        {
+            this.name = name;
+            this.value = value;
+        }
+
+        public string Name => name;
+        public Objd Value => value;
+
+        public bool Equals(ObjdNamedValue other)
         {
             return (this.value == other.value);
         }

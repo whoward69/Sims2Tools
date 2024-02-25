@@ -8,7 +8,7 @@
  
 namespace Sims2Tools
 {
-    public partial class Sims2ToolsAboutDialog
+    public partial class AboutDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -35,7 +35,7 @@ namespace Sims2Tools
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Sims2ToolsAboutDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutDialog));
             this.textProduct = new System.Windows.Forms.TextBox();
             this.textCopyright = new System.Windows.Forms.TextBox();
             this.textRights = new System.Windows.Forms.TextBox();

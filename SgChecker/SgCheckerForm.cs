@@ -360,33 +360,9 @@ namespace SgChecker
 #if DEBUG
                     logger.Debug($"--- Processing game files ---");
 #endif
-                    // Build a list of all the Base, EP and SP folders
-                    List<String> gameFolders = new List<string>();
-
-                    // Base game folder
-                    String baseFolder = SimpeData.PathSetting("Sims2Path");
-                    gameFolders.Add($"{baseFolder}{GameData.base3dPath}");
-
-                    // Expansion Pack (EP) folders
-                    for (int i = 1; i <= 9; i++)
-                    {
-                        String epPath = SimpeData.PathSetting($"Sims2EP{i}Path");
-                        gameFolders.Add($"{epPath}{GameData.ep3dPath}");
-                    }
-
-                    // Stuff Pack (SP) folders
-                    // Note: SimPe ignores Sims2SP4Path, places SP4 in Sims2SP5Path, places SP5 in Sims2SP6Path and uses Sims2SCPath for SP6 ... go figure!
-                    for (int i = 1; i <= 8; i++)
-                    {
-                        String spPath = SimpeData.PathSetting($"Sims2SP{i}Path");
-                        gameFolders.Add($"{spPath}{GameData.sp3dPath}");
-                    }
-                    String scPath = SimpeData.PathSetting($"Sims2SCPath");
-                    gameFolders.Add($"{scPath}{GameData.sp3dPath}");
-
                     String gamePath = (new FileInfo($"{Sims2ToolsLib.Sims2Path}\\..\\..\\")).FullName;
 
-                    foreach (String gameFolder in gameFolders)
+                    foreach (String gameFolder in GameData.gameFolders)
                     {
                         if (Directory.Exists(gameFolder))
                         {
@@ -645,12 +621,12 @@ namespace SgChecker
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(SgCheckerApp.AppProduct).ShowDialog();
+            new AboutDialog(SgCheckerApp.AppProduct).ShowDialog();
         }
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {

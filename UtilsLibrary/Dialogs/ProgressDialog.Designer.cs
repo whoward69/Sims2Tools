@@ -8,7 +8,7 @@
 
 namespace Sims2Tools
 {
-    partial class Sims2ToolsProgressDialog
+    partial class ProgressDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -36,7 +36,7 @@ namespace Sims2Tools
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Sims2ToolsProgressDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProgressDialog));
             this.btnProgressCancel = new System.Windows.Forms.Button();
             this.progressBar = new Sims2Tools.Controls.TextProgressBar();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();

@@ -10,7 +10,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Sims2Tools
 {
-    partial class Sims2ToolsTextEntryDialog
+    partial class TextEntryDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -38,7 +38,7 @@ namespace Sims2Tools
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Sims2ToolsTextEntryDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TextEntryDialog));
             this.lblPrompt = new System.Windows.Forms.Label();
             this.textEntry = new System.Windows.Forms.TextBox();
             this.btnOK = new System.Windows.Forms.Button();
@@ -100,7 +100,7 @@ namespace Sims2Tools
             this.MinimizeBox = false;
             this.Name = "Sims2ToolsTextEntryDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Text Entry";
+            this.Text = "Change Text";
             this.ResumeLayout(false);
             this.PerformLayout();
 

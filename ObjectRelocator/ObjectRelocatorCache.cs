@@ -402,7 +402,7 @@ namespace ObjectRelocator
         public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
         public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
 
-        public void Commit(DBPFResource resource) => package.Commit(resource);
+        public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
 
         public string Update(bool autoBackup) => package.Update(autoBackup);
 

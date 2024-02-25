@@ -30,13 +30,13 @@ namespace Sims2Tools.DBPF.SceneGraph
     public interface ISgName
     {
         // Format is ##0xgggggggg!{filename}_tttt
-        String SgName { get; }
+        string SgName { get; }
     }
 
     public interface ISgHash
     {
         // Format is TTTT-0xGGGGGGGG-0xRRRRRRRR-0xIIIIIIII
-        String SgHash { get; }
+        string SgHash { get; }
     }
 
     public static class SgHelper
@@ -186,6 +186,10 @@ namespace Sims2Tools.DBPF.SceneGraph
     {
         protected readonly SgResourceList sgResourceList = new SgResourceList(1);
         protected readonly List<uint> sgIdrIndexes = new List<uint>(1);
+
+        public override string KeyName => Name ?? base.KeyName;
+
+        public string Name => this.GetItem("name")?.StringValue;
 
         public SgRefCpf(DBPFEntry entry) : base(entry)
         {

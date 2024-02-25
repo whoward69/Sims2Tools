@@ -69,7 +69,9 @@ using Sims2Tools.DBPF.XROF;
 using Sims2Tools.DBPF.XWNT;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
 
 namespace Sims2Tools.DBPF.Package
 {
@@ -78,7 +80,11 @@ namespace Sims2Tools.DBPF.Package
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private static readonly Encoding encoding = new UTF8Encoding(false, true);
+        public static Encoding Encoding => encoding;
+
         private readonly string packagePath;
+        private readonly string packageDir;
         private readonly string packageName;
         private readonly string packageNameNoExtn;
 
@@ -89,6 +95,7 @@ namespace Sims2Tools.DBPF.Package
         private DbpfReader m_Reader;
 
         public string PackagePath => packagePath;
+        public string PackageDir => packageDir;
         public string PackageName => packageName;
         public string PackageNameNoExtn => packageNameNoExtn;
 
@@ -102,7 +109,9 @@ namespace Sims2Tools.DBPF.Package
 
             if (File.Exists(packagePath))
             {
-                this.packageName = new FileInfo(packagePath).Name;
+                FileInfo fi = new FileInfo(packagePath);
+                this.packageDir = fi.DirectoryName;
+                this.packageName = fi.Name;
                 this.packageNameNoExtn = packageName.Substring(0, packageName.LastIndexOf('.'));
 
                 Read(File.OpenRead(packagePath));
@@ -137,7 +146,9 @@ namespace Sims2Tools.DBPF.Package
                 {
                     if (resourceCache.IsResource(entry))
                     {
+                        long bytesBefore = writer.Position;
                         resourceCache.GetResourceByKey(entry).Serialize(writer);
+                        Trace.Assert(entry.FileSize == (writer.Position - bytesBefore), $"Serialize data != FileSize for {entry}");
                     }
                     else if (resourceCache.IsItem(entry))
                     {
@@ -190,9 +201,9 @@ namespace Sims2Tools.DBPF.Package
             return backupName;
         }
 
-        public void Commit(DBPFResource resource)
+        public void Commit(DBPFResource resource, bool ignoreDirty = false)
         {
-            resourceIndex.Commit(resource);
+            resourceIndex.Commit(resource, ignoreDirty);
         }
 
         public void Commit(DBPFKey key, byte[] item)
@@ -225,12 +236,28 @@ namespace Sims2Tools.DBPF.Package
         {
             m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
 
-            // TODO - just because there is no CLST resource (or no entry in the CLST) does NOT mean the data isn't compressed!
-            // TODO - Try to guess if this is compressed data
-            // If entry.FileSize > 9 we could have compressed data
-            //   Read the first 4 bytes as a DWORD, if the value is the same as entry.FileSize it can still be compressed data
-            //   Read the next 2 bytes as a WORD, if the value is 0xFB10 it probably is compressed data
-            //   Read the next 3 bytes as a big-endian 24-bit value, would this make sense as a uncompressed data size?
+            // NOTE: Just because there is no CLST resource (or no entry in the CLST) does NOT mean the data is uncompressed!
+            if (entry.UncompressedSize == 0 && entry.FileSize > 9)
+            {
+                byte[] header = m_Reader.ReadBytes(9);
+
+                m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
+
+                // Header bytes 0 thru 3 are a 32-bit value giving the size of the compressed data (little-endian)
+                Int32 headerCompressedSize = (((header[3] * 256 + header[2]) * 256 + header[1]) * 256 + header[0]);
+                // Header bytes 4 thru 5 are a 16-bit signature value 
+                UInt16 headerSignature = (ushort)(header[5] * 256 + header[4]);
+                // Header bytes 6 thru 8 are a 24-bit value giving the size of the decompressed data (big-endian)
+                Int32 headerUncompressedSize = ((header[6] * 256 + header[7]) * 256 + header[8]);
+
+                if (headerCompressedSize == entry.FileSize &&
+                    headerSignature == 0xFB10 &&
+                    headerUncompressedSize > (entry.FileSize - 9))
+                {
+                    // TODO - _compression - This looks very much like compressed data!
+                    logger.Warn($"Resource {entry} appears to be compressed when marked as not! Missing CLST resource?");
+                }
+            }
 
             if (entry.UncompressedSize != 0)
             {
@@ -289,7 +316,25 @@ namespace Sims2Tools.DBPF.Package
 
         public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName)
         {
-            return GetResourceByKey(SgHelper.KeyFromQualifiedName(sgName, typeId, DBPFData.GROUP_SG_MAXIS));
+            DBPFEntry entry = GetEntryByKey(SgHelper.KeyFromQualifiedName(sgName, typeId, DBPFData.GROUP_SG_MAXIS));
+
+            if (entry == null)
+            {
+                string suffix = $"_{DBPFData.TypeName(typeId).ToLower()}";
+
+                if (sgName.EndsWith(suffix))
+                {
+                    sgName = sgName.Substring(0, sgName.Length - suffix.Length);
+                }
+                else
+                {
+                    sgName = $"{sgName}{suffix}";
+                }
+
+                entry = GetEntryByKey(SgHelper.KeyFromQualifiedName(sgName, typeId, DBPFData.GROUP_SG_MAXIS));
+            }
+
+            return GetResourceByEntry(entry);
         }
 
         public DBPFResource GetResourceByTGIR(int tgir)

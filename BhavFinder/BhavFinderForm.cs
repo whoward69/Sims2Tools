@@ -419,7 +419,7 @@ namespace BhavFinder
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(BhavFinderApp.AppProduct).ShowDialog();
+            new AboutDialog(BhavFinderApp.AppProduct).ShowDialog();
         }
 
         private void OnSaveResultsToClipboardClicked(object sender, EventArgs e)
@@ -514,7 +514,7 @@ namespace BhavFinder
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {

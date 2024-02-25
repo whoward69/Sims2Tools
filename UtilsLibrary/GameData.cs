@@ -27,9 +27,9 @@ namespace Sims2Tools
         static public String objectsSubPath = @"\TSData\Res\Objects\objects.package";
         static public String wantsSubDir = @"\TSData\Res\Wants";
 
-        static public String base3dPath = @"\TSData\Res\Sims3D";
-        static public String ep3dPath = @"\TSData\Res\3D";
-        static public String sp3dPath = @"\TSData\Res\3D";
+        static private readonly String base3dPath = @"\TSData\Res\Sims3D";
+        static private readonly String ep3dPath = @"\TSData\Res\3D";
+        static private readonly String sp3dPath = @"\TSData\Res\3D";
 
         static public SortedDictionary<String, String> languagesByCode;
 
@@ -44,6 +44,8 @@ namespace Sims2Tools
         static public Dictionary<TypeGUID, String> globalObjectsByGUID;
         static public Dictionary<TypeGUID, int> globalObjectsTgirHashByGUID;
         static public SortedDictionary<TypeGroupID, TypeGroupID> semiglobalsByGroupID;
+
+        static public List<string> gameFolders = new List<string>();
 
         static GameData()
         {
@@ -123,6 +125,29 @@ namespace Sims2Tools
             {
                 logger.Warn($"Loading GameData threw {ex.Message}");
                 logger.Info(ex.StackTrace);
+            }
+
+            {
+                // Base game folder
+                String baseFolder = SimpeData.PathSetting("Sims2Path");
+                gameFolders.Add($"{baseFolder}{GameData.base3dPath}");
+
+                // Expansion Pack (EP) folders
+                for (int i = 1; i <= 9; i++)
+                {
+                    String epPath = SimpeData.PathSetting($"Sims2EP{i}Path");
+                    gameFolders.Add($"{epPath}{GameData.ep3dPath}");
+                }
+
+                // Stuff Pack (SP) folders
+                // Note: SimPe ignores Sims2SP4Path, places SP4 in Sims2SP5Path, places SP5 in Sims2SP6Path and uses Sims2SCPath for SP6 ... go figure!
+                for (int i = 1; i <= 8; i++)
+                {
+                    String spPath = SimpeData.PathSetting($"Sims2SP{i}Path");
+                    gameFolders.Add($"{spPath}{GameData.sp3dPath}");
+                }
+                String scPath = SimpeData.PathSetting($"Sims2SCPath");
+                gameFolders.Add($"{scPath}{GameData.sp3dPath}");
             }
 
             stopwatch.Stop();

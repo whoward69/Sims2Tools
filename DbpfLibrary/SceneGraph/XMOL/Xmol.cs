@@ -24,11 +24,6 @@ namespace Sims2Tools.DBPF.SceneGraph.XMOL
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x0C1FE246;
         public const String NAME = "XMOL";
 
-        public override string KeyName
-        {
-            get => Name;
-        }
-
         public Xmol(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgIdrIndexes.AddRange(CresIndexes);
@@ -36,14 +31,9 @@ namespace Sims2Tools.DBPF.SceneGraph.XMOL
             sgIdrIndexes.AddRange(TxmtIndexes);
         }
 
-        public string Name
-        {
-            get { return this.GetSaveItem("name").StringValue; }
-        }
-
         public string Type
         {
-            get { return this.GetSaveItem("type").StringValue; }
+            get { return this.GetItem("type").StringValue; }
         }
 
         public uint[] CresIndexes
@@ -52,8 +42,8 @@ namespace Sims2Tools.DBPF.SceneGraph.XMOL
             {
                 return new uint[]
                 {
-                    this.GetSaveItem("resourcekeyidx").UIntegerValue,
-                    this.GetSaveItem("maskresourcekeyidx").UIntegerValue
+                    this.GetItem("resourcekeyidx").UIntegerValue,
+                    this.GetItem("maskresourcekeyidx").UIntegerValue
                 };
             }
         }
@@ -64,8 +54,8 @@ namespace Sims2Tools.DBPF.SceneGraph.XMOL
             {
                 return new uint[]
                 {
-                    this.GetSaveItem("shapekeyidx").UIntegerValue,
-                    this.GetSaveItem("maskshapekeyidx").UIntegerValue
+                    this.GetItem("shapekeyidx").UIntegerValue,
+                    this.GetItem("maskshapekeyidx").UIntegerValue
                 };
             }
         }
@@ -74,13 +64,13 @@ namespace Sims2Tools.DBPF.SceneGraph.XMOL
         {
             get
             {
-                uint entries = this.GetSaveItem("numoverrides").UIntegerValue;
+                uint entries = this.GetItem("numoverrides").UIntegerValue;
 
                 uint[] indexes = new uint[entries];
 
                 for (int i = 0; i < entries; ++i)
                 {
-                    indexes[i] = this.GetSaveItem($"override{i}resourcekeyidx").UIntegerValue;
+                    indexes[i] = this.GetItem($"override{i}resourcekeyidx").UIntegerValue;
                 }
 
                 return indexes;

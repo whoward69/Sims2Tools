@@ -11,12 +11,18 @@
 
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
+using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Images.IMG;
+using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
+using Sims2Tools.DBPF.SceneGraph.CRES;
+using Sims2Tools.DBPF.SceneGraph.GMDC;
+using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.STR;
@@ -45,6 +51,14 @@ namespace RepositoryWizard
         private readonly Idr idrForBinx;
         private readonly Cpf cpf;
         private readonly Idr idrForCpf;
+
+        private readonly Objd objd;
+        private readonly string modelName;
+        private readonly string shpeSubsets;
+        private readonly string gmdcSubsets;
+        private readonly string designMode;
+        private readonly string materialsMesh;
+
         private readonly Str str;
 
         private readonly bool isObject = false;
@@ -81,35 +95,35 @@ namespace RepositoryWizard
             return Create(package, package.GetEntryByKey(binxKey));
         }
 
-        public static RepoWizardDbpfData Create(RepoWizardDbpfFile package, DBPFEntry binxEntry)
+        public static RepoWizardDbpfData Create(RepoWizardDbpfFile package, DBPFEntry entry)
         {
             RepoWizardDbpfData repoWizardData = null;
 
-            Binx binx = (Binx)package.GetResourceByEntry(binxEntry);
+            DBPFResource res = package.GetResourceByEntry(entry);
 
-            if (binx != null)
+            if (res != null)
             {
-                Idr idrForBinx = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
-
-                if (idrForBinx != null)
+                if (res is Binx binx)
                 {
-                    DBPFResource res = package.GetResourceByKey(idrForBinx.GetItem(binx.GetItem("objectidx").UIntegerValue));
+                    Idr idrForBinx = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
 
-                    if (res != null)
+                    if (idrForBinx != null)
                     {
-                        if (res is Gzps || res is Xmol || res is Xtol)
+                        res = package.GetResourceByKey(idrForBinx.GetItem(binx.GetItem("objectidx").UIntegerValue));
+
+                        if (res != null)
                         {
-                            Cpf cpf = res as Cpf;
-                            Idr idrForCpf = idrForBinx;
-
-                            if (res is Xtol)
+                            if (res is Gzps || res is Xmol || res is Xtol)
                             {
-                                idrForCpf = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(cpf.InstanceID, cpf.ResourceID, Idr.TYPE, cpf.GroupID));
-                            }
+                                Cpf cpf = res as Cpf;
+                                Idr idrForCpf = idrForBinx;
 
-                            if (idrForCpf != null)
-                            {
-                                // if (cpf.GetItem("outfit")?.UIntegerValue == cpf.GetItem("parts")?.UIntegerValue)
+                                if (res is Xtol)
+                                {
+                                    idrForCpf = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(cpf.InstanceID, cpf.ResourceID, Idr.TYPE, cpf.GroupID));
+                                }
+
+                                if (idrForCpf != null)
                                 {
                                     if (cpf.GetItem("species").UIntegerValue == 0x00000001)
                                     {
@@ -120,12 +134,15 @@ namespace RepositoryWizard
                                         // Non-human, eg dog or cat, what should we do with these?
                                     }
                                 }
-                                /* else
-                                {
-                                    // Report this Pets EP 'eff up!
-                                } */
                             }
                         }
+                    }
+                }
+                else if (res is Objd objd)
+                {
+                    if (IsPermittedObject(objd))
+                    {
+                        repoWizardData = new RepoWizardDbpfData(package, objd);
                     }
                 }
             }
@@ -149,6 +166,89 @@ namespace RepositoryWizard
             uint outfit = Outfit;
             isClothing = (outfit == 0x04 || outfit == 0x08 || outfit == 0x10);
             hasShoe = (outfit == 0x08 || outfit == 0x10);
+        }
+
+        private RepoWizardDbpfData(RepoWizardDbpfFile package, Objd objd)
+        {
+            this.packagePath = package.PackagePath;
+            this.packageNameNoExtn = package.PackageNameNoExtn;
+            this.packageName = package.PackageName;
+
+            this.objd = objd;
+
+            Str models = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, objd.GroupID, (TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL));
+            modelName = models.LanguageItems(MetaData.Languages.Default)[objd.GetRawData(ObjdIndex.DefaultGraphic)].Title;
+
+            shpeSubsets = "";
+            gmdcSubsets = "";
+            designMode = "";
+            materialsMesh = "";
+
+            Cres cres = (Cres)package.GetResourceByName(Cres.TYPE, modelName);
+
+            if (cres != null && cres.ShpeKeys.Count == 1)
+            {
+                Shpe shpe = (Shpe)package.GetResourceByKey(cres.ShpeKeys[0]);
+
+                if (shpe != null && shpe.GmndNames.Count == 1)
+                {
+                    foreach (string subset in shpe.Subsets)
+                    {
+                        shpeSubsets = $"{shpeSubsets}, {subset}";
+                    }
+                    if (shpeSubsets.Length > 2) shpeSubsets = shpeSubsets.Substring(2);
+
+                    Gmnd gmnd = (Gmnd)package.GetResourceByName(Gmnd.TYPE, shpe.GmndNames[0]);
+
+                    if (gmnd != null && gmnd.GmdcKeys.Count == 1)
+                    {
+                        designMode = gmnd.GetDesignModeEnabledSubsets();
+                        materialsMesh = gmnd.GetMaterialsMeshNameSubsets();
+
+                        Gmdc gmdc = (Gmdc)package.GetResourceByKey(gmnd.GmdcKeys[0]);
+
+                        if (gmdc != null)
+                        {
+                            foreach (string subset in gmdc.Subsets)
+                            {
+                                gmdcSubsets = $"{gmdcSubsets}, {subset}";
+                            }
+                            if (gmdcSubsets.Length > 2) gmdcSubsets = gmdcSubsets.Substring(2);
+                        }
+                    }
+                }
+            }
+
+            this.str = (Str)package.GetResourceByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
+
+            isObject = true;
+        }
+
+        public static bool IsPermittedObject(Objd objd)
+        {
+            // Ignore "globals", eg controllers, emitters and the like
+            if (objd.GetRawData(ObjdIndex.IsGlobalSimObject) != 0x0000) return false;
+
+            // Only normal objects, door, windows and columns
+            if (objd.Type == ObjdType.Normal || objd.Type == ObjdType.Door || objd.Type == ObjdType.Window || objd.Type == ObjdType.ArchitecturalSupport)
+            {
+                // Single or multi-tile object?
+                if (objd.GetRawData(ObjdIndex.MultiTileMasterId) == 0x0000)
+                {
+                    // Single tile object
+                    return true;
+                }
+                else
+                {
+                    // Is this the main object (and not one of the tiles?)
+                    if (objd.GetRawData(ObjdIndex.MultiTileSubIndex) == 0xFFFF)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public Cpf ThumbnailOwner => cpf is Xtol ? null : cpf;
@@ -218,6 +318,8 @@ namespace RepositoryWizard
             return cloneStr;
         }
 
+        public ObjdType Type => objd.Type;
+
         public uint Product
         {
             get
@@ -276,16 +378,15 @@ namespace RepositoryWizard
         {
             get
             {
-                CpfItem cpfItem = cpf.GetItem("name");
-                return (cpfItem == null) ? "" : cpfItem.StringValue;
-            }
-        }
-
-        public string Tooltip
-        {
-            get
-            {
-                return str.LanguageItems(MetaData.Languages.Default)[0].Title;
+                if (IsClothing)
+                {
+                    CpfItem cpfItem = cpf.GetItem("name");
+                    return (cpfItem == null) ? "" : cpfItem.StringValue;
+                }
+                else
+                {
+                    return objd.KeyName;
+                }
             }
         }
 
@@ -294,6 +395,24 @@ namespace RepositoryWizard
             get
             {
                 return (uint)binx.GetItem("sortindex").IntegerValue;
+            }
+        }
+
+        public string Model => modelName;
+
+        public string ShpeSubsets => shpeSubsets;
+
+        public string GmdcSubsets => gmdcSubsets;
+
+        public string DesignMode => designMode;
+
+        public string MaterialsMesh => materialsMesh;
+
+        public string Tooltip
+        {
+            get
+            {
+                return str.LanguageItems(MetaData.Languages.Default)[0].Title;
             }
         }
 
@@ -324,9 +443,12 @@ namespace RepositoryWizard
         public DBPFEntry GetEntryByKey(DBPFKey key) => package.GetEntryByKey(key);
         public DBPFResource GetResourceByTGIR(int tgir) => package.GetResourceByTGIR(tgir);
         public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
+        public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName) => package.GetResourceByName(typeId, sgName);
         public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
 
-        public void Commit(DBPFResource resource) => package.Commit(resource);
+        public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
+
+        public void Remove(DBPFResource resource) => package.Remove(resource);
 
         public string Update(bool autoBackup) => package.Update(autoBackup);
 

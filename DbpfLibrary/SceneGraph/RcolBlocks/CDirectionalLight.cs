@@ -46,8 +46,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             set { rn = value; }
         }
 
-        ObjectGraphNode ogn;
-        public ObjectGraphNode ObjectGraphNode
+        CObjectGraphNode ogn;
+        public CObjectGraphNode ObjectGraphNode
         {
             get { return ogn; }
             set { ogn = value; }
@@ -102,12 +102,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             version = 1;
             BlockID = TYPE;
+            BlockName = NAME;
 
             slb = new StandardLightBase(null);
-            sgres = new SGResource(null);
             lt = new LightT(null);
             rn = new ReferentNode(null);
-            ogn = new ObjectGraphNode(null);
+            ogn = new CObjectGraphNode(null);
 
             unknown2 = "";
         }
@@ -124,9 +124,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             slb.BlockID = reader.ReadBlockId();
             slb.Unserialize(reader);
 
-            sgres.BlockName = reader.ReadString();
-            sgres.BlockID = reader.ReadBlockId();
-            sgres.Unserialize(reader);
+            NameResource.BlockName = reader.ReadString();
+            NameResource.BlockID = reader.ReadBlockId();
+            NameResource.Unserialize(reader);
 
             lt.BlockName = reader.ReadString();
             lt.BlockID = reader.ReadBlockId();
@@ -147,7 +147,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             green = reader.ReadSingle();
             blue = reader.ReadSingle();
         }
-
 
         public override void Dispose()
         {

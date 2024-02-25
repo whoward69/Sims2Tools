@@ -29,56 +29,51 @@ namespace Sims2Tools.DBPF.SceneGraph.MMAT
         {
         }
 
-        public override string KeyName
-        {
-            get => Name;
-        }
-
         public string Creator
         {
-            get { return this.GetSaveItem("creator").StringValue; }
+            get { return this.GetItem("creator").StringValue; }
         }
 
         public bool DefaultMaterial
         {
-            get { return this.GetSaveItem("defaultMaterial").BooleanValue; }
+            get { return this.GetItem("defaultMaterial").BooleanValue; }
         }
 
         public string Family
         {
-            get { return this.GetSaveItem("family").StringValue; }
+            get { return this.GetItem("family").StringValue; }
         }
 
         public uint Flags
         {
-            get { return this.GetSaveItem("flags").UIntegerValue; }
+            get { return this.GetItem("flags").UIntegerValue; }
         }
 
         public uint MaterialStateFlags
         {
-            get { return this.GetSaveItem("materialStateFlags").UIntegerValue; }
+            get { return this.GetItem("materialStateFlags").UIntegerValue; }
         }
 
         public string ModelName
         {
-            get { return this.GetSaveItem("modelName").StringValue; }
+            get { return this.GetItem("modelName").StringValue; }
         }
 
         public string Name
         {
-            get { return this.GetSaveItem("name").StringValue; }
+            get { return this.GetItem("name").StringValue; }
         }
 
-        public TypeGUID ObjectGUID => (TypeGUID)this.GetSaveItem("objectGUID").UIntegerValue;
+        public TypeGUID ObjectGUID => (TypeGUID)this.GetItem("objectGUID").UIntegerValue;
 
         public int ObjectStateIndex
         {
-            get { return this.GetSaveItem("objectStateIndex").IntegerValue; }
+            get { return this.GetItem("objectStateIndex").IntegerValue; }
         }
 
         public string SubsetName
         {
-            get { return this.GetSaveItem("subsetName").StringValue; }
+            get { return this.GetItem("subsetName").StringValue; }
         }
 
         public override SgResourceList SgNeededResources()

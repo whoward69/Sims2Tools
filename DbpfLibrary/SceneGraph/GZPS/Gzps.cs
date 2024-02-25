@@ -24,11 +24,6 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xEBCF3E27;
         public const String NAME = "GZPS";
 
-        public override string KeyName
-        {
-            get => Name;
-        }
-
         public Gzps(DBPFEntry entry) : base(entry)
         {
         }
@@ -40,14 +35,9 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
             sgIdrIndexes.AddRange(TxmtIndexes);
         }
 
-        public string Name
-        {
-            get { return this.GetSaveItem("name").StringValue; }
-        }
-
         public string Type
         {
-            get { return this.GetSaveItem("type").StringValue; }
+            get { return this.GetItem("type").StringValue; }
         }
 
         public uint[] CresIndexes
@@ -56,7 +46,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
             {
                 return new uint[]
                 {
-                    this.GetSaveItem("resourcekeyidx").UIntegerValue,
+                    this.GetItem("resourcekeyidx").UIntegerValue,
                 };
             }
         }
@@ -67,7 +57,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
             {
                 return new uint[]
                 {
-                    this.GetSaveItem("shapekeyidx").UIntegerValue,
+                    this.GetItem("shapekeyidx").UIntegerValue,
                 };
             }
         }
@@ -76,13 +66,13 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
         {
             get
             {
-                uint entries = this.GetSaveItem("numoverrides").UIntegerValue;
+                uint entries = this.GetItem("numoverrides").UIntegerValue;
 
                 uint[] indexes = new uint[entries];
 
                 for (int i = 0; i < entries; ++i)
                 {
-                    indexes[i] = this.GetSaveItem($"override{i}resourcekeyidx").UIntegerValue;
+                    indexes[i] = this.GetItem($"override{i}resourcekeyidx").UIntegerValue;
                 }
 
                 return indexes;

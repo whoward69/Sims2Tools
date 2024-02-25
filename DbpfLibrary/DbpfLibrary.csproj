@@ -97,6 +97,7 @@
     <Compile Include="Images\TgaLoader.cs" />
     <Compile Include="IO\ByteOrder.cs" />
     <Compile Include="IO\DbpfWriter.cs" />
+    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\ViewerRefNodeBase.cs" />
     <Compile Include="UI\Ui.cs" />
     <Compile Include="Utils\Decompressor.cs" />
     <Compile Include="IO\DbpfReader.cs" />
@@ -146,7 +147,7 @@
     <Compile Include="SceneGraph\Geometry\Quaternion.cs" />
     <Compile Include="SceneGraph\Geometry\Vectors.cs" />
     <Compile Include="SceneGraph\Geometry\VectorTransformation.cs" />
-    <Compile Include="SceneGraph\GmdcHelper.cs" />
+    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcHelper.cs" />
     <Compile Include="SceneGraph\GMDC\Gmdc.cs" />
     <Compile Include="SceneGraph\GMND\Gmnd.cs" />
     <Compile Include="SceneGraph\GZPS\Gzps.cs" />
@@ -164,7 +165,7 @@
     <Compile Include="SceneGraph\LPNT\Lpnt.cs" />
     <Compile Include="SceneGraph\LSPT\Lspt.cs" />
     <Compile Include="SceneGraph\MMAT\Mmat.cs" />
-    <Compile Include="SceneGraph\ObjectGraphNode.cs" />
+    <Compile Include="SceneGraph\RcolBlocks\CObjectGraphNode.cs" />
     <Compile Include="SceneGraph\PackedFileDescriptor.cs" />
     <Compile Include="SceneGraph\RcolBlocks\AbstractCresChildren.cs" />
     <Compile Include="SceneGraph\RcolBlocks\AbstractRcolBlock.cs" />
@@ -194,14 +195,14 @@
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcGroups.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcLinks.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcModel.cs" />
-    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcSubsets.cs" />
+    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcJoint.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\LightT.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\ReferentNode.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\RenderableNode.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\StandardLightBase.cs" />
     <Compile Include="SceneGraph\RCOL\Rcol.cs" />
     <Compile Include="SceneGraph\SgDataTypes.cs" />
-    <Compile Include="SceneGraph\SGResource.cs" />
+    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\SGResource.cs" />
     <Compile Include="SceneGraph\SHPE\Shpe.cs" />
     <Compile Include="SceneGraph\TXMT\Txmt.cs" />
     <Compile Include="SceneGraph\TXTR\Txtr.cs" />

@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
@@ -166,6 +167,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown6 = -1;
             name = "Practical";
             BlockID = TYPE;
+            BlockName = NAME;
         }
 
         /// <summary>

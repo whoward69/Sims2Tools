@@ -24,24 +24,14 @@ namespace Sims2Tools.DBPF.SceneGraph.XTOL
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x2C1FD8A1;
         public const String NAME = "XTOL";
 
-        public override string KeyName
-        {
-            get => Name;
-        }
-
         public Xtol(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
             sgIdrIndexes.AddRange(TxmtIndexes);
         }
 
-        public string Name
-        {
-            get { return this.GetSaveItem("name").StringValue; }
-        }
-
         public string Type
         {
-            get { return this.GetSaveItem("type").StringValue; }
+            get { return this.GetItem("type").StringValue; }
         }
 
         public uint[] TxmtIndexes
@@ -50,7 +40,7 @@ namespace Sims2Tools.DBPF.SceneGraph.XTOL
             {
                 return new uint[]
                 {
-                    this.GetSaveItem("materialkeyidx").UIntegerValue,
+                    this.GetItem("materialkeyidx").UIntegerValue,
                 };
             }
         }

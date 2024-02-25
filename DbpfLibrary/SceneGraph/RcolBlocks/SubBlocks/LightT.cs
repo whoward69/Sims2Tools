@@ -17,35 +17,44 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class LightT : StandardLightBase, System.IDisposable
     {
-
-
-
-
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public LightT(Rcol parent) : base(parent)
         {
             version = 11;
             BlockID = TypeBlockID.NULL;
-
-            sgres = new SGResource(null);
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
 
-            sgres.BlockName = reader.ReadString();
-            sgres.BlockID = reader.ReadBlockId();
+            string blkName = reader.ReadString();
+            TypeBlockID blkId = reader.ReadBlockId();
+
             sgres.Unserialize(reader);
+            sgres.BlockName = blkName;
+            sgres.BlockID = blkId;
         }
 
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4;
+
+                size += (sgres.BlockName.Length + 1) + 4 + sgres.FileSize;
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(version);
+
+            writer.WriteString(sgres.BlockName);
+            writer.WriteBlockId(sgres.BlockID);
+            sgres.Serialize(writer);
+        }
 
         public override void Dispose()
         {

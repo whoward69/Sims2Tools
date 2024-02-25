@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
@@ -35,6 +36,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             ext = new Extension(null);
             version = 0x01;
             BlockID = TYPE;
+            BlockName = NAME;
         }
 
         /// <summary>

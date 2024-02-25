@@ -14,9 +14,9 @@ using System.Windows.Forms;
 namespace Sims2Tools
 {
     // See - https://www.codeproject.com/Articles/160219/ProgressForm-A-simple-form-linked-to-a-BackgroundW
-    public partial class Sims2ToolsProgressDialog : Form
+    public partial class ProgressDialog : Form
     {
-        public delegate void DoWorkEventHandler(Sims2ToolsProgressDialog sender, DoWorkEventArgs e);
+        public delegate void DoWorkEventHandler(ProgressDialog sender, DoWorkEventArgs e);
         public event DoWorkEventHandler DoWork;
         public event DoWorkEventHandler DoData;
 
@@ -39,7 +39,7 @@ namespace Sims2Tools
             set => progressBar.VisualMode = value;
         }
 
-        public Sims2ToolsProgressDialog(object argument = null)
+        public ProgressDialog(object argument = null)
         {
             InitializeComponent();
 

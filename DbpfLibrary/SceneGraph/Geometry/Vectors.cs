@@ -73,28 +73,18 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             return v;
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public virtual void Unserialize(DbpfReader reader)
         {
-            x = (reader.ReadSingle());
-            y = (reader.ReadSingle());
+            x = reader.ReadSingle();
+            y = reader.ReadSingle();
         }
 
-        /// <summary>
-        /// Serializes a the Attributes stored in this Instance to the BinaryStream
-        /// </summary>
-        /// <param name="writer">The Stream the Data should be stored to</param>
-        /// <remarks>
-        /// Be sure that the Position of the stream is Proper on 
-        /// return (i.e. must point to the first Byte after your actual File)
-        /// </remarks>
-        public virtual void Serialize(System.IO.BinaryWriter writer)
+        public virtual uint FileSize => (uint)(4 + 4);
+
+        public virtual void Serialize(DbpfWriter writer)
         {
-            writer.Write((float)x);
-            writer.Write((float)y);
+            writer.WriteSingle((float)x);
+            writer.WriteSingle((float)y);
         }
 
         /// <summary>
@@ -151,39 +141,23 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             z = 0;
         }
 
-        /// <summary>
-        /// Creates new Vector Instance
-        /// </summary>
-        /// <param name="x">X-Coordinate</param>
-        /// <param name="y">Y-Coordinate</param>
-        /// <param name="z">Z-Coordinate</param>
         public Vector3f(double x, double y, double z) : base(x, y)
         {
             this.z = z;
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
             base.Unserialize(reader);
-            z = (reader.ReadSingle());
+            z = reader.ReadSingle();
         }
 
-        /// <summary>
-        /// Serializes a the Attributes stored in this Instance to the BinaryStream
-        /// </summary>
-        /// <param name="writer">The Stream the Data should be stored to</param>
-        /// <remarks>
-        /// Be sure that the Position of the stream is Proper on 
-        /// return (i.e. must point to the first Byte after your actual File)
-        /// </remarks>
-        public override void Serialize(System.IO.BinaryWriter writer)
+        public override uint FileSize => (uint)(base.FileSize + 4);
+
+        public override void Serialize(DbpfWriter writer)
         {
             base.Serialize(writer);
-            writer.Write((float)z);
+            writer.WriteSingle((float)z);
         }
 
         /// <summary>

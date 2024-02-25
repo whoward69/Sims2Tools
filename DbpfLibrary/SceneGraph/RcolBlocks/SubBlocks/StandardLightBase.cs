@@ -17,25 +17,23 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class StandardLightBase : AbstractRcolBlock
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public StandardLightBase(Rcol parent) : base(parent)
         {
             version = 11;
             BlockID = TypeBlockID.NULL;
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
         }
 
+        public override uint FileSize => (uint)4;
 
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(version);
+        }
 
         public override void Dispose()
         {

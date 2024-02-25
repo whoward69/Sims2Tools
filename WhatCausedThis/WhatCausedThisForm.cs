@@ -368,7 +368,7 @@ namespace WhatCausedThis
 
                 if (textBhavName.Text.Equals("CT - Object Error", StringComparison.OrdinalIgnoreCase))
                 {
-                    MsgBox.Show(this, "This error has been caused by shift-clicking on an object and selecting '*Force Error' and not by badly behaving code.", "Unsuitable Error Log", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                    MsgBox.Show("This error has been caused by shift-clicking on an object and selecting '*Force Error' and not by badly behaving code.", "Unsuitable Error Log", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 
                     textBhavGroup.Text = "";
                     textBhavInstance.Text = "";
@@ -391,12 +391,12 @@ namespace WhatCausedThis
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(WhatCausedThisApp.AppProduct).ShowDialog();
+            new AboutDialog(WhatCausedThisApp.AppProduct).ShowDialog();
         }
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -582,7 +582,7 @@ namespace WhatCausedThis
                              "  *Globals Pack (https://modthesims.info/download.php?t=303432)\n" +
                              "\nProceed?";
 
-                if (MsgBox.Show(this, msg, "Bad Gosub Tree Number", MessageBoxButtons.YesNo, MessageBoxIcon.Stop) == DialogResult.No)
+                if (MsgBox.Show(msg, "Bad Gosub Tree Number", MessageBoxButtons.YesNo, MessageBoxIcon.Stop) == DialogResult.No)
                 {
                     textBhavGroup.Text = "";
                     textBhavInstance.Text = "";

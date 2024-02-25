@@ -19,45 +19,14 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class GmdcElementValueBase
     {
-
-        /// <summary>
-        /// Scalar Multiplication
-        /// </summary>
-        /// <param name="evb">First Value</param>
-        /// <param name="d">Scalar Factor</param>
-        /// <returns>The resulting Value</returns>
-        public static GmdcElementValueBase operator *(GmdcElementValueBase evb, double d)
-        {
-            GmdcElementValueBase n = evb.Clone();
-            for (int i = 0; i < n.data.Length; i++) n.data[i] = (float)(n.data[i] * d);
-            return n;
-        }
-
-        /// <summary>
-        /// Scalar Multiplication
-        /// </summary>
-        /// <param name="evb">First Value</param>
-        /// <param name="d">Scalar Factor</param>
-        /// <returns>The resulting Value</returns>
-        public static GmdcElementValueBase operator *(double d, GmdcElementValueBase evb)
-        {
-            return evb * d;
-        }
-
         float[] data;
 
-        /// <summary>
-        /// The plain stored Data
-        /// </summary>
         public float[] Data
         {
             get { return data; }
             set { data = value; }
         }
 
-        /// <summary>
-        /// Returns the number of Float Elements stored here
-        /// </summary>
         internal virtual byte Size
         {
             get { return 0; }
@@ -68,19 +37,18 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             data = new float[Size];
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         internal virtual void Unserialize(DbpfReader reader)
         {
             for (int i = 0; i < data.Length; i++) data[i] = reader.ReadSingle();
         }
 
-        /// <summary>
-        /// This output is used in the ListBox View
-        /// </summary>
-        /// <returns>A String Describing the Data</returns>
+        internal virtual uint FileSize => (uint)(data.Length * 4);
+
+        internal virtual void Serialize(DbpfWriter writer)
+        {
+            for (int i = 0; i < data.Length; i++) writer.WriteSingle(data[i]);
+        }
+
         public override string ToString()
         {
             string s = "";
@@ -92,19 +60,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             return s;
         }
 
-        /// <summary>
-        /// Create a Clone of this Object
-        /// </summary>
-        /// <returns>The Clone</returns>
         public virtual GmdcElementValueBase Clone()
         {
             return this;
         }
 
-        /// <summary>
-        /// This Method supports the protected process of creating a Clone
-        /// </summary>
-        /// <param name="dest">The object that should receive the copied Data</param>
         protected void Clone(GmdcElementValueBase dest)
         {
             for (int i = 0; i < data.Length; i++) dest.Data[i] = data[i];
@@ -116,7 +76,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             for (int i = 0; i < data.Length; i++) f += data[i].GetHashCode();
             return f;
         }
-
 
         public override bool Equals(object obj)
         {
@@ -138,9 +97,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
     }
 
-    /// <summary>
-    /// Contains a single Float Value
-    /// </summary>
     public class GmdcElementValueOneFloat : GmdcElementValueBase
     {
         internal override byte Size
@@ -172,9 +128,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
     }
 
-    /// <summary>
-    /// Contains a two gloat Value
-    /// </summary>
     public class GmdcElementValueTwoFloat : GmdcElementValueBase
     {
         internal override byte Size
@@ -207,9 +160,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
     }
 
-    /// <summary>
-    /// Contains a three gloat Value
-    /// </summary>
     public class GmdcElementValueThreeFloat : GmdcElementValueBase
     {
         internal override byte Size
@@ -244,35 +194,28 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
     }
 
-    /// <summary>
-    /// Contains a two gloat Value
-    /// </summary>
     public class GmdcElementValueOneInt : GmdcElementValueBase
     {
+        private int val;
+
         internal override byte Size
         {
             get { return 1; }
         }
 
         internal GmdcElementValueOneInt() : base() { }
-        /// <summary>
-        /// Create an Instance of this class
-        /// </summary>
-        /// <param name="i1">The integer Value</param>
+
         public GmdcElementValueOneInt(int i1)
         {
             Data = new float[Size];
             Value = i1;
         }
 
-        /// <summary>
-        /// Returns /Sets the stored Value
-        /// </summary>
         public int Value
         {
             get
             {
-                return val;//(int)Data[0];
+                return val;
             }
             set
             {
@@ -281,13 +224,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             }
         }
 
-        /// <summary>
-        /// Returns / Sets the Bytes that are stored as one Dword Value
-        /// </summary>
-        /// <remarks>
-        /// Changein one of the passed Bytes will NOT effect the stored Value, you have to 
-        /// write a complete Array back into this Property to change the stored Value!
-        /// </remarks>
         public byte[] Bytes
         {
             get
@@ -307,10 +243,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             Bytes = r;
         }
 
-        /// <summary>
-        /// This output is used in the ListBox View
-        /// </summary>
-        /// <returns>A String Describing the Data</returns>
         public override string ToString()
         {
             string s = Value.ToString() + " (";
@@ -320,17 +252,19 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             return s;
         }
 
-        int val;
         internal override void Unserialize(DbpfReader reader)
         {
             val = reader.ReadInt32();
             Data[0] = val;
         }
 
-        /// <summary>
-        /// Create a Clone of this Object
-        /// </summary>
-        /// <returns>The Clone</returns>
+        internal override uint FileSize => 4;
+
+        internal override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteInt32(val);
+        }
+
         public override GmdcElementValueBase Clone()
         {
             GmdcElementValueBase dest = new GmdcElementValueOneInt();
@@ -341,102 +275,57 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
     }
 
-    /// <summary>
-    /// This class contains the Elements Section of a Geometric Data Container
-    /// </summary>
     public class GmdcElement : GmdcLinkBlock
     {
+        private int number;
+        private ElementIdentity identity;
+        private int repeat;
+        private BlockFormat blockformat;
+        private SetFormat setformat;
+        private readonly GmdcElementValues data;
+        private readonly List<int> items;
 
-
-        int number;
-        /// <summary>
-        /// Number of stored <see cref="Values"/> that can be used
-        /// </summary>
         public int Number
         {
             get { return number; }
-            set { number = value; }
         }
 
-        ElementIdentity identity;
-        /// <summary>
-        /// The Type of Data that is stored in <see cref="Values"/>.
-        /// </summary>
         public ElementIdentity Identity
         {
             get { return identity; }
-            set { identity = value; }
         }
 
-        int repeat;
-        /// <summary>
-        /// If one <see cref="GmdcLink"/> is referenceing more than one <see cref="GmdcElement"/> 
-        /// of the same <see cref="Identity"/>, this value is used to differ them. (Zero based)
-        /// </summary>
         public int GroupId
         {
             get { return repeat; }
-            set { repeat = value; }
         }
 
-        BlockFormat blockformat;
-        /// <summary>
-        /// What Type are the <see cref="Values"/> stored in.
-        /// </summary>
-        /// <remarks>This Filed Determins which SubClass of <see cref="GmdcElementValueBase"/> is used for 
-        /// the <see cref="Values"/> Members</remarks>
         public BlockFormat BlockFormat
         {
             get { return blockformat; }
-            set { blockformat = value; }
         }
 
-        SetFormat setformat;
-        /// <summary>
-        /// Describes the Elemnet
-        /// </summary>
         public SetFormat SetFormat
         {
             get { return setformat; }
-            set { setformat = value; }
         }
 
-        GmdcElementValues data;
-        /// <summary>
-        /// Contains a List of <see cref="GmdcElementValueBase"/> Values. The Type of the Elements 
-        /// is determined by the <see cref="BlockFormat"/> Property.
-        /// </summary>
         public GmdcElementValues Values
         {
             get { return data; }
-            set { data = value; }
         }
 
-        List<int> items;
-        /// <summary>
-        /// Yet unknown what this is doing
-        /// </summary>
         public List<int> Items
         {
             get { return items; }
-            set { items = value; }
         }
 
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public GmdcElement(CGeometryDataContainer parent) : base(parent)
         {
             data = new GmdcElementValues();
             items = new List<int>();
         }
 
-        /// <summary>
-        /// Returns an instance of GmdcElementValueBase class in the apropriate Format
-        /// </summary>
-        /// <returns>A class Instance</returns>
-        /// <remarks>The Type of the instance is determined using the SubType</remarks>
         public GmdcElementValueBase GetValueInstance()
         {
             switch (blockformat)
@@ -455,10 +344,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             return new GmdcElementValueOneFloat();
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public void Unserialize(DbpfReader reader)
         {
             number = reader.ReadInt32();
@@ -481,10 +366,53 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             this.ReadBlock(reader, items);
         }
 
-        /// <summary>
-        /// This output is used in the ListBox View
-        /// </summary>
-        /// <returns>A String Describing the Data</returns>
+        public uint FileSize
+        {
+            get
+            {
+                long size = 4 + 4 + 4 + 4 + 4;
+
+                size += 4;
+                for (int i = 0; i < data.Length; i++)
+                {
+                    size += data[i].FileSize;
+                }
+
+                size += BlockSize(items);
+
+                return (uint)size;
+            }
+        }
+
+        public void Serialize(DbpfWriter writer)
+        {
+            //automatically keep the Number Field correct
+            if (items.Count == 0)
+            {
+                number = data.Length;
+                foreach (int i in this.items)
+                    if (i > number) number = i - 1;
+            }
+
+            writer.WriteInt32(number);
+
+            writer.WriteUInt32((uint)identity);
+            writer.WriteInt32(repeat);
+            writer.WriteInt32((int)blockformat);
+            writer.WriteInt32((int)setformat);
+
+            int size = 1;
+            if (data.Length > 0) size = data[0].Size;
+
+            writer.WriteInt32((int)(data.Length * 4 * size));
+            for (int i = 0; i < data.Length; i++)
+            {
+                data[i].Serialize(writer);
+            }
+
+            this.WriteBlock(writer, items);
+        }
+
         public override string ToString()
         {
             return this.Identity.ToString() + ", " + this.SetFormat.ToString() + ", " + this.BlockFormat.ToString() + " (" + this.Values.Count.ToString() + ")";
@@ -492,9 +420,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
     }
 
-    /// <summary>
-    /// Typesave ArrayList for GmdcElementValueBase Objects
-    /// </summary>
     public class GmdcElementValues : ArrayList
     {
         /// <summary>
@@ -575,87 +500,20 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
     }
 
-    /// <summary>
-    /// Typesave ArrayList for GmdcElement Objects
-    /// </summary>
-    public class GmdcElements : ArrayList
+    public class GmdcElements : IEnumerable
     {
-        /// <summary>
-        /// Integer Indexer
-        /// </summary>
-        public new GmdcElement this[int index]
+        private readonly ArrayList list = new ArrayList();
+
+        public int Length => list.Count;
+
+        public int AddItem(GmdcElement item)
         {
-            get { return ((GmdcElement)base[index]); }
-            set { base[index] = value; }
+            return list.Add(item);
         }
 
-        /// <summary>
-        /// unsigned Integer Indexer
-        /// </summary>
-        public GmdcElement this[uint index]
+        public IEnumerator GetEnumerator()
         {
-            get { return ((GmdcElement)base[(int)index]); }
-            set { base[(int)index] = value; }
-        }
-
-        /// <summary>
-        /// add a new Element
-        /// </summary>
-        /// <param name="item">The object you want to add</param>
-        /// <returns>The index it was added on</returns>
-        public int Add(GmdcElement item)
-        {
-            return base.Add(item);
-        }
-
-        /// <summary>
-        /// insert a new Element
-        /// </summary>
-        /// <param name="index">The Index where the Element should be stored</param>
-        /// <param name="item">The object that should be inserted</param>
-        public void Insert(int index, GmdcElement item)
-        {
-            base.Insert(index, item);
-        }
-
-        /// <summary>
-        /// remove an Element
-        /// </summary>
-        /// <param name="item">The object that should be removed</param>
-        public void Remove(GmdcElement item)
-        {
-            base.Remove(item);
-        }
-
-        /// <summary>
-        /// Checks wether or not the object is already stored in the List
-        /// </summary>
-        /// <param name="item">The Object you are looking for</param>
-        /// <returns>true, if it was found</returns>
-        public bool Contains(GmdcElement item)
-        {
-            return base.Contains(item);
-        }
-
-        /// <summary>
-        /// Number of stored Elements
-        /// </summary>
-        public int Length
-        {
-            get { return this.Count; }
-        }
-
-        /// <summary>
-        /// Create a clone of this Object
-        /// </summary>
-        /// <returns>The clone</returns>
-        public override object Clone()
-        {
-            GmdcElements list = new GmdcElements();
-            foreach (GmdcElement item in this) list.Add(item);
-
-            return list;
+            return list.GetEnumerator();
         }
     }
-
 }

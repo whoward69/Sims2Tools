@@ -2,11 +2,9 @@
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.Data;
-using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
-using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.XWNT;
 using System;
 using System.Collections.Generic;
@@ -17,51 +15,17 @@ namespace DpbfLister
 {
     class DpbfLister
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
         static void Main(string[] args)
         {
-            DoComplexStuff();
+
+            ProcessFiles(args);
 
             // ProcessObjects();
-
             // ProcessWants();
             // ProcessPrimitives();
-
-            // ProcessFiles(args);
-        }
-
-        private static void DoComplexStuff()
-        {
-#pragma warning disable IDE0063 // Use simple 'using' statement
-            using (DBPFFile package = new DBPFFile($"{Sims2ToolsLib.Sims2Path}{GameData.objectsSubPath}"))
-            {
-                foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
-                {
-                    Objd objd = (Objd)package.GetResourceByEntry(entry);
-
-                    Glob glob = (Glob)package.GetResourceByKey(new DBPFKey(Glob.TYPE, objd.GroupID, (TypeInstanceID)0x00000001, DBPFData.RESOURCE_NULL));
-
-                    glob ??= (Glob)package.GetResourceByKey(new DBPFKey(Glob.TYPE, objd.GroupID, (TypeInstanceID)0x00000080, DBPFData.RESOURCE_NULL));
-
-                    if (glob?.SemiGlobalGroup == (TypeGroupID)0x7F67DD1B)
-                    {
-                        if (objd.GetRawData(ObjdIndex.InteractionTableId) == 0x0001 || objd.GetRawData(ObjdIndex.InteractionTableId) == 0x0002)
-                        {
-                            Ttab ttab = (Ttab)package.GetResourceByKey(new DBPFKey(Ttab.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.InteractionTableId), DBPFData.RESOURCE_NULL));
-
-                            if (ttab == null)
-                            {
-                                Debug.WriteLine($"{objd.Guid}\t{objd.KeyName}");
-                            }
-                        }
-                    }
-                }
-            }
-#pragma warning restore IDE0063 // Use simple 'using' statement
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private static void ProcessFiles(string[] args)
         {
             if (args.Length == 0)

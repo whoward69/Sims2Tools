@@ -10,6 +10,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.IO;
@@ -18,16 +19,12 @@ namespace Sims2Tools.DBPF.IO
 {
     public class DbpfWriter : IDisposable
     {
-        private readonly Stream m_stream;
         private readonly BinaryWriter m_writer;
         private ByteOrder m_byteOrder = ByteOrder.BIG_ENDIAN;
 
-        public Stream MyStream => m_stream;
-
         private DbpfWriter(Stream stream)
         {
-            this.m_stream = stream;
-            this.m_writer = new BinaryWriter(stream);
+            this.m_writer = new BinaryWriter(stream, DBPFFile.Encoding, false);
         }
 
         public static DbpfWriter FromStream(Stream stream)
@@ -94,6 +91,16 @@ namespace Sims2Tools.DBPF.IO
             m_writer.Write(value);
         }
 
+        public void WriteInt16(short value)
+        {
+            if (m_byteOrder == ByteOrder.BIG_ENDIAN)
+            {
+                value = Endian.SwapInt16(value);
+            }
+
+            m_writer.Write(value);
+        }
+
         public void WriteUInt16(ushort value)
         {
             if (m_byteOrder == ByteOrder.BIG_ENDIAN)
@@ -105,6 +112,16 @@ namespace Sims2Tools.DBPF.IO
         }
 
         public void WriteBlockId(TypeBlockID value) => WriteUInt32(value.AsUInt());
+
+        public void WriteInt32(int value)
+        {
+            if (m_byteOrder == ByteOrder.BIG_ENDIAN)
+            {
+                value = Endian.SwapInt32(value);
+            }
+
+            m_writer.Write(value);
+        }
 
         public void WriteUInt32(uint value)
         {
@@ -121,19 +138,19 @@ namespace Sims2Tools.DBPF.IO
         public void WriteInstanceId(TypeInstanceID instanceId) => WriteUInt32(instanceId.AsUInt());
         public void WriteResourceId(TypeResourceID resourceId) => WriteUInt32(resourceId.AsUInt());
 
-        public void WriteString(string value)
+        public void WriteSingle(float value)
         {
             m_writer.Write(value);
         }
 
-        public void WriteChars(char[] value)
+        public void WriteString(string value)
         {
             m_writer.Write(value);
         }
 
         public void WritePChar(string value)
         {
-            WriteChars(value.ToCharArray());
+            m_writer.Write(value.ToCharArray());
             WriteByte(0x00);
         }
         #endregion

@@ -104,12 +104,12 @@ namespace LogWatcher
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(LogWatcherApp.AppProduct).ShowDialog();
+            new AboutDialog(LogWatcherApp.AppProduct).ShowDialog();
         }
 
         private void OnConfigurationClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {

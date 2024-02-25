@@ -379,7 +379,7 @@ namespace OutfitOrganiser
 
         private void OnHelpClicked(object sender, EventArgs e)
         {
-            new Sims2ToolsAboutDialog(OutfitOrganiserApp.AppProduct).ShowDialog();
+            new AboutDialog(OutfitOrganiserApp.AppProduct).ShowDialog();
         }
 
         private void OnFormKeyUp(object sender, KeyEventArgs e)
@@ -492,9 +492,9 @@ namespace OutfitOrganiser
                     lastFolder = null;
                 }
 
-                Sims2ToolsProgressDialog progressDialog = new Sims2ToolsProgressDialog(new WorkerPackage(folder, updateFolders, updatePackages, updateResources));
-                progressDialog.DoWork += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessFoldersOrPackagesOrResources);
-                progressDialog.DoData += new Sims2ToolsProgressDialog.DoWorkEventHandler(DoAsyncWork_DoTask);
+                ProgressDialog progressDialog = new ProgressDialog(new WorkerPackage(folder, updateFolders, updatePackages, updateResources));
+                progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessFoldersOrPackagesOrResources);
+                progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_DoTask);
 
                 DialogResult result = progressDialog.ShowDialog();
 
@@ -548,7 +548,7 @@ namespace OutfitOrganiser
             }
         }
 
-        private void DoAsyncWork_ProcessFoldersOrPackagesOrResources(Sims2ToolsProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_ProcessFoldersOrPackagesOrResources(ProgressDialog sender, DoWorkEventArgs args)
         {
             WorkerPackage workPackage = args.Argument as WorkerPackage; // As passed to the Sims2ToolsProgressDialog constructor
 
@@ -617,14 +617,15 @@ namespace OutfitOrganiser
                                     row["Hairtone"] = "";
                                     row["Jewelry"] = "";
                                     row["Destination"] = "";
+                                    row["AccessoryBin"] = 0;
                                     row["Subtype"] = "";
                                     row["LayerStr"] = "";
                                     row["LayerInt"] = 0;
-                                    row["Bin"] = 0;
+                                    row["MakeupBin"] = 0;
 
                                     row["Type"] = BuildTypeString(outfitData);
 
-                                    switch (outfitData.OutfitOrParts)
+                                    switch (outfitData.ItemType)
                                     {
                                         case 0x01:
                                             row["Visible"] = menuItemOutfitHair.Checked ? "Yes" : "No";
@@ -635,7 +636,7 @@ namespace OutfitOrganiser
                                             row["Subtype"] = BuildMakeupSubtypeString(outfitData.Subtype);
                                             row["LayerStr"] = BuildMakeupLayerString(outfitData.Layer);
                                             row["LayerInt"] = outfitData.Layer;
-                                            row["Bin"] = outfitData.Bin;
+                                            row["MakeupBin"] = outfitData.Bin;
                                             break;
                                         case 0x04:
                                             row["Visible"] = menuItemOutfitClothing.Checked ? "Yes" : "No";
@@ -653,6 +654,7 @@ namespace OutfitOrganiser
                                             row["Visible"] = menuItemOutfitAccessory.Checked ? "Yes" : "No";
                                             row["Jewelry"] = BuildJewelryString(outfitData.Jewelry);
                                             row["Destination"] = BuildDestinationString(outfitData.Destination);
+                                            row["AccessoryBin"] = outfitData.Bin;
                                             break;
                                         default:
                                             // Unsupported type
@@ -694,7 +696,7 @@ namespace OutfitOrganiser
             }
         }
 
-        private void DoAsyncWork_DoTask(Sims2ToolsProgressDialog sender, DoWorkEventArgs e)
+        private void DoAsyncWork_DoTask(ProgressDialog sender, DoWorkEventArgs e)
         {
             if (InvokeRequired)
             {
@@ -709,7 +711,7 @@ namespace OutfitOrganiser
         #endregion
 
         #region Worker Helpers
-        private bool PopulateChildNodes(Sims2ToolsProgressDialog sender, TreeNode parent, string baseDir)
+        private bool PopulateChildNodes(ProgressDialog sender, TreeNode parent, string baseDir)
         {
             foreach (string subDir in Directory.GetDirectories(baseDir, "*", SearchOption.TopDirectoryOnly))
             {
@@ -817,6 +819,7 @@ namespace OutfitOrganiser
 
             gridResources.Columns["colJewelry"].Visible = menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
             gridResources.Columns["colDestination"].Visible = gridResources.Columns["colJewelry"].Visible;
+            gridResources.Columns["colAccessoryBin"].Visible = gridResources.Columns["colJewelry"].Visible;
             grpJewelry.Visible = gridResources.Columns["colJewelry"].Visible;
 
             gridResources.Columns["colMakeupSubtype"].Visible = menuItemOutfitMakeUp.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitAccessory.Checked;
@@ -866,7 +869,7 @@ namespace OutfitOrganiser
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new Sims2ToolsConfigDialog();
+            Form config = new ConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -916,7 +919,7 @@ namespace OutfitOrganiser
                 return;
             }
 
-            Sims2ToolsTextEntryDialog rename = new Sims2ToolsTextEntryDialog("Folder Rename", "Please enter a new name for the folder", new FileInfo(fromFolderPath).Name);
+            TextEntryDialog rename = new TextEntryDialog("Folder Rename", "Please enter a new name for the folder", new FileInfo(fromFolderPath).Name);
 
             if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
             {
@@ -948,7 +951,7 @@ namespace OutfitOrganiser
 
             string baseFolderPath = treeFolders.SelectedNode.Name;
 
-            Sims2ToolsTextEntryDialog rename = new Sims2ToolsTextEntryDialog("New Folder", "Please enter the name for the new folder", "");
+            TextEntryDialog rename = new TextEntryDialog("New Folder", "Please enter the name for the new folder", "");
 
             if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
             {
@@ -1198,7 +1201,7 @@ namespace OutfitOrganiser
             bool wasRenamed = false;
             string fromPackagePath = packageRow.Cells["colPackagePath"].Value as string;
 
-            Sims2ToolsTextEntryDialog rename = new Sims2ToolsTextEntryDialog("Package Rename", "Please enter a new name for the package", new FileInfo(fromPackagePath).Name);
+            TextEntryDialog rename = new TextEntryDialog("Package Rename", "Please enter a new name for the package", new FileInfo(fromPackagePath).Name);
 
             if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
             {
@@ -1403,17 +1406,7 @@ namespace OutfitOrganiser
         {
             if (dataLoading) return;
 
-            ClearEditor();
-
-            if (gridResources.SelectedRows.Count >= 1)
-            {
-                bool append = false;
-                foreach (DataGridViewRow row in gridResources.SelectedRows)
-                {
-                    UpdateEditor(row.Cells["colOutfitData"].Value as OutfitDbpfData, append);
-                    append = true;
-                }
-            }
+            ReloadEditor();
         }
 
         private void OnResourceBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -1430,7 +1423,7 @@ namespace OutfitOrganiser
         {
             string type = "";
 
-            switch (outfitData.OutfitOrParts)
+            switch (outfitData.ItemType)
             {
                 case 0x01:
                     type = "Hair";
@@ -1941,6 +1934,7 @@ namespace OutfitOrganiser
                     {
                         row.Cells["colJewelry"].Value = BuildJewelryString(outfitData.Jewelry);
                         row.Cells["colDestination"].Value = BuildDestinationString(outfitData.Destination);
+                        row.Cells["colAccessoryBin"].Value = outfitData.Bin;
                     }
 
                     if (outfitData.IsMakeUp)
@@ -2049,7 +2043,7 @@ namespace OutfitOrganiser
                     outfitData.Age = data;
                     break;
                 case "bin":
-                    if (outfitData.IsMakeUp) outfitData.Bin = data;
+                    if (outfitData.IsMakeUp || outfitData.IsAccessory) outfitData.Bin = data;
                     break;
                 case "category":
                     outfitData.Category = data;
@@ -2091,7 +2085,7 @@ namespace OutfitOrganiser
 
             if (outfitData.Outfit == 0)
             {
-                outfitData.Outfit = outfitData.Parts;
+                outfitData.Outfit = outfitData.ItemType;
             }
 
             UpdateGridRow(outfitData);
@@ -2118,8 +2112,23 @@ namespace OutfitOrganiser
         #endregion
 
         #region Editor
-        private uint cachedShownValue, cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedProductValue, cachedShoeValue, cachedJewelryValue, cachedDestinationValue, cachedMakeupSubtypeValue, cachedMakeupLayerValue, cachedMakeupBinValue, cachedSortValue;
+        private uint cachedShownValue, cachedGenderValue, cachedAgeFlags, cachedCategoryFlags, cachedProductValue, cachedShoeValue, cachedJewelryValue, cachedDestinationValue, cachedAccessoryBinValue, cachedMakeupSubtypeValue, cachedMakeupLayerValue, cachedMakeupBinValue, cachedSortValue;
         // private string cachedHairtoneValue;
+
+        private void ReloadEditor()
+        {
+            ClearEditor();
+
+            if (gridResources.SelectedRows.Count >= 1)
+            {
+                bool append = false;
+                foreach (DataGridViewRow row in gridResources.SelectedRows)
+                {
+                    UpdateEditor(row.Cells["colOutfitData"].Value as OutfitDbpfData, append);
+                    append = true;
+                }
+            }
+        }
 
         private void ClearEditor()
         {
@@ -2151,6 +2160,7 @@ namespace OutfitOrganiser
             // comboHairtone.SelectedIndex = -1;
             comboJewelry.SelectedIndex = -1;
             comboDestination.SelectedIndex = -1;
+            textAccessoryBin.Text = "";
             comboMakeupSubtype.SelectedIndex = -1;
             comboMakeupLayer.SelectedIndex = -1;
             textMakeupLayer.Text = "";
@@ -2345,7 +2355,7 @@ namespace OutfitOrganiser
             {
                 if (cachedJewelryValue != newJewelryValue)
                 {
-                    comboJewelry.SelectedIndex = 0;
+                    comboJewelry.SelectedIndex = -1;
                 }
             }
             else
@@ -2386,6 +2396,21 @@ namespace OutfitOrganiser
                         break;
                     }
                 }
+            }
+
+            uint newAccessoryBinValue = outfitData.Bin;
+            if (append)
+            {
+                if (cachedAccessoryBinValue != newAccessoryBinValue)
+                {
+                    textAccessoryBin.Text = "";
+                }
+            }
+            else
+            {
+                cachedAccessoryBinValue = newAccessoryBinValue;
+
+                textAccessoryBin.Text = newAccessoryBinValue.ToString();
             }
 
             uint newMakeupSubtypeValue = outfitData.Subtype;
@@ -2535,6 +2560,8 @@ namespace OutfitOrganiser
 
                     if (comboDestination.Enabled) UpdateSelectedRows((comboDestination.SelectedItem as UintNamedValue).Value, "destination");
                     UpdateSelectedRows((comboJewelry.SelectedItem as UintNamedValue).Value, "jewelry");
+
+                    ReloadEditor();
                 }
             }
         }
@@ -2824,6 +2851,29 @@ namespace OutfitOrganiser
                 e.Handled = true;
             }
         }
+
+        private void OnAccessoryBinKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                uint data = 0;
+
+                if (textAccessoryBin.Text.Length > 0 && !UInt32.TryParse(textAccessoryBin.Text, out data))
+                {
+                    textAccessoryBin.Text = "0";
+                    data = 0;
+                }
+
+                if (IsAutoUpdate && textAccessoryBin.Text.Length > 0)
+                {
+                    UpdateSelectedRows(data, "bin");
+
+                    ReloadEditor();
+                }
+
+                e.Handled = true;
+            }
+        }
         #endregion
 
         #region Mouse Management
@@ -3042,7 +3092,7 @@ namespace OutfitOrganiser
                 {
                     if ((row.Cells["colOutfitData"].Value as OutfitDbpfData).Equals(outfitData))
                     {
-                        UpdateOutfitData(outfitData, "outfit", outfitData.Parts);
+                        UpdateOutfitData(outfitData, "outfit", outfitData.ItemType);
                     }
 
                 }

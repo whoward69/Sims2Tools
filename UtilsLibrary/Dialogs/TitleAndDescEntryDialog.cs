@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Sims2Tools
 {
-    public partial class Sims2ToolsTitleAndDescEntryDialog : Form
+    public partial class TitleAndDescEntryDialog : Form
     {
         public string Title
         {
@@ -25,7 +25,7 @@ namespace Sims2Tools
             set => textDescription.Text = Sims2String.SimsToWin(value);
         }
 
-        public Sims2ToolsTitleAndDescEntryDialog(string title, string desc)
+        public TitleAndDescEntryDialog(string title, string desc)
         {
             InitializeComponent();
 

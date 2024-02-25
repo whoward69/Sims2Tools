@@ -66,12 +66,12 @@ namespace OutfitOrganiser
         public bool IsMakeUp => isMakeUp;
         public bool HasShoe => hasShoe;
 
-        public bool IsDirty => (cpf.IsDirty || str.IsDirty || idrForCpf.IsDirty || binx.IsDirty || idrForBinx.IsDirty);
+        public bool IsDirty => (cpf.IsDirty || (str != null && str.IsDirty) || idrForCpf.IsDirty || binx.IsDirty || idrForBinx.IsDirty);
 
         public void SetClean()
         {
             cpf.SetClean();
-            str.SetClean();
+            str?.SetClean();
             idrForCpf.SetClean();
             binx.SetClean();
             idrForBinx.SetClean();
@@ -151,15 +151,16 @@ namespace OutfitOrganiser
             this.cpf = cpf;
             this.idrForCpf = idrForCpf;
 
+            // This could be in a different group/.package
             this.str = (Str)package.GetResourceByKey(idrForBinx.GetItem(binx.GetItem("stringsetidx").UIntegerValue));
 
-            uint outfit = OutfitOrParts;
+            uint itemType = ItemType;
             uint subtype = Subtype;
-            isAccessory = (outfit == 0x20);
-            isClothing = (outfit == 0x04 || outfit == 0x08 || outfit == 0x10);
-            isHair = (outfit == 0x01);
-            isMakeUp = (outfit == 0x02) && (subtype <= 0x07 && subtype != 0x05);
-            hasShoe = (outfit == 0x08 || outfit == 0x10);
+            isAccessory = (itemType == 0x20);
+            isClothing = (itemType == 0x04 || itemType == 0x08 || itemType == 0x10);
+            isHair = (itemType == 0x01);
+            isMakeUp = (itemType == 0x02) && (subtype <= 0x07 && subtype != 0x05);
+            hasShoe = (itemType == 0x08 || itemType == 0x10);
         }
 
         public Cpf ThumbnailOwner => cpf is Xtol ? null : cpf;
@@ -202,7 +203,7 @@ namespace OutfitOrganiser
             if (binx.IsDirty) cache.GetOrAdd(packagePath).Commit(binx);
             if (idrForBinx.IsDirty) cache.GetOrAdd(packagePath).Commit(idrForBinx);
             if (cpf.IsDirty) cache.GetOrAdd(packagePath).Commit(cpf);
-            if (str.IsDirty) cache.GetOrAdd(packagePath).Commit(str);
+            if (str != null && str.IsDirty) cache.GetOrAdd(packagePath).Commit(str);
             if (idrForCpf.IsDirty) cache.GetOrAdd(packagePath).Commit(idrForCpf);
         }
 
@@ -299,13 +300,21 @@ namespace OutfitOrganiser
             }
         }
 
-        public uint OutfitOrParts
+        public uint ItemType
         {
             get
             {
                 CpfItem cpfItem = cpf.GetItem("outfit") ?? cpf.GetItem("parts");
 
                 uint val = (cpfItem == null) ? 0 : cpfItem.UIntegerValue;
+
+                if (val == 0x00)
+                {
+                    if (cpf is Xmol)
+                    {
+                        val = 0x20;
+                    }
+                }
 
                 return val;
             }
@@ -530,12 +539,15 @@ namespace OutfitOrganiser
         {
             get
             {
-                return str.LanguageItems(MetaData.Languages.Default)[0].Title;
+                return (str != null) ? str.LanguageItems(MetaData.Languages.Default)[0].Title : "(unavailable)";
             }
             set
             {
-                str.LanguageItems(MetaData.Languages.Default)[0].Title = value;
-                UpdatePackage();
+                if (str != null)
+                {
+                    str.LanguageItems(MetaData.Languages.Default)[0].Title = value;
+                    UpdatePackage();
+                }
             }
         }
 
@@ -652,7 +664,7 @@ namespace OutfitOrganiser
         public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
         public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
 
-        public void Commit(DBPFResource resource) => package.Commit(resource);
+        public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
 
         public string Update(bool autoBackup) => package.Update(autoBackup);
 

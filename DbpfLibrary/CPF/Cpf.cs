@@ -95,7 +95,8 @@ namespace Sims2Tools.DBPF.CPF
                 UnserializeXml(reader, len);
             }
 
-            this.KeyName = GetSaveItem("name").StringValue;
+            string name = GetItem("name")?.StringValue;
+            if (name != null) this.KeyName = name;
         }
 
         protected void UnserializeXml(DbpfReader reader, int len)
@@ -254,14 +255,6 @@ namespace Sims2Tools.DBPF.CPF
                 if (item.Name == name) return item;
 
             return AddItem(new CpfItem(name, datatype));
-        }
-
-        // TODO - _library - do we really need this? Why not use GetItem instead?
-        public CpfItem GetSaveItem(string name)
-        {
-            CpfItem res = GetItem(name);
-            if (res == null) return new CpfItem();
-            else return res;
         }
 
         protected XmlElement AddXml(XmlElement parent, string name)

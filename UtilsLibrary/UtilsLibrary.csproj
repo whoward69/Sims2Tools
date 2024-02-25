@@ -74,6 +74,12 @@
     <Compile Include="Cache\GameDataCache.cs" />
     <Compile Include="Cache\PackageCache.cs" />
     <Compile Include="Cache\SceneGraphCache.cs" />
+    <Compile Include="Controls\PickerDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\PickerDialog.Designer.cs">
+      <DependentUpon>PickerDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TextProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -81,49 +87,61 @@
       <DependentUpon>TextProgressBar.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\MsgBox.cs" />
-    <Compile Include="Dialogs\Sims2ToolsCreatorEntryDialog.cs">
+    <Compile Include="Dialogs\CreatorConfigDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\Sims2ToolsCreatorEntryDialog.Designer.cs">
-      <DependentUpon>Sims2ToolsCreatorEntryDialog.cs</DependentUpon>
+    <Compile Include="Dialogs\CreatorConfigDialog.Designer.cs">
+      <DependentUpon>CreatorConfigDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Sims2ToolsTitleAndDescEntryDialog.cs">
+    <Compile Include="Dialogs\TreePickerDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\Sims2ToolsTitleAndDescEntryDialog.Designer.cs">
-      <DependentUpon>Sims2ToolsTitleAndDescEntryDialog.cs</DependentUpon>
+    <Compile Include="Dialogs\TreePickerDialog.Designer.cs">
+      <DependentUpon>TreePickerDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Sims2ToolsTextEntryDialog.cs">
+    <Compile Include="Dialogs\ListPickerDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\Sims2ToolsTextEntryDialog.Designer.cs">
-      <DependentUpon>Sims2ToolsTextEntryDialog.cs</DependentUpon>
+    <Compile Include="Dialogs\ListPickerDialog.Designer.cs">
+      <DependentUpon>ListPickerDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\TitleAndDescEntryDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\TitleAndDescEntryDialog.Designer.cs">
+      <DependentUpon>TitleAndDescEntryDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\TextEntryDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\TextEntryDialog.Designer.cs">
+      <DependentUpon>TextEntryDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IO\Sims2Directory.cs" />
     <Compile Include="SimpeData.cs" />
     <Compile Include="GameData.cs" />
-    <Compile Include="Dialogs\Sims2ToolsAboutDialog.cs">
+    <Compile Include="Dialogs\AboutDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\Sims2ToolsAboutDialog.Designer.cs">
-      <DependentUpon>Sims2ToolsAboutDialog.cs</DependentUpon>
+    <Compile Include="Dialogs\AboutDialog.Designer.cs">
+      <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Sims2Tools.cs" />
-    <Compile Include="Dialogs\Sims2ToolsConfigDialog.cs">
+    <Compile Include="Dialogs\ConfigDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\Sims2ToolsConfigDialog.Designer.cs">
-      <DependentUpon>Sims2ToolsConfigDialog.cs</DependentUpon>
+    <Compile Include="Dialogs\ConfigDialog.Designer.cs">
+      <DependentUpon>ConfigDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Persistence\MruList.cs" />
     <Compile Include="Persistence\RegistryTools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Dialogs\Sims2ToolsProgressDialog.cs">
+    <Compile Include="Dialogs\ProgressDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\Sims2ToolsProgressDialog.Designer.cs">
-      <DependentUpon>Sims2ToolsProgressDialog.cs</DependentUpon>
+    <Compile Include="Dialogs\ProgressDialog.Designer.cs">
+      <DependentUpon>ProgressDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Strings\Sims2String.cs" />
     <Compile Include="Updates\Updater.cs" />
@@ -131,20 +149,26 @@
     <Compile Include="Win32\Win32API.cs" />
     <Compile Include="Win32\WindowsHook.cs" />
     <Compile Include="Win32\WndProcRetHook.cs" />
-    <EmbeddedResource Include="Dialogs\Sims2ToolsAboutDialog.resx">
-      <DependentUpon>Sims2ToolsAboutDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\AboutDialog.resx">
+      <DependentUpon>AboutDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Sims2ToolsCreatorEntryDialog.resx">
-      <DependentUpon>Sims2ToolsCreatorEntryDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\CreatorConfigDialog.resx">
+      <DependentUpon>CreatorConfigDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Sims2ToolsTitleAndDescEntryDialog.resx">
-      <DependentUpon>Sims2ToolsTitleAndDescEntryDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\TreePickerDialog.resx">
+      <DependentUpon>TreePickerDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Sims2ToolsTextEntryDialog.resx">
-      <DependentUpon>Sims2ToolsTextEntryDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\ListPickerDialog.resx">
+      <DependentUpon>ListPickerDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Sims2ToolsConfigDialog.resx">
-      <DependentUpon>Sims2ToolsConfigDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\TitleAndDescEntryDialog.resx">
+      <DependentUpon>TitleAndDescEntryDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\TextEntryDialog.resx">
+      <DependentUpon>TextEntryDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ConfigDialog.resx">
+      <DependentUpon>ConfigDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -156,8 +180,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="Dialogs\Sims2ToolsProgressDialog.resx">
-      <DependentUpon>Sims2ToolsProgressDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\ProgressDialog.resx">
+      <DependentUpon>ProgressDialog.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

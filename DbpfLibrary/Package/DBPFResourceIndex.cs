@@ -217,16 +217,16 @@ namespace Sims2Tools.DBPF.Package
             }
         }
 
-        internal void Commit(DBPFResource resource)
+        internal void Commit(DBPFResource resource, bool ignoreDirty)
         {
-            if (resource.IsDirty)
+            if (ignoreDirty || resource.IsDirty)
             {
                 if (GetEntryByKey(resource) == null)
                 {
                     entryByKey.Add(resource, new DBPFEntry(resource));
                 }
 
-                resourceCache.Commit(resource);
+                resourceCache.Commit(resource, ignoreDirty);
             }
         }
 

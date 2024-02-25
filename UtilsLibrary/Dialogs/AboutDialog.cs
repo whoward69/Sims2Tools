@@ -11,14 +11,14 @@ using System.Windows.Forms;
 
 namespace Sims2Tools
 {
-    public partial class Sims2ToolsAboutDialog : Form
+    public partial class AboutDialog : Form
     {
-        Sims2ToolsAboutDialog()
+        AboutDialog()
         {
             InitializeComponent();
         }
 
-        public Sims2ToolsAboutDialog(String product) : this()
+        public AboutDialog(String product) : this()
         {
             textProduct.Text = product;
 

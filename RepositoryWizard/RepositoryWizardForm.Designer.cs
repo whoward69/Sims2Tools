@@ -51,6 +51,10 @@ namespace RepositoryWizard
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RepositoryWizardForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -73,6 +77,8 @@ namespace RepositoryWizard
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAutoMerge = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemDeleteLocalOrphans = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowResTitle = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowResFilename = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,10 +96,42 @@ namespace RepositoryWizard
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackageIcon = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.gridResources = new System.Windows.Forms.DataGridView();
+            this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colId = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colFilename = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colGender = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colShoe = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colProduct = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colSort = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colModel = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colShpeSubsets = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colGmdcSubsets = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDesignMode = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMaterialsMesh = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colTooltip = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colRepoWizardData = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btnSaveAs = new System.Windows.Forms.Button();
             this.grpMesh = new System.Windows.Forms.GroupBox();
             this.textMesh = new System.Windows.Forms.TextBox();
             this.btnMesh = new System.Windows.Forms.Button();
-            this.panelEditor = new System.Windows.Forms.Panel();
+            this.panelObjectEditor = new System.Windows.Forms.Panel();
+            this.grpMaster = new System.Windows.Forms.GroupBox();
+            this.textMaster = new System.Windows.Forms.TextBox();
+            this.btnMaster = new System.Windows.Forms.Button();
+            this.grpPrimarySubset = new System.Windows.Forms.GroupBox();
+            this.lblPrimarySubset = new System.Windows.Forms.Label();
+            this.comboMasterPrimarySubset = new System.Windows.Forms.ComboBox();
+            this.comboSlavePrimarySubset = new System.Windows.Forms.ComboBox();
+            this.grpSecondarySubset = new System.Windows.Forms.GroupBox();
+            this.lblSecondarySubset = new System.Windows.Forms.Label();
+            this.comboMasterSecondarySubset = new System.Windows.Forms.ComboBox();
+            this.comboSlaveSecondarySubset = new System.Windows.Forms.ComboBox();
+            this.panelClothingEditor = new System.Windows.Forms.Panel();
             this.grpProduct = new System.Windows.Forms.GroupBox();
             this.comboProduct = new System.Windows.Forms.ComboBox();
             this.grpName = new System.Windows.Forms.GroupBox();
@@ -123,24 +161,10 @@ namespace RepositoryWizard
             this.comboShoe = new System.Windows.Forms.ComboBox();
             this.grpTooltip = new System.Windows.Forms.GroupBox();
             this.textTooltip = new System.Windows.Forms.TextBox();
-            this.gridResources = new System.Windows.Forms.DataGridView();
-            this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colId = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colFilename = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colGender = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colCategory = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colShoe = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colProduct = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colSort = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colTooltip = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colRepoWizardData = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.btnSaveAs = new System.Windows.Forms.Button();
             this.lblNoModeSelected = new System.Windows.Forms.Label();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openMeshDialog = new System.Windows.Forms.OpenFileDialog();
+            this.openMasterDialog = new System.Windows.Forms.OpenFileDialog();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -152,8 +176,13 @@ namespace RepositoryWizard
             this.splitTopLeftRight.Panel2.SuspendLayout();
             this.splitTopLeftRight.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridResources)).BeginInit();
             this.grpMesh.SuspendLayout();
-            this.panelEditor.SuspendLayout();
+            this.panelObjectEditor.SuspendLayout();
+            this.grpMaster.SuspendLayout();
+            this.grpPrimarySubset.SuspendLayout();
+            this.grpSecondarySubset.SuspendLayout();
+            this.panelClothingEditor.SuspendLayout();
             this.grpProduct.SuspendLayout();
             this.grpName.SuspendLayout();
             this.grpCategory.SuspendLayout();
@@ -162,7 +191,6 @@ namespace RepositoryWizard
             this.grpAge.SuspendLayout();
             this.grpShoe.SuspendLayout();
             this.grpTooltip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridResources)).BeginInit();
             this.SuspendLayout();
             // 
             // menuMain
@@ -280,7 +308,9 @@ namespace RepositoryWizard
             this.menuItemAdvanced,
             this.toolStripSeparator3,
             this.menuItemAutoBackup,
-            this.menuItemAutoMerge});
+            this.menuItemAutoMerge,
+            this.toolStripSeparator5,
+            this.menuItemDeleteLocalOrphans});
             this.menuItemMode.Name = "menuItemMode";
             this.menuItemMode.Size = new System.Drawing.Size(50, 20);
             this.menuItemMode.Text = "&Mode";
@@ -290,51 +320,63 @@ namespace RepositoryWizard
             this.menuItemModeClothing.CheckOnClick = true;
             this.menuItemModeClothing.Name = "menuItemModeClothing";
             this.menuItemModeClothing.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.menuItemModeClothing.Size = new System.Drawing.Size(144, 22);
+            this.menuItemModeClothing.Size = new System.Drawing.Size(186, 22);
             this.menuItemModeClothing.Text = "Clothing";
             this.menuItemModeClothing.Click += new System.EventHandler(this.OnModeSelectedChanged);
             // 
             // menuItemModeObject
             // 
             this.menuItemModeObject.CheckOnClick = true;
-            this.menuItemModeObject.Enabled = false;
             this.menuItemModeObject.Name = "menuItemModeObject";
             this.menuItemModeObject.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.menuItemModeObject.Size = new System.Drawing.Size(144, 22);
+            this.menuItemModeObject.Size = new System.Drawing.Size(186, 22);
             this.menuItemModeObject.Text = "&Object";
             this.menuItemModeObject.Click += new System.EventHandler(this.OnModeSelectedChanged);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(141, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(183, 6);
             // 
             // menuItemAdvanced
             // 
             this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Enabled = false;
             this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAdvanced.Size = new System.Drawing.Size(186, 22);
             this.menuItemAdvanced.Text = "&Advanced";
             this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(141, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(183, 6);
             // 
             // menuItemAutoBackup
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(186, 22);
             this.menuItemAutoBackup.Text = "Auto-&Backup";
             // 
             // menuItemAutoMerge
             // 
             this.menuItemAutoMerge.CheckOnClick = true;
             this.menuItemAutoMerge.Name = "menuItemAutoMerge";
-            this.menuItemAutoMerge.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoMerge.Size = new System.Drawing.Size(186, 22);
             this.menuItemAutoMerge.Text = "Auto-&Merge";
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(183, 6);
+            // 
+            // menuItemDeleteLocalOrphans
+            // 
+            this.menuItemDeleteLocalOrphans.CheckOnClick = true;
+            this.menuItemDeleteLocalOrphans.Name = "menuItemDeleteLocalOrphans";
+            this.menuItemDeleteLocalOrphans.Size = new System.Drawing.Size(186, 22);
+            this.menuItemDeleteLocalOrphans.Text = "&Delete Local Orphans";
             // 
             // menuItemOptions
             // 
@@ -439,10 +481,11 @@ namespace RepositoryWizard
             // 
             // splitTopBottom.Panel2
             // 
-            this.splitTopBottom.Panel2.Controls.Add(this.grpMesh);
-            this.splitTopBottom.Panel2.Controls.Add(this.panelEditor);
             this.splitTopBottom.Panel2.Controls.Add(this.gridResources);
             this.splitTopBottom.Panel2.Controls.Add(this.btnSaveAs);
+            this.splitTopBottom.Panel2.Controls.Add(this.grpMesh);
+            this.splitTopBottom.Panel2.Controls.Add(this.panelObjectEditor);
+            this.splitTopBottom.Panel2.Controls.Add(this.panelClothingEditor);
             this.splitTopBottom.Size = new System.Drawing.Size(984, 537);
             this.splitTopBottom.SplitterDistance = 160;
             this.splitTopBottom.TabIndex = 1;
@@ -524,6 +567,228 @@ namespace RepositoryWizard
             this.colPackageIcon.ReadOnly = true;
             this.colPackageIcon.Visible = false;
             // 
+            // gridResources
+            // 
+            this.gridResources.AllowUserToAddRows = false;
+            this.gridResources.AllowUserToDeleteRows = false;
+            this.gridResources.AllowUserToOrderColumns = true;
+            this.gridResources.AllowUserToResizeRows = false;
+            this.gridResources.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gridResources.BackgroundColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridResources.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.gridResources.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridResources.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colVisible,
+            this.colType,
+            this.colId,
+            this.colTitle,
+            this.colFilename,
+            this.colGender,
+            this.colAge,
+            this.colCategory,
+            this.colShoe,
+            this.colProduct,
+            this.colSort,
+            this.colModel,
+            this.colShpeSubsets,
+            this.colGmdcSubsets,
+            this.colDesignMode,
+            this.colMaterialsMesh,
+            this.colTooltip,
+            this.colRepoWizardData});
+            this.gridResources.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this.gridResources.Location = new System.Drawing.Point(0, 0);
+            this.gridResources.Name = "gridResources";
+            this.gridResources.RowHeadersVisible = false;
+            this.gridResources.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.gridResources.Size = new System.Drawing.Size(984, 154);
+            this.gridResources.TabIndex = 0;
+            this.gridResources.MultiSelectChanged += new System.EventHandler(this.OnResourceSelectionChanged);
+            this.gridResources.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
+            this.gridResources.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
+            this.gridResources.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnResourceToolTipTextNeeded);
+            this.gridResources.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
+            this.gridResources.SelectionChanged += new System.EventHandler(this.OnResourceSelectionChanged);
+            // 
+            // colVisible
+            // 
+            this.colVisible.DataPropertyName = "Visible";
+            this.colVisible.HeaderText = "Visible";
+            this.colVisible.Name = "colVisible";
+            this.colVisible.ReadOnly = true;
+            this.colVisible.Visible = false;
+            // 
+            // colType
+            // 
+            this.colType.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colType.DataPropertyName = "Type";
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colType.DefaultCellStyle = dataGridViewCellStyle2;
+            this.colType.HeaderText = "Type";
+            this.colType.Name = "colType";
+            this.colType.ReadOnly = true;
+            this.colType.Width = 58;
+            // 
+            // colId
+            // 
+            this.colId.DataPropertyName = "Id";
+            this.colId.HeaderText = "Id";
+            this.colId.Name = "colId";
+            // 
+            // colTitle
+            // 
+            this.colTitle.DataPropertyName = "Title";
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colTitle.DefaultCellStyle = dataGridViewCellStyle3;
+            this.colTitle.HeaderText = "Title";
+            this.colTitle.Name = "colTitle";
+            this.colTitle.ReadOnly = true;
+            // 
+            // colFilename
+            // 
+            this.colFilename.DataPropertyName = "Filename";
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colFilename.DefaultCellStyle = dataGridViewCellStyle4;
+            this.colFilename.HeaderText = "Filename";
+            this.colFilename.Name = "colFilename";
+            this.colFilename.ReadOnly = true;
+            // 
+            // colGender
+            // 
+            this.colGender.DataPropertyName = "Gender";
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colGender.DefaultCellStyle = dataGridViewCellStyle5;
+            this.colGender.HeaderText = "Gender";
+            this.colGender.Name = "colGender";
+            this.colGender.ReadOnly = true;
+            // 
+            // colAge
+            // 
+            this.colAge.DataPropertyName = "Age";
+            dataGridViewCellStyle6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colAge.DefaultCellStyle = dataGridViewCellStyle6;
+            this.colAge.HeaderText = "Age";
+            this.colAge.Name = "colAge";
+            this.colAge.ReadOnly = true;
+            // 
+            // colCategory
+            // 
+            this.colCategory.DataPropertyName = "Category";
+            dataGridViewCellStyle7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colCategory.DefaultCellStyle = dataGridViewCellStyle7;
+            this.colCategory.HeaderText = "Category";
+            this.colCategory.Name = "colCategory";
+            this.colCategory.ReadOnly = true;
+            // 
+            // colShoe
+            // 
+            this.colShoe.DataPropertyName = "Shoe";
+            dataGridViewCellStyle8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colShoe.DefaultCellStyle = dataGridViewCellStyle8;
+            this.colShoe.HeaderText = "Shoe";
+            this.colShoe.Name = "colShoe";
+            this.colShoe.ReadOnly = true;
+            // 
+            // colProduct
+            // 
+            this.colProduct.DataPropertyName = "Product";
+            dataGridViewCellStyle9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colProduct.DefaultCellStyle = dataGridViewCellStyle9;
+            this.colProduct.HeaderText = "Product";
+            this.colProduct.Name = "colProduct";
+            this.colProduct.ReadOnly = true;
+            // 
+            // colSort
+            // 
+            this.colSort.DataPropertyName = "Sort";
+            dataGridViewCellStyle10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colSort.DefaultCellStyle = dataGridViewCellStyle10;
+            this.colSort.HeaderText = "Sort";
+            this.colSort.Name = "colSort";
+            this.colSort.ReadOnly = true;
+            // 
+            // colModel
+            // 
+            this.colModel.DataPropertyName = "Model";
+            dataGridViewCellStyle11.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colModel.DefaultCellStyle = dataGridViewCellStyle11;
+            this.colModel.HeaderText = "Model";
+            this.colModel.Name = "colModel";
+            this.colModel.ReadOnly = true;
+            // 
+            // colShpeSubsets
+            // 
+            this.colShpeSubsets.DataPropertyName = "ShpeSubsets";
+            dataGridViewCellStyle12.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colShpeSubsets.DefaultCellStyle = dataGridViewCellStyle12;
+            this.colShpeSubsets.HeaderText = "SHPE Subsets";
+            this.colShpeSubsets.Name = "colShpeSubsets";
+            this.colShpeSubsets.ReadOnly = true;
+            // 
+            // colGmdcSubsets
+            // 
+            this.colGmdcSubsets.DataPropertyName = "GmdcSubsets";
+            dataGridViewCellStyle13.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colGmdcSubsets.DefaultCellStyle = dataGridViewCellStyle13;
+            this.colGmdcSubsets.HeaderText = "GMDC Subsets";
+            this.colGmdcSubsets.Name = "colGmdcSubsets";
+            this.colGmdcSubsets.ReadOnly = true;
+            // 
+            // colDesignMode
+            // 
+            this.colDesignMode.DataPropertyName = "DesignMode";
+            this.colDesignMode.DefaultCellStyle = dataGridViewCellStyle13;
+            this.colDesignMode.HeaderText = "Design Mode";
+            this.colDesignMode.Name = "colDesignMode";
+            this.colDesignMode.ReadOnly = true;
+            // 
+            // colMaterialsMesh
+            // 
+            this.colMaterialsMesh.DataPropertyName = "MaterialsMesh";
+            this.colMaterialsMesh.DefaultCellStyle = dataGridViewCellStyle13;
+            this.colMaterialsMesh.HeaderText = "Materials Mesh";
+            this.colMaterialsMesh.Name = "colMaterialsMesh";
+            this.colMaterialsMesh.ReadOnly = true;
+            // 
+            // colTooltip
+            // 
+            this.colTooltip.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colTooltip.DataPropertyName = "Tooltip";
+            dataGridViewCellStyle14.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.colTooltip.DefaultCellStyle = dataGridViewCellStyle14;
+            this.colTooltip.HeaderText = "Tooltip";
+            this.colTooltip.Name = "colTooltip";
+            this.colTooltip.ReadOnly = true;
+            // 
+            // colRepoWizardData
+            // 
+            this.colRepoWizardData.DataPropertyName = "repoWizardData";
+            this.colRepoWizardData.HeaderText = "repoWizardData";
+            this.colRepoWizardData.Name = "colRepoWizardData";
+            this.colRepoWizardData.ReadOnly = true;
+            this.colRepoWizardData.Visible = false;
+            // 
+            // btnSaveAs
+            // 
+            this.btnSaveAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSaveAs.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSaveAs.Location = new System.Drawing.Point(888, 337);
+            this.btnSaveAs.Name = "btnSaveAs";
+            this.btnSaveAs.Size = new System.Drawing.Size(93, 26);
+            this.btnSaveAs.TabIndex = 23;
+            this.btnSaveAs.Text = "&Save As";
+            this.btnSaveAs.UseVisualStyleBackColor = true;
+            this.btnSaveAs.Click += new System.EventHandler(this.OnSaveAsClicked);
+            // 
             // grpMesh
             // 
             this.grpMesh.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -532,7 +797,7 @@ namespace RepositoryWizard
             this.grpMesh.Controls.Add(this.btnMesh);
             this.grpMesh.Location = new System.Drawing.Point(4, 320);
             this.grpMesh.Name = "grpMesh";
-            this.grpMesh.Size = new System.Drawing.Size(886, 50);
+            this.grpMesh.Size = new System.Drawing.Size(870, 50);
             this.grpMesh.TabIndex = 26;
             this.grpMesh.TabStop = false;
             this.grpMesh.Text = "Target Mesh:";
@@ -544,38 +809,168 @@ namespace RepositoryWizard
             this.textMesh.Location = new System.Drawing.Point(6, 20);
             this.textMesh.Name = "textMesh";
             this.textMesh.ReadOnly = true;
-            this.textMesh.Size = new System.Drawing.Size(775, 21);
+            this.textMesh.Size = new System.Drawing.Size(754, 21);
             this.textMesh.TabIndex = 0;
             this.textMesh.TextChanged += new System.EventHandler(this.OnMeshTextChanged);
             // 
             // btnMesh
             // 
             this.btnMesh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMesh.Location = new System.Drawing.Point(787, 17);
+            this.btnMesh.Location = new System.Drawing.Point(771, 17);
             this.btnMesh.Name = "btnMesh";
-            this.btnMesh.Size = new System.Drawing.Size(95, 26);
+            this.btnMesh.Size = new System.Drawing.Size(100, 26);
             this.btnMesh.TabIndex = 26;
             this.btnMesh.Text = "Select Mesh...";
             this.btnMesh.UseVisualStyleBackColor = true;
             this.btnMesh.Click += new System.EventHandler(this.OnMeshButtonClicked);
             // 
-            // panelEditor
+            // panelObjectEditor
             // 
-            this.panelEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.panelObjectEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelEditor.Controls.Add(this.grpProduct);
-            this.panelEditor.Controls.Add(this.grpName);
-            this.panelEditor.Controls.Add(this.grpCategory);
-            this.panelEditor.Controls.Add(this.grpType);
-            this.panelEditor.Controls.Add(this.grpGender);
-            this.panelEditor.Controls.Add(this.grpAge);
-            this.panelEditor.Controls.Add(this.grpShoe);
-            this.panelEditor.Controls.Add(this.grpTooltip);
-            this.panelEditor.Enabled = false;
-            this.panelEditor.Location = new System.Drawing.Point(0, 160);
-            this.panelEditor.Name = "panelEditor";
-            this.panelEditor.Size = new System.Drawing.Size(984, 160);
-            this.panelEditor.TabIndex = 26;
+            this.panelObjectEditor.Controls.Add(this.grpMaster);
+            this.panelObjectEditor.Controls.Add(this.grpPrimarySubset);
+            this.panelObjectEditor.Controls.Add(this.grpSecondarySubset);
+            this.panelObjectEditor.Enabled = false;
+            this.panelObjectEditor.Location = new System.Drawing.Point(0, 160);
+            this.panelObjectEditor.Name = "panelObjectEditor";
+            this.panelObjectEditor.Size = new System.Drawing.Size(984, 160);
+            this.panelObjectEditor.TabIndex = 26;
+            // 
+            // grpMaster
+            // 
+            this.grpMaster.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpMaster.Controls.Add(this.textMaster);
+            this.grpMaster.Controls.Add(this.btnMaster);
+            this.grpMaster.Location = new System.Drawing.Point(4, 0);
+            this.grpMaster.Name = "grpMaster";
+            this.grpMaster.Size = new System.Drawing.Size(870, 50);
+            this.grpMaster.TabIndex = 26;
+            this.grpMaster.TabStop = false;
+            this.grpMaster.Text = "Master:";
+            // 
+            // textMaster
+            // 
+            this.textMaster.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textMaster.Location = new System.Drawing.Point(6, 20);
+            this.textMaster.Name = "textMaster";
+            this.textMaster.ReadOnly = true;
+            this.textMaster.Size = new System.Drawing.Size(754, 21);
+            this.textMaster.TabIndex = 0;
+            this.textMaster.TextChanged += new System.EventHandler(this.OnMasterTextChanged);
+            // 
+            // btnMaster
+            // 
+            this.btnMaster.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMaster.Location = new System.Drawing.Point(765, 17);
+            this.btnMaster.Name = "btnMaster";
+            this.btnMaster.Size = new System.Drawing.Size(100, 26);
+            this.btnMaster.TabIndex = 26;
+            this.btnMaster.Text = "Select Master...";
+            this.btnMaster.UseVisualStyleBackColor = true;
+            this.btnMaster.Click += new System.EventHandler(this.OnMasterButtonClicked);
+            // 
+            // grpPrimarySubset
+            // 
+            this.grpPrimarySubset.Controls.Add(this.lblPrimarySubset);
+            this.grpPrimarySubset.Controls.Add(this.comboMasterPrimarySubset);
+            this.grpPrimarySubset.Controls.Add(this.comboSlavePrimarySubset);
+            this.grpPrimarySubset.Location = new System.Drawing.Point(4, 50);
+            this.grpPrimarySubset.Name = "grpPrimarySubset";
+            this.grpPrimarySubset.Size = new System.Drawing.Size(456, 50);
+            this.grpPrimarySubset.TabIndex = 6;
+            this.grpPrimarySubset.TabStop = false;
+            this.grpPrimarySubset.Text = "Primary Subset:";
+            // 
+            // lblPrimarySubset
+            // 
+            this.lblPrimarySubset.AutoSize = true;
+            this.lblPrimarySubset.Location = new System.Drawing.Point(214, 23);
+            this.lblPrimarySubset.Name = "lblPrimarySubset";
+            this.lblPrimarySubset.Size = new System.Drawing.Size(28, 15);
+            this.lblPrimarySubset.TabIndex = 9;
+            this.lblPrimarySubset.Text = "==>";
+            // 
+            // comboMasterPrimarySubset
+            // 
+            this.comboMasterPrimarySubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMasterPrimarySubset.FormattingEnabled = true;
+            this.comboMasterPrimarySubset.Location = new System.Drawing.Point(247, 20);
+            this.comboMasterPrimarySubset.Name = "comboMasterPrimarySubset";
+            this.comboMasterPrimarySubset.Size = new System.Drawing.Size(203, 23);
+            this.comboMasterPrimarySubset.TabIndex = 8;
+            this.comboMasterPrimarySubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // comboSlavePrimarySubset
+            // 
+            this.comboSlavePrimarySubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSlavePrimarySubset.FormattingEnabled = true;
+            this.comboSlavePrimarySubset.Location = new System.Drawing.Point(5, 20);
+            this.comboSlavePrimarySubset.Name = "comboSlavePrimarySubset";
+            this.comboSlavePrimarySubset.Size = new System.Drawing.Size(203, 23);
+            this.comboSlavePrimarySubset.TabIndex = 7;
+            this.comboSlavePrimarySubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // grpSecondarySubset
+            // 
+            this.grpSecondarySubset.Controls.Add(this.lblSecondarySubset);
+            this.grpSecondarySubset.Controls.Add(this.comboMasterSecondarySubset);
+            this.grpSecondarySubset.Controls.Add(this.comboSlaveSecondarySubset);
+            this.grpSecondarySubset.Location = new System.Drawing.Point(4, 105);
+            this.grpSecondarySubset.Name = "grpSecondarySubset";
+            this.grpSecondarySubset.Size = new System.Drawing.Size(456, 50);
+            this.grpSecondarySubset.TabIndex = 6;
+            this.grpSecondarySubset.TabStop = false;
+            this.grpSecondarySubset.Text = "Secondary Subset:";
+            // 
+            // lblSecondarySubset
+            // 
+            this.lblSecondarySubset.AutoSize = true;
+            this.lblSecondarySubset.Location = new System.Drawing.Point(214, 23);
+            this.lblSecondarySubset.Name = "lblSecondarySubset";
+            this.lblSecondarySubset.Size = new System.Drawing.Size(28, 15);
+            this.lblSecondarySubset.TabIndex = 10;
+            this.lblSecondarySubset.Text = "==>";
+            // 
+            // comboMasterSecondarySubset
+            // 
+            this.comboMasterSecondarySubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMasterSecondarySubset.FormattingEnabled = true;
+            this.comboMasterSecondarySubset.Location = new System.Drawing.Point(247, 20);
+            this.comboMasterSecondarySubset.Name = "comboMasterSecondarySubset";
+            this.comboMasterSecondarySubset.Size = new System.Drawing.Size(203, 23);
+            this.comboMasterSecondarySubset.TabIndex = 8;
+            this.comboMasterSecondarySubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // comboSlaveSecondarySubset
+            // 
+            this.comboSlaveSecondarySubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSlaveSecondarySubset.FormattingEnabled = true;
+            this.comboSlaveSecondarySubset.Location = new System.Drawing.Point(5, 20);
+            this.comboSlaveSecondarySubset.Name = "comboSlaveSecondarySubset";
+            this.comboSlaveSecondarySubset.Size = new System.Drawing.Size(203, 23);
+            this.comboSlaveSecondarySubset.TabIndex = 7;
+            this.comboSlaveSecondarySubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // panelClothingEditor
+            // 
+            this.panelClothingEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelClothingEditor.Controls.Add(this.grpProduct);
+            this.panelClothingEditor.Controls.Add(this.grpName);
+            this.panelClothingEditor.Controls.Add(this.grpCategory);
+            this.panelClothingEditor.Controls.Add(this.grpType);
+            this.panelClothingEditor.Controls.Add(this.grpGender);
+            this.panelClothingEditor.Controls.Add(this.grpAge);
+            this.panelClothingEditor.Controls.Add(this.grpShoe);
+            this.panelClothingEditor.Controls.Add(this.grpTooltip);
+            this.panelClothingEditor.Enabled = false;
+            this.panelClothingEditor.Location = new System.Drawing.Point(0, 160);
+            this.panelClothingEditor.Name = "panelClothingEditor";
+            this.panelClothingEditor.Size = new System.Drawing.Size(984, 160);
+            this.panelClothingEditor.TabIndex = 26;
             // 
             // grpProduct
             // 
@@ -894,171 +1289,6 @@ namespace RepositoryWizard
             this.textTooltip.Size = new System.Drawing.Size(507, 21);
             this.textTooltip.TabIndex = 0;
             // 
-            // gridResources
-            // 
-            this.gridResources.AllowUserToAddRows = false;
-            this.gridResources.AllowUserToDeleteRows = false;
-            this.gridResources.AllowUserToOrderColumns = true;
-            this.gridResources.AllowUserToResizeRows = false;
-            this.gridResources.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gridResources.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.gridResources.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridResources.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.colVisible,
-            this.colType,
-            this.colId,
-            this.colTitle,
-            this.colFilename,
-            this.colGender,
-            this.colAge,
-            this.colCategory,
-            this.colShoe,
-            this.colProduct,
-            this.colSort,
-            this.colTooltip,
-            this.colRepoWizardData});
-            this.gridResources.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
-            this.gridResources.Location = new System.Drawing.Point(0, 0);
-            this.gridResources.Name = "gridResources";
-            this.gridResources.RowHeadersVisible = false;
-            this.gridResources.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridResources.Size = new System.Drawing.Size(984, 154);
-            this.gridResources.TabIndex = 0;
-            this.gridResources.MultiSelectChanged += new System.EventHandler(this.OnResourceSelectionChanged);
-            this.gridResources.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
-            this.gridResources.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
-            this.gridResources.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnResourceToolTipTextNeeded);
-            this.gridResources.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
-            this.gridResources.SelectionChanged += new System.EventHandler(this.OnResourceSelectionChanged);
-            // 
-            // colVisible
-            // 
-            this.colVisible.DataPropertyName = "Visible";
-            this.colVisible.HeaderText = "Visible";
-            this.colVisible.Name = "colVisible";
-            this.colVisible.ReadOnly = true;
-            this.colVisible.Visible = false;
-            // 
-            // colType
-            // 
-            this.colType.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colType.DataPropertyName = "Type";
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.colType.DefaultCellStyle = dataGridViewCellStyle1;
-            this.colType.HeaderText = "Type";
-            this.colType.Name = "colType";
-            this.colType.ReadOnly = true;
-            this.colType.Width = 58;
-            // 
-            // colId
-            // 
-            this.colId.DataPropertyName = "Id";
-            this.colId.HeaderText = "Id";
-            this.colId.Name = "colId";
-            // 
-            // colTitle
-            // 
-            this.colTitle.DataPropertyName = "Title";
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.colTitle.DefaultCellStyle = dataGridViewCellStyle2;
-            this.colTitle.HeaderText = "Title";
-            this.colTitle.Name = "colTitle";
-            this.colTitle.ReadOnly = true;
-            // 
-            // colFilename
-            // 
-            this.colFilename.DataPropertyName = "Filename";
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.colFilename.DefaultCellStyle = dataGridViewCellStyle3;
-            this.colFilename.HeaderText = "Filename";
-            this.colFilename.Name = "colFilename";
-            this.colFilename.ReadOnly = true;
-            // 
-            // colGender
-            // 
-            this.colGender.DataPropertyName = "Gender";
-            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.colGender.DefaultCellStyle = dataGridViewCellStyle4;
-            this.colGender.HeaderText = "Gender";
-            this.colGender.Name = "colGender";
-            this.colGender.ReadOnly = true;
-            // 
-            // colAge
-            // 
-            this.colAge.DataPropertyName = "Age";
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.colAge.DefaultCellStyle = dataGridViewCellStyle5;
-            this.colAge.HeaderText = "Age";
-            this.colAge.Name = "colAge";
-            this.colAge.ReadOnly = true;
-            // 
-            // colCategory
-            // 
-            this.colCategory.DataPropertyName = "Category";
-            dataGridViewCellStyle6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.colCategory.DefaultCellStyle = dataGridViewCellStyle6;
-            this.colCategory.HeaderText = "Category";
-            this.colCategory.Name = "colCategory";
-            this.colCategory.ReadOnly = true;
-            // 
-            // colShoe
-            // 
-            this.colShoe.DataPropertyName = "Shoe";
-            dataGridViewCellStyle7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.colShoe.DefaultCellStyle = dataGridViewCellStyle7;
-            this.colShoe.HeaderText = "Shoe";
-            this.colShoe.Name = "colShoe";
-            this.colShoe.ReadOnly = true;
-            // 
-            // colProduct
-            // 
-            this.colProduct.DataPropertyName = "Product";
-            dataGridViewCellStyle8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.colProduct.DefaultCellStyle = dataGridViewCellStyle8;
-            this.colProduct.HeaderText = "Product";
-            this.colProduct.Name = "colProduct";
-            this.colProduct.ReadOnly = true;
-            // 
-            // colSort
-            // 
-            this.colSort.DataPropertyName = "Sort";
-            dataGridViewCellStyle9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.colSort.DefaultCellStyle = dataGridViewCellStyle9;
-            this.colSort.HeaderText = "Sort";
-            this.colSort.Name = "colSort";
-            this.colSort.ReadOnly = true;
-            // 
-            // colTooltip
-            // 
-            this.colTooltip.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colTooltip.DataPropertyName = "Tooltip";
-            dataGridViewCellStyle10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.colTooltip.DefaultCellStyle = dataGridViewCellStyle10;
-            this.colTooltip.HeaderText = "Tooltip";
-            this.colTooltip.Name = "colTooltip";
-            this.colTooltip.ReadOnly = true;
-            // 
-            // colRepoWizardData
-            // 
-            this.colRepoWizardData.DataPropertyName = "repoWizardData";
-            this.colRepoWizardData.HeaderText = "repoWizardData";
-            this.colRepoWizardData.Name = "colRepoWizardData";
-            this.colRepoWizardData.ReadOnly = true;
-            this.colRepoWizardData.Visible = false;
-            // 
-            // btnSaveAs
-            // 
-            this.btnSaveAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSaveAs.Location = new System.Drawing.Point(893, 337);
-            this.btnSaveAs.Name = "btnSaveAs";
-            this.btnSaveAs.Size = new System.Drawing.Size(88, 26);
-            this.btnSaveAs.TabIndex = 23;
-            this.btnSaveAs.Text = "&Save As";
-            this.btnSaveAs.UseVisualStyleBackColor = true;
-            this.btnSaveAs.Click += new System.EventHandler(this.OnSaveAsClicked);
-            // 
             // lblNoModeSelected
             // 
             this.lblNoModeSelected.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -1082,7 +1312,12 @@ namespace RepositoryWizard
             // openMeshDialog
             // 
             this.openMeshDialog.Filter = "DBPF Package|*.package";
-            this.openMeshDialog.Title = "Select mesh...";
+            this.openMeshDialog.Title = "Select Mesh...";
+            // 
+            // openMasterDialog
+            // 
+            this.openMasterDialog.Filter = "DBPF Package|*.package";
+            this.openMasterDialog.Title = "Select Master...";
             // 
             // RepositoryWizardForm
             // 
@@ -1115,9 +1350,17 @@ namespace RepositoryWizard
             ((System.ComponentModel.ISupportInitialize)(this.splitTopLeftRight)).EndInit();
             this.splitTopLeftRight.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gridResources)).EndInit();
             this.grpMesh.ResumeLayout(false);
             this.grpMesh.PerformLayout();
-            this.panelEditor.ResumeLayout(false);
+            this.panelObjectEditor.ResumeLayout(false);
+            this.grpMaster.ResumeLayout(false);
+            this.grpMaster.PerformLayout();
+            this.grpPrimarySubset.ResumeLayout(false);
+            this.grpPrimarySubset.PerformLayout();
+            this.grpSecondarySubset.ResumeLayout(false);
+            this.grpSecondarySubset.PerformLayout();
+            this.panelClothingEditor.ResumeLayout(false);
             this.grpProduct.ResumeLayout(false);
             this.grpName.ResumeLayout(false);
             this.grpName.PerformLayout();
@@ -1130,7 +1373,6 @@ namespace RepositoryWizard
             this.grpShoe.ResumeLayout(false);
             this.grpTooltip.ResumeLayout(false);
             this.grpTooltip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridResources)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1154,7 +1396,8 @@ namespace RepositoryWizard
         private System.Windows.Forms.TreeView treeFolders;
         private System.Windows.Forms.DataGridView gridPackageFiles;
         private System.Windows.Forms.DataGridView gridResources;
-        private System.Windows.Forms.Panel panelEditor;
+        private System.Windows.Forms.Panel panelClothingEditor;
+        private System.Windows.Forms.Panel panelObjectEditor;
         private System.Windows.Forms.GroupBox grpCategory;
         private System.Windows.Forms.CheckBox ckbCatSwimwear;
         private System.Windows.Forms.CheckBox ckbCatUnderwear;
@@ -1164,6 +1407,10 @@ namespace RepositoryWizard
         private System.Windows.Forms.CheckBox ckbCatGym;
         private System.Windows.Forms.CheckBox ckbCatFormal;
         private System.Windows.Forms.CheckBox ckbCatEveryday;
+        private System.Windows.Forms.GroupBox grpPrimarySubset;
+        private System.Windows.Forms.ComboBox comboSlavePrimarySubset;
+        private System.Windows.Forms.GroupBox grpSecondarySubset;
+        private System.Windows.Forms.ComboBox comboSlaveSecondarySubset;
         private System.Windows.Forms.GroupBox grpType;
         private System.Windows.Forms.ComboBox comboType;
         private System.Windows.Forms.GroupBox grpGender;
@@ -1190,6 +1437,7 @@ namespace RepositoryWizard
         private System.Windows.Forms.ToolStripMenuItem menuItemModeObject;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoBackup;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoMerge;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDeleteLocalOrphans;
         private System.Windows.Forms.ToolStripMenuItem menuItemOptions;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowResTitle;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowResFilename;
@@ -1210,6 +1458,15 @@ namespace RepositoryWizard
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.SaveFileDialog saveAsFileDialog;
         private System.Windows.Forms.ToolStripMenuItem menuItemCreatorDetails;
+        private System.Windows.Forms.GroupBox grpMesh;
+        private System.Windows.Forms.TextBox textMesh;
+        private System.Windows.Forms.Button btnMesh;
+        private System.Windows.Forms.GroupBox grpMaster;
+        private System.Windows.Forms.TextBox textMaster;
+        private System.Windows.Forms.Button btnMaster;
+        private System.Windows.Forms.OpenFileDialog openMeshDialog;
+        private System.Windows.Forms.OpenFileDialog openMasterDialog;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.DataGridViewTextBoxColumn colVisible;
         private System.Windows.Forms.DataGridViewTextBoxColumn colType;
         private System.Windows.Forms.DataGridViewTextBoxColumn colId;
@@ -1221,12 +1478,17 @@ namespace RepositoryWizard
         private System.Windows.Forms.DataGridViewTextBoxColumn colShoe;
         private System.Windows.Forms.DataGridViewTextBoxColumn colProduct;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSort;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colModel;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colShpeSubsets;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colGmdcSubsets;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colDesignMode;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMaterialsMesh;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTooltip;
         private System.Windows.Forms.DataGridViewTextBoxColumn colRepoWizardData;
-        private System.Windows.Forms.GroupBox grpMesh;
-        private System.Windows.Forms.TextBox textMesh;
-        private System.Windows.Forms.Button btnMesh;
-        private System.Windows.Forms.OpenFileDialog openMeshDialog;
+        private System.Windows.Forms.ComboBox comboMasterSecondarySubset;
+        private System.Windows.Forms.ComboBox comboMasterPrimarySubset;
+        private System.Windows.Forms.Label lblSecondarySubset;
+        private System.Windows.Forms.Label lblPrimarySubset;
     }
 }
 

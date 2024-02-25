@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Utils;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -168,7 +169,7 @@ namespace Sims2Tools.DBPF.STR
             ((StrItemList)languages[lid.Id]).Add(new StrItem(((StrItemList)languages[lid.Id]).Count, lid, title, desc));
         }
 
-        public uint FileSize => (uint)(1 + title.Length + 1 + desc.Length + 1);
+        public uint FileSize => (uint)(1 + Helper.PLength(title) + 1 + Helper.PLength(desc) + 1);
 
         public void Serialize(DbpfWriter writer)
         {

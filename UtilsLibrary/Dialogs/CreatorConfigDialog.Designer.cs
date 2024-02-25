@@ -10,7 +10,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Sims2Tools
 {
-    partial class Sims2ToolsCreatorEntryDialog
+    partial class CreatorConfigDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -38,12 +38,15 @@ namespace Sims2Tools
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Sims2ToolsCreatorEntryDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreatorConfigDialog));
             this.lblCreatorNickName = new System.Windows.Forms.Label();
             this.textCreatorNickName = new System.Windows.Forms.TextBox();
             this.btnConfigOK = new System.Windows.Forms.Button();
             this.lblCreatorGUID = new System.Windows.Forms.Label();
             this.textCreatorGUID = new System.Windows.Forms.TextBox();
+            this.btnRandom = new System.Windows.Forms.Button();
+            this.btnFind = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblCreatorNickName
@@ -88,15 +91,52 @@ namespace Sims2Tools
             // 
             this.textCreatorGUID.Location = new System.Drawing.Point(127, 53);
             this.textCreatorGUID.Name = "textCreatorGUID";
-            this.textCreatorGUID.Size = new System.Drawing.Size(530, 21);
+            this.textCreatorGUID.Size = new System.Drawing.Size(390, 21);
             this.textCreatorGUID.TabIndex = 7;
             // 
-            // Sims2ToolsCreatorEntryDialog
+            // btnRandom
+            // 
+            this.btnRandom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRandom.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRandom.Location = new System.Drawing.Point(593, 51);
+            this.btnRandom.Name = "btnRandom";
+            this.btnRandom.Size = new System.Drawing.Size(64, 25);
+            this.btnRandom.TabIndex = 8;
+            this.btnRandom.Text = "&Random";
+            this.btnRandom.UseVisualStyleBackColor = true;
+            this.btnRandom.Click += new System.EventHandler(this.OnRandomClicked);
+            // 
+            // btnFind
+            // 
+            this.btnFind.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFind.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnFind.Location = new System.Drawing.Point(523, 51);
+            this.btnFind.Name = "btnFind";
+            this.btnFind.Size = new System.Drawing.Size(64, 25);
+            this.btnFind.TabIndex = 9;
+            this.btnFind.Text = "&Find";
+            this.btnFind.UseVisualStyleBackColor = true;
+            this.btnFind.Click += new System.EventHandler(this.OnFindClicked);
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnCancel.Location = new System.Drawing.Point(365, 91);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(143, 30);
+            this.btnCancel.TabIndex = 10;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            // 
+            // Sims2ToolsCreatorConfigDialog
             // 
             this.AcceptButton = this.btnConfigOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(669, 133);
+            this.Controls.Add(this.btnCancel);
+            this.Controls.Add(this.btnFind);
+            this.Controls.Add(this.btnRandom);
             this.Controls.Add(this.lblCreatorNickName);
             this.Controls.Add(this.textCreatorNickName);
             this.Controls.Add(this.btnConfigOK);
@@ -107,7 +147,7 @@ namespace Sims2Tools
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Sims2ToolsCreatorEntryDialog";
+            this.Name = "Sims2ToolsCreatorConfigDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Creator Configuration";
             this.Load += new System.EventHandler(this.OnConfigLoad);
@@ -123,5 +163,8 @@ namespace Sims2Tools
         private System.Windows.Forms.Button btnConfigOK;
         private System.Windows.Forms.Label lblCreatorGUID;
         private System.Windows.Forms.TextBox textCreatorGUID;
+        private System.Windows.Forms.Button btnRandom;
+        private System.Windows.Forms.Button btnFind;
+        private System.Windows.Forms.Button btnCancel;
     }
 }

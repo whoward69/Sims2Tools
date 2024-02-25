@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph

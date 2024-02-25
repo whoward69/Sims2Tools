@@ -27,7 +27,9 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x49596978;
         public const String NAME = "TXMT";
 
+#if !DEBUG
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+#endif
 
         private readonly CMaterialDefinition cMaterialDefinition = null;
         public CMaterialDefinition MaterialDefinition => cMaterialDefinition;
@@ -46,9 +48,12 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
                     }
                     else
                     {
-                        logger.Debug($"2nd CMaterialDefinition found in {ToString()}");
+#if DEBUG
+                        throw new Exception($"2nd cMaterialDefinition found in {this}");
+#else
+                        logger.Warn($"2nd cMaterialDefinition found in {this}");
+#endif
                     }
-                    break;
                 }
             }
         }

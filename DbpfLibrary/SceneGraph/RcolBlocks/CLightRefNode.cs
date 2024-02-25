@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System;
 using System.Collections.Generic;
 
@@ -56,6 +57,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             version = 0xa;
             BlockID = TYPE;
+            BlockName = NAME;
 
             rn = new RenderableNode(null);
             bn = new BoundedNode(null);

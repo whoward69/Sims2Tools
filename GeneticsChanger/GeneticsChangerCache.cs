@@ -113,7 +113,7 @@ namespace GeneticsChanger
 
                     if (res != null)
                     {
-                        // TODO - XHTN/GZPS (hair)
+                        // TODO - _genetics_changer - XHTN/GZPS (hair)
                         if (res is Xstn || res is Xtol)
                         {
                             Cpf cpf = res as Cpf;
@@ -494,7 +494,7 @@ namespace GeneticsChanger
         public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
         public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
 
-        public void Commit(DBPFResource resource) => package.Commit(resource);
+        public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
 
         public string Update(bool autoBackup) => package.Update(autoBackup);
 

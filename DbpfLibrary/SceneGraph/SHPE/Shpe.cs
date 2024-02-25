@@ -28,8 +28,35 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xFC6EB1F7;
         public const String NAME = "SHPE";
 
+#if !DEBUG
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+#endif
+
+        private readonly CShape cShape = null;
+        public CShape Shape => cShape;
+
+        public override bool IsDirty => base.IsDirty || (cShape != null && cShape.IsDirty);
+
         public Shpe(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
+            foreach (IRcolBlock block in Blocks)
+            {
+                if (block.BlockID == CShape.TYPE)
+                {
+                    if (cShape == null)
+                    {
+                        cShape = block as CShape;
+                    }
+                    else
+                    {
+#if DEBUG
+                        throw new Exception($"2nd cShape found in {this}");
+#else
+                        logger.Warn($"2nd cShape found in {this}");
+#endif
+                    }
+                }
+            }
         }
 
         public List<string> GmndNames
@@ -38,11 +65,11 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
             {
                 List<string> gmndKeys = new List<string>();
 
-                foreach (IRcolBlock block in Blocks)
+                // foreach (IRcolBlock block in Blocks)
                 {
-                    if (block.BlockID == CShape.TYPE)
+                    // if (block.BlockID == CShape.TYPE)
                     {
-                        CShape cShape = block as CShape;
+                        // CShape cShape = block as CShape;
 
                         foreach (ShapeItem item in cShape.Items)
                         {
@@ -61,11 +88,11 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
             {
                 List<string> subsets = new List<string>();
 
-                foreach (IRcolBlock block in Blocks)
+                // foreach (IRcolBlock block in Blocks)
                 {
-                    if (block.BlockID == CShape.TYPE)
+                    // if (block.BlockID == CShape.TYPE)
                     {
-                        CShape cShape = block as CShape;
+                        // CShape cShape = block as CShape;
 
                         foreach (ShapePart part in cShape.Parts)
                         {
@@ -78,16 +105,21 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
             }
         }
 
+        public void RenameSubset(string oldName, string newName) => cShape.RenameSubset(oldName, newName);
+
+        public string GetSubsetMaterial(string subset) => cShape.GetSubsetMaterial(subset);
+
+        public void SetSubsetMaterial(string subset, string material) => cShape.SetSubsetMaterial(subset, material);
 
         public override SgResourceList SgNeededResources()
         {
             SgResourceList needed = new SgResourceList();
 
-            foreach (IRcolBlock block in Blocks)
+            // foreach (IRcolBlock block in Blocks)
             {
-                if (block.BlockID == CShape.TYPE)
+                // if (block.BlockID == CShape.TYPE)
                 {
-                    CShape cShape = block as CShape;
+                    // CShape cShape = block as CShape;
 
                     foreach (ShapeItem item in cShape.Items)
                     {

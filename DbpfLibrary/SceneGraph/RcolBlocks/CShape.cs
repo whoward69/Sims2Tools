@@ -20,101 +20,67 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class ShapePart
     {
-        string type;
+        private string subset;
+        private string filename;
+        private byte[] data;
+
         public string Subset
         {
-            get { return type; }
-            set { type = value; }
+            get { return subset; }
+            internal set { subset = value; }
         }
 
-        string desc;
         public string FileName
         {
-            get { return desc; }
-            set { desc = value; }
+            get { return filename; }
+            internal set { filename = value; }
         }
 
-        byte[] data;
         public byte[] Data
         {
             get { return data; }
-            set
-            {
-                if (value.Length == 9)
-                {
-                    data = value;
-                }
-                else if (value.Length > 9)
-                {
-                    data = new byte[9];
-                    for (int i = 0; i < 9; i++) data[i] = value[i];
-                }
-                else
-                {
-                    data = new byte[9];
-                    for (int i = 0; i < value.Length; i++) data[i] = value[i];
-                }
-            }
         }
 
         public ShapePart()
         {
+            subset = "";
+            filename = "";
             data = new byte[9];
-            type = "";
-            desc = "";
         }
 
         public void Unserialize(DbpfReader reader)
         {
-            type = reader.ReadString();
-            desc = reader.ReadString();
+            subset = reader.ReadString();
+            filename = reader.ReadString();
             data = reader.ReadBytes(9);
         }
 
-        public override string ToString()
+        internal uint FileSize => (uint)(subset.Length + 1 + filename.Length + 1 + 9);
+
+        internal void Serialize(DbpfWriter writer)
         {
-            string name = type + ": " + desc;
-            return name;
+            writer.WriteString(subset);
+            writer.WriteString(filename);
+            writer.WriteBytes(data);
         }
+
+        public override string ToString() => $"{subset}: {filename}";
     }
 
     public class ShapeItem
     {
-        readonly CShape parent;
+        private readonly CShape parent;
 
-        int unknown1;
-        public int Unknown1
-        {
-            get { return unknown1; }
-            set { unknown1 = value; }
-        }
+        private int unknown1;
+        private byte unknown2;
+        private int unknown3;
+        private byte unknown4;
 
-        byte unknown2;
-        public byte Unknown2
-        {
-            get { return unknown2; }
-            set { unknown2 = value; }
-        }
+        private string filename;
 
-        int unknown3;
-        public int Unknown3
-        {
-            get { return unknown3; }
-            set { unknown3 = value; }
-        }
-
-        byte unknown4;
-        public byte Unknown4
-        {
-            get { return unknown4; }
-            set { unknown4 = value; }
-        }
-
-        string filename;
         public string FileName
         {
             get { return filename; }
-            set { filename = value; }
         }
 
         public ShapeItem(CShape parent)
@@ -126,7 +92,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public void Unserialize(DbpfReader reader)
         {
             unknown1 = reader.ReadInt32();
+
             unknown2 = reader.ReadByte();
+
             if ((parent.Version == 0x07) || (parent.Version == 0x06))
             {
                 filename = "";
@@ -141,13 +109,55 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             }
         }
 
+        internal uint FileSize
+        {
+            get
+            {
+                long size = 4 + 1;
+
+                if ((parent.Version == 0x07) || (parent.Version == 0x06))
+                {
+                    size += 4 + 1;
+                }
+                else
+                {
+                    size += filename.Length + 1;
+                }
+
+                return (uint)size;
+            }
+        }
+
+        internal void Serialize(DbpfWriter writer)
+        {
+            writer.WriteInt32(unknown1);
+
+            writer.WriteByte(unknown2);
+
+            if ((parent.Version == 0x07) || (parent.Version == 0x06))
+            {
+                writer.WriteInt32(unknown3);
+                writer.WriteByte(unknown4);
+            }
+            else
+            {
+                writer.WriteString(filename);
+            }
+        }
+
         public override string ToString()
         {
             string name = Helper.Hex4PrefixString((uint)unknown1) + " - " + Helper.Hex4PrefixString(unknown2);
-            if ((parent.Version == 0x07) || (parent.Version == 0x06)) return name + " - " + Helper.Hex4PrefixString((uint)unknown3) + " - " + Helper.Hex4PrefixString(unknown4);
-            else return name + ": " + filename;
-        }
 
+            if ((parent.Version == 0x07) || (parent.Version == 0x06))
+            {
+                return name + " - " + Helper.Hex4PrefixString((uint)unknown3) + " - " + Helper.Hex4PrefixString(unknown4);
+            }
+            else
+            {
+                return name + ": " + filename;
+            }
+        }
     }
 
     public class CShape : AbstractRcolBlock
@@ -155,93 +165,118 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xFC6EB1F7;
         public static String NAME = "cShape";
 
+        private ShapeItem[] items;
+        private ShapePart[] parts;
 
-        uint[] lodData;
-        public uint[] LodData
-        {
-            get { return lodData; }
-            set { lodData = value; }
-        }
+        private uint[] lodData;
+        private readonly CObjectGraphNode ogn;
+        private readonly ReferentNode refnode;
 
-        public uint Lod
-        {
-            get { return lodData.Length > 0 ? lodData[0] : 0; }
-            set
-            {
-                if (lodData.Length > 0)
-                {
-                    lodData[0] = value;
-                }
-                else
-                {
-                    lodData = new uint[] { value };
-                }
-            }
-        }
+        public ShapeItem[] Items => items;
 
-        ShapeItem[] items;
-        public ShapeItem[] Items
-        {
-            get { return items; }
-            set { items = value; }
-        }
+        public ShapePart[] Parts => parts;
 
-        ShapePart[] parts;
-        public ShapePart[] Parts
-        {
-            get { return parts; }
-            set { parts = value; }
-        }
+        public uint[] LodData => lodData;
 
+        public uint Lod => (lodData.Length > 0 ? lodData[0] : 0);
 
-        ObjectGraphNode ogn;
-        public ObjectGraphNode GraphNode
-        {
-            get { return ogn; }
-            set { ogn = value; }
-        }
+        public CObjectGraphNode GraphNode => ogn;
 
-        readonly ReferentNode refnode;
-        public ReferentNode RefNode
-        {
-            get { return refnode; }
-        }
-
+        public ReferentNode RefNode => refnode;
 
         // Needed by reflection to create the class
         public CShape(Rcol parent) : base(parent)
         {
-            sgres = new SGResource(null);
             refnode = new ReferentNode(null);
-            ogn = new ObjectGraphNode(null);
+            ogn = new CObjectGraphNode(null);
 
             lodData = new uint[0];
             items = new ShapeItem[0];
             parts = new ShapePart[0];
             BlockID = TYPE;
+            BlockName = NAME;
+        }
+
+        public void RenameSubset(string oldName, string newName)
+        {
+            foreach (ShapePart part in parts)
+            {
+                if (part.Subset.Equals(oldName))
+                {
+                    part.Subset = newName;
+                }
+            }
+
+            isDirty = true;
+        }
+
+        public string GetSubsetMaterial(string subset)
+        {
+            foreach (ShapePart part in parts)
+            {
+                if (part.Subset.Equals(subset))
+                {
+                    return part.FileName;
+                }
+            }
+
+            return null;
+        }
+
+        public void SetSubsetMaterial(string subset, string material)
+        {
+            foreach (ShapePart part in parts)
+            {
+                if (part.Subset.Equals(subset))
+                {
+                    part.FileName = material;
+                }
+            }
+
+            isDirty = true;
         }
 
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
-            reader.ReadString();
 
-            sgres.BlockID = reader.ReadBlockId();
-            sgres.Unserialize(reader);
+            string blkName = reader.ReadString();
+            TypeBlockID blkId = reader.ReadBlockId();
 
-            reader.ReadString();
-            refnode.BlockID = reader.ReadBlockId();
+            NameResource.Unserialize(reader);
+            NameResource.BlockName = blkName;
+            NameResource.BlockID = blkId;
+
+            blkName = reader.ReadString();
+            blkId = reader.ReadBlockId();
+
             refnode.Unserialize(reader);
+            refnode.BlockName = blkName;
+            refnode.BlockID = blkId;
 
-            reader.ReadString();
-            ogn.BlockID = reader.ReadBlockId();
+            blkName = reader.ReadString();
+            blkId = reader.ReadBlockId();
+
             ogn.Unserialize(reader);
+            ogn.BlockName = blkName;
+            ogn.BlockID = blkId;
 
-            if (version != 0x06) lodData = new uint[reader.ReadUInt32()];
-            else lodData = new uint[0];
-            for (int i = 0; i < lodData.Length; i++) lodData[i] = reader.ReadUInt32();
+            if (version != 0x06)
+            {
+                lodData = new uint[reader.ReadUInt32()];
+            }
+            else
+            {
+                lodData = new uint[0];
+            }
+
+            for (int i = 0; i < lodData.Length; i++)
+            {
+                lodData[i] = reader.ReadUInt32();
+            }
 
             items = new ShapeItem[reader.ReadUInt32()];
+
             for (int i = 0; i < items.Length; i++)
             {
                 items[i] = new ShapeItem(this);
@@ -249,10 +284,82 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             }
 
             parts = new ShapePart[reader.ReadUInt32()];
+
             for (int i = 0; i < parts.Length; i++)
             {
                 parts[i] = new ShapePart();
                 parts[i].Unserialize(reader);
+            }
+        }
+
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4;
+
+                size += (NameResource.BlockName.Length + 1) + 4 + NameResource.FileSize;
+                size += (refnode.BlockName.Length + 1) + 4 + refnode.FileSize;
+                size += (ogn.BlockName.Length + 1) + 4 + ogn.FileSize;
+
+                if (version != 0x06)
+                {
+                    size += 4 + lodData.Length * 4;
+                }
+
+                size += 4;
+                foreach (ShapeItem item in items)
+                {
+                    size += item.FileSize;
+                }
+
+                size += 4;
+                foreach (ShapePart part in parts)
+                {
+                    size += part.FileSize;
+                }
+
+                return (uint)size;
+            }
+        }
+
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(version);
+
+            writer.WriteString(sgres.BlockName);
+            writer.WriteBlockId(sgres.BlockID);
+            sgres.Serialize(writer);
+
+            writer.WriteString(refnode.BlockName);
+            writer.WriteBlockId(refnode.BlockID);
+            refnode.Serialize(writer);
+
+            writer.WriteString(ogn.BlockName);
+            writer.WriteBlockId(ogn.BlockID);
+            ogn.Serialize(writer);
+
+            if (version != 0x06)
+            {
+                writer.WriteUInt32((uint)lodData.Length);
+
+                for (int i = 0; i < lodData.Length; i++)
+                {
+                    writer.WriteUInt32(lodData[i]);
+                }
+            }
+
+            writer.WriteUInt32((uint)items.Length);
+            foreach (ShapeItem item in items)
+            {
+                item.Serialize(writer);
+            }
+
+            writer.WriteUInt32((uint)parts.Length);
+            foreach (ShapePart part in parts)
+            {
+                part.Serialize(writer);
             }
         }
 

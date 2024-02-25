@@ -91,7 +91,7 @@
 					<role name="Entertainment / Merrie Minstrels" code="0x00000C74"/>
 					<role name="Media / Action News" code="0x00000C73"/>
 					<role name="NSFW / Blue Heaven Sims Adult" code="0x00000C72"/>
-					<role name="Barbarian / Fantasy" code="0x00000D71"/>
+					<role name="Barbarian / Fantasy" code="0x00000C71"/>
 				</shape>
 			</group>
 		</style>

@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
@@ -21,8 +22,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x6A836D56;
         public static String NAME = "cDataListExtension";
 
+        private readonly Extension ext;
 
-        readonly Extension ext;
         public Extension Extension
         {
             get { return ext; }
@@ -35,16 +36,46 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             ext = new Extension(null);
             version = 0x01;
             BlockID = TYPE;
+            BlockName = NAME;
+        }
+
+        public CDataListExtension(Rcol parent, string name) : this(parent)
+        {
+            BlockName = NAME;
+            ext.VarName = name;
         }
 
         public override void Unserialize(DbpfReader reader)
         {
             version = reader.ReadUInt32();
-            reader.ReadString();
-            TypeBlockID myid = reader.ReadBlockId();
+
+            string blkName = reader.ReadString();
+            TypeBlockID blkId = reader.ReadBlockId();
 
             ext.Unserialize(reader, version);
-            ext.BlockID = myid;
+            ext.BlockName = blkName;
+            ext.BlockID = blkId;
+        }
+
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4;
+
+                size += (ext.BlockName.Length + 1) + 4 + ext.FileSize;
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(version);
+
+            writer.WriteString(ext.BlockName);
+            writer.WriteBlockId(ext.BlockID);
+            ext.Serialize(writer, version);
         }
 
         public override void Dispose()
