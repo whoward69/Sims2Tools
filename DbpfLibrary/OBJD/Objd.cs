@@ -25,7 +25,7 @@ namespace Sims2Tools.DBPF.OBJD
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4F424A44;
-        public const String NAME = "OBJD";
+        public const string NAME = "OBJD";
 
         private ObjdType type;
 
@@ -37,8 +37,8 @@ namespace Sims2Tools.DBPF.OBJD
 
         private ushort[] data = null;
 
-        private readonly String sgHash;
-        private readonly String sgName;
+        private readonly string sgHash;
+        private readonly string sgName;
 
         public Objd(DBPFEntry entry, DbpfReader reader) : base(entry)
         {

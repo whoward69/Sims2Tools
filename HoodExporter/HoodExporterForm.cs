@@ -75,12 +75,12 @@ namespace HoodExporter
 
         private SimDataCache simCache;
 
-        private String xsltPath = "";
+        private string xsltPath = "";
         private bool isRufio = false;
         private bool reuseExport = false;
 
-        private String hoodCode;
-        private String exportPath;
+        private string hoodCode;
+        private string exportPath;
 
         // MUST total 100!
         private const int processSimImagesPercent = 15;
@@ -96,7 +96,7 @@ namespace HoodExporter
 
         private int startingPercent;
 
-        private readonly Dictionary<TypeGUID, String> npcsByGuid = new Dictionary<TypeGUID, string>();
+        private readonly Dictionary<TypeGUID, string> npcsByGuid = new Dictionary<TypeGUID, string>();
 
         public HoodExporterForm()
         {
@@ -135,10 +135,10 @@ namespace HoodExporter
                 rufioTypes.Add(type);
             }
 
-            String lastLid = (String)RegistryTools.GetSetting(HoodExporterApp.RegistryKey + @"\Options", menuLanguage.Name, Helper.Hex2PrefixString((int)MetaData.Languages.English));
-            foreach (String lid in GameData.languagesByCode.Keys)
+            string lastLid = (string)RegistryTools.GetSetting(HoodExporterApp.RegistryKey + @"\Options", menuLanguage.Name, Helper.Hex2PrefixString((int)MetaData.Languages.English));
+            foreach (string lid in GameData.languagesByCode.Keys)
             {
-                if (GameData.languagesByCode.TryGetValue(lid, out String lang))
+                if (GameData.languagesByCode.TryGetValue(lid, out string lang))
                 {
                     ToolStripMenuItem item = new ToolStripMenuItem();
                     menuLanguage.DropDownItems.Add(item);
@@ -154,7 +154,7 @@ namespace HoodExporter
             ParseXml("Resources/XML/npcs.xml", "npc", npcsByGuid);
             ParseTokens("Resources/XML/tokens.xml", tokenDataList);
 
-            foreach (String xslt in Directory.GetFiles("Resources/XSL"))
+            foreach (string xslt in Directory.GetFiles("Resources/XSL"))
             {
                 FileInfo fi = new FileInfo(xslt);
 
@@ -178,12 +178,12 @@ namespace HoodExporter
             }
         }
 
-        private void ParseXml(String xml, String element, Dictionary<TypeGUID, String> byValue)
+        private void ParseXml(string xml, string element, Dictionary<TypeGUID, string> byValue)
         {
             XmlReader reader = XmlReader.Create(xml);
 
             TypeGUID value = DBPFData.GUID_NULL;
-            String name = null;
+            string name = null;
 
             reader.MoveToContent();
             while (reader.Read())
@@ -193,7 +193,7 @@ namespace HoodExporter
                     if (reader.Name.Equals("value"))
                     {
                         reader.Read();
-                        value = (TypeGUID)UInt32.Parse(reader.Value.Substring(2), NumberStyles.HexNumber);
+                        value = (TypeGUID)uint.Parse(reader.Value.Substring(2), NumberStyles.HexNumber);
                     }
                     else if (reader.Name.Equals("name"))
                     {
@@ -208,7 +208,7 @@ namespace HoodExporter
             }
         }
 
-        private void ParseTokens(String xml, List<TokenData> tokenList)
+        private void ParseTokens(string xml, List<TokenData> tokenList)
         {
             XmlReader reader = XmlReader.Create(xml);
 
@@ -219,10 +219,10 @@ namespace HoodExporter
                 {
                     if (reader.Name.Equals("token"))
                     {
-                        String strGuid = reader.GetAttribute("guid");
-                        String strProp = reader.GetAttribute("property");
-                        String strEle = reader.GetAttribute("element");
-                        String strAttr = reader.GetAttribute("attribute");
+                        string strGuid = reader.GetAttribute("guid");
+                        string strProp = reader.GetAttribute("property");
+                        string strEle = reader.GetAttribute("element");
+                        string strAttr = reader.GetAttribute("attribute");
 
                         if (strGuid != null && strProp != null && strEle != null && strAttr != null)
                         {
@@ -230,8 +230,8 @@ namespace HoodExporter
 
                             try
                             {
-                                TypeGUID guid = (TypeGUID)UInt32.Parse(strGuid, NumberStyles.HexNumber);
-                                int prop = Int16.Parse(strProp, NumberStyles.Integer);
+                                TypeGUID guid = (TypeGUID)uint.Parse(strGuid, NumberStyles.HexNumber);
+                                int prop = short.Parse(strProp, NumberStyles.Integer);
 
                                 tokenList.Add(new TokenData(guid, prop, strEle, strAttr));
                             }
@@ -247,7 +247,7 @@ namespace HoodExporter
             BackgroundWorker worker = sender as BackgroundWorker;
 
             DirectoryInfo hoodDirInfo = new DirectoryInfo(textHoodPath.Text);
-            String hoodDirPath = hoodDirInfo.FullName;
+            string hoodDirPath = hoodDirInfo.FullName;
 
 #if !DEBUG
             try
@@ -260,12 +260,12 @@ namespace HoodExporter
                     throw new Exception("Missing main neighborhood package file");
                 }
 
-                String hoodPackagePath = files[0].FullName;
-                String hoodPackageName = files[0].Name;
+                string hoodPackagePath = files[0].FullName;
+                string hoodPackageName = files[0].Name;
                 hoodCode = hoodPackageName.Substring(0, hoodPackageName.IndexOf("_"));
 
                 isRufio = xsltPath.ToLower().Contains("rufio") && File.Exists(xsltPath);
-                String exportSubDir = isRufio ? "Rufio" : hoodCode;
+                string exportSubDir = isRufio ? "Rufio" : hoodCode;
 
                 exportPath = (new DirectoryInfo($"{textSavePath.Text}/{exportSubDir}")).FullName;
 
@@ -372,7 +372,7 @@ namespace HoodExporter
 #endif
         }
 
-        private bool ProcessMainHood(BackgroundWorker worker, int percent, DirectoryInfo _/*hoodDirInfo*/, String mainPackagePath, XmlElement parent, String kind, List<TypeTypeID> types)
+        private bool ProcessMainHood(BackgroundWorker worker, int percent, DirectoryInfo _/*hoodDirInfo*/, string mainPackagePath, XmlElement parent, string kind, List<TypeTypeID> types)
         {
             XmlElement eleMain = parent.OwnerDocument.CreateElement(kind);
             parent.AppendChild(eleMain);
@@ -385,7 +385,7 @@ namespace HoodExporter
             return true;
         }
 
-        private bool ProcessSubHoods(BackgroundWorker worker, int percent, DirectoryInfo hoodDirInfo, String subhoodPackageFilter, XmlElement parent, String kind, List<TypeTypeID> types)
+        private bool ProcessSubHoods(BackgroundWorker worker, int percent, DirectoryInfo hoodDirInfo, string subhoodPackageFilter, XmlElement parent, string kind, List<TypeTypeID> types)
         {
             int savedStartingPercent = startingPercent;
 
@@ -397,7 +397,7 @@ namespace HoodExporter
                     return false;
                 }
 
-                String subhoodPackagePath = subhood.FullName;
+                string subhoodPackagePath = subhood.FullName;
 
                 XmlElement eleSubhood = parent.OwnerDocument.CreateElement(kind);
                 parent.AppendChild(eleSubhood);
@@ -413,7 +413,7 @@ namespace HoodExporter
             return true;
         }
 
-        private bool ProcessHood(BackgroundWorker worker, int percent, String packagePath, XmlElement parent, List<TypeTypeID> types)
+        private bool ProcessHood(BackgroundWorker worker, int percent, string packagePath, XmlElement parent, List<TypeTypeID> types)
         {
             parent.SetAttribute("package", (new FileInfo(packagePath)).Name);
 
@@ -492,7 +492,7 @@ namespace HoodExporter
                                 }
                                 else if (npcsByGuid.ContainsKey(sdsc.SimGuid))
                                 {
-                                    if (npcsByGuid.TryGetValue(sdsc.SimGuid, out String npcName))
+                                    if (npcsByGuid.TryGetValue(sdsc.SimGuid, out string npcName))
                                     {
                                         XmlElement eleGivenName = parent.OwnerDocument.CreateElement("givenName");
                                         element.AppendChild(eleGivenName);
@@ -509,7 +509,7 @@ namespace HoodExporter
                                         {
                                             if (basechild.Name.Equals("aspiration"))
                                             {
-                                                uint aspPri = UInt32.Parse(basechild.GetAttribute("aspiration").Substring(2), NumberStyles.HexNumber);
+                                                uint aspPri = uint.Parse(basechild.GetAttribute("aspiration").Substring(2), NumberStyles.HexNumber);
                                                 uint aspSec = 0;
 
                                                 if (simDataById != null)
@@ -531,10 +531,10 @@ namespace HoodExporter
                                     uint tokenValue = simTokenCache.GetValue(tokenData);
 
                                     XmlElement tokenElementParent = element;
-                                    String tokenElementName = tokenData.ElementName;
+                                    string tokenElementName = tokenData.ElementName;
                                     while (tokenElementName.Contains("/"))
                                     {
-                                        String interElementName = tokenElementName.Substring(0, tokenElementName.IndexOf("/"));
+                                        string interElementName = tokenElementName.Substring(0, tokenElementName.IndexOf("/"));
                                         XmlElement interElement = null;
                                         foreach (XmlElement child in tokenElementParent.ChildNodes)
                                         {
@@ -576,14 +576,14 @@ namespace HoodExporter
 
                                 if (isRufio && Directory.Exists($"{exportPath}/SimImage"))
                                 {
-                                    foreach (String simImage in Directory.GetFiles($"{exportPath}/SimImage", $"{sdsc.SimGuid}*"))
+                                    foreach (string simImage in Directory.GetFiles($"{exportPath}/SimImage", $"{sdsc.SimGuid}*"))
                                     {
                                         FileInfo fi = new FileInfo(simImage);
-                                        String lifeStage = fi.Name.Substring(fi.Name.IndexOf("_") + 1);
+                                        string lifeStage = fi.Name.Substring(fi.Name.IndexOf("_") + 1);
                                         lifeStage = lifeStage.Substring(0, lifeStage.Length - 4);
 
-                                        String suffix = lifeStage.Equals(sdsc.SimBase.LifeSection.ToString()) ? "" : $"_{lifeStage}";
-                                        String newName = Path.Combine(fi.DirectoryName, $"{hoodCode}_{sdsc.InstanceID.AsUInt()}{suffix}{fi.Extension}");
+                                        string suffix = lifeStage.Equals(sdsc.SimBase.LifeSection.ToString()) ? "" : $"_{lifeStage}";
+                                        string newName = Path.Combine(fi.DirectoryName, $"{hoodCode}_{sdsc.InstanceID.AsUInt()}{suffix}{fi.Extension}");
 
                                         if (File.Exists(newName))
                                         {
@@ -608,13 +608,13 @@ namespace HoodExporter
             return true;
         }
 
-        private bool ProcessCharacterFiles(BackgroundWorker worker, int percent, String hoodDir, String outputPath)
+        private bool ProcessCharacterFiles(BackgroundWorker worker, int percent, string hoodDir, string outputPath)
         {
             DirectoryInfo charactersDir = new DirectoryInfo($"{hoodDir}/Characters");
 
-            String extn = menuItemSaveAsPng.Checked ? "png" : "jpg";
-            String simsSubDir = isRufio ? "SimImage" : "Sims";
-            String simsPath = $"{outputPath}/{simsSubDir}";
+            string extn = menuItemSaveAsPng.Checked ? "png" : "jpg";
+            string simsSubDir = isRufio ? "SimImage" : "Sims";
+            string simsPath = $"{outputPath}/{simsSubDir}";
 
             if (menuItemSimImages.Checked) Directory.CreateDirectory(simsPath);
 
@@ -674,7 +674,7 @@ namespace HoodExporter
                                             {
                                                 Img img = (Img)package.GetResourceByEntry(entry);
 
-                                                String suffix;
+                                                string suffix;
                                                 switch (lifeStage)
                                                 {
                                                     case 0x20: suffix = "Baby"; break;
@@ -687,7 +687,7 @@ namespace HoodExporter
                                                     default: suffix = "Unknown"; break;
                                                 }
 
-                                                String imageName = $"{objd.Guid}_{suffix}";
+                                                string imageName = $"{objd.Guid}_{suffix}";
 
                                                 using (Stream stream = new FileStream($"{simsPath}/{imageName}.{extn}", FileMode.OpenOrCreate, FileAccess.Write))
                                                 {
@@ -743,15 +743,15 @@ namespace HoodExporter
             return true;
         }
 
-        private bool ProcessLotFiles(BackgroundWorker worker, int percent, String hoodDir, String outputPath)
+        private bool ProcessLotFiles(BackgroundWorker worker, int percent, string hoodDir, string outputPath)
         {
             if (menuItemLotImages.Checked)
             {
                 DirectoryInfo lotsDir = new DirectoryInfo($"{hoodDir}/Lots");
 
-                String extn = menuItemSaveAsPng.Checked ? "png" : "jpg";
-                String lotsSubDir = isRufio ? "LotImage" : "Lots";
-                String lotsPath = $"{outputPath}/{lotsSubDir}";
+                string extn = menuItemSaveAsPng.Checked ? "png" : "jpg";
+                string lotsSubDir = isRufio ? "LotImage" : "Lots";
+                string lotsPath = $"{outputPath}/{lotsSubDir}";
 
                 Directory.CreateDirectory(lotsPath);
 
@@ -791,10 +791,10 @@ namespace HoodExporter
                                     Match m = LotRegex.Match(lotFile.Name);
                                     if (m.Success)
                                     {
-                                        uint uid = UInt32.Parse(m.Groups[1].Value);
+                                        uint uid = uint.Parse(m.Groups[1].Value);
 
                                         Img img = (Img)package.GetResourceByEntry(entry);
-                                        String imageName = isRufio ? $"{hoodCode}_{uid}" : Helper.Hex8PrefixString(uid);
+                                        string imageName = isRufio ? $"{hoodCode}_{uid}" : Helper.Hex8PrefixString(uid);
 
                                         using (Stream stream = new FileStream($"{lotsPath}/{imageName}.{extn}", FileMode.OpenOrCreate, FileAccess.Write))
                                         {
@@ -832,15 +832,15 @@ namespace HoodExporter
             return true;
         }
 
-        private bool ProcessFamilyThumbnails(BackgroundWorker worker, int percent, String hoodDir, String outputPath)
+        private bool ProcessFamilyThumbnails(BackgroundWorker worker, int percent, string hoodDir, string outputPath)
         {
             if (menuItemFamilyImages.Checked)
             {
                 DirectoryInfo thumbnailsDir = new DirectoryInfo($"{hoodDir}/Thumbnails");
 
-                String extn = menuItemSaveAsPng.Checked ? "png" : "jpg";
-                String familiesSubDir = isRufio ? "FamilyImage" : "Families";
-                String familiesPath = $"{outputPath}/{familiesSubDir}";
+                string extn = menuItemSaveAsPng.Checked ? "png" : "jpg";
+                string familiesSubDir = isRufio ? "FamilyImage" : "Families";
+                string familiesPath = $"{outputPath}/{familiesSubDir}";
 
                 Directory.CreateDirectory(familiesPath);
 
@@ -866,7 +866,7 @@ namespace HoodExporter
                             }
 
                             Img img = (Img)package.GetResourceByEntry(entry);
-                            String imageName = isRufio ? $"{hoodCode}_{entry.InstanceID.AsUInt()}" : entry.InstanceID.ToString();
+                            string imageName = isRufio ? $"{hoodCode}_{entry.InstanceID.AsUInt()}" : entry.InstanceID.ToString();
 
                             using (Stream stream = new FileStream($"{familiesPath}/{imageName}.{extn}", FileMode.OpenOrCreate, FileAccess.Write))
                             {
@@ -963,7 +963,7 @@ namespace HoodExporter
             }
         }
 
-        private void MyMruList_FileSelected(String folder)
+        private void MyMruList_FileSelected(string folder)
         {
             textHoodPath.Text = folder;
         }
@@ -972,8 +972,8 @@ namespace HoodExporter
         {
             RegistryTools.LoadAppSettings(HoodExporterApp.RegistryKey, HoodExporterApp.AppVersionMajor, HoodExporterApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(HoodExporterApp.RegistryKey, this);
-            textHoodPath.Text = RegistryTools.GetSetting(HoodExporterApp.RegistryKey, textHoodPath.Name, "") as String;
-            textSavePath.Text = RegistryTools.GetSetting(HoodExporterApp.RegistryKey, textSavePath.Name, "") as String;
+            textHoodPath.Text = RegistryTools.GetSetting(HoodExporterApp.RegistryKey, textHoodPath.Name, "") as string;
+            textSavePath.Text = RegistryTools.GetSetting(HoodExporterApp.RegistryKey, textSavePath.Name, "") as string;
 
             MyMruList = new MruList(HoodExporterApp.RegistryKey, selectRecentHoodsToolStripMenuItem, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FileSelected;
@@ -1154,7 +1154,7 @@ namespace HoodExporter
 
             try
             {
-                prefLid = (MetaData.Languages)Convert.ToInt16(menuItem.Tag as String, 16);
+                prefLid = (MetaData.Languages)Convert.ToInt16(menuItem.Tag as string, 16);
 
                 RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuLanguage.Name, menuItem.Tag);
 
@@ -1181,7 +1181,7 @@ namespace HoodExporter
                 }
             }
 
-            xsltPath = menuItem.Tag as String;
+            xsltPath = menuItem.Tag as string;
 
             if (menuItem == menuItemXsltNone)
             {

@@ -12,7 +12,6 @@
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.SceneGraph.IDR;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -24,21 +23,21 @@ namespace SgChecker
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly string folder;
-        private readonly List<String> files;
+        private readonly List<string> files;
 
-        private readonly SortedDictionary<String, DuplicatePackages> duplicatesPackages;
-        private readonly SortedDictionary<String, IncompletePackage> incompletePackages;
+        private readonly SortedDictionary<string, DuplicatePackages> duplicatesPackages;
+        private readonly SortedDictionary<string, IncompletePackage> incompletePackages;
 
         private readonly KnownSgResources knownSgResources = new KnownSgResources();
         private readonly NeededSgResources neededSgResources = new NeededSgResources();
         private readonly MissingSgResources missingSgResources = new MissingSgResources();
 
-        public SgCheckerManager(string folder, List<String> files)
+        public SgCheckerManager(string folder, List<string> files)
         {
             this.folder = folder.EndsWith(@"\") ? folder.Substring(0, folder.Length - 1) : folder;
             this.files = files;
 
-            duplicatesPackages = new SortedDictionary<String, DuplicatePackages>();
+            duplicatesPackages = new SortedDictionary<string, DuplicatePackages>();
             incompletePackages = new SortedDictionary<string, IncompletePackage>();
         }
 
@@ -46,7 +45,7 @@ namespace SgChecker
         {
             KnownSgResource knownRes = knownSgResources.Add(sgRes, fileIndex);
 
-            foreach (String qualifiedName in sgRes.SgNeededResources())
+            foreach (string qualifiedName in sgRes.SgNeededResources())
             {
                 AddNeeded(knownRes, qualifiedName);
             }
@@ -67,7 +66,7 @@ namespace SgChecker
             missingSgResources.Remove(sgRes);
         }
 
-        public void AddNeeded(KnownSgResource knownRes, String qualifiedName)
+        public void AddNeeded(KnownSgResource knownRes, string qualifiedName)
         {
             NeededSgResource neededRes = new NeededSgResource(qualifiedName);
             knownRes.AddNeeded(neededRes);
@@ -152,11 +151,11 @@ namespace SgChecker
             return missingSgResources.NeededTypes();
         }
 
-        public bool IsWantedGameFile(String filePath)
+        public bool IsWantedGameFile(string filePath)
         {
             List<TypeTypeID> neededTypes = missingSgResources.NeededTypes();
 
-            String file = (new FileInfo(filePath)).Name;
+            string file = (new FileInfo(filePath)).Name;
 
             foreach (Regex re in SgChecker.excludedFiles)
             {
@@ -176,9 +175,9 @@ namespace SgChecker
             return true;
         }
 
-        public bool IsWantedFile(String filePath)
+        public bool IsWantedFile(string filePath)
         {
-            String file = (new FileInfo(filePath)).Name;
+            string file = (new FileInfo(filePath)).Name;
 
             foreach (Regex re in SgChecker.excludedFiles)
             {
@@ -188,7 +187,7 @@ namespace SgChecker
             return true;
         }
 
-        public SortedDictionary<String, DuplicatePackages> GetDuplicatePackages(TypeTypeID[] exclusionTypes)
+        public SortedDictionary<string, DuplicatePackages> GetDuplicatePackages(TypeTypeID[] exclusionTypes)
         {
             if (duplicatesPackages.Count == 0)
             {
@@ -198,7 +197,7 @@ namespace SgChecker
             return duplicatesPackages;
         }
 
-        public SortedDictionary<String, IncompletePackage> GetIncompletePackages()
+        public SortedDictionary<string, IncompletePackage> GetIncompletePackages()
         {
             if (incompletePackages.Count == 0)
             {

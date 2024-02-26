@@ -23,7 +23,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xAC506764;
-        public const String NAME = "3IDR";
+        public const string NAME = "3IDR";
 
         public override string KeyName
         {

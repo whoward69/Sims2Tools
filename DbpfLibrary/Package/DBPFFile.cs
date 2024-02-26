@@ -103,6 +103,8 @@ namespace Sims2Tools.DBPF.Package
 
         public bool IsDirty => resourceIndex.IsDirty;
 
+        public void SetClean() => resourceIndex.SetClean();
+
         public DBPFFile(string packagePath)
         {
             this.packagePath = packagePath;
@@ -234,36 +236,39 @@ namespace Sims2Tools.DBPF.Package
 
         private byte[] GetItemByEntry(DBPFEntry entry)
         {
+            uint uncompressedSize = entry.UncompressedSize;
+
             m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
 
             // NOTE: Just because there is no CLST resource (or no entry in the CLST) does NOT mean the data is uncompressed!
-            if (entry.UncompressedSize == 0 && entry.FileSize > 9)
+            if (uncompressedSize == 0 && entry.FileSize > 9)
             {
                 byte[] header = m_Reader.ReadBytes(9);
 
                 m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
 
                 // Header bytes 0 thru 3 are a 32-bit value giving the size of the compressed data (little-endian)
-                Int32 headerCompressedSize = (((header[3] * 256 + header[2]) * 256 + header[1]) * 256 + header[0]);
+                int headerCompressedSize = (((header[3] * 256 + header[2]) * 256 + header[1]) * 256 + header[0]);
                 // Header bytes 4 thru 5 are a 16-bit signature value 
-                UInt16 headerSignature = (ushort)(header[5] * 256 + header[4]);
+                ushort headerSignature = (ushort)(header[5] * 256 + header[4]);
                 // Header bytes 6 thru 8 are a 24-bit value giving the size of the decompressed data (big-endian)
-                Int32 headerUncompressedSize = ((header[6] * 256 + header[7]) * 256 + header[8]);
+                int headerUncompressedSize = ((header[6] * 256 + header[7]) * 256 + header[8]);
 
                 if (headerCompressedSize == entry.FileSize &&
                     headerSignature == 0xFB10 &&
                     headerUncompressedSize > (entry.FileSize - 9))
                 {
                     // TODO - _compression - This looks very much like compressed data!
+                    // We could set uncompressedSize = headerUncompressedSize and continue
                     logger.Warn($"Resource {entry} appears to be compressed when marked as not! Missing CLST resource?");
                 }
             }
 
-            if (entry.UncompressedSize != 0)
+            if (uncompressedSize != 0)
             {
                 try
                 {
-                    return Decompressor.Decompress(m_Reader.ReadBytes((int)entry.FileSize), entry.UncompressedSize);
+                    return Decompressor.Decompress(m_Reader.ReadBytes((int)entry.FileSize), uncompressedSize);
                 }
                 catch (Exception)
                 {
@@ -302,7 +307,7 @@ namespace Sims2Tools.DBPF.Package
             return resourceIndex.GetEntriesByType(type);
         }
 
-        public String GetFilenameByEntry(DBPFEntry entry)
+        public string GetFilenameByEntry(DBPFEntry entry)
         {
             if (entry.TypeID == Ui.TYPE)
             {

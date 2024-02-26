@@ -14,10 +14,10 @@ namespace ObjectRelocator
 {
     static class ObjectRelocatorApp
     {
-        public static readonly String AppName = "Object Relocator";
+        public static readonly string AppName = "Object Relocator";
 
-        public static readonly int AppVersionMajor = 3;
-        public static readonly int AppVersionMinor = 4;
+        public static readonly int AppVersionMajor = 4;
+        public static readonly int AppVersionMinor = 0;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;
@@ -37,7 +37,7 @@ namespace ObjectRelocator
         public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static readonly String RegistryKey = Sims2ToolsLib.RegistryKey + @"\ObjectRelocator";
+        public static readonly string RegistryKey = Sims2ToolsLib.RegistryKey + @"\ObjectRelocator";
 
         [STAThread]
         static void Main()

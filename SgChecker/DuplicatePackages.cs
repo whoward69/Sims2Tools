@@ -16,9 +16,9 @@ namespace SgChecker
 {
     public class CheckerDetail : IEquatable<CheckerDetail>, IComparable<CheckerDetail>
     {
-        public String Name { get; }
+        public string Name { get; }
 
-        public CheckerDetail(String name)
+        public CheckerDetail(string name)
         {
             Name = name;
         }
@@ -28,7 +28,7 @@ namespace SgChecker
             return this.Name.Equals(other.Name);
         }
 
-        public override bool Equals(Object other)
+        public override bool Equals(object other)
         {
             return (other is CheckerDetail cd) && Equals(cd);
         }
@@ -46,12 +46,12 @@ namespace SgChecker
 
     public class DuplicatePackages : IComparable<DuplicatePackages>
     {
-        public String PackageA { get; }
-        public String PackageB { get; }
+        public string PackageA { get; }
+        public string PackageB { get; }
 
         public List<CheckerDetail> Details { get; }
 
-        public DuplicatePackages(String PackageA, String PackageB)
+        public DuplicatePackages(string PackageA, string PackageB)
         {
             this.PackageA = PackageA;
             this.PackageB = PackageB;
@@ -59,14 +59,14 @@ namespace SgChecker
             this.Details = new List<CheckerDetail>();
         }
 
-        public void AddDetail(String name)
+        public void AddDetail(string name)
         {
             Details.Add(new CheckerDetail(name));
         }
 
-        public String DetailText(String prefix = "")
+        public string DetailText(string prefix = "")
         {
-            String s = "";
+            string s = "";
 
             foreach (CheckerDetail detail in Details)
             {
@@ -101,25 +101,25 @@ namespace SgChecker
 
     public class IncompletePackage : IComparable<IncompletePackage>
     {
-        public String PackageA { get; }
+        public string PackageA { get; }
 
         public SortedSet<CheckerDetail> Details { get; }
 
-        public IncompletePackage(String PackageA)
+        public IncompletePackage(string PackageA)
         {
             this.PackageA = PackageA;
 
             this.Details = new SortedSet<CheckerDetail>();
         }
 
-        public void AddDetail(String name)
+        public void AddDetail(string name)
         {
             Details.Add(new CheckerDetail(name));
         }
 
-        public String DetailText(String prefix = "")
+        public string DetailText(string prefix = "")
         {
-            String s = "";
+            string s = "";
 
             foreach (CheckerDetail detail in Details)
             {

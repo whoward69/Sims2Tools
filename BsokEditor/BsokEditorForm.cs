@@ -1037,7 +1037,7 @@ namespace BsokEditor
 
                 LoadBsokProductComboBoxes();
 
-                foreach (Object o in comboGender.Items)
+                foreach (object o in comboGender.Items)
                 {
                     if ((o as NamedValue).Value == cachedGenderValue)
                     {
@@ -1068,7 +1068,7 @@ namespace BsokEditor
 
                 if (node != null)
                 {
-                    foreach (Object o in comboBsokGenre.Items)
+                    foreach (object o in comboBsokGenre.Items)
                     {
                         if ((o as XmlValue).Equals(node))
                         {
@@ -1077,7 +1077,7 @@ namespace BsokEditor
                         }
                     }
 
-                    foreach (Object o in comboBsokStyle.Items)
+                    foreach (object o in comboBsokStyle.Items)
                     {
                         if ((o as XmlValue).Equals(node))
                         {
@@ -1086,7 +1086,7 @@ namespace BsokEditor
                         }
                     }
 
-                    foreach (Object o in comboBsokGroup.Items)
+                    foreach (object o in comboBsokGroup.Items)
                     {
                         if ((o as XmlValue).Equals(node))
                         {
@@ -1095,7 +1095,7 @@ namespace BsokEditor
                         }
                     }
 
-                    foreach (Object o in comboBsokShape.Items)
+                    foreach (object o in comboBsokShape.Items)
                     {
                         if ((o as XmlValue).Equals(node))
                         {
@@ -1104,7 +1104,7 @@ namespace BsokEditor
                         }
                     }
 
-                    foreach (Object o in comboBsokRoles.Items)
+                    foreach (object o in comboBsokRoles.Items)
                     {
                         if ((o as XmlValue).Equals(node))
                         {
@@ -1192,7 +1192,7 @@ namespace BsokEditor
             {
                 cachedShoeValue = newShoeValue;
 
-                foreach (Object o in comboShoe.Items)
+                foreach (object o in comboShoe.Items)
                 {
                     if ((o as NamedValue).Value == cachedShoeValue)
                     {
@@ -1617,7 +1617,7 @@ namespace BsokEditor
 
                 if (editedCpf.IsDirty)
                 {
-                    String packageFile = row.Cells["colPackagePath"].Value as string;
+                    string packageFile = row.Cells["colPackagePath"].Value as string;
 
                     if (!dirtyCpfsByPackage.ContainsKey(packageFile))
                     {

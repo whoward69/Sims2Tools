@@ -13,14 +13,13 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
-using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CGeometryDataContainer : AbstractRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xAC4F8687;
-        public static String NAME = "cGeometryDataContainer";
+        public static string NAME = "cGeometryDataContainer";
 
         private readonly GmdcElements elements;
         private readonly GmdcLinks links;
@@ -60,7 +59,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             groups.RenameGroup(oldName, newName);
 
-            isDirty = true;
+            _isDirty = true;
         }
 
         public override void Unserialize(DbpfReader reader)

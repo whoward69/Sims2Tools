@@ -22,7 +22,6 @@ using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.Utils;
-using System;
 using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.SceneGraph
@@ -49,7 +48,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         private static readonly List<TypeTypeID> ImmuneTypes = new List<TypeTypeID>(new TypeTypeID[] { Objd.TYPE, Cres.TYPE, Gmdc.TYPE, Gmnd.TYPE, Shpe.TYPE, Txmt.TYPE, Txtr.TYPE });
 #endif
 
-        public static String SgHash(TypeTypeID typeID, TypeGroupID groupID, TypeResourceID resourceID, TypeInstanceID instanceID)
+        public static string SgHash(TypeTypeID typeID, TypeGroupID groupID, TypeResourceID resourceID, TypeInstanceID instanceID)
         {
 #if DEBUG
             if (groupID == DBPFData.GROUP_LOCAL && !ImmuneTypes.Contains(typeID)) logger.Warn($"Local Group: {DBPFData.TypeName(typeID)}-{groupID}-{resourceID}-{instanceID}");
@@ -58,16 +57,16 @@ namespace Sims2Tools.DBPF.SceneGraph
             return $"{DBPFData.TypeName(typeID)}-{groupID}-{resourceID}-{instanceID}";
         }
 
-        public static String SgHash(DBPFKey key)
+        public static string SgHash(DBPFKey key)
         {
             return SgHash(key.TypeID, key.GroupID, key.ResourceID, key.InstanceID);
         }
 
-        private static String SgName(TypeTypeID typeID, String fileName, String prefix)
+        private static string SgName(TypeTypeID typeID, string fileName, string prefix)
         {
-            String type = DBPFData.TypeName(typeID).ToLower();
+            string type = DBPFData.TypeName(typeID).ToLower();
 
-            String suffix = "";
+            string suffix = "";
 
             if (!fileName.ToLower().EndsWith($"_{type}"))
             {
@@ -78,9 +77,9 @@ namespace Sims2Tools.DBPF.SceneGraph
             return $"{prefix}{fileName}{suffix}".ToLower();
         }
 
-        private static String SgName(TypeTypeID typeID, TypeGroupID groupID, String fileName)
+        private static string SgName(TypeTypeID typeID, TypeGroupID groupID, string fileName)
         {
-            String prefix = "";
+            string prefix = "";
 
             if (!fileName.StartsWith("##"))
             {
@@ -94,19 +93,19 @@ namespace Sims2Tools.DBPF.SceneGraph
             return SgName(typeID, fileName, prefix);
         }
 
-        public static String SgName(TypeTypeID typeID, String fileName)
+        public static string SgName(TypeTypeID typeID, string fileName)
         {
             return SgName(typeID, fileName, "");
         }
 
-        public static String SgName(DBPFNamedKey namedKey)
+        public static string SgName(DBPFNamedKey namedKey)
         {
             return SgName(namedKey.TypeID, namedKey.GroupID, namedKey.KeyName);
         }
 
         public static DBPFKey KeyFromQualifiedName(string fileName, TypeTypeID typeId, TypeGroupID defGroupId)
         {
-            String name = Hashes.StripHashFromName(fileName);
+            string name = Hashes.StripHashFromName(fileName);
             return new DBPFKey(typeId, Hashes.GetHashGroupFromName(fileName, defGroupId), Hashes.InstanceIDHash(name), Hashes.ResourceIDHash(name));
         }
     }
@@ -118,10 +117,10 @@ namespace Sims2Tools.DBPF.SceneGraph
 
     public abstract class SgResource : DBPFResource, ISgResource
     {
-        private String sgHash = null;
-        private String sgName = null;
+        private string sgHash = null;
+        private string sgName = null;
 
-        public String SgHash
+        public string SgHash
         {
             get
             {
@@ -129,7 +128,7 @@ namespace Sims2Tools.DBPF.SceneGraph
                 return sgHash;
             }
         }
-        public String SgName
+        public string SgName
         {
             get
             {
@@ -161,11 +160,11 @@ namespace Sims2Tools.DBPF.SceneGraph
 
     public abstract class SgCpf : Cpf, ISgResource
     {
-        private readonly String sgHash;
-        private readonly String sgName;
+        private readonly string sgHash;
+        private readonly string sgName;
 
-        public String SgHash => sgHash;
-        public String SgName => sgName;
+        public string SgHash => sgHash;
+        public string SgName => sgName;
 
         public SgCpf(DBPFEntry entry) : base(entry)
         {
@@ -212,7 +211,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         }
     }
 
-    public class SgResourceList : List<String>
+    public class SgResourceList : List<string>
     {
         public SgResourceList(int size) : base(size)
         {

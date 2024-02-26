@@ -47,7 +47,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     public class CResourceNode : AbstractCresChildren
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xE519C933;
-        public static String NAME = "cResourceNode";
+        public static string NAME = "cResourceNode";
 
         byte typecode;
         public byte TypeCode

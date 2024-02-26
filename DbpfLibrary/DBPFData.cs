@@ -67,7 +67,6 @@ using Sims2Tools.DBPF.XFLR;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DBPF.XROF;
-using System;
 using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF
@@ -77,13 +76,13 @@ namespace Sims2Tools.DBPF
         public static TypeTypeID TYPE_NULL = (TypeTypeID)0x00000000; // Technically this is type UI
 
         public static TypeGroupID GROUP_GLOBALS = (TypeGroupID)0x7FD46CD0;
-        public static String NAME_GLOBALS = "Globals";
+        public static string NAME_GLOBALS = "Globals";
 
         public static TypeGroupID GROUP_BEHAVIOR = (TypeGroupID)0x7FE59FD0;
-        public static String NAME_BEHAVIOR = "Behaviour";
+        public static string NAME_BEHAVIOR = "Behaviour";
 
         public static TypeGroupID GROUP_LOCAL = (TypeGroupID)0xFFFFFFFF;
-        public static String NAME_LOCAL = "Local";
+        public static string NAME_LOCAL = "Local";
 
         public static TypeGroupID GROUP_SG_MAXIS = (TypeGroupID)0x1C0532FA;
         public static TypeGroupID GROUP_SG_LOCAL = (TypeGroupID)0x1C050000;
@@ -98,11 +97,11 @@ namespace Sims2Tools.DBPF
 
         public static TypeGUID GUID_NULL = (TypeGUID)0x00000000;
 
-        private static readonly Dictionary<TypeTypeID, String> ModTypeNames = new Dictionary<TypeTypeID, string>();
-        private static readonly Dictionary<TypeTypeID, String> ImgTypeNames = new Dictionary<TypeTypeID, string>();
-        private static readonly Dictionary<TypeTypeID, String> SgTypeNames = new Dictionary<TypeTypeID, string>();
-        private static readonly Dictionary<TypeTypeID, String> OtherTypeNames = new Dictionary<TypeTypeID, string>();
-        private static readonly Dictionary<TypeTypeID, String> AllTypeNames = new Dictionary<TypeTypeID, string>();
+        private static readonly Dictionary<TypeTypeID, string> ModTypeNames = new Dictionary<TypeTypeID, string>();
+        private static readonly Dictionary<TypeTypeID, string> ImgTypeNames = new Dictionary<TypeTypeID, string>();
+        private static readonly Dictionary<TypeTypeID, string> SgTypeNames = new Dictionary<TypeTypeID, string>();
+        private static readonly Dictionary<TypeTypeID, string> OtherTypeNames = new Dictionary<TypeTypeID, string>();
+        private static readonly Dictionary<TypeTypeID, string> AllTypeNames = new Dictionary<TypeTypeID, string>();
 
         static DBPFData()
         {
@@ -171,33 +170,33 @@ namespace Sims2Tools.DBPF
 
             OtherTypeNames.Add(Cgn1.TYPE, Cgn1.NAME);
 
-            foreach (KeyValuePair<TypeTypeID, String> kvPair in ModTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
-            foreach (KeyValuePair<TypeTypeID, String> kvPair in ImgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
-            foreach (KeyValuePair<TypeTypeID, String> kvPair in SgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
-            foreach (KeyValuePair<TypeTypeID, String> kvPair in OtherTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
+            foreach (KeyValuePair<TypeTypeID, string> kvPair in ModTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
+            foreach (KeyValuePair<TypeTypeID, string> kvPair in ImgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
+            foreach (KeyValuePair<TypeTypeID, string> kvPair in SgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
+            foreach (KeyValuePair<TypeTypeID, string> kvPair in OtherTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
         }
 
-        public static Dictionary<TypeTypeID, String>.KeyCollection AllTypes
+        public static Dictionary<TypeTypeID, string>.KeyCollection AllTypes
         {
             get => AllTypeNames.Keys;
         }
 
-        public static Dictionary<TypeTypeID, String>.KeyCollection ModTypes
+        public static Dictionary<TypeTypeID, string>.KeyCollection ModTypes
         {
             get => ModTypeNames.Keys;
         }
 
-        public static Dictionary<TypeTypeID, String>.KeyCollection ImgTypes
+        public static Dictionary<TypeTypeID, string>.KeyCollection ImgTypes
         {
             get => ImgTypeNames.Keys;
         }
 
-        public static Dictionary<TypeTypeID, String>.KeyCollection SgTypes
+        public static Dictionary<TypeTypeID, string>.KeyCollection SgTypes
         {
             get => SgTypeNames.Keys;
         }
 
-        public static String TypeName(TypeTypeID type)
+        public static string TypeName(TypeTypeID type)
         {
             AllTypeNames.TryGetValue(type, out string typeName);
 
@@ -224,9 +223,9 @@ namespace Sims2Tools.DBPF
             return SgTypeNames.ContainsKey(type);
         }
 
-        public static TypeTypeID TypeID(String name)
+        public static TypeTypeID TypeID(string name)
         {
-            foreach (KeyValuePair<TypeTypeID, String> kvPair in AllTypeNames)
+            foreach (KeyValuePair<TypeTypeID, string> kvPair in AllTypeNames)
             {
                 if (kvPair.Value.Equals(name.ToUpper()))
                 {

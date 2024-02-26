@@ -15,7 +15,6 @@ using Sims2Tools.DBPF.SceneGraph.Geometry;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -79,7 +78,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     public class CTransformNode : AbstractCresChildren
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x65246462;
-        public static String NAME = "cTransformNode";
+        public static string NAME = "cTransformNode";
 
         /// <summary>
         /// this value in Joint Reference tells us that the 

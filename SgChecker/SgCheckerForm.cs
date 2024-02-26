@@ -93,8 +93,8 @@ namespace SgChecker
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            String modsFolder = textModsPath.Text;
-            String scanFolder = textScanPath.Text;
+            string modsFolder = textModsPath.Text;
+            string scanFolder = textScanPath.Text;
 
             if (modsFolder.EndsWith(@"\")) modsFolder = modsFolder.Substring(0, modsFolder.Length - 1);
             if (scanFolder.EndsWith(@"\")) scanFolder = scanFolder.Substring(0, scanFolder.Length - 1);
@@ -105,20 +105,20 @@ namespace SgChecker
                 modsFolder = "";
             }
 
-            List<String> modsFiles = new List<String>();
-            List<String> scanFiles = new List<String>();
+            List<string> modsFiles = new List<string>();
+            List<string> scanFiles = new List<string>();
 
             if (modsFolder.Length > 0 && Directory.Exists(modsFolder))
             {
-                modsFiles = new List<String>(Directory.GetFiles(modsFolder, "*.package", SearchOption.AllDirectories));
+                modsFiles = new List<string>(Directory.GetFiles(modsFolder, "*.package", SearchOption.AllDirectories));
             }
 
             if (Directory.Exists(scanFolder))
             {
-                scanFiles = new List<String>(Directory.GetFiles(scanFolder, "*.package", SearchOption.AllDirectories));
+                scanFiles = new List<string>(Directory.GetFiles(scanFolder, "*.package", SearchOption.AllDirectories));
             }
 
-            foreach (String file in scanFiles)
+            foreach (string file in scanFiles)
             {
                 if (modsFiles.Contains(file)) modsFiles.Remove(file);
             }
@@ -164,7 +164,7 @@ namespace SgChecker
                     }
                     else
                     {
-                        String scanFile = scanFiles[fileIndex];
+                        string scanFile = scanFiles[fileIndex];
 
                         if (sgManager.IsWantedFile(scanFile))
                         {
@@ -187,7 +187,7 @@ namespace SgChecker
                                                     // Resolve the needed STR# now, while we have the associated DBPFFile to hand
                                                     if (package.GetResourceByKey(new DBPFKey(Str.TYPE, res.GroupID, (TypeInstanceID)0x0085, (TypeResourceID)0x0000)) is Str strRes)
                                                     {
-                                                        String cres = (res as Objd).IsRawDataValid(0x0048) ? strRes.LanguageItems(MetaData.Languages.English)[(res as Objd).GetRawData(0x0048)].Title : null;
+                                                        string cres = (res as Objd).IsRawDataValid(0x0048) ? strRes.LanguageItems(MetaData.Languages.English)[(res as Objd).GetRawData(0x0048)].Title : null;
 
                                                         if (cres != null && cres.Length > 0)
                                                         {
@@ -227,10 +227,10 @@ namespace SgChecker
                                 logger.Error(ex.Message);
                                 logger.Info(ex.StackTrace);
 
-                                String partialPath = scanFile.Substring(scanFolder.Length + 1);
+                                string partialPath = scanFile.Substring(scanFolder.Length + 1);
                                 int pos = partialPath.LastIndexOf(@"\");
 
-                                String fileDetails;
+                                string fileDetails;
 
                                 if (pos == -1)
                                 {
@@ -289,7 +289,7 @@ namespace SgChecker
 #if DEBUG
                     logger.Debug($"--- Processing downloads files ---");
 #endif
-                    foreach (String modsFile in modsFiles)
+                    foreach (string modsFile in modsFiles)
                     {
                         if (worker.CancellationPending == true)
                         {
@@ -326,10 +326,10 @@ namespace SgChecker
                                     logger.Error(ex.Message);
                                     logger.Info(ex.StackTrace);
 
-                                    String partialPath = modsFile.Substring(modsFolder.Length + 1);
+                                    string partialPath = modsFile.Substring(modsFolder.Length + 1);
                                     int pos = partialPath.LastIndexOf(@"\");
 
-                                    String fileDetails;
+                                    string fileDetails;
 
                                     if (pos == -1)
                                     {
@@ -360,15 +360,15 @@ namespace SgChecker
 #if DEBUG
                     logger.Debug($"--- Processing game files ---");
 #endif
-                    String gamePath = (new FileInfo($"{Sims2ToolsLib.Sims2Path}\\..\\..\\")).FullName;
+                    string gamePath = (new FileInfo($"{Sims2ToolsLib.Sims2Path}\\..\\..\\")).FullName;
 
-                    foreach (String gameFolder in GameData.gameFolders)
+                    foreach (string gameFolder in GameData.gameFolders)
                     {
                         if (Directory.Exists(gameFolder))
                         {
-                            String[] gameFiles = Directory.GetFiles(gameFolder, "*.package", SearchOption.AllDirectories);
+                            string[] gameFiles = Directory.GetFiles(gameFolder, "*.package", SearchOption.AllDirectories);
 
-                            foreach (String file in gameFiles)
+                            foreach (string file in gameFiles)
                             {
                                 if (worker.CancellationPending == true)
                                 {
@@ -407,10 +407,10 @@ namespace SgChecker
                                             logger.Error(ex.Message);
                                             logger.Info(ex.StackTrace);
 
-                                            String partialPath = file.Substring(gameFolder.Length + 1);
+                                            string partialPath = file.Substring(gameFolder.Length + 1);
                                             int pos = partialPath.LastIndexOf(@"\");
 
-                                            String fileDetails;
+                                            string fileDetails;
 
                                             if (pos == -1)
                                             {
@@ -467,7 +467,7 @@ namespace SgChecker
                     textProgress.Visible = true;
                 }
 
-                textProgress.Text = e.UserState as String;
+                textProgress.Text = e.UserState as string;
             }
         }
 
@@ -554,7 +554,7 @@ namespace SgChecker
             }
         }
 
-        private void MyMruList_FileSelected(String folder)
+        private void MyMruList_FileSelected(string folder)
         {
             textScanPath.Text = folder;
         }
@@ -563,8 +563,8 @@ namespace SgChecker
         {
             RegistryTools.LoadAppSettings(SgCheckerApp.RegistryKey, SgCheckerApp.AppVersionMajor, SgCheckerApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(SgCheckerApp.RegistryKey, this);
-            textModsPath.Text = RegistryTools.GetSetting(SgCheckerApp.RegistryKey, textModsPath.Name, "") as String;
-            textScanPath.Text = RegistryTools.GetSetting(SgCheckerApp.RegistryKey, textScanPath.Name, "") as String;
+            textModsPath.Text = RegistryTools.GetSetting(SgCheckerApp.RegistryKey, textModsPath.Name, "") as string;
+            textScanPath.Text = RegistryTools.GetSetting(SgCheckerApp.RegistryKey, textScanPath.Name, "") as string;
 
             MyMruList = new MruList(SgCheckerApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FileSelected;
@@ -711,7 +711,7 @@ namespace SgChecker
             {
                 int index = e.RowIndex;
 
-                SortedDictionary<String, IncompletePackage> incomplete = sgManager.GetIncompletePackages();
+                SortedDictionary<string, IncompletePackage> incomplete = sgManager.GetIncompletePackages();
 
                 if (index < incomplete.Count)
                 {
@@ -729,7 +729,7 @@ namespace SgChecker
                         }
                     }
 
-                    e.ToolTipText = row.Tag as String;
+                    e.ToolTipText = row.Tag as string;
                 }
             }
         }
@@ -740,7 +740,7 @@ namespace SgChecker
             {
                 int index = e.RowIndex;
 
-                SortedDictionary<String, DuplicatePackages> duplicates = sgManager.GetDuplicatePackages(sgExclusionTypes);
+                SortedDictionary<string, DuplicatePackages> duplicates = sgManager.GetDuplicatePackages(sgExclusionTypes);
 
                 if (index < duplicates.Count)
                 {
@@ -758,7 +758,7 @@ namespace SgChecker
                         }
                     }
 
-                    e.ToolTipText = row.Tag as String;
+                    e.ToolTipText = row.Tag as string;
                 }
             }
         }

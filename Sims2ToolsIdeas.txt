@@ -1,3 +1,10 @@
+DbpfLibrary
+===========
+  Code tidy
+    setters
+    unused methods
+
+
 Genetics Changer V0.1
 =====================
 http://www.insimenator.org/index.php?topic=48812.0
@@ -30,21 +37,6 @@ Hairs
 
 Eyebrows?
 	
-
-
-Sims 2 Resource Database
-========================
-Use cases
-  GUID -> Object Name
-  Group -> Object Name
-  TGIR -> Resource Name
-  
-  
-DbpfLibrary
-===========
-  Code tidy
-    setters
-    unused methods
 
 
 SG Checker

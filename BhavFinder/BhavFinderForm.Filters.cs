@@ -139,9 +139,9 @@ namespace BhavFinder
             public BhavFilter InnerFilter { get; set; } = null;
             public InstructionFilter InstFilter { get; set; } = null;
 
-            public abstract Boolean Wanted(Bhav bhav);
+            public abstract bool Wanted(Bhav bhav);
 
-            public Boolean IsWanted(Bhav bhav)
+            public bool IsWanted(Bhav bhav)
             {
                 if ((InnerFilter == null || InnerFilter.IsWanted(bhav)) && Wanted(bhav))
                 {
@@ -167,9 +167,9 @@ namespace BhavFinder
         {
             public InstructionFilter InnerFilter { get; set; } = null;
 
-            public abstract Boolean Wanted(TypeGroupID group, Instruction inst);
+            public abstract bool Wanted(TypeGroupID group, Instruction inst);
 
-            public Boolean IsWanted(TypeGroupID group, Instruction inst)
+            public bool IsWanted(TypeGroupID group, Instruction inst)
             {
                 return ((InnerFilter == null || InnerFilter.IsWanted(group, inst)) && Wanted(group, inst));
             }
@@ -177,7 +177,7 @@ namespace BhavFinder
 
         private class TrueFilter : BhavFilter
         {
-            public override Boolean Wanted(Bhav bhav)
+            public override bool Wanted(Bhav bhav)
             {
                 return true;
             }
@@ -192,7 +192,7 @@ namespace BhavFinder
                 this.group = group;
             }
 
-            public override Boolean Wanted(Bhav bhav)
+            public override bool Wanted(Bhav bhav)
             {
                 return (bhav.GroupID == group);
             }
@@ -208,7 +208,7 @@ namespace BhavFinder
                 this.InnerFilter = innerFilter;
             }
 
-            public override Boolean Wanted(Bhav bhav)
+            public override bool Wanted(Bhav bhav)
             {
                 return (GameData.semiglobalsByGroupID.TryGetValue(bhav.GroupID, out TypeGroupID semigroup) && (semigroup == semiglobals));
             }
@@ -227,7 +227,7 @@ namespace BhavFinder
                 this.version = version;
             }
 
-            public override Boolean Wanted(TypeGroupID group, Instruction inst)
+            public override bool Wanted(TypeGroupID group, Instruction inst)
             {
                 return (inst.OpCode >= opcodeFrom && inst.OpCode <= opcodeTo && (version == -1 || inst.NodeVersion == version));
             }
@@ -246,7 +246,7 @@ namespace BhavFinder
                 this.mask = mask;
             }
 
-            public override Boolean Wanted(TypeGroupID group, Instruction inst)
+            public override bool Wanted(TypeGroupID group, Instruction inst)
             {
                 return ((inst.Operands[operand] & mask) == value);
             }
@@ -261,7 +261,7 @@ namespace BhavFinder
                 this.operand = operand;
             }
 
-            public override Boolean Wanted(TypeGroupID group, Instruction inst)
+            public override bool Wanted(TypeGroupID group, Instruction inst)
             {
                 int index = GetIndex(inst, operand);
 

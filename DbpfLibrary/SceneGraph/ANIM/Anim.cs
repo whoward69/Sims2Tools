@@ -22,7 +22,7 @@ namespace Sims2Tools.DBPF.SceneGraph.ANIM
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xFB00791E;
-        public const String NAME = "ANIM";
+        public const string NAME = "ANIM";
 
         public Anim(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

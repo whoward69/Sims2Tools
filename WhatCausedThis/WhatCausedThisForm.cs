@@ -42,12 +42,12 @@ namespace WhatCausedThis
 
         private readonly Regex reSemiGlobalsSuffix = new Regex("(_?[Gg]lobals?)$");
 
-        private String errorMsg = "";
+        private string errorMsg = "";
 
         private TypeGroupID secGroupID;
-        private String secGroupName;
+        private string secGroupName;
         private TypeInstanceID secBhavID;
-        private String secBhavName;
+        private string secBhavName;
         private int secNode;
 
         private Updater MyUpdater;
@@ -71,12 +71,12 @@ namespace WhatCausedThis
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            String modsFolder = textModsPath.Text;
-            List<String> modsFiles = new List<String>();
+            string modsFolder = textModsPath.Text;
+            List<string> modsFiles = new List<string>();
 
             if (modsFolder.Length > 0 && (new DirectoryInfo(modsFolder)).Exists)
             {
-                modsFiles = new List<String>(Directory.GetFiles(modsFolder, "*.package", SearchOption.AllDirectories));
+                modsFiles = new List<string>(Directory.GetFiles(modsFolder, "*.package", SearchOption.AllDirectories));
             }
 
             float total = modsFiles.Count;
@@ -85,7 +85,7 @@ namespace WhatCausedThis
             if (modsFiles.Count > 0)
             {
                 TypeGroupID groupID;
-                String groupName;
+                string groupName;
 
                 if (textBhavGroup.Tag != null)
                 {
@@ -99,9 +99,9 @@ namespace WhatCausedThis
                 }
 
                 TypeInstanceID bhavID = (TypeInstanceID)textBhavInstance.Tag;
-                String bhavName = textBhavName.Text;
+                string bhavName = textBhavName.Text;
 
-                int node = (Int16)textBhavNode.Tag;
+                int node = (short)textBhavNode.Tag;
 
                 found = ProcessMods(worker, e, modsFolder, modsFiles, total, groupID, groupName, bhavID, bhavName, node);
             }
@@ -110,15 +110,15 @@ namespace WhatCausedThis
         }
 
         private int ProcessMods(BackgroundWorker worker, System.ComponentModel.DoWorkEventArgs args,
-            String folder, List<String> files, float total,
-            TypeGroupID groupID, String groupName, TypeInstanceID bhavID, String bhavName, int node)
+            string folder, List<string> files, float total,
+            TypeGroupID groupID, string groupName, TypeInstanceID bhavID, string bhavName, int node)
         {
             int done = 0;
             int found = 0;
 
-            HashSet<String> secPackages = new HashSet<String>();
+            HashSet<string> secPackages = new HashSet<string>();
 
-            foreach (String file in files)
+            foreach (string file in files)
             {
                 if (worker.CancellationPending == true)
                 {
@@ -166,10 +166,10 @@ namespace WhatCausedThis
                         logger.Error(ex.Message);
                         logger.Info(ex.StackTrace);
 
-                        String partialPath = file.Substring(folder.Length + 1);
+                        string partialPath = file.Substring(folder.Length + 1);
                         int pos = partialPath.LastIndexOf(@"\");
 
-                        String fileDetails;
+                        string fileDetails;
 
                         if (pos == -1)
                         {
@@ -194,7 +194,7 @@ namespace WhatCausedThis
             {
                 if (secPackages.Count > 0)
                 {
-                    foreach (String file in secPackages)
+                    foreach (string file in secPackages)
                     {
                         worker.ReportProgress(0, file);
                         ++found;
@@ -205,7 +205,7 @@ namespace WhatCausedThis
             return found;
         }
 
-        private int ProcessPackage(String file, DBPFFile package, DBPFEntry bhavEntry, TypeGroupID groupID, String groupName, TypeInstanceID bhavID, String bhavName, int node)
+        private int ProcessPackage(string file, DBPFFile package, DBPFEntry bhavEntry, TypeGroupID groupID, string groupName, TypeInstanceID bhavID, string bhavName, int node)
         {
             int possible = 0;
 
@@ -232,7 +232,7 @@ namespace WhatCausedThis
                     // Does the package name match?
                     if (possible < 2 && groupName != null)
                     {
-                        String fname = new FileInfo(file).Name;
+                        string fname = new FileInfo(file).Name;
 
                         if (groupName.Equals(fname.Substring(0, fname.Length - ".package".Length)))
                         {
@@ -261,7 +261,7 @@ namespace WhatCausedThis
 
             if (e.UserState != null)
             {
-                dataByPackage.Add(e.UserState as String);
+                dataByPackage.Add(e.UserState as string);
             }
         }
 
@@ -324,7 +324,7 @@ namespace WhatCausedThis
         {
             RegistryTools.LoadAppSettings(WhatCausedThisApp.RegistryKey, WhatCausedThisApp.AppVersionMajor, WhatCausedThisApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(WhatCausedThisApp.RegistryKey, this);
-            textModsPath.Text = RegistryTools.GetSetting(WhatCausedThisApp.RegistryKey, textModsPath.Name, "") as String;
+            textModsPath.Text = RegistryTools.GetSetting(WhatCausedThisApp.RegistryKey, textModsPath.Name, "") as string;
             menuItemSecondaryErrors.Checked = ((int)RegistryTools.GetSetting(WhatCausedThisApp.RegistryKey + @"\Options", menuItemSecondaryErrors.Name, 1) != 0);
 
             MyUpdater = new Updater(WhatCausedThisApp.RegistryKey, menuHelp);
@@ -445,7 +445,7 @@ namespace WhatCausedThis
             }
         }
 
-        private void LoadErrorLog(String logPath)
+        private void LoadErrorLog(string logPath)
         {
             if (!Path.GetFileName(logPath).StartsWith("ObjectError_")) return;
 
@@ -453,7 +453,7 @@ namespace WhatCausedThis
 
             bool primary = true;
 
-            foreach (String line in textErrorText.Lines)
+            foreach (string line in textErrorText.Lines)
             {
                 Match m = reError.Match(line);
                 if (m.Success)
@@ -467,7 +467,7 @@ namespace WhatCausedThis
                     if (primary)
                     {
                         textBhavNode.Tag = Convert.ToInt16(m.Groups[1].Value);
-                        textBhavNode.Text = Helper.Hex2PrefixString((byte)((Int16)textBhavNode.Tag));
+                        textBhavNode.Text = Helper.Hex2PrefixString((byte)((short)textBhavNode.Tag));
                     }
                     else
                     {
@@ -497,7 +497,7 @@ namespace WhatCausedThis
                 {
                     if (primary)
                     {
-                        String s = m.Groups[1].Value;
+                        string s = m.Groups[1].Value;
                         textBhavGroup.Tag = null;
                         textBhavGroup.Text = s;
 
@@ -509,10 +509,10 @@ namespace WhatCausedThis
                         else if (reSemiGlobalsSuffix.IsMatch(s))
                         {
                             Match reSemi = reSemiGlobalsSuffix.Match(s);
-                            String semiSuffix = reSemi.Groups[1].Value;
-                            String semiName = s.Substring(0, s.Length - semiSuffix.Length);
+                            string semiSuffix = reSemi.Groups[1].Value;
+                            string semiName = s.Substring(0, s.Length - semiSuffix.Length);
 
-                            foreach (KeyValuePair<String, String> kvPair in GameData.semiGlobalsByName)
+                            foreach (KeyValuePair<string, string> kvPair in GameData.semiGlobalsByName)
                             {
                                 if (kvPair.Key.Replace(" ", "").Equals(semiName, StringComparison.OrdinalIgnoreCase))
                                 {
@@ -525,9 +525,9 @@ namespace WhatCausedThis
                     }
                     else
                     {
-                        String s = m.Groups[1].Value;
-                        String groupText = s;
-                        Object groupTag = null;
+                        string s = m.Groups[1].Value;
+                        string groupText = s;
+                        object groupTag = null;
 
                         if (s.Equals("global"))
                         {
@@ -537,10 +537,10 @@ namespace WhatCausedThis
                         else if (reSemiGlobalsSuffix.IsMatch(s))
                         {
                             Match reSemi = reSemiGlobalsSuffix.Match(s);
-                            String semiSuffix = reSemi.Groups[1].Value;
-                            String semiName = s.Substring(0, s.Length - semiSuffix.Length);
+                            string semiSuffix = reSemi.Groups[1].Value;
+                            string semiName = s.Substring(0, s.Length - semiSuffix.Length);
 
-                            foreach (KeyValuePair<String, String> kvPair in GameData.semiGlobalsByName)
+                            foreach (KeyValuePair<string, string> kvPair in GameData.semiGlobalsByName)
                             {
                                 if (kvPair.Key.Replace(" ", "").Equals(semiName, StringComparison.OrdinalIgnoreCase))
                                 {
@@ -572,7 +572,7 @@ namespace WhatCausedThis
             {
                 errorMsg = "";
 
-                String msg = "This error is usually caused by a missing global support file.\n\nTypically one of\n" +
+                string msg = "This error is usually caused by a missing global support file.\n\nTypically one of\n" +
                              "  *Smarter EP Check (http://cyjon.net/node/323)\n" +
                              "  *InTeen Check (https://www.picknmixmods.com/Sims2/Downloads/InTeenCheck/InTeenCheck.html)\n" +
                              "  *Money Globals (https://www.picknmixmods.com/Sims2/Downloads/MoneyGlobals/MoneyGlobals.html)\n" +

@@ -104,8 +104,8 @@ namespace HcduPlus
                 scanDataStore = new MemoryDataStore();
             }
 
-            String modsFolder = textModsPath.Text;
-            String scanFolder = textScanPath.Text;
+            string modsFolder = textModsPath.Text;
+            string scanFolder = textScanPath.Text;
 
             bool modsSavedSims = checkModsSavedSims.Checked;
             bool scanSavedSims = checkScanSavedSims.Checked;
@@ -235,7 +235,7 @@ namespace HcduPlus
             logger.Debug($"Finished Scan Folder .package search - found {scanFiles.Count}");
 #endif
 
-            foreach (String scanFile in scanFiles)
+            foreach (string scanFile in scanFiles)
             {
                 if (modsFiles.Contains(scanFile)) modsFiles.Remove(scanFile);
             }
@@ -261,10 +261,10 @@ namespace HcduPlus
                         {
                             foreach (TypeInstanceID instanceId in scanDataStore.SeenResourcesGetInstancesForTypeAndGroup(typeId, groupId))
                             {
-                                List<String> scanPackages = scanDataStore.SeenResourcesGetPackages(typeId, groupId, instanceId);
+                                List<string> scanPackages = scanDataStore.SeenResourcesGetPackages(typeId, groupId, instanceId);
                                 if (scanPackages != null)
                                 {
-                                    List<String> modsPackages = modsDataStore.SeenResourcesGetPackages(typeId, groupId, instanceId);
+                                    List<string> modsPackages = modsDataStore.SeenResourcesGetPackages(typeId, groupId, instanceId);
                                     if (modsPackages != null)
                                     {
                                         scanPackages.Insert(0, modsPackages[modsPackages.Count - 1]);
@@ -317,10 +317,10 @@ namespace HcduPlus
             {
                 foreach (TypeGUID guid in scanDataStore.SeenGuidsGetGuids())
                 {
-                    List<String> scanPackages = scanDataStore.SeenGuidsGetPackages(guid);
+                    List<string> scanPackages = scanDataStore.SeenGuidsGetPackages(guid);
                     if (scanPackages != null)
                     {
-                        List<String> modsPackages = modsDataStore.SeenGuidsGetPackages(guid);
+                        List<string> modsPackages = modsDataStore.SeenGuidsGetPackages(guid);
                         if (modsPackages != null)
                         {
                             scanPackages.Insert(0, modsPackages[modsPackages.Count - 1]);
@@ -331,8 +331,8 @@ namespace HcduPlus
                             for (int i = 0; i < scanPackages.Count - 1; ++i)
                             {
                                 // These have a prefix of "##0xGGGGGGGG-0xIIIIIIII!"
-                                String thisScanPackage = scanPackages[i].Substring(24);
-                                String nextScanPackage = scanPackages[i + 1].Substring(24);
+                                string thisScanPackage = scanPackages[i].Substring(24);
+                                string nextScanPackage = scanPackages[i + 1].Substring(24);
 
                                 // Ignore internal conflicts?
                                 if (!(thisScanPackage.Equals(nextScanPackage) && menuItemInternalConflicts.Checked))
@@ -386,7 +386,7 @@ namespace HcduPlus
         }
 
         private int ProcessFolder(BackgroundWorker worker, System.ComponentModel.DoWorkEventArgs args,
-            String folder, List<String> files, String prefix, float total, int done, IDataStore dataStore)
+            string folder, List<string> files, string prefix, float total, int done, IDataStore dataStore)
         {
             dataStore.SetFiles(folder, files);
             dataStore.SetPrefix(prefix);
@@ -437,10 +437,10 @@ namespace HcduPlus
                         logger.Error(ex.Message);
                         logger.Info(ex.StackTrace);
 
-                        String partialPath = files[fileIndex].Substring(folder.Length + 1);
+                        string partialPath = files[fileIndex].Substring(folder.Length + 1);
                         int pos = partialPath.LastIndexOf(@"\");
 
-                        String fileDetails;
+                        string fileDetails;
 
                         if (pos == -1)
                         {
@@ -562,7 +562,7 @@ namespace HcduPlus
             }
         }
 
-        private void MyMruList_FileSelected(String folder)
+        private void MyMruList_FileSelected(string folder)
         {
             textScanPath.Text = folder;
         }
@@ -575,8 +575,8 @@ namespace HcduPlus
 
                 RegistryTools.LoadAppSettings(HcduPlusApp.RegistryKey, HcduPlusApp.AppVersionMajor, HcduPlusApp.AppVersionMinor);
                 RegistryTools.LoadFormSettings(HcduPlusApp.RegistryKey, this);
-                textModsPath.Text = RegistryTools.GetSetting(HcduPlusApp.RegistryKey, textModsPath.Name, "") as String;
-                textScanPath.Text = RegistryTools.GetSetting(HcduPlusApp.RegistryKey, textScanPath.Name, "") as String;
+                textModsPath.Text = RegistryTools.GetSetting(HcduPlusApp.RegistryKey, textModsPath.Name, "") as string;
+                textScanPath.Text = RegistryTools.GetSetting(HcduPlusApp.RegistryKey, textScanPath.Name, "") as string;
 
                 menuItemIncludeKnownConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemIncludeKnownConflicts.Name, 0) != 0); OnIncludeKnownConflictsClicked(menuItemIncludeKnownConflicts, null);
                 knownConflicts.LoadRegexs();
@@ -795,7 +795,7 @@ namespace HcduPlus
                     }
 
 
-                    e.ToolTipText = row.Tag as String;
+                    e.ToolTipText = row.Tag as string;
                 }
             }
 
@@ -808,10 +808,10 @@ namespace HcduPlus
 
         private void OnSaveToClipboardClicked(object sender, EventArgs e)
         {
-            String text = "";
+            string text = "";
 
-            String scanPath = textScanPath.Text;
-            if (String.IsNullOrWhiteSpace(scanPath)) scanPath = textModsPath.Text;
+            string scanPath = textScanPath.Text;
+            if (string.IsNullOrWhiteSpace(scanPath)) scanPath = textModsPath.Text;
             text += $"Mods conflict report for '{scanPath}'";
 
             DateTime now = DateTime.Now;
@@ -833,8 +833,8 @@ namespace HcduPlus
             {
                 StreamWriter writer = new StreamWriter(saveFileDialog.OpenFile());
 
-                String scanPath = textScanPath.Text;
-                if (String.IsNullOrWhiteSpace(scanPath)) scanPath = textModsPath.Text;
+                string scanPath = textScanPath.Text;
+                if (string.IsNullOrWhiteSpace(scanPath)) scanPath = textModsPath.Text;
                 writer.Write($"Mods conflict report for '{scanPath}'");
 
                 DateTime now = DateTime.Now;

@@ -25,6 +25,11 @@ namespace Sims2Tools.DBPF.Package
 
         public bool IsDirty => (resourceByKey.Count > 0);
 
+        public void SetClean()
+        {
+            resourceByKey.Clear();
+        }
+
         internal bool IsCached(DBPFKey key) => resourceByKey.ContainsKey(key) || itemByKey.ContainsKey(key);
 
         internal bool IsResource(DBPFKey key) => resourceByKey.ContainsKey(key);

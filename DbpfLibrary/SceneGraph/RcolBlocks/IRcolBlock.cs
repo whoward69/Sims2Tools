@@ -35,6 +35,13 @@ namespace Sims2Tools.DBPF.SceneGraph
             get;
         }
 
+        bool IsDirty
+        {
+            get;
+        }
+
+        void SetClean();
+
         void Unserialize(DbpfReader reader);
 
         uint FileSize { get; }

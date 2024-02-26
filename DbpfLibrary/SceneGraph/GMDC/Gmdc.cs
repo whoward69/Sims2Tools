@@ -25,7 +25,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xAC4F8687;
-        public const String NAME = "GMDC";
+        public const string NAME = "GMDC";
 
 #if !DEBUG
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -36,6 +36,12 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
 
         public override bool IsDirty => base.IsDirty || (cGeometryDataContainer != null && cGeometryDataContainer.IsDirty);
 
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            cGeometryDataContainer?.SetClean();
+        }
 
         public Gmdc(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

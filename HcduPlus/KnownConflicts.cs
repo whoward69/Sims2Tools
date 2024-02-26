@@ -27,9 +27,9 @@ namespace HcduPlus.Conflict
 
         public bool IsValid { get; }
 
-        public ConflictRegexPair(String regexA, String regexB)
+        public ConflictRegexPair(string regexA, string regexB)
         {
-            this.IsValid = !(String.IsNullOrWhiteSpace(regexA) || String.IsNullOrWhiteSpace(regexB));
+            this.IsValid = !(string.IsNullOrWhiteSpace(regexA) || string.IsNullOrWhiteSpace(regexB));
 
             if (IsValid)
             {
@@ -44,7 +44,7 @@ namespace HcduPlus.Conflict
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly String KnownRegistryKey = HcduPlusApp.RegistryKey + @"\KnownConflicts";
+        private readonly string KnownRegistryKey = HcduPlusApp.RegistryKey + @"\KnownConflicts";
 
         private readonly DataColumn colRegexEarlier = new DataColumn("Loads Earlier", typeof(string));
         private readonly DataColumn colRegexLater = new DataColumn("Loads Later", typeof(string));
@@ -57,16 +57,16 @@ namespace HcduPlus.Conflict
             this.Columns.Add(colRegexLater);
         }
 
-        public void Add(String reA, String reB)
+        public void Add(string reA, string reB)
         {
             this.Rows.Add(reA, reB);
             reKnownConflicts.Add(new ConflictRegexPair(reA, reB));
         }
 
-        public void AddFromGrid(String packageA, String packageB)
+        public void AddFromGrid(string packageA, string packageB)
         {
-            String reA = packageA;
-            String reB = packageB;
+            string reA = packageA;
+            string reB = packageB;
 
             int pos = packageA.LastIndexOf('\\');
             if (pos >= 0)
@@ -156,8 +156,8 @@ namespace HcduPlus.Conflict
             {
                 for (int i = 0; i < count; i++)
                 {
-                    if (RegistryTools.GetSetting(KnownRegistryKey, $"Earlier{i}", null) is String reA &&
-                        RegistryTools.GetSetting(KnownRegistryKey, $"Later{i}", null) is String reB)
+                    if (RegistryTools.GetSetting(KnownRegistryKey, $"Earlier{i}", null) is string reA &&
+                        RegistryTools.GetSetting(KnownRegistryKey, $"Later{i}", null) is string reB)
                     {
                         Add(reA, reB);
                     }
@@ -192,14 +192,14 @@ namespace HcduPlus.Conflict
             }
         }
 
-        private void ParseXml(String xml)
+        private void ParseXml(string xml)
         {
             try
             {
                 XmlReader reader = XmlReader.Create(xml);
 
-                String earlier = null;
-                String later = null;
+                string earlier = null;
+                string later = null;
 
                 reader.MoveToContent();
                 while (reader.Read())

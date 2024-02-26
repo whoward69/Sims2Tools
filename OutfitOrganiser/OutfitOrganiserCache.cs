@@ -652,6 +652,8 @@ namespace OutfitOrganiser
 
         public bool IsDirty => package.IsDirty;
 
+        public void SetClean() => package.SetClean();
+
         public OrganiserDbpfFile(string packagePath, bool isCached)
         {
             this.package = new DBPFFile(packagePath);
@@ -688,12 +690,12 @@ namespace OutfitOrganiser
     {
         private readonly Dictionary<string, OrganiserDbpfFile> cache = new Dictionary<string, OrganiserDbpfFile>();
 
-        public bool IsDirty() => (cache.Count > 0);
-
         public bool Contains(string packagePath)
         {
             return cache.ContainsKey(packagePath);
         }
+
+        public bool IsDirty => (cache.Count > 0);
 
         public bool SetClean(OrganiserDbpfFile package)
         {

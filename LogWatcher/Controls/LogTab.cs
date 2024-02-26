@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace LogWatcher.Controls
 {
@@ -22,7 +21,7 @@ namespace LogWatcher.Controls
             set => logViewer.IncPropIndex = value;
         }
 
-        public LogTab(ISearcher searcher, String logFilePath, bool incPropIndex)
+        public LogTab(ISearcher searcher, string logFilePath, bool incPropIndex)
         {
             this.searcher = searcher;
 
@@ -54,12 +53,12 @@ namespace LogWatcher.Controls
             logViewer.Reload();
         }
 
-        public void FindFirst(String text)
+        public void FindFirst(string text)
         {
             logViewer.FindFirst(text);
         }
 
-        public void FindNext(String text)
+        public void FindNext(string text)
         {
             logViewer.FindNext(text);
         }

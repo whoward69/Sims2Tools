@@ -116,7 +116,7 @@ namespace Sims2Tools.DBPF.STR
         private bool _dirty = false;
 
         public bool IsDirty => _dirty;
-        public void SetClean() { _dirty = false; }
+        public void SetClean() => _dirty = false;
 
         public StrItem(int index, byte lid, string title, string desc, bool dirty = false)
         {

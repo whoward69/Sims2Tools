@@ -24,7 +24,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly static Dictionary<String, Type> BlockClasses = new Dictionary<String, Type>();
+        private readonly static Dictionary<string, Type> BlockClasses = new Dictionary<string, Type>();
 
         static Rcol()
         {
@@ -54,6 +54,21 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
         private byte[] oversize;
 
         private bool duff = false;
+
+        public override bool IsDirty
+        {
+            get
+            {
+                if (base.IsDirty) return true;
+
+                foreach (IRcolBlock blk in blocks)
+                {
+                    if (blk.IsDirty) return true;
+                }
+
+                return false;
+            }
+        }
 
         protected IPackedFileDescriptor[] ReferencedFiles
         {

@@ -14,7 +14,7 @@ namespace BsokEditor
 {
     static class BsokEditorApp
     {
-        public static String AppName = "Bsok Editor";
+        public static string AppName = "Bsok Editor";
 
         public static int AppVersionMajor = 1;
         public static int AppVersionMinor = 11;
@@ -37,7 +37,7 @@ namespace BsokEditor
         public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static String RegistryKey = Sims2ToolsLib.RegistryKey + @"\BsokEditor";
+        public static string RegistryKey = Sims2ToolsLib.RegistryKey + @"\BsokEditor";
 
         [STAThread]
         static void Main()

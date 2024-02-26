@@ -13,7 +13,7 @@ namespace Sims2Tools.DBPF.Utils
 {
     public class XmlHelper
     {
-        public static XmlElement CreateResElement(XmlElement parent, String name, DBPFNamedKey key)
+        public static XmlElement CreateResElement(XmlElement parent, string name, DBPFNamedKey key)
         {
             XmlElement element = parent.OwnerDocument.CreateElement(name.ToLower());
             parent.AppendChild(element);
@@ -23,12 +23,12 @@ namespace Sims2Tools.DBPF.Utils
             return element;
         }
 
-        public static XmlElement CreateInstElement(XmlElement parent, String name, TypeInstanceID instanceID)
+        public static XmlElement CreateInstElement(XmlElement parent, string name, TypeInstanceID instanceID)
         {
             return CreateInstElement(parent, name, "instanceId", instanceID);
         }
 
-        public static XmlElement CreateInstElement(XmlElement parent, String name, String attrName, TypeInstanceID instanceID)
+        public static XmlElement CreateInstElement(XmlElement parent, string name, string attrName, TypeInstanceID instanceID)
         {
             XmlElement element = parent.OwnerDocument.CreateElement(name.ToLower());
             parent.AppendChild(element);
@@ -38,7 +38,7 @@ namespace Sims2Tools.DBPF.Utils
             return element;
         }
 
-        public static XmlElement CreateElement(XmlElement parent, String name)
+        public static XmlElement CreateElement(XmlElement parent, string name)
         {
             XmlElement element = parent.OwnerDocument.CreateElement(name);
             parent.AppendChild(element);
@@ -46,7 +46,7 @@ namespace Sims2Tools.DBPF.Utils
             return element;
         }
 
-        public static XmlElement CreateTextElement(XmlElement parent, String name, String text)
+        public static XmlElement CreateTextElement(XmlElement parent, string name, string text)
         {
             XmlElement element = CreateElement(parent, name);
 
@@ -56,12 +56,12 @@ namespace Sims2Tools.DBPF.Utils
             return element;
         }
 
-        public static XmlElement CreateCDataElement(XmlElement parent, String name, Byte[] data)
+        public static XmlElement CreateCDataElement(XmlElement parent, string name, byte[] data)
         {
             return CreateCDataElement(parent, name, Convert.ToBase64String(data, Base64FormattingOptions.InsertLineBreaks));
         }
 
-        public static XmlElement CreateCDataElement(XmlElement parent, String name, String text)
+        public static XmlElement CreateCDataElement(XmlElement parent, string name, string text)
         {
             XmlElement element = CreateElement(parent, name);
 
@@ -71,7 +71,7 @@ namespace Sims2Tools.DBPF.Utils
             return element;
         }
 
-        public static void CreateComment(XmlElement parent, String msg)
+        public static void CreateComment(XmlElement parent, string msg)
         {
             parent.AppendChild(parent.OwnerDocument.CreateComment(msg));
         }

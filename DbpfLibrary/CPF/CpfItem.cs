@@ -24,16 +24,16 @@ namespace Sims2Tools.DBPF.CPF
         private MetaData.DataTypes datatype;
         private byte[] val;
 
-        private Boolean isDirty = false;
+        private bool _isDirty = false;
 
-        public bool IsDirty => isDirty;
-        internal void SetClean() => isDirty = false;
+        public bool IsDirty => _isDirty;
+        internal void SetClean() => _isDirty = false;
 
         public CpfItem()
         {
             this.name = "";
             val = new byte[0];
-            isDirty = false;
+            _isDirty = false;
         }
 
         public CpfItem(string name) : this()
@@ -62,7 +62,7 @@ namespace Sims2Tools.DBPF.CPF
             internal set { datatype = value; }
         }
 
-        internal Byte[] Value
+        internal byte[] Value
         {
             get => val;
             set { val = value; }
@@ -110,7 +110,7 @@ namespace Sims2Tools.DBPF.CPF
 
                 val = Helper.ToBytes(value, 0);
 
-                isDirty = true;
+                _isDirty = true;
             }
         }
 
@@ -168,7 +168,7 @@ namespace Sims2Tools.DBPF.CPF
 
                 val = br.ReadBytes((int)br.BaseStream.Length);
 
-                isDirty = true;
+                _isDirty = true;
             }
         }
 
@@ -226,11 +226,11 @@ namespace Sims2Tools.DBPF.CPF
 
                 val = br.ReadBytes((int)br.BaseStream.Length);
 
-                isDirty = true;
+                _isDirty = true;
             }
         }
 
-        public Single SingleValue
+        public float SingleValue
         {
             get
             {
@@ -247,10 +247,10 @@ namespace Sims2Tools.DBPF.CPF
                         }
                     case MetaData.DataTypes.dtString:
                         {
-                            Single ret = 0;
+                            float ret = 0;
                             try
                             {
-                                ret = Single.Parse(AsString());
+                                ret = float.Parse(AsString());
                             }
                             catch (Exception) { }
                             return ret;
@@ -274,7 +274,7 @@ namespace Sims2Tools.DBPF.CPF
 
                 val = br.ReadBytes((int)br.BaseStream.Length);
 
-                isDirty = true;
+                _isDirty = true;
             }
         }
 
@@ -328,7 +328,7 @@ namespace Sims2Tools.DBPF.CPF
 
                 val = br.ReadBytes((int)br.BaseStream.Length);
 
-                isDirty = true;
+                _isDirty = true;
             }
         }
 
@@ -409,7 +409,7 @@ namespace Sims2Tools.DBPF.CPF
             }
         }
 
-        protected Single AsSingle()
+        protected float AsSingle()
         {
             System.IO.BinaryReader br = new System.IO.BinaryReader(new System.IO.MemoryStream(Value));
             try

@@ -36,7 +36,7 @@ namespace Sims2Tools.DBPF
         private int tgiHash = 0;
         private int tgirHash = 0;
 
-        private String tgirString = null;
+        private string tgirString = null;
 
         public TypeTypeID TypeID => typeID;
 
@@ -68,7 +68,7 @@ namespace Sims2Tools.DBPF
             }
         }
 
-        public String TGIRString
+        public string TGIRString
         {
             get
             {
@@ -112,25 +112,25 @@ namespace Sims2Tools.DBPF
 
     public interface IDBPFNamedKey : IDBPFKey
     {
-        String KeyName { get; set; }
+        string KeyName { get; set; }
     }
 
     public abstract class DBPFNamedKey : DBPFKey, IDBPFNamedKey
     {
-        private String keyName;
+        private string keyName;
 
-        public virtual String KeyName
+        public virtual string KeyName
         {
             get => keyName;
             set => keyName = value;
         }
 
-        public DBPFNamedKey(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID, String keyName) : base(typeID, groupID, instanceID, resourceID)
+        public DBPFNamedKey(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID, string keyName) : base(typeID, groupID, instanceID, resourceID)
         {
             this.keyName = keyName;
         }
 
-        public DBPFNamedKey(IDBPFKey key, String keyName) : this(key.TypeID, key.GroupID, key.InstanceID, key.ResourceID, keyName)
+        public DBPFNamedKey(IDBPFKey key, string keyName) : this(key.TypeID, key.GroupID, key.InstanceID, key.ResourceID, keyName)
         {
         }
 

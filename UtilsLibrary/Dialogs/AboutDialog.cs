@@ -18,7 +18,7 @@ namespace Sims2Tools
             InitializeComponent();
         }
 
-        public AboutDialog(String product) : this()
+        public AboutDialog(string product) : this()
         {
             textProduct.Text = product;
 

@@ -144,17 +144,17 @@ namespace DpbfLister
                         {
                             title = str.LanguageItems(MetaData.Languages.Default)[2]?.Title;
 
-                            if (String.IsNullOrEmpty(title))
+                            if (string.IsNullOrEmpty(title))
                             {
                                 title = str.LanguageItems(MetaData.Languages.Default)[0]?.Title;
                             }
                         }
 
-                        if (String.IsNullOrEmpty(title))
+                        if (string.IsNullOrEmpty(title))
                         {
                             title = $"[{xwnt.GetItem("nodeText")?.StringValue}]";
 
-                            if (String.IsNullOrEmpty(title))
+                            if (string.IsNullOrEmpty(title))
                             {
                                 title = "[unknown}";
                             }

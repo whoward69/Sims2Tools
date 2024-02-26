@@ -11,7 +11,6 @@
  */
 
 using Sims2Tools.DBPF.IO;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -55,7 +54,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             get { return alternate; }
         }
 
-        public String Name
+        public string Name
         {
             get { return name; }
             internal set { name = value; }

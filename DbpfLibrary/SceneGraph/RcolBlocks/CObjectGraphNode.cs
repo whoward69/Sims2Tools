@@ -82,7 +82,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         {
             items.Add(new ObjectGraphNodeItem(index));
 
-            isDirty = true;
+            _isDirty = true;
         }
 
         public override void Unserialize(DbpfReader reader)

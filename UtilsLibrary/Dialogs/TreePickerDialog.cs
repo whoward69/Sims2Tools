@@ -7,7 +7,6 @@
  */
 
 using Sims2Tools.Controls;
-using System;
 using System.Windows.Forms;
 
 namespace Sims2Tools
@@ -29,7 +28,7 @@ namespace Sims2Tools
             string text = item.ToString();
 
             int index = 0;
-            while (index < text.Length && !Char.IsLetterOrDigit(text[index]))
+            while (index < text.Length && !char.IsLetterOrDigit(text[index]))
             {
                 ++index;
             }

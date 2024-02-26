@@ -22,7 +22,7 @@ namespace Sims2Tools.DBPF.SceneGraph.LIFO
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xED534136;
-        public const String NAME = "LIFO";
+        public const string NAME = "LIFO";
 
         public Lifo(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

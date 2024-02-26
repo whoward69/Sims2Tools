@@ -33,9 +33,16 @@ namespace Sims2Tools.DBPF.Package
 
         private DBPFEntry clstEntry = null;
 
-        private bool isDirty = false;
+        private bool _isDirty = false;
 
-        public bool IsDirty => (isDirty || resourceCache.IsDirty);
+        public bool IsDirty => (_isDirty || resourceCache.IsDirty);
+
+        public void SetClean()
+        {
+            _isDirty = false;
+
+            resourceCache.SetClean();
+        }
 
         private uint IndexEntrySize => (uint)(indexMinorVersion >= 2 ? 24 : 20);
 
@@ -244,7 +251,7 @@ namespace Sims2Tools.DBPF.Package
         {
             if (entryByKey.Remove(resource))
             {
-                isDirty = true;
+                _isDirty = true;
 
                 return resourceCache.Remove(resource);
             }

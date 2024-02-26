@@ -15,7 +15,7 @@ namespace Sims2Tools.Cache
 {
     public class PackageCache
     {
-        private static readonly String cacheBase = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Sims2Tools/.cache/package";
+        private static readonly string cacheBase = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Sims2Tools/.cache/package";
 
         static PackageCache()
         {

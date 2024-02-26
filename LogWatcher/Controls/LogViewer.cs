@@ -22,10 +22,10 @@ namespace LogWatcher.Controls
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static readonly Dictionary<int, String> dataGlobal = new Dictionary<int, string>();
-        private static readonly Dictionary<int, String> dataGeneral = new Dictionary<int, string>();
-        private static readonly Dictionary<int, String> dataPerson = new Dictionary<int, string>();
-        private static readonly Dictionary<int, String> dataMotive = new Dictionary<int, string>();
+        private static readonly Dictionary<int, string> dataGlobal = new Dictionary<int, string>();
+        private static readonly Dictionary<int, string> dataGeneral = new Dictionary<int, string>();
+        private static readonly Dictionary<int, string> dataPerson = new Dictionary<int, string>();
+        private static readonly Dictionary<int, string> dataMotive = new Dictionary<int, string>();
 
         private readonly Regex reProp = new Regex("Property ([0-9]+): (-?[0-9]+)");
 
@@ -37,12 +37,12 @@ namespace LogWatcher.Controls
             ParseXml("Resources/XML/motivedata.xml", "label", dataMotive);
         }
 
-        private static void ParseXml(String xml, String element, Dictionary<int, String> byValue)
+        private static void ParseXml(string xml, string element, Dictionary<int, string> byValue)
         {
             XmlReader reader = XmlReader.Create(xml);
 
             int value = -1;
-            String name = null;
+            string name = null;
 
             reader.MoveToContent();
             while (reader.Read())
@@ -52,7 +52,7 @@ namespace LogWatcher.Controls
                     if (reader.Name.Equals("value"))
                     {
                         reader.Read();
-                        value = Int32.Parse(reader.Value);
+                        value = int.Parse(reader.Value);
                     }
                     else if (reader.Name.Equals("name"))
                     {
@@ -69,8 +69,8 @@ namespace LogWatcher.Controls
 
         private ISearcher searcher;
 
-        private String logFilePath;
-        private String tabName;
+        private string logFilePath;
+        private string tabName;
 
         private LogXml logXml;
 
@@ -87,9 +87,9 @@ namespace LogWatcher.Controls
             }
         }
 
-        public String TabName => tabName;
+        public string TabName => tabName;
 
-        public String LogFilePath
+        public string LogFilePath
         {
             get => logFilePath;
             set
@@ -193,7 +193,7 @@ namespace LogWatcher.Controls
 
             if (nodeData.ChildNodes.Count > 0)
             {
-                String type = nodeData.ChildNodes[0].Name;
+                string type = nodeData.ChildNodes[0].Name;
 
                 if (type.Equals("data"))
                 {
@@ -277,7 +277,7 @@ namespace LogWatcher.Controls
                     {
                         if (addNL) textBox.AppendText(Environment.NewLine);
 
-                        String colour = child.GetAttribute("colour");
+                        string colour = child.GetAttribute("colour");
                         if (colour != null && !colour.Equals(""))
                         {
                             Color wasColour = textBox.SelectionColor;
@@ -296,7 +296,7 @@ namespace LogWatcher.Controls
                             if (child.Name.Equals("tokenProp"))
                             {
                                 Match m = reProp.Match(child.InnerText);
-                                int index = Int16.Parse(m.Groups[1].Value);
+                                int index = short.Parse(m.Groups[1].Value);
 
                                 if (incPropIndex)
                                 {
@@ -329,15 +329,15 @@ namespace LogWatcher.Controls
             }
         }
 
-        private Object GetIntAttr(XmlElement element, String attrName)
+        private object GetIntAttr(XmlElement element, string attrName)
         {
             try
             {
-                String value = element.GetAttribute(attrName);
+                string value = element.GetAttribute(attrName);
 
                 if (value.Length > 0)
                 {
-                    return Int32.Parse(value);
+                    return int.Parse(value);
                 }
             }
             catch (Exception) { }
@@ -345,15 +345,15 @@ namespace LogWatcher.Controls
             return null;
         }
 
-        private Object GetIntAttrAsHex(XmlElement element, String attrName)
+        private object GetIntAttrAsHex(XmlElement element, string attrName)
         {
             try
             {
-                String value = element.GetAttribute(attrName);
+                string value = element.GetAttribute(attrName);
 
                 if (value.Length > 0)
                 {
-                    return Helper.Hex4PrefixString(Int32.Parse(value));
+                    return Helper.Hex4PrefixString(int.Parse(value));
                 }
             }
             catch (Exception) { }
@@ -361,15 +361,15 @@ namespace LogWatcher.Controls
             return null;
         }
 
-        private Object GetNumAttr(XmlElement element, String attrName)
+        private object GetNumAttr(XmlElement element, string attrName)
         {
             try
             {
-                String value = element.GetAttribute(attrName);
+                string value = element.GetAttribute(attrName);
 
                 if (value.Length > 0)
                 {
-                    return Double.Parse(value);
+                    return double.Parse(value);
                 }
             }
             catch (Exception) { }
@@ -379,13 +379,13 @@ namespace LogWatcher.Controls
 
         private int lastSearchPos;
 
-        public void FindFirst(String text)
+        public void FindFirst(string text)
         {
             textBox.HideSelection = false;
             lastSearchPos = textBox.Find(text);
         }
 
-        public void FindNext(String text)
+        public void FindNext(string text)
         {
             lastSearchPos = textBox.Find(text, lastSearchPos + 1, RichTextBoxFinds.None);
         }
@@ -407,7 +407,7 @@ namespace LogWatcher.Controls
                     string s = textBox.Text.Substring(prevSpacePos, nextSpacePos - prevSpacePos + 1);
                     s = s.Replace("\n", "");
 
-                    if (Int16.TryParse(s, out short i))
+                    if (short.TryParse(s, out short i))
                     {
                         string tt = Helper.Hex4PrefixString(i);
 

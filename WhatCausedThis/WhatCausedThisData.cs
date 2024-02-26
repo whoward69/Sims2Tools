@@ -29,8 +29,8 @@ namespace WhatCausedThis
         public void Add(string package)
         {
             int score = Convert.ToInt32(package.Substring(0, 1));
-            String name = package.Substring(1);
-            String suffix = score == 1 ? "secondary possible" : score == 2 ? "secondary likely" : score == 3 ? "possible" : "likely";
+            string name = package.Substring(1);
+            string suffix = score == 1 ? "secondary possible" : score == 2 ? "secondary likely" : score == 3 ? "possible" : "likely";
 
             this.Rows.Add($"{name} ({suffix})", score);
         }

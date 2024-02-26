@@ -14,7 +14,7 @@ namespace DbpfViewer
 {
     static class DbpfViewerApp
     {
-        public static String AppName = "DBPF Viewer";
+        public static string AppName = "DBPF Viewer";
 
         public static int AppVersionMajor = 1;
         public static int AppVersionMinor = 2;
@@ -37,7 +37,7 @@ namespace DbpfViewer
         public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static String RegistryKey = Sims2ToolsLib.RegistryKey + @"\DbpfViewer";
+        public static string RegistryKey = Sims2ToolsLib.RegistryKey + @"\DbpfViewer";
 
         [STAThread]
         static void Main()

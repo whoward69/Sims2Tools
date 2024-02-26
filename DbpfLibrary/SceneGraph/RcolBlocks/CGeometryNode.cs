@@ -12,14 +12,13 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
-using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CGeometryNode : AbstractRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x7BA3838C;
-        public static String NAME = "cGeometryNode";
+        public static string NAME = "cGeometryNode";
 
         private readonly CObjectGraphNode ogn;
         private IRcolBlock[] data;

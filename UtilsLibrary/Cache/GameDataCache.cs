@@ -16,7 +16,7 @@ namespace Sims2Tools.Cache
 {
     public class GameDataCache
     {
-        private static readonly String cacheBase = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Sims2Tools/.cache";
+        private static readonly string cacheBase = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Sims2Tools/.cache";
 
         static GameDataCache()
         {
@@ -35,7 +35,7 @@ namespace Sims2Tools.Cache
             }
         }
 
-        public static void Validate(String fileName)
+        public static void Validate(string fileName)
         {
             if (!(File.Exists(fileName) && File.GetLastWriteTime(fileName) < Directory.GetLastWriteTime(cacheBase)))
             {
@@ -43,7 +43,7 @@ namespace Sims2Tools.Cache
             }
         }
 
-        public static bool Serialize(SortedDictionary<String, String> data, String cacheName)
+        public static bool Serialize(SortedDictionary<string, string> data, string cacheName)
         {
             try
             {
@@ -66,13 +66,13 @@ namespace Sims2Tools.Cache
             }
         }
 
-        public static bool Deserialize(out SortedDictionary<String, String> data, String cacheName)
+        public static bool Deserialize(out SortedDictionary<string, string> data, string cacheName)
         {
             try
             {
                 using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Open))
                 {
-                    data = (SortedDictionary<String, String>)new BinaryFormatter().Deserialize(fs);
+                    data = (SortedDictionary<string, string>)new BinaryFormatter().Deserialize(fs);
                 }
 
                 return true;
@@ -85,12 +85,12 @@ namespace Sims2Tools.Cache
                 }
                 catch (Exception) { }
 
-                data = new SortedDictionary<String, String>();
+                data = new SortedDictionary<string, string>();
                 return false;
             }
         }
 
-        public static bool Serialize(SortedDictionary<TypeGroupID, TypeGroupID> data, String cacheName)
+        public static bool Serialize(SortedDictionary<TypeGroupID, TypeGroupID> data, string cacheName)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace Sims2Tools.Cache
             }
         }
 
-        public static bool Deserialize(out SortedDictionary<TypeGroupID, TypeGroupID> data, String cacheName)
+        public static bool Deserialize(out SortedDictionary<TypeGroupID, TypeGroupID> data, string cacheName)
         {
             try
             {
@@ -137,7 +137,7 @@ namespace Sims2Tools.Cache
             }
         }
 
-        public static bool Serialize(Dictionary<TypeGUID, String> data, String cacheName)
+        public static bool Serialize(Dictionary<TypeGUID, string> data, string cacheName)
         {
             try
             {
@@ -160,13 +160,13 @@ namespace Sims2Tools.Cache
             }
         }
 
-        public static bool Deserialize(out Dictionary<TypeGUID, String> data, String cacheName)
+        public static bool Deserialize(out Dictionary<TypeGUID, string> data, string cacheName)
         {
             try
             {
                 using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Open))
                 {
-                    data = (Dictionary<TypeGUID, String>)new BinaryFormatter().Deserialize(fs);
+                    data = (Dictionary<TypeGUID, string>)new BinaryFormatter().Deserialize(fs);
                 }
 
                 return true;
@@ -179,12 +179,12 @@ namespace Sims2Tools.Cache
                 }
                 catch (Exception) { }
 
-                data = new Dictionary<TypeGUID, String>();
+                data = new Dictionary<TypeGUID, string>();
                 return false;
             }
         }
 
-        public static bool Serialize(Dictionary<TypeGUID, int> data, String cacheName)
+        public static bool Serialize(Dictionary<TypeGUID, int> data, string cacheName)
         {
             try
             {
@@ -207,7 +207,7 @@ namespace Sims2Tools.Cache
             }
         }
 
-        public static bool Deserialize(out Dictionary<TypeGUID, int> data, String cacheName)
+        public static bool Deserialize(out Dictionary<TypeGUID, int> data, string cacheName)
         {
             try
             {

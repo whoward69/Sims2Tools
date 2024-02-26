@@ -24,24 +24,24 @@ namespace Sims2Tools
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        static public String objectsSubPath = @"\TSData\Res\Objects\objects.package";
-        static public String wantsSubDir = @"\TSData\Res\Wants";
+        static public string objectsSubPath = @"\TSData\Res\Objects\objects.package";
+        static public string wantsSubDir = @"\TSData\Res\Wants";
 
-        static private readonly String base3dPath = @"\TSData\Res\Sims3D";
-        static private readonly String ep3dPath = @"\TSData\Res\3D";
-        static private readonly String sp3dPath = @"\TSData\Res\3D";
+        static private readonly string base3dPath = @"\TSData\Res\Sims3D";
+        static private readonly string ep3dPath = @"\TSData\Res\3D";
+        static private readonly string sp3dPath = @"\TSData\Res\3D";
 
-        static public SortedDictionary<String, String> languagesByCode;
+        static public SortedDictionary<string, string> languagesByCode;
 
-        static public SortedDictionary<String, String> primitivesByOpCode;
+        static public SortedDictionary<string, string> primitivesByOpCode;
 
-        static public SortedDictionary<String, String> textlistsByInstance;
+        static public SortedDictionary<string, string> textlistsByInstance;
 
-        static public SortedDictionary<String, String> semiGlobalsByName;
-        static public SortedDictionary<String, String> semiGlobalsByGroup;
+        static public SortedDictionary<string, string> semiGlobalsByName;
+        static public SortedDictionary<string, string> semiGlobalsByGroup;
 
-        static public SortedDictionary<String, String> globalObjectsByGroupID;
-        static public Dictionary<TypeGUID, String> globalObjectsByGUID;
+        static public SortedDictionary<string, string> globalObjectsByGroupID;
+        static public Dictionary<TypeGUID, string> globalObjectsByGUID;
         static public Dictionary<TypeGUID, int> globalObjectsTgirHashByGUID;
         static public SortedDictionary<TypeGroupID, TypeGroupID> semiglobalsByGroupID;
 
@@ -129,13 +129,13 @@ namespace Sims2Tools
 
             {
                 // Base game folder
-                String baseFolder = SimpeData.PathSetting("Sims2Path");
+                string baseFolder = SimpeData.PathSetting("Sims2Path");
                 gameFolders.Add($"{baseFolder}{GameData.base3dPath}");
 
                 // Expansion Pack (EP) folders
                 for (int i = 1; i <= 9; i++)
                 {
-                    String epPath = SimpeData.PathSetting($"Sims2EP{i}Path");
+                    string epPath = SimpeData.PathSetting($"Sims2EP{i}Path");
                     gameFolders.Add($"{epPath}{GameData.ep3dPath}");
                 }
 
@@ -143,10 +143,10 @@ namespace Sims2Tools
                 // Note: SimPe ignores Sims2SP4Path, places SP4 in Sims2SP5Path, places SP5 in Sims2SP6Path and uses Sims2SCPath for SP6 ... go figure!
                 for (int i = 1; i <= 8; i++)
                 {
-                    String spPath = SimpeData.PathSetting($"Sims2SP{i}Path");
+                    string spPath = SimpeData.PathSetting($"Sims2SP{i}Path");
                     gameFolders.Add($"{spPath}{GameData.sp3dPath}");
                 }
-                String scPath = SimpeData.PathSetting($"Sims2SCPath");
+                string scPath = SimpeData.PathSetting($"Sims2SCPath");
                 gameFolders.Add($"{scPath}{GameData.sp3dPath}");
             }
 
@@ -154,10 +154,10 @@ namespace Sims2Tools
             logger.Info($"Loaded GameData in {stopwatch.ElapsedMilliseconds}ms");
         }
 
-        static public String GroupName(TypeGroupID group, SortedDictionary<String, String> localObjectsByGroupID = null)
+        static public string GroupName(TypeGroupID group, SortedDictionary<string, string> localObjectsByGroupID = null)
         {
-            String groupId = group.Hex8String();
-            String groupName;
+            string groupId = group.Hex8String();
+            string groupName;
 
             if (group == DBPFData.GROUP_GLOBALS)
             {
@@ -193,7 +193,7 @@ namespace Sims2Tools
 
         static public void UpdateGlobalObjects()
         {
-            String sims2Path = Sims2ToolsLib.Sims2Path;
+            string sims2Path = Sims2ToolsLib.Sims2Path;
 
             if (sims2Path.Length > 0)
             {
@@ -258,7 +258,7 @@ namespace Sims2Tools
             }
         }
 
-        static public void BuildObjectsTable(DBPFFile package, SortedDictionary<String, String> objectsByGroupID, Dictionary<TypeGUID, String> objectsByGUID, Dictionary<TypeGUID, int> objectsTgirHashByGUID = null)
+        static public void BuildObjectsTable(DBPFFile package, SortedDictionary<string, string> objectsByGroupID, Dictionary<TypeGUID, string> objectsByGUID, Dictionary<TypeGUID, int> objectsTgirHashByGUID = null)
         {
             objectsByGroupID.Clear();
 
@@ -266,8 +266,8 @@ namespace Sims2Tools
             {
                 // if (entry.GroupID != DBPFData.GROUP_LOCAL)
                 {
-                    String group = entry.GroupID.Hex8String();
-                    String filename = package.GetFilenameByEntry(entry);
+                    string group = entry.GroupID.Hex8String();
+                    string filename = package.GetFilenameByEntry(entry);
 
                     if (objectsByGroupID.ContainsKey(group))
                     {
@@ -296,17 +296,17 @@ namespace Sims2Tools
             }
         }
 
-        private static void ParseXml(String xml, String element, SortedDictionary<String, String> byValue)
+        private static void ParseXml(string xml, string element, SortedDictionary<string, string> byValue)
         {
             ParseXml(xml, element, null, byValue);
         }
 
-        private static void ParseXml(String xml, String element, SortedDictionary<String, String> byName, SortedDictionary<String, String> byValue)
+        private static void ParseXml(string xml, string element, SortedDictionary<string, string> byName, SortedDictionary<string, string> byValue)
         {
             XmlReader reader = XmlReader.Create(xml);
 
-            String value = null;
-            String name = null;
+            string value = null;
+            string name = null;
 
             reader.MoveToContent();
             while (reader.Read())

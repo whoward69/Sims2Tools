@@ -13,7 +13,6 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LGHT;
-using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.LSPT
@@ -22,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.LSPT
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xC9C81BAD;
-        public const String NAME = "LSPT";
+        public const string NAME = "LSPT";
 
         public Lspt(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

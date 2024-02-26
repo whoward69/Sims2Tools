@@ -27,7 +27,7 @@ namespace PackageIconHandler
             if (infoType == RequestedInfoType.InfoTip)
             {
                 FileInfo fi = new FileInfo(SelectedItemPath);
-                String txtPath = $"{fi.FullName.Substring(0, fi.FullName.Length - fi.Extension.Length)}.txt";
+                string txtPath = $"{fi.FullName.Substring(0, fi.FullName.Length - fi.Extension.Length)}.txt";
                 txtPath = txtPath.Replace(@"\Downloads\", @"\Thumbnails\Downloads\");
 
                 try

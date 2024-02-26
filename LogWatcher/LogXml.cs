@@ -19,8 +19,8 @@ namespace LogWatcher
 {
     public class LogXml
     {
-        private static readonly Dictionary<TypeGUID, String> knownTokens = new Dictionary<TypeGUID, string>();
-        private static readonly Dictionary<TypeGUID, String> customTokens = new Dictionary<TypeGUID, string>();
+        private static readonly Dictionary<TypeGUID, string> knownTokens = new Dictionary<TypeGUID, string>();
+        private static readonly Dictionary<TypeGUID, string> customTokens = new Dictionary<TypeGUID, string>();
 
         static LogXml()
         {
@@ -28,14 +28,14 @@ namespace LogWatcher
             ParseXml("Resources/XML/customtokens.xml", "token", customTokens);
         }
 
-        private static void ParseXml(String xml, String element, Dictionary<TypeGUID, String> byValue)
+        private static void ParseXml(string xml, string element, Dictionary<TypeGUID, string> byValue)
         {
             if (!File.Exists(xml)) return;
 
             XmlReader reader = XmlReader.Create(xml);
 
             TypeGUID guid = DBPFData.GUID_NULL;
-            String name = null;
+            string name = null;
 
             reader.MoveToContent();
             while (reader.Read())
@@ -45,7 +45,7 @@ namespace LogWatcher
                     if (reader.Name.Equals("value"))
                     {
                         reader.Read();
-                        guid = (TypeGUID)UInt32.Parse(reader.Value.Substring(2), NumberStyles.HexNumber);
+                        guid = (TypeGUID)uint.Parse(reader.Value.Substring(2), NumberStyles.HexNumber);
                     }
                     else if (reader.Name.Equals("name"))
                     {
@@ -79,7 +79,7 @@ namespace LogWatcher
         public XmlElement Root => logDoc.DocumentElement;
         public XmlElement Header => (XmlElement)logDoc.DocumentElement.FirstChild;
 
-        public LogXml(String logFile)
+        public LogXml(string logFile)
         {
             bool inHeader = false;
             bool inTopFrame = false;
@@ -89,10 +89,10 @@ namespace LogWatcher
             bool inLotObjects = false;
             bool inCheats = false;
 
-            String myOid = null;
-            String myName = null;
-            String soOid = null;
-            String soName = null;
+            string myOid = null;
+            string myName = null;
+            string soOid = null;
+            string soName = null;
 
             logDoc = new XmlDocument();
             logDoc.LoadXml("<?xml version='1.0' ?><log/>");
@@ -111,7 +111,7 @@ namespace LogWatcher
 
                     try
                     {
-                        String line;
+                        string line;
                         while ((line = sr.ReadLine()) != null)
                         {
                             if (line.Length != 0)
@@ -370,8 +370,8 @@ namespace LogWatcher
                                 }
                                 else
                                 {
-                                    String eleType = "line";
-                                    String colour = null;
+                                    string eleType = "line";
+                                    string colour = null;
 
                                     if (inArray && reArrayEntry.IsMatch(line))
                                     {
@@ -381,7 +381,7 @@ namespace LogWatcher
                                     {
                                         eleType = "tokenGuid";
 
-                                        TypeGUID guid = (TypeGUID)(uint)Int32.Parse(line.Substring(11));
+                                        TypeGUID guid = (TypeGUID)(uint)int.Parse(line.Substring(11));
                                         line = guid.ToString();
 
                                         if (customTokens.ContainsKey(guid))
@@ -446,12 +446,12 @@ namespace LogWatcher
             }
         }
 
-        private XmlElement MakeElement(XmlElement parent, String eleName, String name)
+        private XmlElement MakeElement(XmlElement parent, string eleName, string name)
         {
             return MakeElement(parent, eleName, name, null, null);
         }
 
-        private XmlElement MakeElement(XmlElement parent, String eleName, String name, String objName, String objId)
+        private XmlElement MakeElement(XmlElement parent, string eleName, string name, string objName, string objId)
         {
             XmlElement ele = logDoc.CreateElement(eleName);
 

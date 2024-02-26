@@ -13,7 +13,6 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Xml;
@@ -94,7 +93,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
         string description;
         // DWORD length
         List<float> unknown_1;
-        Single unknown_3;   //If subver >= Voyage 
+        float unknown_3;   //If subver >= Voyage 
         uint unknown_4;     //If subver >= Freetime 
         byte[] unknown_5;   //if subver >= Apartment Life
         Point loc;
@@ -122,7 +121,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
         public string LotName { get { return lotname; } set { lotname = value; } }
         public string LotDesc { get { return description; } set { description = value; } }
         internal List<float> Unknown1 { get { return unknown_1; } }
-        internal Single Unknown3 { get { return unknown_3; } set { unknown_3 = value; } }
+        internal float Unknown3 { get { return unknown_3; } set { unknown_3 = value; } }
         internal uint Unknown4 { get { return unknown_4; } set { unknown_4 = value; } }
         internal byte[] Unknown5
         {
@@ -178,10 +177,10 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
             int len = reader.ReadInt32();
             for (int i = 0; i < len; i++) this.unknown_1.Add(reader.ReadSingle());
 
-            if (subver >= (UInt16)LtxtSubVersion.Voyage) unknown_3 = reader.ReadSingle(); else unknown_3 = 0;
-            if (subver >= (UInt16)LtxtSubVersion.Freetime) unknown_4 = reader.ReadUInt32(); else unknown_4 = 0;
+            if (subver >= (ushort)LtxtSubVersion.Voyage) unknown_3 = reader.ReadSingle(); else unknown_3 = 0;
+            if (subver >= (ushort)LtxtSubVersion.Freetime) unknown_4 = reader.ReadUInt32(); else unknown_4 = 0;
 
-            if (ver >= (UInt16)LtxtVersion.Apartment || subver >= (UInt16)LtxtSubVersion.Apartment)
+            if (ver >= (ushort)LtxtVersion.Apartment || subver >= (ushort)LtxtSubVersion.Apartment)
             {
                 unknown_5 = reader.ReadBytes(14);
             }
@@ -205,7 +204,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
             if (ver >= (int)LtxtVersion.Business) owner = reader.ReadUInt32();
             else owner = 0;
 
-            if (ver >= (UInt16)LtxtVersion.Apartment || subver >= (UInt16)LtxtSubVersion.Apartment)
+            if (ver >= (ushort)LtxtVersion.Apartment || subver >= (ushort)LtxtSubVersion.Apartment)
             {
                 int count;
 

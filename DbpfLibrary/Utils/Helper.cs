@@ -25,19 +25,19 @@ namespace Sims2Tools.DBPF.Utils
 
         public static string Binary8String(uint input)
         {
-            String binStr = $"0000000{Convert.ToString(input, 2)}";
+            string binStr = $"0000000{Convert.ToString(input, 2)}";
             return binStr.Substring(binStr.Length - 8, 8);
         }
 
         public static string Binary16String(uint input)
         {
-            String binStr = $"000000000000000{Convert.ToString(input, 2)}";
+            string binStr = $"000000000000000{Convert.ToString(input, 2)}";
             return binStr.Substring(binStr.Length - 16, 16);
         }
 
         public static string Hex8String(uint input)
         {
-            String s = input.ToString("X8");
+            string s = input.ToString("X8");
             return s.Substring(s.Length - 8, 8);
         }
 
@@ -48,7 +48,7 @@ namespace Sims2Tools.DBPF.Utils
 
         public static string Hex4String(uint input)
         {
-            String s = input.ToString("X4");
+            string s = input.ToString("X4");
             return s.Substring(s.Length - 4, 4);
         }
 
@@ -68,7 +68,7 @@ namespace Sims2Tools.DBPF.Utils
 
         public static string Hex2String(byte input)
         {
-            String s = input.ToString("X2");
+            string s = input.ToString("X2");
             return s.Substring(s.Length - 2, 2);
         }
 

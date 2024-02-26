@@ -47,9 +47,9 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             get { return GetBit(4); }
         }
 
-        public override String ToString()
+        public override string ToString()
         {
-            String str = "Normal";
+            string str = "Normal";
             if (Fat) str = "Fat";
             else if (Fit) str = "Fit";
 

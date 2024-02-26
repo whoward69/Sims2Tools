@@ -87,10 +87,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             writer.WriteSingle((float)y);
         }
 
-        /// <summary>
-        /// This output is used in the ListBox View
-        /// </summary>
-        /// <returns>A String Describing the Data</returns>
         public override string ToString()
         {
             return x.ToString("N2") + "; " + y.ToString("N2");
@@ -160,10 +156,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             writer.WriteSingle((float)z);
         }
 
-        /// <summary>
-        /// This output is used in the ListBox View
-        /// </summary>
-        /// <returns>A String Describing the Data</returns>
         public override string ToString()
         {
             return base.ToString() + "; " + z.ToString("N2");
@@ -613,10 +605,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
 
         }
 
-        /// <summary>
-        /// This output is used in the ListBox View
-        /// </summary>
-        /// <returns>A String Describing the Data</returns>
         public override string ToString()
         {
             return base.ToString() + ", " + w.ToString("N2");

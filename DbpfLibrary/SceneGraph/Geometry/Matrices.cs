@@ -341,10 +341,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             return Adjoint() / Determinant();
         }
 
-        /// <summary>
-        /// Return a String describing the Matrix
-        /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
             return Rows + "x" + Columns + "-Matrix";
@@ -370,7 +366,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override bool Equals(Object obj)
+        public override bool Equals(object obj)
         {
             if (obj.GetType() != typeof(Matrixd)) return false;
 

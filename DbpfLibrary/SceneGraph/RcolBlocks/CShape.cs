@@ -14,7 +14,6 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
-using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
@@ -163,7 +162,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     public class CShape : AbstractRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xFC6EB1F7;
-        public static String NAME = "cShape";
+        public static string NAME = "cShape";
 
         private ShapeItem[] items;
         private ShapePart[] parts;
@@ -207,7 +206,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 }
             }
 
-            isDirty = true;
+            _isDirty = true;
         }
 
         public string GetSubsetMaterial(string subset)
@@ -233,7 +232,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 }
             }
 
-            isDirty = true;
+            _isDirty = true;
         }
 
         public override void Unserialize(DbpfReader reader)

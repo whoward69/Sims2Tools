@@ -26,8 +26,6 @@ namespace Sims2Tools.DBPF.CPF
     {
         private static readonly byte[] SIGNATURE = { 0xE0, 0x50, 0xE7, 0xCB, 0x02, 0x00 };
 
-        private Boolean isDirty = false;
-
         private List<CpfItem> items;
 
         public override bool IsDirty
@@ -35,8 +33,6 @@ namespace Sims2Tools.DBPF.CPF
             get
             {
                 if (base.IsDirty) return true;
-
-                if (isDirty) return true;
 
                 foreach (CpfItem item in items)
                 {
@@ -50,8 +46,6 @@ namespace Sims2Tools.DBPF.CPF
         public override void SetClean()
         {
             base.SetClean();
-
-            this.isDirty = false;
 
             foreach (CpfItem item in items)
             {
@@ -235,7 +229,7 @@ namespace Sims2Tools.DBPF.CPF
             if (item != null)
             {
                 items.Add(item);
-                isDirty = true;
+                _isDirty = true;
             }
 
             return item;

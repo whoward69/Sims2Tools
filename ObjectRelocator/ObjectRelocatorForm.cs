@@ -2242,7 +2242,7 @@ namespace ObjectRelocator
             {
                 ushort data = 0;
 
-                if (textBuyPrice.Text.Length > 0 && !UInt16.TryParse(textBuyPrice.Text, out data))
+                if (textBuyPrice.Text.Length > 0 && !ushort.TryParse(textBuyPrice.Text, out data))
                 {
                     textBuyPrice.Text = "0";
                     data = 0;
@@ -2260,7 +2260,7 @@ namespace ObjectRelocator
             {
                 ushort data = 0;
 
-                if (textBuildPrice.Text.Length > 0 && !UInt16.TryParse(textBuildPrice.Text, out data))
+                if (textBuildPrice.Text.Length > 0 && !ushort.TryParse(textBuildPrice.Text, out data))
                 {
                     textBuyPrice.Text = "0";
                     data = 0;
@@ -2278,7 +2278,7 @@ namespace ObjectRelocator
             {
                 ushort data = 0;
 
-                if (textDepLimit.Text.Length > 0 && !UInt16.TryParse(textDepLimit.Text, out data))
+                if (textDepLimit.Text.Length > 0 && !ushort.TryParse(textDepLimit.Text, out data))
                 {
                     textBuyPrice.Text = "0";
                     data = 0;
@@ -2296,7 +2296,7 @@ namespace ObjectRelocator
             {
                 ushort data = 0;
 
-                if (textDepInitial.Text.Length > 0 && !UInt16.TryParse(textDepInitial.Text, out data))
+                if (textDepInitial.Text.Length > 0 && !ushort.TryParse(textDepInitial.Text, out data))
                 {
                     textBuyPrice.Text = "0";
                     data = 0;
@@ -2314,7 +2314,7 @@ namespace ObjectRelocator
             {
                 ushort data = 0;
 
-                if (textDepDaily.Text.Length > 0 && !UInt16.TryParse(textDepDaily.Text, out data))
+                if (textDepDaily.Text.Length > 0 && !ushort.TryParse(textDepDaily.Text, out data))
                 {
                     textBuyPrice.Text = "0";
                     data = 0;
@@ -2328,7 +2328,7 @@ namespace ObjectRelocator
 
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
-            if (!(Char.IsControl(e.KeyChar) || (e.KeyChar >= '0' && e.KeyChar <= '9')))
+            if (!(char.IsControl(e.KeyChar) || (e.KeyChar >= '0' && e.KeyChar <= '9')))
             {
                 e.Handled = true;
             }
@@ -2683,7 +2683,7 @@ namespace ObjectRelocator
 
                 if (objectData.IsDirty)
                 {
-                    String packageFile = objectData.PackagePath;
+                    string packageFile = objectData.PackagePath;
 
                     if (!dirtyObjectsByPackage.ContainsKey(packageFile))
                     {

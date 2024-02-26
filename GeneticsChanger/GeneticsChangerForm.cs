@@ -686,7 +686,7 @@ namespace GeneticsChanger
             }
         }
 
-        private void MyMruList_FileSelected(String folder)
+        private void MyMruList_FileSelected(string folder)
         {
             rootFolder = folder;
             DoWork_FillTree(rootFolder, false, true);
@@ -1458,7 +1458,7 @@ namespace GeneticsChanger
             ReselectResourceRows(new List<GeneticDbpfData>(selectedData.Values));
         }
 
-        private void UpdateSelectedRows(Single data, string name)
+        private void UpdateSelectedRows(float data, string name)
         {
             List<GeneticDbpfData> selectedData = new List<GeneticDbpfData>();
 
@@ -1561,7 +1561,7 @@ namespace GeneticsChanger
             UpdateGridRow(geneticData);
         }
 
-        private void UpdateGeneticData(GeneticDbpfData geneticData, string name, Single data)
+        private void UpdateGeneticData(GeneticDbpfData geneticData, string name, float data)
         {
             if (ignoreEdits) return;
 
@@ -1655,7 +1655,7 @@ namespace GeneticsChanger
             {
                 cachedGenderValue = newGenderValue;
 
-                foreach (Object o in comboGender.Items)
+                foreach (object o in comboGender.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedGenderValue)
                     {
@@ -1681,7 +1681,7 @@ namespace GeneticsChanger
             {
                 cachedShownValue = newShownValue;
 
-                foreach (Object o in comboShown.Items)
+                foreach (object o in comboShown.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedShownValue)
                     {
@@ -1927,7 +1927,7 @@ namespace GeneticsChanger
             }
             else
             {
-                if (!(Char.IsControl(e.KeyChar) || (e.KeyChar >= '0' && e.KeyChar <= '9')))
+                if (!(char.IsControl(e.KeyChar) || (e.KeyChar >= '0' && e.KeyChar <= '9')))
                 {
                     e.Handled = true;
                 }
@@ -1950,7 +1950,7 @@ namespace GeneticsChanger
             {
                 uint data = 0;
 
-                if (textSort.Text.Length > 0 && !UInt32.TryParse(textSort.Text, out data))
+                if (textSort.Text.Length > 0 && !uint.TryParse(textSort.Text, out data))
                 {
                     textSort.Text = "0";
                     data = 0;
@@ -1965,9 +1965,9 @@ namespace GeneticsChanger
         {
             if (e.KeyCode == Keys.Enter)
             {
-                Single data = 0;
+                float data = 0;
 
-                if (textGenetic.Text.Length > 0 && !Single.TryParse(textGenetic.Text, out data))
+                if (textGenetic.Text.Length > 0 && !float.TryParse(textGenetic.Text, out data))
                 {
                     textGenetic.Text = "0";
                     data = 0;

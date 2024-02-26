@@ -16,7 +16,7 @@ namespace HoodExporter
 {
     static class HoodExporterApp
     {
-        public static String AppName = "Hood Exporter";
+        public static string AppName = "Hood Exporter";
 
         public static int AppVersionMajor = 1;
         public static int AppVersionMinor = 8;
@@ -39,7 +39,7 @@ namespace HoodExporter
         public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static String RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\HoodExporter";
+        public static string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\HoodExporter";
 
         [STAThread]
         static void Main()

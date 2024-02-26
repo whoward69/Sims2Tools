@@ -33,12 +33,12 @@ namespace SgChecker
 {
     public static class SgChecker
     {
-        public static String PROP_IDR_ITEMS = "idr_items";
-        public static String PROP_IDR_INDEXES = "idr_indexes";
+        public static string PROP_IDR_ITEMS = "idr_items";
+        public static string PROP_IDR_INDEXES = "idr_indexes";
 
         public static List<Regex> excludedFiles = new List<Regex> { new Regex(@"_EnableColorOptions.*\.package") };
 
-        public static Dictionary<String, List<TypeTypeID>> typesByPackage = new Dictionary<String, List<TypeTypeID>> {
+        public static Dictionary<string, List<TypeTypeID>> typesByPackage = new Dictionary<string, List<TypeTypeID>> {
                 { "Objects00.package", new List<TypeTypeID> { Anim.TYPE } },
                 { "Objects01.package", new List<TypeTypeID> { Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE } },
                 { "Objects02.package", new List<TypeTypeID> { Txmt.TYPE } },
@@ -74,12 +74,12 @@ namespace SgChecker
         private readonly int fileIndex;
         private bool used = false;
 
-        private readonly String sgHash;
-        private readonly String sgName;
+        private readonly string sgHash;
+        private readonly string sgName;
 
         private readonly HashSet<NeededSgResource> neededSgResources = new HashSet<NeededSgResource>();
 
-        private readonly Dictionary<String, Object> props = new Dictionary<string, object>(0);
+        private readonly Dictionary<string, object> props = new Dictionary<string, object>(0);
 
         public int FileIndex => fileIndex;
 
@@ -121,9 +121,9 @@ namespace SgChecker
             return neededSgResources;
         }
 
-        public Object GetProp(String key)
+        public object GetProp(string key)
         {
-            props.TryGetValue(key, out Object obj);
+            props.TryGetValue(key, out object obj);
 
             return obj;
         }
@@ -133,7 +133,7 @@ namespace SgChecker
             return base.Equals(other);
         }
 
-        public override bool Equals(Object other)
+        public override bool Equals(object other)
         {
             return (other is KnownSgResource res) && Equals(res);
         }
@@ -192,7 +192,7 @@ namespace SgChecker
             return new List<KnownSgResource>(knownSgResourcesByType.Keys);
         }
 
-        public void GetDuplicatePackages(List<String> files, int trim, List<TypeTypeID> exclusionTypes, SortedDictionary<String, DuplicatePackages> duplicates)
+        public void GetDuplicatePackages(List<string> files, int trim, List<TypeTypeID> exclusionTypes, SortedDictionary<string, DuplicatePackages> duplicates)
         {
             foreach (KeyValuePair<KnownSgResource, HashSet<int>> kvPair in knownSgResourcesByType)
             {
@@ -203,7 +203,7 @@ namespace SgChecker
 
                     for (int i = 0; i < list.Count - 1; ++i)
                     {
-                        String fileA = files[list[i]].Substring(trim);
+                        string fileA = files[list[i]].Substring(trim);
 
                         if (!duplicates.TryGetValue(fileA, out DuplicatePackages dp))
                         {
@@ -252,7 +252,7 @@ namespace SgChecker
             return knownRes;
         }
 
-        public void GetDuplicatePackages(List<String> files, int trim, List<TypeTypeID> exclusionTypes, SortedDictionary<String, DuplicatePackages> duplicates)
+        public void GetDuplicatePackages(List<string> files, int trim, List<TypeTypeID> exclusionTypes, SortedDictionary<string, DuplicatePackages> duplicates)
         {
             foreach (TypeTypeID typeID in knownSgResourcesByType.Keys)
             {
@@ -266,11 +266,11 @@ namespace SgChecker
         private readonly TypeTypeID typeId;
         private readonly bool isHash;
 
-        private readonly String qualifiedName;
+        private readonly string qualifiedName;
 
         public TypeTypeID TypeID => typeId;
 
-        public NeededSgResource(TypeTypeID typeId, String qualifiedName)
+        public NeededSgResource(TypeTypeID typeId, string qualifiedName)
         {
             // Must be an SgName
             isHash = false;
@@ -278,7 +278,7 @@ namespace SgChecker
             int pos = qualifiedName.LastIndexOf("_");
             if (pos != -1)
             {
-                String typeCode = qualifiedName.Substring(pos + 1);
+                string typeCode = qualifiedName.Substring(pos + 1);
                 this.typeId = DBPFData.TypeID(typeCode);
 
                 if (this.typeId != (TypeTypeID)0x00000000)
@@ -294,13 +294,13 @@ namespace SgChecker
             this.typeId = typeId;
         }
 
-        public NeededSgResource(String qualifiedName)
+        public NeededSgResource(string qualifiedName)
         {
             // Is this a SgHash?
             int pos = qualifiedName.IndexOf("-");
             if (pos != -1)
             {
-                String typeCode = qualifiedName.Substring(0, pos);
+                string typeCode = qualifiedName.Substring(0, pos);
                 this.typeId = DBPFData.TypeID(typeCode);
 
                 if (this.typeId != (TypeTypeID)0x00000000)
@@ -318,7 +318,7 @@ namespace SgChecker
             pos = qualifiedName.LastIndexOf("_");
             if (pos != -1)
             {
-                String typeCode = qualifiedName.Substring(pos + 1);
+                string typeCode = qualifiedName.Substring(pos + 1);
                 this.typeId = DBPFData.TypeID(typeCode);
 
                 if (this.typeId != (TypeTypeID)0x00000000)
@@ -353,7 +353,7 @@ namespace SgChecker
             }
         }
 
-        public override bool Equals(Object other)
+        public override bool Equals(object other)
         {
             return (other is NeededSgResource res) && Equals(res);
         }
@@ -463,13 +463,13 @@ namespace SgChecker
             missingSgResourcesByType.Remove(new NeededSgResource(sgRes.SgHash));
         }
 
-        public void GetIncompletePackages(List<String> files, int trim, SortedDictionary<String, IncompletePackage> incomplete)
+        public void GetIncompletePackages(List<string> files, int trim, SortedDictionary<string, IncompletePackage> incomplete)
         {
             foreach (KeyValuePair<NeededSgResource, HashSet<KnownSgResource>> kvPair in missingSgResourcesByType)
             {
                 foreach (KnownSgResource knownRes in kvPair.Value)
                 {
-                    String fileA = files[knownRes.FileIndex].Substring(trim);
+                    string fileA = files[knownRes.FileIndex].Substring(trim);
 
                     if (!incomplete.TryGetValue(fileA, out IncompletePackage ip))
                     {
@@ -532,7 +532,7 @@ namespace SgChecker
             return neededTypes;
         }
 
-        public void GetIncompletePackages(List<String> files, int trim, SortedDictionary<String, IncompletePackage> incomplete)
+        public void GetIncompletePackages(List<string> files, int trim, SortedDictionary<string, IncompletePackage> incomplete)
         {
             foreach (TypeTypeID typeID in missingSgResourcesByType.Keys)
             {

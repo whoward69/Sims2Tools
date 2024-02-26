@@ -13,7 +13,6 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
-using System;
 using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
@@ -21,7 +20,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     public class CLightRefNode : AbstractCresChildren
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x253D2018;
-        public static String NAME = "cLightRefNode";
+        public static string NAME = "cLightRefNode";
 
 
 

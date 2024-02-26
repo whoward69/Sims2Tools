@@ -267,7 +267,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
     public class Extension : AbstractRcolBlock
     {
         // public static readonly TypeBlockID TYPE = TypeBlockID.NULL;
-        public static String NAME = "cExtension";
+        public static string NAME = "cExtension";
 
         private byte typecode;
         private string varname;
@@ -278,7 +278,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         public string VarName
         {
             get => varname ?? "";
-            internal set => varname = value;
+            internal set
+            {
+                varname = value;
+                _isDirty = true;
+            }
         }
 
         public List<ExtensionItem> Items => items;
@@ -299,7 +303,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         {
             items.Add(item);
 
-            isDirty = true;
+            _isDirty = true;
 
             return item;
         }
@@ -313,7 +317,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                 {
                     item.String = value;
 
-                    isDirty = true;
+                    _isDirty = true;
 
                     return item;
                 }
@@ -343,6 +347,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                 if (item.Name.Equals(name))
                 {
                     items.Remove(item);
+
+                    _isDirty = true;
+
                     return;
                 }
             }
@@ -456,6 +463,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             }
 
             return sz;
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} - {VarName}";
         }
 
         public override void Dispose()

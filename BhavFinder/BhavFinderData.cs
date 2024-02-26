@@ -16,19 +16,14 @@ namespace BhavFinder
     [System.ComponentModel.DesignerCategory("")]
     class BhavFinderData : DataTable
     {
-        private readonly DataColumn colPackage = new DataColumn("Package", typeof(string));
-        private readonly DataColumn colInstance = new DataColumn("Instance", typeof(string));
-        private readonly DataColumn colName = new DataColumn("Name", typeof(string));
-        private readonly DataColumn colGroupInstance = new DataColumn("GroupInstance", typeof(string));
-        private readonly DataColumn colGroupName = new DataColumn("GroupName", typeof(string));
-
         public BhavFinderData()
         {
-            this.Columns.Add(colPackage);
-            this.Columns.Add(colInstance);
-            this.Columns.Add(colName);
-            this.Columns.Add(colGroupInstance);
-            this.Columns.Add(colGroupName);
+            this.Columns.Add(new DataColumn("Package", typeof(string)));
+            this.Columns.Add(new DataColumn("DbpfEntry", typeof(object)));
+            this.Columns.Add(new DataColumn("Instance", typeof(string)));
+            this.Columns.Add(new DataColumn("Name", typeof(string)));
+            this.Columns.Add(new DataColumn("GroupInstance", typeof(string)));
+            this.Columns.Add(new DataColumn("GroupName", typeof(string)));
         }
 
         public bool HasResults => (this.Rows.Count > 0);

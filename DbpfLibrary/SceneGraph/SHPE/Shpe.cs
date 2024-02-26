@@ -26,7 +26,7 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xFC6EB1F7;
-        public const String NAME = "SHPE";
+        public const string NAME = "SHPE";
 
 #if !DEBUG
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -36,6 +36,13 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
         public CShape Shape => cShape;
 
         public override bool IsDirty => base.IsDirty || (cShape != null && cShape.IsDirty);
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            cShape?.SetClean();
+        }
 
         public Shpe(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

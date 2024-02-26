@@ -11,7 +11,6 @@
 
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Utils;
-using System;
 using System.Collections.Generic;
 
 namespace HcduPlus.DataStore
@@ -19,28 +18,28 @@ namespace HcduPlus.DataStore
     public interface IDataStore
     {
         #region FileManagement
-        void SetFiles(String folder, List<String> files);
-        void SetPrefix(String prefix);
+        void SetFiles(string folder, List<string> files);
+        void SetPrefix(string prefix);
         #endregion
 
         #region SeenResources
         IEnumerable<TypeTypeID> SeenResourcesGetTypes();
         IEnumerable<TypeGroupID> SeenResourcesGetGroupsForType(TypeTypeID typeId);
         IEnumerable<TypeInstanceID> SeenResourcesGetInstancesForTypeAndGroup(TypeTypeID typeId, TypeGroupID groupId);
-        List<String> SeenResourcesGetPackages(TypeTypeID typeId, TypeGroupID groupId, TypeInstanceID instanceId);
+        List<string> SeenResourcesGetPackages(TypeTypeID typeId, TypeGroupID groupId, TypeInstanceID instanceId);
         void SeenResourcesAdd(DBPFKey entry, int fileIndex);
         #endregion
 
         #region SeenGuids
         IEnumerable<TypeGUID> SeenGuidsGetGuids();
-        List<String> SeenGuidsGetPackages(TypeGUID guid);
+        List<string> SeenGuidsGetPackages(TypeGUID guid);
         void SeenGuidsAdd(TypeGUID guid, DBPFKey entry, int fileIndex);
         #endregion
 
         #region NamesByTgi
         bool NamesByTgiContains(DBPFKey entry);
-        String NamesByTgiGet(int tgiHash);
-        void NamesByTgiAdd(DBPFKey entry, String resourceName);
+        string NamesByTgiGet(int tgiHash);
+        void NamesByTgiAdd(DBPFKey entry, string resourceName);
         #endregion
     }
 
@@ -61,10 +60,10 @@ namespace HcduPlus.DataStore
 
     public abstract class AbstractDataStore : IDataStore
     {
-        protected String folder;
-        protected List<String> files;
+        protected string folder;
+        protected List<string> files;
 
-        protected String prefix;
+        protected string prefix;
 
         public abstract void NamesByTgiAdd(DBPFKey entry, string resourceName);
         public abstract bool NamesByTgiContains(DBPFKey entry);
@@ -81,13 +80,13 @@ namespace HcduPlus.DataStore
 
         #region FileManagement
 
-        public void SetFiles(String folder, List<String> files)
+        public void SetFiles(string folder, List<string> files)
         {
             this.folder = folder;
             this.files = files;
         }
 
-        public void SetPrefix(String prefix)
+        public void SetPrefix(string prefix)
         {
             this.prefix = prefix;
         }
@@ -99,7 +98,7 @@ namespace HcduPlus.DataStore
     {
         private readonly Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<int>>>> seenResources = new Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<int>>>>();
         private readonly Dictionary<TypeGUID, List<KeyIndexPair>> seenGuids = new Dictionary<TypeGUID, List<KeyIndexPair>>();
-        private readonly Dictionary<int, String> namesByTGI = new Dictionary<int, String>();
+        private readonly Dictionary<int, string> namesByTGI = new Dictionary<int, string>();
 
 
         #region SeenResources
@@ -118,7 +117,7 @@ namespace HcduPlus.DataStore
                 return groupResources.Keys;
             }
 
-            return new Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<String>>>().Keys;
+            return new Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<string>>>().Keys;
         }
 
         public override IEnumerable<TypeInstanceID> SeenResourcesGetInstancesForTypeAndGroup(TypeTypeID typeId, TypeGroupID groupId)
@@ -134,10 +133,10 @@ namespace HcduPlus.DataStore
                 }
             }
 
-            return new Dictionary<TypeInstanceID, List<String>>().Keys;
+            return new Dictionary<TypeInstanceID, List<string>>().Keys;
         }
 
-        public override List<String> SeenResourcesGetPackages(TypeTypeID typeId, TypeGroupID groupId, TypeInstanceID instanceId)
+        public override List<string> SeenResourcesGetPackages(TypeTypeID typeId, TypeGroupID groupId, TypeInstanceID instanceId)
         {
             if (seenResources.TryGetValue(typeId, out Dictionary<TypeGroupID, Dictionary<TypeInstanceID, List<int>>> groupResources))
             {
@@ -145,11 +144,11 @@ namespace HcduPlus.DataStore
                 {
                     if (instanceResources.TryGetValue(instanceId, out List<int> fileIndexes))
                     {
-                        List<String> packages = new List<String>(fileIndexes.Count);
+                        List<string> packages = new List<string>(fileIndexes.Count);
 
                         foreach (int fileIndex in fileIndexes)
                         {
-                            String packageName = prefix + files[fileIndex].Substring(folder.Length + 1);
+                            string packageName = prefix + files[fileIndex].Substring(folder.Length + 1);
                             packages.Add(packageName);
                         }
 
@@ -194,15 +193,15 @@ namespace HcduPlus.DataStore
             return seenGuids.Keys;
         }
 
-        public override List<String> SeenGuidsGetPackages(TypeGUID guid)
+        public override List<string> SeenGuidsGetPackages(TypeGUID guid)
         {
             if (seenGuids.TryGetValue(guid, out List<KeyIndexPair> pairs))
             {
-                List<String> packages = new List<String>(pairs.Count);
+                List<string> packages = new List<string>(pairs.Count);
 
                 foreach (KeyIndexPair pair in pairs)
                 {
-                    String packageName = $"##{pair.Key.GroupID}-{pair.Key.InstanceID}!{prefix}{files[pair.FileIndex].Substring(folder.Length + 1)}";
+                    string packageName = $"##{pair.Key.GroupID}-{pair.Key.InstanceID}!{prefix}{files[pair.FileIndex].Substring(folder.Length + 1)}";
                     packages.Add(packageName);
                 }
 
@@ -233,12 +232,12 @@ namespace HcduPlus.DataStore
             return namesByTGI.ContainsKey(Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID));
         }
 
-        public override String NamesByTgiGet(int tgiHash)
+        public override string NamesByTgiGet(int tgiHash)
         {
             return namesByTGI.TryGetValue(tgiHash, out string name) ? name : null;
         }
 
-        public override void NamesByTgiAdd(DBPFKey entry, String resourceName)
+        public override void NamesByTgiAdd(DBPFKey entry, string resourceName)
         {
             int tgiHash = Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID);
 
@@ -277,9 +276,9 @@ namespace HcduPlus.DataStore
         private SQLiteCommand dbCmdNamesByTgiContains;
         private SQLiteCommand dbCmdNamesByTgiAdd;
 
-        public SqlDataStore(String suffix)
+        public SqlDataStore(string suffix)
         {
-            String connectionString = $"Data Source={Properties.Settings.Default.DbFile}_{suffix}.sqlite;Version=3;New=True;";
+            string connectionString = $"Data Source={Properties.Settings.Default.DbFile}_{suffix}.sqlite;Version=3;New=True;";
 
             dbConn = new SQLiteConnection(connectionString);
             dbConn.Open();
@@ -337,7 +336,7 @@ namespace HcduPlus.DataStore
             throw new NotImplementedException();
         }
 
-        public override List<String> SeenResourcesGetPackages(TypeTypeID typeId, TypeGroupID groupId, TypeInstanceID instanceId)
+        public override List<string> SeenResourcesGetPackages(TypeTypeID typeId, TypeGroupID groupId, TypeInstanceID instanceId)
         {
             throw new NotImplementedException();
         }
@@ -362,7 +361,7 @@ namespace HcduPlus.DataStore
             throw new NotImplementedException();
         }
 
-        public override List<String> SeenGuidsGetPackages(TypeGUID guid)
+        public override List<string> SeenGuidsGetPackages(TypeGUID guid)
         {
             throw new NotImplementedException();
         }
@@ -384,12 +383,12 @@ namespace HcduPlus.DataStore
             return dbCmdNamesByTgiContains.ExecuteScalar() != null;
         }
 
-        public override String NamesByTgiGet(int tgiHash)
+        public override string NamesByTgiGet(int tgiHash)
         {
             throw new NotImplementedException();
         }
 
-        public override void NamesByTgiAdd(DBPFKey entry, String resourceName)
+        public override void NamesByTgiAdd(DBPFKey entry, string resourceName)
         {
             dbCmdNamesByTgiAdd.Parameters.AddWithValue("@tgiHash", Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID));
             dbCmdNamesByTgiAdd.Parameters.AddWithValue("@resourceName", resourceName);

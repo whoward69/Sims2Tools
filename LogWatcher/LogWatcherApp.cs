@@ -14,7 +14,7 @@ namespace LogWatcher
 {
     static class LogWatcherApp
     {
-        public static String AppName = "Log Watcher";
+        public static string AppName = "Log Watcher";
 
         public static int AppVersionMajor = 1;
         public static int AppVersionMinor = 7;
@@ -37,7 +37,7 @@ namespace LogWatcher
         public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static String RegistryKey = Sims2ToolsLib.RegistryKey + @"\LogWatcher";
+        public static string RegistryKey = Sims2ToolsLib.RegistryKey + @"\LogWatcher";
 
         [STAThread]
         static void Main()

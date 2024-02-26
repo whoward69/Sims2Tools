@@ -10,6 +10,7 @@
  */
 
 using CsvHelper;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
@@ -36,7 +37,7 @@ namespace BhavFinder
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly SortedDictionary<String, String> localObjectsByGroupID = new SortedDictionary<string, string>();
+        private readonly SortedDictionary<string, string> localObjectsByGroupID = new SortedDictionary<string, string>();
 
         private MruList MyMruList;
         private Updater MyUpdater;
@@ -51,6 +52,8 @@ namespace BhavFinder
         private readonly Regex HexInstanceRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)");
 
         private readonly BhavFinderData bhavFoundData = new BhavFinderData();
+
+        private readonly CommonOpenFileDialog selectPathDialog;
 
         public BhavFinderForm()
         {
@@ -99,6 +102,7 @@ namespace BhavFinder
 
             gridFoundBhavs.DataSource = bhavFoundData;
             this.gridFoundBhavs.Columns["colBhavPackage"].Visible = false;
+            this.gridFoundBhavs.Columns["colBhavDbpfEntry"].Visible = false;
 
             this.comboBhavInGroup.Items.Add("");
             this.comboBhavInGroup.Items.Add($"{DBPFData.GROUP_LOCAL} {DBPFData.NAME_LOCAL}");
@@ -107,25 +111,30 @@ namespace BhavFinder
 
             this.comboOpCodeInGroup.Items.Add("");
 
-            foreach (KeyValuePair<String, String> kvp in GameData.semiGlobalsByName)
+            foreach (KeyValuePair<string, string> kvp in GameData.semiGlobalsByName)
             {
-                String group = $"0x{kvp.Value.ToUpper()} {kvp.Key}";
+                string group = $"0x{kvp.Value.ToUpper()} {kvp.Key}";
 
                 this.comboBhavInGroup.Items.Add(group);
                 this.comboOpCodeInGroup.Items.Add(group);
             }
 
             this.comboOpCode.Items.Add("");
-            foreach (KeyValuePair<String, String> kvp in GameData.primitivesByOpCode)
+            foreach (KeyValuePair<string, string> kvp in GameData.primitivesByOpCode)
             {
                 this.comboOpCode.Items.Add($"{kvp.Key} {kvp.Value}");
             }
 
             this.comboUsingSTR.Items.Add("");
-            foreach (KeyValuePair<String, String> kvp in GameData.textlistsByInstance)
+            foreach (KeyValuePair<string, string> kvp in GameData.textlistsByInstance)
             {
                 this.comboUsingSTR.Items.Add($"{kvp.Key} {kvp.Value}");
             }
+
+            selectPathDialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true
+            };
         }
 
         private void ClearOperands()
@@ -139,7 +148,7 @@ namespace BhavFinder
 
         private void ResetMasks()
         {
-            String strDefaultMask = "FF";
+            string strDefaultMask = "FF";
 
             foreach (TextBox mask in masks)
             {
@@ -156,8 +165,8 @@ namespace BhavFinder
             {
                 if (comboOpCode.Text.IndexOf(":") != -1)
                 {
-                    String opCodeFrom = comboOpCode.Text.Substring(0, comboOpCode.Text.IndexOf(":"));
-                    String opCodeTo = comboOpCode.Text.Substring(comboOpCode.Text.IndexOf(":") + 1);
+                    string opCodeFrom = comboOpCode.Text.Substring(0, comboOpCode.Text.IndexOf(":"));
+                    string opCodeTo = comboOpCode.Text.Substring(comboOpCode.Text.IndexOf(":") + 1);
 
                     Match mFrom = HexOpCodeRegex.Match(opCodeFrom);
                     Match mTo = HexOpCodeRegex.Match(opCodeTo);
@@ -242,7 +251,7 @@ namespace BhavFinder
                 }
                 else
                 {
-                    String binStr = Helper.Binary8String(Convert.ToUInt32(tb.Text, 16));
+                    string binStr = Helper.Binary8String(Convert.ToUInt32(tb.Text, 16));
                     toolTipOperands.SetToolTip(tb, $"Binary: {binStr.Substring(0, 4)} {binStr.Substring(4, 4)}");
                 }
             }
@@ -270,7 +279,7 @@ namespace BhavFinder
             }
 
             if (!(
-                    Char.IsControl(e.KeyChar) ||
+                    char.IsControl(e.KeyChar) ||
                     (e.KeyChar >= '0' && e.KeyChar <= '9') ||
                     (e.KeyChar >= 'A' && e.KeyChar <= 'F')
                 ))
@@ -290,7 +299,7 @@ namespace BhavFinder
             {
                 e.KeyChar = 'x';
 
-                String text = ((Control)sender).Text;
+                string text = ((Control)sender).Text;
 
                 if (text.Equals("0"))
                 {
@@ -312,7 +321,7 @@ namespace BhavFinder
             }
 
             if (!(
-                    Char.IsControl(e.KeyChar) ||
+                    char.IsControl(e.KeyChar) ||
                     (e.KeyChar >= '0' && e.KeyChar <= '9') ||
                     (e.KeyChar >= 'A' && e.KeyChar <= 'F')
                 ))
@@ -359,8 +368,8 @@ namespace BhavFinder
             {
                 if (cb.Text.IndexOf(":") != -1)
                 {
-                    String opCodeFrom = cb.Text.Substring(0, cb.Text.IndexOf(":"));
-                    String opCodeTo = cb.Text.Substring(cb.Text.IndexOf(":") + 1);
+                    string opCodeFrom = cb.Text.Substring(0, cb.Text.IndexOf(":"));
+                    string opCodeTo = cb.Text.Substring(cb.Text.IndexOf(":") + 1);
 
                     Match mFrom = HexOpCodeRegex.Match(opCodeFrom);
                     Match mTo = HexOpCodeRegex.Match(opCodeTo);
@@ -424,7 +433,7 @@ namespace BhavFinder
 
         private void OnSaveResultsToClipboardClicked(object sender, EventArgs e)
         {
-            String xml = GetResultsAsCSV();
+            string xml = GetResultsAsCSV();
 
             if (xml != null)
             {
@@ -432,7 +441,7 @@ namespace BhavFinder
             }
         }
 
-        private String GetResultsAsCSV()
+        private string GetResultsAsCSV()
         {
             using (MemoryStream ms = new MemoryStream())
             {
@@ -471,7 +480,7 @@ namespace BhavFinder
 
             if (saveResultsDialog.FileName != "")
             {
-                String xml = GetResultsAsCSV();
+                string xml = GetResultsAsCSV();
 
                 if (xml != null)
                 {
@@ -567,7 +576,7 @@ namespace BhavFinder
             }
         }
 
-        private void MyMruList_FileSelected(String package)
+        private void MyMruList_FileSelected(string package)
         {
             textFilePath.Text = package;
         }
@@ -624,7 +633,7 @@ namespace BhavFinder
                         Match m = HexInstanceRegex.Match(comboUsingSTR.Text);
                         usingInstance = (TypeInstanceID)Convert.ToUInt32(m.Groups[2].ToString(), 16);
 
-                        String sims2Path = Sims2ToolsLib.Sims2Path;
+                        string sims2Path = Sims2ToolsLib.Sims2Path;
                         if (sims2Path.Length > 0)
                         {
                             strLookupByIndexGlobal = BuildStrLookupTable(sims2Path + GameData.objectsSubPath, usingInstance, usingRegex);
@@ -657,11 +666,11 @@ namespace BhavFinder
 
             if (Directory.Exists(textFilePath.Text))
             {
-                List<String> packageFiles = new List<String>(Directory.GetFiles(textFilePath.Text, "*.package", SearchOption.AllDirectories));
+                List<string> packageFiles = new List<string>(Directory.GetFiles(textFilePath.Text, "*.package", SearchOption.AllDirectories));
 
                 int done = 0;
 
-                foreach (String packageFile in packageFiles)
+                foreach (string packageFile in packageFiles)
                 {
                     if (strLookupByIndexGlobal != null)
                     {
@@ -692,7 +701,7 @@ namespace BhavFinder
             e.Result = found;
         }
 
-        private int ProcessPackage(BackgroundWorker worker, DoWorkEventArgs e, String packagePath, BhavFilter filter, int found, bool reportPercent)
+        private int ProcessPackage(BackgroundWorker worker, DoWorkEventArgs e, string packagePath, BhavFilter filter, int found, bool reportPercent)
         {
             FileInfo fi = new FileInfo(packagePath);
 
@@ -718,6 +727,7 @@ namespace BhavFinder
                         {
                             DataRow row = bhavFoundData.NewRow();
                             row["Package"] = fi.Name;
+                            row["DbpfEntry"] = entry;
                             row["Instance"] = entry.InstanceID.ToShortString();
                             row["Name"] = bhav.KeyName;
                             row["GroupInstance"] = entry.GroupID.ToString();
@@ -787,7 +797,7 @@ namespace BhavFinder
             btnGO.Text = "FIND &BHAVs";
         }
 
-        private Dictionary<int, HashSet<TypeGroupID>> BuildStrLookupTable(String packagePath, TypeInstanceID instanceID, Regex regex)
+        private Dictionary<int, HashSet<TypeGroupID>> BuildStrLookupTable(string packagePath, TypeInstanceID instanceID, Regex regex)
         {
             Dictionary<int, HashSet<TypeGroupID>> lookup = new Dictionary<int, HashSet<TypeGroupID>>();
 
@@ -850,7 +860,7 @@ namespace BhavFinder
             menuItemPasteGUID.Enabled = Clipboard.ContainsText() && HexGUIDRegex.IsMatch(Clipboard.GetText(TextDataFormat.Text));
         }
 
-        private void PasteGuidClicked(object sender, EventArgs e)
+        private void OnPasteGuidClicked(object sender, EventArgs e)
         {
             if (Clipboard.ContainsText())
             {
@@ -867,6 +877,71 @@ namespace BhavFinder
                         operands[index++].Text = Helper.Hex2String(GUID % 256);
                         GUID /= 256;
                     }
+                }
+            }
+        }
+
+        private void OnContextFoundBhavsOpening(object sender, CancelEventArgs e)
+        {
+            menuItemExtract.Enabled = (gridFoundBhavs.SelectedRows.Count > 0);
+        }
+
+        private void OnExtractBhavsClicked(object sender, EventArgs e)
+        {
+            if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                string extractPath = selectPathDialog.FileName;
+
+                string bhavSubPath = "42484156 - Behaviour Function";
+                string dataFilePath = $"{extractPath}\\{bhavSubPath}";
+
+                Directory.CreateDirectory(dataFilePath);
+
+                using (DBPFFile package = new DBPFFile(textFilePath.Text))
+                {
+                    StreamWriter packageWriter = new StreamWriter($"{extractPath}\\package.xml");
+                    packageWriter.WriteLine($"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+                    packageWriter.WriteLine($"<package type=\"2\">");
+
+                    foreach (DataGridViewRow row in gridFoundBhavs.SelectedRows)
+                    {
+                        DBPFEntry entry = row.Cells["colBhavDbpfEntry"].Value as DBPFEntry;
+                        string dataFileName = $"{entry.ResourceID.Hex8String()}-{entry.GroupID.Hex8String()}-{entry.InstanceID.Hex8String()}.simpe";
+
+                        byte[] data = package.GetOriginalItemByEntry(entry);
+
+                        Stream dataWriter = new FileStream($"{dataFilePath}\\{dataFileName}", FileMode.OpenOrCreate, FileAccess.Write);
+                        dataWriter.Write(data, 0, data.Length);
+                        dataWriter.Close();
+
+                        StreamWriter xmlWriter = new StreamWriter($"{dataFilePath}\\{dataFileName}.xml");
+                        xmlWriter.WriteLine($"<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
+                        xmlWriter.WriteLine($"<package type=\"2\">");
+                        xmlWriter.WriteLine($"    <packedfile path=\"\" name=\"{dataFileName}\">");
+                        xmlWriter.WriteLine($"        <type>");
+                        xmlWriter.WriteLine($"            <number>1112031574</number>");
+                        xmlWriter.WriteLine($"        </type>");
+                        xmlWriter.WriteLine($"        <classid>0</classid>");
+                        xmlWriter.WriteLine($"        <group>{entry.GroupID.IntString()}</group>");
+                        xmlWriter.WriteLine($"        <instance>{entry.InstanceID.IntString()}</instance>");
+                        xmlWriter.WriteLine($"    </packedfile>");
+                        xmlWriter.WriteLine($"</package>");
+                        xmlWriter.Close();
+
+                        packageWriter.WriteLine($"    <packedfile path=\"42484156 - Behaviour Function\" name=\"{dataFileName}\">");
+                        packageWriter.WriteLine($"        <type>");
+                        packageWriter.WriteLine($"            <number>1112031574</number>");
+                        packageWriter.WriteLine($"        </type>");
+                        packageWriter.WriteLine($"        <classid>0</classid>");
+                        packageWriter.WriteLine($"        <group>{entry.GroupID.IntString()}</group>");
+                        packageWriter.WriteLine($"        <instance>{entry.InstanceID.IntString()}</instance>");
+                        packageWriter.WriteLine($"    </packedfile>");
+                    }
+
+                    packageWriter.WriteLine($"</package>");
+                    packageWriter.Close();
+
+                    package.Close();
                 }
             }
         }

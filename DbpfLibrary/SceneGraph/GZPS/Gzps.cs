@@ -12,7 +12,6 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
-using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.GZPS
@@ -22,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xEBCF3E27;
-        public const String NAME = "GZPS";
+        public const string NAME = "GZPS";
 
         public Gzps(DBPFEntry entry) : base(entry)
         {

@@ -22,7 +22,7 @@ namespace Sims2Tools.DBPF.SceneGraph.CINE
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4D51F042;
-        public const String NAME = "CINE";
+        public const string NAME = "CINE";
 
         public Cine(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

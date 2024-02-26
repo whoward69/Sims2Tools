@@ -21,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     public class CMaterialDefinition : AbstractRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x49596978;
-        public static String NAME = "cMaterialDefinition";
+        public static string NAME = "cMaterialDefinition";
 
         string fldsc;
         public string FileDescription => fldsc;
@@ -62,7 +62,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             if (GetProperty(name) != null) return false;
 
-            properties.Add(new MaterialDefinitionProperty(name, value, true));
+            properties.Add(new MaterialDefinitionProperty(name, value));
 
             return true;
         }
@@ -102,7 +102,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             mattype = "";
 
             properties = new List<MaterialDefinitionProperty>();
-            fileList = new String[0];
+            fileList = new string[0];
         }
 
         public override void Unserialize(DbpfReader reader)
@@ -127,11 +127,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             if (version == 8)
             {
-                fileList = new String[0];
+                fileList = new string[0];
             }
             else
             {
-                fileList = new String[reader.ReadUInt32()];
+                fileList = new string[reader.ReadUInt32()];
                 for (int i = 0; i < fileList.Length; i++)
                 {
                     fileList[i] = reader.ReadString();
@@ -207,23 +207,23 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         private string name;
         private string value;
 
-        private bool isDirty = false;
-        internal bool IsDirty => isDirty;
-        internal void SetClean() => isDirty = false;
+        private bool _isDirty = false;
+        internal bool IsDirty => _isDirty;
+        internal void SetClean() => _isDirty = false;
 
         internal string Name => name;
 
         internal string Value
         {
             get { return this.value; }
-            set { this.value = value; isDirty = true; }
+            set { this.value = value; _isDirty = true; }
         }
 
-        internal MaterialDefinitionProperty(string name, string value, bool isDirty)
+        internal MaterialDefinitionProperty(string name, string value)
         {
             this.name = name;
             this.value = value;
-            this.isDirty = isDirty;
+            this._isDirty = true;
         }
 
 

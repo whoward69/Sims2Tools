@@ -26,7 +26,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x7BA3838C;
-        public const String NAME = "GMND";
+        public const string NAME = "GMND";
 
 #if !DEBUG
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -36,6 +36,13 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
         public CGeometryNode GeometryNode => cGeometryNode;
 
         public override bool IsDirty => base.IsDirty || (cGeometryNode != null && cGeometryNode.IsDirty);
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            cGeometryNode?.SetClean();
+        }
 
         public Gmnd(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

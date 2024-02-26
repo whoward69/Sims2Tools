@@ -13,7 +13,6 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
-using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -23,7 +22,7 @@ namespace Sims2Tools.DBPF.OBJF
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4F424A66;
-        public const String NAME = "OBJf";
+        public const string NAME = "OBJf";
 
         private uint[] header;
 

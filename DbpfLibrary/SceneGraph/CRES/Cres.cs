@@ -15,7 +15,6 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LPNT;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
-using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -25,7 +24,7 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xE519C933;
-        public const String NAME = "CRES";
+        public const string NAME = "CRES";
 
         public Cres(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

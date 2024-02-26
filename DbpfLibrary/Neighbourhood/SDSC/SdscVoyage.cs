@@ -12,7 +12,6 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
-using System;
 using System.IO;
 using System.Xml;
 
@@ -26,7 +25,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             collect = 0;
         }
 
-        UInt64 collect;
+        ulong collect;
         ushort daysleft;
         public ushort DaysLeft
         {

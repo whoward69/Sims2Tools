@@ -809,7 +809,7 @@ namespace RepositoryWizard
                             {
                                 if (EncodeAge() != 0x0000 && EncodeCategory() != 0x0000)
                                 {
-                                    if (!String.IsNullOrEmpty(textMesh.Text))
+                                    if (!string.IsNullOrEmpty(textMesh.Text))
                                     {
                                         saveAs = true;
                                     }
@@ -819,9 +819,9 @@ namespace RepositoryWizard
                     }
                     else
                     {
-                        if (!String.IsNullOrEmpty(textMaster.Text))
+                        if (!string.IsNullOrEmpty(textMaster.Text))
                         {
-                            if (!String.IsNullOrEmpty(comboSlavePrimarySubset.SelectedItem as string))
+                            if (!string.IsNullOrEmpty(comboSlavePrimarySubset.SelectedItem as string))
                             {
                                 if (!comboSlavePrimarySubset.SelectedItem.Equals(comboSlaveSecondarySubset.SelectedItem))
                                 {
@@ -1122,7 +1122,7 @@ namespace RepositoryWizard
             }
         }
 
-        private void MyMruList_FileSelected(String folder)
+        private void MyMruList_FileSelected(string folder)
         {
             rootFolder = folder;
             DoWork_FillTree(rootFolder, false, true);
@@ -1578,7 +1578,7 @@ namespace RepositoryWizard
                 int colonPos = macro.IndexOf(':');
                 if (colonPos != -1)
                 {
-                    Int32.TryParse(macro.Substring(colonPos + 1), out macroLen);
+                    int.TryParse(macro.Substring(colonPos + 1), out macroLen);
                     macro = macro.Substring(0, colonPos).ToLower();
                 }
 
@@ -1736,7 +1736,7 @@ namespace RepositoryWizard
                 {
                     cachedTypeValue = newTypeValue;
 
-                    foreach (Object o in comboType.Items)
+                    foreach (object o in comboType.Items)
                     {
                         if ((o as UintNamedValue).Value == cachedTypeValue)
                         {
@@ -1762,7 +1762,7 @@ namespace RepositoryWizard
                 {
                     cachedGenderValue = newGenderValue;
 
-                    foreach (Object o in comboGender.Items)
+                    foreach (object o in comboGender.Items)
                     {
                         if ((o as UintNamedValue).Value == cachedGenderValue)
                         {
@@ -1838,7 +1838,7 @@ namespace RepositoryWizard
                 {
                     cachedProductValue = newProductValue;
 
-                    foreach (Object o in comboProduct.Items)
+                    foreach (object o in comboProduct.Items)
                     {
                         if ((o as UintNamedValue).Value == cachedProductValue)
                         {
@@ -1860,7 +1860,7 @@ namespace RepositoryWizard
                 {
                     cachedShoeValue = newShoeValue;
 
-                    foreach (Object o in comboShoe.Items)
+                    foreach (object o in comboShoe.Items)
                     {
                         if ((o as UintNamedValue).Value == cachedShoeValue)
                         {

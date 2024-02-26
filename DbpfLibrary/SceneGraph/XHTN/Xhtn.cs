@@ -12,7 +12,6 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
-using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.XHTN
@@ -22,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.XHTN
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x8C1580B5;
-        public const String NAME = "XHTN";
+        public const string NAME = "XHTN";
 
         public Xhtn(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

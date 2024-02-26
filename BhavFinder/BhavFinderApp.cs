@@ -16,10 +16,10 @@ namespace BhavFinder
 {
     static class BhavFinderApp
     {
-        public static String AppName = "BHAV Finder";
+        public static string AppName = "BHAV Finder";
 
         public static int AppVersionMajor = 1;
-        public static int AppVersionMinor = 8;
+        public static int AppVersionMinor = 9;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;
@@ -39,7 +39,7 @@ namespace BhavFinder
         public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static String RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\BhavFinder";
+        public static string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\BhavFinder";
 
         [STAThread]
         static void Main()

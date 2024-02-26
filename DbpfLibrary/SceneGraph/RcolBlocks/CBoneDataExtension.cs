@@ -13,14 +13,13 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
-using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CBoneDataExtension : AbstractRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xE9075BC5;
-        public static String NAME = "cBoneDataExtension";
+        public static string NAME = "cBoneDataExtension";
 
 
         readonly Extension ext;

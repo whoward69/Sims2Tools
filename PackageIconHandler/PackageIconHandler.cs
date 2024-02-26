@@ -28,7 +28,7 @@ namespace PackageIconHandler
             Icon icon;
 
             FileInfo fi = new FileInfo(SelectedItemPath);
-            String iconPath = $"{fi.FullName.Substring(0, fi.FullName.Length - fi.Extension.Length)}.ico";
+            string iconPath = $"{fi.FullName.Substring(0, fi.FullName.Length - fi.Extension.Length)}.ico";
             iconPath = iconPath.Replace(@"\Downloads\", @"\Thumbnails\Downloads\");
 
             try

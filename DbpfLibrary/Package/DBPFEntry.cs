@@ -26,24 +26,22 @@ namespace Sims2Tools.DBPF.Package
 
         public uint FileOffset
         {
-            get { return fileOffset; }
-            set { fileOffset = value; }
+            get => fileOffset;
+            set => fileOffset = value;
         }
 
         public uint FileSize
         {
-            get { return fileSize; }
-            set { dataSize = fileSize = value; }
+            get => fileSize;
+            set => dataSize = fileSize = value;
         }
 
-        public uint DataSize
-        {
-            get { return dataSize; }
-        }
+        public uint DataSize => dataSize;
 
         public uint UncompressedSize
         {
-            get { return uncompressedSize; }
+            get => uncompressedSize;
+
             set
             {
 #if DEBUG

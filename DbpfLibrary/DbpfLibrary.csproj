@@ -143,7 +143,7 @@
     <Compile Include="SceneGraph\COLL\Coll.cs" />
     <Compile Include="SceneGraph\CRES\Cres.cs" />
     <Compile Include="SceneGraph\Geometry\GeometryException.cs" />
-    <Compile Include="SceneGraph\Geometry\Matrices.cs.cs" />
+    <Compile Include="SceneGraph\Geometry\Matrices.cs" />
     <Compile Include="SceneGraph\Geometry\Quaternion.cs" />
     <Compile Include="SceneGraph\Geometry\Vectors.cs" />
     <Compile Include="SceneGraph\Geometry\VectorTransformation.cs" />

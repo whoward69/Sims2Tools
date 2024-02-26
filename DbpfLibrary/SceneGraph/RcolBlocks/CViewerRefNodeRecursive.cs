@@ -13,14 +13,13 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
-using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CViewerRefNodeRecursive : AbstractRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x0C152B8E;
-        public static String NAME = "cViewerRefNodeRecursive";
+        public static string NAME = "cViewerRefNodeRecursive";
 
 
         readonly ViewerRefNodeBase vrnb;

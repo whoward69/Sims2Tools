@@ -16,7 +16,7 @@ namespace SgChecker
 {
     static class SgCheckerApp
     {
-        public static String AppName = "SG Checker";
+        public static string AppName = "SG Checker";
 
         public static int AppVersionMajor = 1;
         public static int AppVersionMinor = 2;
@@ -39,7 +39,7 @@ namespace SgChecker
         public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static String RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\SgChecker";
+        public static string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\SgChecker";
 
         // Configuration is in App.config
         // private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

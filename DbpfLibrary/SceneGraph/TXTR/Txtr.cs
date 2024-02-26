@@ -13,7 +13,6 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
-using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.TXTR
@@ -22,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x1C4A276C;
-        public const String NAME = "TXTR";
+        public const string NAME = "TXTR";
 
         public Txtr(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

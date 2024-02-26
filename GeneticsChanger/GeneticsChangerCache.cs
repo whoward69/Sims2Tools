@@ -65,8 +65,6 @@ namespace GeneticsChanger
 
         public Image Thumbnail => thumbnail?.Image;
 
-        public bool IsDirty => (cpf.IsDirty || str.IsDirty || thumbnail.IsDirty || idrForCpf.IsDirty || binx.IsDirty || idrForBinx.IsDirty);
-
         public bool HasThumbnail()
         {
             return (IsSkin || IsEyes) && thumbnail != null;
@@ -76,6 +74,8 @@ namespace GeneticsChanger
         {
             return IsHair && cigenFile != null && cigenFile.HasThumbnail(cpf);
         }
+
+        public bool IsDirty => (cpf.IsDirty || str.IsDirty || thumbnail.IsDirty || idrForCpf.IsDirty || binx.IsDirty || idrForBinx.IsDirty);
 
         public void SetClean()
         {
@@ -380,7 +380,7 @@ namespace GeneticsChanger
             }
         }
 
-        public Single Genetic
+        public float Genetic
         {
             get
             {
@@ -482,6 +482,8 @@ namespace GeneticsChanger
 
         public bool IsDirty => package.IsDirty;
 
+        public void SetClean() => package.SetClean();
+
         public GeneticsDbpfFile(string packagePath, bool isCached)
         {
             this.package = new DBPFFile(packagePath);
@@ -518,12 +520,12 @@ namespace GeneticsChanger
     {
         private readonly Dictionary<string, GeneticsDbpfFile> cache = new Dictionary<string, GeneticsDbpfFile>();
 
-        public bool IsDirty() => (cache.Count > 0);
-
         public bool Contains(string packagePath)
         {
             return cache.ContainsKey(packagePath);
         }
+
+        public bool IsDirty => (cache.Count > 0);
 
         public bool SetClean(GeneticsDbpfFile package)
         {

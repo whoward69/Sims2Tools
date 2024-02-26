@@ -142,7 +142,7 @@ namespace Sims2Tools.Updates
 
                 XmlTextReader reader = new XmlTextReader($"https://www.picknmixmods.com/Sims2/Notes/Sims2Tools.html?now={now.Ticks}");
 
-                String eleName = AppRegKey.Substring(AppRegKey.LastIndexOf(@"\") + 1);
+                string eleName = AppRegKey.Substring(AppRegKey.LastIndexOf(@"\") + 1);
 
                 while (reader.Read())
                 {

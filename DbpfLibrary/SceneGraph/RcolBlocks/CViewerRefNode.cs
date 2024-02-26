@@ -13,14 +13,13 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
-using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CViewerRefNode : AbstractRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x7BA3838C; // NOTE: This could be wrong as same value as cGeometryNode (SimPe has same duplication)
-        public static String NAME = "cViewerRefNode";
+        public static string NAME = "cViewerRefNode";
 
         private readonly ViewerRefNodeBase vrnb;
         private readonly RenderableNode rn;

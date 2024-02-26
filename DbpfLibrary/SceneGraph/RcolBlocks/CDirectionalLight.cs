@@ -13,7 +13,6 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
-using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
@@ -21,7 +20,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xC9C81BA3;
-        public const String NAME = "cDirectionalLight";
+        public const string NAME = "cDirectionalLight";
 
 
 

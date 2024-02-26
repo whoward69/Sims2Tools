@@ -13,14 +13,13 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
-using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class CDataListExtension : AbstractRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x6A836D56;
-        public static String NAME = "cDataListExtension";
+        public static string NAME = "cDataListExtension";
 
         private readonly Extension ext;
 
@@ -29,6 +28,14 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             get { return ext; }
         }
 
+        public override bool IsDirty => base.IsDirty || ext.IsDirty;
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            ext.SetClean();
+        }
 
         // Needed by reflection to create the class
         public CDataListExtension(Rcol parent) : base(parent)
@@ -76,6 +83,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             writer.WriteString(ext.BlockName);
             writer.WriteBlockId(ext.BlockID);
             ext.Serialize(writer, version);
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} - {ext.VarName}";
         }
 
         public override void Dispose()

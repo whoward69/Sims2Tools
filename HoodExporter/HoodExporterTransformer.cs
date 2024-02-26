@@ -44,10 +44,10 @@ namespace HoodExporter
             objectsPackage?.Close();
         }
 
-        public HoodExporterTransformer(String exportPath)
+        public HoodExporterTransformer(string exportPath)
         {
             processor = new Processor();
-            // String saxonEd = processor.Edition;
+            // string saxonEd = processor.Edition;
 
             processor.RegisterExtensionFunction(new AsBinaryDefn());
             processor.RegisterExtensionFunction(new AsIntDefn());
@@ -137,10 +137,10 @@ namespace HoodExporter
 
     abstract class AsStringCastDefn : ExtensionFunctionDefinition
     {
-        private readonly String name;
+        private readonly string name;
         private readonly QName resultType;
 
-        public AsStringCastDefn(String name, QName resultType)
+        public AsStringCastDefn(string name, QName resultType)
         {
             this.name = name;
             this.resultType = resultType;
@@ -161,19 +161,19 @@ namespace HoodExporter
             if (arguments.Length > 0 && arguments[0].MoveNext())
             {
                 XdmAtomicValue arg = (XdmAtomicValue)arguments[0].Current;
-                String str = (String)arg.Value;
+                string str = (string)arg.Value;
 
                 try
                 {
-                    UInt32 result;
+                    uint result;
 
                     if (str.StartsWith("0x"))
                     {
-                        result = UInt32.Parse(str.Substring(2), NumberStyles.HexNumber);
+                        result = uint.Parse(str.Substring(2), NumberStyles.HexNumber);
                     }
                     else
                     {
-                        result = UInt32.Parse(str);
+                        result = uint.Parse(str);
                     }
 
                     return GetResult(result).GetEnumerator();
@@ -194,10 +194,10 @@ namespace HoodExporter
 
     abstract class AsIntCastDefn : ExtensionFunctionDefinition
     {
-        private readonly String name;
+        private readonly string name;
         private readonly QName resultType;
 
-        public AsIntCastDefn(String name, QName resultType)
+        public AsIntCastDefn(string name, QName resultType)
         {
             this.name = name;
             this.resultType = resultType;
@@ -259,7 +259,7 @@ namespace HoodExporter
     {
         protected override XdmAtomicValue GetResult(long value, int digits)
         {
-            String hex = $"00000000{Helper.Hex8String((uint)value)}";
+            string hex = $"00000000{Helper.Hex8String((uint)value)}";
 
             if (digits <= 0) digits = 8;
             if (digits > hex.Length) digits = hex.Length;
@@ -279,7 +279,7 @@ namespace HoodExporter
     {
         protected override XdmAtomicValue GetResult(long value, int digits)
         {
-            String hex = $"00000000{Helper.Hex8String((uint)value)}";
+            string hex = $"00000000{Helper.Hex8String((uint)value)}";
 
             if (digits <= 0) digits = 8;
             if (digits > hex.Length) digits = hex.Length;
@@ -299,7 +299,7 @@ namespace HoodExporter
     {
         protected override XdmAtomicValue GetResult(long value, int digits)
         {
-            String bin = $"0000000000000000{Helper.Binary16String((uint)value)}";
+            string bin = $"0000000000000000{Helper.Binary16String((uint)value)}";
 
             if (digits <= 0) digits = 8;
             if (digits > bin.Length) digits = bin.Length;
@@ -325,11 +325,11 @@ namespace HoodExporter
         {
             if (arguments.Length > 0)
             {
-                String str = "No";
+                string str = "No";
 
                 if (arguments[0].MoveNext())
                 {
-                    str = (String)((XdmAtomicValue)arguments[0].Current).Value;
+                    str = (string)((XdmAtomicValue)arguments[0].Current).Value;
                 }
 
                 long digits = 0;
@@ -338,7 +338,7 @@ namespace HoodExporter
                     digits = (long)((XdmAtomicValue)arguments[1].Current).Value;
                 }
 
-                String result;
+                string result;
 
                 if (str.Length == 0 || str.Equals("No", StringComparison.CurrentCultureIgnoreCase) || str.Equals("N", StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -354,7 +354,7 @@ namespace HoodExporter
 
                     try
                     {
-                        uint num = UInt32.Parse(str, NumberStyles.HexNumber);
+                        uint num = uint.Parse(str, NumberStyles.HexNumber);
 
                         result = (num == 0) ? "No" : "Yes";
                     }
@@ -397,17 +397,17 @@ namespace HoodExporter
 
                 if (arguments[0].MoveNext())
                 {
-                    string str = (String)((XdmAtomicValue)arguments[0].Current).Value;
+                    string str = (string)((XdmAtomicValue)arguments[0].Current).Value;
 
                     try
                     {
                         if (str.StartsWith("0x"))
                         {
-                            guid = UInt32.Parse(str.Substring(2), NumberStyles.HexNumber);
+                            guid = uint.Parse(str.Substring(2), NumberStyles.HexNumber);
                         }
                         else
                         {
-                            guid = UInt32.Parse(str);
+                            guid = uint.Parse(str);
                         }
                     }
                     catch (Exception)

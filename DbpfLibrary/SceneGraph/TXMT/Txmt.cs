@@ -25,7 +25,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x49596978;
-        public const String NAME = "TXMT";
+        public const string NAME = "TXMT";
 
 #if !DEBUG
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -35,6 +35,13 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
         public CMaterialDefinition MaterialDefinition => cMaterialDefinition;
 
         public override bool IsDirty => base.IsDirty || (cMaterialDefinition != null && cMaterialDefinition.IsDirty);
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            cMaterialDefinition?.SetClean();
+        }
 
         public Txmt(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
@@ -66,7 +73,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 
         public override SgResourceList SgNeededResources()
         {
-            String[] propKeys = { "stdMatBaseTextureName", "stdMatNormalMapTextureName", "stdMatEnvCubeTextureName" };
+            string[] propKeys = { "stdMatBaseTextureName", "stdMatNormalMapTextureName", "stdMatEnvCubeTextureName" };
 
             SgResourceList needed = new SgResourceList();
 
@@ -75,9 +82,9 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
                 // if (block.BlockID == CMaterialDefinition.TYPE)
                 {
                     // CMaterialDefinition cMaterialDefinition = block as CMaterialDefinition;
-                    HashSet<String> seen = new HashSet<String>();
+                    HashSet<string> seen = new HashSet<string>();
 
-                    foreach (String propKey in propKeys)
+                    foreach (string propKey in propKeys)
                     {
                         string prop = cMaterialDefinition.GetProperty(propKey);
 
@@ -106,7 +113,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
                         }
                     }
 
-                    foreach (String filename in cMaterialDefinition.FileList)
+                    foreach (string filename in cMaterialDefinition.FileList)
                     {
                         if (!seen.Contains(filename))
                         {

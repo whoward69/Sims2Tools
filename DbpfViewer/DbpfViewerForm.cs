@@ -47,8 +47,8 @@ namespace DbpfViewer
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private String packageFile = null;
-        private readonly SortedDictionary<String, String> localObjectsByGroupID = new SortedDictionary<string, string>();
+        private string packageFile = null;
+        private readonly SortedDictionary<string, string> localObjectsByGroupID = new SortedDictionary<string, string>();
 
         private MruList MyMruList;
         private Updater MyUpdater;
@@ -57,7 +57,7 @@ namespace DbpfViewer
 
         private readonly DbpfViewerData dbpfData = new DbpfViewerData();
 
-        private String pictName;
+        private string pictName;
 
         public DbpfViewerForm()
         {
@@ -126,7 +126,7 @@ namespace DbpfViewer
 
         private void OnSaveXmlToClipboardClicked(object sender, EventArgs e)
         {
-            String xml = GetXMl();
+            string xml = GetXMl();
 
             if (xml != null)
             {
@@ -140,7 +140,7 @@ namespace DbpfViewer
 
             if (saveXmlDialog.FileName != "")
             {
-                String xml = GetXMl();
+                string xml = GetXMl();
 
                 if (xml != null)
                 {
@@ -151,7 +151,7 @@ namespace DbpfViewer
             }
         }
 
-        private String GetXMl()
+        private string GetXMl()
         {
             XmlDocument doc = new XmlDocument();
 
@@ -430,7 +430,7 @@ namespace DbpfViewer
             RegistryTools.SaveSetting(DbpfViewerApp.RegistryKey + @"\Resources", Vers.NAME, enabled ? 1 : 0);
         }
 
-        private void MyMruList_FileSelected(String package)
+        private void MyMruList_FileSelected(string package)
         {
             DoWork_FillGrid(package);
         }
@@ -449,7 +449,7 @@ namespace DbpfViewer
             }
         }
 
-        private void DoWork_FillGrid(String packageFile)
+        private void DoWork_FillGrid(string packageFile)
         {
             this.packageFile = packageFile;
 
@@ -681,7 +681,7 @@ namespace DbpfViewer
 
                         res.AddXml(eleDbpf);
 
-                        String xml;
+                        string xml;
                         if (menuItemPrettyPrint.Checked)
                         {
                             xml = XDocument.Parse(eleDbpf.InnerXml).ToString();
@@ -810,7 +810,7 @@ namespace DbpfViewer
             DoImageSaveFromGrid("png");
         }
 
-        private void DoImageSaveFromGrid(String type)
+        private void DoImageSaveFromGrid(string type)
         {
             if (mouseLocation.RowIndex >= 0)
             {
@@ -823,7 +823,7 @@ namespace DbpfViewer
 
                     if (data != null)
                     {
-                        String typeName;
+                        string typeName;
                         if (type == null)
                         {
                             typeName = DBPFData.TypeName(entry.TypeID);
@@ -849,7 +849,7 @@ namespace DbpfViewer
             }
         }
 
-        private void DoImageSave(Image image, String name, String type, String typeName, byte[] data)
+        private void DoImageSave(Image image, string name, string type, string typeName, byte[] data)
         {
             saveRawDialog.DefaultExt = typeName.ToLower();
             saveRawDialog.Filter = $"{typeName} file|*.{typeName.ToLower()}|All files|*.*";

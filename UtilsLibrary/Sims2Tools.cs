@@ -8,29 +8,28 @@
 
 using Sims2Tools.Cache;
 using Sims2Tools.Utils.Persistence;
-using System;
 
 namespace Sims2Tools
 {
     public class Sims2ToolsLib
     {
-        public static String Copyright = "CopyRight (c) 2020-2023 - William Howard";
+        public static string Copyright = "CopyRight (c) 2020-2023 - William Howard";
 
-        public static String RegistryKey = @"WHoward\Sims2Tools";
-        private static readonly String Sims2PathKey = "Sims2Path";
-        private static readonly String Sims2HomePathKey = "Sims2HomePath";
-        private static readonly String SimPePathKey = "SimPePath";
+        public static string RegistryKey = @"WHoward\Sims2Tools";
+        private static readonly string Sims2PathKey = "Sims2Path";
+        private static readonly string Sims2HomePathKey = "Sims2HomePath";
+        private static readonly string SimPePathKey = "SimPePath";
 
-        private static readonly String SimPeKey = @"Ambertation\SimPe\Settings";
+        private static readonly string SimPeKey = @"Ambertation\SimPe\Settings";
 
-        private static readonly String CreatorNickNameKey = "CreatorNickName";
-        private static readonly String CreatorGuidKey = "CreatorGUID";
+        private static readonly string CreatorNickNameKey = "CreatorNickName";
+        private static readonly string CreatorGuidKey = "CreatorGUID";
 
-        public static String Sims2Path
+        public static string Sims2Path
         {
             get
             {
-                String path = RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.Sims2PathKey, "") as String;
+                string path = RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.Sims2PathKey, "") as string;
 
                 // Better to do this here rather than in the setter as a user can edit the registry directly
                 return path.EndsWith(@"\") ? path.Substring(0, path.Length - 1) : path;
@@ -55,11 +54,11 @@ namespace Sims2Tools
             get => RegistryTools.IsSet(RegistryKey, Sims2ToolsLib.Sims2HomePathKey);
         }
 
-        public static String Sims2HomePath
+        public static string Sims2HomePath
         {
             get
             {
-                String path = RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.Sims2HomePathKey, "") as String;
+                string path = RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.Sims2HomePathKey, "") as string;
 
                 // Better to do this here rather than in the setter as a user can edit the registry directly
                 return path.EndsWith(@"\") ? path.Substring(0, path.Length - 1) : path;
@@ -79,12 +78,12 @@ namespace Sims2Tools
             }
         }
 
-        public static String SimPePath
+        public static string SimPePath
         {
             get
             {
-                String simPePath = RegistryTools.GetSetting(Sims2ToolsLib.SimPeKey, "Path", "") as String;
-                String path = RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.SimPePathKey, simPePath) as String;
+                string simPePath = RegistryTools.GetSetting(Sims2ToolsLib.SimPeKey, "Path", "") as string;
+                string path = RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.SimPePathKey, simPePath) as string;
 
                 if (path.Length == 0) path = simPePath;
 
@@ -103,11 +102,11 @@ namespace Sims2Tools
                 }
             }
         }
-        public static String CreatorNickName
+        public static string CreatorNickName
         {
             get
             {
-                return RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.CreatorNickNameKey, "") as String;
+                return RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.CreatorNickNameKey, "") as string;
             }
             set
             {
@@ -122,11 +121,11 @@ namespace Sims2Tools
             }
         }
 
-        public static String CreatorGUID
+        public static string CreatorGUID
         {
             get
             {
-                return RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.CreatorGuidKey, "00000000-0000-0000-0000-000000000000") as String;
+                return RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.CreatorGuidKey, "00000000-0000-0000-0000-000000000000") as string;
             }
             set
             {

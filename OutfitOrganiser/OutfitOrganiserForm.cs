@@ -861,7 +861,7 @@ namespace OutfitOrganiser
             }
         }
 
-        private void MyMruList_FileSelected(String folder)
+        private void MyMruList_FileSelected(string folder)
         {
             rootFolder = folder;
             DoWork_FillTree(rootFolder, false, true);
@@ -2192,7 +2192,7 @@ namespace OutfitOrganiser
             {
                 cachedGenderValue = newGenderValue;
 
-                foreach (Object o in comboGender.Items)
+                foreach (object o in comboGender.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedGenderValue)
                     {
@@ -2218,7 +2218,7 @@ namespace OutfitOrganiser
             {
                 cachedShownValue = newShownValue;
 
-                foreach (Object o in comboShown.Items)
+                foreach (object o in comboShown.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedShownValue)
                     {
@@ -2294,7 +2294,7 @@ namespace OutfitOrganiser
             {
                 cachedProductValue = newProductValue;
 
-                foreach (Object o in comboProduct.Items)
+                foreach (object o in comboProduct.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedProductValue)
                     {
@@ -2316,7 +2316,7 @@ namespace OutfitOrganiser
             {
                 cachedShoeValue = newShoeValue;
 
-                foreach (Object o in comboShoe.Items)
+                foreach (object o in comboShoe.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedShoeValue)
                     {
@@ -2363,7 +2363,7 @@ namespace OutfitOrganiser
                 cachedJewelryValue = newJewelryValue;
                 comboJewelry.SelectedIndex = 0;
 
-                foreach (Object o in comboJewelry.Items)
+                foreach (object o in comboJewelry.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedJewelryValue)
                     {
@@ -2387,7 +2387,7 @@ namespace OutfitOrganiser
                 comboDestination.SelectedIndex = 0;
                 comboDestination.Enabled = false;
 
-                foreach (Object o in comboDestination.Items)
+                foreach (object o in comboDestination.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedDestinationValue)
                     {
@@ -2426,7 +2426,7 @@ namespace OutfitOrganiser
                 cachedMakeupSubtypeValue = newMakeupSubtypeValue;
                 comboMakeupSubtype.SelectedIndex = 0;
 
-                foreach (Object o in comboMakeupSubtype.Items)
+                foreach (object o in comboMakeupSubtype.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedMakeupSubtypeValue)
                     {
@@ -2451,7 +2451,7 @@ namespace OutfitOrganiser
                 comboMakeupLayer.SelectedIndex = -1;
                 comboMakeupLayer.Text = newMakeupLayerValue.ToString();
 
-                foreach (Object o in comboMakeupLayer.Items)
+                foreach (object o in comboMakeupLayer.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedMakeupLayerValue)
                     {
@@ -2748,7 +2748,7 @@ namespace OutfitOrganiser
         #region Textbox Events
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
-            if (!(Char.IsControl(e.KeyChar) || (e.KeyChar >= '0' && e.KeyChar <= '9')))
+            if (!(char.IsControl(e.KeyChar) || (e.KeyChar >= '0' && e.KeyChar <= '9')))
             {
                 e.Handled = true;
             }
@@ -2770,7 +2770,7 @@ namespace OutfitOrganiser
             {
                 uint data = 0;
 
-                if (textSort.Text.Length > 0 && !UInt32.TryParse(textSort.Text, out data))
+                if (textSort.Text.Length > 0 && !uint.TryParse(textSort.Text, out data))
                 {
                     textSort.Text = "0";
                     data = 0;
@@ -2792,7 +2792,7 @@ namespace OutfitOrganiser
                     {
                         uint data = 0;
 
-                        if (!(comboMakeupLayer.Text.Length > 0 && UInt32.TryParse(comboMakeupLayer.Text, out data)))
+                        if (!(comboMakeupLayer.Text.Length > 0 && uint.TryParse(comboMakeupLayer.Text, out data)))
                         {
                             comboMakeupLayer.Text = data.ToString();
                         }
@@ -2822,7 +2822,7 @@ namespace OutfitOrganiser
             {
                 uint data = 0;
 
-                if (textMakeupLayer.Text.Length > 0 && !UInt32.TryParse(textMakeupLayer.Text, out data))
+                if (textMakeupLayer.Text.Length > 0 && !uint.TryParse(textMakeupLayer.Text, out data))
                 {
                     textMakeupLayer.Text = "0";
                     data = 0;
@@ -2840,7 +2840,7 @@ namespace OutfitOrganiser
             {
                 uint data = 0;
 
-                if (textMakeupBin.Text.Length > 0 && !UInt32.TryParse(textMakeupBin.Text, out data))
+                if (textMakeupBin.Text.Length > 0 && !uint.TryParse(textMakeupBin.Text, out data))
                 {
                     textMakeupBin.Text = "0";
                     data = 0;
@@ -2858,7 +2858,7 @@ namespace OutfitOrganiser
             {
                 uint data = 0;
 
-                if (textAccessoryBin.Text.Length > 0 && !UInt32.TryParse(textAccessoryBin.Text, out data))
+                if (textAccessoryBin.Text.Length > 0 && !uint.TryParse(textAccessoryBin.Text, out data))
                 {
                     textAccessoryBin.Text = "0";
                     data = 0;

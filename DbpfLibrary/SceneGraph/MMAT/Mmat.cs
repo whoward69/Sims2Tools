@@ -14,7 +14,6 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
-using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.MMAT
@@ -23,7 +22,7 @@ namespace Sims2Tools.DBPF.SceneGraph.MMAT
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4C697E5A;
-        public const String NAME = "MMAT";
+        public const string NAME = "MMAT";
 
         public Mmat(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

@@ -12,7 +12,6 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
-using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
@@ -26,7 +25,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     public class CImageData : AbstractRcolBlock, /* IScenegraphBlock, */ System.IDisposable
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x1C4A276C;
-        public static String NAME = "cImageData";
+        public static string NAME = "cImageData";
 
         // Needed by reflection to create the class
         public CImageData(Rcol parent) : base(parent)

@@ -433,6 +433,8 @@ namespace RepositoryWizard
 
         public bool IsDirty => package.IsDirty;
 
+        public void SetClean() => package.SetClean();
+
         public RepoWizardDbpfFile(string packagePath, bool isCached)
         {
             this.package = new DBPFFile(packagePath);
@@ -472,12 +474,12 @@ namespace RepositoryWizard
     {
         private readonly Dictionary<string, RepoWizardDbpfFile> cache = new Dictionary<string, RepoWizardDbpfFile>();
 
-        public bool IsDirty() => (cache.Count > 0);
-
         public bool Contains(string packagePath)
         {
             return cache.ContainsKey(packagePath);
         }
+
+        public bool IsDirty => (cache.Count > 0);
 
         public bool SetClean(RepoWizardDbpfFile package)
         {

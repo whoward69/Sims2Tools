@@ -45,7 +45,7 @@ namespace Sims2Tools.DBPF
 
         public int CompareTo(TypeGUID other) => this.guid.CompareTo(other.guid);
 
-        public override String ToString() => Helper.Hex8PrefixString(guid);
+        public override string ToString() => Helper.Hex8PrefixString(guid);
 
         public int AsInt() => (int)guid;
     }
@@ -69,10 +69,10 @@ namespace Sims2Tools.DBPF
 
         public int CompareTo(TypeTypeID other) => this.id.CompareTo(other.id);
 
-        public override String ToString() => Helper.Hex8PrefixString(id);
-        public String ToShortString() => Helper.Hex4PrefixString(id);
-        public String Hex8String() => Helper.Hex8String(id);
-        public String IntString() => Helper.IntString(id);
+        public override string ToString() => Helper.Hex8PrefixString(id);
+        public string ToShortString() => Helper.Hex4PrefixString(id);
+        public string Hex8String() => Helper.Hex8String(id);
+        public string IntString() => Helper.IntString(id);
 
         public uint AsUInt() => id;
     }
@@ -93,10 +93,10 @@ namespace Sims2Tools.DBPF
 
         public int CompareTo(TypeGroupID other) => this.id.CompareTo(other.id);
 
-        public override String ToString() => Helper.Hex8PrefixString(id);
-        public String ToShortString() => Helper.Hex4PrefixString(id);
-        public String Hex8String() => Helper.Hex8String(id);
-        public String IntString() => Helper.IntString(id);
+        public override string ToString() => Helper.Hex8PrefixString(id);
+        public string ToShortString() => Helper.Hex4PrefixString(id);
+        public string Hex8String() => Helper.Hex8String(id);
+        public string IntString() => Helper.IntString(id);
 
         public uint AsUInt() => id;
 
@@ -119,10 +119,10 @@ namespace Sims2Tools.DBPF
 
         public int CompareTo(TypeInstanceID other) => this.id.CompareTo(other.id);
 
-        public override String ToString() => Helper.Hex8PrefixString(id);
-        public String ToShortString() => Helper.Hex4PrefixString(id);
-        public String Hex8String() => Helper.Hex8String(id);
-        public String IntString() => Helper.IntString(id);
+        public override string ToString() => Helper.Hex8PrefixString(id);
+        public string ToShortString() => Helper.Hex4PrefixString(id);
+        public string Hex8String() => Helper.Hex8String(id);
+        public string IntString() => Helper.IntString(id);
 
         public uint AsUInt() => id;
 
@@ -145,10 +145,10 @@ namespace Sims2Tools.DBPF
 
         public int CompareTo(TypeResourceID other) => this.id.CompareTo(other.id);
 
-        public override String ToString() => Helper.Hex8PrefixString(id);
-        public String ToShortString() => Helper.Hex4PrefixString(id);
-        public String Hex8String() => Helper.Hex8String(id);
-        public String IntString() => Helper.IntString(id);
+        public override string ToString() => Helper.Hex8PrefixString(id);
+        public string ToShortString() => Helper.Hex4PrefixString(id);
+        public string Hex8String() => Helper.Hex8String(id);
+        public string IntString() => Helper.IntString(id);
 
         public uint AsUInt() => id;
 
@@ -174,7 +174,7 @@ namespace Sims2Tools.DBPF
         public override bool Equals(object obj) => (obj is TypeBlockID blockId) && Equals(blockId);
         public override int GetHashCode() => base.GetHashCode();
 
-        public override String ToString() => Helper.Hex8PrefixString(id);
+        public override string ToString() => Helper.Hex8PrefixString(id);
 
         public uint AsUInt() => id;
     }

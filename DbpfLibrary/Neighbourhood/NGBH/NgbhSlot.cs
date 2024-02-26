@@ -12,7 +12,6 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
-using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -37,7 +36,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             base.Unserialize(reader);
         }
 
-        public void AddXml(XmlElement parent, String attrName)
+        public void AddXml(XmlElement parent, string attrName)
         {
             XmlElement element = base.AddXml(parent);
 

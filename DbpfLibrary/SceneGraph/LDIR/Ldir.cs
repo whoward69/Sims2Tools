@@ -13,7 +13,6 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LGHT;
-using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.LDIR
@@ -22,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.LDIR
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xC9C81BA3; // SimPE has this as 0xC9C81B9B (swapped with the LAMB value)
-        public const String NAME = "LDIR";
+        public const string NAME = "LDIR";
 
         public Ldir(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {

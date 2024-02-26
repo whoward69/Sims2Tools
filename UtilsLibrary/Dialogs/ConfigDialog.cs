@@ -35,7 +35,7 @@ namespace Sims2Tools
             }
             else
             {
-                String homePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EA Games\\";
+                string homePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\EA Games\\";
 
                 if (Directory.Exists($"{homePath}The Sims™ 2 Ultimate Collection"))
                 {
@@ -82,9 +82,9 @@ namespace Sims2Tools
 
         private void OnConfigOkClicked(object sender, EventArgs e)
         {
-            String oldSims2Path = Sims2ToolsLib.Sims2Path;
-            String oldSims2HomePath = Sims2ToolsLib.Sims2HomePath;
-            String oldSimPePath = Sims2ToolsLib.SimPePath;
+            string oldSims2Path = Sims2ToolsLib.Sims2Path;
+            string oldSims2HomePath = Sims2ToolsLib.Sims2HomePath;
+            string oldSimPePath = Sims2ToolsLib.SimPePath;
 
             Sims2ToolsLib.Sims2Path = textSims2Path.Text;
             Sims2ToolsLib.Sims2HomePath = textSims2HomePath.Text;

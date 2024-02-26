@@ -14,7 +14,6 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
-using System;
 using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
@@ -82,7 +81,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     public class CShapeRefNode : AbstractCresChildren
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x65245517;
-        public static String NAME = "cShapeRefNode";
+        public static string NAME = "cShapeRefNode";
         readonly RenderableNode rn;
         readonly BoundedNode bn;
         readonly CTransformNode tn;

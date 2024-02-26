@@ -13,7 +13,6 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
-using System;
 using System.IO;
 using System.Xml;
 
@@ -27,7 +26,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 
         protected abstract void AddXml(XmlElement parent);
 
-        internal XmlElement AddXml(XmlElement parent, String name)
+        internal XmlElement AddXml(XmlElement parent, string name)
         {
             if (valid)
             {
@@ -42,7 +41,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             return null;
         }
 
-        protected XmlElement CreateElement(XmlElement parent, String name)
+        protected XmlElement CreateElement(XmlElement parent, string name)
         {
             XmlElement element = parent.OwnerDocument.CreateElement(name);
             parent.AppendChild(element);

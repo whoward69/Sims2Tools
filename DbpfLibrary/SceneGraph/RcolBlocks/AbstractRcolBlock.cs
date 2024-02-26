@@ -28,10 +28,10 @@ namespace Sims2Tools.DBPF.SceneGraph
         protected uint version;
         protected readonly Rcol parent = null;
 
-        protected bool isDirty = false;
+        protected bool _isDirty = false;
 
-        public virtual bool IsDirty => isDirty;
-        public virtual void SetClean() => isDirty = false;
+        public virtual bool IsDirty => _isDirty;
+        public virtual void SetClean() => _isDirty = false;
 
         public SGResource NameResource
         {

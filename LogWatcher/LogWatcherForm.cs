@@ -25,7 +25,7 @@ namespace LogWatcher
         private MruList MyMruList;
         private Updater MyUpdater;
 
-        private String logsDir;
+        private string logsDir;
 
         public LogWatcherForm()
         {
@@ -49,7 +49,7 @@ namespace LogWatcher
             MyMruList = new MruList(LogWatcherApp.RegistryKey, menuItemRecentLogs, Properties.Settings.Default.MruSize, true, false);
             MyMruList.FileSelected += MyMruList_FileSelected;
 
-            String optOpenAtStart = (String)RegistryTools.GetSetting(LogWatcherApp.RegistryKey + @"\Options", "OpenAtStart", "None");
+            string optOpenAtStart = (string)RegistryTools.GetSetting(LogWatcherApp.RegistryKey + @"\Options", "OpenAtStart", "None");
             menuItemOpenAll.Checked = (optOpenAtStart.Equals("All"));
             menuItemOpenRecent.Checked = (optOpenAtStart.Equals("Recent"));
 
@@ -63,7 +63,7 @@ namespace LogWatcher
             {
                 if (menuItemOpenAll.Checked || menuItemOpenRecent.Checked)
                 {
-                    foreach (String logFile in Directory.GetFiles(logsDir, "ObjectError_*.txt"))
+                    foreach (string logFile in Directory.GetFiles(logsDir, "ObjectError_*.txt"))
                     {
                         if (menuItemOpenRecent.Checked && File.GetLastWriteTime(logFile) < DateTime.Now.AddHours(-Properties.Settings.Default.RecentHours))
                         {
@@ -117,7 +117,7 @@ namespace LogWatcher
             }
         }
 
-        private void MyMruList_FileSelected(String logFilePath)
+        private void MyMruList_FileSelected(string logFilePath)
         {
             LoadErrorLog(logFilePath);
         }
@@ -128,7 +128,7 @@ namespace LogWatcher
             selectFileDialog.FileName = "ObjectError_*.txt";
             if (selectFileDialog.ShowDialog() == DialogResult.OK)
             {
-                foreach (String fileName in selectFileDialog.FileNames)
+                foreach (string fileName in selectFileDialog.FileNames)
                 {
                     LoadErrorLog(fileName);
                     MyMruList.AddFile(fileName);
@@ -136,7 +136,7 @@ namespace LogWatcher
             }
         }
 
-        private void LoadErrorLog(String logFilePath)
+        private void LoadErrorLog(string logFilePath)
         {
             foreach (TabPage tab in tabControl.TabPages)
             {
@@ -291,7 +291,7 @@ namespace LogWatcher
         {
             if (tabControl.SelectedTab != null)
             {
-                String logFilePath = null;
+                string logFilePath = null;
 
                 if (tabControl.SelectedTab is LogTab logTab)
                 {

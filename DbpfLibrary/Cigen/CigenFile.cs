@@ -33,6 +33,8 @@ namespace Sims2Tools.DBPF.Cigen
 
         public bool IsDirty => ((cigenPackage != null) && cigenPackage.IsDirty);
 
+        public void SetClean() => cigenPackage?.SetClean();
+
         public CigenFile(string cigenPath)
         {
             this.cigenPath = cigenPath;

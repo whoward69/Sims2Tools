@@ -10,8 +10,6 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using System;
-
 namespace Sims2Tools.DBPF.SceneGraph
 {
     public interface IPackageHeader
@@ -36,7 +34,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// Returns the Major Version of The Packages FileFormat
         /// </summary>
         /// <remarks>This value should be 1</remarks>
-        Int32 MajorVersion
+        int MajorVersion
         {
             get;
         }
@@ -47,7 +45,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         /// Returns the Minor Version of The Packages FileFormat 
         /// </summary>
         /// <remarks>This value should be 0 or 1</remarks>
-        Int32 MinorVersion
+        int MinorVersion
         {
             get;
         }

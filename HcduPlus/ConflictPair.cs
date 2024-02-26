@@ -20,9 +20,9 @@ namespace HcduPlus.Conflict
         public TypeTypeID Type { get; }
         public TypeGroupID Group { get; }
         public TypeInstanceID Instance { get; }
-        public String Name { get; }
+        public string Name { get; }
 
-        public ConflictDetail(TypeTypeID type, TypeGroupID group, TypeInstanceID instance, String name)
+        public ConflictDetail(TypeTypeID type, TypeGroupID group, TypeInstanceID instance, string name)
         {
             Type = type;
             Group = group;
@@ -33,12 +33,12 @@ namespace HcduPlus.Conflict
 
     public class ConflictPair : IComparable<ConflictPair>
     {
-        public String PackageA { get; }
-        public String PackageB { get; }
+        public string PackageA { get; }
+        public string PackageB { get; }
 
         public List<ConflictDetail> Details { get; }
 
-        public ConflictPair(String PackageA, String PackageB)
+        public ConflictPair(string PackageA, string PackageB)
         {
             this.PackageA = PackageA;
             this.PackageB = PackageB;
@@ -46,14 +46,14 @@ namespace HcduPlus.Conflict
             this.Details = new List<ConflictDetail>();
         }
 
-        public void AddTGI(TypeTypeID type, TypeGroupID group, TypeInstanceID instance, String name)
+        public void AddTGI(TypeTypeID type, TypeGroupID group, TypeInstanceID instance, string name)
         {
             Details.Add(new ConflictDetail(type, group, instance, name));
         }
 
-        public String DetailText(String prefix = "")
+        public string DetailText(string prefix = "")
         {
-            String s = "";
+            string s = "";
 
             foreach (ConflictDetail detail in Details)
             {

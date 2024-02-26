@@ -12,7 +12,6 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
-using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.BINX
@@ -22,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x0C560F39;
-        public const String NAME = "BINX";
+        public const string NAME = "BINX";
 
         public override string KeyName
         {

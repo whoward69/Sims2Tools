@@ -35,18 +35,18 @@ namespace HcduPlus
         {
             DataGridViewRow row = gridKnownConflicts.Rows[e.RowIndex];
 
-            row.ErrorText = String.Empty;
+            row.ErrorText = string.Empty;
             btnKnownOk.Enabled = true;
 
-            if (String.IsNullOrEmpty(row.Cells[0].Value as String) && String.IsNullOrEmpty(row.Cells[0].Value as String)) return;
+            if (string.IsNullOrEmpty(row.Cells[0].Value as string) && string.IsNullOrEmpty(row.Cells[0].Value as string)) return;
 
             try
             {
-                new Regex(row.Cells[0].Value as String);
+                new Regex(row.Cells[0].Value as string);
 
                 try
                 {
-                    new Regex(row.Cells[1].Value as String);
+                    new Regex(row.Cells[1].Value as string);
 
                     return;
                 }

@@ -390,6 +390,8 @@ namespace ObjectRelocator
 
         public bool IsDirty => package.IsDirty;
 
+        public void SetClean() => package.SetClean();
+
         public RelocatorDbpfFile(string packagePath, bool isCached)
         {
             this.package = new DBPFFile(packagePath);
@@ -426,12 +428,12 @@ namespace ObjectRelocator
     {
         private readonly Dictionary<string, RelocatorDbpfFile> cache = new Dictionary<string, RelocatorDbpfFile>();
 
-        public bool IsDirty() => (cache.Count > 0);
-
         public bool Contains(string packagePath)
         {
             return cache.ContainsKey(packagePath);
         }
+
+        public bool IsDirty => (cache.Count > 0);
 
         public bool SetClean(RelocatorDbpfFile package)
         {
@@ -487,6 +489,12 @@ namespace ObjectRelocator
         }
 
         public bool IsDirty => (thumbCacheBuyMode != null && thumbCacheBuyMode.IsDirty) || (thumbCacheBuildMode != null && thumbCacheBuildMode.IsDirty);
+
+        public void SetClean()
+        {
+            thumbCacheBuyMode?.SetClean();
+            thumbCacheBuildMode?.SetClean();
+        }
 
         public void Update(bool autoBackup)
         {
