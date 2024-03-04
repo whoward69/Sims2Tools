@@ -1297,6 +1297,11 @@ namespace RepositoryWizard
             }
 
             UpdateFormState();
+
+            if (gridResources.SelectedRows.Count == 1)
+            {
+                gridResources.CurrentCell = gridResources.SelectedRows[0].Cells["colId"];
+            }
         }
 
         private void OnResourceBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)

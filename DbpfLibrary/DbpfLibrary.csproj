@@ -81,6 +81,7 @@
     <Compile Include="CTSS\Ctss.cs" />
     <Compile Include="DBPFData.cs" />
     <Compile Include="Images\THUB\Thub.cs" />
+    <Compile Include="OBJF\ObjfIndex.cs" />
     <Compile Include="Package\DBPFEntry.cs" />
     <Compile Include="OBJD\ObjdType.cs" />
     <Compile Include="OBJD\ObjdIndex.cs" />

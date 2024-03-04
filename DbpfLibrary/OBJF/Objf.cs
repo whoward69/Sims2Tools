@@ -33,6 +33,36 @@ namespace Sims2Tools.DBPF.OBJF
             Unserialize(reader);
         }
 
+        public ushort GetGuardian(ObjfIndex index)
+        {
+            return GetGuardian((int)index);
+        }
+
+        public ushort GetGuardian(int index)
+        {
+            if (items != null && index < items.Count)
+            {
+                return items[index].Guardian;
+            }
+
+            return 0;
+        }
+
+        public ushort GetAction(ObjfIndex index)
+        {
+            return GetAction((int)index);
+        }
+
+        public ushort GetAction(int index)
+        {
+            if (items != null && index < items.Count)
+            {
+                return items[index].Action;
+            }
+
+            return 0;
+        }
+
         protected void Unserialize(DbpfReader reader)
         {
             this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
@@ -61,6 +91,7 @@ namespace Sims2Tools.DBPF.OBJF
                 {
                     XmlElement ele = XmlHelper.CreateElement(element, "item");
                     ele.SetAttribute("index", Helper.Hex4PrefixString(i));
+                    ele.SetAttribute("name", ((ObjfIndex)i).ToString());
                     ele.SetAttribute("guardian", Helper.Hex4PrefixString(items[i].Guardian));
                     ele.SetAttribute("action", Helper.Hex4PrefixString(items[i].Action));
                 }

@@ -3,6 +3,7 @@ using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.OBJD;
+using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.XWNT;
@@ -18,9 +19,10 @@ namespace DpbfLister
         static void Main(string[] args)
         {
 
-            ProcessFiles(args);
+            // ProcessFiles(args);
 
             // ProcessObjects();
+            ProcessObjfs();
             // ProcessWants();
             // ProcessPrimitives();
         }
@@ -112,6 +114,25 @@ namespace DpbfLister
                         }
                     }
                 }
+            }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
+        private static void ProcessObjfs()
+        {
+            using (DBPFFile package = new DBPFFile(Sims2ToolsLib.Sims2Path + GameData.objectsSubPath))
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(Objf.TYPE))
+                {
+                    Objf objf = (Objf)package.GetResourceByEntry(entry);
+
+                    if (objf.GetGuardian(ObjfIndex.addObjectInfoToInvToken) != 0x0000 || objf.GetAction(ObjfIndex.addObjectInfoToInvToken) != 0x0000)
+                    {
+                        Debug.WriteLine($"{entry}");
+                    }
+                }
+
+                package.Close();
             }
         }
 

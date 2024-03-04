@@ -106,9 +106,9 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
         {
             CDataListExtension tsDesignModeEnabled = GetOrAddDataListExtension("tsDesignModeEnabled");
 
-            if (tsDesignModeEnabled.Extension.Count >= 2) return false;
-
             tsDesignModeEnabled.Extension.AddOrGetArray(subset);
+
+            if (tsDesignModeEnabled.Extension.Count >= 3) return false;
 
             return true;
         }

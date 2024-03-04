@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
 using System;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.CPF
 {
@@ -455,9 +456,13 @@ namespace Sims2Tools.DBPF.CPF
 
         internal void Serialize(DbpfWriter writer)
         {
+            long bytesBefore = writer.Position;
             writer.WriteUInt32((uint)datatype);
 
-            writer.WriteBytes(Helper.ToBytes(name, 0));
+            byte[] bname = Helper.ToBytes(name, 0);
+
+            writer.WriteInt32(bname.Length);
+            writer.WriteBytes(bname);
 
             if (datatype == MetaData.DataTypes.dtString)
             {
@@ -468,6 +473,8 @@ namespace Sims2Tools.DBPF.CPF
             {
                 writer.WriteBytes(val);
             }
+
+            Trace.Assert(this.FileSize == (writer.Position - bytesBefore), $"Serialize data != FileSize for {this}");
         }
 
         public override string ToString()
