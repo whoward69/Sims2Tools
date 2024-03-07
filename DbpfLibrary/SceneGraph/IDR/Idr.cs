@@ -32,6 +32,8 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
 
         private List<DBPFKey> items;
 
+        public int ItemCount => items.Count;
+
         [Obsolete("Use GetItem/SetItem methods instead")]
         public DBPFKey[] GetItems()
         {

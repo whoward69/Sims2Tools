@@ -13,6 +13,8 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
+using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.TXTR
@@ -23,8 +25,33 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x1C4A276C;
         public const string NAME = "TXTR";
 
+#if !DEBUG
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+#endif
+
+        private readonly CImageData cImageData = null;
+        public CImageData ImageData => cImageData;
+
         public Txtr(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
+            foreach (IRcolBlock block in Blocks)
+            {
+                if (block.BlockID == CImageData.TYPE)
+                {
+                    if (cImageData == null)
+                    {
+                        cImageData = block as CImageData;
+                    }
+                    else
+                    {
+#if DEBUG
+                        throw new Exception($"2nd cImageData found in {this}");
+#else
+                        logger.Warn($"2nd cImageData found in {this}");
+#endif
+                    }
+                }
+            }
         }
 
         public override SgResourceList SgNeededResources()

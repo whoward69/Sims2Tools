@@ -41,7 +41,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public CDataListExtension(Rcol parent) : base(parent)
         {
             ext = new Extension(null);
-            version = 0x01;
+            Version = 0x01;
             BlockID = TYPE;
             BlockName = NAME;
         }
@@ -54,12 +54,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             string blkName = reader.ReadString();
             TypeBlockID blkId = reader.ReadBlockId();
 
-            ext.Unserialize(reader, version);
+            ext.Unserialize(reader, Version);
             ext.BlockName = blkName;
             ext.BlockID = blkId;
         }
@@ -70,7 +70,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             {
                 long size = 4;
 
-                size += (ext.BlockName.Length + 1) + 4 + ext.FileSize;
+                size += DbpfWriter.Length(ext.BlockName) + 4 + ext.FileSize;
 
                 return (uint)size;
             }
@@ -78,11 +78,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteUInt32(version);
+            writer.WriteUInt32(Version);
 
             writer.WriteString(ext.BlockName);
             writer.WriteBlockId(ext.BlockID);
-            ext.Serialize(writer, version);
+            ext.Serialize(writer, Version);
         }
 
         public override string ToString()

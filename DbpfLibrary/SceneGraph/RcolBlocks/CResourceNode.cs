@@ -80,7 +80,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             ctn = new CompositionTreeNode(null);
             items = new ResourceNodeItem[0];
 
-            version = 0x07;
+            Version = 0x07;
             typecode = 0x01;
             BlockID = TYPE;
             BlockName = NAME;
@@ -114,7 +114,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
             typecode = reader.ReadByte();
 
             _ = reader.ReadString();
@@ -154,7 +154,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             }
             else
             {
-                throw new Exception("Unknown ResourceNode " + Helper.Hex4PrefixString(version) + ", " + Helper.Hex2PrefixString(typecode));
+                throw new Exception("Unknown ResourceNode " + Helper.Hex4PrefixString(Version) + ", " + Helper.Hex2PrefixString(typecode));
             }
             _ = reader.ReadInt32();
         }

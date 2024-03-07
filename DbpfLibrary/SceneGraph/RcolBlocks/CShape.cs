@@ -54,7 +54,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             data = reader.ReadBytes(9);
         }
 
-        internal uint FileSize => (uint)(subset.Length + 1 + filename.Length + 1 + 9);
+        internal uint FileSize => (uint)(DbpfWriter.Length(subset) + DbpfWriter.Length(filename) + 9);
 
         internal void Serialize(DbpfWriter writer)
         {
@@ -120,7 +120,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 }
                 else
                 {
-                    size += filename.Length + 1;
+                    size += DbpfWriter.Length(filename);
                 }
 
                 return (uint)size;
@@ -237,7 +237,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             string blkName = reader.ReadString();
             TypeBlockID blkId = reader.ReadBlockId();
@@ -260,7 +260,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             ogn.BlockName = blkName;
             ogn.BlockID = blkId;
 
-            if (version != 0x06)
+            if (Version != 0x06)
             {
                 lodData = new uint[reader.ReadUInt32()];
             }
@@ -297,11 +297,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             {
                 long size = 4;
 
-                size += (NameResource.BlockName.Length + 1) + 4 + NameResource.FileSize;
-                size += (refnode.BlockName.Length + 1) + 4 + refnode.FileSize;
-                size += (ogn.BlockName.Length + 1) + 4 + ogn.FileSize;
+                size += DbpfWriter.Length(NameResource.BlockName) + 4 + NameResource.FileSize;
+                size += DbpfWriter.Length(refnode.BlockName) + 4 + refnode.FileSize;
+                size += DbpfWriter.Length(ogn.BlockName) + 4 + ogn.FileSize;
 
-                if (version != 0x06)
+                if (Version != 0x06)
                 {
                     size += 4 + lodData.Length * 4;
                 }
@@ -325,11 +325,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteUInt32(version);
+            writer.WriteUInt32(Version);
 
-            writer.WriteString(sgres.BlockName);
-            writer.WriteBlockId(sgres.BlockID);
-            sgres.Serialize(writer);
+            writer.WriteString(NameResource.BlockName);
+            writer.WriteBlockId(NameResource.BlockID);
+            NameResource.Serialize(writer);
 
             writer.WriteString(refnode.BlockName);
             writer.WriteBlockId(refnode.BlockID);
@@ -339,7 +339,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             writer.WriteBlockId(ogn.BlockID);
             ogn.Serialize(writer);
 
-            if (version != 0x06)
+            if (Version != 0x06)
             {
                 writer.WriteUInt32((uint)lodData.Length);
 

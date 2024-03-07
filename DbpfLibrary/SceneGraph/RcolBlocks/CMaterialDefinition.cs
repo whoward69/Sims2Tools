@@ -24,7 +24,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static string NAME = "cMaterialDefinition";
 
         string fldsc;
-        public string FileDescription => fldsc;
+        public string FileDescription
+        {
+            get => fldsc;
+
+            set { fldsc = value; _isDirty = true; }
+        }
 
         string mattype;
         public string MatterialType => mattype;
@@ -107,7 +112,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             string blkName = reader.ReadString();
             TypeBlockID blkId = reader.ReadBlockId();
@@ -125,7 +130,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 properties.Add(new MaterialDefinitionProperty(reader));
             }
 
-            if (version == 8)
+            if (Version == 8)
             {
                 fileList = new string[0];
             }
@@ -145,10 +150,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             {
                 long size = 4;
 
-                size += (sgres.BlockName.Length + 1) + 4 + sgres.FileSize;
+                size += DbpfWriter.Length(NameResource.BlockName) + 4 + NameResource.FileSize;
 
-                size += (fldsc.Length + 1);
-                size += (mattype.Length + 1);
+                size += DbpfWriter.Length(fldsc);
+                size += DbpfWriter.Length(mattype);
 
                 size += 4;
                 foreach (MaterialDefinitionProperty mfd in properties)
@@ -156,12 +161,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                     size += mfd.FileSize;
                 }
 
-                if (version != 8)
+                if (Version != 8)
                 {
                     size += 4;
                     foreach (string s in fileList)
                     {
-                        size += (s.Length + 1);
+                        size += DbpfWriter.Length(s);
                     }
                 }
 
@@ -171,7 +176,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteUInt32(version);
+            writer.WriteUInt32(Version);
 
             writer.WriteString(NameResource.BlockName);
             writer.WriteBlockId(NameResource.BlockID);
@@ -186,7 +191,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 properties[i].Serialize(writer);
             }
 
-            if (version != 8)
+            if (Version != 8)
             {
                 writer.WriteUInt32((uint)fileList.Length);
                 for (int i = 0; i < fileList.Length; i++)
@@ -238,7 +243,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             value = reader.ReadString();
         }
 
-        internal uint FileSize => (uint)(name.Length + 1 + value.Length + 1);
+        internal uint FileSize => (uint)(DbpfWriter.Length(name) + DbpfWriter.Length(value));
 
         internal void Serialize(DbpfWriter writer)
         {
@@ -259,6 +264,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public bool Equals(MaterialDefinitionProperty that)
         {
             return this.name.Equals(that.name);
+        }
+
+        public override string ToString()
+        {
+            return $"{name}: {value}";
         }
     }
 }

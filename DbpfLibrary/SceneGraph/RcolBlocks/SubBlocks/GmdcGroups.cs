@@ -102,7 +102,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         {
             get
             {
-                long size = 4 + 4 + name.Length + 1;
+                long size = 4 + 4 + DbpfWriter.Length(name);
 
                 size += BlockSize(items1);
 

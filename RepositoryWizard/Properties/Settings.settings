@@ -8,5 +8,8 @@
     <Setting Name="GzpsNameFormat" Type="System.String" Scope="User">
       <Value Profile="(Default)">{agecode:1}{gender:1}_{type}_{basename}_{id}</Value>
     </Setting>
+    <Setting Name="StandaloneFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Standalone</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

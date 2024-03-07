@@ -10,7 +10,6 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.Package;
 using System;
 using System.IO;
 
@@ -113,11 +112,6 @@ namespace Sims2Tools.DBPF.Utils
             else ret = System.Text.Encoding.ASCII.GetBytes(str);
 
             return ret;
-        }
-
-        public static int PLength(string value)
-        {
-            return DBPFFile.Encoding.GetBytes(value.ToCharArray()).Length;
         }
     }
 }

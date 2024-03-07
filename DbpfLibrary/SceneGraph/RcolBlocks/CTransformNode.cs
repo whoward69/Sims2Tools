@@ -171,7 +171,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             trans = new VectorTransformation(VectorTransformation.TransformOrder.TranslateThenRotate);
 
-            version = 0x07;
+            Version = 0x07;
             BlockID = TYPE;
             BlockName = NAME;
 
@@ -198,7 +198,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             string name = reader.ReadString();
             TypeBlockID myid = reader.ReadBlockId();

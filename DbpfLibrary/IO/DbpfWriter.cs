@@ -58,7 +58,6 @@ namespace Sims2Tools.DBPF.IO
         }
 
         #region WriteXyz
-
         public void WriteByte(byte value)
         {
             m_writer.Write(value);
@@ -152,6 +151,31 @@ namespace Sims2Tools.DBPF.IO
         {
             m_writer.Write(value.ToCharArray());
             WriteByte(0x00);
+        }
+        #endregion
+
+        #region Length Helpers
+        public static int Length(string value)
+        {
+            int byteCount = DBPFFile.Encoding.GetByteCount(value);
+
+            if (byteCount > 16383)
+            {
+                throw new IOException("String too long!");
+            }
+            else if (byteCount > 127)
+            {
+                return 2 + byteCount;
+            }
+            else
+            {
+                return 1 + byteCount;
+            }
+        }
+
+        public static int PLength(string value)
+        {
+            return DBPFFile.Encoding.GetBytes(value.ToCharArray()).Length + 1;
         }
         #endregion
 

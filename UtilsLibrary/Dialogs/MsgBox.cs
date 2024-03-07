@@ -27,7 +27,6 @@ namespace Sims2Tools.Dialogs
             return dlgResult;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private static DialogResult Show(IWin32Window owner, string text)
         {
             IntPtr handle = (owner == null) ? IntPtr.Zero : owner.Handle;
@@ -46,7 +45,6 @@ namespace Sims2Tools.Dialogs
             return dlgResult;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private static DialogResult Show(IWin32Window owner, string text, string caption)
         {
             IntPtr handle = (owner == null) ? IntPtr.Zero : owner.Handle;
@@ -64,7 +62,6 @@ namespace Sims2Tools.Dialogs
             return dlgResult;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons)
         {
             IntPtr handle = (owner == null) ? IntPtr.Zero : owner.Handle;
@@ -82,7 +79,6 @@ namespace Sims2Tools.Dialogs
             return dlgResult;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
         {
             IntPtr handle = (owner == null) ? IntPtr.Zero : owner.Handle;
@@ -100,7 +96,6 @@ namespace Sims2Tools.Dialogs
             return dlgResult;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
         {
             IntPtr handle = (owner == null) ? IntPtr.Zero : owner.Handle;
@@ -118,7 +113,6 @@ namespace Sims2Tools.Dialogs
             return dlgResult;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private static DialogResult Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton, MessageBoxOptions options)
         {
             IntPtr handle = (owner == null) ? IntPtr.Zero : owner.Handle;

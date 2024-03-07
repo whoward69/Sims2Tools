@@ -75,7 +75,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         public CObjectGraphNode(Rcol parent) : base(parent)
         {
             items = new List<ObjectGraphNodeItem>(0);
-            version = 4;
+            Version = 0x04;
         }
 
         public void AddItemLink(uint index)
@@ -87,7 +87,7 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             uint count = reader.ReadUInt32();
             items = new List<ObjectGraphNodeItem>((int)count);
@@ -97,7 +97,7 @@ namespace Sims2Tools.DBPF.SceneGraph
                 items.Add(new ObjectGraphNodeItem(reader));
             }
 
-            if (version == 0x04)
+            if (Version == 0x04)
             {
                 filename = reader.ReadString();
             }
@@ -115,9 +115,9 @@ namespace Sims2Tools.DBPF.SceneGraph
 
                 size += 4 + (items.Count * ObjectGraphNodeItem.FileSize);
 
-                if (version == 0x04)
+                if (Version == 0x04)
                 {
-                    size += filename.Length + 1;
+                    size += DbpfWriter.Length(filename);
                 }
 
                 return (uint)size;
@@ -126,7 +126,7 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteUInt32(version);
+            writer.WriteUInt32(Version);
 
             writer.WriteUInt32((uint)items.Count);
             for (int i = 0; i < items.Count; i++)
@@ -134,7 +134,7 @@ namespace Sims2Tools.DBPF.SceneGraph
                 items[i].Serialize(writer);
             }
 
-            if (version == 0x04)
+            if (Version == 0x04)
             {
                 writer.WriteString(filename);
             }

@@ -54,9 +54,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             get
             {
-                if (parent == null) return -1;
-                for (int i = 0; i < parent.Blocks.Count; i++)
-                    if (parent.Blocks[i] == this) return i;
+                if (Parent == null) return -1;
+                for (int i = 0; i < Parent.Blocks.Count; i++)
+                    if (Parent.Blocks[i] == this) return i;
                 return -1;
             }
         }
@@ -68,9 +68,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public List<int> GetParentBlocks()
         {
             List<int> l = new List<int>();
-            for (int i = 0; i < parent.Blocks.Count; i++)
+            for (int i = 0; i < Parent.Blocks.Count; i++)
             {
-                IRcolBlock irb = parent.Blocks[i];
+                IRcolBlock irb = Parent.Blocks[i];
                 if (irb.GetType().GetInterface("ICresChildren", false) == typeof(ICresChildren))
                 {
                     ICresChildren icc = (ICresChildren)irb;
@@ -88,7 +88,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             List<int> l = GetParentBlocks();
             if (l.Count == 0) return null;
-            return (ICresChildren)parent.Blocks[l[0]];
+            return (ICresChildren)Parent.Blocks[l[0]];
         }
 
         /// <summary>

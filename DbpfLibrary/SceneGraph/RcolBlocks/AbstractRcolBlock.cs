@@ -24,14 +24,19 @@ namespace Sims2Tools.DBPF.SceneGraph
         private TypeBlockID blockid;
         private string blockname = null;
 
-        protected readonly SGResource sgres = null;
-        protected uint version;
-        protected readonly Rcol parent = null;
+        private readonly SGResource sgres = null;
+        private uint version;
+        private Rcol parent = null;
 
         protected bool _isDirty = false;
 
-        public virtual bool IsDirty => _isDirty;
-        public virtual void SetClean() => _isDirty = false;
+        public virtual bool IsDirty => _isDirty || (sgres != null && sgres.IsDirty);
+        public virtual void SetClean()
+        {
+            sgres.SetClean();
+
+            _isDirty = false;
+        }
 
         public SGResource NameResource
         {
@@ -41,11 +46,13 @@ namespace Sims2Tools.DBPF.SceneGraph
         public uint Version
         {
             get { return version; }
+            protected set { version = value; }
         }
 
         public Rcol Parent
         {
             get { return parent; }
+            protected set { parent = value; }
         }
 
         public TypeBlockID BlockID

@@ -21,6 +21,13 @@ namespace Sims2Tools.DBPF
     {
         protected bool _isDirty = false;
 
+        public void ChangeGroupID(TypeGroupID newGroupID)
+        {
+            this.groupID = newGroupID;
+
+            _isDirty = true;
+        }
+
         protected DBPFResource(DBPFEntry entry) : base(entry, "")
         {
         }

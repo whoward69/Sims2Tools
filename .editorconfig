@@ -1,0 +1,13 @@
+﻿[*.cs]
+
+# IDE0063: Use simple 'using' statement
+csharp_prefer_simple_using_statement = false
+
+# IDE0090: Use 'new(...)'
+csharp_style_implicit_object_creation_when_type_is_apparent = false
+
+# IDE0057: Use range operator
+csharp_style_prefer_range_operator = false
+
+# IDE0051: Remove unused private members
+dotnet_diagnostic.IDE0051.severity = none

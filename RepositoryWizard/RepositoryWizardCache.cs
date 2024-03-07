@@ -412,7 +412,7 @@ namespace RepositoryWizard
         {
             get
             {
-                return str.LanguageItems(MetaData.Languages.Default)[0].Title;
+                return (str != null) ? str.LanguageItems(MetaData.Languages.Default)[0].Title : "";
             }
         }
 

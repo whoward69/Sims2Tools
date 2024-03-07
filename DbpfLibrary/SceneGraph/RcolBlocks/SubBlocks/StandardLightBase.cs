@@ -19,20 +19,20 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
     {
         public StandardLightBase(Rcol parent) : base(parent)
         {
-            version = 11;
+            Version = 11;
             BlockID = TypeBlockID.NULL;
         }
 
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
         }
 
         public override uint FileSize => (uint)4;
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteUInt32(version);
+            writer.WriteUInt32(Version);
         }
 
         public override void Dispose()

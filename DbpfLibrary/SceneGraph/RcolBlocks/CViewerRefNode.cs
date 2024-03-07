@@ -59,7 +59,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             names = new string[0];
             unknown2 = new byte[0xA0];
 
-            version = 0x0c;
+            Version = 0x0c;
             BlockID = TYPE;
             BlockName = NAME;
         }
@@ -70,7 +70,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             _ = reader.ReadString();
             TypeBlockID myid = reader.ReadBlockId();

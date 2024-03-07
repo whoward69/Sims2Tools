@@ -20,6 +20,7 @@ using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
@@ -40,6 +41,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -173,9 +175,17 @@ namespace RepositoryWizard
         #endregion
 
         #region Form Management
+        private void VersionChange(int prevVersionMajor, int prevVersionMinor)
+        {
+            if (prevVersionMajor == 1 && prevVersionMinor == 1)
+            {
+                RegistryTools.DeleteSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyShpeSubsets.Name);
+            }
+        }
+
         private void OnLoad(object sender, System.EventArgs e)
         {
-            RegistryTools.LoadAppSettings(RepositoryWizardApp.RegistryKey, RepositoryWizardApp.AppVersionMajor, RepositoryWizardApp.AppVersionMinor);
+            RegistryTools.LoadAppSettings(RepositoryWizardApp.RegistryKey, RepositoryWizardApp.AppVersionMajor, RepositoryWizardApp.AppVersionMinor, VersionChange);
             RegistryTools.LoadFormSettings(RepositoryWizardApp.RegistryKey, this);
             splitTopBottom.SplitterDistance = (int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
             splitTopLeftRight.SplitterDistance = (int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
@@ -185,6 +195,7 @@ namespace RepositoryWizard
 
             menuItemModeClothing.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothing.Name, 0) != 0);
             menuItemModeObject.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeObject.Name, 1) != 0);
+            menuItemModeClothingStandalone.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothingStandalone.Name, 0) != 0);
             // menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAdvanced.Checked = false; OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
@@ -197,8 +208,10 @@ namespace RepositoryWizard
             menuItemShowResSort.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResSort.Name, 1) != 0); OnShowResSortClicked(menuItemShowResSort, null);
             menuItemShowResToolTip.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResToolTip.Name, 1) != 0); OnShowResToolTipClicked(menuItemShowResToolTip, null);
 
-            menuItemVerifyShpeSubsets.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyShpeSubsets.Name, 1) != 0);
+            menuItemVerifyShpeSubsets.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyShpeSubsets.Name, 0) != 0);
             menuItemVerifyGmdcSubsets.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyGmdcSubsets.Name, 1) != 0);
+
+            ckbDeRepoCopyMeshFiles.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoCopyMeshFiles.Name, 0) != 0);
 
             textTooltip.Text = (string)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Config", textTooltip.Name, "{basename} ({id}) by {creator}");
 
@@ -250,6 +263,7 @@ namespace RepositoryWizard
 
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothing.Name, menuItemModeClothing.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeObject.Name, menuItemModeObject.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothingStandalone.Name, menuItemModeClothingStandalone.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoMerge.Name, menuItemAutoMerge.Checked ? 1 : 0);
@@ -263,6 +277,8 @@ namespace RepositoryWizard
 
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyShpeSubsets.Name, menuItemVerifyShpeSubsets.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyGmdcSubsets.Name, menuItemVerifyGmdcSubsets.Checked ? 1 : 0);
+
+            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoCopyMeshFiles.Name, ckbDeRepoCopyMeshFiles.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Config", textTooltip.Name, textTooltip.Text);
         }
@@ -288,6 +304,7 @@ namespace RepositoryWizard
 
             if (menuItemModeClothing.Checked) mode = "Clothing";
             if (menuItemModeObject.Checked) mode = "Object";
+            if (menuItemModeClothingStandalone.Checked) mode = "Standalone Clothing";
 
             if (mode.Length > 0)
             {
@@ -320,12 +337,21 @@ namespace RepositoryWizard
                 {
                     menuItemModeClothing.Checked = true;
                     menuItemModeObject.Checked = false;
+                    menuItemModeClothingStandalone.Checked = false;
                     e.Handled = true;
                 }
                 else if (e.KeyCode == Keys.F5)
                 {
                     menuItemModeClothing.Checked = false;
                     menuItemModeObject.Checked = true;
+                    menuItemModeClothingStandalone.Checked = false;
+                    e.Handled = true;
+                }
+                else if (e.KeyCode == Keys.F5)
+                {
+                    menuItemModeClothing.Checked = false;
+                    menuItemModeObject.Checked = false;
+                    menuItemModeClothingStandalone.Checked = true;
                     e.Handled = true;
                 }
 
@@ -380,6 +406,7 @@ namespace RepositoryWizard
 
                 panelClothingEditor.Enabled = false;
                 panelObjectEditor.Enabled = false;
+
                 dataResources.Clear();
 
                 if (updateResources)
@@ -660,11 +687,16 @@ namespace RepositoryWizard
 
             InUpdateFormState = true;
 
+            gridResources.Visible = false;
+
             panelClothingEditor.Visible = false;
             grpMesh.Visible = false;
 
             panelObjectEditor.Visible = false;
             grpMaster.Visible = false;
+
+            textDeRepoMsgs.Visible = false;
+            grpDeRepoOptions.Visible = false;
 
             gridResources.Columns["colId"].Visible = false;
             gridResources.Columns["colGender"].Visible = false;
@@ -675,6 +707,8 @@ namespace RepositoryWizard
             menuItemShowResProduct.Enabled = false;
             gridResources.Columns["colSort"].Visible = false;
             menuItemShowResSort.Enabled = false;
+
+            menuItemOptions.Enabled = true;
 
             menuItemAutoMerge.Enabled = false;
             menuItemVerifyShpeSubsets.Enabled = false;
@@ -704,6 +738,8 @@ namespace RepositoryWizard
                 if (menuItemModeClothing.Checked)
                 {
                     btnSaveAs.Text = "&Save As";
+
+                    gridResources.Visible = true;
 
                     panelClothingEditor.Visible = true;
                     grpMesh.Visible = true;
@@ -743,6 +779,8 @@ namespace RepositoryWizard
                 {
                     btnSaveAs.Text = "&Repository";
 
+                    gridResources.Visible = true;
+
                     panelObjectEditor.Visible = true;
                     grpMaster.Visible = true;
 
@@ -754,6 +792,15 @@ namespace RepositoryWizard
 
                     menuItemDeleteLocalOrphans.Enabled = true;
                 }
+            }
+            else if (menuItemModeClothingStandalone.Checked)
+            {
+                btnSaveAs.Text = "&Standalone";
+
+                textDeRepoMsgs.Visible = true;
+                grpDeRepoOptions.Visible = true;
+
+                menuItemOptions.Enabled = false;
             }
             else
             {
@@ -837,6 +884,10 @@ namespace RepositoryWizard
                         }
                     }
                 }
+            }
+            else if (menuItemModeClothingStandalone.Checked)
+            {
+                saveAs = (gridPackageFiles.SelectedRows.Count > 0);
             }
 
             menuItemSaveAs.Enabled = btnSaveAs.Enabled = saveAs;
@@ -1157,6 +1208,7 @@ namespace RepositoryWizard
 
             if (sender != menuItemModeClothing && menuItemModeClothing.Checked) menuItemModeClothing.Checked = false;
             if (sender != menuItemModeObject && menuItemModeObject.Checked) menuItemModeObject.Checked = false;
+            if (sender != menuItemModeClothingStandalone && menuItemModeClothingStandalone.Checked) menuItemModeClothingStandalone.Checked = false;
 
             inModeUpdate = false;
 
@@ -1275,6 +1327,8 @@ namespace RepositoryWizard
         #region Package Grid Management
         private void OnPackageSelectionChanged(object sender, EventArgs e)
         {
+            textDeRepoMsgs.Text = "";
+
             DoWork_FillResourceGrid(lastFolder);
         }
         #endregion
@@ -1300,7 +1354,10 @@ namespace RepositoryWizard
 
             if (gridResources.SelectedRows.Count == 1)
             {
-                gridResources.CurrentCell = gridResources.SelectedRows[0].Cells["colId"];
+                if (gridResources.SelectedRows[0].Cells["colId"].Visible)
+                {
+                    gridResources.CurrentCell = gridResources.SelectedRows[0].Cells["colId"];
+                }
             }
         }
 
@@ -2052,11 +2109,17 @@ namespace RepositoryWizard
                     UpdateFormState();
                 }
             }
-            else
+            else if (menuItemModeObject.Checked)
             {
                 SaveAs(null);
 
                 DoWork_FillResourceGrid(lastFolder);
+            }
+            else if (menuItemModeClothingStandalone.Checked)
+            {
+                textDeRepoMsgs.Text = "";
+
+                ProcessDeRepoClothing(Properties.Settings.Default.StandaloneFolder);
             }
         }
 
@@ -2578,6 +2641,289 @@ namespace RepositoryWizard
             }
 
             throw new ArgumentException($"Unsupported resource type: {DBPFData.TypeName(resource.TypeID)}");
+        }
+
+        private void ProcessDeRepoClothing(string subFolderName)
+        {
+            Dictionary<DBPFKey, string> keyToPackage = new Dictionary<DBPFKey, string>();
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            int count = 0;
+
+            foreach (string packageFile in Directory.GetFiles(rootFolder, "*.package", SearchOption.AllDirectories))
+            {
+                using (DBPFFile package = new DBPFFile(packageFile))
+                {
+                    foreach (TypeTypeID typeId in new TypeTypeID[] { Cres.TYPE, Shpe.TYPE, Txmt.TYPE, Txtr.TYPE, Str.TYPE })
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(typeId))
+                        {
+                            if (!keyToPackage.ContainsKey(entry))
+                            {
+                                keyToPackage.Add(entry, packageFile);
+                            }
+                        }
+                    }
+
+                    package.Close();
+                }
+            }
+
+            HashSet<DBPFKey> allMeshKeys = new HashSet<DBPFKey>();
+
+            foreach (DataGridViewRow packageRow in gridPackageFiles.SelectedRows)
+            {
+                string packageFile = packageRow.Cells["colPackagePath"].Value as string;
+
+                string[] pathParts = packageFile.Split(new string[] { "\\" }, StringSplitOptions.None);
+
+                if (pathParts.Length > 2 && pathParts[pathParts.Length - 2].Equals(subFolderName)) continue;
+
+                using (DBPFFile package = new DBPFFile(packageFile))
+                {
+                    bool complete = true;
+
+                    HashSet<DBPFKey> meshKeys = new HashSet<DBPFKey>();
+
+                    foreach (DBPFEntry idrEntry in package.GetEntriesByType(Idr.TYPE))
+                    {
+                        DBPFEntry binxEntry = package.GetEntryByKey(new DBPFKey(Binx.TYPE, idrEntry.GroupID, idrEntry.InstanceID, idrEntry.ResourceID));
+
+                        if (binxEntry != null)
+                        {
+                            DBPFEntry gzpsEntry = package.GetEntryByKey(new DBPFKey(Gzps.TYPE, idrEntry.GroupID, idrEntry.InstanceID, idrEntry.ResourceID));
+
+                            if (gzpsEntry != null)
+                            {
+                                Idr idr = (Idr)package.GetResourceByEntry(idrEntry);
+
+                                for (uint i = 0; i < idr.ItemCount; ++i)
+                                {
+                                    DBPFKey key = idr.GetItem(i);
+
+                                    if (key.TypeID == Cres.TYPE || key.TypeID == Shpe.TYPE)
+                                    {
+                                        meshKeys.Add(key);
+                                    }
+                                    else if (key.TypeID == Txmt.TYPE)
+                                    {
+                                        complete = complete && DeRepoTxmt(package, idr, i, keyToPackage);
+                                    }
+                                    else if (key.TypeID == Str.TYPE)
+                                    {
+                                        complete = complete && DeRepoStr(package, idr, i, keyToPackage);
+                                    }
+
+                                    if (!complete) break;
+                                }
+
+                                if (complete)
+                                {
+                                    foreach (DBPFEntry entry in package.GetEntriesByType(Txmt.TYPE))
+                                    {
+                                        Txmt txmt = (Txmt)package.GetResourceByEntry(entry);
+
+                                        complete = complete && DeRepoTxtr(package, txmt, "stdMatBaseTextureName", keyToPackage);
+                                        complete = complete && DeRepoTxtr(package, txmt, "stdMatNormalMapTextureName", keyToPackage);
+                                        complete = complete && DeRepoTxtr(package, txmt, "stdMatEnvCubeTextureName", keyToPackage);
+
+                                        if (!complete) break;
+                                    }
+                                }
+                            }
+
+                            if (!complete) break;
+                        }
+                    }
+
+                    if (!complete)
+                    {
+                        textDeRepoMsgs.AppendText($"Missing resources (TXMT/TXTR/STR#) for '{package.PackagePath.Substring(rootFolder.Length + 1)}' ... skipping\r\n");
+                    }
+                    else
+                    {
+                        foreach (DBPFKey meshKey in meshKeys)
+                        {
+                            allMeshKeys.Add(meshKey);
+                        }
+
+                        ++count;
+                    }
+
+                    if (complete && package.IsDirty)
+                    {
+                        package.Update(subFolderName);
+                    }
+
+                    package.Close();
+                }
+            }
+
+            HashSet<string> allMeshPackageFiles = new HashSet<string>();
+
+            foreach (DBPFKey meshKey in allMeshKeys)
+            {
+                if (keyToPackage.TryGetValue(meshKey, out string meshPackgeFile))
+                {
+                    allMeshPackageFiles.Add(meshPackgeFile);
+                }
+                else
+                {
+                    textDeRepoMsgs.AppendText($"No package file available for required mesh resource '{meshKey}'\r\n");
+                }
+            }
+
+            foreach (string meshPackageFile in allMeshPackageFiles)
+            {
+                if (ckbDeRepoCopyMeshFiles.Checked)
+                {
+                    FileInfo fi = new FileInfo(meshPackageFile);
+
+                    File.Copy(meshPackageFile, $"{lastFolder}\\{subFolderName}\\{fi.Name}", true);
+                }
+                else
+                {
+                    textDeRepoMsgs.AppendText($"Required mesh file '{meshPackageFile.Substring(rootFolder.Length + 1)}'\r\n");
+                }
+            }
+
+            textDeRepoMsgs.AppendText($"Processed {count} files in {stopwatch.ElapsedMilliseconds / 1000.0} seconds\r\n");
+        }
+
+        private bool DeRepoTxmt(DBPFFile package, Idr idr, uint i, Dictionary<DBPFKey, string> keyToPackage)
+        {
+            DBPFKey key = idr.GetItem(i);
+
+            if (package.GetEntryByKey(key) == null)
+            {
+                if (keyToPackage.TryGetValue(key, out string donorPackageFile))
+                {
+                    using (DBPFFile donorPackage = new DBPFFile(donorPackageFile))
+                    {
+                        Txmt txmt = (Txmt)donorPackage.GetResourceByKey(key);
+
+                        txmt.ChangeGroupID(idr.GroupID);
+
+                        txmt.MaterialDefinition.NameResource.FileName = ReplaceOrAddGroupID(txmt.MaterialDefinition.NameResource.FileName, txmt.GroupID);
+                        txmt.MaterialDefinition.FileDescription = ReplaceOrAddGroupID(txmt.MaterialDefinition.FileDescription, txmt.GroupID);
+
+                        idr.SetItem(i, txmt);
+
+                        package.Commit(idr);
+                        package.Commit(txmt);
+
+                        donorPackage.Close();
+                    }
+                }
+                else
+                {
+                    return IsMaxisResource(key);
+                }
+            }
+
+            return true;
+        }
+
+        private bool DeRepoTxtr(DBPFFile package, Txmt txmt, string propName, Dictionary<DBPFKey, string> keyToPackage)
+        {
+            string sgName = txmt.MaterialDefinition.GetProperty(propName);
+
+            if (sgName != null)
+            {
+                DBPFKey key = SgHelper.KeyFromQualifiedName(sgName, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS);
+
+                if (!keyToPackage.ContainsKey(key))
+                {
+                    key = SgHelper.KeyFromQualifiedName($"{sgName}_txtr", Txtr.TYPE, DBPFData.GROUP_SG_MAXIS);
+                }
+
+                if (package.GetEntryByKey(key) == null)
+                {
+                    if (keyToPackage.TryGetValue(key, out string donorPackageFile))
+                    {
+                        using (DBPFFile donorPackage = new DBPFFile(donorPackageFile))
+                        {
+                            Txtr txtr = (Txtr)donorPackage.GetResourceByKey(key);
+
+                            txtr.ChangeGroupID(txmt.GroupID);
+
+                            txtr.ImageData.NameResource.FileName = ReplaceOrAddGroupID(txtr.ImageData.NameResource.FileName, txtr.GroupID);
+
+                            txmt.MaterialDefinition.SetProperty(propName, ReplaceOrAddGroupID(txmt.MaterialDefinition.GetProperty(propName), txtr.GroupID));
+
+                            package.Commit(txmt);
+                            package.Commit(txtr);
+
+                            donorPackage.Close();
+                        }
+                    }
+                    else
+                    {
+                        return IsMaxisResource(sgName);
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private bool DeRepoStr(DBPFFile package, Idr idr, uint i, Dictionary<DBPFKey, string> keyToPackage)
+        {
+            DBPFKey key = idr.GetItem(i);
+
+            if (package.GetEntryByKey(key) == null)
+            {
+                if (keyToPackage.TryGetValue(key, out string donorPackageFile))
+                {
+                    using (DBPFFile donorPackage = new DBPFFile(donorPackageFile))
+                    {
+                        Str str = (Str)donorPackage.GetResourceByKey(key);
+
+                        str.ChangeGroupID(idr.GroupID);
+
+                        idr.SetItem(i, str);
+
+                        package.Commit(idr);
+                        package.Commit(str);
+
+                        donorPackage.Close();
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool IsMaxisResource(string sgName)
+        {
+            return !sgName.StartsWith("##");
+        }
+
+        private bool IsMaxisResource(DBPFKey key)
+        {
+            return (key.GroupID == DBPFData.GROUP_SG_MAXIS);
+        }
+
+        private string ReplaceOrAddGroupID(string sgName, TypeGroupID groupID)
+        {
+            string newSgName;
+
+            if (sgName.StartsWith("##"))
+            {
+                int pos = sgName.IndexOf("!");
+
+                newSgName = $"##{groupID}!{sgName.Substring(pos + 1)}";
+            }
+            else
+            {
+                newSgName = $"##{groupID}!{sgName}";
+            }
+
+            return newSgName;
         }
         #endregion
     }

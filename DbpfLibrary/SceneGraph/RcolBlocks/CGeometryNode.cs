@@ -43,7 +43,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             ogn = new CObjectGraphNode(null);
 
-            version = 0x0c;
+            Version = 0x0c;
             BlockID = TYPE;
             BlockName = NAME;
 
@@ -52,7 +52,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             string blkName = reader.ReadString();
             TypeBlockID blkId = reader.ReadBlockId();
@@ -68,12 +68,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             NameResource.BlockName = blkName;
             NameResource.BlockID = blkId;
 
-            if (version == 0x0b)
+            if (Version == 0x0b)
             {
                 unknown1 = reader.ReadInt16();
             }
 
-            if ((version == 0x0b) || (version == 0x0c))
+            if ((Version == 0x0b) || (Version == 0x0c))
             {
                 unknown2 = reader.ReadInt16();
                 unknown3 = reader.ReadByte();
@@ -96,16 +96,16 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             {
                 long size = 4;
 
-                size += (ogn.BlockName.Length + 1) + 4 + ogn.FileSize;
+                size += DbpfWriter.Length(ogn.BlockName) + 4 + ogn.FileSize;
 
-                size += (NameResource.BlockName.Length + 1) + 4 + NameResource.FileSize;
+                size += DbpfWriter.Length(NameResource.BlockName) + 4 + NameResource.FileSize;
 
-                if (version == 0x0b)
+                if (Version == 0x0b)
                 {
                     size += 2;
                 }
 
-                if ((version == 0x0b) || (version == 0x0c))
+                if ((Version == 0x0b) || (Version == 0x0c))
                 {
                     size += 2 + 1;
                 }
@@ -123,7 +123,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteUInt32(version);
+            writer.WriteUInt32(Version);
 
             writer.WriteString(ogn.BlockName);
             writer.WriteBlockId(ogn.BlockID);
@@ -133,12 +133,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             writer.WriteBlockId(NameResource.BlockID);
             NameResource.Serialize(writer);
 
-            if (version == 0x0b)
+            if (Version == 0x0b)
             {
                 writer.WriteInt16(unknown1);
             }
 
-            if ((version == 0x0b) || (version == 0x0c))
+            if ((Version == 0x0b) || (Version == 0x0c))
             {
                 writer.WriteInt16(unknown2);
                 writer.WriteByte(unknown3);

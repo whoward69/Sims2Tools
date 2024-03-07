@@ -159,7 +159,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         {
             get
             {
-                long size = 1 + varname.Length + 1;
+                long size = 1 + DbpfWriter.Length(varname);
 
                 switch (typecode)
                 {
@@ -180,7 +180,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                         }
                     case ItemTypes.String:
                         {
-                            size += str.Length + 1;
+                            size += DbpfWriter.Length(str);
                             break;
                         }
                     case ItemTypes.Array:
@@ -294,7 +294,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             BlockName = NAME;
 
             items = new List<ExtensionItem>();
-            version = 0x03;
+            Version = 0x03;
             typecode = 0x07;
             varname = "";
         }
@@ -359,7 +359,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public void Unserialize(DbpfReader reader, uint ver)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
             typecode = reader.ReadByte();
 
             if (typecode < 0x07)
@@ -394,7 +394,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                 }
                 else
                 {
-                    size += varname.Length + 1;
+                    size += DbpfWriter.Length(varname);
 
                     size += 4;
 
@@ -412,7 +412,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public void Serialize(DbpfWriter writer, uint ver)
         {
-            writer.WriteUInt32(version);
+            writer.WriteUInt32(Version);
             writer.WriteByte(typecode);
 
             if (typecode < 0x07)
@@ -445,7 +445,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                 sz += 15;
             }
 
-            if ((typecode <= 0x03) && (version == 3))
+            if ((typecode <= 0x03) && (Version == 3))
             {
                 if (ver == 5)
                 {

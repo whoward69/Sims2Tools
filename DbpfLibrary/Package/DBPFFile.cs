@@ -165,11 +165,32 @@ namespace Sims2Tools.DBPF.Package
             }
         }
 
+        public string Update(string subFolder)
+        {
+            return Update(false, subFolder);
+        }
+
         public string Update(bool autoBackup)
         {
+            return Update(autoBackup, null);
+        }
+
+        private string Update(bool autoBackup, string subFolder)
+        {
             string originalName = packagePath;
-            string updateName = $"{packagePath}.temp";
+            string updateName;
             string backupName = $"{packagePath}.bak";
+
+            if (subFolder != null)
+            {
+                updateName = $"{packageDir}\\{subFolder}\\{packageName}";
+
+                Directory.CreateDirectory($"{packageDir}\\{subFolder}");
+            }
+            else
+            {
+                updateName = $"{packagePath}.temp";
+            }
 
             using (Stream stream = File.OpenWrite(updateName))
             {
@@ -184,23 +205,26 @@ namespace Sims2Tools.DBPF.Package
                     File.Copy(originalName, backupName, true);
                 }
 
-                try
+                if (subFolder == null)
                 {
-                    File.Delete(originalName);
+                    try
+                    {
+                        File.Delete(originalName);
 
-                    File.Copy(updateName, originalName, true);
-                    File.Delete(updateName);
-                }
-                catch (Exception)
-                {
-                    // SimPe propbably has the file open!
-                    backupName = null;
-                }
+                        File.Copy(updateName, originalName, true);
+                        File.Delete(updateName);
+                    }
+                    catch (Exception)
+                    {
+                        // SimPe propbably has the file open!
+                        backupName = null;
+                    }
 
-                Read(File.OpenRead(originalName));
+                    Read(File.OpenRead(originalName));
+                }
             }
 
-            return backupName;
+            return (subFolder != null) ? updateName : backupName;
         }
 
         public void Commit(DBPFResource resource, bool ignoreDirty = false)

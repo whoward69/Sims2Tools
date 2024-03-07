@@ -19,20 +19,20 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
     {
         public LightT(Rcol parent) : base(parent)
         {
-            version = 11;
+            Version = 11;
             BlockID = TypeBlockID.NULL;
         }
 
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             string blkName = reader.ReadString();
             TypeBlockID blkId = reader.ReadBlockId();
 
-            sgres.Unserialize(reader);
-            sgres.BlockName = blkName;
-            sgres.BlockID = blkId;
+            NameResource.Unserialize(reader);
+            NameResource.BlockName = blkName;
+            NameResource.BlockID = blkId;
         }
 
         public override uint FileSize
@@ -41,7 +41,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             {
                 long size = 4;
 
-                size += (sgres.BlockName.Length + 1) + 4 + sgres.FileSize;
+                size += DbpfWriter.Length(NameResource.BlockName) + 4 + NameResource.FileSize;
 
                 return (uint)size;
             }
@@ -49,11 +49,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteUInt32(version);
+            writer.WriteUInt32(Version);
 
-            writer.WriteString(sgres.BlockName);
-            writer.WriteBlockId(sgres.BlockID);
-            sgres.Serialize(writer);
+            writer.WriteString(NameResource.BlockName);
+            writer.WriteBlockId(NameResource.BlockID);
+            NameResource.Serialize(writer);
         }
 
         public override void Dispose()

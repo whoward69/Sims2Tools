@@ -40,7 +40,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         // Needed by reflection to create the class
         public CGeometryDataContainer(Rcol parent) : base(parent)
         {
-            version = 0x04;
+            Version = 0x04;
             BlockID = TYPE;
             BlockName = NAME;
 
@@ -64,7 +64,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             string blkName = reader.ReadString();
             TypeBlockID blkId = reader.ReadBlockId();
@@ -114,7 +114,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             {
                 long size = 4;
 
-                size += (NameResource.BlockName.Length + 1) + 4 + NameResource.FileSize;
+                size += DbpfWriter.Length(NameResource.BlockName) + 4 + NameResource.FileSize;
 
                 size += 4;
                 foreach (GmdcElement element in elements)
@@ -148,7 +148,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteUInt32(version);
+            writer.WriteUInt32(Version);
 
             writer.WriteString(NameResource.BlockName);
             writer.WriteBlockId(NameResource.BlockID);

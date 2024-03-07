@@ -44,7 +44,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             elementname = reader.ReadString();
         }
 
-        internal uint FileSize => (uint)(blendname.Length + 1 + elementname.Length + 1);
+        internal uint FileSize => (uint)(DbpfWriter.Length(blendname) + DbpfWriter.Length(elementname));
 
         internal void Serialize(DbpfWriter writer)
         {

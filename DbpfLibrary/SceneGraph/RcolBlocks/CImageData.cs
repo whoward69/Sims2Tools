@@ -15,44 +15,61 @@ using Sims2Tools.DBPF.SceneGraph.RCOL;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
-    /// <summary>
-    /// This is the actual FileWrapper
-    /// </summary>
-    /// <remarks>
-    /// The wrapper is used to (un)serialize the Data of a file into it's Attributes. So Basically it reads 
-    /// a BinaryStream and translates the data into some userdefine Attributes.
-    /// </remarks>
     public class CImageData : AbstractRcolBlock, /* IScenegraphBlock, */ System.IDisposable
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x1C4A276C;
         public static string NAME = "cImageData";
+
+        private byte[] imageData;
 
         // Needed by reflection to create the class
         public CImageData(Rcol parent) : base(parent)
         {
             BlockID = TYPE;
             BlockName = NAME;
-            this.version = 0x09;
+            Version = 0x09;
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
-            _ = reader.ReadString();
+            Version = reader.ReadUInt32();
 
-            sgres.BlockID = reader.ReadBlockId();
-            sgres.Unserialize(reader);
+            string blkName = reader.ReadString();
+            TypeBlockID blkId = reader.ReadBlockId();
+
+            NameResource.Unserialize(reader);
+            NameResource.BlockName = blkName;
+            NameResource.BlockID = blkId;
+
+            // TODO - _library - complete this by reading the MipMaps, but for now, just cache the raw data.
+
+            imageData = reader.ReadBytes((int)(reader.Length - reader.Position));
         }
 
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4;
 
+                size += DbpfWriter.Length(NameResource.BlockName) + 4 + NameResource.FileSize;
 
-        /// <summary>
-        /// Will try to load all Lifo References in the MipMpas in all Blocks
-        /// </summary>
+                size += imageData.Length;
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(Version);
+
+            writer.WriteString(NameResource.BlockName);
+            writer.WriteBlockId(NameResource.BlockID);
+            NameResource.Serialize(writer);
+
+            writer.WriteBytes(imageData);
+        }
 
         public override void Dispose()
         {

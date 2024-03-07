@@ -21,26 +21,27 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         public string FileName
         {
             get { return filename; }
+            set { filename = value; _isDirty = true; }
         }
 
 
         public SGResource() : base()
         {
-            version = 0x02;
+            Version = 0x02;
             filename = "";
         }
 
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
             filename = reader.ReadString();
         }
 
-        public override uint FileSize => (uint)(4 + filename.Length + 1);
+        public override uint FileSize => (uint)(4 + DbpfWriter.Length(filename));
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteUInt32(version);
+            writer.WriteUInt32(Version);
             writer.WriteString(filename);
         }
 

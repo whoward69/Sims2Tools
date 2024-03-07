@@ -99,7 +99,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         // Needed by reflection to create the class
         public CDirectionalLight(Rcol parent) : base(parent)
         {
-            version = 1;
+            Version = 1;
             BlockID = TYPE;
             BlockName = NAME;
 
@@ -111,13 +111,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown2 = "";
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             slb.BlockName = reader.ReadString();
             slb.BlockID = reader.ReadBlockId();

@@ -29,7 +29,7 @@ namespace Sims2Tools.DBPF
     public class DBPFKey : IDBPFKey, IEquatable<DBPFKey>, IComparable<DBPFKey>
     {
         private readonly TypeTypeID typeID;
-        private readonly TypeGroupID groupID;
+        protected TypeGroupID groupID;
         private readonly TypeResourceID resourceID;
         private readonly TypeInstanceID instanceID;
 

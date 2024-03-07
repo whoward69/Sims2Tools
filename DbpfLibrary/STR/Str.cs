@@ -51,6 +51,8 @@ namespace Sims2Tools.DBPF.STR
         {
             get
             {
+                if (base.IsDirty) return true;
+
                 foreach (StrItemList strItems in languages.Values)
                 {
                     foreach (StrItem strItem in strItems)

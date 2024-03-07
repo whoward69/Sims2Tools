@@ -151,7 +151,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
         internal uint BlockSize(IRcolBlock blk)
         {
-            long size = blk.BlockName.Length + 1 + 4;
+            long size = DbpfWriter.Length(blk.BlockName) + 4;
 
             size += blk.FileSize;
 

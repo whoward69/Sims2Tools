@@ -5,6 +5,14 @@ using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph;
+using Sims2Tools.DBPF.SceneGraph.BINX;
+using Sims2Tools.DBPF.SceneGraph.CRES;
+using Sims2Tools.DBPF.SceneGraph.GZPS;
+using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.SHPE;
+using Sims2Tools.DBPF.SceneGraph.TXMT;
+using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.XWNT;
 using System;
@@ -19,15 +27,16 @@ namespace DpbfLister
         static void Main(string[] args)
         {
 
-            // ProcessFiles(args);
+            ProcessFiles(args);
+
+            // ProcessDeRepoClothing("C:\\Users\\whowa\\Desktop\\Latmos_4t2-EP05-DressTieSlip", "Standalone");
 
             // ProcessObjects();
-            ProcessObjfs();
+            // ProcessObjfs();
             // ProcessWants();
             // ProcessPrimitives();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
         private static void ProcessFiles(string[] args)
         {
             if (args.Length == 0)
@@ -63,8 +72,6 @@ namespace DpbfLister
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private static void ProcessObjects()
         {
             DirectoryInfo installPath = new DirectoryInfo($"{Sims2ToolsLib.Sims2Path}\\..\\..");
@@ -117,7 +124,270 @@ namespace DpbfLister
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
+        private static void ProcessDeRepoClothing(string folder, string subFolderName)
+        {
+            Dictionary<DBPFKey, string> keyToPackage = new Dictionary<DBPFKey, string>();
+
+            int count = 0;
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            string[] allPackageFiles = Directory.GetFiles(folder, "*.package", SearchOption.AllDirectories);
+
+            foreach (string packageFile in allPackageFiles)
+            {
+                using (DBPFFile package = new DBPFFile(packageFile))
+                {
+                    foreach (TypeTypeID typeId in new TypeTypeID[] { Cres.TYPE, Shpe.TYPE, Txmt.TYPE, Txtr.TYPE, Str.TYPE })
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(typeId))
+                        {
+                            if (!keyToPackage.ContainsKey(entry))
+                            {
+                                keyToPackage.Add(entry, packageFile);
+                            }
+                        }
+                    }
+
+                    package.Close();
+                }
+            }
+
+            HashSet<DBPFKey> allMeshKeys = new HashSet<DBPFKey>();
+
+            foreach (string packageFile in allPackageFiles)
+            {
+                string[] pathParts = packageFile.Split("\\");
+
+                if (pathParts.Length > 2 && pathParts[pathParts.Length - 2].Equals(subFolderName)) continue;
+
+                ++count;
+
+                using (DBPFFile package = new DBPFFile(packageFile))
+                {
+                    bool complete = true;
+
+                    HashSet<DBPFKey> meshKeys = new HashSet<DBPFKey>();
+
+                    foreach (DBPFEntry idrEntry in package.GetEntriesByType(Idr.TYPE))
+                    {
+                        DBPFEntry binxEntry = package.GetEntryByKey(new DBPFKey(Binx.TYPE, idrEntry.GroupID, idrEntry.InstanceID, idrEntry.ResourceID));
+
+                        if (binxEntry != null)
+                        {
+                            DBPFEntry gzpsEntry = package.GetEntryByKey(new DBPFKey(Gzps.TYPE, idrEntry.GroupID, idrEntry.InstanceID, idrEntry.ResourceID));
+
+                            if (gzpsEntry != null)
+                            {
+                                Idr idr = (Idr)package.GetResourceByEntry(idrEntry);
+
+                                for (uint i = 0; i < idr.ItemCount; ++i)
+                                {
+                                    DBPFKey key = idr.GetItem(i);
+
+                                    if (key.TypeID == Cres.TYPE || key.TypeID == Shpe.TYPE)
+                                    {
+                                        meshKeys.Add(key);
+                                    }
+                                    else if (key.TypeID == Txmt.TYPE)
+                                    {
+                                        complete = complete && DeRepoTxmt(package, idr, i, keyToPackage);
+                                    }
+                                    else if (key.TypeID == Str.TYPE)
+                                    {
+                                        complete = complete && DeRepoStr(package, idr, i, keyToPackage);
+                                    }
+
+                                    if (!complete) break;
+                                }
+
+                                if (complete)
+                                {
+                                    foreach (DBPFEntry entry in package.GetEntriesByType(Txmt.TYPE))
+                                    {
+                                        Txmt txmt = (Txmt)package.GetResourceByEntry(entry);
+
+                                        complete = complete && DeRepoTxtr(package, txmt, "stdMatBaseTextureName", keyToPackage);
+                                        complete = complete && DeRepoTxtr(package, txmt, "stdMatNormalMapTextureName", keyToPackage);
+                                        complete = complete && DeRepoTxtr(package, txmt, "stdMatEnvCubeTextureName", keyToPackage);
+
+                                        if (!complete) break;
+                                    }
+                                }
+                            }
+
+                            if (!complete) break;
+                        }
+                    }
+
+                    if (!complete)
+                    {
+                        Debug.WriteLine($"Missing resources (TXMT/TXTR/STR#) for '{package.PackagePath.Substring(folder.Length + 1)}' ... skipping");
+                    }
+                    else
+                    {
+                        foreach (DBPFKey meshKey in meshKeys)
+                        {
+                            allMeshKeys.Add(meshKey);
+                        }
+                    }
+
+                    if (complete && package.IsDirty)
+                    {
+                        package.Update(subFolderName);
+                    }
+
+                    package.Close();
+                }
+            }
+
+            HashSet<string> allMeshPackageFiles = new HashSet<string>();
+
+            foreach (DBPFKey meshKey in allMeshKeys)
+            {
+                if (keyToPackage.TryGetValue(meshKey, out string meshPackgeFile))
+                {
+                    allMeshPackageFiles.Add(meshPackgeFile);
+                }
+                else
+                {
+                    Debug.WriteLine($"No package file available for required mesh resource '{meshKey}'");
+                }
+            }
+
+            foreach (string meshPackageFile in allMeshPackageFiles)
+            {
+                Debug.WriteLine($"Required mesh file '{meshPackageFile.Substring(folder.Length + 1)}'");
+            }
+
+            Debug.WriteLine($"Processed {count} files in {stopwatch.ElapsedMilliseconds / 1000.0} seconds");
+        }
+
+        private static bool DeRepoTxmt(DBPFFile package, Idr idr, uint i, Dictionary<DBPFKey, string> keyToPackage)
+        {
+            DBPFKey key = idr.GetItem(i);
+
+            if (package.GetEntryByKey(key) == null)
+            {
+                if (keyToPackage.TryGetValue(key, out string donorPackageFile))
+                {
+                    using (DBPFFile donorPackage = new DBPFFile(donorPackageFile))
+                    {
+                        Txmt txmt = (Txmt)donorPackage.GetResourceByKey(key);
+
+                        txmt.ChangeGroupID(idr.GroupID);
+
+                        txmt.MaterialDefinition.NameResource.FileName = ReplaceOrAddGroupID(txmt.MaterialDefinition.NameResource.FileName, txmt.GroupID);
+                        txmt.MaterialDefinition.FileDescription = ReplaceOrAddGroupID(txmt.MaterialDefinition.FileDescription, txmt.GroupID);
+
+                        idr.SetItem(i, txmt);
+
+                        package.Commit(idr);
+                        package.Commit(txmt);
+
+                        donorPackage.Close();
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool DeRepoTxtr(DBPFFile package, Txmt txmt, string propName, Dictionary<DBPFKey, string> keyToPackage)
+        {
+            string sgName = txmt.MaterialDefinition.GetProperty(propName);
+
+            if (sgName != null)
+            {
+                DBPFKey key = SgHelper.KeyFromQualifiedName(sgName, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS);
+
+                if (!keyToPackage.ContainsKey(key))
+                {
+                    key = SgHelper.KeyFromQualifiedName($"{sgName}_txtr", Txtr.TYPE, DBPFData.GROUP_SG_MAXIS);
+                }
+
+                if (package.GetEntryByKey(key) == null)
+                {
+                    if (keyToPackage.TryGetValue(key, out string donorPackageFile))
+                    {
+                        using (DBPFFile donorPackage = new DBPFFile(donorPackageFile))
+                        {
+                            Txtr txtr = (Txtr)donorPackage.GetResourceByKey(key);
+
+                            txtr.ChangeGroupID(txmt.GroupID);
+
+                            txtr.ImageData.NameResource.FileName = ReplaceOrAddGroupID(txtr.ImageData.NameResource.FileName, txtr.GroupID);
+
+                            txmt.MaterialDefinition.SetProperty(propName, ReplaceOrAddGroupID(txmt.MaterialDefinition.GetProperty(propName), txtr.GroupID));
+
+                            package.Commit(txmt);
+                            package.Commit(txtr);
+
+                            donorPackage.Close();
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private static bool DeRepoStr(DBPFFile package, Idr idr, uint i, Dictionary<DBPFKey, string> keyToPackage)
+        {
+            DBPFKey key = idr.GetItem(i);
+
+            if (package.GetEntryByKey(key) == null)
+            {
+                if (keyToPackage.TryGetValue(key, out string donorPackageFile))
+                {
+                    using (DBPFFile donorPackage = new DBPFFile(donorPackageFile))
+                    {
+                        Str str = (Str)donorPackage.GetResourceByKey(key);
+
+                        str.ChangeGroupID(idr.GroupID);
+
+                        idr.SetItem(i, str);
+
+                        package.Commit(idr);
+                        package.Commit(str);
+
+                        donorPackage.Close();
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static string ReplaceOrAddGroupID(string sgName, TypeGroupID groupID)
+        {
+            string newSgName;
+
+            if (sgName.StartsWith("##"))
+            {
+                int pos = sgName.IndexOf("!");
+
+                newSgName = $"##{groupID}!{sgName.Substring(pos + 1)}";
+            }
+            else
+            {
+                newSgName = $"##{groupID}!{sgName}";
+            }
+
+            return newSgName;
+        }
+
         private static void ProcessObjfs()
         {
             using (DBPFFile package = new DBPFFile(Sims2ToolsLib.Sims2Path + GameData.objectsSubPath))
@@ -136,8 +406,6 @@ namespace DpbfLister
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
         private static void ProcessWants()
         {
             DirectoryInfo installPath = new DirectoryInfo($"{Sims2ToolsLib.Sims2Path}\\..\\..");
@@ -187,7 +455,6 @@ namespace DpbfLister
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private static void ProcessPrimitives()
         {
             int[] primCount = new int[0x80];

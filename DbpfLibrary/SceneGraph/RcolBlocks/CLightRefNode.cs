@@ -54,7 +54,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         // Needed by reflection to create the class
         public CLightRefNode(Rcol parent) : base(parent)
         {
-            version = 0xa;
+            Version = 0x0A;
             BlockID = TYPE;
             BlockName = NAME;
 
@@ -88,7 +88,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
-            version = reader.ReadUInt32();
+            Version = reader.ReadUInt32();
 
             _ = reader.ReadString();
             TypeBlockID myid = reader.ReadBlockId();
@@ -114,8 +114,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             unknown2 = reader.ReadBytes(13);
         }
-
-
 
         public override void Dispose()
         {

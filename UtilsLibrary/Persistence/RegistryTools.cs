@@ -65,13 +65,17 @@ namespace Sims2Tools.Utils.Persistence
             return (int)GetSetting(AppRegKey, "UpdateCheckFrequency", 7);
         }
 
-        public static void LoadAppSettings(string AppRegKey, int versionMajor, int versionMinor)
+        public delegate void VersionChangeCallback(int prevVersionMajor, int prevVersionMinor);
+
+        public static void LoadAppSettings(string AppRegKey, int versionMajor, int versionMinor, VersionChangeCallback versionChange = null)
         {
             int verMajor = (int)GetSetting(AppRegKey, "VersionMajor", 0);
             int verMinor = (int)GetSetting(AppRegKey, "VersionMinor", 0);
 
             if (versionMajor != verMajor || versionMinor != verMinor)
             {
+                versionChange?.Invoke(verMajor, verMinor);
+
                 DeleteSetting(AppRegKey, "FormWidth");
                 DeleteSetting(AppRegKey, "FormHeight");
             }
