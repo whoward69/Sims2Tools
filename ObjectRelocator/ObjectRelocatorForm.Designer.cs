@@ -90,6 +90,7 @@ namespace ObjectRelocator
             this.colObjectData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextObjects = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemContextEditTitleDesc = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemContextStripCTSSCrap = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemContextRowRestore = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator6 = new System.Windows.Forms.ToolStripSeparator();
@@ -155,7 +156,8 @@ namespace ObjectRelocator
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
-            this.menuItemContextStripCTSSCrap = new System.Windows.Forms.ToolStripMenuItem();
+            this.lblLinkDepreciation = new System.Windows.Forms.Label();
+            this.ckbLinkDep = new System.Windows.Forms.CheckBox();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextObjects.SuspendLayout();
@@ -182,8 +184,8 @@ namespace ObjectRelocator
             this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
             this.menuHelp,
-            this.menuOptions,
-            this.menuMode});
+            this.menuMode,
+            this.menuOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -618,7 +620,7 @@ namespace ObjectRelocator
             this.toolStripSeparator3,
             this.menuItemContextMoveFiles});
             this.menuContextObjects.Name = "menuContextGrid";
-            this.menuContextObjects.Size = new System.Drawing.Size(227, 198);
+            this.menuContextObjects.Size = new System.Drawing.Size(227, 176);
             this.menuContextObjects.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextObjects.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             this.menuContextObjects.Opened += new System.EventHandler(this.OnContextMenuOpened);
@@ -629,6 +631,13 @@ namespace ObjectRelocator
             this.menuItemContextEditTitleDesc.Size = new System.Drawing.Size(226, 22);
             this.menuItemContextEditTitleDesc.Text = "&Change Title and Description";
             this.menuItemContextEditTitleDesc.Click += new System.EventHandler(this.OnEditTitleDescClicked);
+            // 
+            // menuItemContextStripCTSSCrap
+            // 
+            this.menuItemContextStripCTSSCrap.Name = "menuItemContextStripCTSSCrap";
+            this.menuItemContextStripCTSSCrap.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextStripCTSSCrap.Text = "&Tidy Catalog Entries";
+            this.menuItemContextStripCTSSCrap.Click += new System.EventHandler(this.OnStripCTSSCrapClicked);
             // 
             // toolStripSeparator1
             // 
@@ -1160,6 +1169,8 @@ namespace ObjectRelocator
             // 
             // grpBuyPrice
             // 
+            this.grpBuyPrice.Controls.Add(this.lblLinkDepreciation);
+            this.grpBuyPrice.Controls.Add(this.ckbLinkDep);
             this.grpBuyPrice.Controls.Add(this.textBuyPrice);
             this.grpBuyPrice.Location = new System.Drawing.Point(665, 0);
             this.grpBuyPrice.Name = "grpBuyPrice";
@@ -1288,12 +1299,23 @@ namespace ObjectRelocator
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
             // 
-            // menuItemContextStripCTSSCrap
+            // lblLinkDepreciation
             // 
-            this.menuItemContextStripCTSSCrap.Name = "menuItemContextStripCTSSCrap";
-            this.menuItemContextStripCTSSCrap.Size = new System.Drawing.Size(226, 22);
-            this.menuItemContextStripCTSSCrap.Text = "&Tidy Catalog Entries";
-            this.menuItemContextStripCTSSCrap.Click += new System.EventHandler(this.OnStripCTSSCrapClicked);
+            this.lblLinkDepreciation.AutoSize = true;
+            this.lblLinkDepreciation.Location = new System.Drawing.Point(6, 103);
+            this.lblLinkDepreciation.Name = "lblLinkDepreciation";
+            this.lblLinkDepreciation.Size = new System.Drawing.Size(56, 15);
+            this.lblLinkDepreciation.TabIndex = 24;
+            this.lblLinkDepreciation.Text = "Link Dep";
+            // 
+            // ckbLinkDep
+            // 
+            this.ckbLinkDep.AutoSize = true;
+            this.ckbLinkDep.Location = new System.Drawing.Point(69, 104);
+            this.ckbLinkDep.Name = "ckbLinkDep";
+            this.ckbLinkDep.Size = new System.Drawing.Size(15, 14);
+            this.ckbLinkDep.TabIndex = 23;
+            this.ckbLinkDep.UseVisualStyleBackColor = true;
             // 
             // ObjectRelocatorForm
             // 
@@ -1304,8 +1326,8 @@ namespace ObjectRelocator
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.thumbBox);
             this.Controls.Add(this.gridViewResources);
-            this.Controls.Add(this.panelBuildModeEditor);
             this.Controls.Add(this.panelBuyModeEditor);
+            this.Controls.Add(this.panelBuildModeEditor);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
@@ -1467,5 +1489,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.DataGridViewTextBoxColumn colDepreciation;
         private System.Windows.Forms.DataGridViewTextBoxColumn colObjectData;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextStripCTSSCrap;
+        private System.Windows.Forms.Label lblLinkDepreciation;
+        private System.Windows.Forms.CheckBox ckbLinkDep;
     }
 }

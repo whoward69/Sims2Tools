@@ -27,7 +27,9 @@ namespace DpbfLister
         static void Main(string[] args)
         {
 
-            ProcessFiles(args);
+            // ProcessFiles(args);
+
+            ProcessObjectNiceness();
 
             // ProcessDeRepoClothing("C:\\Users\\whowa\\Desktop\\Latmos_4t2-EP05-DressTieSlip", "Standalone");
 
@@ -69,6 +71,22 @@ namespace DpbfLister
                 }
 
                 Console.WriteLine();
+            }
+        }
+
+        private static void ProcessObjectNiceness()
+        {
+            using (DBPFFile package = new DBPFFile($"{Sims2ToolsLib.Sims2Path}{GameData.objectsSubPath}"))
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
+                {
+                    Objd objd = (Objd)package.GetResourceByEntry(entry);
+
+                    if (objd.GetRawData(ObjdIndex.Price) != 0 && objd.GetRawData(ObjdIndex.NicenessMultiplier) != 0)
+                    {
+                        Debug.WriteLine($"{objd.GetRawData(ObjdIndex.Price)}\t{objd.GetRawData(ObjdIndex.NicenessMultiplier)}\t{objd.GetRawData(ObjdIndex.RatingRoom)}\t{objd.KeyName}");
+                    }
+                }
             }
         }
 

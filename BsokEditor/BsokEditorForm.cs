@@ -397,7 +397,7 @@ namespace BsokEditor
                                 {
                                     Str str = (Str)package.GetResourceByKey(idr.GetItem(binx.StringSetIdx));
 
-                                    row["Name"] = str?.LanguageItems(MetaData.Languages.English)?[0]?.Title;
+                                    row["Name"] = str?.LanguageItems(MetaData.Languages.Default)?[0]?.Title;
 
                                     row["Bsok"] = BuildBsokString(cpf);
 

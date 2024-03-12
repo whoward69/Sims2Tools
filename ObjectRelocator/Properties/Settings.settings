@@ -11,5 +11,14 @@
     <Setting Name="SelectedRowHighlight" Type="System.String" Scope="User">
       <Value Profile="(Default)">LightSteelBlue</Value>
     </Setting>
+    <Setting Name="DepreciationInitialPercent" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">15</Value>
+    </Setting>
+    <Setting Name="DepreciationDailyPercent" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="DepreciationLimitPercent" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">40</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

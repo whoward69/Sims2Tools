@@ -24,6 +24,8 @@ using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
+using Sims2Tools.DBPF.SceneGraph.TXMT;
+using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.SLOT;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
@@ -599,6 +601,8 @@ namespace HcduPlus
                 menuItemTrcn.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Trcn.NAME, 0) != 0); OnTrcnClicked(menuItemTrcn, null);
                 menuItemTtab.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttab.NAME, 1) != 0); OnTtabClicked(menuItemTtab, null);
                 menuItemTtas.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttas.NAME, 1) != 0); OnTtasClicked(menuItemTtas, null);
+                menuItemTxmt.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Txmt.NAME, 0) != 0); OnTxmtClicked(menuItemTxmt, null);
+                menuItemTxtr.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Txtr.NAME, 0) != 0); OnTxtrClicked(menuItemTxtr, null);
                 menuItemUi.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Ui.NAME, 1) != 0); OnUiClicked(menuItemUi, null);
                 menuItemVers.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Vers.NAME, 0) != 0); OnVersClicked(menuItemVers, null);
 
@@ -867,6 +871,8 @@ namespace HcduPlus
             if (!menuItemTrcn.Checked) { menuItemTrcn.Checked = true; OnTrcnClicked(menuItemTrcn, null); }
             if (!menuItemTtab.Checked) { menuItemTtab.Checked = true; OnTtabClicked(menuItemTtab, null); }
             if (!menuItemTtas.Checked) { menuItemTtas.Checked = true; OnTtasClicked(menuItemTtas, null); }
+            if (!menuItemTxmt.Checked) { menuItemTxmt.Checked = true; OnTxmtClicked(menuItemTxmt, null); }
+            if (!menuItemTxtr.Checked) { menuItemTxtr.Checked = true; OnTxtrClicked(menuItemTxtr, null); }
             if (!menuItemUi.Checked) { menuItemUi.Checked = true; OnUiClicked(menuItemUi, null); }
             if (!menuItemVers.Checked) { menuItemVers.Checked = true; OnVersClicked(menuItemVers, null); }
         }
@@ -888,6 +894,8 @@ namespace HcduPlus
             if (menuItemTrcn.Checked) { menuItemTrcn.Checked = false; OnTrcnClicked(menuItemTrcn, null); }
             if (menuItemTtab.Checked) { menuItemTtab.Checked = false; OnTtabClicked(menuItemTtab, null); }
             if (menuItemTtas.Checked) { menuItemTtas.Checked = false; OnTtasClicked(menuItemTtas, null); }
+            if (menuItemTxmt.Checked) { menuItemTxmt.Checked = false; OnTxmtClicked(menuItemTxmt, null); }
+            if (menuItemTxtr.Checked) { menuItemTxtr.Checked = false; OnTxtrClicked(menuItemTxtr, null); }
             if (menuItemUi.Checked) { menuItemUi.Checked = false; OnUiClicked(menuItemUi, null); }
             if (menuItemVers.Checked) { menuItemVers.Checked = false; OnVersClicked(menuItemVers, null); }
         }
@@ -1070,6 +1078,30 @@ namespace HcduPlus
                 enabledResources.Remove(Ttas.TYPE);
 
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Ttas.NAME, enabled ? 1 : 0);
+        }
+
+        private void OnTxmtClicked(object sender, EventArgs e)
+        {
+            bool enabled = ((ToolStripMenuItem)sender).Checked;
+
+            if (enabled)
+                enabledResources.Add(Txmt.TYPE);
+            else
+                enabledResources.Remove(Txmt.TYPE);
+
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Txmt.NAME, enabled ? 1 : 0);
+        }
+
+        private void OnTxtrClicked(object sender, EventArgs e)
+        {
+            bool enabled = ((ToolStripMenuItem)sender).Checked;
+
+            if (enabled)
+                enabledResources.Add(Txtr.TYPE);
+            else
+                enabledResources.Remove(Txtr.TYPE);
+
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Txtr.NAME, enabled ? 1 : 0);
         }
 
         private void OnUiClicked(object sender, EventArgs e)

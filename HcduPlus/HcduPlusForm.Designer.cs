@@ -81,6 +81,8 @@ namespace HcduPlus
             this.menuItemTrcn = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemTtab = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemTtas = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemTxmt = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemTxtr = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemUi = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemVers = new System.Windows.Forms.ToolStripMenuItem();
             this.menuConflicts = new System.Windows.Forms.ToolStripMenuItem();
@@ -278,6 +280,8 @@ namespace HcduPlus
             this.menuItemTrcn,
             this.menuItemTtab,
             this.menuItemTtas,
+            this.menuItemTxmt,
+            this.menuItemTxtr,
             this.menuItemUi,
             this.menuItemVers});
             this.menuResources.Name = "menuResources";
@@ -422,6 +426,20 @@ namespace HcduPlus
             this.menuItemTtas.Size = new System.Drawing.Size(180, 22);
             this.menuItemTtas.Text = "Ttas";
             this.menuItemTtas.Click += new System.EventHandler(this.OnTtasClicked);
+            // 
+            // menuItemTxmt
+            // 
+            this.menuItemTxmt.CheckOnClick = true;
+            this.menuItemTxmt.Name = "menuItemTxmt";
+            this.menuItemTxmt.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTxmt.Text = "Txmt";
+            // 
+            // menuItemTxtr
+            // 
+            this.menuItemTxtr.CheckOnClick = true;
+            this.menuItemTxtr.Name = "menuItemTxtr";
+            this.menuItemTxtr.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTxtr.Text = "Txtr";
             // 
             // menuItemUi
             // 
@@ -957,6 +975,8 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemTrcn;
         private System.Windows.Forms.ToolStripMenuItem menuItemTtab;
         private System.Windows.Forms.ToolStripMenuItem menuItemTtas;
+        private System.Windows.Forms.ToolStripMenuItem menuItemTxmt;
+        private System.Windows.Forms.ToolStripMenuItem menuItemTxtr;
         private System.Windows.Forms.ToolStripMenuItem menuItemUi;
         private System.Windows.Forms.ToolStripMenuItem menuItemVers;
         private System.Windows.Forms.ToolStripMenuItem menuConflicts;

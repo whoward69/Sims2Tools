@@ -808,7 +808,7 @@ namespace BhavFinder
                     if (entry.InstanceID == instanceID)
                     {
                         Str str = (Str)package.GetResourceByEntry(entry);
-                        StrItemList entries = str.LanguageItems(MetaData.Languages.English);
+                        StrItemList entries = str.LanguageItems(MetaData.Languages.Default);
 
                         for (int i = 0; i < entries.Count; ++i)
                         {

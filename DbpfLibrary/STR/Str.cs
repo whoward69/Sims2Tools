@@ -114,9 +114,15 @@ namespace Sims2Tools.DBPF.STR
 
         public StrItemList LanguageItems(MetaData.Languages l)
         {
+            StrItemList items = null;
+            byte langKey = (byte)l;
 
-            StrItemList items = languages[(byte)l] ?? new StrItemList();
-            return items;
+            if (languages.ContainsKey(langKey))
+            {
+                items = languages[langKey];
+            }
+
+            return items ?? new StrItemList();
         }
 
         public void AddLanguages(Dictionary<byte, StrItemList> newLanguages)
@@ -234,7 +240,7 @@ namespace Sims2Tools.DBPF.STR
                         return;
                     }
 
-                    if (strlng.Lid == MetaData.Languages.English)
+                    if (strlng.Lid == MetaData.Languages.Default)
                     {
                         deflng = strlng;
                     }

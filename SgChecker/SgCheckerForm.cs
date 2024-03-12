@@ -187,7 +187,7 @@ namespace SgChecker
                                                     // Resolve the needed STR# now, while we have the associated DBPFFile to hand
                                                     if (package.GetResourceByKey(new DBPFKey(Str.TYPE, res.GroupID, (TypeInstanceID)0x0085, (TypeResourceID)0x0000)) is Str strRes)
                                                     {
-                                                        string cres = (res as Objd).IsRawDataValid(0x0048) ? strRes.LanguageItems(MetaData.Languages.English)[(res as Objd).GetRawData(0x0048)].Title : null;
+                                                        string cres = (res as Objd).IsRawDataValid(0x0048) ? strRes.LanguageItems(MetaData.Languages.Default)[(res as Objd).GetRawData(0x0048)].Title : null;
 
                                                         if (cres != null && cres.Length > 0)
                                                         {

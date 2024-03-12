@@ -64,7 +64,7 @@ namespace ObjectRelocator
             {
                 if (HasTitleAndDescription)
                 {
-                    StrItemList strs = strings?.LanguageItems(MetaData.Languages.English);
+                    StrItemList strs = strings?.LanguageItems(MetaData.Languages.Default);
 
                     if (strs?[0] != null)
                     {
@@ -317,7 +317,7 @@ namespace ObjectRelocator
             {
                 if (HasTitleAndDescription)
                 {
-                    StrItemList strs = strings?.LanguageItems(MetaData.Languages.English);
+                    StrItemList strs = strings?.LanguageItems(MetaData.Languages.Default);
 
                     if (strs?[0] != null)
                     {
@@ -553,7 +553,7 @@ namespace ObjectRelocator
                         if (str != null)
                         {
                             int modelIndex = objd.GetRawData(ObjdIndex.DefaultGraphic);
-                            string cresname = str.LanguageItems(MetaData.Languages.English)[modelIndex].Title;
+                            string cresname = str.LanguageItems(MetaData.Languages.Default)[modelIndex].Title;
                             TypeGroupID groupId = objd.GroupID;
 
                             if (groupId == DBPFData.GROUP_LOCAL)

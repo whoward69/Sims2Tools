@@ -198,6 +198,8 @@ namespace ObjectRelocator
             // As we're simulating a click to change mode, we need to change mode first!
             buyMode = !buyMode; OnBuyBuildModeClicked(null, null);
 
+            ckbLinkDep.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", ckbLinkDep.Name, 0) != 0);
+
             UpdateFormState();
 
             MyUpdater = new Updater(ObjectRelocatorApp.RegistryKey, menuHelp);
@@ -237,6 +239,8 @@ namespace ObjectRelocator
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemMakeReplacements.Name, menuItemMakeReplacements.Checked ? 1 : 0);
+
+            RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", ckbLinkDep.Name, ckbLinkDep.Checked ? 1 : 0);
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -2248,7 +2252,20 @@ namespace ObjectRelocator
                     data = 0;
                 }
 
-                if (IsAutoUpdate && textBuyPrice.Text.Length > 0) UpdateSelectedRows(data, ObjdIndex.Price);
+                if (IsAutoUpdate && textBuyPrice.Text.Length > 0)
+                {
+                    UpdateSelectedRows(data, ObjdIndex.Price);
+
+                    if (ckbLinkDep.Checked)
+                    {
+                        textDepInitial.Text = (data * Properties.Settings.Default.DepreciationInitialPercent / 100).ToString();
+                        UpdateSelectedRows((ushort)(data * Properties.Settings.Default.DepreciationInitialPercent / 100), ObjdIndex.InitialDepreciation);
+                        textDepDaily.Text = (data * Properties.Settings.Default.DepreciationDailyPercent / 100).ToString();
+                        UpdateSelectedRows((ushort)(data * Properties.Settings.Default.DepreciationDailyPercent / 100), ObjdIndex.DailyDepreciation);
+                        textDepLimit.Text = (data * Properties.Settings.Default.DepreciationLimitPercent / 100).ToString();
+                        UpdateSelectedRows((ushort)(data * Properties.Settings.Default.DepreciationLimitPercent / 100), ObjdIndex.DepreciationLimit);
+                    }
+                }
 
                 e.Handled = true;
             }

@@ -56,7 +56,7 @@ namespace HoodExporter
         private MruList MyMruList;
         private Updater MyUpdater;
 
-        private const MetaData.Languages defLid = MetaData.Languages.English;
+        private const MetaData.Languages defLid = MetaData.Languages.Default;
         private MetaData.Languages prefLid = defLid;
 
         private readonly TypeTypeID[] baseTypes = new TypeTypeID[] { Idno.TYPE, Ctss.TYPE, Ngbh.TYPE, Str.TYPE };
@@ -135,7 +135,7 @@ namespace HoodExporter
                 rufioTypes.Add(type);
             }
 
-            string lastLid = (string)RegistryTools.GetSetting(HoodExporterApp.RegistryKey + @"\Options", menuLanguage.Name, Helper.Hex2PrefixString((int)MetaData.Languages.English));
+            string lastLid = (string)RegistryTools.GetSetting(HoodExporterApp.RegistryKey + @"\Options", menuLanguage.Name, Helper.Hex2PrefixString((int)MetaData.Languages.Default));
             foreach (string lid in GameData.languagesByCode.Keys)
             {
                 if (GameData.languagesByCode.TryGetValue(lid, out string lang))
@@ -643,7 +643,7 @@ namespace HoodExporter
                             Ctss ctss = (Ctss)package.GetResourceByEntry(ctsss[0]);
 
                             StrItemList strs = ctss.LanguageItems(prefLid);
-                            if (strs.Count == 0) strs = ctss.LanguageItems(MetaData.Languages.English);
+                            if (strs.Count == 0) strs = ctss.LanguageItems(MetaData.Languages.Default);
 
                             if (strs.Count >= 2)
                             {

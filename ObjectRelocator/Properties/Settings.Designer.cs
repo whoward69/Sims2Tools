@@ -12,7 +12,7 @@ namespace ObjectRelocator.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.9.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -56,6 +56,42 @@ namespace ObjectRelocator.Properties {
             }
             set {
                 this["SelectedRowHighlight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15")]
+        public int DepreciationInitialPercent {
+            get {
+                return ((int)(this["DepreciationInitialPercent"]));
+            }
+            set {
+                this["DepreciationInitialPercent"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int DepreciationDailyPercent {
+            get {
+                return ((int)(this["DepreciationDailyPercent"]));
+            }
+            set {
+                this["DepreciationDailyPercent"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        public int DepreciationLimitPercent {
+            get {
+                return ((int)(this["DepreciationLimitPercent"]));
+            }
+            set {
+                this["DepreciationLimitPercent"] = value;
             }
         }
     }
