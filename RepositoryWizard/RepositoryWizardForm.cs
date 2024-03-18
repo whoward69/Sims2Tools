@@ -289,7 +289,7 @@ namespace RepositoryWizard
 
             if (folder != null)
             {
-                if (Sims2ToolsLib.IsSims2HomePathSet && folder.StartsWith($"{Sims2ToolsLib.Sims2HomePath}\\Downloads"))
+                if (Sims2ToolsLib.IsSims2HomePathSet && folder.StartsWith($"{Sims2ToolsLib.Sims2DownloadsPath}"))
                 {
                     displayPath = $" - {folder.Substring(Sims2ToolsLib.Sims2HomePath.Length + 11)}";
                 }
@@ -1634,14 +1634,14 @@ namespace RepositoryWizard
                 codedString = codedString.Substring(braPos + 1);
 
                 int ketPos = codedString.IndexOf('}');
-                string macro = codedString.Substring(0, ketPos);
+                string macro = codedString.Substring(0, ketPos).ToLower();
                 int macroLen = -1;
 
                 int colonPos = macro.IndexOf(':');
                 if (colonPos != -1)
                 {
                     int.TryParse(macro.Substring(colonPos + 1), out macroLen);
-                    macro = macro.Substring(0, colonPos).ToLower();
+                    macro = macro.Substring(0, colonPos);
                 }
 
                 string subst = macro;

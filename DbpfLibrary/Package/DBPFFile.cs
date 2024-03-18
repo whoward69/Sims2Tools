@@ -244,18 +244,7 @@ namespace Sims2Tools.DBPF.Package
 
         private DbpfReader GetDbpfReader(DBPFEntry entry)
         {
-            if (entry.UncompressedSize != 0)
-            {
-                byte[] data = GetItemByEntry(entry);
-
-                return DbpfReader.FromStream(new MemoryStream(data));
-            }
-            else
-            {
-                m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
-
-                return DbpfReader.FromStream(m_Reader.MyStream, entry.FileSize);
-            }
+            return DbpfReader.FromStream(new MemoryStream(GetItemByEntry(entry)));
         }
 
         private byte[] GetItemByEntry(DBPFEntry entry)
@@ -282,9 +271,9 @@ namespace Sims2Tools.DBPF.Package
                     headerSignature == 0xFB10 &&
                     headerUncompressedSize > (entry.FileSize - 9))
                 {
-                    // TODO - _compression - This looks very much like compressed data!
-                    // We could set uncompressedSize = headerUncompressedSize and continue
-                    logger.Warn($"Resource {entry} appears to be compressed when marked as not! Missing CLST resource?");
+                    logger.Debug($"Resource {entry} appears to be compressed when marked as not! Missing CLST resource?");
+
+                    uncompressedSize = (uint)headerUncompressedSize;
                 }
             }
 
@@ -625,7 +614,6 @@ namespace Sims2Tools.DBPF.Package
             {
                 res = new Cgn1(entry, this.GetDbpfReader(entry));
             }
-
 
             return res;
         }

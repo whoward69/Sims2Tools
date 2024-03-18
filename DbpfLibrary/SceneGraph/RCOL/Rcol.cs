@@ -214,7 +214,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             }
             catch (Exception ex)
             {
-                logger.Warn(ex.Message);
+                logger.Warn("RCol error:", ex);
                 duff = true;
             }
         }

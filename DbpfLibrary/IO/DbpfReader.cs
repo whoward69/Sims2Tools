@@ -24,6 +24,7 @@ namespace Sims2Tools.DBPF.IO
 
         private readonly Stream m_stream;
         private readonly BinaryReader m_reader;
+        private readonly long m_startPos;
         private long m_length;
         private ByteOrder m_byteOrder = ByteOrder.BIG_ENDIAN;
 
@@ -33,6 +34,7 @@ namespace Sims2Tools.DBPF.IO
         {
             this.m_stream = stream;
             this.m_reader = new BinaryReader(stream, DBPFFile.Encoding, false);
+            this.m_startPos = Position;
         }
 
         public static DbpfReader FromStream(Stream stream)
@@ -65,6 +67,11 @@ namespace Sims2Tools.DBPF.IO
         public long Length
         {
             get => m_length;
+        }
+
+        public long StartPos
+        {
+            get => m_startPos;
         }
 
         public long Position
@@ -194,7 +201,7 @@ namespace Sims2Tools.DBPF.IO
             // We need this catch block to allow for running off the end of the written data and encountering bad bytes in the UTF-8 stream.  Also my bad!
             catch (DecoderFallbackException ex)
             {
-                logger.Warn(ex.Message);
+                logger.Warn("ReadPChar", ex);
             }
 
             return s;

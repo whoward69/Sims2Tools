@@ -1,7 +1,60 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Sims2Tools.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Sims2Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Double Deluxe\Base</Value>
+    </Setting>
+    <Setting Name="Sims2EP1Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\University Life\EP1</Value>
+    </Setting>
+    <Setting Name="Sims2EP2Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Double Deluxe\EP2</Value>
+    </Setting>
+    <Setting Name="Sims2EP3Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Best of Business\EP3</Value>
+    </Setting>
+    <Setting Name="Sims2EP4Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Fun with Pets\EP4</Value>
+    </Setting>
+    <Setting Name="Sims2EP5Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Seasons</Value>
+    </Setting>
+    <Setting Name="Sims2EP6Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Bon Voyage</Value>
+    </Setting>
+    <Setting Name="Sims2EP7Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Free Time</Value>
+    </Setting>
+    <Setting Name="Sims2EP8Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Apartment Life</Value>
+    </Setting>
+    <Setting Name="Sims2EP9Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Fun with Pets\SP9</Value>
+    </Setting>
+    <Setting Name="Sims2SP1Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Fun with Pets\SP1</Value>
+    </Setting>
+    <Setting Name="Sims2SP2Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Glamour Life Stuff</Value>
+    </Setting>
+    <Setting Name="Sims2SP4Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Double Deluxe\SP4</Value>
+    </Setting>
+    <Setting Name="Sims2SP5Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Best of Business\SP5</Value>
+    </Setting>
+    <Setting Name="Sims2SP6Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\University Life\SP6</Value>
+    </Setting>
+    <Setting Name="Sims2SP7Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Best of Business\SP7</Value>
+    </Setting>
+    <Setting Name="Sims2SP8Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\University Life\SP8</Value>
+    </Setting>
+    <Setting Name="Sims2SCPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\Program Files (x86)\Origin Games\The Sims 2 Ultimate Collection\Double Deluxe\EP99</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

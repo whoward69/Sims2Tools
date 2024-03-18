@@ -13,3 +13,5 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>", Scope = "member", Target = "~M:DpbfLister.DpbfLister.DeRepoTxmt(Sims2Tools.DBPF.Package.DBPFFile,Sims2Tools.DBPF.SceneGraph.IDR.Idr,System.UInt32,System.Collections.Generic.Dictionary{Sims2Tools.DBPF.DBPFKey,System.String})")]
 [assembly: SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>", Scope = "member", Target = "~M:DpbfLister.DpbfLister.ProcessFiles(System.String[])")]
 [assembly: SuppressMessage("Style", "IDE0056:Use index operator", Justification = "<Pending>", Scope = "member", Target = "~M:DpbfLister.DpbfLister.ProcessDeRepoClothing(System.String,System.String)")]
+[assembly: SuppressMessage("Style", "IDE0028:Simplify collection initialization", Justification = "<Pending>", Scope = "member", Target = "~M:DpbfLister.DpbfLister.ProcessDeRepoClothing(System.String,System.String)")]
+[assembly: SuppressMessage("Style", "IDE0028:Simplify collection initialization", Justification = "<Pending>", Scope = "member", Target = "~M:DpbfLister.DpbfLister.ProcessObjects")]

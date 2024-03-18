@@ -541,10 +541,10 @@ namespace BhavFinder
             MyMruList = new MruList(BhavFinderApp.RegistryKey, menuItemRecentPackages, Properties.Settings.Default.MruSize, true, true);
             MyMruList.FileSelected += MyMruList_FileSelected;
 
-            UpdateForm();
-
             MyUpdater = new Updater(BhavFinderApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
+
+            UpdateForm();
         }
 
         private void UpdateLocalObjects()

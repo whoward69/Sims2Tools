@@ -8,6 +8,7 @@
 
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -47,7 +48,25 @@ namespace Sims2Tools
                 }
             }
 
-            textSimPEPath.Text = Sims2ToolsLib.SimPePath;
+            textSimPePath.Text = Sims2ToolsLib.SimPePath;
+
+            UpdateFormState();
+        }
+
+        private void UpdateFormState()
+        {
+            Color badColour = Color.LightCoral;
+
+            bool sims2PathOk = Directory.Exists(textSims2Path.Text);
+            this.textSims2Path.BackColor = sims2PathOk ? System.Drawing.SystemColors.Window : badColour;
+
+            bool sims2HomePathOk = Directory.Exists(textSims2HomePath.Text);
+            this.textSims2HomePath.BackColor = sims2HomePathOk ? System.Drawing.SystemColors.Window : badColour;
+
+            bool simsPePathOk = string.IsNullOrEmpty(textSimPePath.Text) || (Directory.Exists(textSimPePath.Text) && File.Exists($"{textSimPePath.Text}/Data/simpe.xreg"));
+            this.textSimPePath.BackColor = simsPePathOk ? System.Drawing.SystemColors.Window : badColour;
+
+            btnConfigOK.Enabled = (sims2PathOk && sims2HomePathOk && simsPePathOk);
         }
 
         private void OnSelectSim2PathClicked(object sender, EventArgs e)
@@ -72,12 +91,17 @@ namespace Sims2Tools
 
         private void OnSelectSimPEPathClicked(object sender, EventArgs e)
         {
-            selectPathDialog.InitialDirectory = textSimPEPath.Text;
+            selectPathDialog.InitialDirectory = textSimPePath.Text;
 
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                textSimPEPath.Text = selectPathDialog.FileName;
+                textSimPePath.Text = selectPathDialog.FileName;
             }
+        }
+
+        private void OnTextChanged(object sender, EventArgs e)
+        {
+            UpdateFormState();
         }
 
         private void OnConfigOkClicked(object sender, EventArgs e)
@@ -88,10 +112,10 @@ namespace Sims2Tools
 
             Sims2ToolsLib.Sims2Path = textSims2Path.Text;
             Sims2ToolsLib.Sims2HomePath = textSims2HomePath.Text;
-            Sims2ToolsLib.SimPePath = textSimPEPath.Text;
+            Sims2ToolsLib.SimPePath = textSimPePath.Text;
 
             // As updating the global objects is a long process, it's worth checking that one of these actually changed
-            if (!(textSims2Path.Text.Equals(oldSims2Path) && textSims2HomePath.Text.Equals(oldSims2HomePath) && textSimPEPath.Text.Equals(oldSimPePath)))
+            if (!(textSims2Path.Text.Equals(oldSims2Path) && textSims2HomePath.Text.Equals(oldSims2HomePath) && textSimPePath.Text.Equals(oldSimPePath)))
             {
                 btnConfigOK.Enabled = false;
                 GameData.UpdateGlobalObjects();

@@ -13,6 +13,7 @@ using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
+using Sims2Tools.DBPF.SceneGraph.XHTN;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.XWNT;
 using System;
@@ -29,7 +30,9 @@ namespace DpbfLister
 
             // ProcessFiles(args);
 
-            ProcessObjectNiceness();
+            ProcessXhtn("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads\\Hair\\Female\\All4Colors_minanna_FH03_ribbon(Black).package");
+
+            // ProcessObjectNiceness();
 
             // ProcessDeRepoClothing("C:\\Users\\whowa\\Desktop\\Latmos_4t2-EP05-DressTieSlip", "Standalone");
 
@@ -394,7 +397,7 @@ namespace DpbfLister
 
             if (sgName.StartsWith("##"))
             {
-                int pos = sgName.IndexOf("!");
+                int pos = sgName.IndexOf('!');
 
                 newSgName = $"##{groupID}!{sgName.Substring(pos + 1)}";
             }
@@ -418,6 +421,21 @@ namespace DpbfLister
                     {
                         Debug.WriteLine($"{entry}");
                     }
+                }
+
+                package.Close();
+            }
+        }
+
+        private static void ProcessXhtn(string packagePath)
+        {
+            using (DBPFFile package = new DBPFFile(packagePath))
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(Xhtn.TYPE))
+                {
+                    Xhtn xhtn = (Xhtn)package.GetResourceByEntry(entry);
+
+                    xhtn.GetItem("name");
                 }
 
                 package.Close();

@@ -127,16 +127,19 @@ namespace Sims2Tools
                 logger.Info(ex.StackTrace);
             }
 
+            try
             {
+                logger.Info($"Loading SimpeData: Start");
+
                 // Base game folder
                 string baseFolder = SimpeData.PathSetting("Sims2Path");
-                gameFolders.Add($"{baseFolder}{GameData.base3dPath}");
+                if (baseFolder != null) gameFolders.Add($"{baseFolder}{GameData.base3dPath}");
 
                 // Expansion Pack (EP) folders
                 for (int i = 1; i <= 9; i++)
                 {
                     string epPath = SimpeData.PathSetting($"Sims2EP{i}Path");
-                    gameFolders.Add($"{epPath}{GameData.ep3dPath}");
+                    if (epPath != null) gameFolders.Add($"{epPath}{GameData.ep3dPath}");
                 }
 
                 // Stuff Pack (SP) folders
@@ -144,10 +147,17 @@ namespace Sims2Tools
                 for (int i = 1; i <= 8; i++)
                 {
                     string spPath = SimpeData.PathSetting($"Sims2SP{i}Path");
-                    gameFolders.Add($"{spPath}{GameData.sp3dPath}");
+                    if (spPath != null) gameFolders.Add($"{spPath}{GameData.sp3dPath}");
                 }
                 string scPath = SimpeData.PathSetting($"Sims2SCPath");
-                gameFolders.Add($"{scPath}{GameData.sp3dPath}");
+                if (scPath != null) gameFolders.Add($"{scPath}{GameData.sp3dPath}");
+
+                logger.Info($"Loading SimpeData: End");
+            }
+            catch (Exception ex)
+            {
+                logger.Warn($"Loading SimpeData threw {ex.Message}");
+                logger.Info(ex.StackTrace);
             }
 
             stopwatch.Stop();
@@ -193,6 +203,8 @@ namespace Sims2Tools
 
         static public void UpdateGlobalObjects()
         {
+            logger.Info($"UpdateGlobalObjects: Start");
+
             string sims2Path = Sims2ToolsLib.Sims2Path;
 
             if (sims2Path.Length > 0)
@@ -256,6 +268,8 @@ namespace Sims2Tools
                 globalObjectsByGUID = new Dictionary<TypeGUID, string>();
                 globalObjectsTgirHashByGUID = new Dictionary<TypeGUID, int>();
             }
+
+            logger.Info($"UpdateGlobalObjects: End");
         }
 
         static public void BuildObjectsTable(DBPFFile package, SortedDictionary<string, string> objectsByGroupID, Dictionary<TypeGUID, string> objectsByGUID, Dictionary<TypeGUID, int> objectsTgirHashByGUID = null)

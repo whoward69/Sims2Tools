@@ -180,7 +180,7 @@ namespace Sims2Tools.Cache
                 }
                 catch (Exception e)
                 {
-                    logger.Warn(e);
+                    logger.Warn("AddPackageToCacheAsync", e);
                 }
                 finally
                 {

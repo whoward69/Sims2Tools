@@ -97,6 +97,8 @@ namespace HcduPlus
             this.menuItemKnownConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOptionNoLoad = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemOptionSgNames = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTipGridByPackage = new System.Windows.Forms.ToolTip(this.components);
             this.hcduWorker = new System.ComponentModel.BackgroundWorker();
             this.lblModsPath = new System.Windows.Forms.Label();
@@ -433,6 +435,7 @@ namespace HcduPlus
             this.menuItemTxmt.Name = "menuItemTxmt";
             this.menuItemTxmt.Size = new System.Drawing.Size(180, 22);
             this.menuItemTxmt.Text = "Txmt";
+            this.menuItemTxmt.Click += new System.EventHandler(this.OnTxmtClicked);
             // 
             // menuItemTxtr
             // 
@@ -440,6 +443,7 @@ namespace HcduPlus
             this.menuItemTxtr.Name = "menuItemTxtr";
             this.menuItemTxtr.Size = new System.Drawing.Size(180, 22);
             this.menuItemTxtr.Text = "Txtr";
+            this.menuItemTxtr.Click += new System.EventHandler(this.OnTxtrClicked);
             // 
             // menuItemUi
             // 
@@ -547,7 +551,9 @@ namespace HcduPlus
             // menuOptions
             // 
             this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemOptionNoLoad});
+            this.menuItemOptionNoLoad,
+            this.toolStripSeparator5,
+            this.menuItemOptionSgNames});
             this.menuOptions.Name = "menuOptions";
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
@@ -556,9 +562,22 @@ namespace HcduPlus
             // 
             this.menuItemOptionNoLoad.CheckOnClick = true;
             this.menuItemOptionNoLoad.Name = "menuItemOptionNoLoad";
-            this.menuItemOptionNoLoad.Size = new System.Drawing.Size(208, 22);
+            this.menuItemOptionNoLoad.Size = new System.Drawing.Size(219, 22);
             this.menuItemOptionNoLoad.Text = "Include .noload packages";
             this.menuItemOptionNoLoad.Click += new System.EventHandler(this.OnNoLoads);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(216, 6);
+            // 
+            // menuItemOptionSgNames
+            // 
+            this.menuItemOptionSgNames.CheckOnClick = true;
+            this.menuItemOptionSgNames.Name = "menuItemOptionSgNames";
+            this.menuItemOptionSgNames.Size = new System.Drawing.Size(219, 22);
+            this.menuItemOptionSgNames.Text = "Extract Scene Graph Names";
+            this.menuItemOptionSgNames.Click += new System.EventHandler(this.OnNoLoads);
             // 
             // hcduWorker
             // 
@@ -1000,9 +1019,11 @@ namespace HcduPlus
         private System.Windows.Forms.CheckBox checkScanSavedSims;
         private System.Windows.Forms.ToolStripMenuItem menuOptions;
         private System.Windows.Forms.ToolStripMenuItem menuItemOptionNoLoad;
+        private System.Windows.Forms.ToolStripMenuItem menuItemOptionSgNames;
         private System.Windows.Forms.ToolStripMenuItem menuItemAll;
         private System.Windows.Forms.ToolStripMenuItem menuItemNone;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
     }
 }
 

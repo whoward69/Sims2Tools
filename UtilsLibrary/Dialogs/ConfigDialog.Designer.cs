@@ -43,7 +43,7 @@ namespace Sims2Tools
             this.textSims2Path = new System.Windows.Forms.TextBox();
             this.btnSims2Select = new System.Windows.Forms.Button();
             this.lblSimPEPath = new System.Windows.Forms.Label();
-            this.textSimPEPath = new System.Windows.Forms.TextBox();
+            this.textSimPePath = new System.Windows.Forms.TextBox();
             this.btnSimPESelect = new System.Windows.Forms.Button();
             this.btnConfigOK = new System.Windows.Forms.Button();
             this.lblSimsHomePath = new System.Windows.Forms.Label();
@@ -67,6 +67,7 @@ namespace Sims2Tools
             this.textSims2Path.Name = "textSims2Path";
             this.textSims2Path.Size = new System.Drawing.Size(530, 21);
             this.textSims2Path.TabIndex = 1;
+            this.textSims2Path.TextChanged += new System.EventHandler(this.OnTextChanged);
             // 
             // btnSims2Select
             // 
@@ -90,10 +91,11 @@ namespace Sims2Tools
             // 
             // textSimPEPath
             // 
-            this.textSimPEPath.Location = new System.Drawing.Point(127, 89);
-            this.textSimPEPath.Name = "textSimPEPath";
-            this.textSimPEPath.Size = new System.Drawing.Size(530, 21);
-            this.textSimPEPath.TabIndex = 3;
+            this.textSimPePath.Location = new System.Drawing.Point(127, 89);
+            this.textSimPePath.Name = "textSimPEPath";
+            this.textSimPePath.Size = new System.Drawing.Size(530, 21);
+            this.textSimPePath.TabIndex = 3;
+            this.textSimPePath.TextChanged += new System.EventHandler(this.OnTextChanged);
             // 
             // btnSimPESelect
             // 
@@ -133,6 +135,7 @@ namespace Sims2Tools
             this.textSims2HomePath.Name = "textSims2HomePath";
             this.textSims2HomePath.Size = new System.Drawing.Size(530, 21);
             this.textSims2HomePath.TabIndex = 7;
+            this.textSims2HomePath.TextChanged += new System.EventHandler(this.OnTextChanged);
             // 
             // btnSimsHomeSelect
             // 
@@ -155,7 +158,7 @@ namespace Sims2Tools
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // Sims2ToolsConfigDialog
+            // ConfigDialog
             // 
             this.AcceptButton = this.btnConfigOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -166,7 +169,7 @@ namespace Sims2Tools
             this.Controls.Add(this.textSims2Path);
             this.Controls.Add(this.btnSims2Select);
             this.Controls.Add(this.lblSimPEPath);
-            this.Controls.Add(this.textSimPEPath);
+            this.Controls.Add(this.textSimPePath);
             this.Controls.Add(this.btnSimPESelect);
             this.Controls.Add(this.btnConfigOK);
             this.Controls.Add(this.lblSimsHomePath);
@@ -177,7 +180,7 @@ namespace Sims2Tools
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Sims2ToolsConfigDialog";
+            this.Name = "ConfigDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Configuration";
             this.Load += new System.EventHandler(this.OnConfigLoad);
@@ -192,7 +195,7 @@ namespace Sims2Tools
         private System.Windows.Forms.TextBox textSims2Path;
         private System.Windows.Forms.Button btnSims2Select;
         private System.Windows.Forms.Label lblSimPEPath;
-        private System.Windows.Forms.TextBox textSimPEPath;
+        private System.Windows.Forms.TextBox textSimPePath;
         private System.Windows.Forms.Button btnSimPESelect;
         private System.Windows.Forms.Button btnConfigOK;
         private CommonOpenFileDialog selectPathDialog;

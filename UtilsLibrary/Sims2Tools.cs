@@ -78,6 +78,18 @@ namespace Sims2Tools
             }
         }
 
+        public static string Sims2DownloadsPath
+        {
+            get
+            {
+                string downloadsPath = Sims2HomePath;
+
+                if (!string.IsNullOrWhiteSpace(downloadsPath)) downloadsPath = $"{downloadsPath}\\Downloads";
+
+                return downloadsPath;
+            }
+        }
+
         public static string SimPePath
         {
             get

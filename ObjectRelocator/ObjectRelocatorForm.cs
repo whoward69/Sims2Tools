@@ -2592,7 +2592,7 @@ namespace ObjectRelocator
                 }
                 catch (Exception ex)
                 {
-                    logger.Warn(ex);
+                    logger.Warn("OnReplaceThumbClicked", ex);
                     MsgBox.Show($"Unable to open/read {openThumbnailDialog.FileName}", "Thumbnail Error");
                 }
             }

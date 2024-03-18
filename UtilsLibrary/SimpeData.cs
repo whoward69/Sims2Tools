@@ -14,34 +14,44 @@ namespace Sims2Tools
 {
     public class SimpeData
     {
-        static public SortedDictionary<string, string> pathSettings = new SortedDictionary<string, string>();
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private static readonly Dictionary<string, string> pathSettings = new Dictionary<string, string>();
 
         static SimpeData()
         {
             try
             {
+                logger.Debug("SimpeData loading from .xreg");
+
                 ParseXreg($"{Sims2ToolsLib.SimPePath}/Data/simpe.xreg", "Settings", pathSettings);
+
+                logger.Info("SimpeData loaded from .xreg");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                pathSettings.Add("Sims2Path", Properties.Settings.Default.Properties["Sims2Path"].DefaultValue as string);
+                logger.Debug(ex.Message);
+                logger.Debug("SimpeData loading from .config");
+
+                AddSimpePath("Sims2Path");
 
                 for (int i = 1; i <= 9; i++)
                 {
-                    pathSettings.Add($"Sims2EP{i}Path", Properties.Settings.Default.Properties[$"Sims2EP{i}Path"].DefaultValue as string);
+                    AddSimpePath($"Sims2EP{i}Path");
                 }
 
                 for (int i = 1; i <= 8; i++)
                 {
                     if (i == 3) continue;
 
-                    pathSettings.Add($"Sims2SP{i}Path", Properties.Settings.Default.Properties[$"Sims2SP{i}Path"].DefaultValue as string);
+                    AddSimpePath($"Sims2SP{i}Path");
                 }
 
                 // This is where SimPe stores the SP3 path - go figure!
-                pathSettings.Add("Sims2SCPath", Properties.Settings.Default.Properties["Sims2SCPath"].DefaultValue as string);
-            }
+                AddSimpePath("Sims2SCPath");
 
+                logger.Info("SimpeData loaded from .config");
+            }
         }
 
         public static string PathSetting(string key)
@@ -51,7 +61,7 @@ namespace Sims2Tools
             return value;
         }
 
-        private static void ParseXreg(string xml, string section, SortedDictionary<string, string> settings)
+        private static void ParseXreg(string xml, string section, Dictionary<string, string> settings)
         {
             using (XmlReader reader = XmlReader.Create(xml))
             {
@@ -82,6 +92,15 @@ namespace Sims2Tools
 
                 reader.Close();
             }
+        }
+
+        private static void AddSimpePath(string key)
+        {
+            string value = Properties.Settings.Default.Properties[key]?.DefaultValue as string;
+
+            logger.Debug($"  {key}={value}");
+
+            pathSettings.Add(key, value);
         }
     }
 }

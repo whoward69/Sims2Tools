@@ -18,8 +18,8 @@ namespace SgChecker
     {
         public static string AppName = "SG Checker";
 
-        public static int AppVersionMajor = 1;
-        public static int AppVersionMinor = 2;
+        public static int AppVersionMajor = 2;
+        public static int AppVersionMinor = 0;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;

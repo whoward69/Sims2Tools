@@ -290,7 +290,7 @@ namespace OutfitOrganiser
                 MsgBox.Show("'Sims2HomePath' not set - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
             }
 
-            downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\Downloads", "downloads"), "downloads");
+            downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2DownloadsPath}", "downloads"), "downloads");
             savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims", "savedsims"), "savedsims");
             meshCachesLoaded = false;
 
@@ -340,7 +340,7 @@ namespace OutfitOrganiser
 
             if (folder != null)
             {
-                if (Sims2ToolsLib.IsSims2HomePathSet && folder.StartsWith($"{Sims2ToolsLib.Sims2HomePath}\\Downloads"))
+                if (Sims2ToolsLib.IsSims2HomePathSet && folder.StartsWith($"{Sims2ToolsLib.Sims2DownloadsPath}"))
                 {
                     displayPath = $" - {folder.Substring(Sims2ToolsLib.Sims2HomePath.Length + 11)}";
                 }
@@ -3185,7 +3185,7 @@ namespace OutfitOrganiser
                 }
                 catch (Exception ex)
                 {
-                    logger.Warn(ex);
+                    logger.Warn("OnResReplaceThumbClicked", ex);
                     MsgBox.Show($"Unable to open/read {openThumbnailDialog.FileName}", "Thumbnail Error");
                 }
             }

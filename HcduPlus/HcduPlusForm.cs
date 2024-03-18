@@ -404,12 +404,20 @@ namespace HcduPlus
                 {
                     try
                     {
+#if DEBUG
+                        if (Debugger.IsAttached) logger.Debug($"Processing: {files[fileIndex]}");
+#endif
+
                         using (DBPFFile package = new DBPFFile(files[fileIndex]))
                         {
                             foreach (TypeTypeID type in enabledResources)
                             {
                                 foreach (DBPFEntry entry in package.GetEntriesByType(type))
                                 {
+#if DEBUG
+                                    if (Debugger.IsAttached) logger.Debug($"  Entry: {entry}");
+#endif
+
                                     if (type == Objd.TYPE && menuItemGuidConflicts.Checked)
                                     {
                                         Objd objd = (Objd)package.GetResourceByEntry(entry);
@@ -425,7 +433,21 @@ namespace HcduPlus
 
                                         if (!dataStore.NamesByTgiContains(entry))
                                         {
-                                            dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
+                                            if (DBPFData.IsKnownSgType(entry.TypeID))
+                                            {
+                                                if (menuItemOptionSgNames.Checked)
+                                                {
+                                                    dataStore.NamesByTgiAdd(entry, package.GetResourceByEntry(entry)?.KeyName ?? "[unknown]");
+                                                }
+                                                else
+                                                {
+                                                    dataStore.NamesByTgiAdd(entry, "[not loaded]");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
+                                            }
                                         }
                                     }
                                 }
@@ -616,6 +638,7 @@ namespace HcduPlus
                 checkScanSavedSims.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", checkScanSavedSims.Name, 0) != 0);
 
                 menuItemOptionNoLoad.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionNoLoad.Name, 0) != 0);
+                menuItemOptionSgNames.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionSgNames.Name, 0) != 0);
 
                 MyUpdater = new Updater(HcduPlusApp.RegistryKey, menuHelp);
                 MyUpdater.CheckForUpdates();
@@ -661,11 +684,14 @@ namespace HcduPlus
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", checkScanSavedSims.Name, checkScanSavedSims.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionNoLoad.Name, menuItemOptionNoLoad.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionSgNames.Name, menuItemOptionSgNames.Checked ? 1 : 0);
         }
 
         private void OnSelectModsClicked(object sender, EventArgs e)
         {
             selectPathDialog.InitialDirectory = textModsPath.Text;
+
+            if (string.IsNullOrWhiteSpace(selectPathDialog.InitialDirectory)) selectPathDialog.InitialDirectory = Sims2ToolsLib.Sims2DownloadsPath;
 
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
