@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2023
+ * William Howard - 2020-2024
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -2324,11 +2324,11 @@ namespace RepositoryWizard
 
                                                 if (gmdcs.Count > 0)
                                                 {
-                                                    ProcessSubset(dbpfPackage, slaveObjd.Guid, comboMasterPrimarySubset.SelectedItem as string, comboSlavePrimarySubset.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                    ProcessSubset(dbpfPackage, slaveObjd, comboMasterPrimarySubset.SelectedItem as string, comboSlavePrimarySubset.SelectedItem as string, shpes, gmnds, gmdcs);
 
                                                     if (!string.IsNullOrEmpty(comboSlaveSecondarySubset.SelectedItem as string))
                                                     {
-                                                        ProcessSubset(dbpfPackage, slaveObjd.Guid, comboMasterSecondarySubset.SelectedItem as string, comboSlaveSecondarySubset.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                        ProcessSubset(dbpfPackage, slaveObjd, comboMasterSecondarySubset.SelectedItem as string, comboSlaveSecondarySubset.SelectedItem as string, shpes, gmnds, gmdcs);
                                                     }
 
                                                     foreach (Shpe shpe in shpes)
@@ -2361,7 +2361,7 @@ namespace RepositoryWizard
             }
         }
 
-        private void ProcessSubset(RepoWizardDbpfFile package, TypeGUID slaveGuid, string masterSubsetName, string slaveSubsetName, List<Shpe> shpes, List<Gmnd> gmnds, List<Gmdc> gmdcs)
+        private void ProcessSubset(RepoWizardDbpfFile package, Objd slaveObjd, string masterSubsetName, string slaveSubsetName, List<Shpe> shpes, List<Gmnd> gmnds, List<Gmdc> gmdcs)
         {
             string masterMaterialName = null;
             List<string> slaveMaterialNames = new List<string>();
@@ -2389,16 +2389,22 @@ namespace RepositoryWizard
                 {
                     gmdc.RenameSubset(slaveSubsetName, masterSubsetName);
                 }
+
+                // Update STR# 0x0087 "Mesh Names"
+                UpdateStrings(package, slaveObjd, (TypeInstanceID)0x0087, slaveSubsetName, masterSubsetName);
             }
 
             foreach (Shpe shpe in shpes)
             {
-                string slavePrimaryMaterialName = shpe.GetSubsetMaterial(masterSubsetName);
+                string slaveMaterialName = shpe.GetSubsetMaterial(masterSubsetName);
 
-                if (slavePrimaryMaterialName != null)
+                if (slaveMaterialName != null)
                 {
-                    slaveMaterialNames.Add(slavePrimaryMaterialName);
+                    slaveMaterialNames.Add(slaveMaterialName);
                     shpe.SetSubsetMaterial(masterSubsetName, masterMaterialName);
+
+                    // Update STR# 0x0088 "Material Names"
+                    UpdateStrings(package, slaveObjd, (TypeInstanceID)0x0088, slaveMaterialName, masterMaterialName);
                 }
             }
 
@@ -2419,7 +2425,7 @@ namespace RepositoryWizard
             {
                 Mmat mmat = (Mmat)package.GetResourceByEntry(entry);
 
-                if (mmat.ObjectGUID == slaveGuid && mmat.SubsetName.Equals(slaveSubsetName))
+                if (mmat.ObjectGUID == slaveObjd.Guid && mmat.SubsetName.Equals(slaveSubsetName))
                 {
                     toDelete.Add(mmat);
                 }
@@ -2433,9 +2439,9 @@ namespace RepositoryWizard
             if (menuItemDeleteLocalOrphans.Checked)
             {
                 // Delete unused TXMT and TXTR(s)
-                foreach (string slavePrimaryMaterialName in slaveMaterialNames)
+                foreach (string slaveMaterialName in slaveMaterialNames)
                 {
-                    Txmt txmt = (Txmt)package.GetResourceByName(Txmt.TYPE, slavePrimaryMaterialName);
+                    Txmt txmt = (Txmt)package.GetResourceByName(Txmt.TYPE, slaveMaterialName);
 
                     if (IsLocalOrphan(package, txmt))
                     {
@@ -2463,6 +2469,21 @@ namespace RepositoryWizard
                     }
                 }
             }
+        }
+
+        private void UpdateStrings(RepoWizardDbpfFile package, Objd objd, TypeInstanceID instanceId, string fromValue, string toValue)
+        {
+            Str str = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, objd.GroupID, instanceId, DBPFData.RESOURCE_NULL));
+
+            foreach (StrItem strItem in str.LanguageItems(MetaData.Languages.Default))
+            {
+                if (strItem.Title.Equals(fromValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    strItem.Title = toValue;
+                }
+            }
+
+            package.Commit(str);
         }
 
         private int SaveClothingRow(RepoWizardDbpfFile dbpfPackage, DataGridViewRow row, DBPFKey newMeshCresKey, Shpe newMeshShpe, bool verifyShpeSubsets, Gmdc newMeshGmdc, bool verifyGmdcSubsets)
