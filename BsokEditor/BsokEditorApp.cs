@@ -1,7 +1,7 @@
 ﻿/*
  * BSOK Editor - a utility for adding BSOK data to clothing and accessory packages
  *
- * William Howard - 2020-2023
+ * William Howard - 2020-2024
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -17,7 +17,7 @@ namespace BsokEditor
         public static string AppName = "Bsok Editor";
 
         public static int AppVersionMajor = 2;
-        public static int AppVersionMinor = 0;
+        public static int AppVersionMinor = 1;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;

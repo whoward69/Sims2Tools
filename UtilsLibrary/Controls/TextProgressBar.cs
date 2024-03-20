@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2023
+ * William Howard - 2020-2024
  *
  * See https://github.com/ukushu/TextProgressBar
  *

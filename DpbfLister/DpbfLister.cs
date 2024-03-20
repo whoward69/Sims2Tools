@@ -1,4 +1,12 @@
-﻿using Sims2Tools;
+﻿/*
+ * DBPF Lister - a utility for testing the DBPF Library
+ *
+ * William Howard - 2020-2024
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.Data;

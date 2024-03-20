@@ -1,7 +1,7 @@
 ﻿/*
  * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2023
+ * William Howard - 2020-2024
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -17,7 +17,7 @@ namespace ObjectRelocator
         public static readonly string AppName = "Object Relocator";
 
         public static readonly int AppVersionMajor = 5;
-        public static readonly int AppVersionMinor = 0;
+        public static readonly int AppVersionMinor = 1;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;

@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2023
+ * William Howard - 2020-2024
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -19,7 +19,7 @@ namespace OutfitOrganiser
         public static readonly string AppName = "Outfit Organiser";
 
         public static readonly int AppVersionMajor = 2;
-        public static readonly int AppVersionMinor = 0;
+        public static readonly int AppVersionMinor = 1;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;
