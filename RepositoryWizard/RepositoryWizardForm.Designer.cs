@@ -98,8 +98,6 @@ namespace RepositoryWizard
             this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackageIcon = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnSaveAs = new System.Windows.Forms.Button();
-            this.grpDeRepoOptions = new System.Windows.Forms.GroupBox();
-            this.ckbDeRepoCopyMeshFiles = new System.Windows.Forms.CheckBox();
             this.grpMesh = new System.Windows.Forms.GroupBox();
             this.textMesh = new System.Windows.Forms.TextBox();
             this.btnMesh = new System.Windows.Forms.Button();
@@ -123,6 +121,8 @@ namespace RepositoryWizard
             this.colTooltip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colRepoWizardData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panelClothingEditor = new System.Windows.Forms.Panel();
+            this.grpGzpsName = new System.Windows.Forms.GroupBox();
+            this.textGzpsName = new System.Windows.Forms.TextBox();
             this.grpProduct = new System.Windows.Forms.GroupBox();
             this.comboProduct = new System.Windows.Forms.ComboBox();
             this.grpName = new System.Windows.Forms.GroupBox();
@@ -165,6 +165,8 @@ namespace RepositoryWizard
             this.comboMasterSecondarySubset = new System.Windows.Forms.ComboBox();
             this.comboSlaveSecondarySubset = new System.Windows.Forms.ComboBox();
             this.textDeRepoMsgs = new System.Windows.Forms.TextBox();
+            this.grpDeRepoOptions = new System.Windows.Forms.GroupBox();
+            this.ckbDeRepoCopyMeshFiles = new System.Windows.Forms.CheckBox();
             this.lblNoModeSelected = new System.Windows.Forms.Label();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openMeshDialog = new System.Windows.Forms.OpenFileDialog();
@@ -180,10 +182,10 @@ namespace RepositoryWizard
             this.splitTopLeftRight.Panel2.SuspendLayout();
             this.splitTopLeftRight.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).BeginInit();
-            this.grpDeRepoOptions.SuspendLayout();
             this.grpMesh.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).BeginInit();
             this.panelClothingEditor.SuspendLayout();
+            this.grpGzpsName.SuspendLayout();
             this.grpProduct.SuspendLayout();
             this.grpName.SuspendLayout();
             this.grpCategory.SuspendLayout();
@@ -196,6 +198,7 @@ namespace RepositoryWizard
             this.grpMaster.SuspendLayout();
             this.grpPrimarySubset.SuspendLayout();
             this.grpSecondarySubset.SuspendLayout();
+            this.grpDeRepoOptions.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -356,7 +359,6 @@ namespace RepositoryWizard
             // menuItemAdvanced
             // 
             this.menuItemAdvanced.CheckOnClick = true;
-            this.menuItemAdvanced.Enabled = false;
             this.menuItemAdvanced.Name = "menuItemAdvanced";
             this.menuItemAdvanced.Size = new System.Drawing.Size(201, 22);
             this.menuItemAdvanced.Text = "&Advanced";
@@ -595,29 +597,6 @@ namespace RepositoryWizard
             this.btnSaveAs.Text = "&Save As";
             this.btnSaveAs.UseVisualStyleBackColor = true;
             this.btnSaveAs.Click += new System.EventHandler(this.OnSaveAsClicked);
-            // 
-            // grpDeRepoOptions
-            // 
-            this.grpDeRepoOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpDeRepoOptions.Controls.Add(this.ckbDeRepoCopyMeshFiles);
-            this.grpDeRepoOptions.Location = new System.Drawing.Point(727, 320);
-            this.grpDeRepoOptions.Name = "grpDeRepoOptions";
-            this.grpDeRepoOptions.Size = new System.Drawing.Size(147, 50);
-            this.grpDeRepoOptions.TabIndex = 26;
-            this.grpDeRepoOptions.TabStop = false;
-            this.grpDeRepoOptions.Text = "Standalone Options:";
-            // 
-            // ckbDeRepoCopyMeshFiles
-            // 
-            this.ckbDeRepoCopyMeshFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ckbDeRepoCopyMeshFiles.AutoSize = true;
-            this.ckbDeRepoCopyMeshFiles.Location = new System.Drawing.Point(25, 22);
-            this.ckbDeRepoCopyMeshFiles.Name = "ckbDeRepoCopyMeshFiles";
-            this.ckbDeRepoCopyMeshFiles.Size = new System.Drawing.Size(116, 19);
-            this.ckbDeRepoCopyMeshFiles.TabIndex = 0;
-            this.ckbDeRepoCopyMeshFiles.Text = "Copy Mesh Files";
-            this.ckbDeRepoCopyMeshFiles.UseVisualStyleBackColor = true;
             // 
             // grpMesh
             // 
@@ -868,6 +847,7 @@ namespace RepositoryWizard
             // 
             this.panelClothingEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelClothingEditor.Controls.Add(this.grpGzpsName);
             this.panelClothingEditor.Controls.Add(this.grpProduct);
             this.panelClothingEditor.Controls.Add(this.grpName);
             this.panelClothingEditor.Controls.Add(this.grpCategory);
@@ -881,6 +861,27 @@ namespace RepositoryWizard
             this.panelClothingEditor.Name = "panelClothingEditor";
             this.panelClothingEditor.Size = new System.Drawing.Size(984, 160);
             this.panelClothingEditor.TabIndex = 26;
+            // 
+            // grpGzpsName
+            // 
+            this.grpGzpsName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpGzpsName.Controls.Add(this.textGzpsName);
+            this.grpGzpsName.Location = new System.Drawing.Point(460, 100);
+            this.grpGzpsName.Name = "grpGzpsName";
+            this.grpGzpsName.Size = new System.Drawing.Size(519, 50);
+            this.grpGzpsName.TabIndex = 26;
+            this.grpGzpsName.TabStop = false;
+            this.grpGzpsName.Text = "GZPS Name:";
+            // 
+            // textGzpsName
+            // 
+            this.textGzpsName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textGzpsName.Location = new System.Drawing.Point(6, 20);
+            this.textGzpsName.Name = "textGzpsName";
+            this.textGzpsName.Size = new System.Drawing.Size(507, 21);
+            this.textGzpsName.TabIndex = 0;
             // 
             // grpProduct
             // 
@@ -1037,6 +1038,7 @@ namespace RepositoryWizard
             this.grpType.TabIndex = 6;
             this.grpType.TabStop = false;
             this.grpType.Text = "Type:";
+            this.grpType.Visible = false;
             // 
             // comboType
             // 
@@ -1344,6 +1346,29 @@ namespace RepositoryWizard
             this.textDeRepoMsgs.TabIndex = 0;
             this.textDeRepoMsgs.WordWrap = false;
             // 
+            // grpDeRepoOptions
+            // 
+            this.grpDeRepoOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpDeRepoOptions.Controls.Add(this.ckbDeRepoCopyMeshFiles);
+            this.grpDeRepoOptions.Location = new System.Drawing.Point(727, 320);
+            this.grpDeRepoOptions.Name = "grpDeRepoOptions";
+            this.grpDeRepoOptions.Size = new System.Drawing.Size(147, 50);
+            this.grpDeRepoOptions.TabIndex = 26;
+            this.grpDeRepoOptions.TabStop = false;
+            this.grpDeRepoOptions.Text = "Standalone Options:";
+            // 
+            // ckbDeRepoCopyMeshFiles
+            // 
+            this.ckbDeRepoCopyMeshFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ckbDeRepoCopyMeshFiles.AutoSize = true;
+            this.ckbDeRepoCopyMeshFiles.Location = new System.Drawing.Point(25, 22);
+            this.ckbDeRepoCopyMeshFiles.Name = "ckbDeRepoCopyMeshFiles";
+            this.ckbDeRepoCopyMeshFiles.Size = new System.Drawing.Size(116, 19);
+            this.ckbDeRepoCopyMeshFiles.TabIndex = 0;
+            this.ckbDeRepoCopyMeshFiles.Text = "Copy Mesh Files";
+            this.ckbDeRepoCopyMeshFiles.UseVisualStyleBackColor = true;
+            // 
             // lblNoModeSelected
             // 
             this.lblNoModeSelected.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -1380,8 +1405,8 @@ namespace RepositoryWizard
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 561);
             this.Controls.Add(this.menuMain);
-            this.Controls.Add(this.splitTopBottom);
             this.Controls.Add(this.lblNoModeSelected);
+            this.Controls.Add(this.splitTopBottom);
             this.Controls.Add(this.thumbBox);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -1406,12 +1431,12 @@ namespace RepositoryWizard
             ((System.ComponentModel.ISupportInitialize)(this.splitTopLeftRight)).EndInit();
             this.splitTopLeftRight.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).EndInit();
-            this.grpDeRepoOptions.ResumeLayout(false);
-            this.grpDeRepoOptions.PerformLayout();
             this.grpMesh.ResumeLayout(false);
             this.grpMesh.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).EndInit();
             this.panelClothingEditor.ResumeLayout(false);
+            this.grpGzpsName.ResumeLayout(false);
+            this.grpGzpsName.PerformLayout();
             this.grpProduct.ResumeLayout(false);
             this.grpName.ResumeLayout(false);
             this.grpName.PerformLayout();
@@ -1431,6 +1456,8 @@ namespace RepositoryWizard
             this.grpPrimarySubset.PerformLayout();
             this.grpSecondarySubset.ResumeLayout(false);
             this.grpSecondarySubset.PerformLayout();
+            this.grpDeRepoOptions.ResumeLayout(false);
+            this.grpDeRepoOptions.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1551,6 +1578,8 @@ namespace RepositoryWizard
         private System.Windows.Forms.ToolStripMenuItem menuItemModeClothingStandalone;
         private System.Windows.Forms.TextBox textDeRepoMsgs;
         private System.Windows.Forms.CheckBox ckbDeRepoCopyMeshFiles;
+        private System.Windows.Forms.GroupBox grpGzpsName;
+        private System.Windows.Forms.TextBox textGzpsName;
     }
 }
 

@@ -160,6 +160,8 @@ namespace RepositoryWizard
 
             gridPackageFiles.DataSource = dataPackageFiles;
             gridResources.DataSource = dataResources;
+
+            textGzpsName.Text = Properties.Settings.Default.GzpsNameFormat;
         }
 
         public new void Dispose()
@@ -196,8 +198,7 @@ namespace RepositoryWizard
             menuItemModeClothing.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothing.Name, 0) != 0);
             menuItemModeObject.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeObject.Name, 1) != 0);
             menuItemModeClothingStandalone.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothingStandalone.Name, 0) != 0);
-            // menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
-            menuItemAdvanced.Checked = false; OnAdvancedModeChanged(menuItemAdvanced, null);
+            menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
             menuItemAutoMerge.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoMerge.Name, 1) != 0);
             menuItemDeleteLocalOrphans.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemDeleteLocalOrphans.Name, 1) != 0);
@@ -1219,7 +1220,7 @@ namespace RepositoryWizard
 
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
-            grpType.Visible = menuItemAdvanced.Checked;
+            grpGzpsName.Visible = menuItemAdvanced.Checked;
         }
         #endregion
 
@@ -2475,15 +2476,18 @@ namespace RepositoryWizard
         {
             Str str = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, objd.GroupID, instanceId, DBPFData.RESOURCE_NULL));
 
-            foreach (StrItem strItem in str.LanguageItems(MetaData.Languages.Default))
+            if (str != null)
             {
-                if (strItem.Title.Equals(fromValue, StringComparison.OrdinalIgnoreCase))
+                foreach (StrItem strItem in str.LanguageItems(MetaData.Languages.Default))
                 {
-                    strItem.Title = toValue;
+                    if (strItem.Title.Equals(fromValue, StringComparison.OrdinalIgnoreCase))
+                    {
+                        strItem.Title = toValue;
+                    }
                 }
-            }
 
-            package.Commit(str);
+                package.Commit(str);
+            }
         }
 
         private int SaveClothingRow(RepoWizardDbpfFile dbpfPackage, DataGridViewRow row, DBPFKey newMeshCresKey, Shpe newMeshShpe, bool verifyShpeSubsets, Gmdc newMeshGmdc, bool verifyGmdcSubsets)
@@ -2540,7 +2544,7 @@ namespace RepositoryWizard
             }
 
             // Update name, eg "{agecode:1}{gender:1}_{type}_{basename}_{id}" -> "tf_body_sundress_red"
-            string gzpsName = ExpandMacros(row, Properties.Settings.Default.GzpsNameFormat, true);
+            string gzpsName = ExpandMacros(row, textGzpsName.Text, true);
             gzps.GetOrAddItem("name", MetaData.DataTypes.dtUInteger).StringValue = gzpsName.ToLower();
 
             // Update creator GUID
