@@ -65,10 +65,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         private List<ObjectGraphNodeItem> items;
         private string filename;
 
-        public List<ObjectGraphNodeItem> Items
-        {
-            get => items;
-        }
+        public List<ObjectGraphNodeItem> Items => items;
 
         public string FileName => filename ?? BlockName;
 

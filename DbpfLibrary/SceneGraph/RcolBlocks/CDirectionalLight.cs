@@ -13,88 +13,53 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
-    public class CDirectionalLight : AbstractRcolBlock
+    public class CDirectionalLight : AbstractGraphRcolBlock
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xC9C81BA3;
         public const string NAME = "cDirectionalLight";
 
+        private readonly StandardLightBase slb = new StandardLightBase();
+        private readonly LightT lt = new LightT();
+        private readonly ReferentNode rn = new ReferentNode();
+        private string unknown2;
+        private float unknown3;
+        private float unknown4;
+        private float red;
+        private float green;
+        private float blue;
 
+        public StandardLightBase StandardLightBase => slb;
 
-        StandardLightBase slb;
-        public StandardLightBase StandardLightBase
+        public LightT LightT => lt;
+
+        public ReferentNode ReferentNode => rn;
+
+        public string Name => unknown2;
+
+        public float Val1 => unknown3;
+
+        public float Val2 => unknown4;
+
+        public float Red => red;
+
+        public float Green => green;
+        public float Blue => blue;
+
+        public override bool IsDirty => base.IsDirty || slb.IsDirty || lt.IsDirty || rn.IsDirty;
+
+        public override void SetClean()
         {
-            get { return slb; }
-            set { slb = value; }
+            base.SetClean();
+
+            slb.SetClean();
+            lt.SetClean();
+            rn.SetClean();
         }
-
-        LightT lt;
-        public LightT LightT
-        {
-            get { return lt; }
-            set { lt = value; }
-        }
-
-        ReferentNode rn;
-        public ReferentNode ReferentNode
-        {
-            get { return rn; }
-            set { rn = value; }
-        }
-
-        CObjectGraphNode ogn;
-        public CObjectGraphNode ObjectGraphNode
-        {
-            get { return ogn; }
-            set { ogn = value; }
-        }
-
-
-        string unknown2;
-        public string Name
-        {
-            get { return unknown2; }
-            set { unknown2 = value; }
-        }
-
-        float unknown3;
-        public float Val1
-        {
-            get { return unknown3; }
-            set { unknown3 = value; }
-        }
-
-        float unknown4;
-        public float Val2
-        {
-            get { return unknown4; }
-            set { unknown4 = value; }
-        }
-
-        float red;
-        public float Red
-        {
-            get { return red; }
-            set { red = value; }
-        }
-
-        float green;
-        public float Green
-        {
-            get { return green; }
-            set { green = value; }
-        }
-
-        float blue;
-        public float Blue
-        {
-            get { return blue; }
-            set { blue = value; }
-        }
-
 
         // Needed by reflection to create the class
         public CDirectionalLight(Rcol parent) : base(parent)
@@ -103,16 +68,19 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             BlockID = TYPE;
             BlockName = NAME;
 
-            slb = new StandardLightBase(null);
-            lt = new LightT(null);
-            rn = new ReferentNode(null);
-            ogn = new CObjectGraphNode(null);
+            slb.Parent = parent;
+            lt.Parent = parent;
+            rn.Parent = parent;
 
             unknown2 = "";
         }
 
         public override void Unserialize(DbpfReader reader)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             Version = reader.ReadUInt32();
 
             slb.BlockName = reader.ReadString();
@@ -138,9 +106,77 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown2 = reader.ReadString();
             unknown3 = reader.ReadSingle();
             unknown4 = reader.ReadSingle();
+
             red = reader.ReadSingle();
             green = reader.ReadSingle();
             blue = reader.ReadSingle();
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
+        }
+
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4;
+
+                size += DbpfWriter.Length(slb.BlockName) + 4 + slb.FileSize;
+                size += DbpfWriter.Length(NameResource.BlockName) + 4 + NameResource.FileSize;
+                size += DbpfWriter.Length(lt.BlockName) + 4 + lt.FileSize;
+                size += DbpfWriter.Length(rn.BlockName) + 4 + rn.FileSize;
+                size += DbpfWriter.Length(ogn.BlockName) + 4 + ogn.FileSize;
+
+                size += DbpfWriter.Length(unknown2) + 4 + 4;
+
+                size += 4 + 4 + 4;
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
+            writer.WriteUInt32(Version);
+
+            writer.WriteString(slb.BlockName);
+            writer.WriteBlockId(slb.BlockID);
+            slb.Serialize(writer);
+
+            writer.WriteString(NameResource.BlockName);
+            writer.WriteBlockId(NameResource.BlockID);
+            NameResource.Serialize(writer);
+
+            writer.WriteString(lt.BlockName);
+            writer.WriteBlockId(lt.BlockID);
+            lt.Serialize(writer);
+
+            writer.WriteString(rn.BlockName);
+            writer.WriteBlockId(rn.BlockID);
+            rn.Serialize(writer);
+
+            writer.WriteString(ogn.BlockName);
+            writer.WriteBlockId(ogn.BlockID);
+            ogn.Serialize(writer);
+
+            writer.WriteString(unknown2);
+            writer.WriteSingle(unknown3);
+            writer.WriteSingle(unknown4);
+
+            writer.WriteSingle(red);
+            writer.WriteSingle(green);
+            writer.WriteSingle(blue);
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+#endif
         }
 
         public override void Dispose()

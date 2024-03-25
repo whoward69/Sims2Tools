@@ -12,7 +12,6 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.Geometry;
-using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
@@ -280,8 +279,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             get => varname ?? "";
             internal set
             {
-                varname = value;
-                _isDirty = true;
+                if (!varname.Equals(value))
+                {
+                    varname = value;
+                    _isDirty = true;
+                }
             }
         }
 
@@ -289,12 +291,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public int Count => items.Count;
 
-        public Extension(Rcol parent) : base(parent)
+        public Extension() : base(null) // Yes, really! Do NOT use base()
         {
+            Version = 0x03;
             BlockName = NAME;
 
             items = new List<ExtensionItem>();
-            Version = 0x03;
             typecode = 0x07;
             varname = "";
         }
@@ -306,6 +308,19 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             _isDirty = true;
 
             return item;
+        }
+
+        public string GetString(string name)
+        {
+            foreach (ExtensionItem item in items)
+            {
+                if (item.Name.Equals(name))
+                {
+                    return item.String;
+                }
+            }
+
+            return "";
         }
 
         public ExtensionItem AddOrUpdateString(string name, string value)
@@ -340,7 +355,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             return AddItem(new ExtensionItem(name, ExtensionItem.ItemTypes.Array));
         }
 
-        public void Remove(string name)
+        public void RemoveItem(string name)
         {
             foreach (ExtensionItem item in items)
             {
@@ -353,6 +368,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                     return;
                 }
             }
+        }
+
+        public void Rename(string name)
+        {
+            VarName = name;
         }
 
         public override void Unserialize(DbpfReader reader) => Unserialize(reader, 0);

@@ -159,7 +159,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
     }
 
-    public class CShape : AbstractRcolBlock
+    public class CShape : AbstractGraphRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xFC6EB1F7;
         public static string NAME = "cShape";
@@ -168,26 +168,32 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         private ShapePart[] parts;
 
         private uint[] lodData;
-        private readonly CObjectGraphNode ogn;
-        private readonly ReferentNode refnode;
+        private readonly ReferentNode refnode = new ReferentNode();
 
         public ShapeItem[] Items => items;
 
         public ShapePart[] Parts => parts;
 
-        public uint[] LodData => lodData;
+        public uint Lod
+        {
+            get => (lodData.Length > 0 ? lodData[0] : 0);
 
-        public uint Lod => (lodData.Length > 0 ? lodData[0] : 0);
+            set
+            {
+                if (lodData.Length == 0)
+                {
+                    lodData = new uint[1];
+                }
 
-        public CObjectGraphNode GraphNode => ogn;
-
-        public ReferentNode RefNode => refnode;
+                lodData[0] = value;
+                _isDirty = true;
+            }
+        }
 
         // Needed by reflection to create the class
         public CShape(Rcol parent) : base(parent)
         {
-            refnode = new ReferentNode(null);
-            ogn = new CObjectGraphNode(null);
+            refnode.Parent = parent;
 
             lodData = new uint[0];
             items = new ShapeItem[0];

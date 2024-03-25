@@ -11,13 +11,12 @@
  */
 
 using Sims2Tools.DBPF.IO;
-using Sims2Tools.DBPF.SceneGraph.RCOL;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class ViewerRefNodeBase : AbstractRcolBlock
     {
-        public ViewerRefNodeBase(Rcol parent) : base(parent)
+        public ViewerRefNodeBase() : base(null) // Yes, really! Do NOT use base()
         {
             Version = 0x5;
             BlockID = TypeBlockID.NULL;

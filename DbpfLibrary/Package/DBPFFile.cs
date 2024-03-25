@@ -179,7 +179,7 @@ namespace Sims2Tools.DBPF.Package
         {
             string originalName = packagePath;
             string updateName;
-            string backupName = $"{packagePath}.bak";
+            string backupName = NextBackupName();
 
             if (subFolder != null)
             {
@@ -240,6 +240,42 @@ namespace Sims2Tools.DBPF.Package
         public bool Remove(DBPFResource resource)
         {
             return resourceIndex.Remove(resource);
+        }
+
+        private string NextBackupName()
+        {
+            int lastVersion = 0;
+
+            int packageLen = packagePath.Length;
+
+            foreach (string baseFile in Directory.GetFiles($"{packageDir}", $"{packageName}.*", SearchOption.TopDirectoryOnly))
+            {
+                if (baseFile.EndsWith(".bak"))
+                {
+                    string versionPart = baseFile.Substring(packageLen, baseFile.Length - packageLen - 4);
+
+                    if (versionPart.Length == 0)
+                    {
+                        lastVersion = 1;
+                    }
+                    else if (versionPart.StartsWith(".V"))
+                    {
+                        if (int.TryParse(versionPart.Substring(2), out int thisVersion))
+                        {
+                            if (thisVersion > lastVersion)
+                            {
+                                lastVersion = thisVersion;
+                            }
+                        }
+                    }
+                }
+            }
+
+            lastVersion += 1;
+
+            string version = (lastVersion <= 1) ? "" : $".V{lastVersion}";
+
+            return $"{packageDir}/{packageName}{version}.bak";
         }
 
         private DbpfReader GetDbpfReader(DBPFEntry entry)
@@ -455,11 +491,11 @@ namespace Sims2Tools.DBPF.Package
             //
             // Image resources
             //
-            else if (entry.TypeID == Img.TYPE)
+            else if (DBPFData.HasImageSupport && entry.TypeID == Img.TYPE)
             {
                 res = new Img(entry, this.GetDbpfReader(entry));
             }
-            else if (entry.TypeID == Jpg.TYPE)
+            else if (DBPFData.HasImageSupport && entry.TypeID == Jpg.TYPE)
             {
                 res = new Jpg(entry, this.GetDbpfReader(entry));
             }
@@ -467,17 +503,18 @@ namespace Sims2Tools.DBPF.Package
             {
                 res = new Thub(entry, this.GetDbpfReader(entry));
             }
-            else if (entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Awning] ||
-                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Chimney] ||
-                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Dormer] ||
-                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceArch] ||
-                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceOrHalfwall] ||
-                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Floor] ||
-                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FoundationOrPool] ||
-                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.ModularStair] ||
-                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Roof] ||
-                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Terrain] ||
-                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Wall])
+            else if (DBPFData.HasImageSupport &&
+                     (entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Awning] ||
+                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Chimney] ||
+                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Dormer] ||
+                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceArch] ||
+                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceOrHalfwall] ||
+                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Floor] ||
+                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FoundationOrPool] ||
+                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.ModularStair] ||
+                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Roof] ||
+                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Terrain] ||
+                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Wall]))
             {
                 res = new Thub(entry, this.GetDbpfReader(entry));
             }

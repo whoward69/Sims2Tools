@@ -35,6 +35,7 @@ namespace DpbfLister
     {
         static void Main(string[] args)
         {
+            DBPFData.HasImageSupport = false;
 
             // ProcessFiles(args);
 

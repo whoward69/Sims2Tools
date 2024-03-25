@@ -11,13 +11,12 @@
  */
 
 using Sims2Tools.DBPF.IO;
-using Sims2Tools.DBPF.SceneGraph.RCOL;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class BoundedNode : AbstractRcolBlock
     {
-        public BoundedNode(Rcol parent) : base(parent)
+        public BoundedNode() : base(null) // Yes, really! Do NOT use base()
         {
             Version = 0x5;
             BlockID = TypeBlockID.NULL;

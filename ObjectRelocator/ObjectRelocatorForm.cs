@@ -13,6 +13,7 @@ using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
@@ -187,6 +188,7 @@ namespace ObjectRelocator
             menuItemShowPath.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowPath.Name, 0) != 0); OnShowHidePath(menuItemShowPath, null);
             menuItemShowGuids.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowGuids.Name, 0) != 0); OnShowHideGuids(menuItemShowGuids, null);
             menuItemShowDepreciation.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowDepreciation.Name, 0) != 0); OnShowHideDepreciation(menuItemShowDepreciation, null);
+            menuItemShowHoodView.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowHoodView.Name, 0) != 0); OnShowHideHoodView(menuItemShowHoodView, null);
 
             menuItemRecurse.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, 1) != 0);
 
@@ -233,6 +235,7 @@ namespace ObjectRelocator
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowPath.Name, menuItemShowPath.Checked ? 1 : 0);
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowGuids.Name, menuItemShowGuids.Checked ? 1 : 0);
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowDepreciation.Name, menuItemShowDepreciation.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowHoodView.Name, menuItemShowHoodView.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, menuItemRecurse.Checked ? 1 : 0);
 
@@ -665,6 +668,11 @@ namespace ObjectRelocator
             grpDepreciation.Visible = menuItemShowDepreciation.Checked;
         }
 
+        private void OnShowHideHoodView(object sender, EventArgs e)
+        {
+            gridViewResources.Columns["colHoodView"].Visible = menuItemShowHoodView.Checked;
+        }
+
         private void OnExcludeHidden(object sender, EventArgs e)
         {
             UpdateFormState();
@@ -919,6 +927,8 @@ namespace ObjectRelocator
             row["Price"] = objectData.GetRawData(ObjdIndex.Price);
             row["Depreciation"] = BuildDepreciationString(objectData);
 
+            row["HoodView"] = BuildHoodViewString(objectData);
+
             return row;
         }
 
@@ -949,6 +959,8 @@ namespace ObjectRelocator
 
                 row["Price"] = objectData.GetUIntItem("cost");
             }
+
+            row["HoodView"] = BuildHoodViewString(objectData);
 
             return row;
         }
@@ -1239,6 +1251,21 @@ namespace ObjectRelocator
             return "";
         }
 
+        private string BuildHoodViewString(ObjectDbpfData objectData)
+        {
+            if (menuItemShowHoodView.Checked)
+            {
+                if (objectData.IsObjd && objectData.FindScenegraphResources())
+                {
+                    return objectData.IsHoodView ? "Yes" : "No";
+                }
+
+                return "n/a";
+            }
+
+            return "unknown";
+        }
+
         private string CapitaliseString(string s)
         {
             if (string.IsNullOrWhiteSpace(s) || s.Length == 1) return s;
@@ -1275,6 +1302,7 @@ namespace ObjectRelocator
                     row.Cells["colQuarterTile"].Value = BuildQuarterTileString(selectedObject);
                     row.Cells["colPrice"].Value = selectedObject.GetRawData(ObjdIndex.Price);
                     row.Cells["colDepreciation"].Value = BuildDepreciationString(selectedObject);
+                    row.Cells["colHoodView"].Value = BuildHoodViewString(selectedObject);
 
                     dataLoading = oldDataLoading;
                     return;
@@ -1307,6 +1335,8 @@ namespace ObjectRelocator
                     {
                         row.Cells["colPrice"].Value = selectedObject.GetUIntItem("cost");
                     }
+
+                    row.Cells["colHoodView"].Value = BuildHoodViewString(selectedObject);
 
                     dataLoading = oldDataLoading;
                     return;
@@ -2433,6 +2463,8 @@ namespace ObjectRelocator
                     }
 
                     menuItemContextStripCTSSCrap.Enabled = (gridViewResources.SelectedRows.Count > 0);
+                    menuItemContextHoodVisible.Enabled = (gridViewResources.SelectedRows.Count > 0);
+                    menuItemContextHoodInvisible.Enabled = (gridViewResources.SelectedRows.Count > 0);
 
                     return;
                 }
@@ -2654,6 +2686,53 @@ namespace ObjectRelocator
                 DoWork_FillGrid(folder, false);
 
             }
+        }
+
+        // See https://hugelunatic.com/how-to-make-objects-visible-in-neighborhood-view/
+        // but note it contains factual errors
+        //   1) adding a new GameData block does not cause crashes and
+        //   2) the thumbnailExtension block is used for custom thumbnail cameras.
+        private void OnMakeHoodVisibleClicked(object sender, EventArgs e)
+        {
+            List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            {
+                ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                if (objectData.IsObjd || objectData.IsXfnc)
+                {
+                    selectedData.Add(objectData);
+                }
+            }
+
+            foreach (ObjectDbpfData objectData in selectedData)
+            {
+                if (objectData.FindScenegraphResources())
+                {
+                    CDataListExtension gameData = objectData.Cres.GameData;
+
+                    if (gameData != null)
+                    {
+                        if (sender == menuItemContextHoodVisible)
+                        {
+                            gameData.Extension.AddOrUpdateString("LODs", "90");
+                            objectData.Shpe.Shape.Lod = 90;
+                        }
+                        else
+                        {
+                            gameData.Extension.RemoveItem("LODs");
+                            objectData.Shpe.Shape.Lod = 0;
+                        }
+
+                        objectData.UpdatePackage();
+
+                        UpdateGridRow(objectData);
+                    }
+                }
+            }
+
+            ReselectRows(selectedData);
         }
         #endregion
 

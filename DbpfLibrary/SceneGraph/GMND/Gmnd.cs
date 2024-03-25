@@ -104,7 +104,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
 
         public bool AddDesignModeEnabled(string subset)
         {
-            CDataListExtension tsDesignModeEnabled = GetOrAddDataListExtension("tsDesignModeEnabled");
+            CDataListExtension tsDesignModeEnabled = GetOrAddDataListExtension("tsDesignModeEnabled", GeometryNode.ObjectGraphNode);
 
             tsDesignModeEnabled.Extension.AddOrGetArray(subset);
 
@@ -117,7 +117,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
         {
             CDataListExtension tsDesignModeEnabled = GetDataListExtension("tsDesignModeEnabled");
 
-            tsDesignModeEnabled?.Extension.Remove(subset);
+            tsDesignModeEnabled?.Extension.RemoveItem(subset);
         }
 
         public string GetMaterialsMeshNameSubsets()
@@ -140,47 +140,11 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
 
         public bool SetMaterialsMeshName(string subset, string mesh)
         {
-            CDataListExtension tsMaterialsMeshName = GetOrAddDataListExtension("tsMaterialsMeshName");
+            CDataListExtension tsMaterialsMeshName = GetOrAddDataListExtension("tsMaterialsMeshName", GeometryNode.ObjectGraphNode);
 
             tsMaterialsMeshName.Extension.AddOrUpdateString(subset, mesh);
 
             return true;
-        }
-
-        private CDataListExtension GetDataListExtension(string name)
-        {
-            CDataListExtension dataListExtension;
-
-            foreach (IRcolBlock block in Blocks)
-            {
-                if (block.BlockID == CDataListExtension.TYPE)
-                {
-                    dataListExtension = block as CDataListExtension;
-
-                    if (dataListExtension.Extension.VarName.Equals(name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        dataListExtension.Extension.VarName = name;
-                        return dataListExtension;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private CDataListExtension GetOrAddDataListExtension(string name)
-        {
-            CDataListExtension dataListExtension = GetDataListExtension(name);
-
-            if (dataListExtension == null)
-            {
-                dataListExtension = new CDataListExtension(this, name);
-                AddBlock(dataListExtension);
-
-                cGeometryNode.ObjectGraphNode.AddItemLink((uint)Blocks.Count - 1);
-            }
-
-            return dataListExtension;
         }
 
         public override SgResourceList SgNeededResources()

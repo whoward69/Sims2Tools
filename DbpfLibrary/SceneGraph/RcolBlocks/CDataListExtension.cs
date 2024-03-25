@@ -21,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x6A836D56;
         public static string NAME = "cDataListExtension";
 
-        private readonly Extension ext;
+        private readonly Extension ext = new Extension();
 
         public Extension Extension
         {
@@ -40,10 +40,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         // Needed by reflection to create the class
         public CDataListExtension(Rcol parent) : base(parent)
         {
-            ext = new Extension(null);
             Version = 0x01;
             BlockID = TYPE;
             BlockName = NAME;
+
+            ext.Parent = parent;
         }
 
         public CDataListExtension(Rcol parent, string name) : this(parent)

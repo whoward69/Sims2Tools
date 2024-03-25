@@ -168,7 +168,6 @@
     <Compile Include="SceneGraph\MMAT\Mmat.cs" />
     <Compile Include="SceneGraph\RcolBlocks\CObjectGraphNode.cs" />
     <Compile Include="SceneGraph\PackedFileDescriptor.cs" />
-    <Compile Include="SceneGraph\RcolBlocks\AbstractCresChildren.cs" />
     <Compile Include="SceneGraph\RcolBlocks\AbstractRcolBlock.cs" />
     <Compile Include="SceneGraph\RcolBlocks\CAmbientLight.cs" />
     <Compile Include="SceneGraph\RcolBlocks\CBoneDataExtension.cs" />

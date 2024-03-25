@@ -19,7 +19,7 @@ namespace RepositoryWizard
         public static readonly string AppName = "Repository Wizard";
 
         public static readonly int AppVersionMajor = 2;
-        public static readonly int AppVersionMinor = 3;
+        public static readonly int AppVersionMinor = 4;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;

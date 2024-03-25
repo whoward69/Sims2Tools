@@ -39,6 +39,7 @@ namespace ObjectRelocator
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ObjectRelocatorForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -52,18 +53,6 @@ namespace ObjectRelocator
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemShowName = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemShowPath = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemShowGuids = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemShowDepreciation = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemExcludeHidden = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemHideLocals = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemHideNonLocals = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemDisableBuildModeSortFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBuyMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBuildMode = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,22 +61,20 @@ namespace ObjectRelocator
             this.menuItemSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMakeReplacements = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemShowName = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemShowPath = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemShowGuids = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemShowDepreciation = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemShowHoodView = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemExcludeHidden = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemHideLocals = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemHideNonLocals = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemDisableBuildModeSortFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewResources = new System.Windows.Forms.DataGridView();
-            this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colPath = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colGuid = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colRooms = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colFunction = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colCommunity = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colUse = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colQuarterTile = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colDepreciation = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colObjectData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextObjects = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemContextEditTitleDesc = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemContextStripCTSSCrap = new System.Windows.Forms.ToolStripMenuItem();
@@ -98,6 +85,9 @@ namespace ObjectRelocator
             this.menuContextReplaceThumb = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDeleteThumb = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemContextHoodVisible = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemContextHoodInvisible = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemContextMoveFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.comboFunction = new System.Windows.Forms.ComboBox();
             this.comboSubfunction = new System.Windows.Forms.ComboBox();
@@ -144,6 +134,8 @@ namespace ObjectRelocator
             this.ckbUseTeens = new System.Windows.Forms.CheckBox();
             this.ckbUseChildren = new System.Windows.Forms.CheckBox();
             this.grpBuyPrice = new System.Windows.Forms.GroupBox();
+            this.lblLinkDepreciation = new System.Windows.Forms.Label();
+            this.ckbLinkDep = new System.Windows.Forms.CheckBox();
             this.grpDepreciation = new System.Windows.Forms.GroupBox();
             this.grpBuildPlacement = new System.Windows.Forms.GroupBox();
             this.ckbBuildQuarterTile = new System.Windows.Forms.CheckBox();
@@ -156,8 +148,22 @@ namespace ObjectRelocator
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
-            this.lblLinkDepreciation = new System.Windows.Forms.Label();
-            this.ckbLinkDep = new System.Windows.Forms.CheckBox();
+            this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPath = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colGuid = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colRooms = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colFunction = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCommunity = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colUse = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colQuarterTile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDepreciation = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHoodView = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colObjectData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextObjects.SuspendLayout();
@@ -277,104 +283,6 @@ namespace ObjectRelocator
             this.menuItemAbout.Text = "&About";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
             // 
-            // menuOptions
-            // 
-            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemShowName,
-            this.menuItemShowPath,
-            this.menuItemShowGuids,
-            this.menuItemShowDepreciation,
-            this.menuItemSeparator3,
-            this.menuItemExcludeHidden,
-            this.menuItemSeparator4,
-            this.menuItemHideLocals,
-            this.menuItemHideNonLocals,
-            this.menuItemSeparator7,
-            this.menuItemDisableBuildModeSortFilters});
-            this.menuOptions.Name = "menuOptions";
-            this.menuOptions.Size = new System.Drawing.Size(61, 20);
-            this.menuOptions.Text = "&Options";
-            // 
-            // menuItemShowName
-            // 
-            this.menuItemShowName.CheckOnClick = true;
-            this.menuItemShowName.Name = "menuItemShowName";
-            this.menuItemShowName.Size = new System.Drawing.Size(243, 22);
-            this.menuItemShowName.Text = "Show &Name";
-            this.menuItemShowName.Click += new System.EventHandler(this.OnShowHideName);
-            // 
-            // menuItemShowPath
-            // 
-            this.menuItemShowPath.CheckOnClick = true;
-            this.menuItemShowPath.Name = "menuItemShowPath";
-            this.menuItemShowPath.Size = new System.Drawing.Size(243, 22);
-            this.menuItemShowPath.Text = "Show &Path";
-            this.menuItemShowPath.Click += new System.EventHandler(this.OnShowHidePath);
-            // 
-            // menuItemShowGuids
-            // 
-            this.menuItemShowGuids.CheckOnClick = true;
-            this.menuItemShowGuids.Name = "menuItemShowGuids";
-            this.menuItemShowGuids.Size = new System.Drawing.Size(243, 22);
-            this.menuItemShowGuids.Text = "Show &GUIDs";
-            this.menuItemShowGuids.Click += new System.EventHandler(this.OnShowHideGuids);
-            // 
-            // menuItemShowDepreciation
-            // 
-            this.menuItemShowDepreciation.CheckOnClick = true;
-            this.menuItemShowDepreciation.Name = "menuItemShowDepreciation";
-            this.menuItemShowDepreciation.Size = new System.Drawing.Size(243, 22);
-            this.menuItemShowDepreciation.Text = "Show &Depreciation";
-            this.menuItemShowDepreciation.Click += new System.EventHandler(this.OnShowHideDepreciation);
-            // 
-            // menuItemSeparator3
-            // 
-            this.menuItemSeparator3.Name = "menuItemSeparator3";
-            this.menuItemSeparator3.Size = new System.Drawing.Size(240, 6);
-            // 
-            // menuItemExcludeHidden
-            // 
-            this.menuItemExcludeHidden.CheckOnClick = true;
-            this.menuItemExcludeHidden.Name = "menuItemExcludeHidden";
-            this.menuItemExcludeHidden.Size = new System.Drawing.Size(243, 22);
-            this.menuItemExcludeHidden.Text = "E&xclude Hidden";
-            this.menuItemExcludeHidden.Click += new System.EventHandler(this.OnExcludeHidden);
-            // 
-            // menuItemSeparator4
-            // 
-            this.menuItemSeparator4.Name = "menuItemSeparator4";
-            this.menuItemSeparator4.Size = new System.Drawing.Size(240, 6);
-            // 
-            // menuItemHideLocals
-            // 
-            this.menuItemHideLocals.CheckOnClick = true;
-            this.menuItemHideLocals.Name = "menuItemHideLocals";
-            this.menuItemHideLocals.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-            this.menuItemHideLocals.Size = new System.Drawing.Size(243, 22);
-            this.menuItemHideLocals.Text = "Hide &Local Objects";
-            this.menuItemHideLocals.Click += new System.EventHandler(this.OnHideLocalsClicked);
-            // 
-            // menuItemHideNonLocals
-            // 
-            this.menuItemHideNonLocals.CheckOnClick = true;
-            this.menuItemHideNonLocals.Name = "menuItemHideNonLocals";
-            this.menuItemHideNonLocals.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
-            this.menuItemHideNonLocals.Size = new System.Drawing.Size(243, 22);
-            this.menuItemHideNonLocals.Text = "Hide Non-Local Objects";
-            this.menuItemHideNonLocals.Click += new System.EventHandler(this.OnHideNonLocalsClicked);
-            // 
-            // menuItemSeparator7
-            // 
-            this.menuItemSeparator7.Name = "menuItemSeparator7";
-            this.menuItemSeparator7.Size = new System.Drawing.Size(240, 6);
-            // 
-            // menuItemDisableBuildModeSortFilters
-            // 
-            this.menuItemDisableBuildModeSortFilters.Name = "menuItemDisableBuildModeSortFilters";
-            this.menuItemDisableBuildModeSortFilters.Size = new System.Drawing.Size(243, 22);
-            this.menuItemDisableBuildModeSortFilters.Text = "Disable Build Mode Sort Filters";
-            this.menuItemDisableBuildModeSortFilters.Click += new System.EventHandler(this.OnDisableBuildModeSortFiltersClicked);
-            // 
             // menuMode
             // 
             this.menuMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -439,6 +347,113 @@ namespace ObjectRelocator
             this.menuItemMakeReplacements.Text = "&Make Replacements";
             this.menuItemMakeReplacements.Click += new System.EventHandler(this.OnMakeReplcementsClicked);
             // 
+            // menuOptions
+            // 
+            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemShowName,
+            this.menuItemShowPath,
+            this.menuItemShowGuids,
+            this.menuItemShowDepreciation,
+            this.menuItemShowHoodView,
+            this.menuItemSeparator3,
+            this.menuItemExcludeHidden,
+            this.menuItemSeparator4,
+            this.menuItemHideLocals,
+            this.menuItemHideNonLocals,
+            this.menuItemSeparator7,
+            this.menuItemDisableBuildModeSortFilters});
+            this.menuOptions.Name = "menuOptions";
+            this.menuOptions.Size = new System.Drawing.Size(61, 20);
+            this.menuOptions.Text = "&Options";
+            // 
+            // menuItemShowName
+            // 
+            this.menuItemShowName.CheckOnClick = true;
+            this.menuItemShowName.Name = "menuItemShowName";
+            this.menuItemShowName.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowName.Text = "Show &Name";
+            this.menuItemShowName.Click += new System.EventHandler(this.OnShowHideName);
+            // 
+            // menuItemShowPath
+            // 
+            this.menuItemShowPath.CheckOnClick = true;
+            this.menuItemShowPath.Name = "menuItemShowPath";
+            this.menuItemShowPath.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowPath.Text = "Show &Path";
+            this.menuItemShowPath.Click += new System.EventHandler(this.OnShowHidePath);
+            // 
+            // menuItemShowGuids
+            // 
+            this.menuItemShowGuids.CheckOnClick = true;
+            this.menuItemShowGuids.Name = "menuItemShowGuids";
+            this.menuItemShowGuids.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowGuids.Text = "Show &GUIDs";
+            this.menuItemShowGuids.Click += new System.EventHandler(this.OnShowHideGuids);
+            // 
+            // menuItemShowDepreciation
+            // 
+            this.menuItemShowDepreciation.CheckOnClick = true;
+            this.menuItemShowDepreciation.Name = "menuItemShowDepreciation";
+            this.menuItemShowDepreciation.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowDepreciation.Text = "Show &Depreciation";
+            this.menuItemShowDepreciation.Click += new System.EventHandler(this.OnShowHideDepreciation);
+            // 
+            // menuItemShowHoodView
+            // 
+            this.menuItemShowHoodView.CheckOnClick = true;
+            this.menuItemShowHoodView.Name = "menuItemShowHoodView";
+            this.menuItemShowHoodView.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowHoodView.Text = "Show &Hood View";
+            this.menuItemShowHoodView.Click += new System.EventHandler(this.OnShowHideHoodView);
+            // 
+            // menuItemSeparator3
+            // 
+            this.menuItemSeparator3.Name = "menuItemSeparator3";
+            this.menuItemSeparator3.Size = new System.Drawing.Size(240, 6);
+            // 
+            // menuItemExcludeHidden
+            // 
+            this.menuItemExcludeHidden.CheckOnClick = true;
+            this.menuItemExcludeHidden.Name = "menuItemExcludeHidden";
+            this.menuItemExcludeHidden.Size = new System.Drawing.Size(243, 22);
+            this.menuItemExcludeHidden.Text = "E&xclude Hidden";
+            this.menuItemExcludeHidden.Click += new System.EventHandler(this.OnExcludeHidden);
+            // 
+            // menuItemSeparator4
+            // 
+            this.menuItemSeparator4.Name = "menuItemSeparator4";
+            this.menuItemSeparator4.Size = new System.Drawing.Size(240, 6);
+            // 
+            // menuItemHideLocals
+            // 
+            this.menuItemHideLocals.CheckOnClick = true;
+            this.menuItemHideLocals.Name = "menuItemHideLocals";
+            this.menuItemHideLocals.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
+            this.menuItemHideLocals.Size = new System.Drawing.Size(243, 22);
+            this.menuItemHideLocals.Text = "Hide &Local Objects";
+            this.menuItemHideLocals.Click += new System.EventHandler(this.OnHideLocalsClicked);
+            // 
+            // menuItemHideNonLocals
+            // 
+            this.menuItemHideNonLocals.CheckOnClick = true;
+            this.menuItemHideNonLocals.Name = "menuItemHideNonLocals";
+            this.menuItemHideNonLocals.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
+            this.menuItemHideNonLocals.Size = new System.Drawing.Size(243, 22);
+            this.menuItemHideNonLocals.Text = "Hide Non-Local Objects";
+            this.menuItemHideNonLocals.Click += new System.EventHandler(this.OnHideNonLocalsClicked);
+            // 
+            // menuItemSeparator7
+            // 
+            this.menuItemSeparator7.Name = "menuItemSeparator7";
+            this.menuItemSeparator7.Size = new System.Drawing.Size(240, 6);
+            // 
+            // menuItemDisableBuildModeSortFilters
+            // 
+            this.menuItemDisableBuildModeSortFilters.Name = "menuItemDisableBuildModeSortFilters";
+            this.menuItemDisableBuildModeSortFilters.Size = new System.Drawing.Size(243, 22);
+            this.menuItemDisableBuildModeSortFilters.Text = "Disable Build Mode Sort Filters";
+            this.menuItemDisableBuildModeSortFilters.Click += new System.EventHandler(this.OnDisableBuildModeSortFiltersClicked);
+            // 
             // gridViewResources
             // 
             this.gridViewResources.AllowUserToAddRows = false;
@@ -449,6 +464,14 @@ namespace ObjectRelocator
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gridViewResources.BackgroundColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridViewResources.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.gridViewResources.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridViewResources.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colVisible,
@@ -465,6 +488,7 @@ namespace ObjectRelocator
             this.colQuarterTile,
             this.colPrice,
             this.colDepreciation,
+            this.colHoodView,
             this.colObjectData});
             this.gridViewResources.ContextMenuStrip = this.menuContextObjects;
             this.gridViewResources.Location = new System.Drawing.Point(4, 27);
@@ -481,131 +505,6 @@ namespace ObjectRelocator
             this.gridViewResources.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
             this.gridViewResources.SelectionChanged += new System.EventHandler(this.OnGridSelectionChanged);
             // 
-            // colVisible
-            // 
-            this.colVisible.DataPropertyName = "Visible";
-            this.colVisible.HeaderText = "Visible";
-            this.colVisible.Name = "colVisible";
-            this.colVisible.ReadOnly = true;
-            this.colVisible.Visible = false;
-            // 
-            // colTitle
-            // 
-            this.colTitle.DataPropertyName = "Title";
-            this.colTitle.HeaderText = "Title";
-            this.colTitle.MinimumWidth = 50;
-            this.colTitle.Name = "colTitle";
-            this.colTitle.ReadOnly = true;
-            // 
-            // colDescription
-            // 
-            this.colDescription.DataPropertyName = "Description";
-            this.colDescription.HeaderText = "Description";
-            this.colDescription.Name = "colDescription";
-            this.colDescription.ReadOnly = true;
-            this.colDescription.Visible = false;
-            // 
-            // colName
-            // 
-            this.colName.DataPropertyName = "Name";
-            this.colName.HeaderText = "Name";
-            this.colName.MinimumWidth = 50;
-            this.colName.Name = "colName";
-            this.colName.ReadOnly = true;
-            // 
-            // colPackagePath
-            // 
-            this.colPackagePath.DataPropertyName = "PackagePath";
-            this.colPackagePath.HeaderText = "PackagePath";
-            this.colPackagePath.Name = "colPackagePath";
-            this.colPackagePath.ReadOnly = true;
-            this.colPackagePath.Visible = false;
-            // 
-            // colPath
-            // 
-            this.colPath.DataPropertyName = "Path";
-            this.colPath.HeaderText = "Path";
-            this.colPath.MinimumWidth = 50;
-            this.colPath.Name = "colPath";
-            this.colPath.ReadOnly = true;
-            this.colPath.Width = 150;
-            // 
-            // colGuid
-            // 
-            this.colGuid.DataPropertyName = "GUID";
-            this.colGuid.HeaderText = "GUID";
-            this.colGuid.MinimumWidth = 50;
-            this.colGuid.Name = "colGuid";
-            this.colGuid.ReadOnly = true;
-            this.colGuid.Width = 65;
-            // 
-            // colRooms
-            // 
-            this.colRooms.DataPropertyName = "Rooms";
-            this.colRooms.HeaderText = "Rooms";
-            this.colRooms.MinimumWidth = 50;
-            this.colRooms.Name = "colRooms";
-            this.colRooms.ReadOnly = true;
-            // 
-            // colFunction
-            // 
-            this.colFunction.DataPropertyName = "Function";
-            this.colFunction.HeaderText = "Function";
-            this.colFunction.MinimumWidth = 50;
-            this.colFunction.Name = "colFunction";
-            this.colFunction.ReadOnly = true;
-            // 
-            // colCommunity
-            // 
-            this.colCommunity.DataPropertyName = "Community";
-            this.colCommunity.HeaderText = "Community";
-            this.colCommunity.MinimumWidth = 50;
-            this.colCommunity.Name = "colCommunity";
-            this.colCommunity.ReadOnly = true;
-            // 
-            // colUse
-            // 
-            this.colUse.DataPropertyName = "Use";
-            this.colUse.HeaderText = "Use";
-            this.colUse.MinimumWidth = 50;
-            this.colUse.Name = "colUse";
-            this.colUse.ReadOnly = true;
-            // 
-            // colQuarterTile
-            // 
-            this.colQuarterTile.DataPropertyName = "QuarterTile";
-            this.colQuarterTile.HeaderText = "Q Tile";
-            this.colQuarterTile.MinimumWidth = 65;
-            this.colQuarterTile.Name = "colQuarterTile";
-            this.colQuarterTile.ReadOnly = true;
-            this.colQuarterTile.Width = 65;
-            // 
-            // colPrice
-            // 
-            this.colPrice.DataPropertyName = "Price";
-            this.colPrice.HeaderText = "Price";
-            this.colPrice.MinimumWidth = 60;
-            this.colPrice.Name = "colPrice";
-            this.colPrice.ReadOnly = true;
-            this.colPrice.Width = 60;
-            // 
-            // colDepreciation
-            // 
-            this.colDepreciation.DataPropertyName = "Depreciation";
-            this.colDepreciation.HeaderText = "Depreciation";
-            this.colDepreciation.MinimumWidth = 105;
-            this.colDepreciation.Name = "colDepreciation";
-            this.colDepreciation.ReadOnly = true;
-            this.colDepreciation.Width = 105;
-            // 
-            // colObjectData
-            // 
-            this.colObjectData.DataPropertyName = "ObjectData";
-            this.colObjectData.HeaderText = "ObjectData";
-            this.colObjectData.Name = "colObjectData";
-            this.colObjectData.ReadOnly = true;
-            this.colObjectData.Visible = false;
-            // 
             // menuContextObjects
             // 
             this.menuContextObjects.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -618,9 +517,12 @@ namespace ObjectRelocator
             this.menuContextReplaceThumb,
             this.menuContextDeleteThumb,
             this.toolStripSeparator3,
+            this.menuItemContextHoodVisible,
+            this.menuItemContextHoodInvisible,
+            this.toolStripSeparator5,
             this.menuItemContextMoveFiles});
             this.menuContextObjects.Name = "menuContextGrid";
-            this.menuContextObjects.Size = new System.Drawing.Size(227, 176);
+            this.menuContextObjects.Size = new System.Drawing.Size(227, 248);
             this.menuContextObjects.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextObjects.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             this.menuContextObjects.Opened += new System.EventHandler(this.OnContextMenuOpened);
@@ -681,6 +583,25 @@ namespace ObjectRelocator
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(223, 6);
+            // 
+            // menuItemContextHoodVisible
+            // 
+            this.menuItemContextHoodVisible.Name = "menuItemContextHoodVisible";
+            this.menuItemContextHoodVisible.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextHoodVisible.Text = "Make &Visible In Hood";
+            this.menuItemContextHoodVisible.Click += new System.EventHandler(this.OnMakeHoodVisibleClicked);
+            // 
+            // menuItemContextHoodInvisible
+            // 
+            this.menuItemContextHoodInvisible.Name = "menuItemContextHoodInvisible";
+            this.menuItemContextHoodInvisible.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextHoodInvisible.Text = "Remove Visible In Hood";
+            this.menuItemContextHoodInvisible.Click += new System.EventHandler(this.OnMakeHoodVisibleClicked);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(223, 6);
             // 
             // menuItemContextMoveFiles
             // 
@@ -1179,6 +1100,24 @@ namespace ObjectRelocator
             this.grpBuyPrice.TabStop = false;
             this.grpBuyPrice.Text = "Price:";
             // 
+            // lblLinkDepreciation
+            // 
+            this.lblLinkDepreciation.AutoSize = true;
+            this.lblLinkDepreciation.Location = new System.Drawing.Point(6, 103);
+            this.lblLinkDepreciation.Name = "lblLinkDepreciation";
+            this.lblLinkDepreciation.Size = new System.Drawing.Size(56, 15);
+            this.lblLinkDepreciation.TabIndex = 24;
+            this.lblLinkDepreciation.Text = "Link Dep";
+            // 
+            // ckbLinkDep
+            // 
+            this.ckbLinkDep.AutoSize = true;
+            this.ckbLinkDep.Location = new System.Drawing.Point(69, 104);
+            this.ckbLinkDep.Name = "ckbLinkDep";
+            this.ckbLinkDep.Size = new System.Drawing.Size(15, 14);
+            this.ckbLinkDep.TabIndex = 23;
+            this.ckbLinkDep.UseVisualStyleBackColor = true;
+            // 
             // grpDepreciation
             // 
             this.grpDepreciation.Controls.Add(this.lblDepLimit);
@@ -1299,23 +1238,139 @@ namespace ObjectRelocator
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
             // 
-            // lblLinkDepreciation
+            // colVisible
             // 
-            this.lblLinkDepreciation.AutoSize = true;
-            this.lblLinkDepreciation.Location = new System.Drawing.Point(6, 103);
-            this.lblLinkDepreciation.Name = "lblLinkDepreciation";
-            this.lblLinkDepreciation.Size = new System.Drawing.Size(56, 15);
-            this.lblLinkDepreciation.TabIndex = 24;
-            this.lblLinkDepreciation.Text = "Link Dep";
+            this.colVisible.DataPropertyName = "Visible";
+            this.colVisible.HeaderText = "Visible";
+            this.colVisible.Name = "colVisible";
+            this.colVisible.ReadOnly = true;
+            this.colVisible.Visible = false;
             // 
-            // ckbLinkDep
+            // colTitle
             // 
-            this.ckbLinkDep.AutoSize = true;
-            this.ckbLinkDep.Location = new System.Drawing.Point(69, 104);
-            this.ckbLinkDep.Name = "ckbLinkDep";
-            this.ckbLinkDep.Size = new System.Drawing.Size(15, 14);
-            this.ckbLinkDep.TabIndex = 23;
-            this.ckbLinkDep.UseVisualStyleBackColor = true;
+            this.colTitle.DataPropertyName = "Title";
+            this.colTitle.HeaderText = "Title";
+            this.colTitle.MinimumWidth = 50;
+            this.colTitle.Name = "colTitle";
+            this.colTitle.ReadOnly = true;
+            // 
+            // colDescription
+            // 
+            this.colDescription.DataPropertyName = "Description";
+            this.colDescription.HeaderText = "Description";
+            this.colDescription.Name = "colDescription";
+            this.colDescription.ReadOnly = true;
+            this.colDescription.Visible = false;
+            // 
+            // colName
+            // 
+            this.colName.DataPropertyName = "Name";
+            this.colName.HeaderText = "Name";
+            this.colName.MinimumWidth = 50;
+            this.colName.Name = "colName";
+            this.colName.ReadOnly = true;
+            // 
+            // colPackagePath
+            // 
+            this.colPackagePath.DataPropertyName = "PackagePath";
+            this.colPackagePath.HeaderText = "PackagePath";
+            this.colPackagePath.Name = "colPackagePath";
+            this.colPackagePath.ReadOnly = true;
+            this.colPackagePath.Visible = false;
+            // 
+            // colPath
+            // 
+            this.colPath.DataPropertyName = "Path";
+            this.colPath.HeaderText = "Path";
+            this.colPath.MinimumWidth = 50;
+            this.colPath.Name = "colPath";
+            this.colPath.ReadOnly = true;
+            this.colPath.Width = 150;
+            // 
+            // colGuid
+            // 
+            this.colGuid.DataPropertyName = "GUID";
+            this.colGuid.HeaderText = "GUID";
+            this.colGuid.MinimumWidth = 50;
+            this.colGuid.Name = "colGuid";
+            this.colGuid.ReadOnly = true;
+            this.colGuid.Width = 65;
+            // 
+            // colRooms
+            // 
+            this.colRooms.DataPropertyName = "Rooms";
+            this.colRooms.HeaderText = "Rooms";
+            this.colRooms.MinimumWidth = 50;
+            this.colRooms.Name = "colRooms";
+            this.colRooms.ReadOnly = true;
+            // 
+            // colFunction
+            // 
+            this.colFunction.DataPropertyName = "Function";
+            this.colFunction.HeaderText = "Function";
+            this.colFunction.MinimumWidth = 50;
+            this.colFunction.Name = "colFunction";
+            this.colFunction.ReadOnly = true;
+            // 
+            // colCommunity
+            // 
+            this.colCommunity.DataPropertyName = "Community";
+            this.colCommunity.HeaderText = "Community";
+            this.colCommunity.MinimumWidth = 50;
+            this.colCommunity.Name = "colCommunity";
+            this.colCommunity.ReadOnly = true;
+            // 
+            // colUse
+            // 
+            this.colUse.DataPropertyName = "Use";
+            this.colUse.HeaderText = "Use";
+            this.colUse.MinimumWidth = 50;
+            this.colUse.Name = "colUse";
+            this.colUse.ReadOnly = true;
+            // 
+            // colQuarterTile
+            // 
+            this.colQuarterTile.DataPropertyName = "QuarterTile";
+            this.colQuarterTile.HeaderText = "Q Tile";
+            this.colQuarterTile.MinimumWidth = 65;
+            this.colQuarterTile.Name = "colQuarterTile";
+            this.colQuarterTile.ReadOnly = true;
+            this.colQuarterTile.Width = 65;
+            // 
+            // colPrice
+            // 
+            this.colPrice.DataPropertyName = "Price";
+            this.colPrice.HeaderText = "Price";
+            this.colPrice.MinimumWidth = 60;
+            this.colPrice.Name = "colPrice";
+            this.colPrice.ReadOnly = true;
+            this.colPrice.Width = 60;
+            // 
+            // colDepreciation
+            // 
+            this.colDepreciation.DataPropertyName = "Depreciation";
+            this.colDepreciation.HeaderText = "Depreciation";
+            this.colDepreciation.MinimumWidth = 105;
+            this.colDepreciation.Name = "colDepreciation";
+            this.colDepreciation.ReadOnly = true;
+            this.colDepreciation.Width = 105;
+            // 
+            // colHoodView
+            // 
+            this.colHoodView.DataPropertyName = "HoodView";
+            this.colHoodView.HeaderText = "Hood View";
+            this.colHoodView.MinimumWidth = 85;
+            this.colHoodView.Name = "colHoodView";
+            this.colHoodView.ReadOnly = true;
+            this.colHoodView.Width = 85;
+            // 
+            // colObjectData
+            // 
+            this.colObjectData.DataPropertyName = "ObjectData";
+            this.colObjectData.HeaderText = "ObjectData";
+            this.colObjectData.Name = "colObjectData";
+            this.colObjectData.ReadOnly = true;
+            this.colObjectData.Visible = false;
             // 
             // ObjectRelocatorForm
             // 
@@ -1385,6 +1440,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuOptions;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowGuids;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowDepreciation;
+        private System.Windows.Forms.ToolStripMenuItem menuItemShowHoodView;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuItemExcludeHidden;
         private System.Windows.Forms.ToolStripMenuItem menuMode;
@@ -1467,12 +1523,18 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemSaveAll;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem menuItemContextHoodVisible;
+        private System.Windows.Forms.ToolStripMenuItem menuItemContextHoodInvisible;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuContextSaveThumb;
         private System.Windows.Forms.ToolStripMenuItem menuContextReplaceThumb;
         private System.Windows.Forms.ToolStripMenuItem menuContextDeleteThumb;
         private System.Windows.Forms.SaveFileDialog saveThumbnailDialog;
         private System.Windows.Forms.OpenFileDialog openThumbnailDialog;
+        private System.Windows.Forms.ToolStripMenuItem menuItemContextStripCTSSCrap;
+        private System.Windows.Forms.Label lblLinkDepreciation;
+        private System.Windows.Forms.CheckBox ckbLinkDep;
         private System.Windows.Forms.DataGridViewTextBoxColumn colVisible;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTitle;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDescription;
@@ -1487,9 +1549,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.DataGridViewTextBoxColumn colQuarterTile;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPrice;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDepreciation;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHoodView;
         private System.Windows.Forms.DataGridViewTextBoxColumn colObjectData;
-        private System.Windows.Forms.ToolStripMenuItem menuItemContextStripCTSSCrap;
-        private System.Windows.Forms.Label lblLinkDepreciation;
-        private System.Windows.Forms.CheckBox ckbLinkDep;
     }
 }

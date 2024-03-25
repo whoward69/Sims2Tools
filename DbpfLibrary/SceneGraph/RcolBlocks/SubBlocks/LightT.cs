@@ -11,13 +11,12 @@
  */
 
 using Sims2Tools.DBPF.IO;
-using Sims2Tools.DBPF.SceneGraph.RCOL;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class LightT : StandardLightBase, System.IDisposable
     {
-        public LightT(Rcol parent) : base(parent)
+        public LightT() : base()
         {
             Version = 11;
             BlockID = TypeBlockID.NULL;

@@ -21,9 +21,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
     {
         double x, y;
 
-        /// <summary>
-        /// The X Coordinate of teh Vector
-        /// </summary>
         public double X
         {
             get
@@ -34,9 +31,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             }
             set { x = value; }
         }
-        /// <summary>
-        /// The Y Coordinate of teh Vector
-        /// </summary>
+
         public double Y
         {
             get
@@ -47,20 +42,11 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             set { y = value; }
         }
 
-
-        /// <summary>
-        /// Creates a new Vector Instance (0-Vector)
-        /// </summary>
         public Vector2f()
         {
             x = 0; y = 0;
         }
 
-        /// <summary>
-        /// Creates new Vector Instance
-        /// </summary>
-        /// <param name="x">X-Coordinate</param>
-        /// <param name="y">Y-Coordinate</param>
         public Vector2f(double x, double y)
         {
             this.x = x;
@@ -92,10 +78,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             return x.ToString("N2") + "; " + y.ToString("N2");
         }
 
-        /// <summary>
-        /// Create a clone of this Vector
-        /// </summary>
-        /// <returns></returns>
         public Vector2f Clone()
         {
             Vector2f v = new Vector2f(this.X, this.Y);
@@ -108,17 +90,11 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         }
     }
 
-    /// <summary>
-    /// Contains the a 3D Vector (when (un)serialized, it will be interpreted as SingleFloat!)
-    /// </summary>
     [System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
     public class Vector3f : Vector2f
     {
         double z;
 
-        /// <summary>
-        /// The Z Coordinate of teh Vector
-        /// </summary>
         public double Z
         {
             get
@@ -129,9 +105,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             set { z = value; }
         }
 
-        /// <summary>
-        /// Creates a new Vector Instance (0-Vector)
-        /// </summary>
         public Vector3f() : base()
         {
             z = 0;
@@ -145,6 +118,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         public override void Unserialize(DbpfReader reader)
         {
             base.Unserialize(reader);
+
             z = reader.ReadSingle();
         }
 
@@ -153,6 +127,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         public override void Serialize(DbpfWriter writer)
         {
             base.Serialize(writer);
+
             writer.WriteSingle((float)z);
         }
 
@@ -551,9 +526,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
     public class Vector4f : Vector3f
     {
         double w;
-        /// <summary>
-        /// The 4th Component of an Vector (often used as focal Point)
-        /// </summary>
+
         public double W
         {
             get
@@ -564,45 +537,34 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             set { w = value; }
         }
 
-        /// <summary>
-        /// Creates a new Vector Instance (0-Vector)
-        /// </summary>
         public Vector4f() : base()
         {
             w = 0;
         }
 
-        /// <summary>
-        /// Creates new Vector Instance
-        /// </summary>
-        /// <param name="x">X-Coordinate</param>
-        /// <param name="y">Y-Coordinate</param>
-        /// <param name="z">Z-Coordinate</param>
         public Vector4f(double x, double y, double z) : this(x, y, z, 0)
         {
         }
 
-        /// <summary>
-        /// Creates new Vector Instance
-        /// </summary>
-        /// <param name="x">X-Coordinate</param>
-        /// <param name="y">Y-Coordinate</param>
-        /// <param name="z">Z-Coordinate</param>
-        /// <param name="w">4th-Coordinate (often the focal Point)</param>
         public Vector4f(double x, double y, double z, double w) : base(x, y, z)
         {
             this.w = w;
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
             base.Unserialize(reader);
-            w = (reader.ReadSingle());
 
+            w = reader.ReadSingle();
+        }
+
+        public override uint FileSize => (uint)(base.FileSize + 4);
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            base.Serialize(writer);
+
+            writer.WriteSingle((float)w);
         }
 
         public override string ToString()

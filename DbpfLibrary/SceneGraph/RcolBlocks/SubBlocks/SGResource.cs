@@ -24,7 +24,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             set { filename = value; _isDirty = true; }
         }
 
-
         public SGResource() : base()
         {
             Version = 0x02;

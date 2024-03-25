@@ -14,7 +14,9 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LPNT;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 
@@ -26,9 +28,47 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xE519C933;
         public const string NAME = "CRES";
 
+#if !DEBUG
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+#endif
+
+        private readonly CResourceNode cResourceNode = null;
+        public CResourceNode ResourceNode => cResourceNode;
+
+        public override bool IsDirty => base.IsDirty || (cResourceNode != null && cResourceNode.IsDirty);
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            cResourceNode?.SetClean();
+        }
+
         public Cres(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
+            foreach (IRcolBlock block in Blocks)
+            {
+                if (block.BlockID == CResourceNode.TYPE)
+                {
+                    if (cResourceNode == null)
+                    {
+                        cResourceNode = block as CResourceNode;
+                    }
+                    else
+                    {
+#if DEBUG
+                        throw new Exception($"2nd cResourceNode found in {this}");
+#else
+                        logger.Warn($"2nd cResourceNode found in {this}");
+#endif
+                    }
+                }
+            }
         }
+
+        public CDataListExtension GameData => GetOrAddDataListExtension("GameData", ResourceNode.ObjectGraphNode);
+
+        public CDataListExtension ThumbnailExtension => GetOrAddDataListExtension("thumbnailExtension", ResourceNode.ObjectGraphNode);
 
         public List<DBPFKey> ShpeKeys
         {

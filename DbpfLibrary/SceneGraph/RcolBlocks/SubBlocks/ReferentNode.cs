@@ -11,13 +11,12 @@
  */
 
 using Sims2Tools.DBPF.IO;
-using Sims2Tools.DBPF.SceneGraph.RCOL;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class ReferentNode : AbstractRcolBlock
     {
-        public ReferentNode(Rcol parent) : base(parent)
+        public ReferentNode() : base(null) // Yes, really! Do NOT use base()
         {
         }
 

@@ -24,16 +24,21 @@ namespace Sims2Tools.DBPF.SceneGraph
         private TypeBlockID blockid;
         private string blockname = null;
 
-        private readonly SGResource sgres = null;
+#if DEBUG
+        protected long readStart, readEnd, writeStart, writeEnd;
+#endif
+
+        private readonly SGResource sgres = null; // Do NOT do = new SGResource() here or you WILL get a stack overflow!!!
         private uint version;
         private Rcol parent = null;
 
         protected bool _isDirty = false;
 
         public virtual bool IsDirty => _isDirty || (sgres != null && sgres.IsDirty);
+
         public virtual void SetClean()
         {
-            sgres.SetClean();
+            sgres?.SetClean();
 
             _isDirty = false;
         }
@@ -52,7 +57,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         public Rcol Parent
         {
             get { return parent; }
-            protected set { parent = value; }
+            internal set { parent = value; }
         }
 
         public TypeBlockID BlockID
@@ -75,7 +80,8 @@ namespace Sims2Tools.DBPF.SceneGraph
             set { blockname = value; }
         }
 
-        public AbstractRcolBlock()
+        // The ONLY class that should be calling this directly is SGResource
+        protected AbstractRcolBlock()
         {
             blockid = TypeBlockID.NULL;
             version = 0;
@@ -84,7 +90,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         public AbstractRcolBlock(Rcol parent) : this()
         {
             this.parent = parent;
-            sgres = new SGResource();
+            sgres = new SGResource(); // Moving this into the constructor above will send the code into an infinite loop!
         }
 
         private static IRcolBlock Create(Type type, Rcol parent)
@@ -134,5 +140,26 @@ namespace Sims2Tools.DBPF.SceneGraph
         }
 
         public abstract void Dispose();
+    }
+
+    public abstract class AbstractGraphRcolBlock : AbstractRcolBlock
+    {
+        protected readonly CObjectGraphNode ogn = new CObjectGraphNode(null);
+
+        public CObjectGraphNode ObjectGraphNode => ogn;
+
+        public override bool IsDirty => base.IsDirty || ogn.IsDirty;
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            ogn.SetClean();
+        }
+
+        public AbstractGraphRcolBlock(Rcol parent) : base(parent)
+        {
+            ogn.Parent = parent;
+        }
     }
 }

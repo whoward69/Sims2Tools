@@ -15,19 +15,16 @@ using Sims2Tools.DBPF.SceneGraph.RCOL;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
-    public class CGeometryNode : AbstractRcolBlock
+    public class CGeometryNode : AbstractGraphRcolBlock
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x7BA3838C;
         public static string NAME = "cGeometryNode";
 
-        private readonly CObjectGraphNode ogn;
         private IRcolBlock[] data;
 
         private short unknown1;
         private short unknown2;
         private byte unknown3;
-
-        public CObjectGraphNode ObjectGraphNode => ogn;
 
         public IRcolBlock[] Blocks
         {
@@ -41,8 +38,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         // Needed by reflection to create the class
         public CGeometryNode(Rcol parent) : base(parent)
         {
-            ogn = new CObjectGraphNode(null);
-
             Version = 0x0c;
             BlockID = TYPE;
             BlockName = NAME;

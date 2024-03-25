@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
@@ -21,32 +22,78 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xE9075BC5;
         public static string NAME = "cBoneDataExtension";
 
+        private readonly Extension ext = new Extension();
 
-        readonly Extension ext;
-        public Extension Extension
+        public Extension Extension => ext;
+
+        public override bool IsDirty => base.IsDirty || ext.IsDirty;
+
+        public override void SetClean()
         {
-            get { return ext; }
-        }
+            base.SetClean();
 
+            ext.SetClean();
+        }
 
         // Needed by reflection to create the class
         public CBoneDataExtension(Rcol parent) : base(parent)
         {
-            ext = new Extension(null);
             Version = 0x01;
             BlockID = TYPE;
             BlockName = NAME;
+
+            ext.Parent = parent;
         }
 
         public override void Unserialize(DbpfReader reader)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             Version = reader.ReadUInt32();
 
-            _ = reader.ReadString();
-            TypeBlockID myid = reader.ReadBlockId();
+            string blkName = reader.ReadString();
+            TypeBlockID blkId = reader.ReadBlockId();
 
             ext.Unserialize(reader, Version);
-            ext.BlockID = myid;
+            ext.BlockName = blkName;
+            ext.BlockID = blkId;
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
+        }
+
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4;
+
+                size += DbpfWriter.Length(ext.BlockName) + 4 + ext.FileSize;
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
+            writer.WriteUInt32(Version);
+
+            writer.WriteString(ext.BlockName);
+            writer.WriteBlockId(ext.BlockID);
+            ext.Serialize(writer, Version);
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+#endif
         }
 
         public override void Dispose()

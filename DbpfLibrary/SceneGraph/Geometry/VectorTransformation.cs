@@ -25,14 +25,13 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             TranslateThenRotate = 1
         };
 
-        private TransformOrder o;
+        private readonly TransformOrder o;
         private readonly Vector3f trans;
         private readonly Quaternion quat;
 
         public TransformOrder Order
         {
             get { return o; }
-            set { o = value; }
         }
 
         public Vector3f Translation
@@ -50,11 +49,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
             this.o = o;
             trans = new Vector3f();
             quat = Quaternion.Identity;
-        }
-
-        public override string ToString()
-        {
-            return $"trans={trans}    rot={quat}";
         }
 
         public virtual void Unserialize(DbpfReader reader)
@@ -85,6 +79,11 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
                 trans.Serialize(writer);
                 quat.Serialize(writer);
             }
+        }
+
+        public override string ToString()
+        {
+            return $"trans={trans}    rot={quat}";
         }
     }
 }

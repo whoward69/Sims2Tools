@@ -31,6 +31,7 @@ namespace ObjectRelocator
             this.Columns.Add(new DataColumn("QuarterTile", typeof(string)));
             this.Columns.Add(new DataColumn("Price", typeof(uint)));
             this.Columns.Add(new DataColumn("Depreciation", typeof(string)));
+            this.Columns.Add(new DataColumn("HoodView", typeof(string)));
 
             this.Columns.Add(new DataColumn("ObjectData", typeof(object)));
 

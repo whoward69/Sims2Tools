@@ -16,201 +16,107 @@ using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
     public class TransformNodeItem
     {
+        ushort unknown1;
+        int childNode;
+
+        public ushort Unknown1 => unknown1;
+        public int ChildNode => childNode;
+
         public TransformNodeItem()
         {
             unknown1 = 1;
-            unknown2 = 0;
+            childNode = 0;
         }
 
-        ushort unknown1;
-        public ushort Unknown1
-        {
-            get { return unknown1; }
-            set { unknown1 = value; }
-        }
-
-        int unknown2;
-        public int ChildNode
-        {
-            get { return unknown2; }
-            set { unknown2 = value; }
-        }
-
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public void Unserialize(DbpfReader reader)
         {
             unknown1 = reader.ReadUInt16();
-            unknown2 = reader.ReadInt32();
+            childNode = reader.ReadInt32();
         }
 
-        /// <summary>
-        /// Serializes a the Attributes stored in this Instance to the BinaryStream
-        /// </summary>
-        /// <param name="writer">The Stream the Data should be stored to</param>
-        /// <remarks>
-        /// Be sure that the Position of the stream is Proper on 
-        /// return (i.e. must point to the first Byte after your actual File)
-        /// </remarks>
-        public void Serialize(System.IO.BinaryWriter writer)
+        public uint FileSize => 2 + 4;
+
+        public void Serialize(DbpfWriter writer)
         {
-            writer.Write(unknown1);
-            writer.Write(unknown2);
+            writer.WriteUInt16(unknown1);
+            writer.WriteInt32(childNode);
         }
 
         public override string ToString()
         {
-            return Helper.Hex4PrefixString(unknown1) + Helper.Hex4PrefixString((uint)unknown2);
+            return Helper.Hex4PrefixString(unknown1) + Helper.Hex4PrefixString((uint)childNode);
         }
     }
 
-    /// <summary>
-    /// Zusammenfassung für cTransformNode.
-    /// </summary>
-    public class CTransformNode : AbstractCresChildren
+    public class CTransformNode : AbstractGraphRcolBlock, ICresChildren
     {
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x65246462;
         public static string NAME = "cTransformNode";
 
-        /// <summary>
-        /// this value in Joint Reference tells us that the 
-        /// Node is not directly linked to a joint
-        /// </summary>
         public const int NO_JOINT = 0x7fffffff;
 
+        private readonly CompositionTreeNode ctn = new CompositionTreeNode();
 
-        CompositionTreeNode ctn;
-        CObjectGraphNode ogn;
+        private readonly TransformNodeItems items = new TransformNodeItems();
+        private readonly VectorTransformation trans = new VectorTransformation(VectorTransformation.TransformOrder.TranslateThenRotate);
+        private int unknown;
 
-        TransformNodeItems items;
-        VectorTransformation trans;
-        int unknown;
+        public TransformNodeItems Items => items;
 
-        public TransformNodeItems Items
-        {
-            get { return items; }
-        }
+        public CompositionTreeNode CompositionTreeNode => ctn;
 
-        public CObjectGraphNode ObjectGraphNode
-        {
-            get { return ogn; }
-        }
+        public VectorTransformation Transformation => trans;
+        public Vector3f Translation => trans.Translation;
+        public float TransformX => (float)trans.Translation.X;
+        public float TransformY => (float)trans.Translation.Y;
+        public float TransformZ => (float)trans.Translation.Z;
 
-        public CompositionTreeNode CompositionTreeNode
-        {
-            get { return ctn; }
-        }
+        public Quaternion Rotation => trans.Rotation;
+        public float RotationX => (float)trans.Rotation.X;
+        public float RotationY => (float)trans.Rotation.Y;
+        public float RotationZ => (float)trans.Rotation.Z;
+        public float RotationW => (float)trans.Rotation.W;
+        public int JointReference => unknown;
 
-        public VectorTransformation Transformation
-        {
-            get { return trans; }
-        }
+        public override bool IsDirty => base.IsDirty || ctn.IsDirty;
 
-        public Vector3f Translation
+        public override void SetClean()
         {
-            get { return trans.Translation; }
-        }
+            base.SetClean();
 
-        public float TransformX
-        {
-            get { return (float)trans.Translation.X; }
+            ctn.SetClean();
         }
-        public float TransformY
-        {
-            get { return (float)trans.Translation.Y; }
-        }
-        public float TransformZ
-        {
-            get { return (float)trans.Translation.Z; }
-        }
-
-
-        public float RotationX
-        {
-            get { return (float)trans.Rotation.X; }
-        }
-        public float RotationY
-        {
-            get { return (float)trans.Rotation.Y; }
-        }
-        public float RotationZ
-        {
-            get { return (float)trans.Rotation.Z; }
-        }
-        public float RotationW
-        {
-            get { return (float)trans.Rotation.W; }
-        }
-
-        public Quaternion Rotation
-        {
-            get { return trans.Rotation; }
-        }
-
-        public int JointReference
-        {
-            get { return unknown; }
-        }
-
 
         // Needed by reflection to create the class
         public CTransformNode(Rcol parent) : base(parent)
         {
-            ctn = new CompositionTreeNode(parent);
-            ogn = new CObjectGraphNode(parent);
-
-            items = new TransformNodeItems();
-
-            trans = new VectorTransformation(VectorTransformation.TransformOrder.TranslateThenRotate);
-
             Version = 0x07;
             BlockID = TYPE;
             BlockName = NAME;
 
+            ctn.Parent = parent;
+
             unknown = NO_JOINT;
         }
 
-        public override string GetName()
-        {
-            return ogn.FileName;
-        }
-
-        public override List<int> ChildBlocks
-        {
-            get
-            {
-                List<int> l = new List<int>();
-                foreach (TransformNodeItem tni in items)
-                {
-                    l.Add(tni.ChildNode);
-                }
-                return l;
-            }
-        }
+        public string GetName() => ogn.FileName;
 
         public override void Unserialize(DbpfReader reader)
         {
             Version = reader.ReadUInt32();
 
-            string name = reader.ReadString();
-            TypeBlockID myid = reader.ReadBlockId();
+            ctn.BlockName = reader.ReadString();
+            ctn.BlockID = reader.ReadBlockId();
             ctn.Unserialize(reader);
-            ctn.BlockID = myid;
-            ctn.BlockName = name;
 
-            name = reader.ReadString();
-            myid = reader.ReadBlockId();
+            ogn.BlockName = reader.ReadString();
+            ogn.BlockID = reader.ReadBlockId();
             ogn.Unserialize(reader);
-            ogn.BlockID = myid;
-            ogn.BlockName = name;
 
             uint count = reader.ReadUInt32();
             items.Clear();
@@ -221,127 +127,100 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 items.Add(tni);
             }
 
-            trans.Order = VectorTransformation.TransformOrder.TranslateThenRotate;
+            // trans.Order = VectorTransformation.TransformOrder.TranslateThenRotate;
             trans.Unserialize(reader);
 
             unknown = reader.ReadInt32();
         }
 
-        public bool RemoveChild(int index)
+        public override uint FileSize
         {
-            for (int i = 0; i < Items.Length; i++)
+            get
             {
-                if (Items[i].ChildNode == index)
-                {
-                    Items.RemoveAt(i);
-                    return true;
-                }
-            }
+                long size = 4;
 
-            return false;
+                size += DbpfWriter.Length(ctn.BlockName) + 4 + ctn.FileSize;
+                size += DbpfWriter.Length(ogn.BlockName) + 4 + ogn.FileSize;
+
+                size += 4;
+                for (int i = 0; i < items.Length; i++)
+                {
+                    size += items[i].FileSize;
+                }
+
+                size += trans.FileSize;
+
+                size += 4;
+
+                return (uint)size;
+            }
         }
 
-        public bool AddChild(int index)
+        public override void Serialize(DbpfWriter writer)
         {
-            for (int i = 0; i < Items.Length; i++)
+            writer.WriteUInt32(Version);
+
+            writer.WriteString(ctn.BlockName);
+            writer.WriteBlockId(ctn.BlockID);
+            ctn.Serialize(writer);
+
+            writer.WriteString(ogn.BlockName);
+            writer.WriteBlockId(ogn.BlockID);
+            ogn.Serialize(writer);
+
+            writer.WriteUInt32((uint)items.Length);
+            for (int i = 0; i < items.Length; i++)
             {
-                if (Items[i].ChildNode == index)
-                {
-                    return false;
-                }
+                items[i].Serialize(writer);
             }
 
-            TransformNodeItem tni = new TransformNodeItem
-            {
-                ChildNode = index
-            };
-            items.Add(tni);
-            return false;
+            trans.Serialize(writer);
+
+            writer.WriteInt32(unknown);
         }
 
         public override void Dispose()
         {
-            ctn = null;
-            ogn = null;
-            items = null;
-            trans = null;
         }
     }
 
-    /// <summary>
-    /// Typesave ArrayList for TransformNodeItem Objects
-    /// </summary>
     public class TransformNodeItems : ArrayList
     {
-        /// <summary>
-        /// Integer Indexer
-        /// </summary>
         public new TransformNodeItem this[int index]
         {
             get { return ((TransformNodeItem)base[index]); }
-            set { base[index] = value; }
         }
 
-        /// <summary>
-        /// unsigned Integer Indexer
-        /// </summary>
         public TransformNodeItem this[uint index]
         {
             get { return ((TransformNodeItem)base[(int)index]); }
-            set { base[(int)index] = value; }
         }
 
-        /// <summary>
-        /// add a new Element
-        /// </summary>
-        /// <param name="item">The object you want to add</param>
-        /// <returns>The index it was added on</returns>
         public int Add(TransformNodeItem item)
         {
             return base.Add(item);
         }
 
-        /// <summary>
-        /// insert a new Element
-        /// </summary>
-        /// <param name="index">The Index where the Element should be stored</param>
-        /// <param name="item">The object that should be inserted</param>
         public void Insert(int index, TransformNodeItem item)
         {
             base.Insert(index, item);
         }
 
-        /// <summary>
-        /// remove an Element
-        /// </summary>
-        /// <param name="item">The object that should be removed</param>
         public void Remove(TransformNodeItem item)
         {
             base.Remove(item);
         }
 
-        /// <summary>
-        /// Checks wether or not the object is already stored in the List
-        /// </summary>
-        /// <param name="item">The Object you are looking for</param>
-        /// <returns>true, if it was found</returns>
         public bool Contains(TransformNodeItem item)
         {
             return base.Contains(item);
         }
 
-        /// <summary>
-        /// Number of stored Elements
-        /// </summary>
         public int Length
         {
             get { return this.Count; }
         }
 
-        /// <summary>
-        /// Create a clone of this Object
-        /// </summary>
-        /// <returns>The clone</returns>
         public override object Clone()
         {
             TransformNodeItems list = new TransformNodeItems();
@@ -349,8 +228,5 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             return list;
         }
-
-
     }
-
 }

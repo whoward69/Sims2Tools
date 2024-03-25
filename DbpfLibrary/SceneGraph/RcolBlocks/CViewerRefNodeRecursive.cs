@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
@@ -21,101 +22,85 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x0C152B8E;
         public static string NAME = "cViewerRefNodeRecursive";
 
+        private readonly ViewerRefNodeBase vrnb = new ViewerRefNodeBase();
+        private readonly RenderableNode rn = new RenderableNode();
+        private readonly BoundedNode bn = new BoundedNode();
+        private readonly CTransformNode tn = new CTransformNode(null);
 
-        readonly ViewerRefNodeBase vrnb;
-        readonly RenderableNode rn;
-        readonly BoundedNode bn;
-        readonly CTransformNode tn;
+        private short unknown1;
+        private string[] names;
+        private int unknown2;
+        private short unknown3;
+        private string unknown4;
+        private byte[] unknown5;
 
-        short unknown1;
-        public short Unknown1
+        public short Unknown1 => unknown1;
+
+        public string[] Names => names;
+
+        public int Unknown2 => unknown2;
+
+        public short Unknown3 => unknown3;
+
+        public string Unknown4 => unknown4;
+
+        public byte[] Unknown5 => unknown5;
+
+        public override bool IsDirty => base.IsDirty || vrnb.IsDirty || rn.IsDirty || bn.IsDirty || tn.IsDirty;
+
+        public override void SetClean()
         {
-            get { return unknown1; }
-            set { unknown1 = value; }
-        }
+            base.SetClean();
 
-        string[] names;
-        public string[] Names
-        {
-            get { return names; }
-            set { names = value; }
+            vrnb.SetClean();
+            rn.SetClean();
+            bn.SetClean();
+            tn.SetClean();
         }
-
-        int unknown2;
-        public int Unknown2
-        {
-            get { return unknown2; }
-            set { unknown2 = value; }
-        }
-
-        short unknown3;
-        public short Unknown3
-        {
-            get { return unknown3; }
-            set { unknown3 = value; }
-        }
-
-        string unknown4;
-        public string Unknown4
-        {
-            get { return unknown4; }
-            set { unknown4 = value; }
-        }
-
-        byte[] unknown5;
-        public byte[] Unknown5
-        {
-            get { return unknown5; }
-            set { unknown5 = value; }
-        }
-
 
         // Needed by reflection to create the class
         public CViewerRefNodeRecursive(Rcol parent) : base(parent)
         {
-            vrnb = new ViewerRefNodeBase(null);
-            rn = new RenderableNode(null);
-            bn = new BoundedNode(null);
-            tn = new CTransformNode(null);
+            Version = 0x01;
+            BlockID = TYPE;
+            BlockName = NAME;
+
+            vrnb.Parent = parent;
+            rn.Parent = parent;
+            bn.Parent = parent;
+            tn.Parent = parent;
 
             names = new string[0];
             unknown4 = "";
             unknown5 = new byte[64];
-
-            Version = 0x01;
-            BlockID = TYPE;
-            BlockName = NAME;
         }
 
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
         public override void Unserialize(DbpfReader reader)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             Version = reader.ReadUInt32();
 
-            _ = reader.ReadString();
-            TypeBlockID myid = reader.ReadBlockId();
+            vrnb.BlockName = reader.ReadString();
+            vrnb.BlockID = reader.ReadBlockId();
             vrnb.Unserialize(reader);
-            vrnb.BlockID = myid;
 
-            _ = reader.ReadString();
-            myid = reader.ReadBlockId();
+            rn.BlockName = reader.ReadString();
+            rn.BlockID = reader.ReadBlockId();
             rn.Unserialize(reader);
-            rn.BlockID = myid;
 
-            _ = reader.ReadString();
-            myid = reader.ReadBlockId();
+            bn.BlockName = reader.ReadString();
+            bn.BlockID = reader.ReadBlockId();
             bn.Unserialize(reader);
-            bn.BlockID = myid;
 
-            _ = reader.ReadString();
-            myid = reader.ReadBlockId();
+            tn.BlockName = reader.ReadString();
+            tn.BlockID = reader.ReadBlockId();
             tn.Unserialize(reader);
-            tn.BlockID = myid;
 
             unknown1 = reader.ReadInt16();
+
             names = new string[reader.ReadInt32()];
             for (int i = 0; i < names.Length; i++) names[i] = reader.ReadString();
 
@@ -123,9 +108,80 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown3 = reader.ReadInt16();
             unknown4 = reader.ReadString();
             unknown5 = reader.ReadBytes(64);
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
         }
 
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4;
 
+                size += DbpfWriter.Length(vrnb.BlockName) + 4 + vrnb.FileSize;
+                size += DbpfWriter.Length(rn.BlockName) + 4 + rn.FileSize;
+                size += DbpfWriter.Length(bn.BlockName) + 4 + bn.FileSize;
+                size += DbpfWriter.Length(tn.BlockName) + 4 + tn.FileSize;
+
+                size += 2;
+
+                size += 4;
+                for (int i = 0; i < names.Length; i++)
+                {
+                    size += DbpfWriter.Length(names[i]);
+                }
+
+                size += 4 + 2 + DbpfWriter.Length(unknown4) + 64;
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
+            writer.WriteUInt32(Version);
+
+            writer.WriteString(vrnb.BlockName);
+            writer.WriteBlockId(vrnb.BlockID);
+            vrnb.Serialize(writer);
+
+            writer.WriteString(rn.BlockName);
+            writer.WriteBlockId(rn.BlockID);
+            rn.Serialize(writer);
+
+            writer.WriteString(bn.BlockName);
+            writer.WriteBlockId(bn.BlockID);
+            bn.Serialize(writer);
+
+            writer.WriteString(tn.BlockName);
+            writer.WriteBlockId(tn.BlockID);
+            tn.Serialize(writer);
+
+            writer.WriteInt16(unknown1);
+
+            writer.WriteUInt32((uint)names.Length);
+            for (int i = 0; i < names.Length; i++)
+            {
+                writer.WriteString(names[i]);
+            }
+
+            writer.WriteInt32(unknown2);
+            writer.WriteInt16(unknown3);
+            writer.WriteString(unknown4);
+            writer.WriteBytes(unknown5);
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+#endif
+        }
 
         public override void Dispose()
         {

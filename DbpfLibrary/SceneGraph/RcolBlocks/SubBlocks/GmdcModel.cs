@@ -132,7 +132,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             writer.WriteInt32(transforms.Count);
             foreach (VectorTransformation transform in transforms)
             {
-                transform.Order = VectorTransformation.TransformOrder.RotateThenTranslate;
+                // transform.Order = VectorTransformation.TransformOrder.RotateThenTranslate;
                 transform.Serialize(writer);
             }
 

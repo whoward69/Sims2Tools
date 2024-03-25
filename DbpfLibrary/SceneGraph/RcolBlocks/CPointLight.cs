@@ -21,20 +21,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly new TypeBlockID TYPE = (TypeBlockID)0xC9C81BA9;
         public new const string NAME = "cPointLight";
 
+        private float unknown8;
+        private float unknown9;
 
-        float unknown8;
-        public float Val6
-        {
-            get { return unknown8; }
-            set { unknown8 = value; }
-        }
+        public float Val6 => unknown8;
 
-        float unknown9;
-        public float Val7
-        {
-            get { return unknown9; }
-            set { unknown9 = value; }
-        }
+        public float Val7 => unknown9;
 
         // Needed by reflection to create the class
         public CPointLight(Rcol parent) : base(parent)
@@ -47,8 +39,29 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public override void Unserialize(DbpfReader reader)
         {
             base.Unserialize(reader);
+
             unknown8 = reader.ReadSingle();
             unknown9 = reader.ReadSingle();
+        }
+
+        public override uint FileSize
+        {
+            get
+            {
+                long size = base.FileSize;
+
+                size += 4 + 4;
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            base.Serialize(writer);
+
+            writer.WriteSingle(unknown8);
+            writer.WriteSingle(unknown9);
         }
     }
 }

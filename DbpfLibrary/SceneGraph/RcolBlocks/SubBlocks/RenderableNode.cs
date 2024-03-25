@@ -11,13 +11,12 @@
  */
 
 using Sims2Tools.DBPF.IO;
-using Sims2Tools.DBPF.SceneGraph.RCOL;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class RenderableNode : AbstractRcolBlock
     {
-        public RenderableNode(Rcol parent) : base(parent)
+        public RenderableNode() : base(null) // Yes, really! Do NOT use base()
         {
             Version = 0x5;
         }

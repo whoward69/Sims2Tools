@@ -14,6 +14,8 @@ using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Images.THUB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.CRES;
+using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFLR;
@@ -47,6 +49,18 @@ namespace ObjectRelocator
         private readonly Objd leadtile = null;
         private readonly Objd diagonaltile = null;
 
+        private enum SgResState
+        {
+            NotLookedFor = -1,
+            NotFound,
+            Local,
+            Remote
+        }
+
+        private SgResState sgResState = SgResState.NotLookedFor;
+        private Cres cres = null;
+        private Shpe shpe = null;
+
         public string PackagePath => packagePath;
         public string PackageNameNoExtn => packageNameNoExtn;
         public string PackageName => packageName;
@@ -55,6 +69,9 @@ namespace ObjectRelocator
         public bool IsCpf => (res is Cpf);
         public bool IsXobj => (res is Xobj);
         public bool IsXfnc => (res is Xfnc);
+
+        public Cres Cres => cres;
+        public Shpe Shpe => shpe;
 
         public bool HasTitleAndDescription => (strings != null);
 
@@ -130,7 +147,7 @@ namespace ObjectRelocator
 
         public string Guid => (IsObjd) ? (res as Objd).Guid.ToString() : (IsCpf ? Helper.Hex8PrefixString(GetUIntItem("guid")) : "");
 
-        public bool IsDirty => (res.IsDirty || (strings != null && strings.IsDirty) || (leadtile != null && leadtile.IsDirty) || (diagonaltile != null && diagonaltile.IsDirty));
+        public bool IsDirty => (res.IsDirty || (strings != null && strings.IsDirty) || (leadtile != null && leadtile.IsDirty) || (diagonaltile != null && diagonaltile.IsDirty) || (cres != null && cres.IsDirty) || (shpe != null && shpe.IsDirty));
 
         public void SetClean()
         {
@@ -138,6 +155,8 @@ namespace ObjectRelocator
             strings?.SetClean();
             leadtile?.SetClean();
             diagonaltile?.SetClean();
+            cres?.SetClean();
+            shpe?.SetClean();
         }
 
         public static ObjectDbpfData Create(RelocatorDbpfFile package, ObjectDbpfData objectData)
@@ -219,14 +238,18 @@ namespace ObjectRelocator
             if (strings != null && strings.IsDirty) dbpfPackage.Commit(strings);
             if (leadtile != null && leadtile.IsDirty) dbpfPackage.Commit(leadtile);
             if (diagonaltile != null && diagonaltile.IsDirty) dbpfPackage.Commit(diagonaltile);
+            if (cres != null && cres.IsDirty) dbpfPackage.Commit(cres);
+            if (shpe != null && shpe.IsDirty) dbpfPackage.Commit(shpe);
         }
 
-        private void UpdatePackage()
+        public void UpdatePackage()
         {
             if (res.IsDirty) cache.GetOrAdd(packagePath).Commit(res);
             if (strings != null && strings.IsDirty) cache.GetOrAdd(packagePath).Commit(strings);
             if (leadtile != null && leadtile.IsDirty) cache.GetOrAdd(packagePath).Commit(leadtile);
             if (diagonaltile != null && diagonaltile.IsDirty) cache.GetOrAdd(packagePath).Commit(diagonaltile);
+            if (cres != null && cres.IsDirty) cache.GetOrAdd(packagePath).Commit(cres);
+            if (shpe != null && shpe.IsDirty) cache.GetOrAdd(packagePath).Commit(shpe);
         }
 
         public ushort GetRawData(ObjdIndex objdIndex)
@@ -368,6 +391,76 @@ namespace ObjectRelocator
             strings?.DefLanguageOnly();
         }
 
+        public bool FindScenegraphResources()
+        {
+            if (IsObjd)
+            {
+                if (sgResState == SgResState.NotLookedFor)
+                {
+                    sgResState = SgResState.NotFound;
+
+                    using (RelocatorDbpfFile package = cache.GetOrOpen(packagePath))
+                    {
+                        if (package != null)
+                        {
+                            Objd objd = res as Objd;
+
+                            Str str = (Str)package.GetResourceByTGIR(Hash.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
+
+                            if (str != null)
+                            {
+                                int modelIndex = objd.GetRawData(ObjdIndex.DefaultGraphic);
+                                string cresName = str.LanguageItems(MetaData.Languages.Default)[modelIndex].Title;
+
+                                Cres localCres = (Cres)package.GetResourceByName(Cres.TYPE, cresName);
+
+                                if (localCres != null)
+                                {
+                                    if (localCres.ShpeKeys.Count == 1)
+                                    {
+                                        Shpe localShpe = (Shpe)package.GetResourceByKey(localCres.ShpeKeys[0]);
+
+                                        if (localShpe != null)
+                                        {
+                                            cres = localCres;
+                                            shpe = localShpe;
+
+                                            sgResState = SgResState.Local;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // TODO - find the remote CRES/SHPE
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return (sgResState == SgResState.Local || sgResState == SgResState.Remote);
+        }
+
+        public bool IsHoodView
+        {
+            get
+            {
+                if (FindScenegraphResources())
+                {
+                    if (shpe.Shape.Lod == 90)
+                    {
+                        if (cres.HasDataListExtension("GameData"))
+                        {
+                            return cres.GameData.Extension.GetString("LODs").Equals("90");
+                        }
+                    }
+                }
+
+                return false;
+            }
+        }
+
         public bool Equals(ObjectDbpfData other)
         {
             return this.packagePath.Equals(other.packagePath) && this.res.Equals(other.res);
@@ -402,6 +495,7 @@ namespace ObjectRelocator
         public DBPFEntry GetEntryByKey(DBPFKey key) => package.GetEntryByKey(key);
         public DBPFResource GetResourceByTGIR(int tgir) => package.GetResourceByTGIR(tgir);
         public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
+        public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName) => package.GetResourceByName(typeId, sgName);
         public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
 
         public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);

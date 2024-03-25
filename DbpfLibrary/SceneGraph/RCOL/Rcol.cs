@@ -70,6 +70,16 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             }
         }
 
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            foreach (IRcolBlock blk in blocks)
+            {
+                blk.SetClean();
+            }
+        }
+
         protected IPackedFileDescriptor[] ReferencedFiles
         {
             get { return duff ? new IPackedFileDescriptor[0] : reffiles; }
@@ -120,6 +130,48 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             _isDirty = true;
         }
 
+        public bool HasDataListExtension(string name)
+        {
+            return (GetDataListExtension(name, true) != null);
+        }
+
+        protected CDataListExtension GetDataListExtension(string name, bool noRename = false)
+        {
+            CDataListExtension dataListExtension;
+
+            foreach (IRcolBlock block in Blocks)
+            {
+                if (block.BlockID == CDataListExtension.TYPE)
+                {
+                    dataListExtension = block as CDataListExtension;
+
+                    if (dataListExtension.Extension.VarName.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (!noRename) dataListExtension.Extension.VarName = name;
+
+                        return dataListExtension;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        protected CDataListExtension GetOrAddDataListExtension(string name, CObjectGraphNode ogn)
+        {
+            CDataListExtension dataListExtension = GetDataListExtension(name);
+
+            if (dataListExtension == null)
+            {
+                dataListExtension = new CDataListExtension(this, name);
+                AddBlock(dataListExtension);
+
+                ogn.AddItemLink((uint)Blocks.Count - 1);
+            }
+
+            return dataListExtension;
+        }
+
         internal IRcolBlock ReadBlock(TypeBlockID expectedId, DbpfReader reader)
         {
             long errPos = reader.Position;
@@ -164,7 +216,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             writer.WriteBlockId(blk.BlockID);
             blk.Serialize(writer);
         }
-
 
         public void Unserialize(DbpfReader reader, uint dataSize)
         {

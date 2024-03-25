@@ -10,7 +10,6 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.IO;
 using System;
 
 namespace Sims2Tools.DBPF.SceneGraph.Geometry
@@ -300,24 +299,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
 
                 return m;
             }
-        }
-
-        void LoadCorrection()
-        {
-            //W = -W;
-            //X = -X;
-            //Y = Z;
-            //Z = -Z;
-        }
-        /// <summary>
-        /// Unserializes a BinaryStream into the Attributes of this Instance
-        /// </summary>
-        /// <param name="reader">The Stream that contains the FileData</param>
-        public override void Unserialize(DbpfReader reader)
-        {
-            base.Unserialize(reader);
-
-            LoadCorrection();
         }
     }
 }

@@ -11,13 +11,12 @@
  */
 
 using Sims2Tools.DBPF.IO;
-using Sims2Tools.DBPF.SceneGraph.RCOL;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class CompositionTreeNode : AbstractRcolBlock
     {
-        public CompositionTreeNode(Rcol parent) : base(parent)
+        public CompositionTreeNode() : base(null) // Yes, really! Do NOT use base()
         {
             Version = 0xb;
         }
