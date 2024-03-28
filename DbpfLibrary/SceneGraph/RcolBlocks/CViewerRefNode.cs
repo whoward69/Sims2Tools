@@ -163,7 +163,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 #if DEBUG
             writeEnd = writer.Position;
 
-            Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+            Debug.Assert((writeEnd - writeStart) == FileSize);
+            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
 #endif
         }
 

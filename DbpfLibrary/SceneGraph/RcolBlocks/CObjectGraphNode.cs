@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph
 {
@@ -84,6 +85,10 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public override void Unserialize(DbpfReader reader)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             Version = reader.ReadUInt32();
 
             uint count = reader.ReadUInt32();
@@ -102,6 +107,10 @@ namespace Sims2Tools.DBPF.SceneGraph
             {
                 filename = "cObjectGraphNode";
             }
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
         }
 
         public override uint FileSize
@@ -123,6 +132,10 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public override void Serialize(DbpfWriter writer)
         {
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
             writer.WriteUInt32(Version);
 
             writer.WriteUInt32((uint)items.Count);
@@ -135,6 +148,13 @@ namespace Sims2Tools.DBPF.SceneGraph
             {
                 writer.WriteString(filename);
             }
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == FileSize);
+            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+#endif
         }
 
         public override string ToString() => filename;

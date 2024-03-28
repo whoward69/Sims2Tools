@@ -109,13 +109,13 @@ namespace Sims2Tools.DBPF.Package
         {
             this.packagePath = packagePath;
 
+            FileInfo fi = new FileInfo(packagePath);
+            this.packageDir = fi.DirectoryName;
+            this.packageName = fi.Name;
+            this.packageNameNoExtn = packageName.Substring(0, packageName.LastIndexOf('.'));
+
             if (File.Exists(packagePath))
             {
-                FileInfo fi = new FileInfo(packagePath);
-                this.packageDir = fi.DirectoryName;
-                this.packageName = fi.Name;
-                this.packageNameNoExtn = packageName.Substring(0, packageName.LastIndexOf('.'));
-
                 Read(File.OpenRead(packagePath));
             }
             else
@@ -370,6 +370,8 @@ namespace Sims2Tools.DBPF.Package
 
         public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName)
         {
+            if (sgName == null) return null;
+
             DBPFEntry entry = GetEntryByKey(SgHelper.KeyFromQualifiedName(sgName, typeId, DBPFData.GROUP_SG_MAXIS));
 
             if (entry == null)

@@ -17,10 +17,10 @@ namespace ObjectRelocator
         public static readonly string AppName = "Object Relocator";
 
         public static readonly int AppVersionMajor = 5;
-        public static readonly int AppVersionMinor = 1;
+        public static readonly int AppVersionMinor = 2;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 1;
+        private static readonly int AppVersionDebug = 0;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release

@@ -74,6 +74,8 @@ namespace ObjectRelocator
             this.menuItemHideNonLocals = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemDisableBuildModeSortFilters = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemModifyAllModels = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewResources = new System.Windows.Forms.DataGridView();
             this.menuContextObjects = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemContextEditTitleDesc = new System.Windows.Forms.ToolStripMenuItem();
@@ -360,6 +362,8 @@ namespace ObjectRelocator
             this.menuItemSeparator4,
             this.menuItemHideLocals,
             this.menuItemHideNonLocals,
+            this.menuItemSeparator8,
+			this.menuItemModifyAllModels,
             this.menuItemSeparator7,
             this.menuItemDisableBuildModeSortFilters});
             this.menuOptions.Name = "menuOptions";
@@ -453,6 +457,18 @@ namespace ObjectRelocator
             this.menuItemDisableBuildModeSortFilters.Size = new System.Drawing.Size(243, 22);
             this.menuItemDisableBuildModeSortFilters.Text = "Disable Build Mode Sort Filters";
             this.menuItemDisableBuildModeSortFilters.Click += new System.EventHandler(this.OnDisableBuildModeSortFiltersClicked);
+            // 
+            // menuItemSeparator8
+            // 
+            this.menuItemSeparator8.Name = "menuItemSeparator8";
+            this.menuItemSeparator8.Size = new System.Drawing.Size(240, 6);
+            // 
+            // menuItemModifyAllModels
+            // 
+            this.menuItemModifyAllModels.Name = "menuItemModifyAllModels";
+            this.menuItemModifyAllModels.Size = new System.Drawing.Size(243, 22);
+            this.menuItemModifyAllModels.Text = "Modify All Models (CRES/SHPE)";
+            this.menuItemModifyAllModels.Click += new System.EventHandler(this.OnModifyAllModelsClicked);
             // 
             // gridViewResources
             // 
@@ -1518,6 +1534,8 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuItemShowPath;
         private System.Windows.Forms.PictureBox thumbBox;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem menuItemModifyAllModels;
+        private System.Windows.Forms.ToolStripSeparator menuItemSeparator8;
         private System.Windows.Forms.ToolStripMenuItem menuItemDisableBuildModeSortFilters;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextEditTitleDesc;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;

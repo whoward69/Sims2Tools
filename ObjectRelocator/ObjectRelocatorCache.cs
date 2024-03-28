@@ -58,8 +58,8 @@ namespace ObjectRelocator
         }
 
         private SgResState sgResState = SgResState.NotLookedFor;
-        private Cres cres = null;
-        private Shpe shpe = null;
+        private List<Cres> cress = new List<Cres>();
+        private List<Shpe> shpes = new List<Shpe>();
 
         public string PackagePath => packagePath;
         public string PackageNameNoExtn => packageNameNoExtn;
@@ -70,8 +70,8 @@ namespace ObjectRelocator
         public bool IsXobj => (res is Xobj);
         public bool IsXfnc => (res is Xfnc);
 
-        public Cres Cres => cres;
-        public Shpe Shpe => shpe;
+        public List<Cres> Cress => cress;
+        public List<Shpe> Shpes => shpes;
 
         public bool HasTitleAndDescription => (strings != null);
 
@@ -147,16 +147,45 @@ namespace ObjectRelocator
 
         public string Guid => (IsObjd) ? (res as Objd).Guid.ToString() : (IsCpf ? Helper.Hex8PrefixString(GetUIntItem("guid")) : "");
 
-        public bool IsDirty => (res.IsDirty || (strings != null && strings.IsDirty) || (leadtile != null && leadtile.IsDirty) || (diagonaltile != null && diagonaltile.IsDirty) || (cres != null && cres.IsDirty) || (shpe != null && shpe.IsDirty));
+        public bool IsDirty
+        {
+            get
+            {
+                if (res.IsDirty) return true;
 
+                if (strings != null && strings.IsDirty) return true;
+
+                if ((leadtile != null && leadtile.IsDirty) || (diagonaltile != null && diagonaltile.IsDirty)) return true;
+
+                foreach (Cres cres in cress)
+                {
+                    if (cres.IsDirty) return true;
+                }
+
+                foreach (Shpe shpe in shpes)
+                {
+                    if (shpe.IsDirty) return true;
+                }
+
+                return false;
+            }
+        }
         public void SetClean()
         {
             res.SetClean();
             strings?.SetClean();
+
             leadtile?.SetClean();
             diagonaltile?.SetClean();
-            cres?.SetClean();
-            shpe?.SetClean();
+
+            foreach (Cres cres in cress)
+            {
+                cres.SetClean();
+            }
+            foreach (Shpe shpe in shpes)
+            {
+                shpe.SetClean();
+            }
         }
 
         public static ObjectDbpfData Create(RelocatorDbpfFile package, ObjectDbpfData objectData)
@@ -236,20 +265,36 @@ namespace ObjectRelocator
         {
             if (res.IsDirty) dbpfPackage.Commit(res);
             if (strings != null && strings.IsDirty) dbpfPackage.Commit(strings);
+
             if (leadtile != null && leadtile.IsDirty) dbpfPackage.Commit(leadtile);
             if (diagonaltile != null && diagonaltile.IsDirty) dbpfPackage.Commit(diagonaltile);
-            if (cres != null && cres.IsDirty) dbpfPackage.Commit(cres);
-            if (shpe != null && shpe.IsDirty) dbpfPackage.Commit(shpe);
+
+            foreach (Cres cres in cress)
+            {
+                if (cres.IsDirty) dbpfPackage.Commit(cres);
+            }
+            foreach (Shpe shpe in shpes)
+            {
+                if (shpe.IsDirty) dbpfPackage.Commit(shpe);
+            }
         }
 
         public void UpdatePackage()
         {
             if (res.IsDirty) cache.GetOrAdd(packagePath).Commit(res);
             if (strings != null && strings.IsDirty) cache.GetOrAdd(packagePath).Commit(strings);
+
             if (leadtile != null && leadtile.IsDirty) cache.GetOrAdd(packagePath).Commit(leadtile);
             if (diagonaltile != null && diagonaltile.IsDirty) cache.GetOrAdd(packagePath).Commit(diagonaltile);
-            if (cres != null && cres.IsDirty) cache.GetOrAdd(packagePath).Commit(cres);
-            if (shpe != null && shpe.IsDirty) cache.GetOrAdd(packagePath).Commit(shpe);
+
+            foreach (Cres cres in cress)
+            {
+                if (cres.IsDirty) cache.GetOrAdd(packagePath).Commit(cres);
+            }
+            foreach (Shpe shpe in shpes)
+            {
+                if (shpe.IsDirty) cache.GetOrAdd(packagePath).Commit(shpe);
+            }
         }
 
         public ushort GetRawData(ObjdIndex objdIndex)
@@ -391,7 +436,7 @@ namespace ObjectRelocator
             strings?.DefLanguageOnly();
         }
 
-        public bool FindScenegraphResources()
+        public bool FindScenegraphResources(bool allCres)
         {
             if (IsObjd)
             {
@@ -405,33 +450,119 @@ namespace ObjectRelocator
                         {
                             Objd objd = res as Objd;
 
-                            Str str = (Str)package.GetResourceByTGIR(Hash.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
-
-                            if (str != null)
+                            if (allCres)
                             {
-                                int modelIndex = objd.GetRawData(ObjdIndex.DefaultGraphic);
-                                string cresName = str.LanguageItems(MetaData.Languages.Default)[modelIndex].Title;
-
-                                Cres localCres = (Cres)package.GetResourceByName(Cres.TYPE, cresName);
-
-                                if (localCres != null)
+                                foreach (DBPFEntry entry in package.GetEntriesByType(Cres.TYPE))
                                 {
-                                    if (localCres.ShpeKeys.Count == 1)
-                                    {
-                                        Shpe localShpe = (Shpe)package.GetResourceByKey(localCres.ShpeKeys[0]);
+                                    Cres cres = (Cres)package.GetResourceByEntry(entry);
 
-                                        if (localShpe != null)
+                                    if (cres != null)
+                                    {
+                                        cress.Add(cres);
+
+                                        foreach (DBPFKey shpeKey in cres.ShpeKeys)
                                         {
-                                            cres = localCres;
-                                            shpe = localShpe;
+                                            Shpe shpe = (Shpe)package.GetResourceByKey(shpeKey);
+
+                                            if (shpe != null)
+                                            {
+                                                shpes.Add(shpe);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Str str = (Str)package.GetResourceByTGIR(Hash.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
+
+                                if (str != null)
+                                {
+                                    int modelIndex = objd.GetRawData(ObjdIndex.DefaultGraphic);
+                                    string cresName = str.LanguageItems(MetaData.Languages.Default)[modelIndex]?.Title;
+
+                                    Cres localCres = (Cres)package.GetResourceByName(Cres.TYPE, cresName);
+
+                                    if (localCres != null)
+                                    {
+                                        List<Cres> localCress = new List<Cres>();
+                                        List<Shpe> localShpes = new List<Shpe>();
+
+                                        localCress.Add(localCres);
+
+                                        foreach (DBPFKey shpeKey in localCres.ShpeKeys)
+                                        {
+                                            Shpe localShpe = (Shpe)package.GetResourceByKey(shpeKey);
+
+                                            if (localShpe != null)
+                                            {
+                                                localShpes.Add(localShpe);
+                                            }
+                                        }
+
+                                        if (localShpes.Count == localCres.ShpeKeys.Count)
+                                        {
+                                            cress = localCress;
+                                            shpes = localShpes;
 
                                             sgResState = SgResState.Local;
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    // TODO - find the remote CRES/SHPE
+                                    else if (objd.GroupID != DBPFData.GROUP_LOCAL)
+                                    {
+                                        foreach (string gameFolder in GameData.gameFolders)
+                                        {
+                                            string cresPackagePath = $"{gameFolder}\\Objects05.package";
+
+                                            if (File.Exists(cresPackagePath))
+                                            {
+                                                using (DBPFFile cresPackage = new DBPFFile(cresPackagePath))
+                                                {
+                                                    Cres remoteCres = (Cres)cresPackage.GetResourceByName(Cres.TYPE, cresName);
+
+                                                    if (remoteCres != null)
+                                                    {
+                                                        List<Cres> remoteCress = new List<Cres>();
+                                                        List<Shpe> remoteShpes = new List<Shpe>();
+
+                                                        remoteCress.Add(remoteCres);
+
+                                                        string shpePackagePath = $"{gameFolder}\\Objects06.package";
+
+                                                        if (File.Exists(shpePackagePath))
+                                                        {
+                                                            using (DBPFFile shpePackage = new DBPFFile(shpePackagePath))
+                                                            {
+                                                                foreach (DBPFKey shpeKey in remoteCres.ShpeKeys)
+                                                                {
+                                                                    Shpe remoteShpe = (Shpe)shpePackage.GetResourceByKey(shpeKey);
+
+                                                                    if (remoteShpe != null)
+                                                                    {
+                                                                        remoteShpes.Add(remoteShpe);
+                                                                    }
+                                                                }
+
+                                                                if (remoteShpes.Count == remoteCres.ShpeKeys.Count)
+                                                                {
+                                                                    cress = remoteCress;
+                                                                    shpes = remoteShpes;
+
+                                                                    sgResState = SgResState.Remote;
+                                                                }
+
+                                                                shpePackage.Close();
+                                                            }
+                                                        }
+                                                    }
+
+                                                    cresPackage.Close();
+                                                }
+
+                                                if (cress.Count != 0) break;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -442,23 +573,29 @@ namespace ObjectRelocator
             return (sgResState == SgResState.Local || sgResState == SgResState.Remote);
         }
 
-        public bool IsHoodView
+        public bool IsHoodView(bool allCres)
         {
-            get
+            if (FindScenegraphResources(allCres))
             {
-                if (FindScenegraphResources())
+                foreach (Cres cres in cress)
                 {
-                    if (shpe.Shape.Lod == 90)
+                    if (cres.HasDataListExtension("GameData"))
                     {
-                        if (cres.HasDataListExtension("GameData"))
+                        if (cres.GameData.Extension.GetString("LODs").Equals("90"))
                         {
-                            return cres.GameData.Extension.GetString("LODs").Equals("90");
+                            foreach (Shpe shpe in shpes)
+                            {
+                                if (shpe.Shape.Lod == 90)
+                                {
+                                    return true;
+                                }
+                            }
                         }
                     }
                 }
-
-                return false;
             }
+
+            return false;
         }
 
         public bool Equals(ObjectDbpfData other)

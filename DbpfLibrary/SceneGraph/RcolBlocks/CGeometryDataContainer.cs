@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
@@ -64,6 +65,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Unserialize(DbpfReader reader)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             Version = reader.ReadUInt32();
 
             string blkName = reader.ReadString();
@@ -106,6 +111,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 s.Unserialize(reader);
                 joints.AddItem(s);
             }
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
         }
 
         public override uint FileSize
@@ -148,6 +157,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Serialize(DbpfWriter writer)
         {
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
             writer.WriteUInt32(Version);
 
             writer.WriteString(NameResource.BlockName);
@@ -179,6 +192,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             {
                 joint.Serialize(writer);
             }
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == FileSize);
+            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+#endif
         }
 
         public override void Dispose()

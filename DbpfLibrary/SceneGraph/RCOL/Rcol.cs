@@ -16,6 +16,7 @@ using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.RCOL
@@ -46,6 +47,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             BlockClasses.Add(CViewerRefNode.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CViewerRefNode", true));
             BlockClasses.Add(CViewerRefNodeRecursive.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CViewerRefNodeRecursive", true));
         }
+
+#if DEBUG
+        protected long readStart, readEnd, writeStart, writeEnd;
+#endif
 
         private uint[] index;
         private IPackedFileDescriptor[] reffiles;
@@ -219,6 +224,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
         public void Unserialize(DbpfReader reader, uint dataSize)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             long startPos = reader.Position;
 
             duff = false;
@@ -268,6 +277,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                 logger.Warn("RCol error:", ex);
                 duff = true;
             }
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
         }
 
         public override uint FileSize
@@ -294,6 +307,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
         {
             if (duff) return;
 
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
             writer.WriteUInt32(count == 0xffff0001 ? count : (uint)reffiles.Length);
 
             writer.WriteUInt32((uint)reffiles.Length);
@@ -311,6 +328,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             foreach (IRcolBlock blk in blocks) WriteBlock(blk, writer);
 
             writer.WriteBytes(oversize);
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == FileSize);
+            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+#endif
         }
 
         protected XmlElement AddXml(XmlElement parent, string name)

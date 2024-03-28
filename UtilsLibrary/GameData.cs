@@ -133,13 +133,13 @@ namespace Sims2Tools
 
                 // Base game folder
                 string baseFolder = SimpeData.PathSetting("Sims2Path");
-                if (baseFolder != null) gameFolders.Add($"{baseFolder}{GameData.base3dPath}");
+                if (baseFolder != null) gameFolders.Insert(0, $"{baseFolder}{GameData.base3dPath}");
 
                 // Expansion Pack (EP) folders
                 for (int i = 1; i <= 9; i++)
                 {
                     string epPath = SimpeData.PathSetting($"Sims2EP{i}Path");
-                    if (epPath != null) gameFolders.Add($"{epPath}{GameData.ep3dPath}");
+                    if (epPath != null) gameFolders.Insert(0, $"{epPath}{GameData.ep3dPath}");
                 }
 
                 // Stuff Pack (SP) folders
@@ -147,10 +147,10 @@ namespace Sims2Tools
                 for (int i = 1; i <= 8; i++)
                 {
                     string spPath = SimpeData.PathSetting($"Sims2SP{i}Path");
-                    if (spPath != null) gameFolders.Add($"{spPath}{GameData.sp3dPath}");
+                    if (spPath != null) gameFolders.Insert(0, $"{spPath}{GameData.sp3dPath}");
                 }
                 string scPath = SimpeData.PathSetting($"Sims2SCPath");
-                if (scPath != null) gameFolders.Add($"{scPath}{GameData.sp3dPath}");
+                if (scPath != null) gameFolders.Insert(0, $"{scPath}{GameData.sp3dPath}");
 
                 logger.Info($"Loading SimpeData: End");
             }

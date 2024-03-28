@@ -37,9 +37,9 @@ namespace DpbfLister
         {
             DBPFData.HasImageSupport = false;
 
-            // ProcessFiles(args);
+            ProcessFiles(args);
 
-            ProcessXhtn("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads\\Hair\\Female\\All4Colors_minanna_FH03_ribbon(Black).package");
+            // ProcessXhtn("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads\\Hair\\Female\\All4Colors_minanna_FH03_ribbon(Black).package");
 
             // ProcessObjectNiceness();
 

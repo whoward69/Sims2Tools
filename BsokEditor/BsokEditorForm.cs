@@ -1634,11 +1634,15 @@ namespace BsokEditor
             {
                 using (DBPFFile dbpfPackage = new DBPFFile(packageFile))
                 {
+                    List<Cpf> editedCpfs = new List<Cpf>();
+
                     foreach (Cpf editedCpf in dirtyCpfsByPackage[packageFile])
                     {
                         editedCpf.GetItem("creator").StringValue = "00000000-0000-0000-0000-000000000000";
+
                         dbpfPackage.Commit(editedCpf);
-                        editedCpf.SetClean();
+
+                        editedCpfs.Add(editedCpf);
                     }
 
                     try
@@ -1648,6 +1652,11 @@ namespace BsokEditor
                     catch (Exception)
                     {
                         MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
+                    }
+
+                    foreach (Cpf editedCpf in editedCpfs)
+                    {
+                        editedCpf.SetClean();
                     }
 
                     dbpfPackage.Close();

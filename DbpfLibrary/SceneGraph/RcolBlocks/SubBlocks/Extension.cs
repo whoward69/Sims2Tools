@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.SceneGraph.Geometry;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
@@ -31,6 +32,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             Rotation = 0x08,
             Binary = 0x09
         }
+
+#if DEBUG
+        protected long readStart, readEnd, writeStart, writeEnd;
+#endif
 
         private ItemTypes typecode;
         private string varname;
@@ -55,7 +60,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         public string String
         {
             get => str;
-            internal set => str = value;
+            internal set => str = value; // TODO - _library - this should mark this ExtensionItem as dirty, and not rely on the calling code marking the parent as dirty
         }
 
         public ExtensionItem[] Items => ei;
@@ -99,6 +104,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public void Unserialize(DbpfReader reader)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             long errPos = reader.Position;
 
             typecode = (ItemTypes)reader.ReadByte();
@@ -152,6 +161,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                         throw new Exception($"Unknown Extension Item {Helper.Hex2PrefixString((byte)typecode)}\n\nPosition: {Helper.Hex8PrefixString((uint)errPos)}");
                     }
             }
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
         }
 
         public uint FileSize
@@ -210,6 +223,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public void Serialize(DbpfWriter writer)
         {
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
             writer.WriteByte((byte)typecode);
             writer.WriteString(varname);
 
@@ -260,6 +277,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                         throw new Exception($"Unknown Extension Item {Helper.Hex2PrefixString((byte)typecode)}");
                     }
             }
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == FileSize);
+            if (!true) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+#endif
         }
     }
 
@@ -379,6 +403,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public void Unserialize(DbpfReader reader, uint ver)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             Version = reader.ReadUInt32();
             typecode = reader.ReadByte();
 
@@ -400,6 +428,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                     items.Add(new ExtensionItem(reader));
                 }
             }
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
         }
 
         public override uint FileSize
@@ -432,6 +464,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public void Serialize(DbpfWriter writer, uint ver)
         {
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
             writer.WriteUInt32(Version);
             writer.WriteByte(typecode);
 
@@ -454,6 +490,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                     items[i].Serialize(writer);
                 }
             }
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == FileSize);
+            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+#endif
         }
 
         private int DeduceSize(byte typecode, uint ver)

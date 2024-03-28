@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
@@ -65,17 +66,23 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown1 = reader.ReadInt32();
         }
 
-        // This is seperate as the In32 array is written, followed by the String array, and not interleaved as Int32, String, Int32, String ...
+        // This is seperate as the Int32 array is written, followed by the String array, and not interleaved as Int32, String, Int32, String ...
         public void UnserializeName(DbpfReader reader)
         {
             data = reader.ReadString();
         }
 
-        public uint FileSize => (uint)(4 + DbpfWriter.Length(data));
+        public uint FileSize => 4;
+        public uint FileSizeName => (uint)DbpfWriter.Length(data);
 
         public void Serialize(DbpfWriter writer)
         {
             writer.WriteInt32(unknown1);
+        }
+
+        public void SerializeName(DbpfWriter writer)
+        {
+            writer.WriteString(data);
         }
 
         public override string ToString()
@@ -161,6 +168,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Unserialize(DbpfReader reader)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             Version = reader.ReadUInt32();
 
             rn.BlockName = reader.ReadString();
@@ -208,6 +219,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             data = reader.ReadBytes(reader.ReadInt32());
 
             unknown6 = reader.ReadInt32();
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
         }
 
         public override uint FileSize
@@ -237,7 +252,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
                     if (Version == 0x15)
                     {
-                        size += DbpfWriter.Length(itemsb[i].Name);
+                        size += itemsb[i].FileSizeName;
                     }
                 }
 
@@ -252,6 +267,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Serialize(DbpfWriter writer)
         {
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
             writer.WriteUInt32(Version);
 
             writer.WriteString(rn.BlockName);
@@ -290,7 +309,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             {
                 for (int i = 0; i < itemsb.Length; i++)
                 {
-                    writer.WriteString(itemsb[i].Name);
+                    itemsb[i].SerializeName(writer);
                 }
             }
 
@@ -298,6 +317,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             writer.WriteBytes(data);
 
             writer.WriteInt32(unknown6);
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == FileSize);
+            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+#endif
         }
 
         public override string ToString()

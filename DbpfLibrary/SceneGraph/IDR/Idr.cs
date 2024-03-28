@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.IDR
@@ -24,6 +25,10 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xAC506764;
         public const string NAME = "3IDR";
+
+#if DEBUG
+        protected long readStart, readEnd, writeStart, writeEnd;
+#endif
 
         public override string KeyName
         {
@@ -93,6 +98,10 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
 
         protected void Unserialize(DbpfReader reader)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             _ = reader.ReadUInt32();
             uint type = reader.ReadUInt32();
             uint entries = reader.ReadUInt32();
@@ -108,12 +117,20 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
 
                 items.Add(new DBPFKey(typeID, groupID, instanceID, resourceID));
             }
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
         }
 
         public override uint FileSize => (uint)(12 + (items.Count * 16));
 
         public override void Serialize(DbpfWriter writer)
         {
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
             writer.WriteUInt32(0xDEADBEEF);
             writer.WriteUInt32(0x02);
             writer.WriteUInt32((uint)items.Count);
@@ -127,6 +144,13 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
                 writer.WriteInstanceId(item.InstanceID);
                 writer.WriteResourceId(item.ResourceID);
             }
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == FileSize);
+            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+#endif
         }
 
         public override SgResourceList SgNeededResources()

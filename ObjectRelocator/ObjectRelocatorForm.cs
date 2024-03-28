@@ -13,7 +13,9 @@ using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
+using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
@@ -334,9 +336,9 @@ namespace ObjectRelocator
 
             string[] packages = Directory.GetFiles(folder, "*.package", (menuItemRecurse.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
 
-            uint total = (uint)packages.Length;
-            uint done = 0;
-            uint found = 0;
+            uint totalPackages = (uint)packages.Length;
+            uint donePackages = 0;
+            uint foundResources = 0;
 
             foreach (string packagePath in packages)
             {
@@ -350,6 +352,21 @@ namespace ObjectRelocator
 
                     using (RelocatorDbpfFile package = packageCache.GetOrOpen(packagePath))
                     {
+                        bool showHoodView = menuItemShowHoodView.Checked;
+
+                        if (package.PackageName.Equals("objects.package"))
+                        {
+                            showHoodView = false;
+                        }
+
+                        int totalResources = 0;
+                        int doneResources = 0;
+
+                        foreach (TypeTypeID type in (IsBuyMode ? buyModeResources : buildModeResources))
+                        {
+                            totalResources += package.GetEntriesByType(type).Count;
+                        }
+
                         foreach (TypeTypeID type in (IsBuyMode ? buyModeResources : buildModeResources))
                         {
                             List<DBPFEntry> resources = package.GetEntriesByType(type);
@@ -366,17 +383,25 @@ namespace ObjectRelocator
 
                                 if (IsModeResource(res))
                                 {
-                                    sender.SetData(FillRow(package, dataTableResources.NewRow(), res));
+                                    sender.SetData(FillRow(package, dataTableResources.NewRow(), res, showHoodView));
 
-                                    ++found;
+                                    ++foundResources;
+                                }
+
+                                ++doneResources;
+
+                                // For most .package files this will never trigger, it's here for the likes of objects.package
+                                if (doneResources % 100 == 0)
+                                {
+                                    sender.SetProgress((int)((doneResources / (float)totalResources) * 100.0));
                                 }
                             }
                         }
 
-                        sender.SetProgress((int)((++done / (float)total) * 100.0));
+                        sender.SetProgress((int)((++donePackages / (float)totalPackages) * 100.0));
                         package.Close();
 
-                        args.Result = found;
+                        args.Result = foundResources;
                     }
                 }
 #if !DEBUG
@@ -717,6 +742,10 @@ namespace ObjectRelocator
             UpdateFormState();
         }
 
+        private void OnModifyAllModelsClicked(object sender, EventArgs e)
+        {
+        }
+
         private void OnDisableBuildModeSortFiltersClicked(object sender, EventArgs e)
         {
             if (!menuItemDisableBuildModeSortFilters.Checked)
@@ -877,7 +906,14 @@ namespace ObjectRelocator
                 bool append = false;
                 foreach (DataGridViewRow row in gridViewResources.SelectedRows)
                 {
-                    UpdateEditor((row.Cells["colObjectData"].Value as ObjectDbpfData), append);
+                    ObjectDbpfData objectDbpfData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                    if (menuItemShowHoodView.Checked)
+                    {
+                        row.Cells["colHoodView"].Value = objectDbpfData.IsHoodView(menuItemModifyAllModels.Checked) ? "Yes" : "No";
+                    }
+
+                    UpdateEditor(objectDbpfData, append);
                     append = true;
                 }
             }
@@ -893,18 +929,18 @@ namespace ObjectRelocator
         #endregion
 
         #region Grid Row Fill
-        private DataRow FillRow(RelocatorDbpfFile package, DataRow row, DBPFResource res)
+        private DataRow FillRow(RelocatorDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
         {
             row["PackagePath"] = package.PackagePath;
             row["Path"] = BuildPathString(package.PackagePath);
 
             if (IsBuyMode)
-                return FillBuyModeRow(package, row, res);
+                return FillBuyModeRow(package, row, res, showHoodView);
             else
-                return FillBuildModeRow(package, row, res);
+                return FillBuildModeRow(package, row, res, showHoodView);
         }
 
-        private DataRow FillBuyModeRow(RelocatorDbpfFile package, DataRow row, DBPFResource res)
+        private DataRow FillBuyModeRow(RelocatorDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
         {
             ObjectDbpfData objectData = ObjectDbpfData.Create(package, res);
 
@@ -927,12 +963,12 @@ namespace ObjectRelocator
             row["Price"] = objectData.GetRawData(ObjdIndex.Price);
             row["Depreciation"] = BuildDepreciationString(objectData);
 
-            row["HoodView"] = BuildHoodViewString(objectData);
+            row["HoodView"] = BuildHoodViewString(objectData, showHoodView);
 
             return row;
         }
 
-        private DataRow FillBuildModeRow(RelocatorDbpfFile package, DataRow row, DBPFResource res)
+        private DataRow FillBuildModeRow(RelocatorDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
         {
             ObjectDbpfData objectData = ObjectDbpfData.Create(package, res);
 
@@ -960,7 +996,7 @@ namespace ObjectRelocator
                 row["Price"] = objectData.GetUIntItem("cost");
             }
 
-            row["HoodView"] = BuildHoodViewString(objectData);
+            row["HoodView"] = BuildHoodViewString(objectData, showHoodView);
 
             return row;
         }
@@ -1251,13 +1287,13 @@ namespace ObjectRelocator
             return "";
         }
 
-        private string BuildHoodViewString(ObjectDbpfData objectData)
+        private string BuildHoodViewString(ObjectDbpfData objectData, bool showHoodView)
         {
-            if (menuItemShowHoodView.Checked)
+            if (showHoodView)
             {
-                if (objectData.IsObjd && objectData.FindScenegraphResources())
+                if (objectData.IsObjd)
                 {
-                    return objectData.IsHoodView ? "Yes" : "No";
+                    return objectData.IsHoodView(menuItemModifyAllModels.Checked) ? "Yes" : "No";
                 }
 
                 return "n/a";
@@ -1302,7 +1338,7 @@ namespace ObjectRelocator
                     row.Cells["colQuarterTile"].Value = BuildQuarterTileString(selectedObject);
                     row.Cells["colPrice"].Value = selectedObject.GetRawData(ObjdIndex.Price);
                     row.Cells["colDepreciation"].Value = BuildDepreciationString(selectedObject);
-                    row.Cells["colHoodView"].Value = BuildHoodViewString(selectedObject);
+                    row.Cells["colHoodView"].Value = BuildHoodViewString(selectedObject, menuItemShowHoodView.Checked);
 
                     dataLoading = oldDataLoading;
                     return;
@@ -1336,7 +1372,7 @@ namespace ObjectRelocator
                         row.Cells["colPrice"].Value = selectedObject.GetUIntItem("cost");
                     }
 
-                    row.Cells["colHoodView"].Value = BuildHoodViewString(selectedObject);
+                    row.Cells["colHoodView"].Value = BuildHoodViewString(selectedObject, menuItemShowHoodView.Checked);
 
                     dataLoading = oldDataLoading;
                     return;
@@ -2708,27 +2744,40 @@ namespace ObjectRelocator
 
             foreach (ObjectDbpfData objectData in selectedData)
             {
-                if (objectData.FindScenegraphResources())
+                if (objectData.FindScenegraphResources(menuItemModifyAllModels.Checked))
                 {
-                    CDataListExtension gameData = objectData.Cres.GameData;
+                    foreach (Cres cres in objectData.Cress)
+                    {
+                        CDataListExtension gameData = cres.GameData;
 
-                    if (gameData != null)
+                        if (gameData != null)
+                        {
+                            if (sender == menuItemContextHoodVisible)
+                            {
+                                gameData.Extension.AddOrUpdateString("LODs", "90");
+                            }
+                            else
+                            {
+                                gameData.Extension.RemoveItem("LODs");
+                            }
+                        }
+                    }
+
+                    foreach (Shpe shpe in objectData.Shpes)
                     {
                         if (sender == menuItemContextHoodVisible)
                         {
-                            gameData.Extension.AddOrUpdateString("LODs", "90");
-                            objectData.Shpe.Shape.Lod = 90;
+                            shpe.Shape.Lod = 90;
                         }
                         else
                         {
-                            gameData.Extension.RemoveItem("LODs");
-                            objectData.Shpe.Shape.Lod = 0;
+                            shpe.Shape.Lod = 0;
                         }
-
-                        objectData.UpdatePackage();
-
-                        UpdateGridRow(objectData);
                     }
+
+                    objectData.UpdatePackage();
+
+                    UpdateGridRow(objectData);
                 }
             }
 
@@ -2794,11 +2843,6 @@ namespace ObjectRelocator
             {
                 using (RelocatorDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
                 {
-                    foreach (ObjectDbpfData editedObject in dirtyObjectsByPackage[packageFile])
-                    {
-                        editedObject.SetClean();
-                    }
-
                     try
                     {
                         if (dbpfPackage.IsDirty) dbpfPackage.Update(menuItemAutoBackup.Checked);
@@ -2806,6 +2850,11 @@ namespace ObjectRelocator
                     catch (Exception)
                     {
                         MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
+                    }
+
+                    foreach (ObjectDbpfData editedObject in dirtyObjectsByPackage[packageFile])
+                    {
+                        editedObject.SetClean();
                     }
 
                     dbpfPackage.Close();
@@ -2817,15 +2866,17 @@ namespace ObjectRelocator
         {
             using (RelocatorDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
             {
+                List<ObjectDbpfData> editedObjects = new List<ObjectDbpfData>();
+
                 foreach (DataGridViewRow row in gridViewResources.Rows)
                 {
                     ObjectDbpfData editedObject = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
                     if (editedObject.IsDirty)
                     {
-                        editedObject.CopyTo(dbpfPackage);
+                        editedObjects.Add(editedObject);
 
-                        editedObject.SetClean();
+                        editedObject.CopyTo(dbpfPackage);
                     }
                 }
 
@@ -2836,6 +2887,11 @@ namespace ObjectRelocator
                 catch (Exception)
                 {
                     MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
+                }
+
+                foreach (ObjectDbpfData editedObject in editedObjects)
+                {
+                    editedObject.SetClean();
                 }
 
                 dbpfPackage.Close();
