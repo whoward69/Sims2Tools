@@ -107,6 +107,8 @@ namespace BsokEditor
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextGrid.SuspendLayout();
@@ -254,6 +256,8 @@ namespace BsokEditor
             // menuMode
             // 
             this.menuMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAdvanced,
+            this.toolStripSeparator1,
             this.menuItemAutoBackup});
             this.menuMode.Name = "menuMode";
             this.menuMode.Size = new System.Drawing.Size(50, 20);
@@ -263,7 +267,7 @@ namespace BsokEditor
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
             this.menuItemAutoBackup.Text = "Auto-&Backup";
             // 
             // gridViewResources
@@ -800,6 +804,19 @@ namespace BsokEditor
             this.thumbBox.TabStop = false;
             this.thumbBox.Visible = false;
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAdvanced.Text = "Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
             // BsokEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -906,5 +923,7 @@ namespace BsokEditor
         private System.Windows.Forms.DataGridViewTextBoxColumn colShoe;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPackagePath;
         private System.Windows.Forms.DataGridViewTextBoxColumn colResRef;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }

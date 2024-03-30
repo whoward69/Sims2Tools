@@ -108,6 +108,12 @@ namespace BhavFinder
             this.checkShowNames = new System.Windows.Forms.CheckBox();
             this.btnGO = new System.Windows.Forms.Button();
             this.gridFoundBhavs = new System.Windows.Forms.DataGridView();
+            this.colBhavPackage = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colBhavDbpfEntry = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colBhavInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colBhavName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colBhavGroupInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colBhavGroupName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextFoundBhavs = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemExtract = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTipOperands = new System.Windows.Forms.ToolTip(this.components);
@@ -126,12 +132,7 @@ namespace BhavFinder
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.saveResultsDialog = new System.Windows.Forms.SaveFileDialog();
             this.bhavFinderWorker = new System.ComponentModel.BackgroundWorker();
-            this.colBhavPackage = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colBhavDbpfEntry = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colBhavInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colBhavName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colBhavGroupInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colBhavGroupName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.menuItemSelectFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextOperands.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridFoundBhavs)).BeginInit();
             this.menuContextFoundBhavs.SuspendLayout();
@@ -910,18 +911,82 @@ namespace BhavFinder
             this.gridFoundBhavs.TabIndex = 0;
             this.gridFoundBhavs.TabStop = false;
             // 
+            // colBhavPackage
+            // 
+            this.colBhavPackage.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colBhavPackage.DataPropertyName = "Package";
+            this.colBhavPackage.FillWeight = 5F;
+            this.colBhavPackage.HeaderText = "Package";
+            this.colBhavPackage.MaxInputLength = 10;
+            this.colBhavPackage.Name = "colBhavPackage";
+            this.colBhavPackage.ReadOnly = true;
+            this.colBhavPackage.Visible = false;
+            // 
+            // colBhavDbpfEntry
+            // 
+            this.colBhavDbpfEntry.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colBhavDbpfEntry.DataPropertyName = "DbpfEntry";
+            this.colBhavDbpfEntry.FillWeight = 5F;
+            this.colBhavDbpfEntry.HeaderText = "Dbpf Entry";
+            this.colBhavDbpfEntry.MaxInputLength = 6;
+            this.colBhavDbpfEntry.Name = "colBhavDbpfEntry";
+            this.colBhavDbpfEntry.ReadOnly = true;
+            this.colBhavDbpfEntry.Visible = false;
+            // 
+            // colBhavInstance
+            // 
+            this.colBhavInstance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colBhavInstance.DataPropertyName = "Instance";
+            this.colBhavInstance.FillWeight = 5F;
+            this.colBhavInstance.HeaderText = "Instance";
+            this.colBhavInstance.MaxInputLength = 6;
+            this.colBhavInstance.Name = "colBhavInstance";
+            this.colBhavInstance.ReadOnly = true;
+            this.colBhavInstance.Width = 78;
+            // 
+            // colBhavName
+            // 
+            this.colBhavName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colBhavName.DataPropertyName = "Name";
+            this.colBhavName.HeaderText = "Name";
+            this.colBhavName.MinimumWidth = 500;
+            this.colBhavName.Name = "colBhavName";
+            this.colBhavName.ReadOnly = true;
+            // 
+            // colBhavGroupInstance
+            // 
+            this.colBhavGroupInstance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colBhavGroupInstance.DataPropertyName = "GroupInstance";
+            this.colBhavGroupInstance.FillWeight = 10F;
+            this.colBhavGroupInstance.HeaderText = "Group";
+            this.colBhavGroupInstance.MaxInputLength = 100;
+            this.colBhavGroupInstance.Name = "colBhavGroupInstance";
+            this.colBhavGroupInstance.ReadOnly = true;
+            this.colBhavGroupInstance.Width = 66;
+            // 
+            // colBhavGroupName
+            // 
+            this.colBhavGroupName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colBhavGroupName.DataPropertyName = "GroupName";
+            this.colBhavGroupName.FillWeight = 15F;
+            this.colBhavGroupName.HeaderText = "Object / Semi-Global";
+            this.colBhavGroupName.MaxInputLength = 100;
+            this.colBhavGroupName.Name = "colBhavGroupName";
+            this.colBhavGroupName.ReadOnly = true;
+            this.colBhavGroupName.Width = 145;
+            // 
             // menuContextFoundBhavs
             // 
             this.menuContextFoundBhavs.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemExtract});
             this.menuContextFoundBhavs.Name = "menuContextOperands";
-            this.menuContextFoundBhavs.Size = new System.Drawing.Size(181, 48);
+            this.menuContextFoundBhavs.Size = new System.Drawing.Size(156, 26);
             this.menuContextFoundBhavs.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextFoundBhavsOpening);
             // 
             // menuItemExtract
             // 
             this.menuItemExtract.Name = "menuItemExtract";
-            this.menuItemExtract.Size = new System.Drawing.Size(180, 22);
+            this.menuItemExtract.Size = new System.Drawing.Size(155, 22);
             this.menuItemExtract.Text = "SimPE Extract...";
             this.menuItemExtract.Click += new System.EventHandler(this.OnExtractBhavsClicked);
             // 
@@ -951,6 +1016,7 @@ namespace BhavFinder
             this.menuFile.BackColor = System.Drawing.SystemColors.Menu;
             this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemSelectPackage,
+            this.menuItemSelectFolder,
             this.menuItemRecentPackages,
             this.menuItemSeparator3,
             this.menuItemSaveResultsToClipboard,
@@ -1057,71 +1123,12 @@ namespace BhavFinder
             this.bhavFinderWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BhavFinderWorker_Progress);
             this.bhavFinderWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BhavFinderWorker_Completed);
             // 
-            // colBhavPackage
+            // menuItemSelectFolder
             // 
-            this.colBhavPackage.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colBhavPackage.DataPropertyName = "Package";
-            this.colBhavPackage.FillWeight = 5F;
-            this.colBhavPackage.HeaderText = "Package";
-            this.colBhavPackage.MaxInputLength = 10;
-            this.colBhavPackage.Name = "colBhavPackage";
-            this.colBhavPackage.ReadOnly = true;
-            this.colBhavPackage.Visible = false;
-            this.colBhavPackage.Width = 61;
-            // 
-            // colBhavDbpfEntry
-            // 
-            this.colBhavDbpfEntry.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colBhavDbpfEntry.DataPropertyName = "DbpfEntry";
-            this.colBhavDbpfEntry.FillWeight = 5F;
-            this.colBhavDbpfEntry.HeaderText = "Dbpf Entry";
-            this.colBhavDbpfEntry.MaxInputLength = 6;
-            this.colBhavDbpfEntry.Name = "colBhavDbpfEntry";
-            this.colBhavDbpfEntry.ReadOnly = true;
-            this.colBhavDbpfEntry.Visible = false;
-            this.colBhavDbpfEntry.Width = 69;
-            // 
-            // colBhavInstance
-            // 
-            this.colBhavInstance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colBhavInstance.DataPropertyName = "Instance";
-            this.colBhavInstance.FillWeight = 5F;
-            this.colBhavInstance.HeaderText = "Instance";
-            this.colBhavInstance.MaxInputLength = 6;
-            this.colBhavInstance.Name = "colBhavInstance";
-            this.colBhavInstance.ReadOnly = true;
-            this.colBhavInstance.Width = 78;
-            // 
-            // colBhavName
-            // 
-            this.colBhavName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colBhavName.DataPropertyName = "Name";
-            this.colBhavName.HeaderText = "Name";
-            this.colBhavName.MinimumWidth = 500;
-            this.colBhavName.Name = "colBhavName";
-            this.colBhavName.ReadOnly = true;
-            // 
-            // colBhavGroupInstance
-            // 
-            this.colBhavGroupInstance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colBhavGroupInstance.DataPropertyName = "GroupInstance";
-            this.colBhavGroupInstance.FillWeight = 10F;
-            this.colBhavGroupInstance.HeaderText = "Group";
-            this.colBhavGroupInstance.MaxInputLength = 100;
-            this.colBhavGroupInstance.Name = "colBhavGroupInstance";
-            this.colBhavGroupInstance.ReadOnly = true;
-            this.colBhavGroupInstance.Width = 66;
-            // 
-            // colBhavGroupName
-            // 
-            this.colBhavGroupName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            this.colBhavGroupName.DataPropertyName = "GroupName";
-            this.colBhavGroupName.FillWeight = 15F;
-            this.colBhavGroupName.HeaderText = "Object / Semi-Global";
-            this.colBhavGroupName.MaxInputLength = 100;
-            this.colBhavGroupName.Name = "colBhavGroupName";
-            this.colBhavGroupName.ReadOnly = true;
-            this.colBhavGroupName.Width = 145;
+            this.menuItemSelectFolder.Name = "menuItemSelectFolder";
+            this.menuItemSelectFolder.Size = new System.Drawing.Size(248, 22);
+            this.menuItemSelectFolder.Text = "Select Package Folder...";
+            this.menuItemSelectFolder.Click += new System.EventHandler(this.OnSelectFolderClicked);
             // 
             // BhavFinderForm
             // 
@@ -1301,6 +1308,7 @@ namespace BhavFinder
         private System.Windows.Forms.DataGridViewTextBoxColumn colBhavName;
         private System.Windows.Forms.DataGridViewTextBoxColumn colBhavGroupInstance;
         private System.Windows.Forms.DataGridViewTextBoxColumn colBhavGroupName;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSelectFolder;
     }
 }
 

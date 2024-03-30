@@ -237,6 +237,7 @@ namespace BsokEditor
             menuItemShowCategoryShoe.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowCategoryShoe.Name, 0) != 0); OnShowCategoryAndShoeClicked(menuItemShowCategoryShoe, null);
             menuItemShowGenderAge.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowGenderAge.Name, 0) != 0); OnShowGenderAndAgeClicked(menuItemShowGenderAge, null);
 
+            menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
 
             UpdateFormState();
@@ -266,6 +267,7 @@ namespace BsokEditor
             RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowCategoryShoe.Name, menuItemShowCategoryShoe.Checked ? 1 : 0);
             RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowGenderAge.Name, menuItemShowGenderAge.Checked ? 1 : 0);
 
+            RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
             RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
         }
 
@@ -657,6 +659,9 @@ namespace BsokEditor
         #endregion
 
         #region Mode Menu Actions
+        private void OnAdvancedModeChanged(object sender, EventArgs e)
+        {
+        }
         #endregion
 
         #region Tooltips and Thumbnails

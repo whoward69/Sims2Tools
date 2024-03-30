@@ -332,9 +332,23 @@ namespace BhavFinder
 
         private void OnSelectClicked(object sender, EventArgs e)
         {
-            if (selectFileDialog.ShowDialog() == DialogResult.OK)
+            if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift)
             {
-                textFilePath.Text = selectFileDialog.FileName;
+                OnSelectFolderClicked(sender, e);
+            }
+            else
+            {
+                if (selectFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    textFilePath.Text = selectFileDialog.FileName;
+                }
+            }
+        }
+        private void OnSelectFolderClicked(object sender, EventArgs e)
+        {
+            if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                textFilePath.Text = selectPathDialog.FileName;
             }
         }
 
