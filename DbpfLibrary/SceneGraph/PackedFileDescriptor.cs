@@ -65,9 +65,6 @@ namespace Sims2Tools.DBPF.SceneGraph
         }
     }
 
-    /// <summary>
-    /// Structure of a FileIndex Item
-    /// </summary>
     public class PackedFileDescriptor : PackedFileDescriptorSimple, IPackedFileDescriptor, System.IDisposable
     {
         protected uint offset;

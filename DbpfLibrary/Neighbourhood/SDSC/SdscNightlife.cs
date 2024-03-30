@@ -60,9 +60,6 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         }
 
         ushort traits3;
-        /// <remarks>
-        /// This is only valid if the SDSC Version is at least SDescVersions.Voyage
-        /// </remarks>
         public ushort AttractionTraits3
         {
             get { return traits3; }
@@ -98,9 +95,6 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         }
 
         ushort turnon3;
-        /// <remarks>
-        /// This is only valid if the SDSC Version is at least SDescVersions.Voyage
-        /// </remarks>
         public ushort AttractionTurnOns3
         {
             get { return turnon3; }
@@ -108,9 +102,6 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         }
 
         ushort turnoff3;
-        /// <remarks>
-        /// This is only valid if the SDSC Version is at least SDescVersions.Voyage
-        /// </remarks>
         public ushort AttractionTurnOffs3
         {
             get { return turnoff3; }

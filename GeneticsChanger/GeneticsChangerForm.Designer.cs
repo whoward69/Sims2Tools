@@ -41,7 +41,6 @@ namespace GeneticsChanger
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GeneticsChangerForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -83,7 +82,7 @@ namespace GeneticsChanger
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackageIcon = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextPackages = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextPackages = new System.Windows.Forms.ContextMenuStrip();
             this.menuContextPkgRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgMove = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgMerge = new System.Windows.Forms.ToolStripMenuItem();
@@ -133,21 +132,23 @@ namespace GeneticsChanger
             this.colTownie = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTooltip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colGeneticData = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextResources = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextResources = new System.Windows.Forms.ContextMenuStrip();
             this.menuContextResRestore = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuContextResSaveThumb = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextResReplaceThumb = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextResDeleteThumb = new System.Windows.Forms.ToolStripMenuItem();
             this.grpHairtone = new System.Windows.Forms.GroupBox();
             this.comboHairtone = new System.Windows.Forms.ComboBox();
-            this.menuContextFolders = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextFolders = new System.Windows.Forms.ContextMenuStrip();
             this.menuContextDirRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDirAdd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDirMove = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDirDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
-            this.menuContextResDeleteThumb = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -290,7 +291,7 @@ namespace GeneticsChanger
             this.menuItemGeneticSkins.CheckOnClick = true;
             this.menuItemGeneticSkins.Name = "menuItemGeneticSkins";
             this.menuItemGeneticSkins.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.menuItemGeneticSkins.Size = new System.Drawing.Size(180, 22);
+            this.menuItemGeneticSkins.Size = new System.Drawing.Size(120, 22);
             this.menuItemGeneticSkins.Text = "&Skins";
             this.menuItemGeneticSkins.Click += new System.EventHandler(this.OnGeneticsSelectedChanged);
             // 
@@ -300,7 +301,7 @@ namespace GeneticsChanger
             this.menuItemGeneticHair.Enabled = false;
             this.menuItemGeneticHair.Name = "menuItemGeneticHair";
             this.menuItemGeneticHair.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.menuItemGeneticHair.Size = new System.Drawing.Size(180, 22);
+            this.menuItemGeneticHair.Size = new System.Drawing.Size(120, 22);
             this.menuItemGeneticHair.Text = "&Hair";
             this.menuItemGeneticHair.Click += new System.EventHandler(this.OnGeneticsSelectedChanged);
             // 
@@ -309,7 +310,7 @@ namespace GeneticsChanger
             this.menuItemGeneticEyes.CheckOnClick = true;
             this.menuItemGeneticEyes.Name = "menuItemGeneticEyes";
             this.menuItemGeneticEyes.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this.menuItemGeneticEyes.Size = new System.Drawing.Size(180, 22);
+            this.menuItemGeneticEyes.Size = new System.Drawing.Size(120, 22);
             this.menuItemGeneticEyes.Text = "&Eyes";
             this.menuItemGeneticEyes.Click += new System.EventHandler(this.OnGeneticsSelectedChanged);
             // 
@@ -422,6 +423,8 @@ namespace GeneticsChanger
             // menuItemMode
             // 
             this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAdvanced,
+            this.toolStripSeparator3,
             this.menuItemAutoBackup});
             this.menuItemMode.Name = "menuItemMode";
             this.menuItemMode.Size = new System.Drawing.Size(50, 20);
@@ -431,7 +434,7 @@ namespace GeneticsChanger
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
             this.menuItemAutoBackup.Text = "Auto-Backup";
             // 
             // saveFileDialog
@@ -1116,6 +1119,13 @@ namespace GeneticsChanger
             this.menuContextResReplaceThumb.Text = "Replace Thumbnail...";
             this.menuContextResReplaceThumb.Click += new System.EventHandler(this.OnResReplaceThumbClicked);
             // 
+            // menuContextResDeleteThumb
+            // 
+            this.menuContextResDeleteThumb.Name = "menuContextResDeleteThumb";
+            this.menuContextResDeleteThumb.Size = new System.Drawing.Size(194, 22);
+            this.menuContextResDeleteThumb.Text = "Delete Thumbnail";
+            this.menuContextResDeleteThumb.Click += new System.EventHandler(this.OnResDeleteThumbClicked);
+            // 
             // grpHairtone
             // 
             this.grpHairtone.Controls.Add(this.comboHairtone);
@@ -1188,12 +1198,18 @@ namespace GeneticsChanger
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
             // 
-            // menuContextResDeleteThumb
+            // toolStripSeparator3
             // 
-            this.menuContextResDeleteThumb.Name = "menuContextResDeleteThumb";
-            this.menuContextResDeleteThumb.Size = new System.Drawing.Size(194, 22);
-            this.menuContextResDeleteThumb.Text = "Delete Thumbnail";
-            this.menuContextResDeleteThumb.Click += new System.EventHandler(this.OnResDeleteThumbClicked);
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAdvanced.Text = "Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // GeneticsChangerForm
             // 
@@ -1355,6 +1371,8 @@ namespace GeneticsChanger
         private System.Windows.Forms.DataGridViewTextBoxColumn colTooltip;
         private System.Windows.Forms.DataGridViewTextBoxColumn colGeneticData;
         private System.Windows.Forms.ToolStripMenuItem menuContextResDeleteThumb;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
     }
 }
 

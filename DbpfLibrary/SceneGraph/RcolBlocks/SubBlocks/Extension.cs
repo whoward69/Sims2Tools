@@ -37,6 +37,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         protected long readStart, readEnd, writeStart, writeEnd;
 #endif
 
+        private bool _isDirty = false;
+
         private ItemTypes typecode;
         private string varname;
         private int val;
@@ -60,7 +62,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         public string String
         {
             get => str;
-            internal set => str = value; // TODO - _library - this should mark this ExtensionItem as dirty, and not rely on the calling code marking the parent as dirty
+
+            internal set
+            {
+                str = value;
+
+                _isDirty = true;
+            }
         }
 
         public ExtensionItem[] Items => ei;
@@ -68,6 +76,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         public Quaternion Rotation => rotation;
 
         public byte[] Data => data;
+
+        public bool IsDirty => _isDirty;
+
+        public void SetClean()
+        {
+            _isDirty = false;
+        }
 
         public ExtensionItem()
         {
@@ -282,7 +297,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             writeEnd = writer.Position;
 
             Debug.Assert((writeEnd - writeStart) == FileSize);
-            if (!true) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
 #endif
         }
     }
@@ -294,7 +309,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         private byte typecode;
         private string varname;
-        private List<ExtensionItem> items;
+        private List<ExtensionItem> items = new List<ExtensionItem>();
 
         public byte TypeCode => typecode;
 
@@ -315,12 +330,36 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public int Count => items.Count;
 
+        public override bool IsDirty
+        {
+            get
+            {
+                if (base.IsDirty) return true;
+
+                foreach (ExtensionItem item in items)
+                {
+                    if (item.IsDirty) return true;
+                }
+
+                return false;
+            }
+        }
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            foreach (ExtensionItem item in items)
+            {
+                item.SetClean();
+            }
+        }
+
         public Extension() : base(null) // Yes, really! Do NOT use base()
         {
             Version = 0x03;
             BlockName = NAME;
 
-            items = new List<ExtensionItem>();
             typecode = 0x07;
             varname = "";
         }
@@ -356,8 +395,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                 {
                     item.String = value;
 
-                    _isDirty = true;
-
                     return item;
                 }
             }
@@ -377,6 +414,16 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             }
 
             return AddItem(new ExtensionItem(name, ExtensionItem.ItemTypes.Array));
+        }
+
+        public void RemoveAllItems()
+        {
+            if (items.Count > 0)
+            {
+                items.Clear();
+
+                _isDirty = true;
+            }
         }
 
         public void RemoveItem(string name)

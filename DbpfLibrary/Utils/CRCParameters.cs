@@ -17,10 +17,10 @@ namespace Classless.Hasher
     public class CRCParameters : HashAlgorithmParameters
     {
         private int order;
-        private long polynomial;
-        private long initial;
-        private long finalXOR;
-        private bool reflectIn;
+        private readonly long polynomial;
+        private readonly long initial;
+        private readonly long finalXOR;
+        private readonly bool reflectIn;
 
         public int Order
         {
@@ -41,34 +41,34 @@ namespace Classless.Hasher
         public long Polynomial
         {
             get => polynomial;
-            set => polynomial = value;
+            // set => polynomial = value;
         }
 
         public long InitialValue
         {
             get => initial;
-            set => initial = value;
+            // set => initial = value;
         }
 
         public long FinalXORValue
         {
             get => finalXOR;
-            set => finalXOR = value;
+            // set => finalXOR = value;
         }
 
         public bool ReflectInput
         {
             get => reflectIn;
-            set => reflectIn = value;
+            // set => reflectIn = value;
         }
 
         public CRCParameters(int order, long polynomial, long initial, long finalXOR, bool reflectIn)
         {
-            this.Order = order;
-            this.Polynomial = polynomial;
-            this.InitialValue = initial;
-            this.FinalXORValue = finalXOR;
-            this.ReflectInput = reflectIn;
+            this.order = order;
+            this.polynomial = polynomial;
+            this.initial = initial;
+            this.finalXOR = finalXOR;
+            this.reflectIn = reflectIn;
         }
 
         public override int GetHashCode()

@@ -21,56 +21,32 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
 
         List<int> items1;
-        /// <summary>
-        /// This returns the List of all used <see cref="GmdcElement"/> Items. The Values are Indices
-        /// for the <see cref="CGeometryDataContainer.Elements"/> Property.
-        /// </summary>
         public List<int> ReferencedElement
         {
             get { return items1; }
-            set { items1 = value; }
+            // set { items1 = value; }
         }
 
         int unknown1;
-        /// <summary>
-        /// The Number of Elements that are Referenced by this Link
-        /// </summary>
         public int ReferencedSize
         {
             get { return unknown1; }
-            set { unknown1 = value; }
+            // set { unknown1 = value; }
         }
 
         int unknown2;
-        /// <summary>
-        /// How many <see cref="GmdcElement"/> Items are referenced by this Link
-        /// </summary>
         public int ActiveElements
         {
             get { return unknown2; }
-            set { unknown2 = value; }
+            // set { unknown2 = value; }
         }
 
         readonly List<int>[] refs;
-        /// <summary>
-        /// This Array Contains three <see cref="IntArrayList"/> Items. Each Item has to be interporeted as 
-        /// Element Index Alias.
-        /// The <see cref="GmdcGroup"/> is referencing the Vertices that form a Face by an Index. If one of 
-        /// this Lists is set, it means, that whenever you pares an Index, read the value stored at that Index 
-        /// in one of this Lists. The Value read from there is then thge actual <see cref="GmdcElement"/> Index.
-        /// 
-        /// The first List store here is an Alias Map for the first referenced <see cref="GmdcElement"/> in the
-        /// <see cref="ReferencedElement"/> Property.
-        /// </summary>
         public List<int>[] AliasValues
         {
             get { return refs; }
         }
 
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public GmdcLink(CGeometryDataContainer parent) : base(parent)
         {
             items1 = new List<int>();

@@ -31,9 +31,6 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
         }
     }
 
-    /// <summary>
-    /// Contains an Item in a NghbSlot
-    /// </summary>
     public class NgbhItem
     {
         readonly Ngbh parent;

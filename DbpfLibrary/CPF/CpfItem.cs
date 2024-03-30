@@ -66,14 +66,14 @@ namespace Sims2Tools.DBPF.CPF
         internal byte[] Value
         {
             get => val;
-            set { val = value; }
+            // set { val = value; }
         }
 
         public CpfItem Clone()
         {
             CpfItem clone = new CpfItem(name, datatype)
             {
-                Value = (byte[])val.Clone()
+                val = (byte[])val.Clone()
             };
 
             return clone;

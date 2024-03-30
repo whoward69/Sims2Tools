@@ -151,6 +151,7 @@ namespace GeneticsChanger
             menuItemShowResTitle.Checked = ((int)RegistryTools.GetSetting(GeneticsChangerApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, 1) != 0); OnShowResTitleClicked(menuItemShowResFilename, null);
             menuItemShowResFilename.Checked = ((int)RegistryTools.GetSetting(GeneticsChangerApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, 1) != 0); OnShowResFilenameClicked(menuItemShowResFilename, null);
 
+            menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(GeneticsChangerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(GeneticsChangerApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
 
             SetTitle(null);
@@ -207,6 +208,7 @@ namespace GeneticsChanger
             RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
             RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
 
+            RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
             RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
         }
 
@@ -1086,6 +1088,12 @@ namespace GeneticsChanger
         private void OnShowResFilenameClicked(object sender, EventArgs e)
         {
             gridResources.Columns["colFilename"].Visible = menuItemShowResFilename.Checked;
+        }
+        #endregion
+
+        #region Mode Menu Actions
+        private void OnAdvancedModeChanged(object sender, EventArgs e)
+        {
         }
         #endregion
 

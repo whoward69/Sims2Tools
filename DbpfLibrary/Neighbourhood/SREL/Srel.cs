@@ -73,45 +73,28 @@ namespace Sims2Tools.DBPF.Neighbourhood.SREL
 
         private int[] values = new int[4];
 
-        /// <summary>
-        /// Returns the Shortterm Relationship
-        /// </summary>
         public int Shortterm
         {
             get { return GetValue(0); }
         }
 
         readonly RelationshipFlags flags = new RelationshipFlags(1 << (byte)RelationshipStateBits.Known);
-        /// <summary>
-        /// Returns the Relationship Values.
-        /// </summary>
-        /// <remarks>The Meaning of the Bits is stored in MataData.RelationshipStateBits</remarks>
         public RelationshipFlags RelationState
         {
             get { return flags; }
         }
 
-        /// <summary>
-        /// Returns the Shortterm Relationship
-        /// </summary>
         public int Longterm
         {
             get { return GetValue(2); }
         }
 
-        /// <summary>
-        /// The Type of Family Relationship the Sim has to another
-        /// </summary>
         public RelationshipTypes FamilyRelation
         {
             get { return (RelationshipTypes)GetValue(3); }
         }
 
         readonly UIFlags2 flags2 = new UIFlags2(0);
-        /// <summary>
-        /// Returns the second set of relationship state flags
-        /// </summary>
-        /// <remarks>The Meaning of the Bits is given by MetaData.UIFlags2Names</remarks>
         public UIFlags2 RelationState2
         {
             get { return flags2; }

@@ -28,9 +28,6 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMT
 
         ArrayList sims;
 
-        /// <summary>
-        /// Returns/Sets all stored Sims
-        /// </summary>
         public FamilyTieSim[] Sims
         {
             get

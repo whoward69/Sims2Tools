@@ -30,7 +30,7 @@ namespace Sims2Tools.DBPF.TTAB
 
         private readonly TtabItemMotiveTableType type;
         private readonly int[] counts;
-        private TtabItemMotiveTable.TtabItemMotiveGroupArrayList items;
+        private TtabItemMotiveGroupArrayList items;
 
         public TtabItemMotiveTableType Type
         {
@@ -49,7 +49,7 @@ namespace Sims2Tools.DBPF.TTAB
             this.counts = counts;
             this.type = type;
             int length = counts == null ? (type == TtabItemMotiveTableType.Human ? 5 : 8) : counts.Length;
-            this.items = new TtabItemMotiveTable.TtabItemMotiveGroupArrayList(new TtabItemMotiveGroup[length]);
+            this.items = new TtabItemMotiveGroupArrayList(new TtabItemMotiveGroup[length]);
             for (int index = 0; index < length; ++index)
                 this.items[index] = new TtabItemMotiveGroup(format, counts != null ? counts[index] : -1, type, null);
 
@@ -60,7 +60,7 @@ namespace Sims2Tools.DBPF.TTAB
         {
             int length = this.counts == null ? reader.ReadInt32() : this.counts.Length;
             if (this.items.Capacity < length)
-                this.items = new TtabItemMotiveTable.TtabItemMotiveGroupArrayList(new TtabItemMotiveGroup[length]);
+                this.items = new TtabItemMotiveGroupArrayList(new TtabItemMotiveGroup[length]);
             for (int index = 0; index < length; ++index)
                 this.items[index] = new TtabItemMotiveGroup(format, this.counts != null ? this.counts[index] : 0, this.type, reader);
         }
@@ -90,18 +90,18 @@ namespace Sims2Tools.DBPF.TTAB
 
         public IEnumerator GetEnumerator() => this.items.GetEnumerator();
 
+    }
 
-        private class TtabItemMotiveGroupArrayList : ArrayList
+    internal class TtabItemMotiveGroupArrayList : ArrayList
+    {
+        public TtabItemMotiveGroupArrayList(TtabItemMotiveGroup[] c) : base(c)
         {
-            public TtabItemMotiveGroupArrayList(TtabItemMotiveGroup[] c) : base(c)
-            {
-            }
+        }
 
-            public new TtabItemMotiveGroup this[int index]
-            {
-                get => (TtabItemMotiveGroup)base[index];
-                set => base[index] = value;
-            }
+        public new TtabItemMotiveGroup this[int index]
+        {
+            get => (TtabItemMotiveGroup)base[index];
+            internal set => base[index] = value;
         }
     }
 
@@ -111,7 +111,7 @@ namespace Sims2Tools.DBPF.TTAB
 
         private readonly int count;
         private readonly TtabItemMotiveTableType type;
-        private readonly TtabItemMotiveGroup.TtabItemMotiveItemArrayList items;
+        private readonly TtabItemMotiveItemArrayList items;
 
         public TtabItemMotiveItem this[int index]
         {
@@ -125,7 +125,7 @@ namespace Sims2Tools.DBPF.TTAB
             this.count = count;
             this.type = type;
             int num = count != -1 ? count : 16;
-            this.items = new TtabItemMotiveGroup.TtabItemMotiveItemArrayList(new TtabItemMotiveItem[num < 16 ? 16 : num]);
+            this.items = new TtabItemMotiveItemArrayList(new TtabItemMotiveItem[num < 16 ? 16 : num]);
             if (type == TtabItemMotiveTableType.Human)
             {
                 for (int index = 0; index < num; ++index)
@@ -184,19 +184,18 @@ namespace Sims2Tools.DBPF.TTAB
 
 
         public IEnumerator GetEnumerator() => this.items.GetEnumerator();
+    }
 
-
-        private class TtabItemMotiveItemArrayList : ArrayList
+    internal class TtabItemMotiveItemArrayList : ArrayList
+    {
+        public TtabItemMotiveItemArrayList(TtabItemMotiveItem[] c) : base(c)
         {
-            public TtabItemMotiveItemArrayList(TtabItemMotiveItem[] c) : base(c)
-            {
-            }
+        }
 
-            public new TtabItemMotiveItem this[int index]
-            {
-                get => (TtabItemMotiveItem)base[index];
-                set => base[index] = value;
-            }
+        public new TtabItemMotiveItem this[int index]
+        {
+            get => (TtabItemMotiveItem)base[index];
+            internal set => base[index] = value;
         }
     }
 
@@ -260,7 +259,7 @@ namespace Sims2Tools.DBPF.TTAB
 
     public class TtabItemAnimalMotiveItem : TtabItemMotiveItem, ICollection, IEnumerable
     {
-        private TtabItemAnimalMotiveItem.TtabItemSingleMotiveItemArrayList items;
+        private TtabItemSingleMotiveItemArrayList items;
 
         public TtabItemSingleMotiveItem this[int index]
         {
@@ -274,7 +273,7 @@ namespace Sims2Tools.DBPF.TTAB
         protected override void Unserialize(DbpfReader reader)
         {
             int length = reader.ReadInt32();
-            this.items = new TtabItemAnimalMotiveItem.TtabItemSingleMotiveItemArrayList(new TtabItemSingleMotiveItem[length]);
+            this.items = new TtabItemSingleMotiveItemArrayList(new TtabItemSingleMotiveItem[length]);
             for (int index = 0; index < length; ++index)
                 this.items[index] = new TtabItemSingleMotiveItem(reader);
         }
@@ -303,19 +302,18 @@ namespace Sims2Tools.DBPF.TTAB
         public void CopyTo(Array a, int i) => this.items.CopyTo(a, i);
 
         public IEnumerator GetEnumerator() => this.items.GetEnumerator();
+    }
 
-
-        private class TtabItemSingleMotiveItemArrayList : ArrayList
+    internal class TtabItemSingleMotiveItemArrayList : ArrayList
+    {
+        public TtabItemSingleMotiveItemArrayList(TtabItemSingleMotiveItem[] c) : base(c)
         {
-            public TtabItemSingleMotiveItemArrayList(TtabItemSingleMotiveItem[] c) : base(c)
-            {
-            }
+        }
 
-            public new TtabItemSingleMotiveItem this[int index]
-            {
-                get => (TtabItemSingleMotiveItem)base[index];
-                set => this[index] = value;
-            }
+        public new TtabItemSingleMotiveItem this[int index]
+        {
+            get => (TtabItemSingleMotiveItem)base[index];
+            internal set => this[index] = value;
         }
     }
 }

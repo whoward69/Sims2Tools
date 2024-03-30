@@ -24,7 +24,10 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         {
             if (p == QuaternionParameterType.ImaginaryReal)
             {
-                X = x; Y = y; Z = z; W = w;
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.w = w;
             }
         }
 

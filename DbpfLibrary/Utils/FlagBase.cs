@@ -36,7 +36,7 @@ namespace Sims2Tools.DBPF.Utils
         public ushort Value
         {
             get { return flags; }
-            set { flags = value; }
+            internal set { flags = value; }
         }
 
         protected bool GetBit(byte nr)

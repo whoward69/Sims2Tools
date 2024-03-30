@@ -19,12 +19,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class GmdcElementValueBase
     {
-        float[] data;
+        protected float[] data;
 
         public float[] Data
         {
             get { return data; }
-            set { data = value; }
+            // set { data = value; }
         }
 
         internal virtual byte Size
@@ -105,20 +105,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
 
         internal GmdcElementValueOneFloat() : base() { }
-        /// <summary>
-        /// Create an Instance of this class
-        /// </summary>
-        /// <param name="f1">The Float Value</param>
         public GmdcElementValueOneFloat(float f1)
         {
-            Data = new float[Size];
+            this.data = new float[Size];
             Data[0] = f1;
         }
 
-        /// <summary>
-        /// Create a Clone of this Object
-        /// </summary>
-        /// <returns>The Clone</returns>
         public override GmdcElementValueBase Clone()
         {
             GmdcElementValueBase dest = new GmdcElementValueOneFloat();
@@ -136,22 +128,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
 
         internal GmdcElementValueTwoFloat() : base() { }
-        /// <summary>
-        /// Create an Instance of this class
-        /// </summary>
-        /// <param name="f1">The first Value</param>
-        /// <param name="f2">The second Value</param>
         public GmdcElementValueTwoFloat(float f1, float f2)
         {
-            Data = new float[Size];
+            this.data = new float[Size];
             Data[0] = f1;
             Data[1] = f2;
         }
 
-        /// <summary>
-        /// Create a Clone of this Object
-        /// </summary>
-        /// <returns>The Clone</returns>
         public override GmdcElementValueBase Clone()
         {
             GmdcElementValueBase dest = new GmdcElementValueTwoFloat();
@@ -168,24 +151,14 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
 
         internal GmdcElementValueThreeFloat() : base() { }
-        /// <summary>
-        /// Create an Instance of this class
-        /// </summary>
-        /// <param name="f1">The first Value</param>
-        /// <param name="f2">The second Value</param>
-        /// <param name="f3">The third Value</param>
         public GmdcElementValueThreeFloat(float f1, float f2, float f3)
         {
-            Data = new float[Size];
+            this.data = new float[Size];
             Data[0] = f1;
             Data[1] = f2;
             Data[2] = f3;
         }
 
-        /// <summary>
-        /// Create a Clone of this Object
-        /// </summary>
-        /// <returns>The Clone</returns>
         public override GmdcElementValueBase Clone()
         {
             GmdcElementValueBase dest = new GmdcElementValueThreeFloat();
@@ -205,22 +178,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         internal GmdcElementValueOneInt() : base() { }
 
-        public GmdcElementValueOneInt(int i1)
-        {
-            Data = new float[Size];
-            Value = i1;
-        }
-
         public int Value
         {
             get
             {
                 return val;
-            }
-            set
-            {
-                Data[0] = value;
-                val = value;
             }
         }
 
@@ -230,17 +192,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             {
                 return BitConverter.GetBytes(Value);
             }
-            set
-            {
-                Value = BitConverter.ToInt32(value, 0);
-            }
-        }
-
-        public void SetByte(int index, byte val)
-        {
-            byte[] r = Bytes;
-            r[index] = val;
-            Bytes = r;
         }
 
         public override string ToString()
@@ -422,75 +373,43 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
     public class GmdcElementValues : ArrayList
     {
-        /// <summary>
-        /// Integer Indexer
-        /// </summary>
         public new GmdcElementValueBase this[int index]
         {
             get { return ((GmdcElementValueBase)base[index]); }
-            set { base[index] = value; }
+            // set { base[index] = value; }
         }
 
-        /// <summary>
-        /// unsigned Integer Indexer
-        /// </summary>
         public GmdcElementValueBase this[uint index]
         {
             get { return ((GmdcElementValueBase)base[(int)index]); }
-            set { base[(int)index] = value; }
+            // set { base[(int)index] = value; }
         }
 
-        /// <summary>
-        /// add a new Element
-        /// </summary>
-        /// <param name="item">The object you want to add</param>
-        /// <returns>The index it was added on</returns>
         public int Add(GmdcElementValueBase item)
         {
             return base.Add(item);
         }
 
-        /// <summary>
-        /// insert a new Element
-        /// </summary>
-        /// <param name="index">The Index where the Element should be stored</param>
-        /// <param name="item">The object that should be inserted</param>
         public void Insert(int index, GmdcElementValueBase item)
         {
             base.Insert(index, item);
         }
 
-        /// <summary>
-        /// remove an Element
-        /// </summary>
-        /// <param name="item">The object that should be removed</param>
         public void Remove(GmdcElementValueBase item)
         {
             base.Remove(item);
         }
 
-        /// <summary>
-        /// Checks wether or not the object is already stored in the List
-        /// </summary>
-        /// <param name="item">The Object you are looking for</param>
-        /// <returns>true, if it was found</returns>
         public bool Contains(GmdcElementValueBase item)
         {
             return base.Contains(item);
         }
 
-        /// <summary>
-        /// Number of stored Elements
-        /// </summary>
         public int Length
         {
             get { return this.Count; }
         }
 
-        /// <summary>
-        /// Create a clone of this Object
-        /// </summary>
-        /// <returns>The clone</returns>
         public override object Clone()
         {
             GmdcElementValues list = new GmdcElementValues();

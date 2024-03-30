@@ -194,6 +194,7 @@ namespace ObjectRelocator
 
             menuItemRecurse.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, 1) != 0);
 
+            menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
 
             menuItemMakeReplacements.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemMakeReplacements.Name, 0) != 0); OnMakeReplcementsClicked(menuItemMakeReplacements, null);
@@ -241,6 +242,7 @@ namespace ObjectRelocator
 
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, menuItemRecurse.Checked ? 1 : 0);
 
+            RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemMakeReplacements.Name, menuItemMakeReplacements.Checked ? 1 : 0);
@@ -803,6 +805,34 @@ namespace ObjectRelocator
         private void OnMakeReplcementsClicked(object sender, EventArgs e)
         {
             btnSave.Text = (menuItemMakeReplacements.Checked) ? "&Save As..." : "&Save";
+        }
+
+        private void OnAdvancedModeChanged(object sender, EventArgs e)
+        {
+            // Option menu entries
+            menuItemShowHoodView.Visible = menuItemAdvanced.Checked;
+            menuItemSeparatorModels.Visible = menuItemAdvanced.Checked;
+            menuItemModifyAllModels.Visible = menuItemAdvanced.Checked;
+            menuItemSeparatorFilters.Visible = menuItemAdvanced.Checked;
+            menuItemDisableBuildModeSortFilters.Visible = menuItemAdvanced.Checked;
+
+            // Right-click context menu entries
+            menuItemContextStripCTSSCrap.Visible = menuItemAdvanced.Checked;
+            toolStripSeparatorHood.Visible = menuItemAdvanced.Checked;
+            menuItemContextHoodVisible.Visible = menuItemAdvanced.Checked;
+            menuItemContextHoodInvisible.Visible = menuItemAdvanced.Checked;
+            toolStripSeparatorCamera.Visible = menuItemAdvanced.Checked;
+            menuItemContextRemoveThumbCamera.Visible = menuItemAdvanced.Checked;
+
+            // Resource grid columns
+            if (menuItemAdvanced.Checked)
+            {
+                gridViewResources.Columns["colHoodView"].Visible = menuItemShowHoodView.Checked;
+            }
+            else
+            {
+                gridViewResources.Columns["colHoodView"].Visible = false;
+            }
         }
         #endregion
 
@@ -2501,6 +2531,7 @@ namespace ObjectRelocator
                     menuItemContextStripCTSSCrap.Enabled = (gridViewResources.SelectedRows.Count > 0);
                     menuItemContextHoodVisible.Enabled = (gridViewResources.SelectedRows.Count > 0);
                     menuItemContextHoodInvisible.Enabled = (gridViewResources.SelectedRows.Count > 0);
+                    menuItemContextRemoveThumbCamera.Enabled = (gridViewResources.SelectedRows.Count > 0);
 
                     return;
                 }
@@ -2736,7 +2767,7 @@ namespace ObjectRelocator
             {
                 ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
-                if (objectData.IsObjd || objectData.IsXfnc)
+                if (objectData.IsObjd)
                 {
                     selectedData.Add(objectData);
                 }
@@ -2775,6 +2806,40 @@ namespace ObjectRelocator
                         }
                     }
 
+                    objectData.UpdatePackage();
+
+                    UpdateGridRow(objectData);
+                }
+            }
+
+            ReselectRows(selectedData);
+        }
+
+        private void OnMakeRemoveThumbCameraClicked(object sender, EventArgs e)
+        {
+            List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            {
+                ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                if (objectData.IsObjd)
+                {
+                    selectedData.Add(objectData);
+                }
+            }
+
+            foreach (ObjectDbpfData objectData in selectedData)
+            {
+                if (objectData.FindScenegraphResources(menuItemModifyAllModels.Checked))
+                {
+                    foreach (Cres cres in objectData.Cress)
+                    {
+                        if (cres.HasDataListExtension("thumbnailExtension"))
+                        {
+                            cres.ThumbnailExtension.Extension.RemoveAllItems();
+                        }
+                    }
                     objectData.UpdatePackage();
 
                     UpdateGridRow(objectData);

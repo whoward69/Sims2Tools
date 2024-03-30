@@ -261,6 +261,7 @@ namespace OutfitOrganiser
 
             menuItemPreloadMeshes.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, 0) != 0);
 
+            menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
 
             SetTitle(null);
@@ -331,6 +332,7 @@ namespace OutfitOrganiser
 
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
 
+            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
         }
 
@@ -1301,6 +1303,12 @@ namespace OutfitOrganiser
             {
                 CacheMeshes();
             }
+        }
+        #endregion
+
+        #region Mode Menu Actions
+        private void OnAdvancedModeChanged(object sender, EventArgs e)
+        {
         }
         #endregion
 

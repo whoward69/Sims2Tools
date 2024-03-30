@@ -50,26 +50,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
 
         private uint strinstance;
 
-        /// <summary>
-        /// Instance Number of the Lot this Familie lives in
-        /// </summary>
         private uint lotinstance, businesslot, vacationlot;
 
-        /// <summary>
-        /// Money of the Family
-        /// </summary>
         private int money, businessmoney;
 
-        /// <summary>
-        /// Friends of this Family
-        /// </summary>
         private uint friends;
 
-
-
-        /// <summary>
-        /// The Members of this Family
-        /// </summary>
         private uint[] sims;
 
         private FamiVersions version;

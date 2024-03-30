@@ -22,30 +22,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public int VertexCount
-        {
-            get { return verts.Length; }
-        }
-
-        Vectors3f verts;
-        public Vectors3f Vertices
-        {
-            get { return verts; }
-            set { verts = value; }
-        }
-
-        List<int> items;
-        public List<int> Items
-        {
-            get { return items; }
-            set { items = value; }
-        }
-
+        private readonly List<Vector3f> verts = new List<Vector3f>();
+        private readonly List<int> items = new List<int>();
 
         public GmdcJoint(CGeometryDataContainer parent) : base(parent)
         {
-            verts = new Vectors3f();
-            items = new List<int>();
         }
 
         public void Unserialize(DbpfReader reader)

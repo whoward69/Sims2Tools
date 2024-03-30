@@ -12,14 +12,13 @@
 
 using Sims2Tools.DBPF.IO;
 using System;
-using System.Collections;
 
 namespace Sims2Tools.DBPF.SceneGraph.Geometry
 {
     [System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
     public class Vector2f
     {
-        double x, y;
+        protected double x, y;
 
         public double X
         {
@@ -29,7 +28,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
                     return 0;
                 return x;
             }
-            set { x = value; }
+            // set { x = value; }
         }
 
         public double Y
@@ -39,7 +38,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
                 if (double.IsNaN(y)) return 0;
                 return y;
             }
-            set { y = value; }
+            // set { y = value; }
         }
 
         public Vector2f()
@@ -82,7 +81,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
     [System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
     public class Vector3f : Vector2f
     {
-        double z;
+        protected double z;
 
         public double Z
         {
@@ -91,7 +90,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
                 if (double.IsNaN(z)) return 0;
                 return z;
             }
-            set { z = value; }
+            // set { z = value; }
         }
 
         public Vector3f() : base()
@@ -126,31 +125,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         }
 
         [System.ComponentModel.Browsable(false)]
-        public Vector3f UnitVector
-        {
-            get
-            {
-                Vector3f uv = new Vector3f();
-
-                double l = Length;
-                if (l != 0)
-                {
-                    uv.X = X / l;
-                    uv.Y = Y / l;
-                    uv.Z = Z / l;
-                }
-                return uv;
-            }
-        }
-
-        public void MakeUnitVector()
-        {
-            Vector3f uv = UnitVector;
-            X = uv.X;
-            Y = uv.Y;
-            Z = uv.Z;
-        }
-
         public double Norm
         {
             get
@@ -178,7 +152,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
     [System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
     public class Vector4f : Vector3f
     {
-        double w;
+        protected double w;
 
         public double W
         {
@@ -187,7 +161,7 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
                 if (double.IsNaN(w)) return 0;
                 return w;
             }
-            set { w = value; }
+            // set { w = value; }
         }
 
         public Vector4f() : base()
@@ -220,34 +194,6 @@ namespace Sims2Tools.DBPF.SceneGraph.Geometry
         {
             Vector4f v = new Vector4f(this.X, this.Y, this.Z, this.W);
             return v;
-        }
-    }
-
-    // TODO - _library - convert this to a List<Vector3f>
-    public class Vectors3f : ArrayList
-    {
-        public new Vector3f this[int index]
-        {
-            get { return ((Vector3f)base[index]); }
-            set { base[index] = value; }
-        }
-
-        public int Add(Vector3f item)
-        {
-            return base.Add(item);
-        }
-
-        public int Length
-        {
-            get { return this.Count; }
-        }
-
-        public override object Clone()
-        {
-            Vectors3f list = new Vectors3f();
-            foreach (Vector3f item in this) list.Add(item);
-
-            return list;
         }
     }
 }

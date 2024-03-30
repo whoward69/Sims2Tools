@@ -18,23 +18,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public enum MeshOpacity : uint
     {
-        /// <summary>
-        /// Unknown Format
-        /// </summary>
         Unknown = 0,
-        /// <summary>
-        /// Marks a solid Mesh
-        /// </summary>
         Opaque = 0xffffffff,
-        /// <summary>
-        /// Marks a Shadow or Highlight Mesh
-        /// </summary>
         Shadow = 0x00000003
     }
 
-    /// <summary>
-    /// Contains the Group Section of a GMDC
-    /// </summary>
     public class GmdcGroup : GmdcLinkBlock
     {
         private PrimitiveType unknown1;

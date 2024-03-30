@@ -77,7 +77,7 @@ namespace Sims2Tools.DBPF.STR
         }
     }
 
-
+    // TODO - _library - replace this with List<StrLanguage>
     public class StrLanguageList : IEnumerable
     {
         private readonly ArrayList _list = new ArrayList();
@@ -85,7 +85,7 @@ namespace Sims2Tools.DBPF.STR
         public StrLanguage this[int index]
         {
             get => index < _list.Count ? ((StrLanguage)_list[index]) : null;
-            set => _list[index] = value;
+            // set => _list[index] = value;
         }
 
         public int Add(StrLanguage strlng)
@@ -190,6 +190,7 @@ namespace Sims2Tools.DBPF.STR
         }
     }
 
+    // TODO - _library - replace this with List<StrItem>
     public class StrItemList : IEnumerable
     {
         private readonly ArrayList _list = new ArrayList();
@@ -199,7 +200,7 @@ namespace Sims2Tools.DBPF.STR
         public StrItem this[int index]
         {
             get => index < _list.Count ? ((StrItem)_list[index]) : null;
-            set => _list[index] = value;
+            // set => _list[index] = value;
         }
 
         internal int Add(StrItem strItem)
