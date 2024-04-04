@@ -394,9 +394,9 @@ namespace LogWatcher
                                             line += " : " + knownTokens[guid];
                                             colour = Properties.Settings.Default.KnownTokensColour;
                                         }
-                                        else if (GameData.globalObjectsByGUID.ContainsKey(guid))
+                                        else if (GameData.GlobalObjectsByGUID.ContainsKey(guid))
                                         {
-                                            line += " : " + GameData.globalObjectsByGUID[guid];
+                                            line += " : " + GameData.GlobalObjectsByGUID[guid];
                                             colour = Properties.Settings.Default.GameTokensColour;
                                         }
                                     }

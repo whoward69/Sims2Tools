@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="Cache\GameDataCache.cs" />
     <Compile Include="Cache\PackageCache.cs" />
+    <Compile Include="Cache\DrDataCache.cs" />
     <Compile Include="Cache\SceneGraphCache.cs" />
     <Compile Include="Controls\PickerDialog.cs">
       <SubType>Form</SubType>

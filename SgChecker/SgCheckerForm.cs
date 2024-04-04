@@ -362,7 +362,7 @@ namespace SgChecker
 #endif
                     string gamePath = (new FileInfo($"{Sims2ToolsLib.Sims2Path}\\..\\..\\")).FullName;
 
-                    foreach (string gameFolder in GameData.gameFolders)
+                    foreach (string gameFolder in GameData.Game3dFolders)
                     {
                         if (Directory.Exists(gameFolder))
                         {

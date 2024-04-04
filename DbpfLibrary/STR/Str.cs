@@ -31,13 +31,13 @@ namespace Sims2Tools.DBPF.STR
 
         private MetaData.FormatCode format;
 
-        Dictionary<byte, StrItemList> languages;
+        Dictionary<byte, List<StrItem>> languages;
 
         #region Constructors
         public Str(DBPFEntry entry) : base(entry)
         {
             format = MetaData.FormatCode.normal;
-            languages = new Dictionary<byte, StrItemList>();
+            languages = new Dictionary<byte, List<StrItem>>();
         }
 
         public Str(DBPFEntry entry, DbpfReader reader) : base(entry)
@@ -53,7 +53,7 @@ namespace Sims2Tools.DBPF.STR
             {
                 if (base.IsDirty) return true;
 
-                foreach (StrItemList strItems in languages.Values)
+                foreach (List<StrItem> strItems in languages.Values)
                 {
                     foreach (StrItem strItem in strItems)
                     {
@@ -67,13 +67,15 @@ namespace Sims2Tools.DBPF.STR
 
         public override void SetClean()
         {
-            foreach (StrItemList strItems in languages.Values)
+            foreach (List<StrItem> strItems in languages.Values)
             {
                 foreach (StrItem strItem in strItems)
                 {
                     strItem.SetClean();
                 }
             }
+
+            base.SetClean();
         }
         #endregion
 
@@ -84,11 +86,11 @@ namespace Sims2Tools.DBPF.STR
             set => onlyLid = value;
         }
 
-        public StrLanguageList Languages
+        public List<StrLanguage> Languages
         {
             get
             {
-                StrLanguageList lngs = new StrLanguageList();
+                List<StrLanguage> lngs = new List<StrLanguage>();
                 foreach (byte k in languages.Keys) lngs.Add(k);
                 lngs.Sort();
 
@@ -99,7 +101,7 @@ namespace Sims2Tools.DBPF.STR
 
         public void DefLanguageOnly()
         {
-            StrItemList defLang = LanguageItems(MetaData.Languages.Default);
+            List<StrItem> defLang = LanguageItems(MetaData.Languages.Default);
 
             foreach (StrItem item in defLang)
             {
@@ -112,9 +114,9 @@ namespace Sims2Tools.DBPF.STR
             _isDirty = true;
         }
 
-        public StrItemList LanguageItems(MetaData.Languages l)
+        public List<StrItem> LanguageItems(MetaData.Languages l)
         {
-            StrItemList items = null;
+            List<StrItem> items = null;
             byte langKey = (byte)l;
 
             if (languages.ContainsKey(langKey))
@@ -122,10 +124,10 @@ namespace Sims2Tools.DBPF.STR
                 items = languages[langKey];
             }
 
-            return items ?? new StrItemList();
+            return items ?? new List<StrItem>();
         }
 
-        public void AddLanguages(Dictionary<byte, StrItemList> newLanguages)
+        public void AddLanguages(Dictionary<byte, List<StrItem>> newLanguages)
         {
             foreach (byte lid in newLanguages.Keys)
             {
@@ -140,13 +142,25 @@ namespace Sims2Tools.DBPF.STR
             }
         }
 
-        public Dictionary<byte, StrItemList> CloneLanguages()
+        public Dictionary<byte, List<StrItem>> CloneLanguages()
         {
-            Dictionary<byte, StrItemList> clone = new Dictionary<byte, StrItemList>(languages.Count);
+            Dictionary<byte, List<StrItem>> clone = new Dictionary<byte, List<StrItem>>(languages.Count);
 
             foreach (byte lid in languages.Keys)
             {
-                clone.Add(lid, languages[lid].CloneStrings());
+                clone.Add(lid, CloneStrings(languages[lid]));
+            }
+
+            return clone;
+        }
+
+        private List<StrItem> CloneStrings(List<StrItem> list)
+        {
+            List<StrItem> clone = new List<StrItem>();
+
+            foreach (StrItem item in list)
+            {
+                clone.Add(item.Clone());
             }
 
             return clone;
@@ -155,7 +169,7 @@ namespace Sims2Tools.DBPF.STR
         #region Serialization
         protected void Unserialize(DbpfReader reader /*, uint length*/)
         {
-            languages = new Dictionary<byte, StrItemList>();
+            languages = new Dictionary<byte, List<StrItem>>();
             // Why? Some resources have a declared length less than the actual amount of data in them!
             // if (length <= 0x40) return;
 
@@ -177,7 +191,7 @@ namespace Sims2Tools.DBPF.STR
             {
                 uint size = 0x40 + 2 + 2;
 
-                foreach (StrItemList strItems in languages.Values)
+                foreach (List<StrItem> strItems in languages.Values)
                 {
                     foreach (StrItem strItem in strItems)
                     {
@@ -196,10 +210,10 @@ namespace Sims2Tools.DBPF.STR
             writer.WriteUInt16((ushort)format);
 
             int count = 0;
-            foreach (StrItemList strItems in languages.Values) count += strItems.Count;
+            foreach (List<StrItem> strItems in languages.Values) count += strItems.Count;
             writer.WriteUInt16((ushort)count);
 
-            foreach (StrItemList strItems in languages.Values)
+            foreach (List<StrItem> strItems in languages.Values)
             {
                 foreach (StrItem strItem in strItems)
                 {
@@ -259,7 +273,7 @@ namespace Sims2Tools.DBPF.STR
             lang.SetAttribute("id", Helper.Hex2PrefixString(strlng.Id));
             if (strlng.Name != strlng.Id.ToString()) lang.SetAttribute("name", strlng.Name);
 
-            StrItemList stritems = LanguageItems((MetaData.Languages)strlng.Id);
+            List<StrItem> stritems = LanguageItems((MetaData.Languages)strlng.Id);
 
             for (int i = 0; i < stritems.Count; ++i)
             {

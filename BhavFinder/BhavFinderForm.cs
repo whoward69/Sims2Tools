@@ -111,7 +111,7 @@ namespace BhavFinder
 
             this.comboOpCodeInGroup.Items.Add("");
 
-            foreach (KeyValuePair<string, string> kvp in GameData.semiGlobalsByName)
+            foreach (KeyValuePair<string, string> kvp in GameData.SemiGlobalsByName)
             {
                 string group = $"0x{kvp.Value.ToUpper()} {kvp.Key}";
 
@@ -120,13 +120,13 @@ namespace BhavFinder
             }
 
             this.comboOpCode.Items.Add("");
-            foreach (KeyValuePair<string, string> kvp in GameData.primitivesByOpCode)
+            foreach (KeyValuePair<string, string> kvp in GameData.PrimitivesByOpCode)
             {
                 this.comboOpCode.Items.Add($"{kvp.Key} {kvp.Value}");
             }
 
             this.comboUsingSTR.Items.Add("");
-            foreach (KeyValuePair<string, string> kvp in GameData.textlistsByInstance)
+            foreach (KeyValuePair<string, string> kvp in GameData.TextlistsByInstance)
             {
                 this.comboUsingSTR.Items.Add($"{kvp.Key} {kvp.Value}");
             }
@@ -822,7 +822,7 @@ namespace BhavFinder
                     if (entry.InstanceID == instanceID)
                     {
                         Str str = (Str)package.GetResourceByEntry(entry);
-                        StrItemList entries = str.LanguageItems(MetaData.Languages.Default);
+                        List<StrItem> entries = str.LanguageItems(MetaData.Languages.Default);
 
                         for (int i = 0; i < entries.Count; ++i)
                         {

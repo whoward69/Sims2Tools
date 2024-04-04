@@ -82,7 +82,12 @@ namespace OutfitOrganiser
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemPreloadMeshes = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemLoadMeshesNow = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemPreloadDrData = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemLoadDrDataNow = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
@@ -180,8 +185,6 @@ namespace OutfitOrganiser
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
             this.lblNoOutfitSelected = new System.Windows.Forms.Label();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -328,7 +331,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitClothing.CheckOnClick = true;
             this.menuItemOutfitClothing.Name = "menuItemOutfitClothing";
             this.menuItemOutfitClothing.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.menuItemOutfitClothing.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitClothing.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitClothing.Text = "&Clothing";
             this.menuItemOutfitClothing.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -337,7 +340,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitHair.CheckOnClick = true;
             this.menuItemOutfitHair.Name = "menuItemOutfitHair";
             this.menuItemOutfitHair.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.menuItemOutfitHair.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitHair.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitHair.Text = "&Hair";
             this.menuItemOutfitHair.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -346,7 +349,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitAccessory.CheckOnClick = true;
             this.menuItemOutfitAccessory.Name = "menuItemOutfitAccessory";
             this.menuItemOutfitAccessory.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this.menuItemOutfitAccessory.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitAccessory.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitAccessory.Text = "&Accessories";
             this.menuItemOutfitAccessory.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -355,7 +358,7 @@ namespace OutfitOrganiser
             this.menuItemOutfitMakeUp.CheckOnClick = true;
             this.menuItemOutfitMakeUp.Name = "menuItemOutfitMakeUp";
             this.menuItemOutfitMakeUp.ShortcutKeys = System.Windows.Forms.Keys.F7;
-            this.menuItemOutfitMakeUp.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitMakeUp.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitMakeUp.Text = "&Make-Up";
             this.menuItemOutfitMakeUp.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -451,7 +454,10 @@ namespace OutfitOrganiser
             this.menuItemAutosetBin,
             this.toolStripSeparator3,
             this.menuItemPreloadMeshes,
-            this.menuItemLoadMeshesNow});
+            this.menuItemLoadMeshesNow,
+            this.toolStripSeparator7,
+            this.menuItemPreloadDrData,
+            this.menuItemLoadDrDataNow});
             this.menuItemOptions.Name = "menuItemOptions";
             this.menuItemOptions.Size = new System.Drawing.Size(61, 20);
             this.menuItemOptions.Text = "&Options";
@@ -525,8 +531,28 @@ namespace OutfitOrganiser
             // 
             this.menuItemLoadMeshesNow.Name = "menuItemLoadMeshesNow";
             this.menuItemLoadMeshesNow.Size = new System.Drawing.Size(258, 22);
-            this.menuItemLoadMeshesNow.Text = "Load Meshes &Now";
+            this.menuItemLoadMeshesNow.Text = "Load Meshes Now";
             this.menuItemLoadMeshesNow.Click += new System.EventHandler(this.OnLoadMeshesNowClicked);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(255, 6);
+            // 
+            // menuItemPreloadDrData
+            // 
+            this.menuItemPreloadDrData.CheckOnClick = true;
+            this.menuItemPreloadDrData.Name = "menuItemPreloadDrData";
+            this.menuItemPreloadDrData.Size = new System.Drawing.Size(258, 22);
+            this.menuItemPreloadDrData.Text = "Preload &DR Data";
+            this.menuItemPreloadDrData.Click += new System.EventHandler(this.OnPreloadDrDataClicked);
+            // 
+            // menuItemLoadDrDataNow
+            // 
+            this.menuItemLoadDrDataNow.Name = "menuItemLoadDrDataNow";
+            this.menuItemLoadDrDataNow.Size = new System.Drawing.Size(258, 22);
+            this.menuItemLoadDrDataNow.Text = "Load DR Data Now";
+            this.menuItemLoadDrDataNow.Click += new System.EventHandler(this.OnLoadDrDataNowClicked);
             // 
             // menuItemMode
             // 
@@ -538,11 +564,24 @@ namespace OutfitOrganiser
             this.menuItemMode.Size = new System.Drawing.Size(50, 20);
             this.menuItemMode.Text = "&Mode";
             // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAdvanced.Text = "Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(141, 6);
+            // 
             // menuItemAutoBackup
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
             this.menuItemAutoBackup.Text = "Auto-Backup";
             // 
             // saveFileDialog
@@ -1530,19 +1569,6 @@ namespace OutfitOrganiser
             this.lblNoOutfitSelected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblNoOutfitSelected.Visible = false;
             // 
-            // toolStripSeparator6
-            // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
-            // 
-            // menuItemAdvanced
-            // 
-            this.menuItemAdvanced.CheckOnClick = true;
-            this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAdvanced.Text = "Advanced";
-            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
-            // 
             // OutfitOrganiserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1708,6 +1734,9 @@ namespace OutfitOrganiser
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuItemPreloadMeshes;
         private System.Windows.Forms.ToolStripMenuItem menuItemLoadMeshesNow;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPreloadDrData;
+        private System.Windows.Forms.ToolStripMenuItem menuItemLoadDrDataNow;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem menuContextResSaveThumb;
         private System.Windows.Forms.ToolStripMenuItem menuContextResReplaceThumb;

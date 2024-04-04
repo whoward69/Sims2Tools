@@ -8,9 +8,8 @@
 
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Package;
-using Sims2Tools.DBPF.SceneGraph.CRES;
-using Sims2Tools.DBPF.SceneGraph.SHPE;
-using Sims2Tools.DBPF.SceneGraph.TXMT;
+using Sims2Tools.DBPF.SceneGraph.BINX;
+using Sims2Tools.DBPF.SceneGraph.IDR;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,15 +20,13 @@ using System.Threading.Tasks;
 
 namespace Sims2Tools.Cache
 {
-    public class SceneGraphCache
+    public class DrDataCache
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static readonly string cacheBase = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Sims2Tools/.cache/scenegraph";
+        private static readonly string cacheBase = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Sims2Tools/.cache/drdata";
 
-        private static readonly TypeTypeID[] sgCachedTypes = { Cres.TYPE, Shpe.TYPE, Txmt.TYPE };
-
-        static SceneGraphCache()
+        static DrDataCache()
         {
             if (!Directory.Exists(cacheBase))
             {
@@ -37,27 +34,36 @@ namespace Sims2Tools.Cache
             }
         }
 
-        private ConcurrentDictionary<DBPFKey, int> packageIndexBySgKey;
-        private ConcurrentDictionary<int, List<DBPFKey>> sgKeysByPackageIndex;
+        private ConcurrentDictionary<DBPFKey, int> packageIndexByBinxKey;
+        private ConcurrentDictionary<DBPFKey, DBPFKey> binxKeyByResourceKey;
 
-        private readonly PackageCache packageCache;
+        private PackageCache packageCache = null;
         private readonly string cacheName;
 
         private bool complete = false;
 
         public bool Complete => complete;
 
-        public SceneGraphCache(PackageCache packageCache, string cacheName)
+        public DrDataCache(string cacheName)
         {
-            this.packageCache = packageCache;
             this.cacheName = cacheName;
         }
 
-        public string GetPackagePath(DBPFKey key)
+        public string GetPackagePath(DBPFKey binxKey)
         {
-            if (key != null && packageIndexBySgKey.ContainsKey(key))
+            if (binxKey != null && packageIndexByBinxKey.ContainsKey(binxKey))
             {
-                return packageCache.GetPackagePath(packageIndexBySgKey[key]);
+                return packageCache?.GetPackagePath(packageIndexByBinxKey[binxKey]);
+            }
+
+            return null;
+        }
+
+        public DBPFKey GetBinxKey(DBPFKey resourceKey)
+        {
+            if (resourceKey != null)
+            {
+                return binxKeyByResourceKey[resourceKey];
             }
 
             return null;
@@ -65,14 +71,19 @@ namespace Sims2Tools.Cache
 
         public async Task<bool> DeserializeAsync(SemaphoreSlim throttler)
         {
-            if (packageCache.Deserialize())
+            if (packageCache == null)
+            {
+                packageCache = new GameDataPackageCache(GameData.subFolderBins, "globalcatbin.bundle.package", cacheName);
+            }
+
+            if (packageCache != null && packageCache.Deserialize())
             {
                 try
                 {
                     using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Open))
                     {
-                        packageIndexBySgKey = (ConcurrentDictionary<DBPFKey, int>)new BinaryFormatter().Deserialize(fs);
-                        sgKeysByPackageIndex = (ConcurrentDictionary<int, List<DBPFKey>>)new BinaryFormatter().Deserialize(fs);
+                        packageIndexByBinxKey = (ConcurrentDictionary<DBPFKey, int>)new BinaryFormatter().Deserialize(fs);
+                        binxKeyByResourceKey = (ConcurrentDictionary<DBPFKey, DBPFKey>)new BinaryFormatter().Deserialize(fs);
                     }
 
                     return true;
@@ -85,8 +96,8 @@ namespace Sims2Tools.Cache
                     }
                     catch (Exception) { }
 
-                    packageIndexBySgKey = new ConcurrentDictionary<DBPFKey, int>();
-                    sgKeysByPackageIndex = new ConcurrentDictionary<int, List<DBPFKey>>();
+                    packageIndexByBinxKey = new ConcurrentDictionary<DBPFKey, int>();
+                    binxKeyByResourceKey = new ConcurrentDictionary<DBPFKey, DBPFKey>();
 
                     await BuildCacheAsync(throttler);
 
@@ -97,17 +108,16 @@ namespace Sims2Tools.Cache
             return false;
         }
 
-        // This should never be called, as we can't tell when the player changes their Downloads or SavedSims contents
-        private bool Serialize()
+        public bool Serialize()
         {
-            if (packageCache.Serialize())
+            if (packageCache != null && packageCache.Serialize())
             {
                 try
                 {
                     using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Create))
                     {
-                        new BinaryFormatter().Serialize(fs, packageIndexBySgKey);
-                        new BinaryFormatter().Serialize(fs, sgKeysByPackageIndex);
+                        new BinaryFormatter().Serialize(fs, packageIndexByBinxKey);
+                        new BinaryFormatter().Serialize(fs, binxKeyByResourceKey);
                     }
 
                     return true;
@@ -158,19 +168,21 @@ namespace Sims2Tools.Cache
                 {
                     using (DBPFFile package = new DBPFFile(packagePath))
                     {
-                        foreach (TypeTypeID sgTypeId in sgCachedTypes)
+                        foreach (DBPFEntry binxEntry in package.GetEntriesByType(Binx.TYPE))
                         {
-                            foreach (DBPFEntry entry in package.GetEntriesByType(sgTypeId))
+                            Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, binxEntry.GroupID, binxEntry.InstanceID, binxEntry.ResourceID));
+
+                            if (idr != null)
                             {
-                                packageIndexBySgKey.TryAdd(entry, packageIndex);
+                                Binx binx = (Binx)package.GetResourceByEntry(binxEntry);
 
-                                if (!sgKeysByPackageIndex.TryGetValue(packageIndex, out List<DBPFKey> keys))
+                                DBPFKey resKey = idr.GetItem(binx.ObjectIdx);
+
+                                if (resKey != null)
                                 {
-                                    keys = new List<DBPFKey>();
-                                    sgKeysByPackageIndex.TryAdd(packageIndex, keys);
+                                    packageIndexByBinxKey.TryAdd(binxEntry, packageIndex);
+                                    binxKeyByResourceKey.TryAdd(resKey, binxEntry);
                                 }
-
-                                keys.Add(entry);
                             }
                         }
 

@@ -260,11 +260,10 @@ namespace OutfitOrganiser
             menuItemAutosetBin.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetBin.Name, 1) != 0);
 
             menuItemPreloadMeshes.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, 0) != 0);
+            menuItemPreloadDrData.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadDrData.Name, 0) != 0);
 
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
-
-            SetTitle(null);
 
             UpdateFormState();
 
@@ -295,7 +294,13 @@ namespace OutfitOrganiser
             savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims", "savedsims"), "savedsims");
             meshCachesLoaded = false;
 
-            if (menuItemPreloadMeshes.Checked) CacheMeshes();
+            drDataCache = new DrDataCache("drdata");
+            drDataCachesLoaded = false;
+
+            if (menuItemAdvanced.Checked && menuItemPreloadMeshes.Checked) CacheMeshes();
+            if (menuItemAdvanced.Checked && menuItemPreloadDrData.Checked) CacheDrData();
+
+            SetTitle(lastFolder);
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
@@ -331,6 +336,7 @@ namespace OutfitOrganiser
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetBin.Name, menuItemAutosetBin.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadDrData.Name, menuItemPreloadDrData.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
@@ -369,6 +375,27 @@ namespace OutfitOrganiser
             {
                 outfits = " - NO OUTFITS SELECTED";
                 lblNoOutfitSelected.Visible = true;
+            }
+
+            if (menuItemAdvanced.Checked)
+            {
+                if (meshCachesLoaded)
+                {
+                    displayPath = $"{displayPath} - Mesh Cache Loaded";
+                }
+                else if (meshCachesLoading)
+                {
+                    displayPath = $"{displayPath} - Mesh Cache Loading...";
+                }
+
+                if (drDataCachesLoaded)
+                {
+                    displayPath = $"{displayPath} - DR Data Cache Loaded";
+                }
+                else if (drDataCachesLoading)
+                {
+                    displayPath = $"{displayPath} - DR Data Cache Loading...";
+                }
             }
 
             this.Text = $"{OutfitOrganiserApp.AppTitle}{outfits}{displayPath}";
@@ -595,10 +622,27 @@ namespace OutfitOrganiser
                 }
                 else if (workPackage.UpdateResources)
                 {
+                    int rowLimit = gridPackageFiles.SelectedRows.Count;
+                    int rowCount = 0;
+
                     foreach (DataGridViewRow packageRow in gridPackageFiles.SelectedRows)
                     {
                         using (OrganiserDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
                         {
+                            HashSet<DBPFKey> allGzps = new HashSet<DBPFKey>();
+                            HashSet<DBPFKey> allIdr = new HashSet<DBPFKey>();
+
+                            foreach (DBPFEntry gzpsEntry in package.GetEntriesByType(Gzps.TYPE))
+                            {
+                                allGzps.Add(gzpsEntry);
+                            }
+
+                            foreach (DBPFEntry idrEntry in package.GetEntriesByType(Idr.TYPE))
+                            {
+                                allIdr.Add(idrEntry);
+                            }
+
+                            // Process BINX/3IDR/GZPS triples, ie, custom clothing
                             foreach (DBPFEntry binxEntry in package.GetEntriesByType(Binx.TYPE))
                             {
                                 if (sender.CancellationPending)
@@ -607,82 +651,66 @@ namespace OutfitOrganiser
                                     return;
                                 }
 
-                                OutfitDbpfData outfitData = OutfitDbpfData.Create(package, binxEntry);
+                                allGzps.Remove(new DBPFKey(Gzps.TYPE, binxEntry.GroupID, binxEntry.InstanceID, binxEntry.ResourceID));
+                                allIdr.Remove(new DBPFKey(Idr.TYPE, binxEntry.GroupID, binxEntry.InstanceID, binxEntry.ResourceID));
 
-                                if (outfitData != null)
+                                AddToGrid(sender, package, OutfitDbpfData.Create(package, binxEntry));
+                            }
+
+                            if (drDataCachesLoaded)
+                            {
+                                bool startFromLastGameDir = false;
+
+                                // Process lone GZPS resources, ie, default replacements
+                                foreach (DBPFKey gzpsKey in allGzps)
                                 {
-                                    DataRow row = dataResources.NewRow();
+                                    Gzps gzps = (Gzps)package.GetResourceByKey(gzpsKey);
 
-                                    row["OutfitData"] = outfitData;
-
-                                    row["Shoe"] = "";
-                                    row["Hairtone"] = "";
-                                    row["Jewelry"] = "";
-                                    row["Destination"] = "";
-                                    row["AccessoryBin"] = 0;
-                                    row["Subtype"] = "";
-                                    row["LayerStr"] = "";
-                                    row["LayerInt"] = 0;
-                                    row["MakeupBin"] = 0;
-
-                                    row["Type"] = BuildTypeString(outfitData);
-
-                                    switch (outfitData.ItemType)
+                                    if (gzps != null)
                                     {
-                                        case 0x01:
-                                            row["Visible"] = menuItemOutfitHair.Checked ? "Yes" : "No";
-                                            row["Hairtone"] = BuildHairString(outfitData.Hairtone);
-                                            break;
-                                        case 0x02:
-                                            row["Visible"] = menuItemOutfitMakeUp.Checked ? "Yes" : "No";
-                                            row["Subtype"] = BuildMakeupSubtypeString(outfitData.Subtype);
-                                            row["LayerStr"] = BuildMakeupLayerString(outfitData.Layer);
-                                            row["LayerInt"] = outfitData.Layer;
-                                            row["MakeupBin"] = outfitData.Bin;
-                                            break;
-                                        case 0x04:
-                                            row["Visible"] = menuItemOutfitClothing.Checked ? "Yes" : "No";
-                                            row["Shoe"] = "N/A";
-                                            break;
-                                        case 0x08:
-                                            row["Visible"] = menuItemOutfitClothing.Checked ? "Yes" : "No";
-                                            row["Shoe"] = BuildShoeString(outfitData.Shoe);
-                                            break;
-                                        case 0x10:
-                                            row["Visible"] = menuItemOutfitClothing.Checked ? "Yes" : "No";
-                                            row["Shoe"] = BuildShoeString(outfitData.Shoe);
-                                            break;
-                                        case 0x20:
-                                            row["Visible"] = menuItemOutfitAccessory.Checked ? "Yes" : "No";
-                                            row["Jewelry"] = BuildJewelryString(outfitData.Jewelry);
-                                            row["Destination"] = BuildDestinationString(outfitData.Destination);
-                                            row["AccessoryBin"] = outfitData.Bin;
-                                            break;
-                                        default:
-                                            // Unsupported type
-                                            continue;
+                                        DBPFKey idrForGzpsKey = new DBPFKey(Idr.TYPE, gzpsKey.GroupID, gzpsKey.InstanceID, gzpsKey.ResourceID);
+
+                                        Idr idrForGzps = (Idr)package.GetResourceByKey(idrForGzpsKey);
+
+                                        if (idrForGzps != null)
+                                        {
+                                            allIdr.Remove(idrForGzpsKey);
+                                        }
+                                        else
+                                        {
+                                            idrForGzps = (Idr)GameData.GetMaxisResource(Idr.TYPE, gzpsKey, startFromLastGameDir);
+
+                                            if (idrForGzps != null) startFromLastGameDir = true;
+                                        }
+
+                                        if (idrForGzps != null)
+                                        {
+                                            ProcessDR(sender, package, gzps, idrForGzps);
+                                        }
                                     }
+                                }
 
-                                    row["Filename"] = package.PackageNameNoExtn;
+                                // Process lone IDR resources, ie, default replacements
+                                foreach (DBPFKey idrKey in allIdr)
+                                {
+                                    Idr idrForGzps = (Idr)package.GetResourceByKey(idrKey);
 
-                                    row["Title"] = outfitData.Title;
-                                    row["Tooltip"] = outfitData.Tooltip;
+                                    if (idrForGzps != null)
+                                    {
+                                        Gzps gzps = (Gzps)GameData.GetMaxisResource(Gzps.TYPE, idrKey, startFromLastGameDir);
 
-                                    row["Shown"] = BuildShownString(outfitData.Shown);
+                                        if (gzps != null)
+                                        {
+                                            startFromLastGameDir = true;
 
-                                    row["Townie"] = BuildTownieString(outfitData);
-
-                                    row["Gender"] = BuildGenderString(outfitData.Gender);
-                                    row["Age"] = BuildAgeString(outfitData.Age);
-                                    row["Category"] = BuildCategoryString(outfitData.Category);
-                                    row["Product"] = BuildProductString(outfitData.Product);
-
-                                    row["Sort"] = outfitData.SortIndex;
-
-                                    sender.SetData(new WorkerGridTask(dataResources, row));
+                                            ProcessDR(sender, package, gzps, idrForGzps);
+                                        }
+                                    }
                                 }
                             }
                         }
+
+                        sender.SetProgress((int)((++rowCount / (float)rowLimit) * 100));
                     }
                 }
             }
@@ -695,6 +723,102 @@ namespace OutfitOrganiser
                 {
                     throw ex;
                 }
+            }
+        }
+
+        private void ProcessDR(ProgressDialog sender, OrganiserDbpfFile package, Gzps gzps, Idr idrForGzps)
+        {
+            DBPFKey binxKey = drDataCache.GetBinxKey(gzps);
+            string gameDataPackagePath = drDataCache.GetPackagePath(binxKey);
+
+            if (gameDataPackagePath != null)
+            {
+                using (DBPFFile gameDataPackage = new DBPFFile(drDataCache.GetPackagePath(binxKey)))
+                {
+                    Binx binx = (Binx)gameDataPackage.GetResourceByKey(binxKey);
+                    Idr idrForBinx = (Idr)gameDataPackage.GetResourceByKey(new DBPFKey(Idr.TYPE, binxKey));
+                    if (binx != null && idrForBinx != null)
+                    {
+                        AddToGrid(sender, package, OutfitDbpfData.Create(package, binx, idrForBinx, gzps, idrForGzps));
+                    }
+                    gameDataPackage.Close();
+                }
+            }
+        }
+
+        private void AddToGrid(ProgressDialog sender, OrganiserDbpfFile package, OutfitDbpfData outfitData)
+        {
+            if (outfitData != null)
+            {
+                DataRow row = dataResources.NewRow();
+
+                row["OutfitData"] = outfitData;
+
+                row["Shoe"] = "";
+                row["Hairtone"] = "";
+                row["Jewelry"] = "";
+                row["Destination"] = "";
+                row["AccessoryBin"] = 0;
+                row["Subtype"] = "";
+                row["LayerStr"] = "";
+                row["LayerInt"] = 0;
+                row["MakeupBin"] = 0;
+
+                row["Type"] = BuildTypeString(outfitData);
+
+                switch (outfitData.ItemType)
+                {
+                    case 0x01:
+                        row["Visible"] = menuItemOutfitHair.Checked ? "Yes" : "No";
+                        row["Hairtone"] = BuildHairString(outfitData.Hairtone);
+                        break;
+                    case 0x02:
+                        row["Visible"] = menuItemOutfitMakeUp.Checked ? "Yes" : "No";
+                        row["Subtype"] = BuildMakeupSubtypeString(outfitData.Subtype);
+                        row["LayerStr"] = BuildMakeupLayerString(outfitData.Layer);
+                        row["LayerInt"] = outfitData.Layer;
+                        row["MakeupBin"] = outfitData.Bin;
+                        break;
+                    case 0x04:
+                        row["Visible"] = menuItemOutfitClothing.Checked ? "Yes" : "No";
+                        row["Shoe"] = "N/A";
+                        break;
+                    case 0x08:
+                        row["Visible"] = menuItemOutfitClothing.Checked ? "Yes" : "No";
+                        row["Shoe"] = BuildShoeString(outfitData.Shoe);
+                        break;
+                    case 0x10:
+                        row["Visible"] = menuItemOutfitClothing.Checked ? "Yes" : "No";
+                        row["Shoe"] = BuildShoeString(outfitData.Shoe);
+                        break;
+                    case 0x20:
+                        row["Visible"] = menuItemOutfitAccessory.Checked ? "Yes" : "No";
+                        row["Jewelry"] = BuildJewelryString(outfitData.Jewelry);
+                        row["Destination"] = BuildDestinationString(outfitData.Destination);
+                        row["AccessoryBin"] = outfitData.Bin;
+                        break;
+                    default:
+                        // Unsupported type
+                        return;
+                }
+
+                row["Filename"] = package.PackageNameNoExtn;
+
+                row["Title"] = outfitData.Title;
+                row["Tooltip"] = outfitData.Tooltip;
+
+                row["Shown"] = BuildShownString(outfitData.Shown);
+
+                row["Townie"] = BuildTownieString(outfitData);
+
+                row["Gender"] = BuildGenderString(outfitData.Gender);
+                row["Age"] = BuildAgeString(outfitData.Age);
+                row["Category"] = BuildCategoryString(outfitData.Category);
+                row["Product"] = BuildProductString(outfitData.Product);
+
+                row["Sort"] = outfitData.SortIndex;
+
+                sender.SetData(new WorkerGridTask(dataResources, row));
             }
         }
 
@@ -825,8 +949,8 @@ namespace OutfitOrganiser
             grpJewelry.Visible = gridResources.Columns["colJewelry"].Visible;
 
             gridResources.Columns["colMakeupSubtype"].Visible = menuItemOutfitMakeUp.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitAccessory.Checked;
-            gridResources.Columns["colMakeupLayerStr"].Visible = gridResources.Columns["colMakeupSubtype"].Visible && !menuItemNumericLayer.Checked;
-            gridResources.Columns["colMakeupLayerInt"].Visible = gridResources.Columns["colMakeupSubtype"].Visible && menuItemNumericLayer.Checked;
+            gridResources.Columns["colMakeupLayerStr"].Visible = gridResources.Columns["colMakeupSubtype"].Visible && !(menuItemNumericLayer.Visible && menuItemNumericLayer.Checked);
+            gridResources.Columns["colMakeupLayerInt"].Visible = gridResources.Columns["colMakeupSubtype"].Visible && menuItemNumericLayer.Visible && menuItemNumericLayer.Checked;
             gridResources.Columns["colMakeupBin"].Visible = gridResources.Columns["colMakeupSubtype"].Visible;
             grpMakeup.Visible = gridResources.Columns["colMakeupSubtype"].Visible;
 
@@ -1254,6 +1378,7 @@ namespace OutfitOrganiser
         private void OnOptionsMenuOpening(object sender, EventArgs e)
         {
             menuItemLoadMeshesNow.Enabled = !(meshCachesLoaded || meshCachesLoading);
+            menuItemLoadDrDataNow.Enabled = !(drDataCachesLoaded || drDataCachesLoading);
         }
 
         private void OnShowResTitleClicked(object sender, EventArgs e)
@@ -1274,7 +1399,7 @@ namespace OutfitOrganiser
 
         private void OnNumericLayerClicked(object sender, EventArgs e)
         {
-            if (menuItemNumericLayer.Checked)
+            if (menuItemNumericLayer.Visible && menuItemNumericLayer.Checked)
             {
                 gridResources.Columns["colMakeupLayerInt"].Visible = true;
                 textMakeupLayer.Visible = true;
@@ -1304,11 +1429,56 @@ namespace OutfitOrganiser
                 CacheMeshes();
             }
         }
+
+        private void OnLoadDrDataNowClicked(object sender, EventArgs e)
+        {
+            CacheDrData();
+        }
+
+        private void OnPreloadDrDataClicked(object sender, EventArgs e)
+        {
+            if (menuItemPreloadDrData.Checked && !drDataCachesLoaded)
+            {
+                CacheDrData();
+            }
+        }
         #endregion
 
         #region Mode Menu Actions
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
+            if (menuItemAdvanced.Checked)
+            {
+                toolStripSeparator3.Visible = true;
+                menuItemLoadMeshesNow.Visible = true;
+                menuItemPreloadMeshes.Visible = true;
+                btnMeshes.Visible = true;
+
+                toolStripSeparator7.Visible = true;
+                menuItemLoadDrDataNow.Visible = true;
+                menuItemPreloadDrData.Visible = true;
+
+                menuItemNumericLayer.Visible = true;
+
+                btnTownify.Visible = (menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked) && (gridResources.SelectedRows.Count > 0);
+            }
+            else
+            {
+                toolStripSeparator3.Visible = false;
+                menuItemLoadMeshesNow.Visible = false;
+                menuItemPreloadMeshes.Visible = false;
+                btnMeshes.Visible = false;
+
+                toolStripSeparator7.Visible = false;
+                menuItemLoadDrDataNow.Visible = false;
+                menuItemPreloadDrData.Visible = false;
+
+                menuItemNumericLayer.Visible = false;
+
+                btnTownify.Visible = false;
+            }
+
+            OnNumericLayerClicked(menuItemNumericLayer, null);
         }
         #endregion
 
@@ -3135,6 +3305,12 @@ namespace OutfitOrganiser
                         {
                             OutfitDbpfData originalData = OutfitDbpfData.Create(package, outfitData);
 
+                            if (originalData == null)
+                            {
+                                // TODO - Outfit Organiser - for Default Replacements this will return null, as there is no BINX in the package file
+                                // If the GZPS resource in the package, rebuild from that, otherwise use the idrForCpf resource
+                            }
+
                             row.Cells["colOutfitData"].Value = originalData;
 
                             package.Close();
@@ -3402,7 +3578,6 @@ namespace OutfitOrganiser
         }
         #endregion
 
-
         #region Townify Button
         private void OnTownifyClicked(object sender, EventArgs e)
         {
@@ -3462,12 +3637,46 @@ namespace OutfitOrganiser
 
                 Task.WhenAll(cacheTasks).ContinueWith(t =>
                 {
-                    // Run UpdateFormState() on the main thread
+                    // Run on the main thread
                     btnMeshes.BeginInvoke((Action)(() =>
                     {
                         meshCachesLoaded = true;
                         meshCachesLoading = false;
                         UpdateFormState();
+                        SetTitle(lastFolder);
+                    }));
+                });
+            }
+        }
+        #endregion
+
+        #region DR Data Cache
+        private bool drDataCachesLoaded = false;
+        private bool drDataCachesLoading = false;
+        private DrDataCache drDataCache;
+
+        private void CacheDrData()
+        {
+            if (!drDataCachesLoaded && !drDataCachesLoading)
+            {
+                int usableCores = Math.Max(1, System.Environment.ProcessorCount - 2);
+                SemaphoreSlim throttler = new SemaphoreSlim(initialCount: usableCores);
+
+                drDataCachesLoading = true;
+
+                List<Task> cacheTasks = new List<Task>(1)
+                {
+                    drDataCache.DeserializeAsync(throttler)
+                };
+
+                Task.WhenAll(cacheTasks).ContinueWith(t =>
+                {
+                    // Run on the main thread
+                    btnMeshes.BeginInvoke((Action)(() =>
+                    {
+                        drDataCachesLoaded = true;
+                        drDataCachesLoading = false;
+                        SetTitle(lastFolder);
                     }));
                 });
             }

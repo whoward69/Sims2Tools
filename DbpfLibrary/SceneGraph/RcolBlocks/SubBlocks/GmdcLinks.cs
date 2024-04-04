@@ -18,30 +18,29 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class GmdcLink : GmdcLinkBlock
     {
+        private readonly List<int> items1;
+        private int unknown1;
+        private int unknown2;
+        private readonly List<int>[] refs;
 
-
-        List<int> items1;
         public List<int> ReferencedElement
         {
             get { return items1; }
             // set { items1 = value; }
         }
 
-        int unknown1;
         public int ReferencedSize
         {
             get { return unknown1; }
             // set { unknown1 = value; }
         }
 
-        int unknown2;
         public int ActiveElements
         {
             get { return unknown2; }
             // set { unknown2 = value; }
         }
 
-        readonly List<int>[] refs;
         public List<int>[] AliasValues
         {
             get { return refs; }

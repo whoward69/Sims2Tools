@@ -1109,24 +1109,9 @@ namespace RepositoryWizard
 
             if (cres == null)
             {
-                foreach (string gameFolder in GameData.gameFolders)
-                {
-                    string cresPackagePath = $"{gameFolder}\\Objects05.package";
+                cres = (Cres)GameData.GetMaxisResource(Cres.TYPE, cresName);
 
-                    if (File.Exists(cresPackagePath))
-                    {
-                        using (DBPFFile cresPackage = new DBPFFile(cresPackagePath))
-                        {
-                            cres = (Cres)cresPackage.GetResourceByName(Cres.TYPE, cresName);
-
-                            if (cres != null) cresPackageDir = cresPackage.PackageDir;
-
-                            cresPackage.Close();
-                        }
-
-                        if (cres != null) break;
-                    }
-                }
+                if (cres != null) cresPackageDir = GameData.LastPackageDir;
             }
 
             return cres;
@@ -1147,16 +1132,9 @@ namespace RepositoryWizard
             }
             else
             {
-                string shpePackagePath = $"{cresPackageDir}\\Objects06.package";
-
-                using (DBPFFile shpePackage = new DBPFFile(shpePackagePath))
+                foreach (DBPFKey shpeKey in cres.ShpeKeys)
                 {
-                    foreach (DBPFKey shpeKey in cres.ShpeKeys)
-                    {
-                        shpes.Add((Shpe)shpePackage.GetResourceByKey(shpeKey));
-                    }
-
-                    shpePackage.Close();
+                    shpes.Add((Shpe)GameData.GetMaxisResource(shpeKey.TypeID, shpeKey, true));
                 }
             }
 

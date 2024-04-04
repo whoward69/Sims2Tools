@@ -362,9 +362,9 @@ namespace HcduPlus
                         }
                         else
                         {
-                            if (GameData.globalObjectsByGUID.ContainsKey(guid))
+                            if (GameData.GlobalObjectsByGUID.ContainsKey(guid))
                             {
-                                ConflictPair cpNew = new ConflictPair(GameData.globalObjectsByGUID[guid], scanPackages[0].Substring(24));
+                                ConflictPair cpNew = new ConflictPair(GameData.GlobalObjectsByGUID[guid], scanPackages[0].Substring(24));
 
                                 if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
                                 {

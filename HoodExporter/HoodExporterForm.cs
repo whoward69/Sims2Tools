@@ -136,9 +136,9 @@ namespace HoodExporter
             }
 
             string lastLid = (string)RegistryTools.GetSetting(HoodExporterApp.RegistryKey + @"\Options", menuLanguage.Name, Helper.Hex2PrefixString((int)MetaData.Languages.Default));
-            foreach (string lid in GameData.languagesByCode.Keys)
+            foreach (string lid in GameData.LanguagesByCode.Keys)
             {
-                if (GameData.languagesByCode.TryGetValue(lid, out string lang))
+                if (GameData.LanguagesByCode.TryGetValue(lid, out string lang))
                 {
                     ToolStripMenuItem item = new ToolStripMenuItem();
                     menuLanguage.DropDownItems.Add(item);
@@ -642,7 +642,7 @@ namespace HoodExporter
                             Objd objd = (Objd)package.GetResourceByEntry(objds[0]);
                             Ctss ctss = (Ctss)package.GetResourceByEntry(ctsss[0]);
 
-                            StrItemList strs = ctss.LanguageItems(prefLid);
+                            List<StrItem> strs = ctss.LanguageItems(prefLid);
                             if (strs.Count == 0) strs = ctss.LanguageItems(MetaData.Languages.Default);
 
                             if (strs.Count >= 2)

@@ -9,6 +9,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.SceneGraph.IDR;
@@ -162,7 +163,7 @@ namespace SgChecker
                 if (re.IsMatch(file)) return false;
             }
 
-            if (SgChecker.typesByPackage.TryGetValue(file, out List<TypeTypeID> types))
+            if (GameData.TypesBy3dPackage.TryGetValue(file, out List<TypeTypeID> types))
             {
                 foreach (TypeTypeID type in types)
                 {

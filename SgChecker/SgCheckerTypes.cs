@@ -11,20 +11,7 @@
 
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.SceneGraph;
-using Sims2Tools.DBPF.SceneGraph.ANIM;
-using Sims2Tools.DBPF.SceneGraph.CINE;
-using Sims2Tools.DBPF.SceneGraph.CRES;
-using Sims2Tools.DBPF.SceneGraph.GMDC;
-using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.IDR;
-using Sims2Tools.DBPF.SceneGraph.LAMB;
-using Sims2Tools.DBPF.SceneGraph.LDIR;
-using Sims2Tools.DBPF.SceneGraph.LIFO;
-using Sims2Tools.DBPF.SceneGraph.LPNT;
-using Sims2Tools.DBPF.SceneGraph.LSPT;
-using Sims2Tools.DBPF.SceneGraph.SHPE;
-using Sims2Tools.DBPF.SceneGraph.TXMT;
-using Sims2Tools.DBPF.SceneGraph.TXTR;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -37,36 +24,6 @@ namespace SgChecker
         public static string PROP_IDR_INDEXES = "idr_indexes";
 
         public static List<Regex> excludedFiles = new List<Regex> { new Regex(@"_EnableColorOptions.*\.package") };
-
-        public static Dictionary<string, List<TypeTypeID>> typesByPackage = new Dictionary<string, List<TypeTypeID>> {
-                { "Objects00.package", new List<TypeTypeID> { Anim.TYPE } },
-                { "Objects01.package", new List<TypeTypeID> { Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE } },
-                { "Objects02.package", new List<TypeTypeID> { Txmt.TYPE } },
-                { "Objects03.package", new List<TypeTypeID> { Gmdc.TYPE } },
-                { "Objects04.package", new List<TypeTypeID> { Gmnd.TYPE } },
-                { "Objects05.package", new List<TypeTypeID> { Cres.TYPE } },
-                { "Objects06.package", new List<TypeTypeID> { Shpe.TYPE, Txtr.TYPE } },
-                { "Objects07.package", new List<TypeTypeID> { Lifo.TYPE } },
-                { "Objects08.package", new List<TypeTypeID> { Lifo.TYPE } },
-                { "Objects09.package", new List<TypeTypeID> { Lifo.TYPE } },
-
-                { "Sims00.package", new List<TypeTypeID> { Anim.TYPE } },
-                { "Sims01.package", new List<TypeTypeID> { Cine.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE } },
-                { "Sims02.package", new List<TypeTypeID> { Txmt.TYPE } },
-                { "Sims03.package", new List<TypeTypeID> { Gmdc.TYPE } },
-                { "Sims04.package", new List<TypeTypeID> { Gmnd.TYPE } },
-                { "Sims05.package", new List<TypeTypeID> { Shpe.TYPE } },
-                { "Sims06.package", new List<TypeTypeID> { Cres.TYPE } },
-                { "Sims07.package", new List<TypeTypeID> { Txtr.TYPE } },
-                { "Sims08.package", new List<TypeTypeID> { Lifo.TYPE } },
-                { "Sims09.package", new List<TypeTypeID> { Lifo.TYPE } },
-                { "Sims10.package", new List<TypeTypeID> { Lifo.TYPE } },
-                { "Sims11.package", new List<TypeTypeID> { Lifo.TYPE } },
-                { "Sims12.package", new List<TypeTypeID> { Lifo.TYPE } },
-                { "Sims13.package", new List<TypeTypeID> { Lifo.TYPE } },
-
-                { "Textures.package", new List<TypeTypeID> { Txtr.TYPE, Lifo.TYPE } },
-            };
     }
 
     public class KnownSgResource : DBPFNamedKey, ISgHash, ISgName, IEquatable<KnownSgResource>

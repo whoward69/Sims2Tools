@@ -106,16 +106,16 @@ namespace HoodExporter
             return s;
         }
 
-        private static StrItemList GetObjectCatalog(TypeGUID guid)
+        private static List<StrItem> GetObjectCatalog(TypeGUID guid)
         {
-            if (GameData.globalObjectsTgirHashByGUID.ContainsKey(guid))
+            if (GameData.GlobalObjectsTgirHashByGUID.ContainsKey(guid))
             {
                 if (objectsPackage == null)
                 {
                     objectsPackage = new DBPFFile(Sims2ToolsLib.Sims2Path + GameData.objectsSubPath);
                 }
 
-                Objd objd = (Objd)objectsPackage.GetResourceByTGIR(GameData.globalObjectsTgirHashByGUID[guid]);
+                Objd objd = (Objd)objectsPackage.GetResourceByTGIR(GameData.GlobalObjectsTgirHashByGUID[guid]);
                 Ctss ctss = (Ctss)objectsPackage.GetResourceByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
 
                 return ctss?.LanguageItems(MetaData.Languages.Default);
@@ -441,9 +441,9 @@ namespace HoodExporter
     {
         public override string GetValueFromGuid(TypeGUID guid)
         {
-            if (GameData.globalObjectsByGUID.ContainsKey(guid))
+            if (GameData.GlobalObjectsByGUID.ContainsKey(guid))
             {
-                return GameData.globalObjectsByGUID[guid];
+                return GameData.GlobalObjectsByGUID[guid];
             }
 
             return null;

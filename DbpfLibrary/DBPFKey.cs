@@ -91,6 +91,10 @@ namespace Sims2Tools.DBPF
         {
         }
 
+        public DBPFKey(TypeTypeID typeId, IDBPFKey key) : this(typeId, key.GroupID, key.InstanceID, key.ResourceID)
+        {
+        }
+
         public bool Equals(DBPFKey other)
         {
             if (other == null) return false;

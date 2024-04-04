@@ -512,7 +512,7 @@ namespace WhatCausedThis
                             string semiSuffix = reSemi.Groups[1].Value;
                             string semiName = s.Substring(0, s.Length - semiSuffix.Length);
 
-                            foreach (KeyValuePair<string, string> kvPair in GameData.semiGlobalsByName)
+                            foreach (KeyValuePair<string, string> kvPair in GameData.SemiGlobalsByName)
                             {
                                 if (kvPair.Key.Replace(" ", "").Equals(semiName, StringComparison.OrdinalIgnoreCase))
                                 {
@@ -540,7 +540,7 @@ namespace WhatCausedThis
                             string semiSuffix = reSemi.Groups[1].Value;
                             string semiName = s.Substring(0, s.Length - semiSuffix.Length);
 
-                            foreach (KeyValuePair<string, string> kvPair in GameData.semiGlobalsByName)
+                            foreach (KeyValuePair<string, string> kvPair in GameData.SemiGlobalsByName)
                             {
                                 if (kvPair.Key.Replace(" ", "").Equals(semiName, StringComparison.OrdinalIgnoreCase))
                                 {

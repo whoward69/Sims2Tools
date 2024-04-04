@@ -25,9 +25,9 @@ namespace Sims2Tools.Cache
             }
         }
 
-        private int nextIndex;
-        private Dictionary<string, int> packageIndexByPath;
-        private Dictionary<int, string> packagePathByIndex;
+        protected int nextIndex;
+        protected Dictionary<string, int> packageIndexByPath;
+        protected Dictionary<int, string> packagePathByIndex;
 
         private readonly string baseFolder;
         private readonly string cacheName;
@@ -96,7 +96,7 @@ namespace Sims2Tools.Cache
             }
         }
 
-        private bool BuildCache()
+        protected virtual bool BuildCache()
         {
             nextIndex = 0;
             packageIndexByPath = new Dictionary<string, int>();
@@ -110,6 +110,47 @@ namespace Sims2Tools.Cache
                     packagePathByIndex.Add(nextIndex, packagePath);
 
                     ++nextIndex;
+                }
+            }
+            catch (Exception) { }
+
+            return true;
+        }
+    }
+
+    public class GameDataPackageCache : PackageCache
+    {
+        private readonly string subFolderPath;
+        private readonly string pattern;
+
+        public GameDataPackageCache(string subFolderPath, string pattern, string cacheName) : base("", cacheName)
+        {
+            this.subFolderPath = subFolderPath;
+            this.pattern = pattern;
+        }
+
+        protected override bool BuildCache()
+        {
+            nextIndex = 0;
+            packageIndexByPath = new Dictionary<string, int>();
+            packagePathByIndex = new Dictionary<int, string>();
+
+            try
+            {
+                foreach (string gameFolder in GameData.GameFolders)
+                {
+                    string packageFolder = $"{gameFolder}{subFolderPath}";
+
+                    if (Directory.Exists(packageFolder))
+                    {
+                        foreach (string packagePath in Directory.GetFiles(packageFolder, pattern, SearchOption.AllDirectories))
+                        {
+                            packageIndexByPath.Add(packagePath, nextIndex);
+                            packagePathByIndex.Add(nextIndex, packagePath);
+
+                            ++nextIndex;
+                        }
+                    }
                 }
             }
             catch (Exception) { }

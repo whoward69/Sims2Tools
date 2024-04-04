@@ -35,9 +35,11 @@ namespace DpbfLister
     {
         static void Main(string[] args)
         {
-            DBPFData.HasImageSupport = false;
+            // DBPFData.HasImageSupport = false;
 
             ProcessFiles(args);
+
+            // FindBinx("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Apartment Life");
 
             // ProcessXhtn("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads\\Hair\\Female\\All4Colors_minanna_FH03_ribbon(Black).package");
 
@@ -83,6 +85,22 @@ namespace DpbfLister
                 }
 
                 Console.WriteLine();
+            }
+        }
+
+        private static void FindBinx(string baseFolder)
+        {
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                using (DBPFFile package = new DBPFFile(packagePath))
+                {
+                    if (package.GetEntriesByType(Binx.TYPE) != null)
+                    {
+                        Debug.WriteLine($"{packagePath.Substring(baseFolder.Length + 1)}");
+                    }
+
+                    package.Close();
+                }
             }
         }
 

@@ -81,7 +81,7 @@ namespace ObjectRelocator
             {
                 if (HasTitleAndDescription)
                 {
-                    StrItemList strs = strings?.LanguageItems(MetaData.Languages.Default);
+                    List<StrItem> strs = strings?.LanguageItems(MetaData.Languages.Default);
 
                     if (strs?[0] != null)
                     {
@@ -103,7 +103,7 @@ namespace ObjectRelocator
             {
                 if (HasTitleAndDescription)
                 {
-                    StrItemList strs = strings.LanguageItems(MetaData.Languages.Default);
+                    List<StrItem> strs = strings.LanguageItems(MetaData.Languages.Default);
 
                     if (strs?[1] != null)
                     {
@@ -348,12 +348,12 @@ namespace ObjectRelocator
                 {
                     if (strings != null)
                     {
-                        StrItemList defLangStrings = strings.LanguageItems(MetaData.Languages.Default);
+                        List<StrItem> defLangStrings = strings.LanguageItems(MetaData.Languages.Default);
 
                         // Add any missing strings, [0]=name, [1]=author, [2]=cost
                         while (defLangStrings.Count < 3)
                         {
-                            defLangStrings.Append((byte)MetaData.Languages.Default, "", "");
+                            defLangStrings.Add(new StrItem((byte)MetaData.Languages.Default, "", ""));
                         }
 
                         defLangStrings[2].Title = value.ToString();
@@ -385,7 +385,7 @@ namespace ObjectRelocator
             {
                 if (HasTitleAndDescription)
                 {
-                    StrItemList strs = strings?.LanguageItems(MetaData.Languages.Default);
+                    List<StrItem> strs = strings?.LanguageItems(MetaData.Languages.Default);
 
                     if (strs?[0] != null)
                     {
@@ -406,7 +406,7 @@ namespace ObjectRelocator
             {
                 if (HasTitleAndDescription)
                 {
-                    StrItemList strs = strings.LanguageItems(MetaData.Languages.Default);
+                    List<StrItem> strs = strings.LanguageItems(MetaData.Languages.Default);
 
                     if (strs?[1] != null)
                     {
@@ -510,56 +510,31 @@ namespace ObjectRelocator
                                     }
                                     else if (objd.GroupID != DBPFData.GROUP_LOCAL)
                                     {
-                                        foreach (string gameFolder in GameData.gameFolders)
+                                        Cres remoteCres = (Cres)GameData.GetMaxisResource(Cres.TYPE, cresName);
+
+                                        if (remoteCres != null)
                                         {
-                                            string cresPackagePath = $"{gameFolder}\\Objects05.package";
+                                            List<Cres> remoteCress = new List<Cres>();
+                                            List<Shpe> remoteShpes = new List<Shpe>();
 
-                                            if (File.Exists(cresPackagePath))
+                                            remoteCress.Add(remoteCres);
+
+                                            foreach (DBPFKey shpeKey in remoteCres.ShpeKeys)
                                             {
-                                                using (DBPFFile cresPackage = new DBPFFile(cresPackagePath))
+                                                Shpe remoteShpe = (Shpe)GameData.GetMaxisResource(shpeKey.TypeID, shpeKey, true);
+
+                                                if (remoteShpe != null)
                                                 {
-                                                    Cres remoteCres = (Cres)cresPackage.GetResourceByName(Cres.TYPE, cresName);
-
-                                                    if (remoteCres != null)
-                                                    {
-                                                        List<Cres> remoteCress = new List<Cres>();
-                                                        List<Shpe> remoteShpes = new List<Shpe>();
-
-                                                        remoteCress.Add(remoteCres);
-
-                                                        string shpePackagePath = $"{gameFolder}\\Objects06.package";
-
-                                                        if (File.Exists(shpePackagePath))
-                                                        {
-                                                            using (DBPFFile shpePackage = new DBPFFile(shpePackagePath))
-                                                            {
-                                                                foreach (DBPFKey shpeKey in remoteCres.ShpeKeys)
-                                                                {
-                                                                    Shpe remoteShpe = (Shpe)shpePackage.GetResourceByKey(shpeKey);
-
-                                                                    if (remoteShpe != null)
-                                                                    {
-                                                                        remoteShpes.Add(remoteShpe);
-                                                                    }
-                                                                }
-
-                                                                if (remoteShpes.Count == remoteCres.ShpeKeys.Count)
-                                                                {
-                                                                    cress = remoteCress;
-                                                                    shpes = remoteShpes;
-
-                                                                    sgResState = SgResState.Remote;
-                                                                }
-
-                                                                shpePackage.Close();
-                                                            }
-                                                        }
-                                                    }
-
-                                                    cresPackage.Close();
+                                                    remoteShpes.Add(remoteShpe);
                                                 }
+                                            }
 
-                                                if (cress.Count != 0) break;
+                                            if (remoteShpes.Count == remoteCres.ShpeKeys.Count)
+                                            {
+                                                cress = remoteCress;
+                                                shpes = remoteShpes;
+
+                                                sgResState = SgResState.Remote;
                                             }
                                         }
                                     }
