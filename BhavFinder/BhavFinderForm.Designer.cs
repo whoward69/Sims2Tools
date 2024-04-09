@@ -109,6 +109,7 @@ namespace BhavFinder
             this.btnGO = new System.Windows.Forms.Button();
             this.gridFoundBhavs = new System.Windows.Forms.DataGridView();
             this.colBhavPackage = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colBhavDbpfPath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colBhavDbpfEntry = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colBhavInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colBhavName = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -891,6 +892,7 @@ namespace BhavFinder
             this.gridFoundBhavs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridFoundBhavs.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colBhavPackage,
+            this.colBhavDbpfPath,
             this.colBhavDbpfEntry,
             this.colBhavInstance,
             this.colBhavName,
@@ -921,6 +923,17 @@ namespace BhavFinder
             this.colBhavPackage.Name = "colBhavPackage";
             this.colBhavPackage.ReadOnly = true;
             this.colBhavPackage.Visible = false;
+            // 
+            // colBhavDbpfPath
+            // 
+            this.colBhavDbpfPath.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
+            this.colBhavDbpfPath.DataPropertyName = "DbpfPath";
+            this.colBhavDbpfPath.FillWeight = 5F;
+            this.colBhavDbpfPath.HeaderText = "Dbpf Path";
+            this.colBhavDbpfPath.MaxInputLength = 6;
+            this.colBhavDbpfPath.Name = "colBhavDbpfPath";
+            this.colBhavDbpfPath.ReadOnly = true;
+            this.colBhavDbpfPath.Visible = false;
             // 
             // colBhavDbpfEntry
             // 
@@ -1303,6 +1316,7 @@ namespace BhavFinder
         private System.Windows.Forms.ContextMenuStrip menuContextFoundBhavs;
         private System.Windows.Forms.ToolStripMenuItem menuItemExtract;
         private System.Windows.Forms.DataGridViewTextBoxColumn colBhavPackage;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colBhavDbpfPath;
         private System.Windows.Forms.DataGridViewTextBoxColumn colBhavDbpfEntry;
         private System.Windows.Forms.DataGridViewTextBoxColumn colBhavInstance;
         private System.Windows.Forms.DataGridViewTextBoxColumn colBhavName;

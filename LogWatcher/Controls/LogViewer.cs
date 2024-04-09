@@ -67,6 +67,9 @@ namespace LogWatcher.Controls
             }
         }
 
+        private readonly AttributesDataTable dataTableAttributes = new AttributesDataTable();
+        private readonly LotObjectsDataTable dataTableLotObjects = new LotObjectsDataTable();
+
         private ISearcher searcher;
 
         private string logFilePath;
@@ -159,6 +162,9 @@ namespace LogWatcher.Controls
         public LogViewer()
         {
             InitializeComponent();
+
+            gridAttributes.DataSource = dataTableAttributes;
+            gridLotObjects.DataSource = dataTableLotObjects;
         }
 
         private void OnTreeNodeClicked(object sender, TreeViewEventArgs e)
@@ -197,7 +203,8 @@ namespace LogWatcher.Controls
 
                 if (type.Equals("data"))
                 {
-                    gridAttributes.Rows.Clear();
+                    dataTableAttributes.Clear();
+
                     gridAttributes.Columns["colAttrIndex"].Visible = true;
                     gridAttributes.Columns["colAttrValueHex"].Visible = true;
 
@@ -207,19 +214,19 @@ namespace LogWatcher.Controls
                     {
                         if (nodeData.Name.Equals("globals"))
                         {
-                            gridAttributes.Rows.Add(index, dataGlobal[index], GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
+                            dataTableAttributes.Append(index, dataGlobal[index], GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
                         }
                         else if (nodeData.Name.Equals("general"))
                         {
-                            gridAttributes.Rows.Add(index, dataGeneral[index], GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
+                            dataTableAttributes.Append(index, dataGeneral[index], GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
                         }
                         else if (nodeData.Name.Equals("person"))
                         {
-                            gridAttributes.Rows.Add(index, dataPerson[index], GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
+                            dataTableAttributes.Append(index, dataPerson[index], GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
                         }
                         else if (nodeData.Name.Equals("motives"))
                         {
-                            gridAttributes.Rows.Add(index, dataMotive[index], GetNumAttr(attr, "value"), null);
+                            dataTableAttributes.Append(index, dataMotive[index], GetNumAttr(attr, "value"), null);
                             gridAttributes.Columns["colAttrValueHex"].Visible = false;
                         }
 
@@ -231,13 +238,14 @@ namespace LogWatcher.Controls
                 }
                 else if (type.Equals("attr"))
                 {
-                    gridAttributes.Rows.Clear();
+                    dataTableAttributes.Clear();
+
                     gridAttributes.Columns["colAttrIndex"].Visible = true;
                     gridAttributes.Columns["colAttrValueHex"].Visible = true;
 
                     foreach (XmlElement attr in nodeData.ChildNodes)
                     {
-                        gridAttributes.Rows.Add(GetIntAttr(attr, "index"), attr.GetAttribute("key"), GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
+                        dataTableAttributes.Append(GetIntAttr(attr, "index"), attr.GetAttribute("key"), GetIntAttr(attr, "value"), GetIntAttrAsHex(attr, "value"));
                     }
 
                     gridAttributes.Sort(gridAttributes.Columns["colAttrIndex"], ListSortDirection.Ascending);
@@ -245,24 +253,25 @@ namespace LogWatcher.Controls
                 }
                 else if (type.Equals("lotobj"))
                 {
-                    gridLotObjects.Rows.Clear();
+                    dataTableLotObjects.Clear();
 
                     foreach (XmlElement lotObj in nodeData.ChildNodes)
                     {
-                        gridLotObjects.Rows.Add(GetIntAttr(lotObj, "oid"), lotObj.GetAttribute("object"), GetIntAttr(lotObj, "room"), GetIntAttr(lotObj, "container"), GetIntAttr(lotObj, "slot"));
+                        dataTableLotObjects.Append(GetIntAttr(lotObj, "oid"), lotObj.GetAttribute("object"), GetIntAttr(lotObj, "room"), GetIntAttr(lotObj, "container"), GetIntAttr(lotObj, "slot"));
                     }
 
                     gridLotObjects.Visible = true;
                 }
                 else if (type.Equals("cheat"))
                 {
-                    gridAttributes.Rows.Clear();
+                    dataTableAttributes.Clear();
+
                     gridAttributes.Columns["colAttrIndex"].Visible = false;
                     gridAttributes.Columns["colAttrValueHex"].Visible = false;
 
                     foreach (XmlElement cheat in nodeData.ChildNodes)
                     {
-                        gridAttributes.Rows.Add("", cheat.GetAttribute("key"), cheat.GetAttribute("value"), null);
+                        dataTableAttributes.Append("", cheat.GetAttribute("key"), cheat.GetAttribute("value"), null);
                     }
 
                     gridAttributes.Sort(gridAttributes.Columns["colAttrKey"], ListSortDirection.Ascending);
@@ -425,6 +434,37 @@ namespace LogWatcher.Controls
             }
 
             toolTipTextBox.Hide(textBox);
+        }
+
+        private void OnToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                string s = null;
+
+                if (sender == gridLotObjects && e.ColumnIndex == 3)
+                {
+                    s = gridLotObjects.Rows[e.RowIndex].Cells[e.ColumnIndex].Value as string;
+                }
+                else if (sender == gridAttributes && (e.ColumnIndex == 2 || e.ColumnIndex == 3))
+                {
+                    s = gridAttributes.Rows[e.RowIndex].Cells[2].Value as string;
+                }
+
+                if (s != null && short.TryParse(s, out short i))
+                {
+                    string tt = Helper.Hex4PrefixString(i);
+
+                    XmlNode node = logXml.Root.SelectSingleNode($"lotObjects/lotobj[@oid='{s}']");
+
+                    if (node != null)
+                    {
+                        tt = $"{tt} - {node.Attributes.GetNamedItem("object")?.Value}";
+                    }
+
+                    e.ToolTipText = tt;
+                }
+            }
         }
     }
 }

@@ -35,13 +35,13 @@ namespace LogWatcher.Controls
             this.panelMultiView = new System.Windows.Forms.Panel();
             this.textBox = new System.Windows.Forms.RichTextBox();
             this.gridLotObjects = new System.Windows.Forms.DataGridView();
+            this.gridAttributes = new System.Windows.Forms.DataGridView();
+            this.toolTipTextBox = new System.Windows.Forms.ToolTip(this.components);
             this.colLotObjId = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colLotObjName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colLotRoom = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colLotContainer = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colLotSlot = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gridAttributes = new System.Windows.Forms.DataGridView();
-            this.toolTipTextBox = new System.Windows.Forms.ToolTip(this.components);
             this.colAttrIndex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAttrKey = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAttrValueDec = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -124,45 +124,7 @@ namespace LogWatcher.Controls
             this.gridLotObjects.Size = new System.Drawing.Size(419, 448);
             this.gridLotObjects.TabIndex = 1;
             this.gridLotObjects.Visible = false;
-            // 
-            // colLotObjId
-            // 
-            this.colLotObjId.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colLotObjId.HeaderText = "Id";
-            this.colLotObjId.Name = "colLotObjId";
-            this.colLotObjId.ReadOnly = true;
-            this.colLotObjId.Width = 41;
-            // 
-            // colLotObjName
-            // 
-            this.colLotObjName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colLotObjName.HeaderText = "Object";
-            this.colLotObjName.Name = "colLotObjName";
-            this.colLotObjName.ReadOnly = true;
-            // 
-            // colLotRoom
-            // 
-            this.colLotRoom.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colLotRoom.HeaderText = "Room";
-            this.colLotRoom.Name = "colLotRoom";
-            this.colLotRoom.ReadOnly = true;
-            this.colLotRoom.Width = 60;
-            // 
-            // colLotContainer
-            // 
-            this.colLotContainer.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colLotContainer.HeaderText = "Container";
-            this.colLotContainer.Name = "colLotContainer";
-            this.colLotContainer.ReadOnly = true;
-            this.colLotContainer.Width = 77;
-            // 
-            // colLotSlot
-            // 
-            this.colLotSlot.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colLotSlot.HeaderText = "Slot";
-            this.colLotSlot.Name = "colLotSlot";
-            this.colLotSlot.ReadOnly = true;
-            this.colLotSlot.Width = 50;
+            this.gridLotObjects.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
             // 
             // gridAttributes
             // 
@@ -183,10 +145,56 @@ namespace LogWatcher.Controls
             this.gridAttributes.Size = new System.Drawing.Size(419, 448);
             this.gridAttributes.TabIndex = 1;
             this.gridAttributes.Visible = false;
+            this.gridAttributes.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
+            // 
+            // colLotObjId
+            // 
+            this.colLotObjId.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colLotObjId.DataPropertyName = "Id";
+            this.colLotObjId.HeaderText = "Id";
+            this.colLotObjId.Name = "colLotObjId";
+            this.colLotObjId.ReadOnly = true;
+            this.colLotObjId.Width = 41;
+            // 
+            // colLotObjName
+            // 
+            this.colLotObjName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colLotObjName.DataPropertyName = "Object";
+            this.colLotObjName.HeaderText = "Object";
+            this.colLotObjName.Name = "colLotObjName";
+            this.colLotObjName.ReadOnly = true;
+            // 
+            // colLotRoom
+            // 
+            this.colLotRoom.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colLotRoom.DataPropertyName = "Room";
+            this.colLotRoom.HeaderText = "Room";
+            this.colLotRoom.Name = "colLotRoom";
+            this.colLotRoom.ReadOnly = true;
+            this.colLotRoom.Width = 60;
+            // 
+            // colLotContainer
+            // 
+            this.colLotContainer.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colLotContainer.DataPropertyName = "Container";
+            this.colLotContainer.HeaderText = "Container";
+            this.colLotContainer.Name = "colLotContainer";
+            this.colLotContainer.ReadOnly = true;
+            this.colLotContainer.Width = 77;
+            // 
+            // colLotSlot
+            // 
+            this.colLotSlot.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colLotSlot.DataPropertyName = "Slot";
+            this.colLotSlot.HeaderText = "Slot";
+            this.colLotSlot.Name = "colLotSlot";
+            this.colLotSlot.ReadOnly = true;
+            this.colLotSlot.Width = 50;
             // 
             // colAttrIndex
             // 
             this.colAttrIndex.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colAttrIndex.DataPropertyName = "Index";
             this.colAttrIndex.HeaderText = "Index";
             this.colAttrIndex.Name = "colAttrIndex";
             this.colAttrIndex.ReadOnly = true;
@@ -195,6 +203,7 @@ namespace LogWatcher.Controls
             // colAttrKey
             // 
             this.colAttrKey.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colAttrKey.DataPropertyName = "Name";
             this.colAttrKey.HeaderText = "Name";
             this.colAttrKey.Name = "colAttrKey";
             this.colAttrKey.ReadOnly = true;
@@ -203,6 +212,7 @@ namespace LogWatcher.Controls
             // colAttrValueDec
             // 
             this.colAttrValueDec.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colAttrValueDec.DataPropertyName = "Value";
             this.colAttrValueDec.HeaderText = "Value";
             this.colAttrValueDec.Name = "colAttrValueDec";
             this.colAttrValueDec.ReadOnly = true;
@@ -210,6 +220,7 @@ namespace LogWatcher.Controls
             // colAttrValueHex
             // 
             this.colAttrValueHex.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colAttrValueHex.DataPropertyName = "Hex";
             this.colAttrValueHex.HeaderText = "Hex";
             this.colAttrValueHex.Name = "colAttrValueHex";
             this.colAttrValueHex.ReadOnly = true;
@@ -238,13 +249,13 @@ namespace LogWatcher.Controls
         private System.Windows.Forms.Panel panelMultiView;
         private System.Windows.Forms.RichTextBox textBox;
         private System.Windows.Forms.DataGridView gridLotObjects;
+        private System.Windows.Forms.DataGridView gridAttributes;
+        private System.Windows.Forms.ToolTip toolTipTextBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLotObjId;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLotObjName;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLotRoom;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLotContainer;
         private System.Windows.Forms.DataGridViewTextBoxColumn colLotSlot;
-        private System.Windows.Forms.DataGridView gridAttributes;
-        private System.Windows.Forms.ToolTip toolTipTextBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn colAttrIndex;
         private System.Windows.Forms.DataGridViewTextBoxColumn colAttrKey;
         private System.Windows.Forms.DataGridViewTextBoxColumn colAttrValueDec;

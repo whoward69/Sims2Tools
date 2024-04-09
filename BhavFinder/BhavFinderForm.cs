@@ -102,6 +102,7 @@ namespace BhavFinder
 
             gridFoundBhavs.DataSource = bhavFoundData;
             this.gridFoundBhavs.Columns["colBhavPackage"].Visible = false;
+            this.gridFoundBhavs.Columns["colBhavDbpfPath"].Visible = false;
             this.gridFoundBhavs.Columns["colBhavDbpfEntry"].Visible = false;
 
             this.comboBhavInGroup.Items.Add("");
@@ -741,6 +742,7 @@ namespace BhavFinder
                         {
                             DataRow row = bhavFoundData.NewRow();
                             row["Package"] = fi.Name;
+                            row["DbpfPath"] = packagePath;
                             row["DbpfEntry"] = entry;
                             row["Instance"] = entry.InstanceID.ToShortString();
                             row["Name"] = bhav.KeyName;
@@ -911,13 +913,15 @@ namespace BhavFinder
 
                 Directory.CreateDirectory(dataFilePath);
 
-                using (DBPFFile package = new DBPFFile(textFilePath.Text))
-                {
-                    StreamWriter packageWriter = new StreamWriter($"{extractPath}\\package.xml");
-                    packageWriter.WriteLine($"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-                    packageWriter.WriteLine($"<package type=\"2\">");
+                StreamWriter packageWriter = new StreamWriter($"{extractPath}\\package.xml");
+                packageWriter.WriteLine($"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+                packageWriter.WriteLine($"<package type=\"2\">");
 
-                    foreach (DataGridViewRow row in gridFoundBhavs.SelectedRows)
+                foreach (DataGridViewRow row in gridFoundBhavs.SelectedRows)
+                {
+                    string dbpfPath = row.Cells["colBhavDbpfPath"].Value as string;
+
+                    using (DBPFFile package = new DBPFFile(dbpfPath))
                     {
                         DBPFEntry entry = row.Cells["colBhavDbpfEntry"].Value as DBPFEntry;
                         string dataFileName = $"{entry.ResourceID.Hex8String()}-{entry.GroupID.Hex8String()}-{entry.InstanceID.Hex8String()}.simpe";
@@ -950,13 +954,13 @@ namespace BhavFinder
                         packageWriter.WriteLine($"        <group>{entry.GroupID.IntString()}</group>");
                         packageWriter.WriteLine($"        <instance>{entry.InstanceID.IntString()}</instance>");
                         packageWriter.WriteLine($"    </packedfile>");
+
+                        package.Close();
                     }
-
-                    packageWriter.WriteLine($"</package>");
-                    packageWriter.Close();
-
-                    package.Close();
                 }
+
+                packageWriter.WriteLine($"</package>");
+                packageWriter.Close();
             }
         }
     }

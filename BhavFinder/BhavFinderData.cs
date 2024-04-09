@@ -19,6 +19,7 @@ namespace BhavFinder
         public BhavFinderData()
         {
             this.Columns.Add(new DataColumn("Package", typeof(string)));
+            this.Columns.Add(new DataColumn("DbpfPath", typeof(object)));
             this.Columns.Add(new DataColumn("DbpfEntry", typeof(object)));
             this.Columns.Add(new DataColumn("Instance", typeof(string)));
             this.Columns.Add(new DataColumn("Name", typeof(string)));
