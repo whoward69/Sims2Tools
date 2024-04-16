@@ -19,26 +19,26 @@ namespace Sims2Tools.DBPF.STR
 {
     public class StrLanguage : IComparable<StrLanguage>
     {
-        readonly byte lid;
+        readonly MetaData.Languages lid;
 
-        public StrLanguage(byte lid)
+        public StrLanguage(MetaData.Languages lid)
         {
             this.lid = lid;
         }
 
-        public byte Id
+        private byte Id
         {
-            get => lid;
+            get => (byte)lid;
         }
 
         public MetaData.Languages Lid
         {
-            get => (MetaData.Languages)lid;
+            get => lid;
         }
 
         public string Name
         {
-            get => ((MetaData.Languages)lid).ToString();
+            get => lid.ToString();
         }
 
         public override string ToString()
@@ -46,14 +46,14 @@ namespace Sims2Tools.DBPF.STR
             return Name;
         }
 
-        public static implicit operator StrLanguage(byte val)
+        public static implicit operator StrLanguage(MetaData.Languages val)
         {
             return new StrLanguage(val);
         }
 
-        public static implicit operator byte(StrLanguage val)
+        public static implicit operator MetaData.Languages(StrLanguage val)
         {
-            return val.Id;
+            return val.Lid;
         }
 
         public override int GetHashCode()
@@ -69,7 +69,7 @@ namespace Sims2Tools.DBPF.STR
 
     public class StrItem
     {
-        private readonly StrLanguage lid;
+        private readonly StrLanguage lang;
         private string title;
         private string desc;
 
@@ -78,9 +78,9 @@ namespace Sims2Tools.DBPF.STR
         public bool IsDirty => _isDirty;
         public void SetClean() => _isDirty = false;
 
-        public StrItem(byte lid, string title, string desc, bool dirty = false)
+        public StrItem(MetaData.Languages lid, string title, string desc, bool dirty = false)
         {
-            this.lid = new StrLanguage(lid);
+            this.lang = new StrLanguage(lid);
             this.title = title;
             this.desc = desc;
             this._isDirty = dirty;
@@ -88,7 +88,7 @@ namespace Sims2Tools.DBPF.STR
 
         public StrLanguage Language
         {
-            get => lid;
+            get => lang;
         }
 
         public string Title
@@ -111,29 +111,29 @@ namespace Sims2Tools.DBPF.STR
             }
         }
 
-        internal static void Unserialize(DbpfReader reader, Dictionary<byte, List<StrItem>> languages)
+        internal static void Unserialize(DbpfReader reader, Dictionary<MetaData.Languages, List<StrItem>> languages)
         {
-            StrLanguage lid = new StrLanguage(reader.ReadByte());
+            StrLanguage l = new StrLanguage((MetaData.Languages)reader.ReadByte());
             string title = reader.ReadPChar();
             string desc = reader.ReadPChar();
 
-            if (!languages.ContainsKey(lid.Id)) languages.Add(lid.Id, new List<StrItem>());
+            if (!languages.ContainsKey(l)) languages.Add(l, new List<StrItem>());
 
-            ((List<StrItem>)languages[lid.Id]).Add(new StrItem(lid, title, desc));
+            ((List<StrItem>)languages[l]).Add(new StrItem(l, title, desc));
         }
 
         public uint FileSize => (uint)(1 + DbpfWriter.PLength(title) + DbpfWriter.PLength(desc));
 
         public void Serialize(DbpfWriter writer)
         {
-            writer.WriteByte(lid.Id);
+            writer.WriteByte((byte)lang.Lid);
             writer.WritePChar(title);
             writer.WritePChar(desc);
         }
 
         internal StrItem Clone()
         {
-            StrItem clone = new StrItem(lid.Id, title, desc);
+            StrItem clone = new StrItem(lang, title, desc);
 
             return clone;
         }

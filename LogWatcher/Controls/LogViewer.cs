@@ -409,12 +409,22 @@ namespace LogWatcher.Controls
                 if (char.IsDigit(c))
                 {
                     int prevSpacePos = textBox.Text.LastIndexOf(" ", pos);
+                    int prevTabPos = textBox.Text.LastIndexOf("\t", pos);
+                    int prevNlPos = textBox.Text.LastIndexOf("\n", pos);
+
+                    if (prevNlPos > prevSpacePos) prevSpacePos = prevNlPos;
+                    if (prevTabPos > prevSpacePos) prevSpacePos = prevTabPos;
                     if (prevSpacePos == -1) prevSpacePos = 0; else prevSpacePos += 1;
+
                     int nextSpacePos = textBox.Text.IndexOf(" ", pos);
+                    int nextTabPos = textBox.Text.IndexOf("\t", pos);
+                    int nextNlPos = textBox.Text.IndexOf("\n", pos);
+
+                    if (nextNlPos != -1 && nextNlPos < nextSpacePos) nextSpacePos = nextNlPos;
+                    if (nextTabPos != -1 && nextTabPos < nextSpacePos) nextSpacePos = nextTabPos;
                     if (nextSpacePos == -1) nextSpacePos = textBox.Text.Length - 1; else nextSpacePos -= 1;
 
                     string s = textBox.Text.Substring(prevSpacePos, nextSpacePos - prevSpacePos + 1);
-                    s = s.Replace("\n", "");
 
                     if (short.TryParse(s, out short i))
                     {

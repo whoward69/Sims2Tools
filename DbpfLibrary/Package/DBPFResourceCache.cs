@@ -76,6 +76,12 @@ namespace Sims2Tools.DBPF.Package
             itemByKey[key] = item;
         }
 
+        internal void UnCommit(DBPFKey key)
+        {
+            resourceByKey.Remove(key);
+            itemByKey.Remove(key);
+        }
+
         internal bool Remove(DBPFResource resource)
         {
             return resourceByKey.Remove(resource);

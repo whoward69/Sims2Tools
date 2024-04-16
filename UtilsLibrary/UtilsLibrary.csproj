@@ -119,6 +119,7 @@
       <DependentUpon>TextEntryDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IO\PjseStringFileReader.cs" />
     <Compile Include="IO\Sims2Directory.cs" />
     <Compile Include="SimpeData.cs" />
     <Compile Include="GameData.cs" />

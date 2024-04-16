@@ -47,6 +47,7 @@
             this.textMessages.Size = new System.Drawing.Size(776, 391);
             this.textMessages.TabIndex = 0;
             this.textMessages.TabStop = false;
+            this.textMessages.WordWrap = false;
             // 
             // btnGo
             // 

@@ -9,6 +9,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.Data;
@@ -44,11 +45,13 @@ namespace OutfitOrganiser
         private string packageNameNoExtn;
         private string packageName;
 
-        private readonly Binx binx;
-        private readonly Idr idrForBinx;
         private readonly Cpf cpf;
         private readonly Idr idrForCpf;
         private readonly Str str;
+
+        // Both these will be null for Default Replacements (DRs)
+        private readonly Binx binx;
+        private readonly Idr idrForBinx;
 
         private readonly bool isAccessory = false;
         private readonly bool isClothing = false;
@@ -59,6 +62,8 @@ namespace OutfitOrganiser
         public string PackagePath => packagePath;
         public string PackageNameNoExtn => packageNameNoExtn;
         public string PackageName => packageName;
+
+        public bool IsDefaultReplacement => (binx == null);
 
         public bool IsAccessory => isAccessory;
         public bool IsClothing => isClothing;
@@ -79,8 +84,20 @@ namespace OutfitOrganiser
 
         public static OutfitDbpfData Create(OrganiserDbpfFile package, OutfitDbpfData outfitData)
         {
-            // This is correct, we want the original (clean) resources from the package using the old (dirty) resource as the key
-            return Create(package, package.GetEntryByKey(outfitData.binx));
+            if (outfitData.IsDefaultReplacement)
+            {
+                Gzps gzps = (Gzps)package.GetResourceByKey(outfitData.cpf);
+
+                DBPFKey idrForGzpsKey = new DBPFKey(Idr.TYPE, gzps);
+                Idr idrForGzps = (Idr)(package.GetResourceByKey(idrForGzpsKey) ?? GameData.GetMaxisResource(Idr.TYPE, gzps, false));
+
+                return CreateDR(package, gzps, idrForGzps);
+            }
+            else
+            {
+                // This is correct, we want the original (clean) resources from the package using the old (dirty) resource as the key
+                return Create(package, package.GetEntryByKey(outfitData.binx));
+            }
         }
 
         public static OutfitDbpfData Create(OrganiserDbpfFile package, DBPFKey binxKey)
@@ -109,9 +126,9 @@ namespace OutfitOrganiser
             return outfitData;
         }
 
-        public static OutfitDbpfData Create(OrganiserDbpfFile package, Binx binx, Idr idrForBinx, Gzps gzps, Idr idrForGzps)
+        public static OutfitDbpfData CreateDR(OrganiserDbpfFile package, Gzps gzps, Idr idrForGzps)
         {
-            return new OutfitDbpfData(package, binx, idrForBinx, gzps, idrForGzps);
+            return new OutfitDbpfData(package, null, null, gzps, idrForGzps);
         }
 
         public static OutfitDbpfData Create(OrganiserDbpfFile package, Binx binx, Idr idrForBinx, DBPFResource res)
@@ -160,13 +177,17 @@ namespace OutfitOrganiser
             this.packageNameNoExtn = package.PackageNameNoExtn;
             this.packageName = package.PackageName;
 
-            this.binx = binx;
-            this.idrForBinx = idrForBinx;
             this.cpf = cpf;
             this.idrForCpf = idrForCpf;
 
-            // This could be in a different group/.package
-            this.str = (Str)package.GetResourceByKey(idrForBinx.GetItem(binx.GetItem("stringsetidx").UIntegerValue));
+            this.binx = binx;
+            this.idrForBinx = idrForBinx;
+
+            if (!IsDefaultReplacement)
+            {
+                // This could be in a different group/.package
+                this.str = (Str)package.GetResourceByKey(idrForBinx.GetItem(binx.GetItem("stringsetidx").UIntegerValue));
+            }
 
             uint itemType = ItemType;
             uint subtype = Subtype;
@@ -216,11 +237,45 @@ namespace OutfitOrganiser
 
         private void UpdatePackage()
         {
-            if (binx != null && binx.IsDirty) cache.GetOrAdd(packagePath).Commit(binx);
-            if (idrForBinx != null && idrForBinx.IsDirty) cache.GetOrAdd(packagePath).Commit(idrForBinx);
-            if (cpf.IsDirty) cache.GetOrAdd(packagePath).Commit(cpf);
-            if (str != null && str.IsDirty) cache.GetOrAdd(packagePath).Commit(str);
-            if (idrForCpf.IsDirty) cache.GetOrAdd(packagePath).Commit(idrForCpf);
+            if (IsDirty)
+            {
+                OrganiserDbpfFile package = cache.GetOrAdd(packagePath);
+
+                if (cpf.IsDirty) package.Commit(cpf);
+                if (idrForCpf.IsDirty) package.Commit(idrForCpf);
+
+                if (str != null && str.IsDirty) package.Commit(str);
+
+                if (!IsDefaultReplacement)
+                {
+                    if (binx != null && binx.IsDirty) package.Commit(binx);
+                    if (idrForBinx != null && idrForBinx.IsDirty) package.Commit(idrForBinx);
+                }
+            }
+        }
+
+        public void UnUpdatePackage()
+        {
+            if (IsDirty)
+            {
+                OrganiserDbpfFile package = cache.GetOrAdd(packagePath);
+
+                if (cpf.IsDirty) package.UnCommit(cpf);
+                if (idrForCpf.IsDirty) package.UnCommit(idrForCpf);
+
+                if (str != null && str.IsDirty) package.UnCommit(str);
+
+                if (!IsDefaultReplacement)
+                {
+                    if (binx != null && binx.IsDirty) package.UnCommit(binx);
+                    if (idrForBinx != null && idrForBinx.IsDirty) package.UnCommit(idrForBinx);
+                }
+
+                if (!package.IsDirty)
+                {
+                    cache.SetClean(package);
+                }
+            }
         }
 
         public uint Product
@@ -429,38 +484,45 @@ namespace OutfitOrganiser
             }
             set
             {
-                if (binx != null && idrForBinx != null)
+                if (!IsDefaultReplacement)
                 {
-                    CpfItem binidx = binx.GetItem("binidx");
-                    if (binidx != null)
+                    if (idrForBinx != null)
                     {
-                        if (value == 0)
+                        CpfItem binidx = binx.GetItem("binidx");
+                        if (binidx != null)
                         {
-                            // Non-BV Accessory
-                            cpf.GetOrAddItem("parts", MetaData.DataTypes.dtUInteger).UIntegerValue = 0x00000000;
-                            cpf.GetOrAddItem("outfit", MetaData.DataTypes.dtUInteger).UIntegerValue = 0x00000000;
-                            cpf.GetItem("subtype").UIntegerValue = 0x00000005;
-                            cpf.GetItem("bin").UIntegerValue = Properties.Settings.Default.AccessoryBin;
+                            if (value == 0)
+                            {
+                                // Non-BV Accessory
+                                cpf.GetOrAddItem("parts", MetaData.DataTypes.dtUInteger).UIntegerValue = 0x00000000;
+                                cpf.GetOrAddItem("outfit", MetaData.DataTypes.dtUInteger).UIntegerValue = 0x00000000;
+                                cpf.GetItem("subtype").UIntegerValue = 0x00000005;
+                                cpf.GetItem("bin").UIntegerValue = Properties.Settings.Default.AccessoryBin;
 
-                            idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_COLLECTIONS, DBPFData.INSTANCE_COLLECTIONS, DBPFData.RESOURCE_NULL));
+                                idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_COLLECTIONS, DBPFData.INSTANCE_COLLECTIONS, DBPFData.RESOURCE_NULL));
+                            }
+                            else
+                            {
+                                // BV Jewelry
+                                cpf.GetOrAddItem("parts", MetaData.DataTypes.dtUInteger).UIntegerValue = 0x00000020;
+                                cpf.GetOrAddItem("outfit", MetaData.DataTypes.dtUInteger).UIntegerValue = 0x00000020;
+                                cpf.GetItem("subtype").UIntegerValue = 0x00000008;
+                                cpf.GetItem("bin").UIntegerValue = value;
+
+                                idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_BONVOYAGE, (TypeInstanceID)Destination, DBPFData.RESOURCE_NULL));
+                            }
+
+                            UpdatePackage();
                         }
                         else
                         {
-                            // BV Jewelry
-                            cpf.GetOrAddItem("parts", MetaData.DataTypes.dtUInteger).UIntegerValue = 0x00000020;
-                            cpf.GetOrAddItem("outfit", MetaData.DataTypes.dtUInteger).UIntegerValue = 0x00000020;
-                            cpf.GetItem("subtype").UIntegerValue = 0x00000008;
-                            cpf.GetItem("bin").UIntegerValue = value;
-
-                            idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_BONVOYAGE, (TypeInstanceID)Destination, DBPFData.RESOURCE_NULL));
+                            logger.Warn($"No 'binidx' entry for {cpf}");
                         }
-
-                        UpdatePackage();
                     }
-                    else
-                    {
-                        logger.Warn($"No 'binidx' entry for {cpf}");
-                    }
+                }
+                else
+                {
+                    // We'll just ignore this, as you can't change the jewelry bin/destination for DR accessories (as that info is in the globalcatbin.bundle.package resources)
                 }
             }
         }
@@ -489,26 +551,33 @@ namespace OutfitOrganiser
             }
             set
             {
-                if (binx != null && idrForBinx != null)
+                if (IsDefaultReplacement)
                 {
-                    CpfItem binidx = binx.GetItem("binidx");
-                    if (binidx != null)
+                    if (idrForBinx != null)
                     {
-                        if (value == 0)
+                        CpfItem binidx = binx.GetItem("binidx");
+                        if (binidx != null)
                         {
-                            idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_COLLECTIONS, DBPFData.INSTANCE_COLLECTIONS, DBPFData.RESOURCE_NULL));
+                            if (value == 0)
+                            {
+                                idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_COLLECTIONS, DBPFData.INSTANCE_COLLECTIONS, DBPFData.RESOURCE_NULL));
+                            }
+                            else
+                            {
+                                idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_BONVOYAGE, (TypeInstanceID)value, DBPFData.RESOURCE_NULL));
+                            }
+
+                            UpdatePackage();
                         }
                         else
                         {
-                            idrForBinx.SetItem(binidx.UIntegerValue, new DBPFKey(Coll.TYPE, DBPFData.GROUP_BONVOYAGE, (TypeInstanceID)value, DBPFData.RESOURCE_NULL));
+                            logger.Warn($"No 'binidx' entry for {cpf}");
                         }
-
-                        UpdatePackage();
                     }
-                    else
-                    {
-                        logger.Warn($"No 'binidx' entry for {cpf}");
-                    }
+                }
+                else
+                {
+                    // We'll just ignore this, as you can't change the jewelry bin/destination for DR accessories (as that info is in the globalcatbin.bundle.package resources)
                 }
             }
         }
@@ -588,10 +657,14 @@ namespace OutfitOrganiser
             }
             set
             {
-                if (binx != null)
+                if (!IsDefaultReplacement)
                 {
                     binx.GetItem("sortindex").IntegerValue = (int)value;
                     UpdatePackage();
+                }
+                else
+                {
+                    // We'll just ignore this, as you can't change the sort order for DRs (as that info is in the globalcatbin.bundle.package resources)
                 }
             }
         }
@@ -699,6 +772,7 @@ namespace OutfitOrganiser
         public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
 
         public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
+        public void UnCommit(DBPFKey key) => package.UnCommit(key);
 
         public string Update(bool autoBackup) => package.Update(autoBackup);
 
@@ -729,15 +803,15 @@ namespace OutfitOrganiser
 
         public bool IsDirty => (cache.Count > 0);
 
-        public bool SetClean(OrganiserDbpfFile package)
+        public void SetClean(OrganiserDbpfFile package)
         {
             package.DeCache();
-            return SetClean(package.PackagePath);
+            SetClean(package.PackagePath);
         }
 
-        public bool SetClean(string packagePath)
+        public void SetClean(string packagePath)
         {
-            return cache.Remove(packagePath);
+            cache.Remove(packagePath);
         }
 
         public OrganiserDbpfFile GetOrOpen(string packagePath)

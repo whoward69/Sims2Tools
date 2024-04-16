@@ -53,7 +53,7 @@ namespace LogWatcher
         public LotObjectsDataTable()
         {
             // Must match the order in the DataGridView control
-            this.Columns.Add(new DataColumn("Id", typeof(string)));
+            this.Columns.Add(new DataColumn("Id", typeof(int)));
             this.Columns.Add(new DataColumn("Object", typeof(string)));
             this.Columns.Add(new DataColumn("Room", typeof(string)));
             this.Columns.Add(new DataColumn("Container", typeof(string)));

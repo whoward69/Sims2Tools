@@ -165,15 +165,17 @@ namespace Sims2Tools.DBPF.Package
             }
         }
 
-        public string Update(string subFolder)
-        {
-            return Update(false, subFolder);
-        }
+        public void Commit(DBPFResource resource, bool ignoreDirty = false) => resourceIndex.Commit(resource, ignoreDirty);
 
-        public string Update(bool autoBackup)
-        {
-            return Update(autoBackup, null);
-        }
+        public void Commit(DBPFKey key, byte[] item) => resourceIndex.Commit(key, item);
+
+        public void UnCommit(DBPFKey key) => resourceIndex.UnCommit(key);
+
+        public bool Remove(DBPFResource resource) => resourceIndex.Remove(resource);
+
+        public string Update(string subFolder) => Update(false, subFolder);
+
+        public string Update(bool autoBackup) => Update(autoBackup, null);
 
         private string Update(bool autoBackup, string subFolder)
         {
@@ -225,21 +227,6 @@ namespace Sims2Tools.DBPF.Package
             }
 
             return (subFolder != null) ? updateName : backupName;
-        }
-
-        public void Commit(DBPFResource resource, bool ignoreDirty = false)
-        {
-            resourceIndex.Commit(resource, ignoreDirty);
-        }
-
-        public void Commit(DBPFKey key, byte[] item)
-        {
-            resourceIndex.Commit(key, item);
-        }
-
-        public bool Remove(DBPFResource resource)
-        {
-            return resourceIndex.Remove(resource);
         }
 
         private string NextBackupName()

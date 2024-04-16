@@ -46,7 +46,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             NameResource.BlockName = blkName;
             NameResource.BlockID = blkId;
 
-            // TODO - _library - complete this by reading the MipMaps, but for now, just cache the raw data.
+            // TODO - _library - Complete this by reading the MipMaps, but for now, just cache the raw data.
             imageData = reader.ReadBytes((int)(reader.Length - (reader.Position - reader.StartPos)));
 
 #if DEBUG

@@ -27,7 +27,8 @@ namespace Sims2Tools.DBPF.Package
         private readonly uint /*indexMajorVersion,*/ indexMinorVersion;
         private readonly uint resourceIndexCount, resourceIndexOffset /*, resourceIndexSize*/;
 
-        private readonly Dictionary<DBPFKey, DBPFEntry> entryByKey = new Dictionary<DBPFKey, DBPFEntry>();
+        private readonly Dictionary<DBPFKey, DBPFEntry> entriesByKey = new Dictionary<DBPFKey, DBPFEntry>();
+        private readonly Dictionary<DBPFKey, DBPFEntry> newEntriesByKey = new Dictionary<DBPFKey, DBPFEntry>();
 
         private readonly DBPFResourceCache resourceCache;
 
@@ -53,7 +54,7 @@ namespace Sims2Tools.DBPF.Package
                 int count = 0;
                 bool anyCompressed = false;
 
-                foreach (DBPFEntry entry in entryByKey.Values)
+                foreach (DBPFEntry entry in entriesByKey.Values)
                 {
                     if (entry.TypeID != Clst.TYPE)
                     {
@@ -63,6 +64,16 @@ namespace Sims2Tools.DBPF.Package
                         {
                             anyCompressed = true;
                         }
+                    }
+                }
+
+                foreach (DBPFEntry entry in newEntriesByKey.Values)
+                {
+                    ++count;
+
+                    if (entry.UncompressedSize > 0)
+                    {
+                        anyCompressed = true;
                     }
                 }
 
@@ -102,7 +113,7 @@ namespace Sims2Tools.DBPF.Package
         {
             List<DBPFEntry> result = new List<DBPFEntry>();
 
-            foreach (DBPFEntry entry in entryByKey.Values)
+            foreach (DBPFEntry entry in entriesByKey.Values)
             {
                 if (entry.TypeID != Clst.TYPE)
                 {
@@ -171,7 +182,7 @@ namespace Sims2Tools.DBPF.Package
                     FileSize = reader.ReadUInt32()
                 };
 
-                entryByKey[entry] = entry;
+                entriesByKey[entry] = entry;
 
                 if (entry.TypeID == Clst.TYPE)
                 {
@@ -226,11 +237,13 @@ namespace Sims2Tools.DBPF.Package
 
         internal void Commit(DBPFResource resource, bool ignoreDirty)
         {
+            if (resource.TypeID == Clst.TYPE) return;
+
             if (ignoreDirty || resource.IsDirty)
             {
                 if (GetEntryByKey(resource) == null)
                 {
-                    entryByKey.Add(resource, new DBPFEntry(resource));
+                    newEntriesByKey.Add(resource, new DBPFEntry(resource));
                 }
 
                 resourceCache.Commit(resource, ignoreDirty);
@@ -239,20 +252,34 @@ namespace Sims2Tools.DBPF.Package
 
         internal void Commit(DBPFKey key, byte[] item)
         {
+            if (key.TypeID == Clst.TYPE) return;
+
             if (GetEntryByKey(key) == null)
             {
-                entryByKey.Add(key, new DBPFEntry(key));
+                newEntriesByKey.Add(key, new DBPFEntry(key));
             }
 
             resourceCache.Commit(key, item);
         }
 
+        internal void UnCommit(DBPFKey key)
+        {
+            newEntriesByKey.Remove(key);
+
+            resourceCache.UnCommit(key);
+        }
+
         internal bool Remove(DBPFResource resource)
         {
-            if (entryByKey.Remove(resource))
+            if (entriesByKey.Remove(resource))
             {
                 _isDirty = true;
 
+                return resourceCache.Remove(resource);
+            }
+
+            if (newEntriesByKey.Remove(resource))
+            {
                 return resourceCache.Remove(resource);
             }
 
@@ -295,9 +322,9 @@ namespace Sims2Tools.DBPF.Package
 
                     // Just because there is an entry in the CLST resource does NOT mean the data is compressed! But we'll let the decompressor take care of it.
                     DBPFKey key = new DBPFKey(TypeID, GroupID, InstanceID, ResourceID);
-                    if (entryByKey.ContainsKey(key))
+                    if (entriesByKey.ContainsKey(key))
                     {
-                        entryByKey[key].UncompressedSize = uncompressedSize;
+                        entriesByKey[key].UncompressedSize = uncompressedSize;
                     }
 
                     done += ClstEntrySize;

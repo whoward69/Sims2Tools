@@ -260,7 +260,6 @@ namespace OutfitOrganiser
             menuItemAutosetBin.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetBin.Name, 1) != 0);
 
             menuItemPreloadMeshes.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, 0) != 0);
-            menuItemPreloadDrData.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadDrData.Name, 0) != 0);
 
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
@@ -294,11 +293,7 @@ namespace OutfitOrganiser
             savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims", "savedsims"), "savedsims");
             meshCachesLoaded = false;
 
-            drDataCache = new DrDataCache("drdata");
-            drDataCachesLoaded = false;
-
             if (menuItemAdvanced.Checked && menuItemPreloadMeshes.Checked) CacheMeshes();
-            if (menuItemAdvanced.Checked && menuItemPreloadDrData.Checked) CacheDrData();
 
             SetTitle(lastFolder);
         }
@@ -336,7 +331,6 @@ namespace OutfitOrganiser
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetBin.Name, menuItemAutosetBin.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadDrData.Name, menuItemPreloadDrData.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
@@ -386,15 +380,6 @@ namespace OutfitOrganiser
                 else if (meshCachesLoading)
                 {
                     displayPath = $"{displayPath} - Mesh Cache Loading...";
-                }
-
-                if (drDataCachesLoaded)
-                {
-                    displayPath = $"{displayPath} - DR Data Cache Loaded";
-                }
-                else if (drDataCachesLoading)
-                {
-                    displayPath = $"{displayPath} - DR Data Cache Loading...";
                 }
             }
 
@@ -630,16 +615,10 @@ namespace OutfitOrganiser
                         using (OrganiserDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
                         {
                             HashSet<DBPFKey> allGzps = new HashSet<DBPFKey>();
-                            HashSet<DBPFKey> allIdr = new HashSet<DBPFKey>();
 
                             foreach (DBPFEntry gzpsEntry in package.GetEntriesByType(Gzps.TYPE))
                             {
                                 allGzps.Add(gzpsEntry);
-                            }
-
-                            foreach (DBPFEntry idrEntry in package.GetEntriesByType(Idr.TYPE))
-                            {
-                                allIdr.Add(idrEntry);
                             }
 
                             // Process BINX/3IDR/GZPS triples, ie, custom clothing
@@ -652,12 +631,11 @@ namespace OutfitOrganiser
                                 }
 
                                 allGzps.Remove(new DBPFKey(Gzps.TYPE, binxEntry.GroupID, binxEntry.InstanceID, binxEntry.ResourceID));
-                                allIdr.Remove(new DBPFKey(Idr.TYPE, binxEntry.GroupID, binxEntry.InstanceID, binxEntry.ResourceID));
 
                                 AddToGrid(sender, package, OutfitDbpfData.Create(package, binxEntry));
                             }
 
-                            if (drDataCachesLoaded)
+                            if (menuItemAdvanced.Checked)
                             {
                                 bool startFromLastGameDir = false;
 
@@ -672,11 +650,7 @@ namespace OutfitOrganiser
 
                                         Idr idrForGzps = (Idr)package.GetResourceByKey(idrForGzpsKey);
 
-                                        if (idrForGzps != null)
-                                        {
-                                            allIdr.Remove(idrForGzpsKey);
-                                        }
-                                        else
+                                        if (idrForGzps == null)
                                         {
                                             idrForGzps = (Idr)GameData.GetMaxisResource(Idr.TYPE, gzpsKey, startFromLastGameDir);
 
@@ -685,25 +659,7 @@ namespace OutfitOrganiser
 
                                         if (idrForGzps != null)
                                         {
-                                            ProcessDR(sender, package, gzps, idrForGzps);
-                                        }
-                                    }
-                                }
-
-                                // Process lone IDR resources, ie, default replacements
-                                foreach (DBPFKey idrKey in allIdr)
-                                {
-                                    Idr idrForGzps = (Idr)package.GetResourceByKey(idrKey);
-
-                                    if (idrForGzps != null)
-                                    {
-                                        Gzps gzps = (Gzps)GameData.GetMaxisResource(Gzps.TYPE, idrKey, startFromLastGameDir);
-
-                                        if (gzps != null)
-                                        {
-                                            startFromLastGameDir = true;
-
-                                            ProcessDR(sender, package, gzps, idrForGzps);
+                                            AddToGrid(sender, package, OutfitDbpfData.CreateDR(package, gzps, idrForGzps));
                                         }
                                     }
                                 }
@@ -722,26 +678,6 @@ namespace OutfitOrganiser
                 if (MsgBox.Show($"An error occured while processing\n{workPackage.Folder}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
                 {
                     throw ex;
-                }
-            }
-        }
-
-        private void ProcessDR(ProgressDialog sender, OrganiserDbpfFile package, Gzps gzps, Idr idrForGzps)
-        {
-            DBPFKey binxKey = drDataCache.GetBinxKey(gzps);
-            string gameDataPackagePath = drDataCache.GetPackagePath(binxKey);
-
-            if (gameDataPackagePath != null)
-            {
-                using (DBPFFile gameDataPackage = new DBPFFile(drDataCache.GetPackagePath(binxKey)))
-                {
-                    Binx binx = (Binx)gameDataPackage.GetResourceByKey(binxKey);
-                    Idr idrForBinx = (Idr)gameDataPackage.GetResourceByKey(new DBPFKey(Idr.TYPE, binxKey));
-                    if (binx != null && idrForBinx != null)
-                    {
-                        AddToGrid(sender, package, OutfitDbpfData.Create(package, binx, idrForBinx, gzps, idrForGzps));
-                    }
-                    gameDataPackage.Close();
                 }
             }
         }
@@ -929,6 +865,8 @@ namespace OutfitOrganiser
                 if (outfitData.IsDirty)
                 {
                     row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+
+                    menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
                 }
                 else
                 {
@@ -1378,7 +1316,6 @@ namespace OutfitOrganiser
         private void OnOptionsMenuOpening(object sender, EventArgs e)
         {
             menuItemLoadMeshesNow.Enabled = !(meshCachesLoaded || meshCachesLoading);
-            menuItemLoadDrDataNow.Enabled = !(drDataCachesLoaded || drDataCachesLoading);
         }
 
         private void OnShowResTitleClicked(object sender, EventArgs e)
@@ -1429,19 +1366,6 @@ namespace OutfitOrganiser
                 CacheMeshes();
             }
         }
-
-        private void OnLoadDrDataNowClicked(object sender, EventArgs e)
-        {
-            CacheDrData();
-        }
-
-        private void OnPreloadDrDataClicked(object sender, EventArgs e)
-        {
-            if (menuItemPreloadDrData.Checked && !drDataCachesLoaded)
-            {
-                CacheDrData();
-            }
-        }
         #endregion
 
         #region Mode Menu Actions
@@ -1454,10 +1378,6 @@ namespace OutfitOrganiser
                 menuItemPreloadMeshes.Visible = true;
                 btnMeshes.Visible = true;
 
-                toolStripSeparator7.Visible = true;
-                menuItemLoadDrDataNow.Visible = true;
-                menuItemPreloadDrData.Visible = true;
-
                 menuItemNumericLayer.Visible = true;
 
                 btnTownify.Visible = (menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked) && (gridResources.SelectedRows.Count > 0);
@@ -1468,10 +1388,6 @@ namespace OutfitOrganiser
                 menuItemLoadMeshesNow.Visible = false;
                 menuItemPreloadMeshes.Visible = false;
                 btnMeshes.Visible = false;
-
-                toolStripSeparator7.Visible = false;
-                menuItemLoadDrDataNow.Visible = false;
-                menuItemPreloadDrData.Visible = false;
 
                 menuItemNumericLayer.Visible = false;
 
@@ -1621,6 +1537,11 @@ namespace OutfitOrganiser
                 case 0x20:
                     type = "Accessory";
                     break;
+            }
+
+            if (!string.IsNullOrEmpty(type) && outfitData.IsDefaultReplacement)
+            {
+                type = $"DR - {type}";
             }
 
             if (!string.IsNullOrEmpty(type) && outfitData.Outfit == 0)
@@ -3299,17 +3220,11 @@ namespace OutfitOrganiser
                 {
                     if ((row.Cells["colOutfitData"].Value as OutfitDbpfData).Equals(outfitData))
                     {
-                        packageCache.SetClean(outfitData.PackagePath);
+                        outfitData.UnUpdatePackage();
 
                         using (OrganiserDbpfFile package = packageCache.GetOrOpen(outfitData.PackagePath))
                         {
                             OutfitDbpfData originalData = OutfitDbpfData.Create(package, outfitData);
-
-                            if (originalData == null)
-                            {
-                                // TODO - Outfit Organiser - for Default Replacements this will return null, as there is no BINX in the package file
-                                // If the GZPS resource in the package, rebuild from that, otherwise use the idrForCpf resource
-                            }
 
                             row.Cells["colOutfitData"].Value = originalData;
 
@@ -3322,6 +3237,8 @@ namespace OutfitOrganiser
             }
 
             ReselectResourceRows(selectedData);
+
+            UpdateFormState();
         }
 
         private void OnResSaveThumbClicked(object sender, EventArgs e)
@@ -3643,39 +3560,6 @@ namespace OutfitOrganiser
                         meshCachesLoaded = true;
                         meshCachesLoading = false;
                         UpdateFormState();
-                        SetTitle(lastFolder);
-                    }));
-                });
-            }
-        }
-        #endregion
-
-        #region DR Data Cache
-        private bool drDataCachesLoaded = false;
-        private bool drDataCachesLoading = false;
-        private DrDataCache drDataCache;
-
-        private void CacheDrData()
-        {
-            if (!drDataCachesLoaded && !drDataCachesLoading)
-            {
-                int usableCores = Math.Max(1, System.Environment.ProcessorCount - 2);
-                SemaphoreSlim throttler = new SemaphoreSlim(initialCount: usableCores);
-
-                drDataCachesLoading = true;
-
-                List<Task> cacheTasks = new List<Task>(1)
-                {
-                    drDataCache.DeserializeAsync(throttler)
-                };
-
-                Task.WhenAll(cacheTasks).ContinueWith(t =>
-                {
-                    // Run on the main thread
-                    btnMeshes.BeginInvoke((Action)(() =>
-                    {
-                        drDataCachesLoaded = true;
-                        drDataCachesLoading = false;
                         SetTitle(lastFolder);
                     }));
                 });

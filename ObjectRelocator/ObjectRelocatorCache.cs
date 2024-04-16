@@ -83,7 +83,7 @@ namespace ObjectRelocator
                 {
                     List<StrItem> strs = strings?.LanguageItems(MetaData.Languages.Default);
 
-                    if (strs?[0] != null)
+                    if (strs != null && strs.Count > 0)
                     {
                         return strs[0].Title;
                     }
@@ -105,7 +105,7 @@ namespace ObjectRelocator
                 {
                     List<StrItem> strs = strings.LanguageItems(MetaData.Languages.Default);
 
-                    if (strs?[1] != null)
+                    if (strs != null && strs.Count > 1)
                     {
                         return strs[1].Title;
                     }
@@ -353,7 +353,7 @@ namespace ObjectRelocator
                         // Add any missing strings, [0]=name, [1]=author, [2]=cost
                         while (defLangStrings.Count < 3)
                         {
-                            defLangStrings.Add(new StrItem((byte)MetaData.Languages.Default, "", ""));
+                            defLangStrings.Add(new StrItem(MetaData.Languages.Default, "", ""));
                         }
 
                         defLangStrings[2].Title = value.ToString();
