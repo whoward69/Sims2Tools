@@ -65,9 +65,16 @@ namespace Sims2Tools.DBPF.TTAB
             XmlElement element = XmlHelper.CreateResElement(parent, NAME, this);
             element.SetAttribute("format", Helper.Hex8PrefixString(Format));
 
-            for (int i = 0; i < items.Count; ++i)
+            SortedList<TtabItem, TtabItem> sorted = new SortedList<TtabItem, TtabItem>(items.Count);
+
+            foreach (TtabItem item in items)
             {
-                items[i].AddXml(element).SetAttribute("index", Helper.Hex2PrefixString((byte)i));
+                sorted.Add(item, item);
+            }
+
+            foreach (TtabItem item in sorted.Values)
+            {
+                item.AddXml(element);
             }
 
             return element;

@@ -12,11 +12,12 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
+using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.TTAB
 {
-    public class TtabItem
+    public class TtabItem : IComparable<TtabItem>
     {
         private readonly uint format; // Owning TTAB format
 
@@ -182,6 +183,11 @@ namespace Sims2Tools.DBPF.TTAB
             }
         }
 
+        public int CompareTo(TtabItem that)
+        {
+            return (int)(this.StringIndex - that.StringIndex);
+        }
+
         public XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = parent.OwnerDocument.CreateElement("entry");
@@ -203,10 +209,8 @@ namespace Sims2Tools.DBPF.TTAB
             element.SetAttribute("modelTableId", Helper.Hex8PrefixString(ModelTableID));
             element.SetAttribute("memoryIterativeMultiplier", MemoryIterativeMultiplier.ToString());
 
-            /*
             HumanMotives.AddXml(element);
             AnimalMotives.AddXml(element);
-            */
 
             return element;
         }

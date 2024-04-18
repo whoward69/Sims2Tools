@@ -83,10 +83,10 @@ namespace Sims2Tools.DBPF.Package
         private static readonly Encoding encoding = new UTF8Encoding(false, true);
         public static Encoding Encoding => encoding;
 
-        private readonly string packagePath;
-        private readonly string packageDir;
-        private readonly string packageName;
-        private readonly string packageNameNoExtn;
+        private readonly string packagePath = null;
+        private readonly string packageDir = null;
+        private readonly string packageName = null;
+        private readonly string packageNameNoExtn = null;
 
         private DBPFHeader header;
         private DBPFResourceIndex resourceIndex;
@@ -128,7 +128,12 @@ namespace Sims2Tools.DBPF.Package
 
         protected void Read(Stream stream)
         {
-            this.m_Reader = DbpfReader.FromStream(stream);
+            Read(stream, stream.Length);
+        }
+
+        protected void Read(Stream stream, long length)
+        {
+            this.m_Reader = DbpfReader.FromStream(stream, length);
 
             header = new DBPFHeader(m_Reader);
 

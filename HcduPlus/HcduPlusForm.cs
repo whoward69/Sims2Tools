@@ -45,6 +45,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Windows.Forms;
 
 namespace HcduPlus
@@ -195,6 +196,23 @@ namespace HcduPlus
                     foreach (string scanNoLoad in Sims2Directory.GetFiles(scanFolder, "*.noload", SearchOption.AllDirectories))
                     {
                         scanFiles.Add(scanNoLoad);
+                    }
+                }
+
+                if (menuItemOptionExpandZips.Checked)
+                {
+                    foreach (string zipFile in Sims2Directory.GetFiles(scanFolder, "*.zip", SearchOption.AllDirectories))
+                    {
+                        using (ZipArchive zip = ZipFile.Open(zipFile, ZipArchiveMode.Read))
+                        {
+                            foreach (ZipArchiveEntry zipEntry in zip.Entries)
+                            {
+                                if (zipEntry.FullName.EndsWith(".package"))
+                                {
+                                    scanFiles.Add($"{zipFile}\\{zipEntry.FullName}");
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -393,6 +411,8 @@ namespace HcduPlus
             dataStore.SetFiles(folder, files);
             dataStore.SetPrefix(prefix);
 
+            string tempFile = null;
+
             for (int fileIndex = 0; fileIndex < files.Count; ++fileIndex)
             {
                 if (worker.CancellationPending == true)
@@ -402,60 +422,49 @@ namespace HcduPlus
                 }
                 else
                 {
+#if !DEBUG
                     try
+#endif
                     {
 #if DEBUG
                         if (Debugger.IsAttached) logger.Debug($"Processing: {files[fileIndex]}");
 #endif
+                        string packagePath = files[fileIndex];
+                        int pos = packagePath.IndexOf(".zip\\");
 
-                        using (DBPFFile package = new DBPFFile(files[fileIndex]))
+                        if (pos != -1)
                         {
-                            foreach (TypeTypeID type in enabledResources)
+                            string zipFile = packagePath.Substring(0, pos + 4);
+                            string zipEntryName = packagePath.Substring(pos + 5);
+
+                            using (ZipArchive zip = ZipFile.Open(zipFile, ZipArchiveMode.Read))
                             {
-                                foreach (DBPFEntry entry in package.GetEntriesByType(type))
+                                ZipArchiveEntry zipEntry = zip.GetEntry(zipEntryName);
+
+                                if (tempFile == null) tempFile = Path.GetTempFileName();
+
+                                zipEntry.ExtractToFile(tempFile, true);
+
+                                using (DBPFFile package = new DBPFFile(tempFile))
                                 {
-#if DEBUG
-                                    if (Debugger.IsAttached) logger.Debug($"  Entry: {entry}");
-#endif
+                                    ProcessPackage(package, fileIndex, dataStore);
 
-                                    if (type == Objd.TYPE && menuItemGuidConflicts.Checked)
-                                    {
-                                        Objd objd = (Objd)package.GetResourceByEntry(entry);
-
-                                        dataStore.SeenGuidsAdd(objd.Guid, entry, fileIndex);
-
-                                        dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
-                                    }
-
-                                    if (entry.GroupID != DBPFData.GROUP_LOCAL)
-                                    {
-                                        dataStore.SeenResourcesAdd(entry, fileIndex);
-
-                                        if (!dataStore.NamesByTgiContains(entry))
-                                        {
-                                            if (DBPFData.IsKnownSgType(entry.TypeID))
-                                            {
-                                                if (menuItemOptionSgNames.Checked)
-                                                {
-                                                    dataStore.NamesByTgiAdd(entry, package.GetResourceByEntry(entry)?.KeyName ?? "[unknown]");
-                                                }
-                                                else
-                                                {
-                                                    dataStore.NamesByTgiAdd(entry, "[not loaded]");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
-                                            }
-                                        }
-                                    }
+                                    package.Close();
                                 }
                             }
 
-                            package.Close();
+                        }
+                        else
+                        {
+                            using (DBPFFile package = new DBPFFile(files[fileIndex]))
+                            {
+                                ProcessPackage(package, fileIndex, dataStore);
+
+                                package.Close();
+                            }
                         }
                     }
+#if !DEBUG
                     catch (Exception ex)
                     {
                         logger.Error(ex.Message);
@@ -480,12 +489,61 @@ namespace HcduPlus
                             throw ex;
                         }
                     }
+#endif
 
                     worker.ReportProgress((int)((++done / total) * 100.0), null);
                 }
             }
 
+            if (tempFile != null) File.Delete(tempFile);
+
             return done;
+        }
+
+        private void ProcessPackage(DBPFFile package, int fileIndex, IDataStore dataStore)
+        {
+            foreach (TypeTypeID type in enabledResources)
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(type))
+                {
+#if DEBUG
+                    if (Debugger.IsAttached) logger.Debug($"  Entry: {entry}");
+#endif
+
+                    if (type == Objd.TYPE && menuItemGuidConflicts.Checked)
+                    {
+                        Objd objd = (Objd)package.GetResourceByEntry(entry);
+
+                        dataStore.SeenGuidsAdd(objd.Guid, entry, fileIndex);
+
+                        dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
+                    }
+
+                    if (entry.GroupID != DBPFData.GROUP_LOCAL)
+                    {
+                        dataStore.SeenResourcesAdd(entry, fileIndex);
+
+                        if (!dataStore.NamesByTgiContains(entry))
+                        {
+                            if (DBPFData.IsKnownSgType(entry.TypeID))
+                            {
+                                if (menuItemOptionSgNames.Checked)
+                                {
+                                    dataStore.NamesByTgiAdd(entry, package.GetResourceByEntry(entry)?.KeyName ?? "[unknown]");
+                                }
+                                else
+                                {
+                                    dataStore.NamesByTgiAdd(entry, "[not loaded]");
+                                }
+                            }
+                            else
+                            {
+                                dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void HcduWorker_Progress(object sender, System.ComponentModel.ProgressChangedEventArgs e)
@@ -639,6 +697,7 @@ namespace HcduPlus
 
                 menuItemOptionNoLoad.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionNoLoad.Name, 0) != 0);
                 menuItemOptionSgNames.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionSgNames.Name, 0) != 0);
+                menuItemOptionExpandZips.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionExpandZips.Name, 0) != 0);
 
                 MyUpdater = new Updater(HcduPlusApp.RegistryKey, menuHelp);
                 MyUpdater.CheckForUpdates();
@@ -685,6 +744,7 @@ namespace HcduPlus
 
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionNoLoad.Name, menuItemOptionNoLoad.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionSgNames.Name, menuItemOptionSgNames.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionExpandZips.Name, menuItemOptionExpandZips.Checked ? 1 : 0);
         }
 
         private void OnSelectModsClicked(object sender, EventArgs e)
@@ -1187,6 +1247,16 @@ namespace HcduPlus
         }
 
         private void OnNoLoads(object sender, EventArgs e)
+        {
+            UpdateForm();
+        }
+
+        private void OnSgNames(object sender, EventArgs e)
+        {
+            UpdateForm();
+        }
+
+        private void OnExpandZip(object sender, EventArgs e)
         {
             UpdateForm();
         }
