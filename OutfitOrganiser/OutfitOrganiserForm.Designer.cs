@@ -80,6 +80,7 @@ namespace OutfitOrganiser
             this.menuItemAutosetLayer = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAutosetBin = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemPreloadMeshes = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemLoadMeshesNow = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
@@ -130,10 +131,9 @@ namespace OutfitOrganiser
             this.ckbAgeTeens = new System.Windows.Forms.CheckBox();
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.btnSaveAll = new System.Windows.Forms.Button();
-            this.grpJewelry = new System.Windows.Forms.GroupBox();
+            this.grpAccessories = new System.Windows.Forms.GroupBox();
             this.comboJewelry = new System.Windows.Forms.ComboBox();
             this.comboDestination = new System.Windows.Forms.ComboBox();
-            this.textAccessoryBin = new System.Windows.Forms.TextBox();
             this.grpMakeup = new System.Windows.Forms.GroupBox();
             this.comboMakeupSubtype = new System.Windows.Forms.ComboBox();
             this.comboMakeupLayer = new System.Windows.Forms.ComboBox();
@@ -141,6 +141,8 @@ namespace OutfitOrganiser
             this.textMakeupBin = new System.Windows.Forms.TextBox();
             this.grpShoe = new System.Windows.Forms.GroupBox();
             this.comboShoe = new System.Windows.Forms.ComboBox();
+            this.grpMultipleOutfits = new System.Windows.Forms.GroupBox();
+            this.textMultipleOutfits = new System.Windows.Forms.TextBox();
             this.gridResources = new System.Windows.Forms.DataGridView();
             this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -181,7 +183,7 @@ namespace OutfitOrganiser
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
             this.lblNoOutfitSelected = new System.Windows.Forms.Label();
-            this.menuItemPreloadMeshes = new System.Windows.Forms.ToolStripMenuItem();
+            this.comboAccessoryBin = new System.Windows.Forms.ComboBox();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -202,9 +204,10 @@ namespace OutfitOrganiser
             this.grpGender.SuspendLayout();
             this.grpShown.SuspendLayout();
             this.grpAge.SuspendLayout();
-            this.grpJewelry.SuspendLayout();
+            this.grpAccessories.SuspendLayout();
             this.grpMakeup.SuspendLayout();
             this.grpShoe.SuspendLayout();
+            this.grpMultipleOutfits.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).BeginInit();
             this.menuContextResources.SuspendLayout();
             this.grpHairtone.SuspendLayout();
@@ -513,6 +516,14 @@ namespace OutfitOrganiser
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(255, 6);
             // 
+            // menuItemPreloadMeshes
+            // 
+            this.menuItemPreloadMeshes.CheckOnClick = true;
+            this.menuItemPreloadMeshes.Name = "menuItemPreloadMeshes";
+            this.menuItemPreloadMeshes.Size = new System.Drawing.Size(258, 22);
+            this.menuItemPreloadMeshes.Text = "Preload &Meshes";
+            this.menuItemPreloadMeshes.Click += new System.EventHandler(this.OnPreloadMeshesClicked);
+            // 
             // menuItemLoadMeshesNow
             // 
             this.menuItemLoadMeshesNow.Name = "menuItemLoadMeshesNow";
@@ -724,9 +735,10 @@ namespace OutfitOrganiser
             this.panelEditor.Controls.Add(this.grpShown);
             this.panelEditor.Controls.Add(this.grpAge);
             this.panelEditor.Controls.Add(this.btnSaveAll);
-            this.panelEditor.Controls.Add(this.grpJewelry);
+            this.panelEditor.Controls.Add(this.grpAccessories);
             this.panelEditor.Controls.Add(this.grpMakeup);
             this.panelEditor.Controls.Add(this.grpShoe);
+            this.panelEditor.Controls.Add(this.grpMultipleOutfits);
             this.panelEditor.Enabled = false;
             this.panelEditor.Location = new System.Drawing.Point(0, 155);
             this.panelEditor.Name = "panelEditor";
@@ -1065,17 +1077,17 @@ namespace OutfitOrganiser
             this.btnSaveAll.UseVisualStyleBackColor = true;
             this.btnSaveAll.Click += new System.EventHandler(this.OnSaveAllClicked);
             // 
-            // grpJewelry
+            // grpAccessories
             // 
-            this.grpJewelry.Controls.Add(this.comboJewelry);
-            this.grpJewelry.Controls.Add(this.comboDestination);
-            this.grpJewelry.Controls.Add(this.textAccessoryBin);
-            this.grpJewelry.Location = new System.Drawing.Point(310, 0);
-            this.grpJewelry.Name = "grpJewelry";
-            this.grpJewelry.Size = new System.Drawing.Size(135, 105);
-            this.grpJewelry.TabIndex = 1;
-            this.grpJewelry.TabStop = false;
-            this.grpJewelry.Text = "Jewelry:";
+            this.grpAccessories.Controls.Add(this.comboJewelry);
+            this.grpAccessories.Controls.Add(this.comboDestination);
+            this.grpAccessories.Controls.Add(this.comboAccessoryBin);
+            this.grpAccessories.Location = new System.Drawing.Point(310, 0);
+            this.grpAccessories.Name = "grpAccessories";
+            this.grpAccessories.Size = new System.Drawing.Size(135, 105);
+            this.grpAccessories.TabIndex = 1;
+            this.grpAccessories.TabStop = false;
+            this.grpAccessories.Text = "Accessories:";
             // 
             // comboJewelry
             // 
@@ -1096,15 +1108,6 @@ namespace OutfitOrganiser
             this.comboDestination.Size = new System.Drawing.Size(125, 23);
             this.comboDestination.TabIndex = 8;
             this.comboDestination.SelectedIndexChanged += new System.EventHandler(this.OnDestinationChanged);
-            // 
-            // textAccessoryBin
-            // 
-            this.textAccessoryBin.Location = new System.Drawing.Point(5, 78);
-            this.textAccessoryBin.Name = "textAccessoryBin";
-            this.textAccessoryBin.Size = new System.Drawing.Size(123, 21);
-            this.textAccessoryBin.TabIndex = 0;
-            this.textAccessoryBin.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
-            this.textAccessoryBin.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnAccessoryBinKeyUp);
             // 
             // grpMakeup
             // 
@@ -1177,6 +1180,27 @@ namespace OutfitOrganiser
             this.comboShoe.Size = new System.Drawing.Size(125, 23);
             this.comboShoe.TabIndex = 8;
             this.comboShoe.SelectedIndexChanged += new System.EventHandler(this.OnShoeChanged);
+            // 
+            // grpMultipleOutfits
+            // 
+            this.grpMultipleOutfits.Controls.Add(this.textMultipleOutfits);
+            this.grpMultipleOutfits.Location = new System.Drawing.Point(310, 0);
+            this.grpMultipleOutfits.Name = "grpMultipleOutfits";
+            this.grpMultipleOutfits.Size = new System.Drawing.Size(135, 105);
+            this.grpMultipleOutfits.TabIndex = 9;
+            this.grpMultipleOutfits.TabStop = false;
+            this.grpMultipleOutfits.Text = "Multiple Outfit Types:";
+            // 
+            // textMultipleOutfits
+            // 
+            this.textMultipleOutfits.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textMultipleOutfits.Location = new System.Drawing.Point(10, 20);
+            this.textMultipleOutfits.Multiline = true;
+            this.textMultipleOutfits.Name = "textMultipleOutfits";
+            this.textMultipleOutfits.ReadOnly = true;
+            this.textMultipleOutfits.Size = new System.Drawing.Size(122, 76);
+            this.textMultipleOutfits.TabIndex = 0;
+            this.textMultipleOutfits.Text = "To enable these controls, select only ONE type of outfit.";
             // 
             // gridResources
             // 
@@ -1535,13 +1559,16 @@ namespace OutfitOrganiser
             this.lblNoOutfitSelected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblNoOutfitSelected.Visible = false;
             // 
-            // menuItemPreloadMeshes
+            // comboAccessoryBin
             // 
-            this.menuItemPreloadMeshes.CheckOnClick = true;
-            this.menuItemPreloadMeshes.Name = "menuItemPreloadMeshes";
-            this.menuItemPreloadMeshes.Size = new System.Drawing.Size(258, 22);
-            this.menuItemPreloadMeshes.Text = "Preload &Meshes";
-            this.menuItemPreloadMeshes.Click += new System.EventHandler(this.OnPreloadMeshesClicked);
+            this.comboAccessoryBin.FormattingEnabled = true;
+            this.comboAccessoryBin.Location = new System.Drawing.Point(5, 78);
+            this.comboAccessoryBin.Name = "comboAccessoryBin";
+            this.comboAccessoryBin.Size = new System.Drawing.Size(125, 23);
+            this.comboAccessoryBin.TabIndex = 9;
+            this.comboAccessoryBin.SelectedIndexChanged += new System.EventHandler(this.OnAccessoryBinChanged);
+            this.comboAccessoryBin.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.comboAccessoryBin.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnAccessoryBinKeyUp);
             // 
             // OutfitOrganiserForm
             // 
@@ -1587,11 +1614,12 @@ namespace OutfitOrganiser
             this.grpShown.ResumeLayout(false);
             this.grpAge.ResumeLayout(false);
             this.grpAge.PerformLayout();
-            this.grpJewelry.ResumeLayout(false);
-            this.grpJewelry.PerformLayout();
+            this.grpAccessories.ResumeLayout(false);
             this.grpMakeup.ResumeLayout(false);
             this.grpMakeup.PerformLayout();
             this.grpShoe.ResumeLayout(false);
+            this.grpMultipleOutfits.ResumeLayout(false);
+            this.grpMultipleOutfits.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).EndInit();
             this.menuContextResources.ResumeLayout(false);
             this.grpHairtone.ResumeLayout(false);
@@ -1646,10 +1674,9 @@ namespace OutfitOrganiser
         private System.Windows.Forms.ComboBox comboProduct;
         private System.Windows.Forms.GroupBox grpShoe;
         private System.Windows.Forms.ComboBox comboShoe;
-        private System.Windows.Forms.GroupBox grpJewelry;
+        private System.Windows.Forms.GroupBox grpAccessories;
         private System.Windows.Forms.ComboBox comboJewelry;
         private System.Windows.Forms.ComboBox comboDestination;
-        private System.Windows.Forms.TextBox textAccessoryBin;
         private System.Windows.Forms.GroupBox grpMakeup;
         private System.Windows.Forms.ComboBox comboMakeupSubtype;
         private System.Windows.Forms.ComboBox comboMakeupLayer;
@@ -1741,6 +1768,9 @@ namespace OutfitOrganiser
         private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem menuItemPreloadMeshes;
+        private System.Windows.Forms.GroupBox grpMultipleOutfits;
+        private System.Windows.Forms.TextBox textMultipleOutfits;
+        private System.Windows.Forms.ComboBox comboAccessoryBin;
     }
 }
 

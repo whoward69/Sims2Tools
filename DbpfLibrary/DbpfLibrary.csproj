@@ -80,6 +80,9 @@
     <Compile Include="CPF\CpfItem.cs" />
     <Compile Include="CTSS\Ctss.cs" />
     <Compile Include="DBPFData.cs" />
+    <Compile Include="Groups\GroupsFile.cs" />
+    <Compile Include="Groups\GROP\GropItem.cs" />
+    <Compile Include="Groups\GROP\Grop.cs" />
     <Compile Include="Images\THUB\Thub.cs" />
     <Compile Include="OBJF\ObjfIndex.cs" />
     <Compile Include="Package\DBPFEntry.cs" />
@@ -99,6 +102,9 @@
     <Compile Include="IO\ByteOrder.cs" />
     <Compile Include="IO\DbpfWriter.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\ViewerRefNodeBase.cs" />
+    <Compile Include="TTAB\Ttab.cs" />
+    <Compile Include="TTAB\TtabMotives.cs" />
+    <Compile Include="TTAB\TtabItem.cs" />
     <Compile Include="UI\Ui.cs" />
     <Compile Include="Utils\Decompressor.cs" />
     <Compile Include="IO\DbpfReader.cs" />
@@ -219,9 +225,6 @@
     <Compile Include="TPRP\TprpParamLabel.cs" />
     <Compile Include="TRCN\Trcn.cs" />
     <Compile Include="TRCN\TrcnItem.cs" />
-    <Compile Include="TTAB\Ttab.cs" />
-    <Compile Include="TTAB\TtabItem.cs" />
-    <Compile Include="TTAB\TtabMotives.cs" />
     <Compile Include="TTAS\Ttas.cs" />
     <Compile Include="Utils\CRC.cs" />
     <Compile Include="Utils\CRCParameters.cs" />

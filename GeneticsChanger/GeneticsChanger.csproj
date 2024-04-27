@@ -98,7 +98,6 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NamedValue.cs" />
     <Compile Include="GeneticsChangerApp.cs" />
     <Compile Include="GeneticsChangerCache.cs" />
     <Compile Include="GeneticsChangerWorker.cs" />

@@ -65,8 +65,8 @@ namespace Sims2Tools
         static private readonly SortedDictionary<string, string> semiGlobalsByGroup;
         static public SortedDictionary<string, string> SemiGlobalsByGroup => semiGlobalsByGroup;
 
-        static private SortedDictionary<string, string> globalObjectsByGroupID;
-        static public SortedDictionary<string, string> GlobalObjectsByGroupID => globalObjectsByGroupID;
+        static private SortedDictionary<string, string> globalObjectsByGroup;
+        static public SortedDictionary<string, string> GlobalObjectsByGroup => globalObjectsByGroup;
 
         static private Dictionary<TypeGUID, string> globalObjectsByGUID;
         static public Dictionary<TypeGUID, string> GlobalObjectsByGUID => globalObjectsByGUID;
@@ -74,8 +74,8 @@ namespace Sims2Tools
         static private Dictionary<TypeGUID, int> globalObjectsTgirHashByGUID;
         static public Dictionary<TypeGUID, int> GlobalObjectsTgirHashByGUID => globalObjectsTgirHashByGUID;
 
-        static private SortedDictionary<TypeGroupID, TypeGroupID> semiglobalsByGroupID;
-        static public SortedDictionary<TypeGroupID, TypeGroupID> SemiglobalsByGroupID => semiglobalsByGroupID;
+        static private SortedDictionary<TypeGroupID, TypeGroupID> semiGlobalsByGroupID;
+        static public SortedDictionary<TypeGroupID, TypeGroupID> SemiGlobalsByGroupID => semiGlobalsByGroupID;
 
         static private readonly List<string> gameFolders = new List<string>();
         static public List<string> GameFolders => gameFolders;
@@ -328,7 +328,7 @@ namespace Sims2Tools
             {
                 groupName += " (semi-global)";
             }
-            else if (GameData.globalObjectsByGroupID.TryGetValue(groupId, out groupName))
+            else if (GameData.globalObjectsByGroup.TryGetValue(groupId, out groupName))
             {
                 groupName += " (game object)";
             }
@@ -472,10 +472,10 @@ namespace Sims2Tools
             {
                 GameDataCache.Validate(sims2Path + objectsSubPath);
 
-                if (!(GameDataCache.Deserialize(out semiglobalsByGroupID, "semiglobalsByGroupID") && GameDataCache.Deserialize(out globalObjectsByGroupID, "globalObjectsByGroupID") && GameDataCache.Deserialize(out globalObjectsByGUID, "globalObjectsByGUID") && GameDataCache.Deserialize(out globalObjectsTgirHashByGUID, "globalObjectsTgirHashByGUID")))
+                if (!(GameDataCache.Deserialize(out semiGlobalsByGroupID, "semiglobalsByGroupID") && GameDataCache.Deserialize(out globalObjectsByGroup, "globalObjectsByGroupID") && GameDataCache.Deserialize(out globalObjectsByGUID, "globalObjectsByGUID") && GameDataCache.Deserialize(out globalObjectsTgirHashByGUID, "globalObjectsTgirHashByGUID")))
                 {
-                    semiglobalsByGroupID = new SortedDictionary<TypeGroupID, TypeGroupID>();
-                    globalObjectsByGroupID = new SortedDictionary<string, string>();
+                    semiGlobalsByGroupID = new SortedDictionary<TypeGroupID, TypeGroupID>();
+                    globalObjectsByGroup = new SortedDictionary<string, string>();
                     globalObjectsByGUID = new Dictionary<TypeGUID, string>();
                     globalObjectsTgirHashByGUID = new Dictionary<TypeGUID, int>();
 
@@ -487,10 +487,10 @@ namespace Sims2Tools
                             foreach (var entry in globs)
                             {
                                 Glob glob = (Glob)package.GetResourceByEntry(entry);
-                                semiglobalsByGroupID.Add(entry.GroupID, glob.SemiGlobalGroup);
+                                semiGlobalsByGroupID.Add(entry.GroupID, glob.SemiGlobalGroup);
                             }
 
-                            BuildObjectsTable(package, globalObjectsByGroupID, globalObjectsByGUID, globalObjectsTgirHashByGUID);
+                            BuildObjectsTable(package, globalObjectsByGroup, globalObjectsByGUID, globalObjectsTgirHashByGUID);
 
                             package.Close();
                         }
@@ -506,26 +506,26 @@ namespace Sims2Tools
                     }
 
 #if DEBUG
-                    logger.Info($"Loaded {globalObjectsByGroupID.Count} game objects from 'objects.package'");
-                    logger.Info($"Loaded {semiglobalsByGroupID.Count} semi-global references from 'objects.package'");
+                    logger.Info($"Loaded {globalObjectsByGroup.Count} game objects from 'objects.package'");
+                    logger.Info($"Loaded {semiGlobalsByGroupID.Count} semi-global references from 'objects.package'");
 #endif
-                    GameDataCache.Serialize(globalObjectsByGroupID, "globalObjectsByGroupID");
+                    GameDataCache.Serialize(globalObjectsByGroup, "globalObjectsByGroupID");
                     GameDataCache.Serialize(globalObjectsByGUID, "globalObjectsByGUID");
                     GameDataCache.Serialize(globalObjectsTgirHashByGUID, "globalObjectsTgirHashByGUID");
-                    GameDataCache.Serialize(semiglobalsByGroupID, "semiglobalsByGroupID");
+                    GameDataCache.Serialize(semiGlobalsByGroupID, "semiglobalsByGroupID");
 #if DEBUG
                 }
                 else
                 {
-                    logger.Info($"Loaded {globalObjectsByGroupID.Count} game objects from cache");
-                    logger.Info($"Loaded {semiglobalsByGroupID.Count} semi-global references from cache");
+                    logger.Info($"Loaded {globalObjectsByGroup.Count} game objects from cache");
+                    logger.Info($"Loaded {semiGlobalsByGroupID.Count} semi-global references from cache");
 #endif
                 }
             }
             else
             {
-                semiglobalsByGroupID = new SortedDictionary<TypeGroupID, TypeGroupID>();
-                globalObjectsByGroupID = new SortedDictionary<string, string>();
+                semiGlobalsByGroupID = new SortedDictionary<TypeGroupID, TypeGroupID>();
+                globalObjectsByGroup = new SortedDictionary<string, string>();
                 globalObjectsByGUID = new Dictionary<TypeGUID, string>();
                 globalObjectsTgirHashByGUID = new Dictionary<TypeGUID, int>();
             }

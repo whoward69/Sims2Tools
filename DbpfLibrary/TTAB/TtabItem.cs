@@ -36,92 +36,35 @@ namespace Sims2Tools.DBPF.TTAB
         private float memoryitermult;
         private uint objecttype;
         private uint modeltableid;
+
         private TtabItemMotiveTable humanGroups;
         private TtabItemMotiveTable animalGroups;
 
-        public ushort Action
-        {
-            get => this.action;
-        }
+        public uint StringIndex => strindex;
+        public ushort Action => action;
+        public ushort Guardian => guard;
 
-        public ushort Guardian
-        {
-            get => this.guard;
-        }
+        public ushort Flags => flags;
+        public ushort Flags2 => flags2;
 
-        public ushort Flags
-        {
-            get => this.flags;
-        }
+        public uint Autonomy => autonomy;
+        public uint JoinIndex => joinindex;
 
-        public ushort Flags2
-        {
-            get => this.flags2;
-        }
+        public uint AttenuationCode => attenuationcode;
+        public float AttenuationValue => attenuationvalue;
+        public ushort UIDisplayType => uidisplaytype;
+        public uint FacialAnimationID => facialanimation;
+        public float MemoryIterativeMultiplier => memoryitermult;
+        public uint ObjectType => objecttype;
+        public uint ModelTableID => modeltableid;
 
-        public uint StringIndex
-        {
-            get => this.strindex;
-        }
-
-        public uint AttenuationCode
-        {
-            get => this.attenuationcode;
-        }
-
-        public float AttenuationValue
-        {
-            get => this.attenuationvalue;
-        }
-
-        public uint Autonomy
-        {
-            get => this.autonomy;
-        }
-
-        public uint JoinIndex
-        {
-            get => this.joinindex;
-        }
-
-        public ushort UIDisplayType
-        {
-            get => this.uidisplaytype;
-        }
-
-        public uint FacialAnimationID
-        {
-            get => this.facialanimation;
-        }
-
-        public float MemoryIterativeMultiplier
-        {
-            get => this.memoryitermult;
-        }
-
-        public uint ObjectType
-        {
-            get => this.objecttype;
-        }
-
-        public uint ModelTableID
-        {
-            get => this.modeltableid;
-        }
-
-        public TtabItemMotiveTable HumanMotives
-        {
-            get => this.humanGroups;
-        }
-
-        public TtabItemMotiveTable AnimalMotives
-        {
-            get => this.animalGroups;
-        }
+        public TtabItemMotiveTable HumanMotives => humanGroups;
+        public TtabItemMotiveTable AnimalMotives => animalGroups;
 
         public TtabItem(uint format, DbpfReader reader)
         {
             this.format = format;
+
             if (format < 68U)
                 this.counts = new int[1] { 16 };
             else if (format < 84U)
@@ -139,11 +82,13 @@ namespace Sims2Tools.DBPF.TTAB
         {
             this.action = reader.ReadUInt16();
             this.guard = reader.ReadUInt16();
+
             if (this.counts != null)
             {
                 for (int index = 0; index < this.counts.Length; ++index)
                     this.counts[index] = reader.ReadInt32();
             }
+
             this.flags = reader.ReadUInt16();
             this.flags2 = reader.ReadUInt16();
             this.strindex = reader.ReadUInt32();

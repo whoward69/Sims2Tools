@@ -24,6 +24,7 @@ using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
+using Sims2Tools.Utils.NamedValue;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
@@ -77,22 +78,22 @@ namespace BsokEditor
                 LoadBsokProductComboBoxes();
 
                 comboGender.Items.Clear();
-                comboGender.Items.AddRange(new NamedValue[] {
-                    new NamedValue("", 0),
-                    new NamedValue("Female", 1),
-                    new NamedValue("Male", 2),
-                    new NamedValue("Unisex", 3),
+                comboGender.Items.AddRange(new UintNamedValue[] {
+                    new UintNamedValue("", 0),
+                    new UintNamedValue("Female", 1),
+                    new UintNamedValue("Male", 2),
+                    new UintNamedValue("Unisex", 3),
                 });
 
                 comboShoe.Items.Clear();
-                comboShoe.Items.AddRange(new NamedValue[] {
-                    new NamedValue("", 0),
-                    new NamedValue("Armour", 7),
-                    new NamedValue("Barefoot", 1),
-                    new NamedValue("Heels", 3),
-                    new NamedValue("Heavy Boot", 2),
-                    new NamedValue("Normal Shoe", 4),
-                    new NamedValue("Sandal", 5),
+                comboShoe.Items.AddRange(new UintNamedValue[] {
+                    new UintNamedValue("", 0),
+                    new UintNamedValue("Armour", 7),
+                    new UintNamedValue("Barefoot", 1),
+                    new UintNamedValue("Heels", 3),
+                    new UintNamedValue("Heavy Boot", 2),
+                    new UintNamedValue("Normal Shoe", 4),
+                    new UintNamedValue("Sandal", 5),
                 });
 
                 dataLoading = false;
@@ -102,7 +103,9 @@ namespace BsokEditor
 
             if (Sims2ToolsLib.IsSims2HomePathSet)
             {
-                cigenCache = new CigenFile($"{Sims2ToolsLib.Sims2HomePath}\\cigen.package");
+                string cigenPath = $"{Sims2ToolsLib.Sims2HomePath}\\cigen.package";
+
+                cigenCache = new CigenFile(cigenPath);
             }
         }
 
@@ -1044,7 +1047,7 @@ namespace BsokEditor
 
                 foreach (object o in comboGender.Items)
                 {
-                    if ((o as NamedValue).Value == cachedGenderValue)
+                    if ((o as UintNamedValue).Value == cachedGenderValue)
                     {
                         comboGender.SelectedItem = o;
                         break;
@@ -1199,7 +1202,7 @@ namespace BsokEditor
 
                 foreach (object o in comboShoe.Items)
                 {
-                    if ((o as NamedValue).Value == cachedShoeValue)
+                    if ((o as UintNamedValue).Value == cachedShoeValue)
                     {
                         comboShoe.SelectedItem = o;
                         break;
@@ -1401,7 +1404,7 @@ namespace BsokEditor
             {
                 if (IsAutoUpdate)
                 {
-                    cachedGenderValue = (comboGender.SelectedItem as NamedValue).Value;
+                    cachedGenderValue = (comboGender.SelectedItem as UintNamedValue).Value;
                     UpdateSelectedRows(cachedGenderValue, "gender");
                 }
 
@@ -1413,7 +1416,7 @@ namespace BsokEditor
         {
             if (comboShoe.SelectedIndex != -1)
             {
-                if (IsAutoUpdate) UpdateSelectedRows((comboShoe.SelectedItem as NamedValue).Value, "shoe");
+                if (IsAutoUpdate) UpdateSelectedRows((comboShoe.SelectedItem as UintNamedValue).Value, "shoe");
             }
         }
         #endregion

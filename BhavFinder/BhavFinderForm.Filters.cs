@@ -210,7 +210,7 @@ namespace BhavFinder
 
             public override bool Wanted(Bhav bhav)
             {
-                return (GameData.SemiglobalsByGroupID.TryGetValue(bhav.GroupID, out TypeGroupID semigroup) && (semigroup == semiglobals));
+                return (GameData.SemiGlobalsByGroupID.TryGetValue(bhav.GroupID, out TypeGroupID semigroup) && (semigroup == semiglobals));
             }
         }
 
@@ -271,7 +271,7 @@ namespace BhavFinder
                     if (groups.Contains(group)) return true;
 
                     // The semiglobals group this BHAV references?
-                    if (GameData.SemiglobalsByGroupID.TryGetValue(group, out TypeGroupID semigroup) && groups.Contains(semigroup)) return true;
+                    if (GameData.SemiGlobalsByGroupID.TryGetValue(group, out TypeGroupID semigroup) && groups.Contains(semigroup)) return true;
                 }
 
                 if (strLookupByIndexGlobal != null && strLookupByIndexGlobal.TryGetValue(index, out groups))
@@ -283,7 +283,7 @@ namespace BhavFinder
                     if (groups.Contains(DBPFData.GROUP_GLOBALS)) return true;
 
                     // The semiglobals group this BHAV references?
-                    if (GameData.SemiglobalsByGroupID.TryGetValue(group, out TypeGroupID semigroup) && groups.Contains(semigroup)) return true;
+                    if (GameData.SemiGlobalsByGroupID.TryGetValue(group, out TypeGroupID semigroup) && groups.Contains(semigroup)) return true;
                 }
 
                 return false;

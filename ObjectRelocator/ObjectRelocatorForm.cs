@@ -21,6 +21,7 @@ using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
+using Sims2Tools.Utils.NamedValue;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
@@ -65,60 +66,60 @@ namespace ObjectRelocator
         private bool IsAutoUpdate => !ignoreEdits;
 
         #region Dropdown Menu Items
-        private readonly NamedValue[] functionSortItems = {
-                new NamedValue("", 0x00),
-                new NamedValue("Appliance", 0x04),
-                new NamedValue("Decorative", 0x20),
-                new NamedValue("Electronic", 0x08),
-                new NamedValue("Hobby", 0x100),
-                new NamedValue("Lighting", 0x80),
-                new NamedValue("Misc", 0x40),
-                new NamedValue("Plumbing", 0x10),
-                new NamedValue("Seating", 0x01),
-                new NamedValue("Surface", 0x02),
-                new NamedValue("Aspiration Reward", 0x400),
-                new NamedValue("Career Reward", 0x800)
+        private readonly UintNamedValue[] functionSortItems = {
+                new UintNamedValue("", 0x00),
+                new UintNamedValue("Appliance", 0x04),
+                new UintNamedValue("Decorative", 0x20),
+                new UintNamedValue("Electronic", 0x08),
+                new UintNamedValue("Hobby", 0x100),
+                new UintNamedValue("Lighting", 0x80),
+                new UintNamedValue("Misc", 0x40),
+                new UintNamedValue("Plumbing", 0x10),
+                new UintNamedValue("Seating", 0x01),
+                new UintNamedValue("Surface", 0x02),
+                new UintNamedValue("Aspiration Reward", 0x400),
+                new UintNamedValue("Career Reward", 0x800)
             };
 
-        private readonly NamedValue[] buildSortItems = {
-                new NamedValue("", 0x0000),
-                new NamedValue("Doors & Windows", 0x0008),
-                new NamedValue("Floor Coverings", 0x1000),
-                new NamedValue("Garden Centre", 0x0004),
-                new NamedValue("Other", 0x0001),
-                new NamedValue("Wall Coverings", 0x2000),
-                new NamedValue("Walls", 0x4000)
-            };
-
-        // These are "fake" values
-        private readonly NamedValue[] surfacetypeItems = {
-                new NamedValue("",       0x0000),
-                new NamedValue("cment",  0x0001),
-                new NamedValue("cpet",   0x0002),
-                new NamedValue("grass",  0x0004),
-                new NamedValue("gravel", 0x0008),
-                new NamedValue("lino",   0x0010),
-                new NamedValue("marble", 0x0020),
-                new NamedValue("wdeck",  0x0040),
-                new NamedValue("wood",   0x0080)
+        private readonly UintNamedValue[] buildSortItems = {
+                new UintNamedValue("", 0x0000),
+                new UintNamedValue("Doors & Windows", 0x0008),
+                new UintNamedValue("Floor Coverings", 0x1000),
+                new UintNamedValue("Garden Centre", 0x0004),
+                new UintNamedValue("Other", 0x0001),
+                new UintNamedValue("Wall Coverings", 0x2000),
+                new UintNamedValue("Walls", 0x4000)
             };
 
         // These are "fake" values
-        private readonly NamedValue[] coveringSubsortItems = {
-                new NamedValue("",          0x0000),
-                new NamedValue("brick",     0x0001),
-                new NamedValue("carpet",    0x0002),
-                new NamedValue("lino",      0x0004),
-                new NamedValue("masonry",   0x0008),
-                new NamedValue("other",     0x0010),
-                new NamedValue("paint",     0x0020),
-                new NamedValue("paneling",  0x0040),
-                new NamedValue("poured",    0x0080),
-                new NamedValue("siding",    0x0100),
-                new NamedValue("stone",     0x0200),
-                new NamedValue("tile",      0x0400),
-                new NamedValue("wallpaper", 0x0800),
-                new NamedValue("wood",      0x1000)
+        private readonly UintNamedValue[] surfacetypeItems = {
+                new UintNamedValue("",       0x0000),
+                new UintNamedValue("cment",  0x0001),
+                new UintNamedValue("cpet",   0x0002),
+                new UintNamedValue("grass",  0x0004),
+                new UintNamedValue("gravel", 0x0008),
+                new UintNamedValue("lino",   0x0010),
+                new UintNamedValue("marble", 0x0020),
+                new UintNamedValue("wdeck",  0x0040),
+                new UintNamedValue("wood",   0x0080)
+            };
+
+        // These are "fake" values
+        private readonly UintNamedValue[] coveringSubsortItems = {
+                new UintNamedValue("",          0x0000),
+                new UintNamedValue("brick",     0x0001),
+                new UintNamedValue("carpet",    0x0002),
+                new UintNamedValue("lino",      0x0004),
+                new UintNamedValue("masonry",   0x0008),
+                new UintNamedValue("other",     0x0010),
+                new UintNamedValue("paint",     0x0020),
+                new UintNamedValue("paneling",  0x0040),
+                new UintNamedValue("poured",    0x0080),
+                new UintNamedValue("siding",    0x0100),
+                new UintNamedValue("stone",     0x0200),
+                new UintNamedValue("tile",      0x0400),
+                new UintNamedValue("wallpaper", 0x0800),
+                new UintNamedValue("wood",      0x1000)
             };
 
         private enum CoveringSubsortIndex
@@ -1412,7 +1413,7 @@ namespace ObjectRelocator
         #endregion
 
         #region Selected Row Update
-        private void UpdateSelectedRows(NamedValue nv, ObjdIndex index, string itemName)
+        private void UpdateSelectedRows(UintNamedValue nv, ObjdIndex index, string itemName)
         {
             if (ignoreEdits) return;
 
@@ -1674,7 +1675,7 @@ namespace ObjectRelocator
                 cachedSubfunctionFlags = objectData.GetRawData(ObjdIndex.FunctionSubSort);
                 foreach (object o in comboFunction.Items)
                 {
-                    if ((o as NamedValue).Value == cachedFunctionFlags)
+                    if ((o as UintNamedValue).Value == cachedFunctionFlags)
                     {
                         comboFunction.SelectedItem = o;
                         UpdateFunctionSubsortItems(cachedSubfunctionFlags);
@@ -1805,7 +1806,7 @@ namespace ObjectRelocator
                     cachedSubbuildFlags = objectData.GetRawData(ObjdIndex.BuildModeSubsort);
                     foreach (object o in comboBuild.Items)
                     {
-                        if ((o as NamedValue).Value == cachedBuildFlags)
+                        if ((o as UintNamedValue).Value == cachedBuildFlags)
                         {
                             comboBuild.SelectedItem = o;
                             UpdateBuildSubsortItems(cachedSubbuildFlags);
@@ -1861,7 +1862,7 @@ namespace ObjectRelocator
 
                         string st = objectData.GetStrItem("surfacetype");
 
-                        foreach (NamedValue nv in surfacetypeItems)
+                        foreach (UintNamedValue nv in surfacetypeItems)
                         {
                             if (nv.Name.Equals(st))
                             {
@@ -1877,7 +1878,7 @@ namespace ObjectRelocator
 
                     string s = objectData.GetStrItem("subsort");
 
-                    foreach (NamedValue nv in coveringSubsortItems)
+                    foreach (UintNamedValue nv in coveringSubsortItems)
                     {
                         if (nv.Name.Equals(s))
                         {
@@ -1914,7 +1915,7 @@ namespace ObjectRelocator
 
                     foreach (object o in comboBuild.Items)
                     {
-                        if ((o as NamedValue).Value == cachedBuildFlags)
+                        if ((o as UintNamedValue).Value == cachedBuildFlags)
                         {
                             comboBuild.SelectedItem = o;
                             UpdateBuildSubsortItems(cachedSubbuildFlags);
@@ -1926,7 +1927,7 @@ namespace ObjectRelocator
 
                     foreach (object o in comboSurfacetype.Items)
                     {
-                        if ((o as NamedValue).Value == cachedSurfacetype)
+                        if ((o as UintNamedValue).Value == cachedSurfacetype)
                         {
                             comboSurfacetype.SelectedItem = o;
                             break;
@@ -1956,7 +1957,7 @@ namespace ObjectRelocator
         {
             if (comboFunction.SelectedIndex != -1)
             {
-                UpdateSelectedRows((ushort)(comboFunction.SelectedItem as NamedValue).Value, ObjdIndex.FunctionSortFlags);
+                UpdateSelectedRows((ushort)(comboFunction.SelectedItem as UintNamedValue).Value, ObjdIndex.FunctionSortFlags);
             }
 
             UpdateFunctionSubsortItems(0x80);
@@ -1966,7 +1967,7 @@ namespace ObjectRelocator
         {
             if (comboSubfunction.SelectedIndex != -1)
             {
-                UpdateSelectedRows((ushort)(comboSubfunction.SelectedItem as NamedValue).Value, ObjdIndex.FunctionSubSort);
+                UpdateSelectedRows((ushort)(comboSubfunction.SelectedItem as UintNamedValue).Value, ObjdIndex.FunctionSubSort);
             }
         }
 
@@ -1977,97 +1978,97 @@ namespace ObjectRelocator
             comboSubfunction.Items.Clear();
             comboSubfunction.Enabled = true;
 
-            switch ((comboFunction.SelectedItem as NamedValue).Value)
+            switch ((comboFunction.SelectedItem as UintNamedValue).Value)
             {
                 case 0x00:
                     UpdateSelectedRows(0x00, ObjdIndex.FunctionSubSort);
                     break;
                 case 0x04:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Cooking", 0x01),
-                        new NamedValue("Fridge", 0x02),
-                        new NamedValue("Large", 0x08),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Small", 0x04)
+                    comboSubfunction.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Cooking", 0x01),
+                        new UintNamedValue("Fridge", 0x02),
+                        new UintNamedValue("Large", 0x08),
+                        new UintNamedValue("Misc", 0x80),
+                        new UintNamedValue("Small", 0x04)
                     });
                     break;
                 case 0x20:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Curtain", 0x20),
-                        new NamedValue("Mirror", 0x10),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Picture", 0x01),
-                        new NamedValue("Plant", 0x08),
-                        new NamedValue("Rug", 0x04),
-                        new NamedValue("Sculpture", 0x02)
+                    comboSubfunction.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Curtain", 0x20),
+                        new UintNamedValue("Mirror", 0x10),
+                        new UintNamedValue("Misc", 0x80),
+                        new UintNamedValue("Picture", 0x01),
+                        new UintNamedValue("Plant", 0x08),
+                        new UintNamedValue("Rug", 0x04),
+                        new UintNamedValue("Sculpture", 0x02)
                     });
                     break;
                 case 0x08:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Audio", 0x04),
-                        new NamedValue("Entertainment", 0x01),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Small", 0x08),
-                        new NamedValue("TV/Computer", 0x02)
+                    comboSubfunction.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Audio", 0x04),
+                        new UintNamedValue("Entertainment", 0x01),
+                        new UintNamedValue("Misc", 0x80),
+                        new UintNamedValue("Small", 0x08),
+                        new UintNamedValue("TV/Computer", 0x02)
                     });
                     break;
                 case 0x40:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Car", 0x20),
-                        new NamedValue("Children", 0x10),
-                        new NamedValue("Dresser", 0x02),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Party", 0x08),
-                        new NamedValue("Pets", 0x40)
+                    comboSubfunction.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Car", 0x20),
+                        new UintNamedValue("Children", 0x10),
+                        new UintNamedValue("Dresser", 0x02),
+                        new UintNamedValue("Misc", 0x80),
+                        new UintNamedValue("Party", 0x08),
+                        new UintNamedValue("Pets", 0x40)
                     });
                     break;
                 case 0x100:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Creative", 0x01),
-                        new NamedValue("Exercise", 0x04),
-                        new NamedValue("Knowledge", 0x02),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Recreation", 0x08)
+                    comboSubfunction.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Creative", 0x01),
+                        new UintNamedValue("Exercise", 0x04),
+                        new UintNamedValue("Knowledge", 0x02),
+                        new UintNamedValue("Misc", 0x80),
+                        new UintNamedValue("Recreation", 0x08)
                     });
                     break;
                 case 0x80:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Ceiling", 0x08),
-                        new NamedValue("Floor", 0x02),
-                        new NamedValue("Garden", 0x10),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Table", 0x01),
-                        new NamedValue("Wall", 0x04)
+                    comboSubfunction.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Ceiling", 0x08),
+                        new UintNamedValue("Floor", 0x02),
+                        new UintNamedValue("Garden", 0x10),
+                        new UintNamedValue("Misc", 0x80),
+                        new UintNamedValue("Table", 0x01),
+                        new UintNamedValue("Wall", 0x04)
                     });
                     break;
                 case 0x10:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Bath/Shower", 0x02),
-                        new NamedValue("Hot Tub", 0x08),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Sink", 0x04),
-                        new NamedValue("Toilet", 0x01)
+                    comboSubfunction.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Bath/Shower", 0x02),
+                        new UintNamedValue("Hot Tub", 0x08),
+                        new UintNamedValue("Misc", 0x80),
+                        new UintNamedValue("Sink", 0x04),
+                        new UintNamedValue("Toilet", 0x01)
                     });
                     break;
                 case 0x01:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Arm Chair", 0x02),
-                        new NamedValue("Bed", 0x08),
-                        new NamedValue("Dining Chair", 0x01),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Recliner", 0x10),
-                        new NamedValue("Sofa", 0x04)
+                    comboSubfunction.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Arm Chair", 0x02),
+                        new UintNamedValue("Bed", 0x08),
+                        new UintNamedValue("Dining Chair", 0x01),
+                        new UintNamedValue("Misc", 0x80),
+                        new UintNamedValue("Recliner", 0x10),
+                        new UintNamedValue("Sofa", 0x04)
                     });
                     break;
                 case 0x02:
-                    comboSubfunction.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Coffee Table", 0x10),
-                        new NamedValue("Counter", 0x01),
-                        new NamedValue("Desk", 0x08),
-                        new NamedValue("Dining Table", 0x02),
-                        new NamedValue("End Table", 0x04),
-                        new NamedValue("Misc", 0x80),
-                        new NamedValue("Shelf", 0x20)
+                    comboSubfunction.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Coffee Table", 0x10),
+                        new UintNamedValue("Counter", 0x01),
+                        new UintNamedValue("Desk", 0x08),
+                        new UintNamedValue("Dining Table", 0x02),
+                        new UintNamedValue("End Table", 0x04),
+                        new UintNamedValue("Misc", 0x80),
+                        new UintNamedValue("Shelf", 0x20)
                     });
                     break;
                 case 0x400:
@@ -2083,7 +2084,7 @@ namespace ObjectRelocator
             // Select the required sub-function item
             foreach (object o in comboSubfunction.Items)
             {
-                if ((o as NamedValue).Value == subFunctionFlags)
+                if ((o as UintNamedValue).Value == subFunctionFlags)
                 {
                     comboSubfunction.SelectedItem = o;
                     break;
@@ -2095,7 +2096,7 @@ namespace ObjectRelocator
         {
             if (comboBuild.SelectedIndex != -1)
             {
-                UpdateSelectedRows(comboBuild.SelectedItem as NamedValue, ObjdIndex.BuildModeType, "type");
+                UpdateSelectedRows(comboBuild.SelectedItem as UintNamedValue, ObjdIndex.BuildModeType, "type");
             }
 
             UpdateBuildSubsortItems(0x00);
@@ -2105,7 +2106,7 @@ namespace ObjectRelocator
         {
             if (comboSubbuild.SelectedIndex != -1)
             {
-                UpdateSelectedRows(comboSubbuild.SelectedItem as NamedValue, ObjdIndex.BuildModeSubsort, "subsort");
+                UpdateSelectedRows(comboSubbuild.SelectedItem as UintNamedValue, ObjdIndex.BuildModeSubsort, "subsort");
             }
         }
 
@@ -2116,40 +2117,40 @@ namespace ObjectRelocator
             comboSubbuild.Items.Clear();
             comboSubbuild.Enabled = true;
 
-            switch ((comboBuild.SelectedItem as NamedValue).Value)
+            switch ((comboBuild.SelectedItem as UintNamedValue).Value)
             {
                 case 0x0000:
                     UpdateSelectedRows(0x00, ObjdIndex.BuildModeSubsort);
                     break;
                 case 0x0001: // Other
-                    comboSubbuild.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Architecture", 0x1000),
-                        new NamedValue("Columns", 0x0008),
-                        new NamedValue("Connecting Arches", 0x0200),
-                        new NamedValue("Elevator", 0x0800),
-                        new NamedValue("Fence", 0x8000),
-                        new NamedValue("Garage", 0x0400),
-                        new NamedValue("Multi-Story Columns", 0x0100),
-                        new NamedValue("Pools", 0x0040),
-                        new NamedValue("Staircases", 0x0020)
+                    comboSubbuild.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Architecture", 0x1000),
+                        new UintNamedValue("Columns", 0x0008),
+                        new UintNamedValue("Connecting Arches", 0x0200),
+                        new UintNamedValue("Elevator", 0x0800),
+                        new UintNamedValue("Fence", 0x8000),
+                        new UintNamedValue("Garage", 0x0400),
+                        new UintNamedValue("Multi-Story Columns", 0x0100),
+                        new UintNamedValue("Pools", 0x0040),
+                        new UintNamedValue("Staircases", 0x0020)
                     });
                     break;
                 case 0x0004: // Garden Centre
-                    comboSubbuild.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Flowers", 0x0004),
-                        new NamedValue("Gardening", 0x0010),
-                        new NamedValue("Shrubs", 0x0002),
-                        new NamedValue("Trees", 0x0001)
+                    comboSubbuild.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Flowers", 0x0004),
+                        new UintNamedValue("Gardening", 0x0010),
+                        new UintNamedValue("Shrubs", 0x0002),
+                        new UintNamedValue("Trees", 0x0001)
                     });
                     break;
                 case 0x0008: // Doors & Windows
-                    comboSubbuild.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Archways", 0x0010),
-                        new NamedValue("Doors", 0x0001),
-                        new NamedValue("Gates", 0x0008),
-                        new NamedValue("Multi-Story Doors", 0x0100),
-                        new NamedValue("Multi-Story Windows", 0x0002),
-                        new NamedValue("Windows", 0x0004)
+                    comboSubbuild.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Archways", 0x0010),
+                        new UintNamedValue("Doors", 0x0001),
+                        new UintNamedValue("Gates", 0x0008),
+                        new UintNamedValue("Multi-Story Doors", 0x0100),
+                        new UintNamedValue("Multi-Story Windows", 0x0002),
+                        new UintNamedValue("Windows", 0x0004)
                     });
                     break;
 
@@ -2176,8 +2177,8 @@ namespace ObjectRelocator
                     comboSubbuild.Items.Add(coveringSubsortItems[(int)CoveringSubsortIndex.Wallpaper]);
                     break;
                 case 0x4000: // Walls
-                    comboSubbuild.Items.AddRange(new NamedValue[] {
-                        new NamedValue("Halfwalls", 0x8000)
+                    comboSubbuild.Items.AddRange(new UintNamedValue[] {
+                        new UintNamedValue("Halfwalls", 0x8000)
                     });
                     break;
             }
@@ -2185,7 +2186,7 @@ namespace ObjectRelocator
             // Select the required sub-build item
             foreach (object o in comboSubbuild.Items)
             {
-                if ((o as NamedValue).Value == subBuildFlags)
+                if ((o as UintNamedValue).Value == subBuildFlags)
                 {
                     comboSubbuild.SelectedItem = o;
                     break;
@@ -2197,7 +2198,7 @@ namespace ObjectRelocator
         {
             if (comboSurfacetype.SelectedIndex != -1)
             {
-                UpdateSelectedRows(comboSurfacetype.SelectedItem as NamedValue, ObjdIndex.NONE, "surfacetype");
+                UpdateSelectedRows(comboSurfacetype.SelectedItem as UintNamedValue, ObjdIndex.NONE, "surfacetype");
             }
         }
 

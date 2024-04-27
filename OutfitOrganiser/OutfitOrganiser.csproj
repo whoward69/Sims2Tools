@@ -98,7 +98,6 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NamedValue.cs" />
     <Compile Include="OutfitOrganiserApp.cs" />
     <Compile Include="OutfitOrganiserCache.cs" />
     <Compile Include="OutfitOrganiserWorker.cs" />
@@ -167,6 +166,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\XML\config_example.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Sims2Tools.ico" />
   </ItemGroup>
   <ItemGroup />

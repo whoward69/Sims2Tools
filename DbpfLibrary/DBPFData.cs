@@ -16,6 +16,7 @@ using Sims2Tools.DBPF.Cigen.CGN1;
 using Sims2Tools.DBPF.CLST;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
+using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.JPG;
 using Sims2Tools.DBPF.Images.THUB;
@@ -160,14 +161,16 @@ namespace Sims2Tools.DBPF
             SgTypeNames.Add(Xstn.TYPE, Xstn.NAME);
             SgTypeNames.Add(Xtol.TYPE, Xtol.NAME);
 
+            // Should probably be in SgTypeNames
             OtherTypeNames.Add(Anim.TYPE, Anim.NAME);
-            OtherTypeNames.Add(Bnfo.TYPE, Bnfo.NAME);
             OtherTypeNames.Add(Cine.TYPE, Cine.NAME);
+            OtherTypeNames.Add(Lifo.TYPE, Lifo.NAME);
+
+            OtherTypeNames.Add(Bnfo.TYPE, Bnfo.NAME);
             OtherTypeNames.Add(Clst.TYPE, Clst.NAME);
             OtherTypeNames.Add(Fami.TYPE, Fami.NAME);
             OtherTypeNames.Add(Famt.TYPE, Famt.NAME);
             OtherTypeNames.Add(Idno.TYPE, Idno.NAME);
-            OtherTypeNames.Add(Lifo.TYPE, Lifo.NAME);
             OtherTypeNames.Add(Ltxt.TYPE, Ltxt.NAME);
             OtherTypeNames.Add(Ngbh.TYPE, Ngbh.NAME);
             OtherTypeNames.Add(Sdna.TYPE, Sdna.NAME);
@@ -180,6 +183,7 @@ namespace Sims2Tools.DBPF
             OtherTypeNames.Add(Xrof.TYPE, Xrof.NAME);
 
             OtherTypeNames.Add(Cgn1.TYPE, Cgn1.NAME);
+            OtherTypeNames.Add(Grop.TYPE, Grop.NAME);
 
             foreach (KeyValuePair<TypeTypeID, string> kvPair in ModTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, string> kvPair in ImgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }

@@ -12,7 +12,7 @@
 using Sims2Tools.DBPF.OBJD;
 using System;
 
-namespace RepositoryWizard
+namespace Sims2Tools.Utils.NamedValue
 {
     public class UintNamedValue : IEquatable<UintNamedValue>
     {

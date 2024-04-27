@@ -27,6 +27,7 @@ using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
+using Sims2Tools.Utils.NamedValue;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;

@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.Cigen.CGN1;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
+using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.JPG;
 using Sims2Tools.DBPF.Images.THUB;
@@ -406,6 +407,7 @@ namespace Sims2Tools.DBPF.Package
 
             DBPFResource res = null;
 
+            // There's got to be a better way to do this!
             if (entry.TypeID == Bcon.TYPE)
             {
                 res = new Bcon(entry, this.GetDbpfReader(entry));
@@ -644,6 +646,13 @@ namespace Sims2Tools.DBPF.Package
             else if (entry.TypeID == Cgn1.TYPE)
             {
                 res = new Cgn1(entry, this.GetDbpfReader(entry));
+            }
+            //
+            // Groups Resources
+            //
+            else if (entry.TypeID == Grop.TYPE)
+            {
+                res = new Grop(entry, this.GetDbpfReader(entry));
             }
 
             return res;

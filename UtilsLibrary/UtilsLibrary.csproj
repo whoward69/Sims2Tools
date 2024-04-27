@@ -75,6 +75,7 @@
     <Compile Include="Cache\PackageCache.cs" />
     <Compile Include="Cache\DrDataCache.cs" />
     <Compile Include="Cache\SceneGraphCache.cs" />
+    <Compile Include="Controls\ControlHelper.cs" />
     <Compile Include="Controls\PickerDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -121,6 +122,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IO\PjseStringFileReader.cs" />
     <Compile Include="IO\Sims2Directory.cs" />
+    <Compile Include="NamedValue\NamedValue.cs" />
     <Compile Include="SimpeData.cs" />
     <Compile Include="GameData.cs" />
     <Compile Include="Dialogs\AboutDialog.cs">

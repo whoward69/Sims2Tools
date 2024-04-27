@@ -1,11 +1,16 @@
-﻿using Sims2Tools.DBPF;
+﻿using Sims2Tools;
+using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
+using Sims2Tools.DBPF.Groups;
+using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.STR;
+using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
+using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Files;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -42,15 +47,57 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
+            if (Sims2ToolsLib.IsSims2HomePathSet)
+            {
+                string groupsPath = $"{Sims2ToolsLib.Sims2HomePath}\\Groups.cache";
+
+                GroupsFile groupsCache = new GroupsFile(groupsPath);
+
+                foreach (GropItem item in groupsCache.GetGroups("%UserDataDir%/downloads/"))
+                {
+                    for (int i = 0; i < item.RefGroupIDs.Length; ++i)
+                    {
+                        TypeGroupID group = item.RefGroupIDs[i];
+
+                        if ((group.AsUInt() & 0xFF000000) == 0x7F000000)
+                        {
+                            if (group == DBPFData.GROUP_GLOBALS)
+                            {
+                                textMessages.AppendText($"Global\t{DBPFData.GROUP_GLOBALS}\t{item.FileName}\r\n");
+                            }
+                            else if (group == DBPFData.GROUP_BEHAVIOR)
+                            {
+                                textMessages.AppendText($"Behaviour:\t{DBPFData.GROUP_BEHAVIOR}\t{item.FileName}\r\n");
+                            }
+                            else if (GameData.SemiGlobalsByGroup.TryGetValue(group.Hex8String(), out string semiName))
+                            {
+                                textMessages.AppendText($"Semi-global\t{semiName}\t{item.FileName}\r\n");
+                            }
+                            else if (GameData.GlobalObjectsByGroup.TryGetValue(group.Hex8String(), out string objectName))
+                            {
+                                textMessages.AppendText($"Game object\t{objectName}\t{item.FileName}\r\n");
+                            }
+                        }
+                    }
+                }
+            }
+
             // ExportStrings("C:\\Users\\whowa\\Desktop\\DrivingLicence_FR", MetaData.Languages.French);
             // ImportStrings("C:\\Users\\whowa\\Desktop\\DrivingLicence", "C:\\Users\\whowa\\Desktop\\DrivingLicence_FR", MetaData.Languages.French);
-            ExportStrings("C:\\Users\\whowa\\Desktop\\DrivingLicence", MetaData.Languages.French);
+            // ExportStrings("C:\\Users\\whowa\\Desktop\\DrivingLicence", MetaData.Languages.French);
 
             // FindBinx("C:/Program Files/EA Games/The Sims 2 Ultimate Collection/Apartment Life", new DBPFKey(Gzps.TYPE, (TypeGroupID)0x2C17B74A, (TypeInstanceID)0xB519F9C9, DBPFData.RESOURCE_NULL));
             // FindBinx("C:/Program Files/EA Games/The Sims 2 Ultimate Collection", new DBPFKey(Gzps.TYPE, (TypeGroupID)0x2C17B74A, (TypeInstanceID)0x14E56E42, DBPFData.RESOURCE_NULL));
 
+            // FindTTAB("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP9\\TSData\\Res\\Objects\\objects.package");
+
             textMessages.AppendText("=== FINISHED ===");
             btnGo.Enabled = true;
+        }
+
+        private void OnCopyClicked(object sender, EventArgs e)
+        {
+            Clipboard.SetText(textMessages.Text);
         }
 
         private void ImportStrings(string targetFolder, string importFolder, MetaData.Languages importLang)
@@ -267,6 +314,35 @@ namespace DbpfLister
 
                     package.Close();
                 }
+            }
+        }
+
+        private void FindTTAB(string packagePath)
+        {
+            using (DBPFFile package = new DBPFFile(packagePath))
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(Ttab.TYPE))
+                {
+                    Console.WriteLine(entry);
+                    try
+                    {
+                        Ttab ttab = (Ttab)package.GetResourceByEntry(entry);
+
+                        foreach (TtabItem item in ttab.GetItems())
+                        {
+                            if (item.Autonomy != 0x64 && item.Autonomy != 0x32)
+                            {
+                                textMessages.AppendText($"{entry}::{item.StringIndex} Autonomy {item.Autonomy} ({Helper.Hex8PrefixString(item.Autonomy)})\r\n");
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        textMessages.AppendText($"EXCEPTION: {entry} - {e.Message}\r\n");
+                    }
+                }
+
+                package.Close();
             }
         }
     }

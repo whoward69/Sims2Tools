@@ -12,57 +12,47 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
-using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.TTAB
 {
+    #region MotiveType
     public enum TtabItemMotiveTableType
     {
         Human,
-        Animal,
+        Animal
     }
+    #endregion
 
-    public class TtabItemMotiveTable : ICollection, IEnumerable
+    #region MotiveTable
+    public class TtabItemMotiveTable
     {
-        private readonly uint format; // Owning TTAB format
-
-        private readonly TtabItemMotiveTableType type;
         private readonly int[] counts;
-        private TtabItemMotiveGroupArrayList items;
+        private readonly TtabItemMotiveTableType type;
+        private readonly TtabItemMotiveGroupList items;
 
-        public TtabItemMotiveTableType Type
-        {
-            get => this.type;
-        }
-
-        public TtabItemMotiveGroup this[int index]
-        {
-            get => this.items[index];
-        }
+        public TtabItemMotiveTableType Type => type;
 
         public TtabItemMotiveTable(uint format, int[] counts, TtabItemMotiveTableType type, DbpfReader reader)
         {
-            this.format = format;
-
             this.counts = counts;
             this.type = type;
             int length = counts == null ? (type == TtabItemMotiveTableType.Human ? 5 : 8) : counts.Length;
-            this.items = new TtabItemMotiveGroupArrayList(new TtabItemMotiveGroup[length]);
-            for (int index = 0; index < length; ++index)
-                this.items[index] = new TtabItemMotiveGroup(format, counts != null ? counts[index] : -1, type, null);
+            this.items = new TtabItemMotiveGroupList();
 
-            if (reader != null) Unserialize(reader);
+            for (int index = 0; index < length; ++index)
+                items.Add(new TtabItemMotiveGroup(this, format, counts != null ? counts[index] : -1, type, null));
+
+            if (reader != null) this.Unserialize(reader, format);
         }
 
-        private void Unserialize(DbpfReader reader)
+        private void Unserialize(DbpfReader reader, uint format)
         {
             int length = this.counts == null ? reader.ReadInt32() : this.counts.Length;
-            if (this.items.Capacity < length)
-                this.items = new TtabItemMotiveGroupArrayList(new TtabItemMotiveGroup[length]);
+
             for (int index = 0; index < length; ++index)
-                this.items[index] = new TtabItemMotiveGroup(format, this.counts != null ? this.counts[index] : 0, this.type, reader);
+                items.Set(index, new TtabItemMotiveGroup(this, format, this.counts != null ? this.counts[index] : 0, this.type, reader));
         }
 
         public void AddXml(XmlElement parent)
@@ -75,92 +65,68 @@ namespace Sims2Tools.DBPF.TTAB
 
                 for (int i = 0; i < items.Count; ++i)
                 {
-                    this[i].AddXml(element, i);
+                    items.Get(i).AddXml(element, i);
                 }
             }
         }
-
-        public int Count => this.items.Count;
-
-        public bool IsSynchronized => this.items.IsSynchronized;
-
-        public object SyncRoot => this.items.SyncRoot;
-
-        public void CopyTo(Array a, int i) => this.items.CopyTo(a, i);
-
-        public IEnumerator GetEnumerator() => this.items.GetEnumerator();
-
     }
+    #endregion
 
-    internal class TtabItemMotiveGroupArrayList : ArrayList
+    #region MotiveGroup
+    internal class TtabItemMotiveGroup
     {
-        public TtabItemMotiveGroupArrayList(TtabItemMotiveGroup[] c) : base(c)
-        {
-        }
-
-        public new TtabItemMotiveGroup this[int index]
-        {
-            get => (TtabItemMotiveGroup)base[index];
-            internal set => base[index] = value;
-        }
-    }
-
-    public class TtabItemMotiveGroup : ICollection, IEnumerable
-    {
-        private readonly uint format; // Owning TTAB format
-
+        private readonly TtabItemMotiveTable parent;
         private readonly int count;
         private readonly TtabItemMotiveTableType type;
-        private readonly TtabItemMotiveItemArrayList items;
+        private readonly TtabItemMotiveItemList items;
 
-        public TtabItemMotiveItem this[int index]
+        public TtabItemMotiveTable Parent
         {
-            get => this.items[index];
+            get => this.parent;
         }
 
-        public TtabItemMotiveGroup(uint format, int count, TtabItemMotiveTableType type, DbpfReader reader)
+        internal TtabItemMotiveGroup(TtabItemMotiveTable parent, uint format, int count, TtabItemMotiveTableType type, DbpfReader reader)
         {
-            this.format = format;
-
+            this.parent = parent;
             this.count = count;
             this.type = type;
             int num = count != -1 ? count : 16;
-            this.items = new TtabItemMotiveItemArrayList(new TtabItemMotiveItem[num < 16 ? 16 : num]);
+            this.items = new TtabItemMotiveItemList(this, type);
             if (type == TtabItemMotiveTableType.Human)
             {
                 for (int index = 0; index < num; ++index)
-                    this.items[index] = new TtabItemSingleMotiveItem(null);
+                    items.Add(new TtabItemSingleMotiveItem(this, null));
             }
             else
             {
                 for (int index = 0; index < num; ++index)
-                    this.items[index] = new TtabItemAnimalMotiveItem(null);
+                    items.Add(new TtabItemAnimalMotiveItem(this, null));
             }
 
-            if (reader != null) this.Unserialize(reader);
+            if (reader != null) this.Unserialize(reader, format);
         }
 
-        private void Unserialize(DbpfReader reader)
+        private void Unserialize(DbpfReader reader, uint format)
         {
             int num = format < 84U ? this.count : reader.ReadInt32();
 
             if (this.type == TtabItemMotiveTableType.Human)
             {
                 for (int index = 0; index < num; ++index)
-                    this.items[index] = new TtabItemSingleMotiveItem(reader);
+                    items.Set(index, new TtabItemSingleMotiveItem(this, reader));
                 for (int index = num; index < this.items.Count; ++index)
-                    this.items[index] = new TtabItemSingleMotiveItem(null);
+                    items.Set(index, new TtabItemSingleMotiveItem(this, null));
             }
             else
             {
                 for (int index = 0; index < num; ++index)
-                    this.items[index] = new TtabItemAnimalMotiveItem(reader);
+                    items.Set(index, new TtabItemAnimalMotiveItem(this, reader));
                 for (int index = num; index < this.items.Count; ++index)
-                    this.items[index] = new TtabItemAnimalMotiveItem(null);
+                    items.Set(index, new TtabItemAnimalMotiveItem(this, null));
             }
         }
 
-        public void AddXml(XmlElement parent, int index)
+        internal void AddXml(XmlElement parent, int index)
         {
             XmlElement element = parent.OwnerDocument.CreateElement("motivegroup");
             parent.AppendChild(element);
@@ -170,54 +136,54 @@ namespace Sims2Tools.DBPF.TTAB
             {
                 for (int i = 0; i < items.Count; ++i)
                 {
-                    items[i].AddXml(element, i);
+                    items.Get(i).AddXml(element, i);
                 }
             }
         }
-
-        public int Count => this.items.Count;
-
-        public bool IsSynchronized => this.items.IsSynchronized;
-
-        public object SyncRoot => this.items.SyncRoot;
-        public void CopyTo(Array a, int i) => this.items.CopyTo(a, i);
-
-
-        public IEnumerator GetEnumerator() => this.items.GetEnumerator();
     }
 
-    internal class TtabItemMotiveItemArrayList : ArrayList
+    internal class TtabItemMotiveGroupList
     {
-        public TtabItemMotiveItemArrayList(TtabItemMotiveItem[] c) : base(c)
+        private readonly List<TtabItemMotiveGroup> items = new List<TtabItemMotiveGroup>();
+
+        internal TtabItemMotiveGroupList()
         {
         }
 
-        public new TtabItemMotiveItem this[int index]
-        {
-            get => (TtabItemMotiveItem)base[index];
-            internal set => base[index] = value;
-        }
-    }
+        internal int Count => items.Count;
 
-    public abstract class TtabItemMotiveItem
+        internal void Add(TtabItemMotiveGroup item) => items.Add(item);
+
+        internal TtabItemMotiveGroup Get(int index) => items[index];
+
+        internal void Set(int index, TtabItemMotiveGroup item) => items[index] = item;
+    }
+    #endregion
+
+    #region MotiveItems
+    internal abstract class TtabItemAbstractMotiveItem
     {
-        public TtabItemMotiveItem(DbpfReader reader)
+        protected TtabItemMotiveGroup parent;
+
+        internal TtabItemAbstractMotiveItem(TtabItemMotiveGroup parent) => this.parent = parent;
+
+        internal TtabItemAbstractMotiveItem(TtabItemMotiveGroup parent, DbpfReader reader) : this(parent)
         {
             if (reader != null) this.Unserialize(reader);
         }
 
         protected abstract void Unserialize(DbpfReader reader);
 
-        public abstract void AddXml(XmlElement parent, int index);
+        internal abstract void AddXml(XmlElement parent, int index);
     }
 
-    public class TtabItemSingleMotiveItem : TtabItemMotiveItem
+    internal class TtabItemSingleMotiveItem : TtabItemAbstractMotiveItem
     {
         private readonly short[] items = new short[3];
 
         public short Min
         {
-            get => this[0];
+            get => this.items[0];
         }
 
         public short Delta
@@ -230,12 +196,7 @@ namespace Sims2Tools.DBPF.TTAB
             get => this.items[2];
         }
 
-        private short this[int index]
-        {
-            get => this.items[index];
-        }
-
-        public TtabItemSingleMotiveItem(DbpfReader reader) : base(reader)
+        internal TtabItemSingleMotiveItem(TtabItemMotiveGroup parent, DbpfReader reader) : base(parent, reader)
         {
         }
 
@@ -245,7 +206,7 @@ namespace Sims2Tools.DBPF.TTAB
                 this.items[index] = reader.ReadInt16();
         }
 
-        public override void AddXml(XmlElement parent, int index)
+        internal override void AddXml(XmlElement parent, int index)
         {
             XmlElement element = parent.OwnerDocument.CreateElement("motive");
             parent.AppendChild(element);
@@ -257,28 +218,25 @@ namespace Sims2Tools.DBPF.TTAB
         }
     }
 
-    public class TtabItemAnimalMotiveItem : TtabItemMotiveItem, ICollection, IEnumerable
+    internal class TtabItemAnimalMotiveItem : TtabItemAbstractMotiveItem
     {
-        private TtabItemSingleMotiveItemArrayList items;
+        private TtabItemSingleMotiveItemList items = new TtabItemSingleMotiveItemList();
 
-        public TtabItemSingleMotiveItem this[int index]
-        {
-            get => this.items[index];
-        }
-
-        public TtabItemAnimalMotiveItem(DbpfReader reader) : base(reader)
+        internal TtabItemAnimalMotiveItem(TtabItemMotiveGroup parent, DbpfReader reader) : base(parent, reader)
         {
         }
 
         protected override void Unserialize(DbpfReader reader)
         {
             int length = reader.ReadInt32();
-            this.items = new TtabItemSingleMotiveItemArrayList(new TtabItemSingleMotiveItem[length]);
+
+            this.items = new TtabItemSingleMotiveItemList();
+
             for (int index = 0; index < length; ++index)
-                this.items[index] = new TtabItemSingleMotiveItem(reader);
+                items.Add(new TtabItemSingleMotiveItem(this.parent, reader));
         }
 
-        public override void AddXml(XmlElement parent, int index)
+        internal override void AddXml(XmlElement parent, int index)
         {
             if (items != null)
             {
@@ -288,32 +246,70 @@ namespace Sims2Tools.DBPF.TTAB
 
                 for (int i = 0; i < items.Count; ++i)
                 {
-                    this[i].AddXml(element, i);
+                    items.Get(i).AddXml(element, i);
                 }
             }
         }
-
-        public int Count => this.items.Count;
-
-        public bool IsSynchronized => this.items.IsSynchronized;
-
-        public object SyncRoot => this.items.SyncRoot;
-
-        public void CopyTo(Array a, int i) => this.items.CopyTo(a, i);
-
-        public IEnumerator GetEnumerator() => this.items.GetEnumerator();
     }
+    #endregion
 
-    internal class TtabItemSingleMotiveItemArrayList : ArrayList
+    #region MotiveItemLists
+    internal class TtabItemMotiveItemList
     {
-        public TtabItemSingleMotiveItemArrayList(TtabItemSingleMotiveItem[] c) : base(c)
+        private readonly TtabItemMotiveGroup parent;
+        private readonly TtabItemMotiveTableType type;
+
+        private readonly List<TtabItemAbstractMotiveItem> items = new List<TtabItemAbstractMotiveItem>();
+
+        internal TtabItemMotiveItemList(TtabItemMotiveGroup parent, TtabItemMotiveTableType type)
+        {
+            this.parent = parent;
+            this.type = type;
+        }
+
+        internal int Count => items.Count;
+
+        internal void Add(TtabItemAbstractMotiveItem item) => items.Add(item);
+
+        internal TtabItemAbstractMotiveItem Get(int index)
+        {
+            return (index < items.Count) ? items[index] : null;
+        }
+
+        internal void Set(int index, TtabItemAbstractMotiveItem item)
+        {
+            if (index >= items.Count)
+            {
+                while (items.Count <= index)
+                {
+                    if (type == TtabItemMotiveTableType.Human)
+                    {
+                        items.Add(new TtabItemSingleMotiveItem(parent, null));
+                    }
+                    else
+                    {
+                        items.Add(new TtabItemAnimalMotiveItem(parent, null));
+                    }
+                }
+            }
+
+            items[index] = item;
+        }
+    }
+
+    internal class TtabItemSingleMotiveItemList
+    {
+        private readonly List<TtabItemSingleMotiveItem> items = new List<TtabItemSingleMotiveItem>();
+
+        internal TtabItemSingleMotiveItemList()
         {
         }
 
-        public new TtabItemSingleMotiveItem this[int index]
-        {
-            get => (TtabItemSingleMotiveItem)base[index];
-            internal set => this[index] = value;
-        }
+        internal int Count => items.Count;
+
+        internal void Add(TtabItemSingleMotiveItem item) => items.Add(item);
+
+        internal TtabItemSingleMotiveItem Get(int index) => items[index];
     }
+    #endregion
 }

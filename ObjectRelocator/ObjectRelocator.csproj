@@ -76,7 +76,6 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NamedValue.cs" />
     <Compile Include="ObjectRelocatorApp.cs" />
     <Compile Include="ObjectRelocatorData.cs" />
     <Compile Include="ObjectRelocatorForm.cs">

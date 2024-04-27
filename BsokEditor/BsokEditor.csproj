@@ -82,7 +82,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="XmlValue.cs" />
-    <Compile Include="NamedValue.cs" />
     <Compile Include="BsokEditorApp.cs" />
     <Compile Include="BsokEditorData.cs" />
     <Compile Include="BsokEditorForm.cs">

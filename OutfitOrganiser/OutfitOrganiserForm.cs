@@ -28,6 +28,7 @@ using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
+using Sims2Tools.Utils.NamedValue;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 #endregion
 
 namespace OutfitOrganiser
@@ -60,6 +62,7 @@ namespace OutfitOrganiser
 
         private readonly OutfitOrganiserPackageData dataPackageFiles = new OutfitOrganiserPackageData();
         private readonly OutfitOrganiserResourceData dataResources = new OutfitOrganiserResourceData();
+        private readonly XmlElement configXml;
 
         #region Dropdown Menu Items
         private readonly UintNamedValue[] genderItems = {
@@ -189,6 +192,8 @@ namespace OutfitOrganiser
             {
                 dataLoading = true;
 
+                configXml = ProcessConfig()?.DocumentElement;
+
                 comboGender.Items.Clear();
                 comboGender.Items.AddRange(genderItems);
 
@@ -216,6 +221,8 @@ namespace OutfitOrganiser
                 comboMakeupLayer.Items.Clear();
                 comboMakeupLayer.Items.AddRange(makeupLayerItems);
 
+                UserConfigLoad(comboAccessoryBin, "accessories", "bins", "bin");
+
                 dataLoading = false;
             }
 
@@ -232,6 +239,83 @@ namespace OutfitOrganiser
             }
 
             base.Dispose();
+        }
+        #endregion
+
+        #region XML Config
+        private XmlDocument ProcessConfig()
+        {
+            return LoadConfigFile("Resources/XML/config.xml");
+        }
+
+        private XmlDocument LoadConfigFile(string configXmlFile)
+        {
+            XmlDocument configXmlDoc = new XmlDocument();
+
+            try
+            {
+                configXmlDoc.Load(configXmlFile);
+                logger.Info($"Loaded config {configXmlFile}");
+            }
+            catch (Exception e)
+            {
+                logger.Warn($"Config {configXmlFile} is invalid!", e);
+            }
+
+            return configXmlDoc;
+        }
+
+        private void UserConfigLoad(ComboBox comboBox, string outfit, string group, string item)
+        {
+            if (configXml == null) return;
+
+            foreach (XmlNode node in configXml.ChildNodes)
+            {
+                if (node is XmlElement eleOutfit)
+                {
+                    if (eleOutfit.Name.Equals(outfit))
+                    {
+                        foreach (XmlNode groupNode in eleOutfit.ChildNodes)
+                        {
+                            if (groupNode is XmlElement eleGroup)
+                            {
+                                if (eleGroup.Name.Equals(group))
+                                {
+                                    foreach (XmlNode itemNode in eleGroup.ChildNodes)
+                                    {
+                                        if (itemNode is XmlElement eleItem)
+                                        {
+                                            if (eleItem.Name.Equals(item))
+                                            {
+                                                string name = eleItem.GetAttribute("name");
+                                                string s = eleItem.GetAttribute("value");
+                                                uint value = 0;
+
+                                                try
+                                                {
+                                                    if (s.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+                                                    {
+                                                        value = Convert.ToUInt32(s, 16);
+                                                    }
+                                                    else
+                                                    {
+                                                        value = Convert.ToUInt32(s, 10);
+                                                    }
+                                                }
+                                                catch (Exception) { }
+
+                                                comboBox.Items.Add(new UintNamedValue(name, value));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            ControlHelper.SetDropDownWidth(comboBox);
         }
         #endregion
 
@@ -874,25 +958,27 @@ namespace OutfitOrganiser
                 }
             }
 
-            gridResources.Columns["colHairtone"].Visible = menuItemOutfitHair.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitMakeUp.Checked;
-            // grpHairtone.Visible = gridResources.Columns["colHairtone"].Visible;
-            grpHairtone.Visible = false;
+            gridResources.Columns["colShoe"].Visible = menuItemOutfitClothing.Checked;
+            grpShoe.Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitMakeUp.Checked && !menuItemOutfitHair.Checked;
 
-            gridResources.Columns["colShoe"].Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
-            grpShoe.Visible = gridResources.Columns["colShoe"].Visible;
-
-            gridResources.Columns["colJewelry"].Visible = menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
+            gridResources.Columns["colJewelry"].Visible = menuItemOutfitAccessory.Checked;
             gridResources.Columns["colDestination"].Visible = gridResources.Columns["colJewelry"].Visible;
             gridResources.Columns["colAccessoryBin"].Visible = gridResources.Columns["colJewelry"].Visible;
-            grpJewelry.Visible = gridResources.Columns["colJewelry"].Visible;
+            grpAccessories.Visible = menuItemOutfitAccessory.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitMakeUp.Checked && !menuItemOutfitHair.Checked;
 
-            gridResources.Columns["colMakeupSubtype"].Visible = menuItemOutfitMakeUp.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitAccessory.Checked;
+            gridResources.Columns["colMakeupSubtype"].Visible = menuItemOutfitMakeUp.Checked;
             gridResources.Columns["colMakeupLayerStr"].Visible = gridResources.Columns["colMakeupSubtype"].Visible && !(menuItemNumericLayer.Visible && menuItemNumericLayer.Checked);
             gridResources.Columns["colMakeupLayerInt"].Visible = gridResources.Columns["colMakeupSubtype"].Visible && menuItemNumericLayer.Visible && menuItemNumericLayer.Checked;
             gridResources.Columns["colMakeupBin"].Visible = gridResources.Columns["colMakeupSubtype"].Visible;
-            grpMakeup.Visible = gridResources.Columns["colMakeupSubtype"].Visible;
+            grpMakeup.Visible = menuItemOutfitMakeUp.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked;
 
-            gridResources.Columns["colTownie"].Visible = menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked;
+            gridResources.Columns["colHairtone"].Visible = menuItemOutfitHair.Checked;
+            // grpHairtone.Visible = menuItemOutfitHair.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitMakeUp.Checked;
+            grpHairtone.Visible = false;
+
+            gridResources.Columns["colTownie"].Visible = menuItemOutfitClothing.Checked;
+
+            grpMultipleOutfits.Visible = !(grpShoe.Visible || grpAccessories.Visible || grpMakeup.Visible || grpHairtone.Visible);
 
             if (IsCigenDirty())
             {
@@ -1427,6 +1513,20 @@ namespace OutfitOrganiser
                         {
                             e.ToolTipText = row.Cells["colFilename"].Value as string;
                         }
+                    }
+                    else if (colName.Equals("colAccessoryBin"))
+                    {
+                        uint value = (uint)row.Cells["colAccessoryBin"].Value;
+
+                        foreach (object o in comboAccessoryBin.Items)
+                        {
+                            if ((o as UintNamedValue).Value == value)
+                            {
+                                e.ToolTipText = (o as UintNamedValue).Name;
+                                break;
+                            }
+                        }
+
                     }
                 }
             }
@@ -2259,7 +2359,7 @@ namespace OutfitOrganiser
             // comboHairtone.SelectedIndex = -1;
             comboJewelry.SelectedIndex = -1;
             comboDestination.SelectedIndex = -1;
-            textAccessoryBin.Text = "";
+            comboAccessoryBin.Text = "";
             comboMakeupSubtype.SelectedIndex = -1;
             comboMakeupLayer.SelectedIndex = -1;
             textMakeupLayer.Text = "";
@@ -2502,14 +2602,24 @@ namespace OutfitOrganiser
             {
                 if (cachedAccessoryBinValue != newAccessoryBinValue)
                 {
-                    textAccessoryBin.Text = "";
+                    comboAccessoryBin.Text = "";
                 }
             }
             else
             {
                 cachedAccessoryBinValue = newAccessoryBinValue;
 
-                textAccessoryBin.Text = newAccessoryBinValue.ToString();
+                comboAccessoryBin.Text = newAccessoryBinValue.ToString();
+
+                foreach (object o in comboAccessoryBin.Items)
+                {
+                    if ((o as UintNamedValue).Value == cachedAccessoryBinValue)
+                    {
+                        comboAccessoryBin.SelectedItem = o;
+                        comboAccessoryBin.Text = o.ToString();
+                        break;
+                    }
+                }
             }
 
             uint newMakeupSubtypeValue = outfitData.Subtype;
@@ -2670,6 +2780,14 @@ namespace OutfitOrganiser
             if (comboDestination.SelectedIndex != -1)
             {
                 if (IsAutoUpdate) UpdateSelectedRows((comboDestination.SelectedItem as UintNamedValue).Value, "destination");
+            }
+        }
+
+        private void OnAccessoryBinChanged(object sender, EventArgs e)
+        {
+            if (comboAccessoryBin.SelectedIndex != -1)
+            {
+                if (IsAutoUpdate) UpdateSelectedRows((comboAccessoryBin.SelectedItem as UintNamedValue).Value, "bin");
             }
         }
 
@@ -2957,13 +3075,13 @@ namespace OutfitOrganiser
             {
                 uint data = 0;
 
-                if (textAccessoryBin.Text.Length > 0 && !uint.TryParse(textAccessoryBin.Text, out data))
+                if (comboAccessoryBin.Text.Length > 0 && !uint.TryParse(comboAccessoryBin.Text, out data))
                 {
-                    textAccessoryBin.Text = "0";
+                    comboAccessoryBin.Text = "0";
                     data = 0;
                 }
 
-                if (IsAutoUpdate && textAccessoryBin.Text.Length > 0)
+                if (IsAutoUpdate && comboAccessoryBin.Text.Length > 0)
                 {
                     UpdateSelectedRows(data, "bin");
 

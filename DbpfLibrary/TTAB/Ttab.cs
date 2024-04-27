@@ -41,6 +41,11 @@ namespace Sims2Tools.DBPF.TTAB
             Unserialize(reader);
         }
 
+        public List<TtabItem> GetItems()
+        {
+            return items;
+        }
+
         // See - https://modthesims.info/wiki.php?title=54544142
         protected void Unserialize(DbpfReader reader)
         {
@@ -48,16 +53,18 @@ namespace Sims2Tools.DBPF.TTAB
 
             this.header = new uint[3];
             this.header[0] = reader.ReadUInt32();
-            this.header[1] = reader.ReadUInt32();
-            this.header[2] = reader.ReadUInt32();
+
             if (this.header[0] != 0xFFFFFFFF)
                 throw new Exception($"Unexpected data in TTAB header.  Read {Helper.Hex8PrefixString(this.header[0])}.  Expected 0xFFFFFFFF.");
+
+            this.header[1] = reader.ReadUInt32();
+            this.header[2] = reader.ReadUInt32();
 
             ushort num = reader.ReadUInt16();
             while (this.items.Count < num)
                 this.items.Add(new TtabItem(this.Format, reader));
 
-            //this.footer = reader.ReadBytes((int)(reader.Length - reader.Position));
+            // this.footer = reader.ReadBytes((int)(reader.Length - reader.Position));
         }
 
         public override XmlElement AddXml(XmlElement parent)

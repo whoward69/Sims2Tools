@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<config>
+  <accessories>
+    <bins>
+      <!-- value may be hex (0x1234) or decimal (12345) -->
+      <bin name="Midnight at.../Combadge (Chest)" value="0xFA9A1731"/>
+      <bin name="Midnight at.../Helmet" value="0xFA9A1732"/>
+      <bin name="Midnight at.../Rank pips (Collar)" value="0xFA9A1733"/>
+      <bin name="Midnight at.../Boots" value="0xFA9A1734"/>
+      <bin name="Midnight at.../Right Hand" value="0xFA9A1735"/>
+      <bin name="Midnight at.../Left Hand" value="0xFA9A1736"/>
+      <bin name="Midnight at.../Gear pack (Back)" value="0xFA9A1738"/>
+      <bin name="Midnight at.../Belt" value="0xFA9A1739"/>
+      <bin name="Midnight at.../Harness" value="0xFA9A173A"/>
+      <bin name="Midnight at.../Right Thigh Holster" value="0xFA9A173B"/>
+      <bin name="Midnight at.../Left Thigh Holster" value="0xFA9A173C"/>
+      <bin name="Midnight at.../Right Belt Holster" value="0xFA9A173D"/>
+      <bin name="Midnight at.../Left Belt Holster" value="0xFA9A173E"/>
+      <bin name="Midnight at.../Right Shoulder" value="0xFA9A173F"/>
+      <bin name="Midnight at.../Left Shoulder" value="0xFA9A1740"/>
+      <bin name="NixNivis-The Armory/Right Hand" value="0x00074657"/>
+      <bin name="NixNivis-The Armory/Left Hand" value="0x00074656"/>
+      <bin name="NixNivis-The Armory/Right Hip" value="0x00074659"/>
+      <bin name="NixNivis-The Armory/Left Hip" value="0x00074658"/>
+      <bin name="NixNivis-The Armory/Back" value="0x0007465A"/>
+      <bin name="NixNivis-The Armory/Helmet" value="0x0007465B"/>
+      <bin name="NixNivis-The Armory/Chest" value="0x0007465C"/>
+      <bin name="NixNivis-The Armory/Pelvis" value="0x0007465D"/>
+    </bins>
+  </accessories>
+</config>
