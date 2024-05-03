@@ -68,6 +68,7 @@ using Sims2Tools.DBPF.XFLR;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DBPF.XROF;
+using Sims2Tools.DBPF.XWNT;
 using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF
@@ -104,14 +105,6 @@ namespace Sims2Tools.DBPF
         private static readonly Dictionary<TypeTypeID, string> OtherTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, string> AllTypeNames = new Dictionary<TypeTypeID, string>();
 
-        private static bool hasImageSupport = true;
-
-        public static bool HasImageSupport
-        {
-            get => hasImageSupport;
-            set => hasImageSupport = value;
-        }
-
         static DBPFData()
         {
             ModTypeNames.Add(Bcon.TYPE, Bcon.NAME);
@@ -130,12 +123,9 @@ namespace Sims2Tools.DBPF
             ModTypeNames.Add(Ui.TYPE, Ui.NAME);
             ModTypeNames.Add(Vers.TYPE, Vers.NAME);
 
-            if (hasImageSupport)
-            {
-                ImgTypeNames.Add(Img.TYPE, Img.NAME);
-                ImgTypeNames.Add(Jpg.TYPE, Jpg.NAME);
-                ImgTypeNames.Add(Thub.TYPE, Thub.NAME);
-            }
+            ImgTypeNames.Add(Img.TYPE, Img.NAME);
+            ImgTypeNames.Add(Jpg.TYPE, Jpg.NAME);
+            ImgTypeNames.Add(Thub.TYPE, Thub.NAME);
 
             // SgTypeNames.Add(Anim.TYPE, Anim.NAME);
             SgTypeNames.Add(Binx.TYPE, Binx.NAME);
@@ -181,6 +171,7 @@ namespace Sims2Tools.DBPF
             OtherTypeNames.Add(Xfnc.TYPE, Xfnc.NAME);
             OtherTypeNames.Add(Xobj.TYPE, Xobj.NAME);
             OtherTypeNames.Add(Xrof.TYPE, Xrof.NAME);
+            OtherTypeNames.Add(Xwnt.TYPE, Xwnt.NAME);
 
             OtherTypeNames.Add(Cgn1.TYPE, Cgn1.NAME);
             OtherTypeNames.Add(Grop.TYPE, Grop.NAME);

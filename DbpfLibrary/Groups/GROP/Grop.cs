@@ -55,7 +55,7 @@ namespace Sims2Tools.DBPF.Groups.GROP
         {
             XmlElement element = XmlHelper.CreateResElement(parent, NAME, this);
 
-            // TODO - Grop - AddXml()
+            // TODO - _library - Grop - AddXml()
 
             return element;
         }

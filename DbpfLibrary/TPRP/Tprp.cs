@@ -38,7 +38,27 @@ namespace Sims2Tools.DBPF.TPRP
 
         public int ParamCount => !this.duff ? this.paramCount : 0;
 
+        public string GetParamName(int index)
+        {
+            if (index < ParamCount)
+            {
+                return items[index].Label;
+            }
+
+            return null;
+        }
+
         public int LocalCount => !this.duff ? this.localCount : 0;
+
+        public string GetLocalName(int index)
+        {
+            if (index < LocalCount)
+            {
+                return items[index + ParamCount].Label;
+            }
+
+            return null;
+        }
 
         protected void Unserialize(DbpfReader reader)
         {

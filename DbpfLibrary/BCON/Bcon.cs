@@ -33,9 +33,18 @@ namespace Sims2Tools.DBPF.BCON
             Unserialize(reader);
         }
 
-        public bool Flag
+        public bool Flag => this.flag;
+
+        public int Count => this.items.Count;
+
+        public uint GetValue(int index)
         {
-            get => this.flag;
+            if (index < items.Count)
+            {
+                return items[index];
+            }
+
+            return 0;
         }
 
         protected void Unserialize(DbpfReader reader)

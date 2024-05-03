@@ -53,7 +53,7 @@ namespace Sims2Tools.DBPF.Groups.GROP
         {
             string absFilename = filename;
 
-            /* TODO - GropItem - AbsoluteFileName()
+            /* TODO - _library - GropItem - AbsoluteFileName()
             absFilename = absFilename.Replace("%userdatadir%", PathProvider.SimSavegameFolder.Trim().ToLower());
 
             foreach (ExpansionItem ei in PathProvider.Global.Expansions)

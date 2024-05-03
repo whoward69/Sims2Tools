@@ -204,6 +204,18 @@ namespace Sims2Tools.DBPF.CPF
             }
         }
 
+        public List<string> GetItemNames()
+        {
+            List<string> names = new List<string>();
+
+            for (int i = 0; i < items.Count; ++i)
+            {
+                names.Add(items[i].Name);
+            }
+
+            return names;
+        }
+
         public List<CpfItem> CloneItems()
         {
             List<CpfItem> cloneItems = new List<CpfItem>(items.Count);

@@ -124,6 +124,44 @@ namespace Sims2Tools.Utils.Persistence
             }
         }
 
+        public static void LoadPopupSettings(string AppRegKey, Form frm)
+        {
+            string frmKey = AppRegKey + $"\\Popup\\{frm.Name}";
+
+            Rectangle formArea = new Rectangle((int)GetSetting(frmKey, "FormLeft", frm.Left), (int)GetSetting(frmKey, "FormTop", frm.Top),
+                                               (int)GetSetting(frmKey, "FormWidth", frm.Width), (int)GetSetting(frmKey, "FormHeight", frm.Height));
+
+            if (Screen.AllScreens.Any(s => s.WorkingArea.IntersectsWith(formArea)))
+            {
+                frm.SetBounds(formArea.Left, formArea.Top, formArea.Width, formArea.Height);
+            }
+
+            frm.WindowState = (FormWindowState)GetSetting(frmKey, "FormWindowState", frm.WindowState);
+        }
+
+        public static void SavePopupSettings(string AppRegKey, Form frm)
+        {
+            string frmKey = AppRegKey + $"\\Popup\\{frm.Name}";
+
+            SaveSetting(frmKey, "FormWindowState", (int)frm.WindowState);
+            if (frm.WindowState == FormWindowState.Normal)
+            {
+                // Save current location.
+                SaveSetting(frmKey, "FormLeft", frm.Left);
+                SaveSetting(frmKey, "FormTop", frm.Top);
+                SaveSetting(frmKey, "FormWidth", frm.Width);
+                SaveSetting(frmKey, "FormHeight", frm.Height);
+            }
+            else
+            {
+                // Save location when we're restored.
+                SaveSetting(frmKey, "FormLeft", frm.RestoreBounds.Left);
+                SaveSetting(frmKey, "FormTop", frm.RestoreBounds.Top);
+                SaveSetting(frmKey, "FormWidth", frm.RestoreBounds.Width);
+                SaveSetting(frmKey, "FormHeight", frm.RestoreBounds.Height);
+            }
+        }
+
         public static bool IsSet(string AppRegKey, string Key)
         {
             RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("Software", true);

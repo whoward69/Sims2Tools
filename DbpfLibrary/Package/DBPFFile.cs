@@ -324,6 +324,13 @@ namespace Sims2Tools.DBPF.Package
             return m_Reader.ReadBytes((int)entry.FileSize);
         }
 
+        public byte[] GetItemByKey(DBPFKey key)
+        {
+            DBPFEntry entry = GetEntryByKey(key);
+
+            return (entry != null) ? GetItemByEntry(entry) : null;
+        }
+
         public byte[] GetOriginalItemByEntry(DBPFEntry entry)
         {
             return GetItemByEntry(entry);
@@ -357,6 +364,7 @@ namespace Sims2Tools.DBPF.Package
             }
             else
             {
+                // TODO - _library - doesn't work for RCOL based resources
                 return Helper.ToString(this.GetDbpfReader(entry).ReadBytes(Math.Min((int)entry.FileSize, 0x40)));
             }
         }
@@ -406,253 +414,255 @@ namespace Sims2Tools.DBPF.Package
             }
 
             DBPFResource res = null;
+            DbpfReader reader = this.GetDbpfReader(entry);
 
-            // There's got to be a better way to do this!
+            // If these wern't constructors ...
+            // ... we could use delegates.
+            // But they are, so we can't!
             if (entry.TypeID == Bcon.TYPE)
             {
-                res = new Bcon(entry, this.GetDbpfReader(entry));
+                res = new Bcon(entry, reader);
             }
             else if (entry.TypeID == Bhav.TYPE)
             {
-                res = new Bhav(entry, this.GetDbpfReader(entry));
+                res = new Bhav(entry, reader);
             }
             else if (entry.TypeID == Ctss.TYPE)
             {
-                res = new Ctss(entry, this.GetDbpfReader(entry));
+                res = new Ctss(entry, reader);
             }
             else if (entry.TypeID == Glob.TYPE)
             {
-                res = new Glob(entry, this.GetDbpfReader(entry));
+                res = new Glob(entry, reader);
             }
             else if (entry.TypeID == Objd.TYPE)
             {
-                res = new Objd(entry, this.GetDbpfReader(entry));
+                res = new Objd(entry, reader);
             }
             else if (entry.TypeID == Objf.TYPE)
             {
-                res = new Objf(entry, this.GetDbpfReader(entry));
+                res = new Objf(entry, reader);
             }
             else if (entry.TypeID == Nref.TYPE)
             {
-                res = new Nref(entry, this.GetDbpfReader(entry));
+                res = new Nref(entry, reader);
             }
             else if (entry.TypeID == Slot.TYPE)
             {
-                res = new Slot(entry, this.GetDbpfReader(entry));
+                res = new Slot(entry, reader);
             }
             else if (entry.TypeID == Str.TYPE)
             {
-                res = new Str(entry, this.GetDbpfReader(entry));
+                res = new Str(entry, reader);
             }
             else if (entry.TypeID == Tprp.TYPE)
             {
-                res = new Tprp(entry, this.GetDbpfReader(entry));
+                res = new Tprp(entry, reader);
             }
             else if (entry.TypeID == Trcn.TYPE)
             {
-                res = new Trcn(entry, this.GetDbpfReader(entry));
+                res = new Trcn(entry, reader);
             }
             else if (entry.TypeID == Ttab.TYPE)
             {
-                res = new Ttab(entry, this.GetDbpfReader(entry));
+                res = new Ttab(entry, reader);
             }
             else if (entry.TypeID == Ttas.TYPE)
             {
-                res = new Ttas(entry, this.GetDbpfReader(entry));
+                res = new Ttas(entry, reader);
             }
             else if (entry.TypeID == Vers.TYPE)
             {
-                res = new Vers(entry, this.GetDbpfReader(entry));
+                res = new Vers(entry, reader);
             }
             else if (entry.TypeID == Xflr.TYPE)
             {
-                res = new Xflr(entry, this.GetDbpfReader(entry));
+                res = new Xflr(entry, reader);
             }
             else if (entry.TypeID == Xfnc.TYPE)
             {
-                res = new Xfnc(entry, this.GetDbpfReader(entry));
+                res = new Xfnc(entry, reader);
             }
             else if (entry.TypeID == Xobj.TYPE)
             {
-                res = new Xobj(entry, this.GetDbpfReader(entry));
+                res = new Xobj(entry, reader);
             }
             else if (entry.TypeID == Xrof.TYPE)
             {
-                res = new Xrof(entry, this.GetDbpfReader(entry));
+                res = new Xrof(entry, reader);
             }
             else if (entry.TypeID == Xwnt.TYPE)
             {
-                res = new Xwnt(entry, this.GetDbpfReader(entry));
+                res = new Xwnt(entry, reader);
             }
             //
             // Image resources
             //
-            else if (DBPFData.HasImageSupport && entry.TypeID == Img.TYPE)
+            else if (entry.TypeID == Img.TYPE)
             {
-                res = new Img(entry, this.GetDbpfReader(entry));
+                res = new Img(entry, reader);
             }
-            else if (DBPFData.HasImageSupport && entry.TypeID == Jpg.TYPE)
+            else if (entry.TypeID == Jpg.TYPE)
             {
-                res = new Jpg(entry, this.GetDbpfReader(entry));
+                res = new Jpg(entry, reader);
             }
             else if (entry.TypeID == Thub.TYPE)
             {
-                res = new Thub(entry, this.GetDbpfReader(entry));
+                res = new Thub(entry, reader);
             }
-            else if (DBPFData.HasImageSupport &&
-                     (entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Awning] ||
-                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Chimney] ||
-                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Dormer] ||
-                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceArch] ||
-                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceOrHalfwall] ||
-                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Floor] ||
-                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FoundationOrPool] ||
-                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.ModularStair] ||
-                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Roof] ||
-                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Terrain] ||
-                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Wall]))
+            else if (entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Awning] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Chimney] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Dormer] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceArch] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceOrHalfwall] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Floor] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FoundationOrPool] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.ModularStair] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Roof] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Terrain] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Wall])
             {
-                res = new Thub(entry, this.GetDbpfReader(entry));
+                res = new Thub(entry, reader);
             }
             //
             // Neighbourhood resources
             //
             else if (entry.TypeID == Bnfo.TYPE)
             {
-                res = new Bnfo(entry, this.GetDbpfReader(entry));
+                res = new Bnfo(entry, reader);
             }
             else if (entry.TypeID == Fami.TYPE)
             {
-                res = new Fami(entry, this.GetDbpfReader(entry));
+                res = new Fami(entry, reader);
             }
             else if (entry.TypeID == Famt.TYPE)
             {
-                res = new Famt(entry, this.GetDbpfReader(entry));
+                res = new Famt(entry, reader);
             }
             else if (entry.TypeID == Idno.TYPE)
             {
-                res = new Idno(entry, this.GetDbpfReader(entry));
+                res = new Idno(entry, reader);
             }
             else if (entry.TypeID == Ltxt.TYPE)
             {
-                res = new Ltxt(entry, this.GetDbpfReader(entry));
+                res = new Ltxt(entry, reader);
             }
             else if (entry.TypeID == Ngbh.TYPE)
             {
-                res = new Ngbh(entry, this.GetDbpfReader(entry));
+                res = new Ngbh(entry, reader);
             }
             else if (entry.TypeID == Sdna.TYPE)
             {
-                res = new Sdna(entry, this.GetDbpfReader(entry));
+                res = new Sdna(entry, reader);
             }
             else if (entry.TypeID == Sdsc.TYPE)
             {
-                res = new Sdsc(entry, this.GetDbpfReader(entry));
+                res = new Sdsc(entry, reader);
             }
             else if (entry.TypeID == Srel.TYPE)
             {
-                res = new Srel(entry, this.GetDbpfReader(entry));
+                res = new Srel(entry, reader);
             }
             else if (entry.TypeID == Swaf.TYPE)
             {
-                res = new Swaf(entry, this.GetDbpfReader(entry));
+                res = new Swaf(entry, reader);
             }
             //
             // SceneGraph resources
             //
             else if (entry.TypeID == Binx.TYPE)
             {
-                res = new Binx(entry, this.GetDbpfReader(entry));
+                res = new Binx(entry, reader);
             }
             else if (entry.TypeID == Coll.TYPE)
             {
-                res = new Coll(entry, this.GetDbpfReader(entry));
+                res = new Coll(entry, reader);
             }
             else if (entry.TypeID == Cres.TYPE)
             {
-                res = new Cres(entry, this.GetDbpfReader(entry));
+                res = new Cres(entry, reader);
             }
             else if (entry.TypeID == Gmdc.TYPE)
             {
-                res = new Gmdc(entry, this.GetDbpfReader(entry));
+                res = new Gmdc(entry, reader);
             }
             else if (entry.TypeID == Gmnd.TYPE)
             {
-                res = new Gmnd(entry, this.GetDbpfReader(entry));
+                res = new Gmnd(entry, reader);
             }
             else if (entry.TypeID == Gzps.TYPE)
             {
-                res = new Gzps(entry, this.GetDbpfReader(entry));
+                res = new Gzps(entry, reader);
             }
             else if (entry.TypeID == Idr.TYPE)
             {
-                res = new Idr(entry, this.GetDbpfReader(entry));
+                res = new Idr(entry, reader);
             }
             else if (entry.TypeID == Lamb.TYPE)
             {
-                res = new Lamb(entry, this.GetDbpfReader(entry));
+                res = new Lamb(entry, reader);
             }
             else if (entry.TypeID == Ldir.TYPE)
             {
-                res = new Ldir(entry, this.GetDbpfReader(entry));
+                res = new Ldir(entry, reader);
             }
             else if (entry.TypeID == Lpnt.TYPE)
             {
-                res = new Lpnt(entry, this.GetDbpfReader(entry));
+                res = new Lpnt(entry, reader);
             }
             else if (entry.TypeID == Lspt.TYPE)
             {
-                res = new Lspt(entry, this.GetDbpfReader(entry));
+                res = new Lspt(entry, reader);
             }
             else if (entry.TypeID == Mmat.TYPE)
             {
-                res = new Mmat(entry, this.GetDbpfReader(entry));
+                res = new Mmat(entry, reader);
             }
             else if (entry.TypeID == Shpe.TYPE)
             {
-                res = new Shpe(entry, this.GetDbpfReader(entry));
+                res = new Shpe(entry, reader);
             }
             else if (entry.TypeID == Txmt.TYPE)
             {
-                res = new Txmt(entry, this.GetDbpfReader(entry));
+                res = new Txmt(entry, reader);
             }
             else if (entry.TypeID == Txtr.TYPE)
             {
-                res = new Txtr(entry, this.GetDbpfReader(entry));
+                res = new Txtr(entry, reader);
             }
             else if (entry.TypeID == Xfch.TYPE)
             {
-                res = new Xfch(entry, this.GetDbpfReader(entry));
+                res = new Xfch(entry, reader);
             }
             else if (entry.TypeID == Xmol.TYPE)
             {
-                res = new Xmol(entry, this.GetDbpfReader(entry));
+                res = new Xmol(entry, reader);
             }
             else if (entry.TypeID == Xhtn.TYPE)
             {
-                res = new Xhtn(entry, this.GetDbpfReader(entry));
+                res = new Xhtn(entry, reader);
             }
             else if (entry.TypeID == Xstn.TYPE)
             {
-                res = new Xstn(entry, this.GetDbpfReader(entry));
+                res = new Xstn(entry, reader);
             }
             else if (entry.TypeID == Xtol.TYPE)
             {
-                res = new Xtol(entry, this.GetDbpfReader(entry));
+                res = new Xtol(entry, reader);
             }
             //
             // Cigen Resources
             //
             else if (entry.TypeID == Cgn1.TYPE)
             {
-                res = new Cgn1(entry, this.GetDbpfReader(entry));
+                res = new Cgn1(entry, reader);
             }
             //
             // Groups Resources
             //
             else if (entry.TypeID == Grop.TYPE)
             {
-                res = new Grop(entry, this.GetDbpfReader(entry));
+                res = new Grop(entry, reader);
             }
 
             return res;

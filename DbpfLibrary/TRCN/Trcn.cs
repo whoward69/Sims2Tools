@@ -40,6 +40,19 @@ namespace Sims2Tools.DBPF.TRCN
 
         public bool TextOnly => this.duff || this.header[1] < 63U || this.header[1] >= 65U && this.header[1] < 70U || this.header[0] != 0x5452434E || this.header[2] != 0U;
 
+        public int Count => this.items.Count;
+
+        public string GetName(int index)
+        {
+            if (index < items.Count)
+            {
+                return items[index].ConstName;
+            }
+
+            return null;
+        }
+
+
         protected void Unserialize(DbpfReader reader)
         {
             this.duff = false;

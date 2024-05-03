@@ -47,8 +47,30 @@ namespace Sims2Tools.DBPF.Data
             TraditionalChinese = 0x12,
             Thai = 0x13,
             Korean = 0x14,
+            Hindi,
+            Arabic,
+            Bulgarian,
+            Cyrillic,
+            Ukranian,
             Czech = 0x1a,
-            Brazilian = 0x23
+            Greek,
+            Hungarian,
+            Icelandic,
+            Romanian,
+            Latin,
+            Slovak,
+            Albanian,
+            Turkish,
+            BrazilianPortuguese = 0x23,
+            SwissFrench,
+            CanadianFrench,
+            BelgianFrench,
+            SwissGerman,
+            SwissItalian,
+            BelgianDutch,
+            MexicanSpanish,
+            Tagalog,
+            Vietnamese = 0x2c
         }
 
         public enum FormatCode : ushort

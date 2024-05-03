@@ -14,10 +14,11 @@ using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.IO;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Sims2Tools.DBPF.STR
 {
-    public class StrLanguage : IComparable<StrLanguage>
+    public class StrLanguage : IEquatable<StrLanguage>, IComparable<StrLanguage>
     {
         readonly MetaData.Languages lid;
 
@@ -26,7 +27,7 @@ namespace Sims2Tools.DBPF.STR
             this.lid = lid;
         }
 
-        private byte Id
+        public byte Id
         {
             get => (byte)lid;
         }
@@ -43,7 +44,19 @@ namespace Sims2Tools.DBPF.STR
 
         public override string ToString()
         {
-            return Name;
+            if (Id == 0 || Id == 1) return "English (Default)";
+            if (Id == 2) return "English (UK)";
+
+            string s = Name;
+
+            Match m = new Regex("([a-z])([A-Z])").Match(s);
+
+            if (m.Success)
+            {
+                s.Replace($"{m.Groups[1]}{m.Groups[2]}", $"{m.Groups[1]} {m.Groups[2]}");
+            }
+
+            return s;
         }
 
         public static implicit operator StrLanguage(MetaData.Languages val)
@@ -61,13 +74,18 @@ namespace Sims2Tools.DBPF.STR
             return base.GetHashCode();
         }
 
+        public bool Equals(StrLanguage that)
+        {
+            return (this.Id == that.Id);
+        }
+
         public int CompareTo(StrLanguage that)
         {
-            return that.Id - this.Id;
+            return (that.Id - this.Id);
         }
     }
 
-    public class StrItem
+    public class StrItem : IEquatable<StrItem>
     {
         private readonly StrLanguage lang;
         private string title;
@@ -141,6 +159,11 @@ namespace Sims2Tools.DBPF.STR
         public override string ToString()
         {
             return Title;
+        }
+
+        public bool Equals(StrItem that)
+        {
+            return (this.Title.Equals(that.Title) && this.Description.Equals(that.Description));
         }
     }
 }

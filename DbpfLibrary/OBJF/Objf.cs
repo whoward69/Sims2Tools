@@ -33,6 +33,10 @@ namespace Sims2Tools.DBPF.OBJF
             Unserialize(reader);
         }
 
+        public bool HasEntry(ObjfIndex index) => HasEntry((int)index);
+
+        public bool HasEntry(int index) => (items != null && index < items.Count);
+
         public ushort GetGuardian(ObjfIndex index)
         {
             return GetGuardian((int)index);

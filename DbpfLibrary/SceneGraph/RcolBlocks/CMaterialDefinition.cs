@@ -33,12 +33,29 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
 
         string mattype;
-        public string MatterialType => mattype;
+        public string MaterialType => mattype;
 
         private string[] fileList;
         public ReadOnlyCollection<string> FileList => new ReadOnlyCollection<string>(fileList);
 
         private readonly List<MaterialDefinitionProperty> properties;
+
+        public List<string> GetPropertyNames()
+        {
+            List<string> names = new List<string>();
+
+            foreach (MaterialDefinitionProperty prop in properties)
+            {
+                names.Add(prop.Name);
+            }
+
+            return names;
+        }
+
+        public bool HasProperty(string name)
+        {
+            return (GetProperty(name) != null);
+        }
 
         public string GetProperty(string name)
         {
