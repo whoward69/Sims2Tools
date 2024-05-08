@@ -31,6 +31,8 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 #endif
 
+        private static readonly string[] txtrPropKeys = { "stdMatBaseTextureName", "stdMatNormalMapTextureName", "stdMatEnvCubeTextureName" };
+
         private readonly CMaterialDefinition cMaterialDefinition = null;
         public CMaterialDefinition MaterialDefinition => cMaterialDefinition;
 
@@ -65,6 +67,26 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
             }
         }
 
+        public List<string> TxtrNames
+        {
+            get
+            {
+                List<string> txtrNames = new List<string>();
+
+                foreach (string propKey in txtrPropKeys)
+                {
+                    string prop = cMaterialDefinition.GetProperty(propKey);
+
+                    if (prop != null && prop.Length > 0)
+                    {
+                        txtrNames.Add(prop);
+                    }
+                }
+
+                return txtrNames;
+            }
+        }
+
         public string GetProperty(string name) => MaterialDefinition.GetProperty(name);
 
         public void SetProperty(string name, string value) => MaterialDefinition.SetProperty(name, value);
@@ -73,8 +95,6 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 
         public override SgResourceList SgNeededResources()
         {
-            string[] propKeys = { "stdMatBaseTextureName", "stdMatNormalMapTextureName", "stdMatEnvCubeTextureName" };
-
             SgResourceList needed = new SgResourceList();
 
             // foreach (IRcolBlock block in Blocks)
@@ -84,7 +104,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
                     // CMaterialDefinition cMaterialDefinition = block as CMaterialDefinition;
                     HashSet<string> seen = new HashSet<string>();
 
-                    foreach (string propKey in propKeys)
+                    foreach (string propKey in txtrPropKeys)
                     {
                         string prop = cMaterialDefinition.GetProperty(propKey);
 

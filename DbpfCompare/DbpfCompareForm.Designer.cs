@@ -61,17 +61,20 @@ namespace DbpfCompare
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.btnSwitch = new System.Windows.Forms.Button();
             this.textLeftPath = new System.Windows.Forms.TextBox();
+            this.linkedTreeViewLeft = new DbpfCompare.Controls.LinkedTreeView();
+            this.btnSaveRight = new System.Windows.Forms.Button();
             this.textRightPath = new System.Windows.Forms.TextBox();
+            this.linkedTreeViewRight = new DbpfCompare.Controls.LinkedTreeView();
             this.menuContextResource = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemContextCopyRight = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTipPaths = new System.Windows.Forms.ToolTip(this.components);
-            this.btnSwitch = new System.Windows.Forms.Button();
-            this.btnSaveRight = new System.Windows.Forms.Button();
             this.menuContextType = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemContextCopyAllMissingRight = new System.Windows.Forms.ToolStripMenuItem();
-            this.linkedTreeViewLeft = new DbpfCompare.Controls.LinkedTreeView();
-            this.linkedTreeViewRight = new DbpfCompare.Controls.LinkedTreeView();
+            this.menuItemSaveAsCsv = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.saveCsvDialog = new System.Windows.Forms.SaveFileDialog();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
@@ -105,6 +108,8 @@ namespace DbpfCompare
             this.toolStripSeparator2,
             this.menuItemSaveRightPackage,
             this.menuItemSeparator3,
+            this.menuItemSaveAsCsv,
+            this.toolStripSeparator3,
             this.menuItemConfiguration,
             this.toolStripSeparator1,
             this.menuItemExit});
@@ -274,6 +279,17 @@ namespace DbpfCompare
             this.splitContainer.SplitterDistance = 450;
             this.splitContainer.TabIndex = 2;
             // 
+            // btnSwitch
+            // 
+            this.btnSwitch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSwitch.Image = global::DbpfCompare.Properties.Resources.SwitchIcon;
+            this.btnSwitch.Location = new System.Drawing.Point(426, 2);
+            this.btnSwitch.Name = "btnSwitch";
+            this.btnSwitch.Size = new System.Drawing.Size(22, 24);
+            this.btnSwitch.TabIndex = 5;
+            this.btnSwitch.UseVisualStyleBackColor = true;
+            this.btnSwitch.Click += new System.EventHandler(this.OnSwitchClicked);
+            // 
             // textLeftPath
             // 
             this.textLeftPath.AllowDrop = true;
@@ -287,72 +303,6 @@ namespace DbpfCompare
             this.textLeftPath.TabIndex = 2;
             this.textLeftPath.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
             this.textLeftPath.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
-            // 
-            // textRightPath
-            // 
-            this.textRightPath.AllowDrop = true;
-            this.textRightPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textRightPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textRightPath.Location = new System.Drawing.Point(0, 3);
-            this.textRightPath.Name = "textRightPath";
-            this.textRightPath.ReadOnly = true;
-            this.textRightPath.Size = new System.Drawing.Size(425, 21);
-            this.textRightPath.TabIndex = 3;
-            this.textRightPath.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
-            this.textRightPath.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
-            // 
-            // menuContextResource
-            // 
-            this.menuContextResource.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemContextCopyRight});
-            this.menuContextResource.Name = "menuContextResource";
-            this.menuContextResource.Size = new System.Drawing.Size(149, 26);
-            this.menuContextResource.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextResourceOpening);
-            // 
-            // menuItemContextCopyRight
-            // 
-            this.menuItemContextCopyRight.Name = "menuItemContextCopyRight";
-            this.menuItemContextCopyRight.Size = new System.Drawing.Size(148, 22);
-            this.menuItemContextCopyRight.Text = "Copy To Right";
-            this.menuItemContextCopyRight.Click += new System.EventHandler(this.OnContextCopyRight);
-            // 
-            // btnSwitch
-            // 
-            this.btnSwitch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSwitch.Image = global::DbpfCompare.Properties.Resources.SwitchIcon;
-            this.btnSwitch.Location = new System.Drawing.Point(426, 2);
-            this.btnSwitch.Name = "btnSwitch";
-            this.btnSwitch.Size = new System.Drawing.Size(22, 24);
-            this.btnSwitch.TabIndex = 5;
-            this.btnSwitch.UseVisualStyleBackColor = true;
-            this.btnSwitch.Click += new System.EventHandler(this.OnSwitchClicked);
-            // 
-            // btnSaveRight
-            // 
-            this.btnSaveRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSaveRight.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveRight.Image")));
-            this.btnSaveRight.Location = new System.Drawing.Point(426, 2);
-            this.btnSaveRight.Name = "btnSaveRight";
-            this.btnSaveRight.Size = new System.Drawing.Size(22, 24);
-            this.btnSaveRight.TabIndex = 4;
-            this.btnSaveRight.UseVisualStyleBackColor = true;
-            this.btnSaveRight.Click += new System.EventHandler(this.OnSaveRightPackage);
-            // 
-            // menuContextType
-            // 
-            this.menuContextType.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemContextCopyAllMissingRight});
-            this.menuContextType.Name = "menuContextType";
-            this.menuContextType.Size = new System.Drawing.Size(210, 26);
-            this.menuContextType.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextTypeOpening);
-            // 
-            // menuItemContextCopyAllMissingRight
-            // 
-            this.menuItemContextCopyAllMissingRight.Name = "menuItemContextCopyAllMissingRight";
-            this.menuItemContextCopyAllMissingRight.Size = new System.Drawing.Size(209, 22);
-            this.menuItemContextCopyAllMissingRight.Text = "Copy All Missing To Right";
-            this.menuItemContextCopyAllMissingRight.Click += new System.EventHandler(this.OnContextCopyAllMissingRight);
             // 
             // linkedTreeViewLeft
             // 
@@ -369,6 +319,31 @@ namespace DbpfCompare
             this.linkedTreeViewLeft.DoubleClick += new System.EventHandler(this.OnDoubleClick);
             this.linkedTreeViewLeft.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnTreeViewMouseClick);
             // 
+            // btnSaveRight
+            // 
+            this.btnSaveRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSaveRight.Image = ((System.Drawing.Image)(resources.GetObject("btnSaveRight.Image")));
+            this.btnSaveRight.Location = new System.Drawing.Point(426, 2);
+            this.btnSaveRight.Name = "btnSaveRight";
+            this.btnSaveRight.Size = new System.Drawing.Size(22, 24);
+            this.btnSaveRight.TabIndex = 4;
+            this.btnSaveRight.UseVisualStyleBackColor = true;
+            this.btnSaveRight.Click += new System.EventHandler(this.OnSaveRightPackage);
+            // 
+            // textRightPath
+            // 
+            this.textRightPath.AllowDrop = true;
+            this.textRightPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textRightPath.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textRightPath.Location = new System.Drawing.Point(0, 3);
+            this.textRightPath.Name = "textRightPath";
+            this.textRightPath.ReadOnly = true;
+            this.textRightPath.Size = new System.Drawing.Size(425, 21);
+            this.textRightPath.TabIndex = 3;
+            this.textRightPath.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
+            this.textRightPath.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
+            // 
             // linkedTreeViewRight
             // 
             this.linkedTreeViewRight.AllowDrop = true;
@@ -382,6 +357,56 @@ namespace DbpfCompare
             this.linkedTreeViewRight.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
             this.linkedTreeViewRight.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
             this.linkedTreeViewRight.DoubleClick += new System.EventHandler(this.OnDoubleClick);
+            // 
+            // menuContextResource
+            // 
+            this.menuContextResource.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemContextCopyRight});
+            this.menuContextResource.Name = "menuContextResource";
+            this.menuContextResource.Size = new System.Drawing.Size(149, 26);
+            this.menuContextResource.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextResourceOpening);
+            // 
+            // menuItemContextCopyRight
+            // 
+            this.menuItemContextCopyRight.Name = "menuItemContextCopyRight";
+            this.menuItemContextCopyRight.Size = new System.Drawing.Size(148, 22);
+            this.menuItemContextCopyRight.Text = "Copy To Right";
+            this.menuItemContextCopyRight.Click += new System.EventHandler(this.OnContextCopyRight);
+            // 
+            // menuContextType
+            // 
+            this.menuContextType.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemContextCopyAllMissingRight});
+            this.menuContextType.Name = "menuContextType";
+            this.menuContextType.Size = new System.Drawing.Size(210, 26);
+            this.menuContextType.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextTypeOpening);
+            // 
+            // menuItemContextCopyAllMissingRight
+            // 
+            this.menuItemContextCopyAllMissingRight.Name = "menuItemContextCopyAllMissingRight";
+            this.menuItemContextCopyAllMissingRight.Size = new System.Drawing.Size(209, 22);
+            this.menuItemContextCopyAllMissingRight.Text = "Copy All Missing To Right";
+            this.menuItemContextCopyAllMissingRight.Click += new System.EventHandler(this.OnContextCopyAllMissingRight);
+            // 
+            // menuItemSaveAsCsv
+            // 
+            this.menuItemSaveAsCsv.Name = "menuItemSaveAsCsv";
+            this.menuItemSaveAsCsv.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.S)));
+            this.menuItemSaveAsCsv.Size = new System.Drawing.Size(216, 22);
+            this.menuItemSaveAsCsv.Text = "Save &As CSV...";
+            this.menuItemSaveAsCsv.Click += new System.EventHandler(this.OnSaveAsCsv);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(213, 6);
+            // 
+            // saveCsvDialog
+            // 
+            this.saveCsvDialog.DefaultExt = "csv";
+            this.saveCsvDialog.Filter = "CSV file|*.csv|All files|*.*";
+            this.saveCsvDialog.Title = "Save As CSV";
             // 
             // DbpfCompareForm
             // 
@@ -450,5 +475,8 @@ namespace DbpfCompare
         private System.Windows.Forms.Button btnSwitch;
         private System.Windows.Forms.ContextMenuStrip menuContextType;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextCopyAllMissingRight;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSaveAsCsv;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.SaveFileDialog saveCsvDialog;
     }
 }

@@ -369,7 +369,7 @@ namespace Sims2Tools.DBPF.Package
             }
         }
 
-        public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName)
+        public DBPFEntry GetEntryByName(TypeTypeID typeId, string sgName)
         {
             if (sgName == null) return null;
 
@@ -391,7 +391,12 @@ namespace Sims2Tools.DBPF.Package
                 entry = GetEntryByKey(SgHelper.KeyFromQualifiedName(sgName, typeId, DBPFData.GROUP_SG_MAXIS));
             }
 
-            return GetResourceByEntry(entry);
+            return entry;
+        }
+
+        public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName)
+        {
+            return GetResourceByEntry(GetEntryByName(typeId, sgName));
         }
 
         public DBPFResource GetResourceByTGIR(int tgir)

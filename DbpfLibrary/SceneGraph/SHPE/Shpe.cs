@@ -89,6 +89,21 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
             }
         }
 
+        public List<string> TxmtNames
+        {
+            get
+            {
+                List<string> txmtNames = new List<string>();
+
+                foreach (ShapePart part in cShape.Parts)
+                {
+                    txmtNames.Add(part.FileName);
+                }
+
+                return txmtNames;
+            }
+        }
+
         public List<string> Subsets
         {
             get

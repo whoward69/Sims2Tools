@@ -105,6 +105,8 @@ namespace DbpfViewer
             RegistryTools.SaveAppSettings(DbpfViewerApp.RegistryKey, DbpfViewerApp.AppVersionMajor, DbpfViewerApp.AppVersionMinor);
             RegistryTools.SaveFormSettings(DbpfViewerApp.RegistryKey, this);
             RegistryTools.SaveSetting(DbpfViewerApp.RegistryKey, "splitter", splitContainer.SplitterDistance);
+
+            RegistryTools.SaveSetting(DbpfViewerApp.RegistryKey + @"\Options", menuItemPrettyPrint.Name, menuItemPrettyPrint.Checked ? 1 : 0);
         }
 
         private void OnFileOpening(object sender, EventArgs e)
