@@ -136,6 +136,8 @@ namespace DbpfCompare
             menuItemSelectRightPackage.Enabled = !IsDirty;
 
             menuItemSaveRightPackage.Enabled = IsDirty;
+
+            menuItemSaveAsCsv.Enabled = menuItemReloadPackage.Enabled;
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -434,7 +436,7 @@ namespace DbpfCompare
         {
             if (IsDirty) return;
 
-            Regex rePackageName = new Regex(@"\.((package((\.V[1-9][0-9]*)?\.bak)?)|bak)$");
+            Regex rePackageName = new Regex(@"\.((package((\.V[1-9][0-9]*)?\.bak)?)|(bak|temp))$");
 
             DataObject data = e.Data as DataObject;
 
@@ -442,11 +444,14 @@ namespace DbpfCompare
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                if (rawFiles != null)
+                if (rawFiles != null && rawFiles.Length <= 2)
                 {
                     if (rePackageName.Match(Path.GetFileName(rawFiles[0])).Success)
                     {
-                        e.Effect = DragDropEffects.Copy;
+                        if (rawFiles.Length == 1 || rePackageName.Match(Path.GetFileName(rawFiles[1])).Success)
+                        {
+                            e.Effect = DragDropEffects.Copy;
+                        }
                     }
                 }
             }
@@ -467,10 +472,20 @@ namespace DbpfCompare
                     if (sender == linkedTreeViewLeft || sender == textLeftPath)
                     {
                         SetLeftPath(rawFiles[0]);
+
+                        if (rawFiles.Length == 2)
+                        {
+                            SetRightPath(rawFiles[1]);
+                        }
                     }
                     else
                     {
                         SetRightPath(rawFiles[0]);
+
+                        if (rawFiles.Length == 2)
+                        {
+                            SetLeftPath(rawFiles[1]);
+                        }
                     }
                 }
             }
@@ -616,6 +631,48 @@ namespace DbpfCompare
                         typeData.EnsureVisible();
                     }
                 }
+            }
+        }
+
+        private void OnSaveAsCsv(object sender, EventArgs e)
+        {
+            saveCsvDialog.ShowDialog();
+
+            if (saveCsvDialog.FileName != "")
+            {
+                try
+                {
+                    StreamWriter writer = new StreamWriter(saveCsvDialog.OpenFile());
+
+                    writer.WriteLine("TGRI,Type,Group ID,Resource ID,Instance ID,State");
+
+                    WriteNodeAsCsv(writer, linkedTreeViewLeft.Nodes[0]);
+
+                    writer.Close();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex.Message);
+
+                    MsgBox.Show(ex.Message, "Cannot save results!", MessageBoxButtons.OK);
+                }
+            }
+        }
+
+        private void WriteNodeAsCsv(StreamWriter writer, TreeNode node)
+        {
+            if (node.Nodes.Count > 0)
+            {
+                foreach (TreeNode childNode in node.Nodes)
+                {
+                    WriteNodeAsCsv(writer, childNode);
+                }
+            }
+            else
+            {
+                DbpfCompareNodeResourceData data = node.Tag as DbpfCompareNodeResourceData;
+
+                writer.WriteLine($"{data.Key},{DBPFData.TypeName(data.Key.TypeID)},{data.Key.GroupID},{data.Key.ResourceID},{data.Key.InstanceID},{(data.IsSame ? "Same" : (data.IsDifferent ? "Different" : (data.IsLeftMissing ? "Right Only" : "Left Only")))}");
             }
         }
     }
