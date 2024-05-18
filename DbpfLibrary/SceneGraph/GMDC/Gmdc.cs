@@ -17,6 +17,7 @@ using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.GMDC
@@ -65,7 +66,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
             }
         }
 
-        public List<string> BotMorphs
+        public ReadOnlyCollection<string> BotMorphs
         {
             get
             {
@@ -87,30 +88,22 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
                     }
                 }
 
-                return morphs;
+                return morphs.AsReadOnly();
             }
         }
 
-        public List<string> Subsets
+        public ReadOnlyCollection<string> Subsets
         {
             get
             {
                 HashSet<string> subsets = new HashSet<string>();
 
-                // foreach (IRcolBlock block in Blocks)
+                foreach (GmdcGroup group in cGeometryDataContainer.Groups)
                 {
-                    // if (block.BlockID == CGeometryDataContainer.TYPE)
-                    {
-                        // CGeometryDataContainer cGeometryDataContainer = (CGeometryDataContainer)block;
-
-                        foreach (GmdcGroup group in cGeometryDataContainer.Groups)
-                        {
-                            subsets.Add(group.Name);
-                        }
-                    }
+                    subsets.Add(group.Name);
                 }
 
-                return new List<string>(subsets);
+                return (new List<string>(subsets)).AsReadOnly();
             }
         }
 

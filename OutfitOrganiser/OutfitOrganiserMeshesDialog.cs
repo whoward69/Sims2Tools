@@ -26,9 +26,11 @@ using Sims2Tools.DBPF.SceneGraph.XHTN;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.Utils;
+using Sims2Tools.DbpfCache;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
@@ -39,13 +41,13 @@ namespace OutfitOrganiser
 {
     public partial class OutfitOrganiserMeshesDialog : Form
     {
-        private readonly OrganiserDbpfCache packageCache;
+        private readonly DbpfFileCache packageCache;
         private readonly CigenFile cigenCache;
 
         private readonly OutfitOrganiserMeshData dataMeshFiles = new OutfitOrganiserMeshData();
 
         #region Constructor and Dispose
-        public OutfitOrganiserMeshesDialog(DataGridView gridResources, OrganiserDbpfCache packageCache, CigenFile cigenCache, SceneGraphCache downloadsSgCache, SceneGraphCache savedsimsSgCache)
+        public OutfitOrganiserMeshesDialog(DataGridView gridResources, DbpfFileCache packageCache, CigenFile cigenCache, SceneGraphCache downloadsSgCache, SceneGraphCache savedsimsSgCache)
         {
             this.packageCache = packageCache;
             this.cigenCache = cigenCache;
@@ -97,7 +99,7 @@ namespace OutfitOrganiser
 
                                 if (shpe != null)
                                 {
-                                    List<string> gmndNames = shpe.GmndNames;
+                                    ReadOnlyCollection<string> gmndNames = shpe.GmndNames;
 
                                     foreach (DBPFEntry gmndEntry in package.GetEntriesByType(Gmnd.TYPE))
                                     {
@@ -221,7 +223,7 @@ namespace OutfitOrganiser
 
                         if (thumbnail == null)
                         {
-                            using (OrganiserDbpfFile package = packageCache.GetOrOpen(row.Cells["colPackagePath"].Value as string))
+                            using (CacheableDbpfFile package = packageCache.GetOrOpen(row.Cells["colPackagePath"].Value as string))
                             {
                                 foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                 {

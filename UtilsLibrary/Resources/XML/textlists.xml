@@ -92,4 +92,8 @@
     <value>0x012F</value>
     <name>CT Strings</name>
   </textlist>
+  <textlist>
+    <value>0x0130</value>
+    <name>Lua Strings</name>
+  </textlist>
 </textlists>

@@ -25,6 +25,7 @@ using Sims2Tools.DBPF.SceneGraph.XHTN;
 using Sims2Tools.DBPF.SceneGraph.XSTN;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.Utils;
+using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.NamedValue;
@@ -46,7 +47,7 @@ namespace GeneticsChanger
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly GeneticsDbpfCache packageCache = new GeneticsDbpfCache();
+        private readonly DbpfFileCache packageCache = new DbpfFileCache();
 
         private CigenFile cigenCache = null;
 
@@ -462,7 +463,7 @@ namespace GeneticsChanger
                 {
                     foreach (DataGridViewRow packageRow in gridPackageFiles.SelectedRows)
                     {
-                        using (GeneticsDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
+                        using (CacheableDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
                         {
                             foreach (DBPFEntry binxEntry in package.GetEntriesByType(Binx.TYPE))
                             {
@@ -2020,7 +2021,7 @@ namespace GeneticsChanger
 
                             if (thumbnail == null)
                             {
-                                using (GeneticsDbpfFile package = packageCache.GetOrOpen(row.Cells["colPackagePath"].Value as string))
+                                using (CacheableDbpfFile package = packageCache.GetOrOpen(row.Cells["colPackagePath"].Value as string))
                                 {
                                     foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                     {
@@ -2203,7 +2204,7 @@ namespace GeneticsChanger
                     {
                         packageCache.SetClean(geneticData.PackagePath);
 
-                        using (GeneticsDbpfFile package = packageCache.GetOrOpen(geneticData.PackagePath))
+                        using (CacheableDbpfFile package = packageCache.GetOrOpen(geneticData.PackagePath))
                         {
                             GeneticDbpfData originalData = GeneticDbpfData.Create(package, geneticData);
 
@@ -2452,7 +2453,7 @@ namespace GeneticsChanger
             {
                 string packagePath = packageRow.Cells["colPackagePath"].Value as string;
 
-                using (GeneticsDbpfFile package = packageCache.GetOrOpen(packagePath))
+                using (CacheableDbpfFile package = packageCache.GetOrOpen(packagePath))
                 {
                     if (package.IsDirty)
                     {

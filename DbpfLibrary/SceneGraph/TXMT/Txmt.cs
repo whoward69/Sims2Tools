@@ -17,6 +17,7 @@ using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.TXMT
@@ -67,11 +68,11 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
             }
         }
 
-        public List<string> TxtrNames
+        public ReadOnlyDictionary<string, string> TxtrKeyedNames
         {
             get
             {
-                List<string> txtrNames = new List<string>();
+                Dictionary<string, string> txtrKeyedNames = new Dictionary<string, string>();
 
                 foreach (string propKey in txtrPropKeys)
                 {
@@ -79,13 +80,15 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 
                     if (prop != null && prop.Length > 0)
                     {
-                        txtrNames.Add(prop);
+                        txtrKeyedNames.Add(propKey, prop);
                     }
                 }
 
-                return txtrNames;
+                return new ReadOnlyDictionary<string, string>(txtrKeyedNames);
             }
         }
+
+        public bool IsFileListValid => cMaterialDefinition.IsFileListValid;
 
         public string GetProperty(string name) => MaterialDefinition.GetProperty(name);
 

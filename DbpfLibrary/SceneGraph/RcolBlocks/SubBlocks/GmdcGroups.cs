@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
@@ -29,8 +30,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         private string name;
         private int alternate;
         private uint opacity;
-        private readonly List<int> items1;
-        private readonly List<int> items2;
+        private readonly List<int> faces;
+        private readonly List<int> joints;
 
         public PrimitiveType PrimitiveType
         {
@@ -48,9 +49,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             internal set { name = value; }
         }
 
-        public List<int> Faces
+        public ReadOnlyCollection<int> Faces
         {
-            get { return items1; }
+            get { return faces.AsReadOnly(); }
         }
 
         public uint Opacity
@@ -58,15 +59,15 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             get { return opacity; }
         }
 
-        public List<int> UsedJoints
+        public ReadOnlyCollection<int> UsedJoints
         {
-            get { return items2; }
+            get { return joints.AsReadOnly(); }
         }
 
         public GmdcGroup(CGeometryDataContainer parent) : base(parent)
         {
-            items1 = new List<int>();
-            items2 = new List<int>();
+            faces = new List<int>();
+            joints = new List<int>();
             name = "";
             alternate = -1;
         }
@@ -77,13 +78,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             alternate = reader.ReadInt32();
             name = reader.ReadString();
 
-            ReadBlock(reader, items1);
+            ReadBlock(reader, faces);
 
             if (parent.Version != 0x03) opacity = reader.ReadUInt32();
             else opacity = 0;
 
-            if (parent.Version != 0x01) ReadBlock(reader, items2);
-            else items2.Clear();
+            if (parent.Version != 0x01) ReadBlock(reader, joints);
+            else joints.Clear();
         }
 
         public uint FileSize
@@ -92,11 +93,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             {
                 long size = 4 + 4 + DbpfWriter.Length(name);
 
-                size += BlockSize(items1);
+                size += BlockSize(faces);
 
                 if (parent.Version != 0x03) size += 4;
 
-                if (parent.Version != 0x01) size += BlockSize(items2);
+                if (parent.Version != 0x01) size += BlockSize(joints);
 
                 return (uint)size;
             }
@@ -108,11 +109,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             writer.WriteInt32(alternate);
             writer.WriteString(name);
 
-            WriteBlock(writer, items1);
+            WriteBlock(writer, faces);
 
             if (parent.Version != 0x03) writer.WriteUInt32((uint)opacity);
 
-            if (parent.Version != 0x01) WriteBlock(writer, items2);
+            if (parent.Version != 0x01) WriteBlock(writer, joints);
         }
     }
 

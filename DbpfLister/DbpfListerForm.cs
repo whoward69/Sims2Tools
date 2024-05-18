@@ -6,6 +6,7 @@ using Sims2Tools.DBPF.Groups;
 using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
+using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TTAB;
@@ -47,6 +48,30 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
+            DumpAllMaxisCres("C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+
+            // GropTesting();
+
+            // ExportStrings("C:\\Users\\whowa\\Desktop\\DrivingLicence_FR", MetaData.Languages.French);
+            // ImportStrings("C:\\Users\\whowa\\Desktop\\DrivingLicence", "C:\\Users\\whowa\\Desktop\\DrivingLicence_FR", MetaData.Languages.French);
+            // ExportStrings("C:\\Users\\whowa\\Desktop\\DrivingLicence", MetaData.Languages.French);
+
+            // FindBinx("C:/Program Files/EA Games/The Sims 2 Ultimate Collection/Apartment Life", new DBPFKey(Gzps.TYPE, (TypeGroupID)0x2C17B74A, (TypeInstanceID)0xB519F9C9, DBPFData.RESOURCE_NULL));
+            // FindBinx("C:/Program Files/EA Games/The Sims 2 Ultimate Collection", new DBPFKey(Gzps.TYPE, (TypeGroupID)0x2C17B74A, (TypeInstanceID)0x14E56E42, DBPFData.RESOURCE_NULL));
+
+            // FindTTAB("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP9\\TSData\\Res\\Objects\\objects.package");
+
+            textMessages.AppendText("=== FINISHED ===");
+            btnGo.Enabled = true;
+        }
+
+        private void OnCopyClicked(object sender, EventArgs e)
+        {
+            Clipboard.SetText(textMessages.Text);
+        }
+
+        private void GropTesting()
+        {
             if (Sims2ToolsLib.IsSims2HomePathSet)
             {
                 string groupsPath = $"{Sims2ToolsLib.Sims2HomePath}\\Groups.cache";
@@ -81,23 +106,6 @@ namespace DbpfLister
                     }
                 }
             }
-
-            // ExportStrings("C:\\Users\\whowa\\Desktop\\DrivingLicence_FR", MetaData.Languages.French);
-            // ImportStrings("C:\\Users\\whowa\\Desktop\\DrivingLicence", "C:\\Users\\whowa\\Desktop\\DrivingLicence_FR", MetaData.Languages.French);
-            // ExportStrings("C:\\Users\\whowa\\Desktop\\DrivingLicence", MetaData.Languages.French);
-
-            // FindBinx("C:/Program Files/EA Games/The Sims 2 Ultimate Collection/Apartment Life", new DBPFKey(Gzps.TYPE, (TypeGroupID)0x2C17B74A, (TypeInstanceID)0xB519F9C9, DBPFData.RESOURCE_NULL));
-            // FindBinx("C:/Program Files/EA Games/The Sims 2 Ultimate Collection", new DBPFKey(Gzps.TYPE, (TypeGroupID)0x2C17B74A, (TypeInstanceID)0x14E56E42, DBPFData.RESOURCE_NULL));
-
-            // FindTTAB("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP9\\TSData\\Res\\Objects\\objects.package");
-
-            textMessages.AppendText("=== FINISHED ===");
-            btnGo.Enabled = true;
-        }
-
-        private void OnCopyClicked(object sender, EventArgs e)
-        {
-            Clipboard.SetText(textMessages.Text);
         }
 
         private void ImportStrings(string targetFolder, string importFolder, MetaData.Languages importLang)
@@ -271,6 +279,42 @@ namespace DbpfLister
                                 }
                             }
                         }
+                    }
+
+                    package.Close();
+                }
+            }
+        }
+
+        private void DumpAllMaxisCres(string baseFolder)
+        {
+            Regex re = new Regex("#0x[0-9a-f]+!(0x[0-9a-f]+_?)?age[0-9]_[0-9]_cres");
+
+            textMessages.AppendText($"Type ID,Group ID,Instance ID,Resource ID,Name,Relative Path\r\n");
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                if (
+                    packagePath.Contains("\\Characters\\") ||
+                    packagePath.Contains("\\Lots\\") ||
+                    packagePath.Contains("\\LotCatalog\\") ||
+                    packagePath.Contains("\\GlobalLots\\") ||
+                    packagePath.Contains("\\LotTemplates\\")
+                   ) continue;
+
+                using (DBPFFile package = new DBPFFile(packagePath))
+                {
+                    foreach (DBPFEntry entry in package.GetEntriesByType(Cres.TYPE))
+                    {
+                        Cres cres = (Cres)package.GetResourceByEntry(entry);
+
+                        string name = cres.KeyName;
+
+                        if (re.IsMatch(name.ToLower())) continue;
+
+                        if (name.EndsWith("_cres", StringComparison.OrdinalIgnoreCase)) name = name.Substring(0, name.Length - 5);
+
+                        textMessages.AppendText($"{cres.TypeID},{cres.GroupID},{cres.InstanceID},{cres.ResourceID},{name},{packagePath.Substring(baseFolder.Length + 1)}\r\n");
                     }
 
                     package.Close();

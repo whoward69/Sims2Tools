@@ -27,8 +27,8 @@ using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
+using Sims2Tools.DbpfCache;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 
 namespace RepositoryWizard
@@ -37,8 +37,8 @@ namespace RepositoryWizard
     {
         // private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static RepoWizardDbpfCache cache;
-        public static void SetCache(RepoWizardDbpfCache cache)
+        private static DbpfFileCache cache;
+        public static void SetCache(DbpfFileCache cache)
         {
             RepoWizardDbpfData.cache = cache;
         }
@@ -84,18 +84,18 @@ namespace RepositoryWizard
             idrForBinx.SetClean();
         }
 
-        public static RepoWizardDbpfData Create(RepoWizardDbpfFile package, RepoWizardDbpfData repoWizardData)
+        public static RepoWizardDbpfData Create(CacheableDbpfFile package, RepoWizardDbpfData repoWizardData)
         {
             // This is correct, we want the original (clean) resources from the package using the old (dirty) resource as the key
             return Create(package, package.GetEntryByKey(repoWizardData.binx));
         }
 
-        public static RepoWizardDbpfData Create(RepoWizardDbpfFile package, DBPFKey binxKey)
+        public static RepoWizardDbpfData Create(CacheableDbpfFile package, DBPFKey binxKey)
         {
             return Create(package, package.GetEntryByKey(binxKey));
         }
 
-        public static RepoWizardDbpfData Create(RepoWizardDbpfFile package, DBPFEntry entry)
+        public static RepoWizardDbpfData Create(CacheableDbpfFile package, DBPFEntry entry)
         {
             RepoWizardDbpfData repoWizardData = null;
 
@@ -150,7 +150,7 @@ namespace RepositoryWizard
             return repoWizardData;
         }
 
-        private RepoWizardDbpfData(RepoWizardDbpfFile package, Binx binx, Idr idrForBinx, Cpf cpf, Idr idrForCpf)
+        private RepoWizardDbpfData(CacheableDbpfFile package, Binx binx, Idr idrForBinx, Cpf cpf, Idr idrForCpf)
         {
             this.packagePath = package.PackagePath;
             this.packageNameNoExtn = package.PackageNameNoExtn;
@@ -168,7 +168,7 @@ namespace RepositoryWizard
             hasShoe = (outfit == 0x08 || outfit == 0x10);
         }
 
-        private RepoWizardDbpfData(RepoWizardDbpfFile package, Objd objd)
+        private RepoWizardDbpfData(CacheableDbpfFile package, Objd objd)
         {
             this.packagePath = package.PackagePath;
             this.packageNameNoExtn = package.PackageNameNoExtn;
@@ -261,7 +261,7 @@ namespace RepositoryWizard
 
                 Image thumbnail = null;
 
-                using (RepoWizardDbpfFile package = cache.GetOrOpen(packagePath))
+                using (CacheableDbpfFile package = cache.GetOrOpen(packagePath))
                 {
                     CpfItem iconidx = binx.GetItem("iconidx");
 
@@ -419,97 +419,6 @@ namespace RepositoryWizard
         public bool Equals(RepoWizardDbpfData other)
         {
             return this.cpf.Equals(other.cpf);
-        }
-    }
-
-    public class RepoWizardDbpfFile : IDisposable
-    {
-        private readonly DBPFFile package;
-        private bool isCached;
-
-        public string PackagePath => package.PackagePath;
-        public string PackageName => package.PackageName;
-        public string PackageNameNoExtn => package.PackageNameNoExtn;
-
-        public bool IsDirty => package.IsDirty;
-
-        public void SetClean() => package.SetClean();
-
-        public RepoWizardDbpfFile(string packagePath, bool isCached)
-        {
-            this.package = new DBPFFile(packagePath);
-            this.isCached = isCached;
-        }
-
-        public List<DBPFEntry> GetEntriesByType(TypeTypeID type) => package.GetEntriesByType(type);
-        public DBPFEntry GetEntryByKey(DBPFKey key) => package.GetEntryByKey(key);
-        public DBPFResource GetResourceByTGIR(int tgir) => package.GetResourceByTGIR(tgir);
-        public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
-        public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName) => package.GetResourceByName(typeId, sgName);
-        public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
-
-        public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
-
-        public void Remove(DBPFResource resource) => package.Remove(resource);
-
-        public string Update(bool autoBackup) => package.Update(autoBackup);
-
-        internal void DeCache()
-        {
-            isCached = false;
-        }
-
-        public void Close()
-        {
-            if (!isCached) package.Close();
-        }
-
-        public void Dispose()
-        {
-            if (!isCached) package.Dispose();
-        }
-    }
-
-    public class RepoWizardDbpfCache
-    {
-        private readonly Dictionary<string, RepoWizardDbpfFile> cache = new Dictionary<string, RepoWizardDbpfFile>();
-
-        public bool Contains(string packagePath)
-        {
-            return cache.ContainsKey(packagePath);
-        }
-
-        public bool IsDirty => (cache.Count > 0);
-
-        public bool SetClean(RepoWizardDbpfFile package)
-        {
-            package.DeCache();
-            return SetClean(package.PackagePath);
-        }
-
-        public bool SetClean(string packagePath)
-        {
-            return cache.Remove(packagePath);
-        }
-
-        public RepoWizardDbpfFile GetOrOpen(string packagePath)
-        {
-            if (cache.ContainsKey(packagePath))
-            {
-                return cache[packagePath];
-            }
-
-            return new RepoWizardDbpfFile(packagePath, false);
-        }
-
-        public RepoWizardDbpfFile GetOrAdd(string packagePath)
-        {
-            if (!cache.ContainsKey(packagePath))
-            {
-                cache.Add(packagePath, new RepoWizardDbpfFile(packagePath, true));
-            }
-
-            return cache[packagePath];
         }
     }
 }

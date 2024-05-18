@@ -849,6 +849,44 @@ namespace BhavFinder
             return lookup;
         }
 
+        private void OnDragEnter(object sender, DragEventArgs e)
+        {
+            // Regex rePackageName = new Regex(@"\.((package((\.V[1-9][0-9]*)?\.bak)?)|(bak|temp))$");
+            Regex rePackageName = new Regex(@"\.package$");
+
+            DataObject data = e.Data as DataObject;
+
+            if (data.ContainsFileDropList())
+            {
+                string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                if (rawFiles != null && rawFiles.Length == 1)
+                {
+                    if (!rePackageName.Match(Path.GetFileName(rawFiles[0])).Success)
+                    {
+                        return;
+                    }
+
+                    e.Effect = DragDropEffects.Copy;
+                }
+            }
+        }
+
+        private void OnDragDrop(object sender, DragEventArgs e)
+        {
+            DataObject data = e.Data as DataObject;
+
+            if (data.ContainsFileDropList())
+            {
+                string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                if (rawFiles != null)
+                {
+                    textFilePath.Text = rawFiles[0];
+                }
+            }
+        }
+
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.F5 || (e.Modifiers == Keys.Control && e.KeyCode == Keys.R))

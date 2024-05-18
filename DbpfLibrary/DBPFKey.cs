@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.Utils;
 using System;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF
 {
@@ -29,9 +30,9 @@ namespace Sims2Tools.DBPF
     public class DBPFKey : IDBPFKey, IEquatable<DBPFKey>, IComparable<DBPFKey>
     {
         private readonly TypeTypeID typeID;
-        protected TypeGroupID groupID;
-        private readonly TypeResourceID resourceID;
-        private readonly TypeInstanceID instanceID;
+        private TypeGroupID groupID;
+        private TypeResourceID resourceID;
+        private TypeInstanceID instanceID;
 
         private int tgiHash = 0;
         private int tgirHash = 0;
@@ -45,6 +46,25 @@ namespace Sims2Tools.DBPF
         public TypeResourceID ResourceID => resourceID;
 
         public TypeInstanceID InstanceID => instanceID;
+
+        public bool IsTGIRValid(string sgName)
+        {
+            string name = Hashes.StripHashFromName(sgName);
+            Trace.Assert(!string.IsNullOrEmpty(name), "SG Name cannot be blank!");
+
+            return (Hashes.InstanceIDHash(name) == InstanceID && Hashes.ResourceIDHash(name) == ResourceID);
+        }
+
+        public void FixTGIR(string sgName)
+        {
+            if (!IsTGIRValid(sgName))
+            {
+                string name = Hashes.StripHashFromName(sgName);
+
+                instanceID = Hashes.InstanceIDHash(name);
+                resourceID = Hashes.ResourceIDHash(name);
+            }
+        }
 
         public int TGIHash
         {
@@ -95,6 +115,11 @@ namespace Sims2Tools.DBPF
         {
         }
 
+        protected void ChangeGroupID(TypeGroupID groupID)
+        {
+            this.groupID = groupID;
+        }
+
         public bool Equals(DBPFKey other)
         {
             if (other == null) return false;
@@ -116,7 +141,10 @@ namespace Sims2Tools.DBPF
 
     public interface IDBPFNamedKey : IDBPFKey
     {
-        string KeyName { get; set; }
+        string KeyName
+        {
+            get;
+        }
     }
 
     public abstract class DBPFNamedKey : DBPFKey, IDBPFNamedKey

@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Cigen.CGN1
@@ -36,9 +37,9 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
             Unserialize(reader);
         }
 
-        public List<DBPFKey> GetImageKeys(DBPFKey ownerKey)
+        public ReadOnlyCollection<DBPFKey> GetImageKeys(DBPFKey ownerKey)
         {
-            if (!items.ContainsKey(ownerKey)) return new List<DBPFKey>(0);
+            if (!items.ContainsKey(ownerKey)) return (new List<DBPFKey>(0)).AsReadOnly();
 
             return items.GetImageKeys(ownerKey);
         }

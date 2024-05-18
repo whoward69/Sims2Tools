@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Groups.GROP
@@ -31,7 +32,7 @@ namespace Sims2Tools.DBPF.Groups.GROP
         // private byte[] over;
 
         public uint ID => id;
-        public List<GropItem> Items => items;
+        public ReadOnlyCollection<GropItem> Items => items.AsReadOnly();
 
         public Grop(DBPFEntry entry, DbpfReader reader) : base(entry)
         {

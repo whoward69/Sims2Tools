@@ -16,6 +16,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Xml;
 
@@ -86,7 +87,7 @@ namespace Sims2Tools.DBPF.STR
             set => onlyLid = value;
         }
 
-        public List<StrLanguage> Languages
+        public ReadOnlyCollection<StrLanguage> Languages
         {
             get
             {
@@ -94,7 +95,7 @@ namespace Sims2Tools.DBPF.STR
                 foreach (MetaData.Languages k in languages.Keys) lngs.Add(k);
                 lngs.Sort();
 
-                return lngs;
+                return lngs.AsReadOnly();
             }
         }
         #endregion

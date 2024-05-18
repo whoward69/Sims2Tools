@@ -22,6 +22,7 @@ using Sims2Tools.DBPF.SceneGraph.XSTN;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
+using Sims2Tools.DbpfCache;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,8 +35,8 @@ namespace GeneticsChanger
     {
         // private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static GeneticsDbpfCache cache;
-        public static void SetCache(GeneticsDbpfCache cache)
+        private static DbpfFileCache cache;
+        public static void SetCache(DbpfFileCache cache)
         {
             GeneticDbpfData.cache = cache;
         }
@@ -86,18 +87,18 @@ namespace GeneticsChanger
             idrForBinx.SetClean();
         }
 
-        public static GeneticDbpfData Create(GeneticsDbpfFile package, GeneticDbpfData geneticData)
+        public static GeneticDbpfData Create(CacheableDbpfFile package, GeneticDbpfData geneticData)
         {
             // This is correct, we want the original (clean) resources from the package using the old (dirty) resource as the key
             return Create(package, package.GetEntryByKey(geneticData.binx));
         }
 
-        public static GeneticDbpfData Create(GeneticsDbpfFile package, DBPFKey binxKey)
+        public static GeneticDbpfData Create(CacheableDbpfFile package, DBPFKey binxKey)
         {
             return Create(package, package.GetEntryByKey(binxKey));
         }
 
-        public static GeneticDbpfData Create(GeneticsDbpfFile package, DBPFEntry binxEntry)
+        public static GeneticDbpfData Create(CacheableDbpfFile package, DBPFEntry binxEntry)
         {
             GeneticDbpfData geneticData = null;
 
@@ -150,7 +151,7 @@ namespace GeneticsChanger
             return geneticData;
         }
 
-        private GeneticDbpfData(GeneticsDbpfFile package, Binx binx, Idr idrForBinx, Cpf cpf, Idr idrForCpf)
+        private GeneticDbpfData(CacheableDbpfFile package, Binx binx, Idr idrForBinx, Cpf cpf, Idr idrForCpf)
         {
             this.packagePath = package.PackagePath;
             this.packageNameNoExtn = package.PackageNameNoExtn;
@@ -468,94 +469,6 @@ namespace GeneticsChanger
         public bool Equals(GeneticDbpfData other)
         {
             return this.cpf.Equals(other.cpf);
-        }
-    }
-
-    public class GeneticsDbpfFile : IDisposable
-    {
-        private readonly DBPFFile package;
-        private bool isCached;
-
-        public string PackagePath => package.PackagePath;
-        public string PackageName => package.PackageName;
-        public string PackageNameNoExtn => package.PackageNameNoExtn;
-
-        public bool IsDirty => package.IsDirty;
-
-        public void SetClean() => package.SetClean();
-
-        public GeneticsDbpfFile(string packagePath, bool isCached)
-        {
-            this.package = new DBPFFile(packagePath);
-            this.isCached = isCached;
-        }
-
-        public List<DBPFEntry> GetEntriesByType(TypeTypeID type) => package.GetEntriesByType(type);
-        public DBPFEntry GetEntryByKey(DBPFKey key) => package.GetEntryByKey(key);
-        public DBPFResource GetResourceByTGIR(int tgir) => package.GetResourceByTGIR(tgir);
-        public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
-        public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
-
-        public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
-
-        public string Update(bool autoBackup) => package.Update(autoBackup);
-
-        internal void DeCache()
-        {
-            isCached = false;
-        }
-
-        public void Close()
-        {
-            if (!isCached) package.Close();
-        }
-
-        public void Dispose()
-        {
-            if (!isCached) package.Dispose();
-        }
-    }
-
-    public class GeneticsDbpfCache
-    {
-        private readonly Dictionary<string, GeneticsDbpfFile> cache = new Dictionary<string, GeneticsDbpfFile>();
-
-        public bool Contains(string packagePath)
-        {
-            return cache.ContainsKey(packagePath);
-        }
-
-        public bool IsDirty => (cache.Count > 0);
-
-        public bool SetClean(GeneticsDbpfFile package)
-        {
-            package.DeCache();
-            return SetClean(package.PackagePath);
-        }
-
-        public bool SetClean(string packagePath)
-        {
-            return cache.Remove(packagePath);
-        }
-
-        public GeneticsDbpfFile GetOrOpen(string packagePath)
-        {
-            if (cache.ContainsKey(packagePath))
-            {
-                return cache[packagePath];
-            }
-
-            return new GeneticsDbpfFile(packagePath, false);
-        }
-
-        public GeneticsDbpfFile GetOrAdd(string packagePath)
-        {
-            if (!cache.ContainsKey(packagePath))
-            {
-                cache.Add(packagePath, new GeneticsDbpfFile(packagePath, true));
-            }
-
-            return cache[packagePath];
         }
     }
 }

@@ -13,6 +13,7 @@ using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Neighbourhood.NGBH;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace HoodExporter
 {
@@ -84,7 +85,7 @@ namespace HoodExporter
             {
                 SimData simData = new SimData((TypeInstanceID)slot.OwnerId);
 
-                List<NgbhItem> items = slot.FindTokensByGuid((TypeGUID)0x53D08989);
+                ReadOnlyCollection<NgbhItem> items = slot.FindTokensByGuid((TypeGUID)0x53D08989);
                 if (items.Count == 1)
                 {
                     simData.SecondaryAspiration = items[0].Data[0];
@@ -163,7 +164,7 @@ namespace HoodExporter
         {
             foreach (TokenData data in tokenDataList)
             {
-                List<NgbhItem> items = slot.FindTokensByGuid(data.Key.Guid);
+                ReadOnlyCollection<NgbhItem> items = slot.FindTokensByGuid(data.Key.Guid);
 
                 if (items.Count == 1)
                 {

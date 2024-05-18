@@ -18,6 +18,7 @@ using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.SHPE
@@ -53,6 +54,7 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
                     if (cShape == null)
                     {
                         cShape = block as CShape;
+                        ogn = cShape.ObjectGraphNode;
                     }
                     else
                     {
@@ -66,64 +68,48 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
             }
         }
 
-        public List<string> GmndNames
+        public ReadOnlyCollection<string> GmndNames
         {
             get
             {
                 List<string> gmndKeys = new List<string>();
 
-                // foreach (IRcolBlock block in Blocks)
+                foreach (ShapeItem item in cShape.Items)
                 {
-                    // if (block.BlockID == CShape.TYPE)
-                    {
-                        // CShape cShape = block as CShape;
-
-                        foreach (ShapeItem item in cShape.Items)
-                        {
-                            gmndKeys.Add(item.FileName);
-                        }
-                    }
+                    gmndKeys.Add(item.FileName);
                 }
 
-                return gmndKeys;
+                return gmndKeys.AsReadOnly();
             }
         }
 
-        public List<string> TxmtNames
+        public ReadOnlyDictionary<string, string> TxmtKeyedNames
         {
             get
             {
-                List<string> txmtNames = new List<string>();
+                Dictionary<string, string> txmtKeyedNames = new Dictionary<string, string>();
 
                 foreach (ShapePart part in cShape.Parts)
                 {
-                    txmtNames.Add(part.FileName);
+                    txmtKeyedNames.Add(part.Subset, part.FileName);
                 }
 
-                return txmtNames;
+                return new ReadOnlyDictionary<string, string>(txmtKeyedNames);
             }
         }
 
-        public List<string> Subsets
+        public ReadOnlyCollection<string> Subsets
         {
             get
             {
                 List<string> subsets = new List<string>();
 
-                // foreach (IRcolBlock block in Blocks)
+                foreach (ShapePart part in cShape.Parts)
                 {
-                    // if (block.BlockID == CShape.TYPE)
-                    {
-                        // CShape cShape = block as CShape;
-
-                        foreach (ShapePart part in cShape.Parts)
-                        {
-                            subsets.Add(part.Subset);
-                        }
-                    }
+                    subsets.Add(part.Subset);
                 }
 
-                return subsets;
+                return subsets.AsReadOnly();
             }
         }
 

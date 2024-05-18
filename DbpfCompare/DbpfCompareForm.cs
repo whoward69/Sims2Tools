@@ -10,6 +10,7 @@ using DbpfCompare.Controls;
 using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BCON;
+using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Neighbourhood.SDNA;
 using Sims2Tools.DBPF.OBJD;
@@ -605,7 +606,7 @@ namespace DbpfCompare
             if ((sender as LinkedTreeView)?.SelectedNode?.Tag is DbpfCompareNodeResourceData nodeData && nodeData.IsDifferent)
             {
                 if (nodeData.TypeID == Bcon.TYPE || nodeData.TypeID == Trcn.TYPE ||
-                    nodeData.TypeID == Tprp.TYPE ||
+                    nodeData.TypeID == Bhav.TYPE || nodeData.TypeID == Tprp.TYPE ||
                     nodeData.TypeID == Objd.TYPE || nodeData.TypeID == Objf.TYPE ||
                     nodeData.TypeID == Str.TYPE || nodeData.TypeID == Ctss.TYPE || nodeData.TypeID == Ttas.TYPE ||
                     nodeData.TypeID == Txmt.TYPE ||

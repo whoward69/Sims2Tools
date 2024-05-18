@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Xml;
 
@@ -149,8 +150,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
                 for (int i = 0; i < value.Length && i < unknown_6.Length; i++) unknown_6[i] = value[i];
             }
         }
-        public List<SubLot> SubLots { get { return subLots; } }
-        public List<uint> Unknown7 { get { return unknown_7; } }
+        public ReadOnlyCollection<SubLot> SubLots => subLots.AsReadOnly();
+        public ReadOnlyCollection<uint> Unknown7 => unknown_7.AsReadOnly();
 
 
         public Ltxt(DBPFEntry entry, DbpfReader reader) : base(entry)

@@ -34,6 +34,7 @@ using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
+using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.NamedValue;
@@ -54,7 +55,7 @@ namespace RepositoryWizard
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly RepoWizardDbpfCache packageCache = new RepoWizardDbpfCache();
+        private readonly DbpfFileCache packageCache = new DbpfFileCache();
 
         private CigenFile cigenCache = null;
 
@@ -214,6 +215,7 @@ namespace RepositoryWizard
             menuItemVerifyGmdcSubsets.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyGmdcSubsets.Name, 1) != 0);
 
             ckbDeRepoCopyMeshFiles.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoCopyMeshFiles.Name, 0) != 0);
+            ckbDeRepoSplitFiles.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoSplitFiles.Name, 0) != 0);
 
             textTooltip.Text = (string)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Config", textTooltip.Name, "{basename} ({id}) by {creator}");
 
@@ -281,6 +283,7 @@ namespace RepositoryWizard
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyGmdcSubsets.Name, menuItemVerifyGmdcSubsets.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoCopyMeshFiles.Name, ckbDeRepoCopyMeshFiles.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoSplitFiles.Name, ckbDeRepoSplitFiles.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Config", textTooltip.Name, textTooltip.Text);
         }
@@ -535,7 +538,7 @@ namespace RepositoryWizard
             {
                 foreach (DataGridViewRow packageRow in gridPackageFiles.SelectedRows)
                 {
-                    using (RepoWizardDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
+                    using (CacheableDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
                     {
                         TypeTypeID repoTypeID = menuItemModeClothing.Checked ? Binx.TYPE : Objd.TYPE;
 
@@ -2020,7 +2023,7 @@ namespace RepositoryWizard
 
                             if (thumbnail == null)
                             {
-                                using (RepoWizardDbpfFile package = packageCache.GetOrOpen(row.Cells["colPackagePath"].Value as string))
+                                using (CacheableDbpfFile package = packageCache.GetOrOpen(row.Cells["colPackagePath"].Value as string))
                                 {
                                     foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                     {
@@ -2170,7 +2173,7 @@ namespace RepositoryWizard
 
                 if (menuItemAutoMerge.Checked)
                 {
-                    using (RepoWizardDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
+                    using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
                     {
                         bool anyUpdates = false;
 
@@ -2213,7 +2216,7 @@ namespace RepositoryWizard
                     {
                         string rowPackageFile = $"{packageInfo.FullName.Substring(0, packageInfo.FullName.Length - packageInfo.Extension.Length)}_{ExpandMacros(row, $"{{id}}", true)}{packageInfo.Extension}"; ;
 
-                        using (RepoWizardDbpfFile dbpfPackage = packageCache.GetOrOpen(rowPackageFile))
+                        using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(rowPackageFile))
                         {
                             exitCode = SaveClothingRow(dbpfPackage, row, newMeshCresKey, newMeshShpe, menuItemVerifyShpeSubsets.Checked, newMeshGmdc, menuItemVerifyGmdcSubsets.Checked);
 
@@ -2244,7 +2247,7 @@ namespace RepositoryWizard
                     {
                         RepoWizardDbpfData selectedResource = row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
 
-                        using (RepoWizardDbpfFile dbpfPackage = packageCache.GetOrOpen(selectedResource.PackagePath))
+                        using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(selectedResource.PackagePath))
                         {
                             Objd slaveObjd = null;
 
@@ -2341,7 +2344,7 @@ namespace RepositoryWizard
             }
         }
 
-        private void ProcessSubset(RepoWizardDbpfFile package, Objd slaveObjd, string masterSubsetName, string slaveSubsetName, List<Shpe> shpes, List<Gmnd> gmnds, List<Gmdc> gmdcs)
+        private void ProcessSubset(CacheableDbpfFile package, Objd slaveObjd, string masterSubsetName, string slaveSubsetName, List<Shpe> shpes, List<Gmnd> gmnds, List<Gmdc> gmdcs)
         {
             string masterMaterialName = null;
             List<string> slaveMaterialNames = new List<string>();
@@ -2451,7 +2454,7 @@ namespace RepositoryWizard
             }
         }
 
-        private void UpdateStrings(RepoWizardDbpfFile package, Objd objd, TypeInstanceID instanceId, string fromValue, string toValue)
+        private void UpdateStrings(CacheableDbpfFile package, Objd objd, TypeInstanceID instanceId, string fromValue, string toValue)
         {
             Str str = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, objd.GroupID, instanceId, DBPFData.RESOURCE_NULL));
 
@@ -2469,7 +2472,7 @@ namespace RepositoryWizard
             }
         }
 
-        private int SaveClothingRow(RepoWizardDbpfFile dbpfPackage, DataGridViewRow row, DBPFKey newMeshCresKey, Shpe newMeshShpe, bool verifyShpeSubsets, Gmdc newMeshGmdc, bool verifyGmdcSubsets)
+        private int SaveClothingRow(CacheableDbpfFile dbpfPackage, DataGridViewRow row, DBPFKey newMeshCresKey, Shpe newMeshShpe, bool verifyShpeSubsets, Gmdc newMeshGmdc, bool verifyGmdcSubsets)
         {
             RepoWizardDbpfData selectedResource = row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
 
@@ -2596,7 +2599,7 @@ namespace RepositoryWizard
             return 1;
         }
 
-        private bool IsLocalOrphan(RepoWizardDbpfFile package, DBPFResource resource)
+        private bool IsLocalOrphan(CacheableDbpfFile package, DBPFResource resource)
         {
             if (resource == null) return false;
 
@@ -2691,11 +2694,12 @@ namespace RepositoryWizard
 
                     foreach (DBPFEntry idrEntry in package.GetEntriesByType(Idr.TYPE))
                     {
-                        DBPFEntry binxEntry = package.GetEntryByKey(new DBPFKey(Binx.TYPE, idrEntry.GroupID, idrEntry.InstanceID, idrEntry.ResourceID));
+                        // DBPFEntry binxEntry = package.GetEntryByKey(new DBPFKey(Binx.TYPE, idrEntry));
 
-                        if (binxEntry != null)
+                        // If binxEntry is null, this is a default replacment, which we should be able to handle
+                        // if (binxEntry != null)
                         {
-                            DBPFEntry gzpsEntry = package.GetEntryByKey(new DBPFKey(Gzps.TYPE, idrEntry.GroupID, idrEntry.InstanceID, idrEntry.ResourceID));
+                            DBPFEntry gzpsEntry = package.GetEntryByKey(new DBPFKey(Gzps.TYPE, idrEntry));
 
                             if (gzpsEntry != null)
                             {
@@ -2754,9 +2758,98 @@ namespace RepositoryWizard
                         ++count;
                     }
 
-                    if (complete && package.IsDirty)
+                    if (complete)
                     {
-                        package.Update(subFolderName);
+                        if (ckbDeRepoSplitFiles.Checked)
+                        {
+                            List<DBPFKey> processedCres = new List<DBPFKey>();
+
+                            int index = 0;
+
+                            foreach (DBPFEntry entry in package.GetEntriesByType(Gzps.TYPE))
+                            {
+                                Gzps gzps = (Gzps)package.GetResourceByEntry(entry);
+                                Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+                                ++index;
+
+                                string gzpsName = gzps.Name;
+                                int pos = gzpsName.LastIndexOf("_");
+                                string suffix = (pos != -1) ? gzpsName.Substring(pos) : index.ToString();
+
+                                using (DBPFFile splitPackage = new DBPFFile($"{package.PackageDir}\\{package.PackageNameNoExtn}{suffix}.package"))
+                                {
+                                    splitPackage.Commit(gzps, true);
+                                    splitPackage.Commit(idr, true);
+
+                                    Binx binx = (Binx)package.GetResourceByKey(new DBPFKey(Binx.TYPE, entry));
+                                    if (binx != null)
+                                    {
+                                        splitPackage.Commit(binx, true);
+
+                                        DBPFEntry strEntry = package.GetEntryByKey(idr.GetItem(binx.GetItem("stringsetidx").UIntegerValue));
+                                        if (strEntry != null) splitPackage.Commit(strEntry, package.GetItemByKey(strEntry));
+                                    }
+
+                                    foreach (uint txmtIdx in gzps.TxmtIndexes)
+                                    {
+                                        Txmt txmt = (Txmt)package.GetResourceByKey(idr.GetItem(txmtIdx));
+
+                                        splitPackage.Commit(txmt, true);
+
+                                        foreach (string txtrName in txmt.TxtrKeyedNames.Values)
+                                        {
+                                            splitPackage.Commit(package.GetResourceByName(Txtr.TYPE, txtrName), true);
+                                        }
+                                    }
+
+                                    splitPackage.Update(subFolderName);
+
+                                    splitPackage.Close();
+                                }
+
+                                if (ckbDeRepoCopyMeshFiles.Checked)
+                                {
+                                    // Now do the mesh
+                                    DBPFKey cresKey = idr.GetItem(gzps.CresIndexes[0]);
+                                    if (!processedCres.Contains(cresKey))
+                                    {
+                                        processedCres.Add(cresKey);
+
+                                        string meshId = (processedCres.Count == 1) ? "" : $"_{processedCres.Count}";
+                                        using (DBPFFile meshPackage = new DBPFFile($"{package.PackageDir}\\{package.PackageNameNoExtn}_MESH{meshId}.package"))
+                                        {
+                                            Cres cres = (Cres)package.GetResourceByKey(cresKey);
+                                            meshPackage.Commit(cres, true);
+
+                                            foreach (DBPFKey shpeKey in cres.ShpeKeys)
+                                            {
+                                                Shpe shpe = (Shpe)package.GetResourceByKey(shpeKey);
+                                                meshPackage.Commit(shpe, true);
+
+                                                foreach (string gmndName in shpe.GmndNames)
+                                                {
+                                                    Gmnd gmnd = (Gmnd)package.GetResourceByName(Gmnd.TYPE, gmndName);
+                                                    meshPackage.Commit(gmnd, true);
+
+                                                    foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
+                                                    {
+                                                        meshPackage.Commit(gmdcKey, package.GetItemByKey(gmdcKey));
+                                                    }
+                                                }
+                                            }
+
+                                            meshPackage.Update(subFolderName);
+
+                                            meshPackage.Close();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (package.IsDirty)
+                        {
+                            package.Update(subFolderName);
+                        }
                     }
 
                     package.Close();
@@ -2779,7 +2872,7 @@ namespace RepositoryWizard
 
             foreach (string meshPackageFile in allMeshPackageFiles)
             {
-                if (ckbDeRepoCopyMeshFiles.Checked)
+                if (ckbDeRepoCopyMeshFiles.Checked && !ckbDeRepoSplitFiles.Checked)
                 {
                     FileInfo fi = new FileInfo(meshPackageFile);
 

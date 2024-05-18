@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Package;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
@@ -43,9 +44,9 @@ namespace Sims2Tools.DBPF.Cigen
             cigenIndex = (Cgn1)cigenPackage?.GetResourceByKey(new DBPFKey(Cgn1.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000001, (TypeResourceID)0x00000000));
         }
 
-        private List<DBPFKey> GetImageKeys(DBPFKey ownerKey)
+        private ReadOnlyCollection<DBPFKey> GetImageKeys(DBPFKey ownerKey)
         {
-            return (cigenIndex != null) ? cigenIndex.GetImageKeys(ownerKey) : new List<DBPFKey>(0);
+            return (cigenIndex != null) ? cigenIndex.GetImageKeys(ownerKey) : (new List<DBPFKey>(0)).AsReadOnly();
         }
 
         public bool HasThumbnail(DBPFKey ownerKey)
@@ -55,7 +56,7 @@ namespace Sims2Tools.DBPF.Cigen
 
         public Image GetThumbnail(DBPFKey ownerKey)
         {
-            List<DBPFKey> imageKeys = GetImageKeys(ownerKey);
+            ReadOnlyCollection<DBPFKey> imageKeys = GetImageKeys(ownerKey);
 
             if (imageKeys.Count > 0)
             {
@@ -71,7 +72,7 @@ namespace Sims2Tools.DBPF.Cigen
         {
             if (cigenPackage != null)
             {
-                List<DBPFKey> imageKeys = GetImageKeys(ownerKey);
+                ReadOnlyCollection<DBPFKey> imageKeys = GetImageKeys(ownerKey);
 
                 if (imageKeys.Count > 0)
                 {
@@ -144,7 +145,7 @@ namespace Sims2Tools.DBPF.Cigen
         {
             if (cigenPackage != null)
             {
-                List<DBPFKey> imageKeys = GetImageKeys(ownerKey);
+                ReadOnlyCollection<DBPFKey> imageKeys = GetImageKeys(ownerKey);
 
                 if (imageKeys.Count > 0)
                 {

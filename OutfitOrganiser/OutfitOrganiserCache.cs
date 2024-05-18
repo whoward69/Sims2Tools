@@ -23,6 +23,7 @@ using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
+using Sims2Tools.DbpfCache;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -35,8 +36,8 @@ namespace OutfitOrganiser
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static OrganiserDbpfCache cache;
-        public static void SetCache(OrganiserDbpfCache cache)
+        private static DbpfFileCache cache;
+        public static void SetCache(DbpfFileCache cache)
         {
             OutfitDbpfData.cache = cache;
         }
@@ -82,7 +83,7 @@ namespace OutfitOrganiser
             idrForBinx?.SetClean();
         }
 
-        public static OutfitDbpfData Create(OrganiserDbpfFile package, OutfitDbpfData outfitData)
+        public static OutfitDbpfData Create(CacheableDbpfFile package, OutfitDbpfData outfitData)
         {
             if (outfitData.IsDefaultReplacement)
             {
@@ -100,12 +101,12 @@ namespace OutfitOrganiser
             }
         }
 
-        public static OutfitDbpfData Create(OrganiserDbpfFile package, DBPFKey binxKey)
+        public static OutfitDbpfData Create(CacheableDbpfFile package, DBPFKey binxKey)
         {
             return Create(package, package.GetEntryByKey(binxKey));
         }
 
-        public static OutfitDbpfData Create(OrganiserDbpfFile package, DBPFEntry binxEntry)
+        public static OutfitDbpfData Create(CacheableDbpfFile package, DBPFEntry binxEntry)
         {
             OutfitDbpfData outfitData = null;
 
@@ -126,12 +127,12 @@ namespace OutfitOrganiser
             return outfitData;
         }
 
-        public static OutfitDbpfData CreateDR(OrganiserDbpfFile package, Gzps gzps, Idr idrForGzps)
+        public static OutfitDbpfData CreateDR(CacheableDbpfFile package, Gzps gzps, Idr idrForGzps)
         {
             return new OutfitDbpfData(package, null, null, gzps, idrForGzps);
         }
 
-        public static OutfitDbpfData Create(OrganiserDbpfFile package, Binx binx, Idr idrForBinx, DBPFResource res)
+        public static OutfitDbpfData Create(CacheableDbpfFile package, Binx binx, Idr idrForBinx, DBPFResource res)
         {
             OutfitDbpfData outfitData = null;
 
@@ -171,7 +172,7 @@ namespace OutfitOrganiser
             return outfitData;
         }
 
-        private OutfitDbpfData(OrganiserDbpfFile package, Binx binx, Idr idrForBinx, Cpf cpf, Idr idrForCpf)
+        private OutfitDbpfData(CacheableDbpfFile package, Binx binx, Idr idrForBinx, Cpf cpf, Idr idrForCpf)
         {
             this.packagePath = package.PackagePath;
             this.packageNameNoExtn = package.PackageNameNoExtn;
@@ -210,7 +211,7 @@ namespace OutfitOrganiser
 
                 Image thumbnail = null;
 
-                using (OrganiserDbpfFile package = cache.GetOrOpen(packagePath))
+                using (CacheableDbpfFile package = cache.GetOrOpen(packagePath))
                 {
                     CpfItem iconidx = binx.GetItem("iconidx");
 
@@ -239,7 +240,7 @@ namespace OutfitOrganiser
         {
             if (IsDirty)
             {
-                OrganiserDbpfFile package = cache.GetOrAdd(packagePath);
+                CacheableDbpfFile package = cache.GetOrAdd(packagePath);
 
                 if (cpf.IsDirty) package.Commit(cpf);
                 if (idrForCpf.IsDirty) package.Commit(idrForCpf);
@@ -258,7 +259,7 @@ namespace OutfitOrganiser
         {
             if (IsDirty)
             {
-                OrganiserDbpfFile package = cache.GetOrAdd(packagePath);
+                CacheableDbpfFile package = cache.GetOrAdd(packagePath);
 
                 if (cpf.IsDirty) package.UnCommit(cpf);
                 if (idrForCpf.IsDirty) package.UnCommit(idrForCpf);
@@ -743,95 +744,6 @@ namespace OutfitOrganiser
         public bool Equals(OutfitDbpfData other)
         {
             return this.cpf.Equals(other.cpf);
-        }
-    }
-
-    public class OrganiserDbpfFile : IDisposable
-    {
-        private readonly DBPFFile package;
-        private bool isCached;
-
-        public string PackagePath => package.PackagePath;
-        public string PackageName => package.PackageName;
-        public string PackageNameNoExtn => package.PackageNameNoExtn;
-
-        public bool IsDirty => package.IsDirty;
-
-        public void SetClean() => package.SetClean();
-
-        public OrganiserDbpfFile(string packagePath, bool isCached)
-        {
-            this.package = new DBPFFile(packagePath);
-            this.isCached = isCached;
-        }
-
-        public List<DBPFEntry> GetEntriesByType(TypeTypeID type) => package.GetEntriesByType(type);
-        public DBPFEntry GetEntryByKey(DBPFKey key) => package.GetEntryByKey(key);
-        public DBPFResource GetResourceByTGIR(int tgir) => package.GetResourceByTGIR(tgir);
-        public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
-        public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
-
-        public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
-        public void UnCommit(DBPFKey key) => package.UnCommit(key);
-
-        public string Update(bool autoBackup) => package.Update(autoBackup);
-
-        internal void DeCache()
-        {
-            isCached = false;
-        }
-
-        public void Close()
-        {
-            if (!isCached) package.Close();
-        }
-
-        public void Dispose()
-        {
-            if (!isCached) package.Dispose();
-        }
-    }
-
-    public class OrganiserDbpfCache
-    {
-        private readonly Dictionary<string, OrganiserDbpfFile> cache = new Dictionary<string, OrganiserDbpfFile>();
-
-        public bool Contains(string packagePath)
-        {
-            return cache.ContainsKey(packagePath);
-        }
-
-        public bool IsDirty => (cache.Count > 0);
-
-        public void SetClean(OrganiserDbpfFile package)
-        {
-            package.DeCache();
-            SetClean(package.PackagePath);
-        }
-
-        public void SetClean(string packagePath)
-        {
-            cache.Remove(packagePath);
-        }
-
-        public OrganiserDbpfFile GetOrOpen(string packagePath)
-        {
-            if (cache.ContainsKey(packagePath))
-            {
-                return cache[packagePath];
-            }
-
-            return new OrganiserDbpfFile(packagePath, false);
-        }
-
-        public OrganiserDbpfFile GetOrAdd(string packagePath)
-        {
-            if (!cache.ContainsKey(packagePath))
-            {
-                cache.Add(packagePath, new OrganiserDbpfFile(packagePath, true));
-            }
-
-            return cache[packagePath];
         }
     }
 }

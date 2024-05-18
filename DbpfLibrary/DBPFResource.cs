@@ -21,9 +21,20 @@ namespace Sims2Tools.DBPF
     {
         protected bool _isDirty = false;
 
-        public void ChangeGroupID(TypeGroupID newGroupID)
+        public override string KeyName
         {
-            this.groupID = newGroupID;
+            get => base.KeyName;
+            set
+            {
+                base.KeyName = value;
+                _isDirty = true;
+            }
+        }
+
+
+        public new void ChangeGroupID(TypeGroupID groupID)
+        {
+            base.ChangeGroupID(groupID);
 
             _isDirty = true;
         }

@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.TTAB
@@ -41,9 +42,9 @@ namespace Sims2Tools.DBPF.TTAB
             Unserialize(reader);
         }
 
-        public List<TtabItem> GetItems()
+        public ReadOnlyCollection<TtabItem> GetItems()
         {
-            return items;
+            return items.AsReadOnly();
         }
 
         // See - https://modthesims.info/wiki.php?title=54544142

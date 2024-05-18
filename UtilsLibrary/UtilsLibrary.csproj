@@ -88,6 +88,7 @@
     <Compile Include="Controls\TextProgressBar.Designer.cs">
       <DependentUpon>TextProgressBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="DbpfCache\DbpfFileCache.cs" />
     <Compile Include="Dialogs\MsgBox.cs" />
     <Compile Include="Dialogs\CreatorConfigDialog.cs">
       <SubType>Form</SubType>
@@ -200,6 +201,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\XML\primitivesShortNames.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\XML\primitives.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

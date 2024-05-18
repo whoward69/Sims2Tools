@@ -45,7 +45,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
             return items.ToArray();
         }
 
-        public List<DBPFKey> CloneItems()
+        public List<DBPFKey> CloneItems() // Do NOT change this to ReadOnlyCollection, as we specifically want an alterable clone!
         {
             List<DBPFKey> cloneItems = new List<DBPFKey>(items.Count);
 

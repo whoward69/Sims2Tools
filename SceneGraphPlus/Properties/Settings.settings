@@ -1,0 +1,111 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SceneGraphPlus.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="MruSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">8</Value>
+    </Setting>
+    <Setting Name="MmatBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">MediumOrchid</Value>
+    </Setting>
+    <Setting Name="CresBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">RoyalBlue</Value>
+    </Setting>
+    <Setting Name="ShpeBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">GreenYellow</Value>
+    </Setting>
+    <Setting Name="GmndBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Yellow</Value>
+    </Setting>
+    <Setting Name="GmdcBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Thistle</Value>
+    </Setting>
+    <Setting Name="TxmtBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Orange</Value>
+    </Setting>
+    <Setting Name="TxtrBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">MediumVioletRed</Value>
+    </Setting>
+    <Setting Name="GzpsBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">MediumPurple</Value>
+    </Setting>
+    <Setting Name="ColumnGap" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="RowGap" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="MmatRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="CresRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="ShpeRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3</Value>
+    </Setting>
+    <Setting Name="GmndRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4</Value>
+    </Setting>
+    <Setting Name="GmdcRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="TxmtRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4</Value>
+    </Setting>
+    <Setting Name="TxtrRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="GzpsRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="BlockWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="BlockHeight" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">40</Value>
+    </Setting>
+    <Setting Name="OverflowRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
+    <Setting Name="BadTgirColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">White</Value>
+    </Setting>
+    <Setting Name="ConnectorColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">DimGray</Value>
+    </Setting>
+    <Setting Name="MultiConnectorColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SaddleBrown</Value>
+    </Setting>
+    <Setting Name="ConnectorWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="MultiConnectorWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4</Value>
+    </Setting>
+    <Setting Name="ConnectorHighlightColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Red</Value>
+    </Setting>
+    <Setting Name="ConnectorHighlightWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4</Value>
+    </Setting>
+    <Setting Name="ConnectorDetectWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
+    <Setting Name="ConnectorPopupTextColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">DarkSlateGray</Value>
+    </Setting>
+    <Setting Name="ConnectorPopupBackColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">AliceBlue</Value>
+    </Setting>
+    <Setting Name="MissingBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LightGray</Value>
+    </Setting>
+    <Setting Name="CloneBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LightSalmon</Value>
+    </Setting>
+    <Setting Name="MaxisBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Gray</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

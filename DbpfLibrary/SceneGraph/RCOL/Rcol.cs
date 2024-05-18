@@ -16,6 +16,7 @@ using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Xml;
 
@@ -53,12 +54,27 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 #endif
 
         private uint[] index;
-        private IPackedFileDescriptor[] reffiles;
-        private List<IRcolBlock> blocks;
+        private readonly List<DBPFKey> reffiles = new List<DBPFKey>();
+        private readonly List<IRcolBlock> blocks = new List<IRcolBlock>();
         private uint count;
         private byte[] oversize;
 
         private bool duff = false;
+
+        protected CObjectGraphNode ogn = null;
+
+        public string OgnName
+        {
+            get => ogn?.FileName;
+            set
+            {
+                if (ogn != null)
+                {
+                    ogn.FileName = value;
+                    _isDirty = true;
+                }
+            }
+        }
 
         public override bool IsDirty
         {
@@ -85,20 +101,57 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             }
         }
 
-        protected IPackedFileDescriptor[] ReferencedFiles
+        public new bool IsTGIRValid
         {
-            get { return duff ? new IPackedFileDescriptor[0] : reffiles; }
+            get
+            {
+                string sgName = null;
+
+                if (blocks.Count > 0)
+                {
+                    if (blocks[0].NameResource != null)
+                    {
+                        sgName = blocks[0].NameResource.FileName;
+                    }
+                }
+
+                return base.IsTGIRValid(sgName);
+            }
         }
 
-        public List<IRcolBlock> Blocks
+        public void FixTGIR()
         {
-            get { return duff ? new List<IRcolBlock>(0) : blocks; }
+            if (!IsTGIRValid)
+            {
+                string sgName = null;
+
+                if (blocks.Count > 0)
+                {
+                    if (blocks[0].NameResource != null)
+                    {
+                        sgName = blocks[0].NameResource.FileName;
+                    }
+                }
+
+                base.FixTGIR(sgName);
+            }
         }
 
-        public uint Count
+        protected ReadOnlyCollection<DBPFKey> ReferencedFiles => reffiles.AsReadOnly();
+
+        protected void SetReferencedFile(int index, DBPFKey key)
         {
-            get { return count; }
+            Trace.Assert(!duff, "RCOL is duff!");
+            Trace.Assert(index >= 0 && index < reffiles.Count, "reffiles[index] is invalid!");
+
+            reffiles[index] = key;
+
+            _isDirty = true;
         }
+
+        public ReadOnlyCollection<IRcolBlock> Blocks => (duff ? new List<IRcolBlock>(0) : blocks).AsReadOnly();
+
+        public uint Count => count;
 
         public override string KeyName
         {
@@ -119,6 +172,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
                 return "";
             }
+
+            set => base.KeyName = value;
         }
 
         public Rcol(DBPFEntry entry, DbpfReader reader) : base(entry)
@@ -236,24 +291,21 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
             try
             {
-                reffiles = new IPackedFileDescriptor[count == 0xffff0001 ? reader.ReadUInt32() : count];
-                for (int i = 0; i < reffiles.Length; i++)
-                {
-                    PackedFileDescriptor pfd = new PackedFileDescriptor
-                    {
-                        Group = reader.ReadGroupId(),
-                        Instance = reader.ReadInstanceId(),
-                        SubType = (count == 0xffff0001) ? reader.ReadResourceId() : (TypeResourceID)0x00000000,
-                        Type = reader.ReadTypeId()
-                    };
+                uint refFilesCount = ((count == 0xffff0001) ? reader.ReadUInt32() : count);
 
-                    reffiles[i] = pfd;
+                for (int i = 0; i < refFilesCount; i++)
+                {
+                    TypeGroupID groupId = reader.ReadGroupId();
+                    TypeInstanceID instanceId = reader.ReadInstanceId();
+                    TypeResourceID resourceId = (count == 0xffff0001) ? reader.ReadResourceId() : DBPFData.RESOURCE_NULL;
+                    TypeTypeID typeId = reader.ReadTypeId();
+
+                    reffiles.Add(new DBPFKey(typeId, groupId, instanceId, resourceId));
                 }
 
                 index = new uint[reader.ReadUInt32()];
                 for (int i = 0; i < index.Length; i++) index[i] = reader.ReadUInt32();
 
-                blocks = new List<IRcolBlock>(index.Length);
                 for (int i = 0; i < index.Length; i++)
                 {
                     IRcolBlock blk = ReadBlock((TypeBlockID)index[i], reader);
@@ -291,7 +343,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
                 long size = 4;
 
-                size += 4 + (reffiles.Length * ((count == 0xffff0001) ? 16 : 12));
+                size += 4 + (reffiles.Count * ((count == 0xffff0001) ? 16 : 12));
 
                 size += 4 + (blocks.Count * 4);
 
@@ -311,16 +363,16 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             writeStart = writer.Position;
 #endif
 
-            writer.WriteUInt32(count == 0xffff0001 ? count : (uint)reffiles.Length);
+            writer.WriteUInt32(count == 0xffff0001 ? count : (uint)reffiles.Count);
 
-            writer.WriteUInt32((uint)reffiles.Length);
-            for (int i = 0; i < reffiles.Length; i++)
+            writer.WriteUInt32((uint)reffiles.Count);
+            for (int i = 0; i < reffiles.Count; i++)
             {
-                IPackedFileDescriptor pfd = reffiles[i];
-                writer.WriteGroupId(pfd.Group);
-                writer.WriteInstanceId(pfd.Instance);
-                if (count == 0xffff0001) writer.WriteResourceId(pfd.SubType);
-                writer.WriteTypeId(pfd.Type);
+                DBPFKey key = reffiles[i];
+                writer.WriteGroupId(key.GroupID);
+                writer.WriteInstanceId(key.InstanceID);
+                if (count == 0xffff0001) writer.WriteResourceId(key.ResourceID);
+                writer.WriteTypeId(key.TypeID);
             }
 
             writer.WriteUInt32((uint)blocks.Count);
@@ -341,24 +393,30 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
         {
             XmlElement element = XmlHelper.CreateResElement(parent, name, this);
 
-            for (uint idx = 0; idx < reffiles.Length; ++idx)
+            int index = 0;
+            foreach (DBPFKey key in reffiles)
             {
                 XmlElement ele = XmlHelper.CreateElement(element, "reference");
-                ele.SetAttribute("index", idx.ToString());
-                ele.SetAttribute("type", DBPFData.TypeName(reffiles[idx].Type));
-                ele.SetAttribute("group", reffiles[idx].Group.ToString());
-                ele.SetAttribute("instance", reffiles[idx].Instance.ToString());
-                ele.SetAttribute("resource", reffiles[idx].SubType.ToString());
+                ele.SetAttribute("index", index.ToString());
+                ele.SetAttribute("type", DBPFData.TypeName(key.TypeID));
+                ele.SetAttribute("group", key.GroupID.ToString());
+                ele.SetAttribute("instance", key.InstanceID.ToString());
+                ele.SetAttribute("resource", key.ResourceID.ToString());
+
+                ++index;
             }
 
-            for (int idx = 0; idx < blocks.Count; ++idx)
+            index = 0;
+            foreach (IRcolBlock block in blocks)
             {
                 XmlElement ele = XmlHelper.CreateElement(element, "block");
-                ele.SetAttribute("index", idx.ToString());
-                ele.SetAttribute("id", blocks[idx].BlockID.ToString());
-                ele.SetAttribute("name", blocks[idx].BlockName);
+                ele.SetAttribute("index", index.ToString());
+                ele.SetAttribute("id", block.BlockID.ToString());
+                ele.SetAttribute("name", block.BlockName);
 
-                blocks[idx].AddXml(ele);
+                block.AddXml(ele);
+
+                ++index;
             }
 
             return element;

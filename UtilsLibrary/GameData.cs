@@ -50,13 +50,16 @@ namespace Sims2Tools
         static public readonly string subFolderBins = "/TSData/Res/Catalog/Bins";
         static public readonly string subFolderSkins = "/TSData/Res/Catalog/Skins";
 
-        static private readonly SortedDictionary<string, string> languagesByCode;
+        static private readonly SortedDictionary<string, string> languagesByCode = new SortedDictionary<string, string>();
         static public SortedDictionary<string, string> LanguagesByCode => languagesByCode;
 
-        static private readonly SortedDictionary<string, string> primitivesByOpCode;
+        static private readonly SortedDictionary<string, string> primitivesByOpCode = new SortedDictionary<string, string>();
         static public SortedDictionary<string, string> PrimitivesByOpCode => primitivesByOpCode;
 
-        static private readonly SortedDictionary<string, string> textlistsByInstance;
+        static private readonly SortedDictionary<string, string> shortPrimitivesByOpCode = new SortedDictionary<string, string>();
+        static public SortedDictionary<string, string> ShortPrimitivesByOpCode => shortPrimitivesByOpCode;
+
+        static private readonly SortedDictionary<string, string> textlistsByInstance = new SortedDictionary<string, string>();
         static public SortedDictionary<string, string> TextlistsByInstance => textlistsByInstance;
 
         static private readonly SortedDictionary<string, string> semiGlobalsByName;
@@ -142,50 +145,25 @@ namespace Sims2Tools
 
             try
             {
-                if (!GameDataCache.Deserialize(out languagesByCode, "languagesByCode"))
-                {
-                    ParseXml("Resources/XML/languages.xml", "language", languagesByCode);
+                ParseXml("Resources/XML/languages.xml", "language", languagesByCode);
 #if DEBUG
-                    logger.Info($"Loaded {languagesByCode.Count} languages from XML");
+                logger.Info($"Loaded {languagesByCode.Count} languages from XML");
 #endif
-                    GameDataCache.Serialize(languagesByCode, "languagesByCode");
-#if DEBUG
-                }
-                else
-                {
-                    logger.Info($"Loaded {languagesByCode.Count} languages from cache");
-#endif
-                }
 
-                if (!GameDataCache.Deserialize(out primitivesByOpCode, "primitivesByOpCode"))
-                {
-                    ParseXml("Resources/XML/primitives.xml", "primitive", primitivesByOpCode);
+                ParseXml("Resources/XML/primitives.xml", "primitive", primitivesByOpCode);
 #if DEBUG
-                    logger.Info($"Loaded {primitivesByOpCode.Count} primitives from XML");
+                logger.Info($"Loaded {primitivesByOpCode.Count} primitives from XML");
 #endif
-                    GameDataCache.Serialize(primitivesByOpCode, "primitivesByOpCode");
-#if DEBUG
-                }
-                else
-                {
-                    logger.Info($"Loaded {primitivesByOpCode.Count} primitives from cache");
-#endif
-                }
 
-                if (!GameDataCache.Deserialize(out textlistsByInstance, "textlistsByInstance"))
-                {
-                    ParseXml("Resources/XML/textlists.xml", "textlist", textlistsByInstance);
+                ParseXml("Resources/XML/primitivesShortNames.xml", "primitive", shortPrimitivesByOpCode);
 #if DEBUG
-                    logger.Info($"Loaded {textlistsByInstance.Count} textlists from XML");
+                logger.Info($"Loaded {shortPrimitivesByOpCode.Count} primitives from XML");
 #endif
-                    GameDataCache.Serialize(textlistsByInstance, "textlistsByInstance");
+
+                ParseXml("Resources/XML/textlists.xml", "textlist", textlistsByInstance);
 #if DEBUG
-                }
-                else
-                {
-                    logger.Info($"Loaded {textlistsByInstance.Count} textlists from cache");
+                logger.Info($"Loaded {textlistsByInstance.Count} textlists from XML");
 #endif
-                }
 
                 if (!(GameDataCache.Deserialize(out semiGlobalsByName, "semiGlobalsByName") && GameDataCache.Deserialize(out semiGlobalsByGroup, "semiGlobalsByGroup")))
                 {
@@ -602,7 +580,7 @@ namespace Sims2Tools
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Equals(element))
                 {
                     byName?.Add(name, value);
-                    byValue.Add(value, name);
+                    byValue?.Add(value, name);
                 }
             }
         }

@@ -160,9 +160,6 @@
     <Compile Include="SceneGraph\IPackageHeader.cs" />
     <Compile Include="SceneGraph\IPackageHeaderHoleIndex.cs" />
     <Compile Include="SceneGraph\IPackageHeaderIndex.cs" />
-    <Compile Include="SceneGraph\IPackedFileDescriptor.cs" />
-    <Compile Include="SceneGraph\IPackedFileDescriptorBasic.cs" />
-    <Compile Include="SceneGraph\IPackedFileDescriptorSimple.cs" />
     <Compile Include="SceneGraph\LAMB\Lamb.cs" />
     <Compile Include="SceneGraph\LDIR\Ldir.cs" />
     <Compile Include="SceneGraph\LGHT\Lght.cs" />
@@ -171,7 +168,6 @@
     <Compile Include="SceneGraph\LSPT\Lspt.cs" />
     <Compile Include="SceneGraph\MMAT\Mmat.cs" />
     <Compile Include="SceneGraph\RcolBlocks\CObjectGraphNode.cs" />
-    <Compile Include="SceneGraph\PackedFileDescriptor.cs" />
     <Compile Include="SceneGraph\RcolBlocks\AbstractRcolBlock.cs" />
     <Compile Include="SceneGraph\RcolBlocks\CAmbientLight.cs" />
     <Compile Include="SceneGraph\RcolBlocks\CBoneDataExtension.cs" />

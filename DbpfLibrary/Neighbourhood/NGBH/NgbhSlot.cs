@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.NGBH
@@ -48,24 +49,20 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
     {
         readonly Ngbh parent;
 
-        uint version;
+        private uint version;
         public NgbhVersion Version
         {
             get { return (NgbhVersion)version; }
             set { version = (uint)value; }
         }
 
-        List<NgbhItem> specialTokens;
-        public List<NgbhItem> SpecialTokens
-        {
-            get { return specialTokens; }
-        }
+        private readonly List<NgbhItem> specialTokens = new List<NgbhItem>();
 
-        List<NgbhItem> standardTokens;
-        public List<NgbhItem> StandardTokens
-        {
-            get { return standardTokens; }
-        }
+        public ReadOnlyCollection<NgbhItem> SpecialTokens => specialTokens.AsReadOnly();
+
+        private readonly List<NgbhItem> standardTokens = new List<NgbhItem>();
+
+        public ReadOnlyCollection<NgbhItem> StandardTokens => standardTokens.AsReadOnly();
 
         public NgbhGenericSlot(Ngbh parent, DbpfReader reader)
         {
@@ -80,21 +77,19 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             if ((uint)parent.Version >= (uint)NgbhVersion.Nightlife) version = reader.ReadUInt32();
 
             uint ct = reader.ReadUInt32();
-            specialTokens = new List<NgbhItem>();
             for (int j = 0; j < ct; j++)
             {
                 specialTokens.Add(new NgbhItem(parent, reader));
             }
 
             ct = reader.ReadUInt32();
-            standardTokens = new List<NgbhItem>();
             for (int j = 0; j < ct; j++)
             {
                 standardTokens.Add(new NgbhItem(parent, reader));
             }
         }
 
-        public List<NgbhItem> FindTokensByGuid(TypeGUID guid)
+        public ReadOnlyCollection<NgbhItem> FindTokensByGuid(TypeGUID guid)
         {
             List<NgbhItem> items = new List<NgbhItem>();
 
@@ -108,7 +103,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
                 if (item.Guid == guid) items.Add(item);
             }
 
-            return items;
+            return items.AsReadOnly();
         }
 
         public XmlElement AddXml(XmlElement parent)

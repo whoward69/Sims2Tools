@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph
@@ -64,11 +65,19 @@ namespace Sims2Tools.DBPF.SceneGraph
     public class CObjectGraphNode : AbstractRcolBlock
     {
         private List<ObjectGraphNodeItem> items;
-        private string filename;
+        private string filename = "No OGN Name";
 
-        public List<ObjectGraphNodeItem> Items => items;
+        public ReadOnlyCollection<ObjectGraphNodeItem> Items => items.AsReadOnly();
 
-        public string FileName => filename ?? BlockName;
+        public string FileName
+        {
+            get => filename;
+            set
+            {
+                filename = value;
+                _isDirty = true;
+            }
+        }
 
         public CObjectGraphNode(Rcol parent) : base(parent)
         {

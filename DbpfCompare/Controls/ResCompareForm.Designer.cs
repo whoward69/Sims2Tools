@@ -37,6 +37,7 @@ namespace DbpfCompare.Controls
         private void InitializeComponent()
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ResCompareForm));
             this.btnClose = new System.Windows.Forms.Button();
             this.btnKeepRight = new System.Windows.Forms.Button();
             this.gridResCompare = new System.Windows.Forms.DataGridView();
@@ -104,6 +105,7 @@ namespace DbpfCompare.Controls
             this.gridResCompare.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridResCompare.Size = new System.Drawing.Size(788, 409);
             this.gridResCompare.TabIndex = 2;
+            this.gridResCompare.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.OnCellPainting);
             this.gridResCompare.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnDataBindingComplete);
             this.gridResCompare.SelectionChanged += new System.EventHandler(this.OnSelectionChanged);
             this.gridResCompare.Sorted += new System.EventHandler(this.OnSorted);
@@ -115,7 +117,8 @@ namespace DbpfCompare.Controls
             this.colKey.HeaderText = "Key";
             this.colKey.Name = "colKey";
             this.colKey.ReadOnly = true;
-            this.colKey.Width = 50;
+            this.colKey.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colKey.Width = 31;
             // 
             // colLeftValue1
             // 
@@ -124,7 +127,8 @@ namespace DbpfCompare.Controls
             this.colLeftValue1.HeaderText = "Left Value 1";
             this.colLeftValue1.Name = "colLeftValue1";
             this.colLeftValue1.ReadOnly = true;
-            this.colLeftValue1.Width = 89;
+            this.colLeftValue1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colLeftValue1.Width = 70;
             // 
             // colLeftValue2
             // 
@@ -133,7 +137,8 @@ namespace DbpfCompare.Controls
             this.colLeftValue2.HeaderText = "Left Value 2";
             this.colLeftValue2.Name = "colLeftValue2";
             this.colLeftValue2.ReadOnly = true;
-            this.colLeftValue2.Width = 89;
+            this.colLeftValue2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colLeftValue2.Width = 70;
             // 
             // colRightValue1
             // 
@@ -142,7 +147,8 @@ namespace DbpfCompare.Controls
             this.colRightValue1.HeaderText = "Right Value 1";
             this.colRightValue1.Name = "colRightValue1";
             this.colRightValue1.ReadOnly = true;
-            this.colRightValue1.Width = 96;
+            this.colRightValue1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colRightValue1.Width = 77;
             // 
             // colRightValue2
             // 
@@ -151,6 +157,7 @@ namespace DbpfCompare.Controls
             this.colRightValue2.HeaderText = "Right Value 2";
             this.colRightValue2.Name = "colRightValue2";
             this.colRightValue2.ReadOnly = true;
+            this.colRightValue2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // comboVariations
             // 
@@ -186,6 +193,7 @@ namespace DbpfCompare.Controls
             this.Controls.Add(this.gridResCompare);
             this.Controls.Add(this.btnKeepRight);
             this.Controls.Add(this.btnClose);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ResCompareForm";
             this.Text = "ResCompareForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);

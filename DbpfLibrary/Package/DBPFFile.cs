@@ -177,7 +177,7 @@ namespace Sims2Tools.DBPF.Package
 
         public void UnCommit(DBPFKey key) => resourceIndex.UnCommit(key);
 
-        public bool Remove(DBPFResource resource) => resourceIndex.Remove(resource);
+        public bool Remove(DBPFKey key) => resourceIndex.Remove(key);
 
         public string Update(string subFolder) => Update(false, subFolder);
 
@@ -346,12 +346,12 @@ namespace Sims2Tools.DBPF.Package
             return resourceIndex.GetEntryByKey(key);
         }
 
-        public List<DBPFEntry> GetAllEntries()
+        public List<DBPFEntry> GetAllEntries() // Do NOT change to ReadOnlyCollection, this copy List can be changed if needed
         {
             return resourceIndex.GetAllEntries();
         }
 
-        public List<DBPFEntry> GetEntriesByType(TypeTypeID type)
+        public List<DBPFEntry> GetEntriesByType(TypeTypeID type) // Do NOT change to ReadOnlyCollection, this copy List can be changed if needed
         {
             return resourceIndex.GetEntriesByType(type);
         }

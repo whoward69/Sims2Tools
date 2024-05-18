@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Package;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Sims2Tools.DBPF.Groups
 {
@@ -36,7 +37,7 @@ namespace Sims2Tools.DBPF.Groups
             groupsIndex = (Grop)groupsPackage?.GetResourceByKey(new DBPFKey(Grop.TYPE, (TypeGroupID)0x00000001, (TypeInstanceID)0x00000001, (TypeResourceID)0x00000000));
         }
 
-        public List<GropItem> GetGroups(string startsWith)
+        public ReadOnlyCollection<GropItem> GetGroups(string startsWith)
         {
             List<GropItem> groups = new List<GropItem>();
 
@@ -48,7 +49,7 @@ namespace Sims2Tools.DBPF.Groups
                 }
             }
 
-            return groups;
+            return groups.AsReadOnly();
         }
 
         public void Close()

@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Xml;
 
@@ -19,109 +20,96 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 {
     public class SdscFreetime : SdscData
     {
+        private readonly List<ushort> enthusiasm = new List<ushort>();
+
+        private ushort predestined = 0;
+        private ushort ltasp = 0;
+        private ushort unlockpts = 0;
+        private ushort unlocksspent = 0;
+
+        private readonly List<ushort> decays = new List<ushort>();
+
+        private uint bugcollection = 0;
+
         internal SdscFreetime()
         {
-            enthusiasm = new List<ushort>();
-            decays = new List<ushort>();
-
             for (int i = 0; i < 11; i++) enthusiasm.Add(0);
             for (int i = 0; i < 7; i++) decays.Add(0);
-
-            predestined = 0;
-            ltasp = 0;
-            unlockpts = 0;
-            unlocksspent = 0;
-            bugcollection = 0;
         }
 
-        readonly List<ushort> enthusiasm;
-        ushort predestined;
-        ushort ltasp;
-        ushort unlockpts;
-        ushort unlocksspent;
-        readonly List<ushort> decays;
-        uint bugcollection;
-
-        public List<ushort> HobbyEnthusiasm
-        {
-            get { return enthusiasm; }
-        }
+        ReadOnlyCollection<ushort> HobbyEnthusiasm => enthusiasm.AsReadOnly();
 
         public Hobbies HobbyPredistined
         {
             get { return (Hobbies)predestined; }
-            set { predestined = (ushort)value; }
+            // set { predestined = (ushort)value; }
         }
 
         public ushort LongtermAspiration
         {
             get { return ltasp; }
-            set { ltasp = value; }
+            // set { ltasp = value; }
         }
 
         public ushort LongtermAspirationUnlockPoints
         {
             get { return unlockpts; }
-            set { unlockpts = value; }
+            // set { unlockpts = value; }
         }
 
         public ushort LongtermAspirationUnlocksSpent
         {
             get { return unlocksspent; }
-            set { unlocksspent = value; }
+            // set { unlocksspent = value; }
         }
 
         public ushort HungerDecayModifier
         {
             get { return decays[0]; }
-            set { decays[0] = value; }
+            // set { decays[0] = value; }
         }
 
         public ushort ComfortDecayModifier
         {
             get { return decays[1]; }
-            set { decays[1] = value; }
+            // set { decays[1] = value; }
         }
 
         public ushort BladderDecayModifier
         {
             get { return decays[2]; }
-            set { decays[2] = value; }
+            // set { decays[2] = value; }
         }
 
         public ushort EnergyDecayModifier
         {
             get { return decays[3]; }
-            set { decays[3] = value; }
+            // set { decays[3] = value; }
         }
 
         public ushort HygieneDecayModifier
         {
             get { return decays[4]; }
-            set { decays[4] = value; }
+            // set { decays[4] = value; }
         }
 
         public ushort FunDecayModifier
         {
             get { return decays[5]; }
-            set { decays[5] = value; }
+            // set { decays[5] = value; }
         }
 
         public ushort SocialPublicDecayModifier
         {
             get { return decays[6]; }
-            set { decays[6] = value; }
+            // set { decays[6] = value; }
         }
-
-
 
         public uint BugCollection
         {
             get { return bugcollection; }
-            set { bugcollection = value; }
+            // set { bugcollection = value; }
         }
-
-
 
         internal override void Unserialize(DbpfReader reader)
         {

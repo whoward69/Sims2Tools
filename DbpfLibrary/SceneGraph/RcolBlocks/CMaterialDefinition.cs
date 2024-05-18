@@ -35,12 +35,16 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         string mattype;
         public string MaterialType => mattype;
 
-        private string[] fileList;
+        private readonly List<string> fileList = new List<string>();
         public ReadOnlyCollection<string> FileList => new ReadOnlyCollection<string>(fileList);
 
-        private readonly List<MaterialDefinitionProperty> properties;
+        private bool fileListValid;
+        public bool IsFileListValid => fileListValid;
 
-        public List<string> GetPropertyNames()
+
+        private readonly List<MaterialDefinitionProperty> properties = new List<MaterialDefinitionProperty>();
+
+        public ReadOnlyCollection<string> GetPropertyNames()
         {
             List<string> names = new List<string>();
 
@@ -49,7 +53,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 names.Add(prop.Name);
             }
 
-            return names;
+            return names.AsReadOnly();
         }
 
         public bool HasProperty(string name)
@@ -90,6 +94,18 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             return true;
         }
 
+        public void ClearFiles()
+        {
+            fileList.Clear();
+            _isDirty = true;
+        }
+
+        public void AddFile(string name)
+        {
+            fileList.Add(name);
+            _isDirty = true;
+        }
+
         public override bool IsDirty
         {
             get
@@ -123,9 +139,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             fldsc = "";
             mattype = "";
-
-            properties = new List<MaterialDefinitionProperty>();
-            fileList = new string[0];
         }
 
         public override void Unserialize(DbpfReader reader)
@@ -154,14 +167,36 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             if (Version == 8)
             {
-                fileList = new string[0];
+                // fileList = new List<string>();
             }
             else
             {
-                fileList = new string[reader.ReadUInt32()];
-                for (int i = 0; i < fileList.Length; i++)
+                uint files = reader.ReadUInt32();
+                for (int i = 0; i < files; i++)
                 {
-                    fileList[i] = reader.ReadString();
+                    fileList.Add(reader.ReadString());
+                }
+            }
+
+            fileListValid = true;
+
+            foreach (string fileRef in fileList)
+            {
+                bool found = false;
+
+                foreach (MaterialDefinitionProperty prop in properties)
+                {
+                    if (prop.Value.Equals(fileRef))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    fileListValid = false;
+                    break;
                 }
             }
 
@@ -223,10 +258,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
             if (Version != 8)
             {
-                writer.WriteUInt32((uint)fileList.Length);
-                for (int i = 0; i < fileList.Length; i++)
+                writer.WriteUInt32((uint)fileList.Count);
+                foreach (string file in fileList)
                 {
-                    writer.WriteString(fileList[i]);
+                    writer.WriteString(file);
                 }
             }
 

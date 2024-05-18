@@ -171,6 +171,7 @@ namespace RepositoryWizard
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openMeshDialog = new System.Windows.Forms.OpenFileDialog();
             this.openMasterDialog = new System.Windows.Forms.OpenFileDialog();
+            this.ckbDeRepoSplitFiles = new System.Windows.Forms.CheckBox();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -499,12 +500,12 @@ namespace RepositoryWizard
             // splitTopBottom.Panel2
             // 
             this.splitTopBottom.Panel2.Controls.Add(this.btnSaveAs);
-            this.splitTopBottom.Panel2.Controls.Add(this.grpMesh);
             this.splitTopBottom.Panel2.Controls.Add(this.gridResources);
             this.splitTopBottom.Panel2.Controls.Add(this.panelClothingEditor);
             this.splitTopBottom.Panel2.Controls.Add(this.panelObjectEditor);
             this.splitTopBottom.Panel2.Controls.Add(this.textDeRepoMsgs);
             this.splitTopBottom.Panel2.Controls.Add(this.grpDeRepoOptions);
+            this.splitTopBottom.Panel2.Controls.Add(this.grpMesh);
             this.splitTopBottom.Size = new System.Drawing.Size(984, 537);
             this.splitTopBottom.SplitterDistance = 160;
             this.splitTopBottom.TabIndex = 1;
@@ -1348,12 +1349,12 @@ namespace RepositoryWizard
             // 
             // grpDeRepoOptions
             // 
-            this.grpDeRepoOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpDeRepoOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpDeRepoOptions.Controls.Add(this.ckbDeRepoSplitFiles);
             this.grpDeRepoOptions.Controls.Add(this.ckbDeRepoCopyMeshFiles);
-            this.grpDeRepoOptions.Location = new System.Drawing.Point(727, 320);
+            this.grpDeRepoOptions.Location = new System.Drawing.Point(658, 320);
             this.grpDeRepoOptions.Name = "grpDeRepoOptions";
-            this.grpDeRepoOptions.Size = new System.Drawing.Size(147, 50);
+            this.grpDeRepoOptions.Size = new System.Drawing.Size(216, 50);
             this.grpDeRepoOptions.TabIndex = 26;
             this.grpDeRepoOptions.TabStop = false;
             this.grpDeRepoOptions.Text = "Standalone Options:";
@@ -1362,7 +1363,7 @@ namespace RepositoryWizard
             // 
             this.ckbDeRepoCopyMeshFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ckbDeRepoCopyMeshFiles.AutoSize = true;
-            this.ckbDeRepoCopyMeshFiles.Location = new System.Drawing.Point(25, 22);
+            this.ckbDeRepoCopyMeshFiles.Location = new System.Drawing.Point(94, 22);
             this.ckbDeRepoCopyMeshFiles.Name = "ckbDeRepoCopyMeshFiles";
             this.ckbDeRepoCopyMeshFiles.Size = new System.Drawing.Size(116, 19);
             this.ckbDeRepoCopyMeshFiles.TabIndex = 0;
@@ -1398,6 +1399,17 @@ namespace RepositoryWizard
             // 
             this.openMasterDialog.Filter = "DBPF Package|*.package";
             this.openMasterDialog.Title = "Select Master...";
+            // 
+            // ckbDeRepoSplitFiles
+            // 
+            this.ckbDeRepoSplitFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ckbDeRepoSplitFiles.AutoSize = true;
+            this.ckbDeRepoSplitFiles.Location = new System.Drawing.Point(9, 22);
+            this.ckbDeRepoSplitFiles.Name = "ckbDeRepoSplitFiles";
+            this.ckbDeRepoSplitFiles.Size = new System.Drawing.Size(79, 19);
+            this.ckbDeRepoSplitFiles.TabIndex = 1;
+            this.ckbDeRepoSplitFiles.Text = "Split Files";
+            this.ckbDeRepoSplitFiles.UseVisualStyleBackColor = true;
             // 
             // RepositoryWizardForm
             // 
@@ -1580,6 +1592,7 @@ namespace RepositoryWizard
         private System.Windows.Forms.CheckBox ckbDeRepoCopyMeshFiles;
         private System.Windows.Forms.GroupBox grpGzpsName;
         private System.Windows.Forms.TextBox textGzpsName;
+        private System.Windows.Forms.CheckBox ckbDeRepoSplitFiles;
     }
 }
 

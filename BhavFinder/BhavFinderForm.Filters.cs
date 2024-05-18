@@ -21,7 +21,7 @@ namespace BhavFinder
     public partial class BhavFinderForm
     {
         private static Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal = null;
-        private static Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal = null;
+        private static Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal = null; // TODO - BHAV Finder - would be quite useful if this was populated!
         private Regex usingRegex;
         private TypeInstanceID usingInstance;
 
@@ -293,8 +293,8 @@ namespace BhavFinder
             {
                 int index = inst.Operands[operand];
 
-                // Some primitives use 1-based indexing (eg 0x001C RTBN, 0x0024 Dialog, and possibly others)
-                if (inst.OpCode == 0x001C || inst.OpCode == 0x0024)
+                // Some primitives use 1-based indexing (eg 0x001C RTBN, 0x0024 Dialog, 0x007E Lua, and possibly others)
+                if (inst.OpCode == 0x001C || inst.OpCode == 0x0024 || inst.OpCode == 0x007E)
                 {
                     --index;
                 }

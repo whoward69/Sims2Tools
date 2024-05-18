@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
@@ -266,9 +267,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             get { return data; }
         }
 
-        public List<int> Items
+        public ReadOnlyCollection<int> Items
         {
-            get { return items; }
+            get { return items.AsReadOnly(); }
         }
 
         public GmdcElement(CGeometryDataContainer parent) : base(parent)

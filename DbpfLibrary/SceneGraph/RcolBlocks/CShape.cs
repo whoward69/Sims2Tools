@@ -14,6 +14,8 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
@@ -22,7 +24,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
     {
         private string subset;
         private string filename;
-        private byte[] data;
+        private byte[] data = new byte[9] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
         public string Subset
         {
@@ -45,7 +47,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             subset = "";
             filename = "";
-            data = new byte[9];
+        }
+
+        public ShapePart(string subset, string filename)
+        {
+            this.subset = subset;
+            this.filename = filename;
         }
 
         public void Unserialize(DbpfReader reader)
@@ -91,6 +98,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             this.parent = parent;
             filename = "";
+        }
+
+        public ShapeItem(CShape parent, string filename)
+        {
+            this.parent = parent;
+            this.filename = filename;
         }
 
         public void Unserialize(DbpfReader reader)
@@ -188,15 +201,15 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xFC6EB1F7;
         public static string NAME = "cShape";
 
-        private ShapeItem[] items;
-        private ShapePart[] parts;
+        private readonly List<ShapeItem> items = new List<ShapeItem>();
+        private readonly List<ShapePart> parts = new List<ShapePart>();
 
         private uint[] lodData;
         private readonly ReferentNode refnode = new ReferentNode();
 
-        public ShapeItem[] Items => items;
+        public ReadOnlyCollection<ShapeItem> Items => items.AsReadOnly();
 
-        public ShapePart[] Parts => parts;
+        public ReadOnlyCollection<ShapePart> Parts => parts.AsReadOnly();
 
         public uint Lod
         {
@@ -220,10 +233,32 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             refnode.Parent = parent;
 
             lodData = new uint[0];
-            items = new ShapeItem[0];
-            parts = new ShapePart[0];
             BlockID = TYPE;
             BlockName = NAME;
+        }
+
+        public void ClearItems()
+        {
+            items.Clear();
+            _isDirty = true;
+        }
+
+        public void AddItem(string filename)
+        {
+            items.Add(new ShapeItem(this, filename));
+            _isDirty = true;
+        }
+
+        public void ClearParts()
+        {
+            parts.Clear();
+            _isDirty = true;
+        }
+
+        public void AddPart(string subset, string filename)
+        {
+            parts.Add(new ShapePart(subset, filename));
+            _isDirty = true;
         }
 
         public void RenameSubset(string oldName, string newName)
@@ -308,20 +343,22 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 lodData[i] = reader.ReadUInt32();
             }
 
-            items = new ShapeItem[reader.ReadUInt32()];
+            uint itemCount = reader.ReadUInt32();
 
-            for (int i = 0; i < items.Length; i++)
+            for (int i = 0; i < itemCount; i++)
             {
-                items[i] = new ShapeItem(this);
-                items[i].Unserialize(reader);
+                ShapeItem item = new ShapeItem(this);
+                item.Unserialize(reader);
+                items.Add(item);
             }
 
-            parts = new ShapePart[reader.ReadUInt32()];
+            uint partCount = reader.ReadUInt32();
 
-            for (int i = 0; i < parts.Length; i++)
+            for (int i = 0; i < partCount; i++)
             {
-                parts[i] = new ShapePart();
-                parts[i].Unserialize(reader);
+                ShapePart part = new ShapePart();
+                part.Unserialize(reader);
+                parts.Add(part);
             }
 
 #if DEBUG
@@ -391,13 +428,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 }
             }
 
-            writer.WriteUInt32((uint)items.Length);
+            writer.WriteUInt32((uint)items.Count);
             foreach (ShapeItem item in items)
             {
                 item.Serialize(writer);
             }
 
-            writer.WriteUInt32((uint)parts.Length);
+            writer.WriteUInt32((uint)parts.Count);
             foreach (ShapePart part in parts)
             {
                 part.Serialize(writer);

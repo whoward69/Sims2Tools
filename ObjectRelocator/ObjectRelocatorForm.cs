@@ -19,6 +19,7 @@ using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
+using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.NamedValue;
@@ -42,7 +43,7 @@ namespace ObjectRelocator
         private static readonly ushort QuarterTileOn = 0x0023;
         private static readonly ushort QuarterTileOff = 0x0001;
 
-        private readonly RelocatorDbpfCache packageCache = new RelocatorDbpfCache();
+        private readonly DbpfFileCache packageCache = new DbpfFileCache();
 
         private MruList MyMruList;
         private Updater MyUpdater;
@@ -353,7 +354,7 @@ namespace ObjectRelocator
                 {
                     sender.VisualMode = ProgressBarDisplayMode.Percentage;
 
-                    using (RelocatorDbpfFile package = packageCache.GetOrOpen(packagePath))
+                    using (CacheableDbpfFile package = packageCache.GetOrOpen(packagePath))
                     {
                         bool showHoodView = menuItemShowHoodView.Checked;
 
@@ -960,7 +961,7 @@ namespace ObjectRelocator
         #endregion
 
         #region Grid Row Fill
-        private DataRow FillRow(RelocatorDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
+        private DataRow FillRow(CacheableDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
         {
             row["PackagePath"] = package.PackagePath;
             row["Path"] = BuildPathString(package.PackagePath);
@@ -971,7 +972,7 @@ namespace ObjectRelocator
                 return FillBuildModeRow(package, row, res, showHoodView);
         }
 
-        private DataRow FillBuyModeRow(RelocatorDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
+        private DataRow FillBuyModeRow(CacheableDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
         {
             ObjectDbpfData objectData = ObjectDbpfData.Create(package, res);
 
@@ -999,7 +1000,7 @@ namespace ObjectRelocator
             return row;
         }
 
-        private DataRow FillBuildModeRow(RelocatorDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
+        private DataRow FillBuildModeRow(CacheableDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
         {
             ObjectDbpfData objectData = ObjectDbpfData.Create(package, res);
 
@@ -2631,7 +2632,7 @@ namespace ObjectRelocator
                     {
                         packageCache.SetClean(objectData.PackagePath);
 
-                        using (RelocatorDbpfFile package = packageCache.GetOrOpen(objectData.PackagePath))
+                        using (CacheableDbpfFile package = packageCache.GetOrOpen(objectData.PackagePath))
                         {
                             ObjectDbpfData originalData = ObjectDbpfData.Create(package, objectData);
 
@@ -2907,7 +2908,7 @@ namespace ObjectRelocator
 
             foreach (string packageFile in dirtyObjectsByPackage.Keys)
             {
-                using (RelocatorDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
+                using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
                 {
                     try
                     {
@@ -2930,7 +2931,7 @@ namespace ObjectRelocator
 
         private void SaveAs(string packageFile)
         {
-            using (RelocatorDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
+            using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
             {
                 List<ObjectDbpfData> editedObjects = new List<ObjectDbpfData>();
 

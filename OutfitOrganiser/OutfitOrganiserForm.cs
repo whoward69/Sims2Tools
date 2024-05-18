@@ -26,6 +26,7 @@ using Sims2Tools.DBPF.SceneGraph.XHTN;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.Utils;
+using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.NamedValue;
@@ -50,7 +51,7 @@ namespace OutfitOrganiser
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly OrganiserDbpfCache packageCache = new OrganiserDbpfCache();
+        private readonly DbpfFileCache packageCache = new DbpfFileCache();
 
         private CigenFile cigenCache = null;
 
@@ -696,7 +697,7 @@ namespace OutfitOrganiser
 
                     foreach (DataGridViewRow packageRow in gridPackageFiles.SelectedRows)
                     {
-                        using (OrganiserDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
+                        using (CacheableDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
                         {
                             HashSet<DBPFKey> allGzps = new HashSet<DBPFKey>();
 
@@ -766,7 +767,7 @@ namespace OutfitOrganiser
             }
         }
 
-        private void AddToGrid(ProgressDialog sender, OrganiserDbpfFile package, OutfitDbpfData outfitData)
+        private void AddToGrid(ProgressDialog sender, CacheableDbpfFile package, OutfitDbpfData outfitData)
         {
             if (outfitData != null)
             {
@@ -3124,7 +3125,7 @@ namespace OutfitOrganiser
 
                             if (thumbnail == null)
                             {
-                                using (OrganiserDbpfFile package = packageCache.GetOrOpen(row.Cells["colPackagePath"].Value as string))
+                                using (CacheableDbpfFile package = packageCache.GetOrOpen(row.Cells["colPackagePath"].Value as string))
                                 {
                                     foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                     {
@@ -3340,7 +3341,7 @@ namespace OutfitOrganiser
                     {
                         outfitData.UnUpdatePackage();
 
-                        using (OrganiserDbpfFile package = packageCache.GetOrOpen(outfitData.PackagePath))
+                        using (CacheableDbpfFile package = packageCache.GetOrOpen(outfitData.PackagePath))
                         {
                             OutfitDbpfData originalData = OutfitDbpfData.Create(package, outfitData);
 
@@ -3571,7 +3572,7 @@ namespace OutfitOrganiser
             {
                 string packagePath = packageRow.Cells["colPackagePath"].Value as string;
 
-                using (OrganiserDbpfFile package = packageCache.GetOrOpen(packagePath))
+                using (CacheableDbpfFile package = packageCache.GetOrOpen(packagePath))
                 {
                     if (package.IsDirty)
                     {

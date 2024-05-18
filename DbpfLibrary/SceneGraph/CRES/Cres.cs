@@ -18,6 +18,7 @@ using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.CRES
@@ -53,6 +54,7 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
                     if (cResourceNode == null)
                     {
                         cResourceNode = block as CResourceNode;
+                        ogn = cResourceNode.ObjectGraphNode;
                     }
                     else
                     {
@@ -70,21 +72,40 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
 
         public CDataListExtension ThumbnailExtension => GetOrAddDataListExtension("thumbnailExtension", ResourceNode.ObjectGraphNode);
 
-        public List<DBPFKey> ShpeKeys
+        public ReadOnlyCollection<DBPFKey> ShpeKeys
         {
             get
             {
                 List<DBPFKey> shpeKeys = new List<DBPFKey>();
 
-                for (int i = 0; i < ReferencedFiles.Length; ++i)
+                foreach (DBPFKey key in ReferencedFiles)
                 {
-                    if (ReferencedFiles[i].Type == Shpe.TYPE)
+                    if (key.TypeID == Shpe.TYPE)
                     {
-                        shpeKeys.Add(ReferencedFiles[i].DbpfKey);
+                        shpeKeys.Add(key);
                     }
                 }
 
-                return shpeKeys;
+                return shpeKeys.AsReadOnly();
+            }
+        }
+
+        public void SetShpeKey(int index, DBPFKey key)
+        {
+            int idxShpe = 0;
+
+            for (int i = 0; i < ReferencedFiles.Count; ++i)
+            {
+                if (ReferencedFiles[i].TypeID == Shpe.TYPE)
+                {
+                    if (idxShpe == index)
+                    {
+                        SetReferencedFile(i, key);
+                        return;
+                    }
+
+                    ++idxShpe;
+                }
             }
         }
 
@@ -92,11 +113,11 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
         {
             SgResourceList needed = new SgResourceList();
 
-            for (int i = 0; i < ReferencedFiles.Length; ++i)
+            foreach (DBPFKey key in ReferencedFiles)
             {
-                if (ReferencedFiles[i].Type == Shpe.TYPE || ReferencedFiles[i].Type == Lpnt.TYPE)
+                if (key.TypeID == Shpe.TYPE || key.TypeID == Lpnt.TYPE)
                 {
-                    needed.Add(ReferencedFiles[i].Type, ReferencedFiles[i].Group, ReferencedFiles[i].SubType, ReferencedFiles[i].Instance);
+                    needed.Add(key.TypeID, key.GroupID, key.ResourceID, key.InstanceID);
                 }
             }
 

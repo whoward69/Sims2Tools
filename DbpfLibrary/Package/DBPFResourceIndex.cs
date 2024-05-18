@@ -20,9 +20,7 @@ namespace Sims2Tools.DBPF.Package
 {
     internal class DBPFResourceIndex
     {
-#pragma warning disable IDE0052 // Remove unread private members
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-#pragma warning restore IDE0052 // Remove unread private members
 
         private readonly uint /*indexMajorVersion,*/ indexMinorVersion;
         private readonly uint resourceIndexCount, resourceIndexOffset /*, resourceIndexSize*/;
@@ -182,6 +180,15 @@ namespace Sims2Tools.DBPF.Package
                     FileSize = reader.ReadUInt32()
                 };
 
+                if (entriesByKey.ContainsKey(entry))
+                {
+                    logger.Error($"Duplicate resource {entry}");
+
+                    // TODO - _library - fix duplicate resources
+                    // We could add the duplicate entries to a "duplicates list", not accessible via GetResourceByXyz methods, but written back out on save
+                    // At least that way we're not silently deleting resources as is happening now!
+                }
+
                 entriesByKey[entry] = entry;
 
                 if (entry.TypeID == Clst.TYPE)
@@ -269,18 +276,18 @@ namespace Sims2Tools.DBPF.Package
             resourceCache.UnCommit(key);
         }
 
-        internal bool Remove(DBPFResource resource)
+        internal bool Remove(DBPFKey key)
         {
-            if (entriesByKey.Remove(resource))
+            if (entriesByKey.Remove(key))
             {
                 _isDirty = true;
 
-                return resourceCache.Remove(resource);
+                return resourceCache.Remove(key);
             }
 
-            if (newEntriesByKey.Remove(resource))
+            if (newEntriesByKey.Remove(key))
             {
-                return resourceCache.Remove(resource);
+                return resourceCache.Remove(key);
             }
 
             return false;

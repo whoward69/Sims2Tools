@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.NGBH
@@ -24,24 +25,24 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4E474248;
         public const string NAME = "NGBH";
 
-        uint version;
+        private uint version;
         public NgbhVersion Version => (NgbhVersion)version;
 
-        byte[] zonename;
+        private byte[] zonename;
         public string ZoneName => Helper.ToString(zonename);
 
-        List<NgbhGlobalSlot> globalSlots;
-        List<NgbhInstanceSlot> lotSlots;
-        List<NgbhInstanceSlot> familySlots;
-        List<NgbhInstanceSlot> simSlots;
+        private List<NgbhGlobalSlot> globalSlots;
+        private List<NgbhInstanceSlot> lotSlots;
+        private List<NgbhInstanceSlot> familySlots;
+        private List<NgbhInstanceSlot> simSlots;
 
-        public List<NgbhGlobalSlot> GlobalSlots => globalSlots;
+        public ReadOnlyCollection<NgbhGlobalSlot> GlobalSlots => globalSlots.AsReadOnly();
 
-        public List<NgbhInstanceSlot> LotSlots => lotSlots;
+        public ReadOnlyCollection<NgbhInstanceSlot> LotSlots => lotSlots.AsReadOnly();
 
-        public List<NgbhInstanceSlot> FamilySlots => familySlots;
+        public ReadOnlyCollection<NgbhInstanceSlot> FamilySlots => familySlots.AsReadOnly();
 
-        public List<NgbhInstanceSlot> SimSlots => simSlots;
+        public ReadOnlyCollection<NgbhInstanceSlot> SimSlots => simSlots.AsReadOnly();
 
         public Ngbh(DBPFEntry entry, DbpfReader reader) : base(entry)
         {

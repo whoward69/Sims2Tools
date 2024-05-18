@@ -121,6 +121,7 @@ namespace BhavFinder
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSelectPackage = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSelectFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemRecentPackages = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemSaveResultsToClipboard = new System.Windows.Forms.ToolStripMenuItem();
@@ -133,7 +134,6 @@ namespace BhavFinder
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.saveResultsDialog = new System.Windows.Forms.SaveFileDialog();
             this.bhavFinderWorker = new System.ComponentModel.BackgroundWorker();
-            this.menuItemSelectFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextOperands.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridFoundBhavs)).BeginInit();
             this.menuContextFoundBhavs.SuspendLayout();
@@ -151,6 +151,7 @@ namespace BhavFinder
             // 
             // textFilePath
             // 
+            this.textFilePath.AllowDrop = true;
             this.textFilePath.Location = new System.Drawing.Point(111, 38);
             this.textFilePath.Name = "textFilePath";
             this.textFilePath.Size = new System.Drawing.Size(816, 21);
@@ -158,6 +159,8 @@ namespace BhavFinder
             this.textFilePath.TabStop = false;
             this.textFilePath.WordWrap = false;
             this.textFilePath.TextChanged += new System.EventHandler(this.OnFilePathChanged);
+            this.textFilePath.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
+            this.textFilePath.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
             // 
             // btnSelect
             // 
@@ -1051,6 +1054,13 @@ namespace BhavFinder
             this.menuItemSelectPackage.Text = "&Select Package...";
             this.menuItemSelectPackage.Click += new System.EventHandler(this.OnSelectClicked);
             // 
+            // menuItemSelectFolder
+            // 
+            this.menuItemSelectFolder.Name = "menuItemSelectFolder";
+            this.menuItemSelectFolder.Size = new System.Drawing.Size(248, 22);
+            this.menuItemSelectFolder.Text = "Select Package Folder...";
+            this.menuItemSelectFolder.Click += new System.EventHandler(this.OnSelectFolderClicked);
+            // 
             // menuItemRecentPackages
             // 
             this.menuItemRecentPackages.Name = "menuItemRecentPackages";
@@ -1135,13 +1145,6 @@ namespace BhavFinder
             this.bhavFinderWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BhavFinderWorker_DoWork);
             this.bhavFinderWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BhavFinderWorker_Progress);
             this.bhavFinderWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BhavFinderWorker_Completed);
-            // 
-            // menuItemSelectFolder
-            // 
-            this.menuItemSelectFolder.Name = "menuItemSelectFolder";
-            this.menuItemSelectFolder.Size = new System.Drawing.Size(248, 22);
-            this.menuItemSelectFolder.Text = "Select Package Folder...";
-            this.menuItemSelectFolder.Click += new System.EventHandler(this.OnSelectFolderClicked);
             // 
             // BhavFinderForm
             // 

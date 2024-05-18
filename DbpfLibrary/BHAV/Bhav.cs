@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.BHAV
@@ -26,7 +27,7 @@ namespace Sims2Tools.DBPF.BHAV
 
         private readonly BhavHeader header;
 
-        private List<Instruction> items;
+        private readonly List<Instruction> instructions = new List<Instruction>();
 
         public Bhav(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
@@ -37,16 +38,17 @@ namespace Sims2Tools.DBPF.BHAV
 
         public BhavHeader Header => this.header;
 
-        public List<Instruction> Instructions => this.items;
+        public ReadOnlyCollection<Instruction> Instructions => instructions.AsReadOnly();
 
         protected void Unserialize(DbpfReader reader)
         {
             this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
 
             this.header.Unserialize(reader);
-            this.items = new List<Instruction>();
-            while (this.items.Count < Header.InstructionCount)
-                this.items.Add(new Instruction(reader, header.Format));
+
+            int index = 0;
+            while (this.instructions.Count < Header.InstructionCount)
+                this.instructions.Add(new Instruction(reader, header.Format, index++));
         }
 
         public override XmlElement AddXml(XmlElement parent)
@@ -68,8 +70,8 @@ namespace Sims2Tools.DBPF.BHAV
                 // inst.SetAttribute("entry", i.ToString()); // Adding this back in makes using WinDiff/BeyondCompare very hard!
                 inst.SetAttribute("opCode", Helper.Hex4PrefixString(item.OpCode));
                 inst.SetAttribute("nodeVersion", Helper.Hex4PrefixString(item.NodeVersion));
-                inst.SetAttribute("trueTarget", GetTarget(i, item.TrueTarget));
-                inst.SetAttribute("falseTarget", GetTarget(i, item.FalseTarget));
+                inst.SetAttribute("trueTarget", item.GetTarget(i, item.TrueTarget));
+                inst.SetAttribute("falseTarget", item.GetTarget(i, item.FalseTarget));
 
                 XmlElement ops = XmlHelper.CreateElement(inst, "operands");
                 for (int j = 0; j < 16; j++)
@@ -81,21 +83,9 @@ namespace Sims2Tools.DBPF.BHAV
             return element;
         }
 
-        private string GetTarget(int inst, ushort target)
+        public string DiffString()
         {
-            switch (target)
-            {
-                case Instruction.TARGET_ERROR:
-                    return "Error";
-                case Instruction.TARGET_TRUE:
-                    return "True";
-                case Instruction.TARGET_FALSE:
-                    return "False";
-                default:
-                    int delta = target - inst;
-                    return $"{delta:+#;-#;0}";
-                    // return Helper.Hex4PrefixString(target); // Using the absolute target makes using WinDiff/BeyondCompare very hard!
-            }
+            return $"Inst:{header.InstructionCount}; Params{header.ArgCount}; Locals:{header.LocalVarCount}; Format:{Helper.Hex4PrefixString(header.Format)}; TreeType:{Helper.Hex2PrefixString(header.TreeType)}; HeaderFlags:{Helper.Hex2PrefixString(header.HeaderFlag)}; TreeVersion:{Helper.Hex8PrefixString(header.TreeVersion)}; CacheFlags:{Helper.Hex2PrefixString(header.CacheFlags)}";
         }
     }
 }

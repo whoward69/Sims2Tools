@@ -22,6 +22,7 @@ using Sims2Tools.DBPF.XFLR;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DBPF.XROF;
+using Sims2Tools.DbpfCache;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -34,8 +35,8 @@ namespace ObjectRelocator
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static RelocatorDbpfCache cache;
-        public static void SetCache(RelocatorDbpfCache cache)
+        private static DbpfFileCache cache;
+        public static void SetCache(DbpfFileCache cache)
         {
             ObjectDbpfData.cache = cache;
         }
@@ -188,18 +189,18 @@ namespace ObjectRelocator
             }
         }
 
-        public static ObjectDbpfData Create(RelocatorDbpfFile package, ObjectDbpfData objectData)
+        public static ObjectDbpfData Create(CacheableDbpfFile package, ObjectDbpfData objectData)
         {
             // This is correct, we want the original (clean) resource from the package using the old (dirty) resource as the key
             return Create(package, package.GetResourceByKey(objectData.res));
         }
 
-        public static ObjectDbpfData Create(RelocatorDbpfFile package, DBPFResource res)
+        public static ObjectDbpfData Create(CacheableDbpfFile package, DBPFResource res)
         {
             return new ObjectDbpfData(package, res);
         }
 
-        private ObjectDbpfData(RelocatorDbpfFile package, DBPFResource res)
+        private ObjectDbpfData(CacheableDbpfFile package, DBPFResource res)
         {
             this.packagePath = package.PackagePath;
             this.packageNameNoExtn = package.PackageNameNoExtn;
@@ -261,7 +262,7 @@ namespace ObjectRelocator
 
         public DBPFResource ThumbnailOwner => res;
 
-        public void CopyTo(RelocatorDbpfFile dbpfPackage)
+        public void CopyTo(CacheableDbpfFile dbpfPackage)
         {
             if (res.IsDirty) dbpfPackage.Commit(res);
             if (strings != null && strings.IsDirty) dbpfPackage.Commit(strings);
@@ -444,7 +445,7 @@ namespace ObjectRelocator
                 {
                     sgResState = SgResState.NotFound;
 
-                    using (RelocatorDbpfFile package = cache.GetOrOpen(packagePath))
+                    using (CacheableDbpfFile package = cache.GetOrOpen(packagePath))
                     {
                         if (package != null)
                         {
@@ -584,95 +585,6 @@ namespace ObjectRelocator
         }
     }
 
-    public class RelocatorDbpfFile : IDisposable
-    {
-        private readonly DBPFFile package;
-        private bool isCached;
-
-        public string PackagePath => package.PackagePath;
-        public string PackageName => package.PackageName;
-        public string PackageNameNoExtn => package.PackageNameNoExtn;
-
-        public bool IsDirty => package.IsDirty;
-
-        public void SetClean() => package.SetClean();
-
-        public RelocatorDbpfFile(string packagePath, bool isCached)
-        {
-            this.package = new DBPFFile(packagePath);
-            this.isCached = isCached;
-        }
-
-        public List<DBPFEntry> GetEntriesByType(TypeTypeID type) => package.GetEntriesByType(type);
-        public DBPFEntry GetEntryByKey(DBPFKey key) => package.GetEntryByKey(key);
-        public DBPFResource GetResourceByTGIR(int tgir) => package.GetResourceByTGIR(tgir);
-        public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
-        public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName) => package.GetResourceByName(typeId, sgName);
-        public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
-
-        public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
-
-        public string Update(bool autoBackup) => package.Update(autoBackup);
-
-        internal void DeCache()
-        {
-            isCached = false;
-        }
-
-        public void Close()
-        {
-            if (!isCached) package.Close();
-        }
-
-        public void Dispose()
-        {
-            if (!isCached) package.Dispose();
-        }
-    }
-
-    public class RelocatorDbpfCache
-    {
-        private readonly Dictionary<string, RelocatorDbpfFile> cache = new Dictionary<string, RelocatorDbpfFile>();
-
-        public bool Contains(string packagePath)
-        {
-            return cache.ContainsKey(packagePath);
-        }
-
-        public bool IsDirty => (cache.Count > 0);
-
-        public bool SetClean(RelocatorDbpfFile package)
-        {
-            package.DeCache();
-            return SetClean(package.PackagePath);
-        }
-
-        public bool SetClean(string packagePath)
-        {
-            return cache.Remove(packagePath);
-        }
-
-        public RelocatorDbpfFile GetOrOpen(string packagePath)
-        {
-            if (cache.ContainsKey(packagePath))
-            {
-                return cache[packagePath];
-            }
-
-            return new RelocatorDbpfFile(packagePath, false);
-        }
-
-        public RelocatorDbpfFile GetOrAdd(string packagePath)
-        {
-            if (!cache.ContainsKey(packagePath))
-            {
-                cache.Add(packagePath, new RelocatorDbpfFile(packagePath, true));
-            }
-
-            return cache[packagePath];
-        }
-    }
-
     public class ThumbnailDbpfCache : DBPFFile
     {
         public ThumbnailDbpfCache(string packagePath) : base(packagePath)
@@ -723,12 +635,12 @@ namespace ObjectRelocator
             }
         }
 
-        public Image GetThumbnail(RelocatorDbpfCache packageCache, ObjectDbpfData objectData, bool buyMode)
+        public Image GetThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode)
         {
             return GetThub(packageCache, objectData, buyMode)?.Image;
         }
 
-        private Thub GetThub(RelocatorDbpfCache packageCache, ObjectDbpfData objectData, bool buyMode)
+        private Thub GetThub(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode)
         {
             Thub thub = null;
 
@@ -744,11 +656,11 @@ namespace ObjectRelocator
             return thub;
         }
 
-        private Thub GetThub(RelocatorDbpfCache packageCache, ObjectDbpfData objectData, Objd objd, bool buyMode)
+        private Thub GetThub(DbpfFileCache packageCache, ObjectDbpfData objectData, Objd objd, bool buyMode)
         {
             Thub thub = null;
 
-            using (RelocatorDbpfFile package = packageCache.GetOrOpen(objectData.PackagePath))
+            using (CacheableDbpfFile package = packageCache.GetOrOpen(objectData.PackagePath))
             {
                 if (package != null)
                 {
@@ -790,11 +702,11 @@ namespace ObjectRelocator
             return thub;
         }
 
-        private Thub GetBuildThub(RelocatorDbpfCache packageCache, ObjectDbpfData objectData, Cpf cpf)
+        private Thub GetBuildThub(DbpfFileCache packageCache, ObjectDbpfData objectData, Cpf cpf)
         {
             Thub thub = null;
 
-            using (RelocatorDbpfFile package = packageCache.GetOrOpen(objectData.PackagePath))
+            using (CacheableDbpfFile package = packageCache.GetOrOpen(objectData.PackagePath))
             {
                 if (package != null)
                 {
@@ -866,7 +778,7 @@ namespace ObjectRelocator
             return thub;
         }
 
-        public bool ReplaceThumbnail(RelocatorDbpfCache packageCache, ObjectDbpfData objectData, bool buyMode, Image newThumbnail)
+        public bool ReplaceThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode, Image newThumbnail)
         {
             ThumbnailDbpfCache thumbCache = (buyMode ? thumbCacheBuyMode : thumbCacheBuildMode);
 
@@ -910,7 +822,7 @@ namespace ObjectRelocator
             return false;
         }
 
-        public bool DeleteThumbnail(RelocatorDbpfCache packageCache, ObjectDbpfData objectData, bool buyMode)
+        public bool DeleteThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode)
         {
             ThumbnailDbpfCache thumbCache = (buyMode ? thumbCacheBuyMode : thumbCacheBuildMode);
 

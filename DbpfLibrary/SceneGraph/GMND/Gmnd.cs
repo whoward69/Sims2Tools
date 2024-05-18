@@ -18,6 +18,7 @@ using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.GMND
@@ -53,6 +54,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
                     if (cGeometryNode == null)
                     {
                         cGeometryNode = block as CGeometryNode;
+                        ogn = cGeometryNode.ObjectGraphNode;
                     }
                     else
                     {
@@ -66,21 +68,40 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
             }
         }
 
-        public List<DBPFKey> GmdcKeys
+        public ReadOnlyCollection<DBPFKey> GmdcKeys
         {
             get
             {
                 List<DBPFKey> gmdcKeys = new List<DBPFKey>();
 
-                for (int i = 0; i < ReferencedFiles.Length; ++i)
+                foreach (DBPFKey key in ReferencedFiles)
                 {
-                    if (ReferencedFiles[i].Type == Gmdc.TYPE)
+                    if (key.TypeID == Gmdc.TYPE)
                     {
-                        gmdcKeys.Add(ReferencedFiles[i].DbpfKey);
+                        gmdcKeys.Add(key);
                     }
                 }
 
-                return gmdcKeys;
+                return gmdcKeys.AsReadOnly();
+            }
+        }
+
+        public void SetGmdcKey(int index, DBPFKey key)
+        {
+            int idxGmdc = 0;
+
+            for (int i = 0; i < ReferencedFiles.Count; ++i)
+            {
+                if (ReferencedFiles[i].TypeID == Gmdc.TYPE)
+                {
+                    if (idxGmdc == index)
+                    {
+                        SetReferencedFile(i, key);
+                        return;
+                    }
+
+                    ++idxGmdc;
+                }
             }
         }
 
@@ -151,11 +172,11 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
         {
             SgResourceList needed = new SgResourceList();
 
-            for (int i = 0; i < ReferencedFiles.Length; ++i)
+            foreach (DBPFKey key in ReferencedFiles)
             {
-                if (ReferencedFiles[i].Type == Gmdc.TYPE)
+                if (key.TypeID == Gmdc.TYPE)
                 {
-                    needed.Add(ReferencedFiles[i].Type, ReferencedFiles[i].Group, ReferencedFiles[i].SubType, ReferencedFiles[i].Instance);
+                    needed.Add(key.TypeID, key.GroupID, key.ResourceID, key.InstanceID);
                 }
             }
 

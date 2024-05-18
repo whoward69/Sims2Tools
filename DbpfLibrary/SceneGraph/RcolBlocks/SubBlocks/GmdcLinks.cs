@@ -13,52 +13,45 @@
 using Sims2Tools.DBPF.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class GmdcLink : GmdcLinkBlock
     {
-        private readonly List<int> items1;
-        private int unknown1;
-        private int unknown2;
+        private readonly List<int> refElements;
+        private int refSize;
+        private int activeElements;
         private readonly List<int>[] refs;
 
-        public List<int> ReferencedElement
+        public ReadOnlyCollection<int> ReferencedElement
         {
-            get { return items1; }
-            // set { items1 = value; }
+            get { return refElements.AsReadOnly(); }
         }
 
         public int ReferencedSize
         {
-            get { return unknown1; }
-            // set { unknown1 = value; }
+            get { return refSize; }
         }
 
         public int ActiveElements
         {
-            get { return unknown2; }
-            // set { unknown2 = value; }
-        }
-
-        public List<int>[] AliasValues
-        {
-            get { return refs; }
+            get { return activeElements; }
         }
 
         public GmdcLink(CGeometryDataContainer parent) : base(parent)
         {
-            items1 = new List<int>();
+            refElements = new List<int>();
             refs = new List<int>[3];
             for (int i = 0; i < refs.Length; i++) refs[i] = new List<int>();
         }
 
         public void Unserialize(DbpfReader reader)
         {
-            ReadBlock(reader, items1);
+            ReadBlock(reader, refElements);
 
-            unknown1 = reader.ReadInt32();
-            unknown2 = reader.ReadInt32();
+            refSize = reader.ReadInt32();
+            activeElements = reader.ReadInt32();
 
             for (int i = 0; i < refs.Length; i++) ReadBlock(reader, refs[i]);
         }
@@ -67,7 +60,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         {
             get
             {
-                long size = BlockSize(items1) + 4 + 4;
+                long size = BlockSize(refElements) + 4 + 4;
 
                 for (int i = 0; i < refs.Length; i++) size += BlockSize(refs[i]);
 
@@ -77,17 +70,17 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public void Serialize(DbpfWriter writer)
         {
-            WriteBlock(writer, items1);
+            WriteBlock(writer, refElements);
 
-            writer.WriteInt32(unknown1);
-            writer.WriteInt32(unknown2);
+            writer.WriteInt32(refSize);
+            writer.WriteInt32(activeElements);
 
             for (int i = 0; i < refs.Length; i++) WriteBlock(writer, refs[i]);
         }
 
         public override string ToString()
         {
-            string s = items1.Count.ToString();
+            string s = refElements.Count.ToString();
             for (int i = 0; i < refs.Length; i++) s += ", " + refs[i].Count;
             return s;
         }

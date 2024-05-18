@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.Cigen.CGN1
@@ -52,7 +53,7 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
 
         public bool ContainsKey(DBPFKey key) => theDictionary.ContainsKey(key);
 
-        public List<DBPFKey> GetImageKeys(DBPFKey key)
+        public ReadOnlyCollection<DBPFKey> GetImageKeys(DBPFKey key)
         {
             List<DBPFKey> imageKeys = new List<DBPFKey>(1);
 
@@ -64,7 +65,7 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
                 }
             }
 
-            return imageKeys;
+            return imageKeys.AsReadOnly();
         }
 
         public void Add(DBPFKey key, Cgn1Item item)
@@ -157,9 +158,9 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
 
         public int Count => theList.Count;
 
-        public List<Cgn1Item> AsList()
+        public ReadOnlyCollection<Cgn1Item> AsList()
         {
-            return theList;
+            return theList.AsReadOnly();
         }
 
         public void Add(Cgn1Item item)

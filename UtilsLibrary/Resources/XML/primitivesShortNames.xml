@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<primitives>
+  <primitive>
+    <value>0x00</value>
+    <name>Sleep</name>
+  </primitive>
+  <primitive>
+    <value>0x01</value>
+    <name>Generic</name>
+  </primitive>
+  <primitive>
+    <value>0x02</value>
+    <name>Expr</name>
+  </primitive>
+  <primitive>
+    <value>0x03</value>
+    <name>Best Int</name>
+  </primitive>
+  <primitive>
+    <value>0x07</value>
+    <name>Refresh</name>
+  </primitive>
+  <primitive>
+    <value>0x08</value>
+    <name>Random</name>
+  </primitive>
+  <primitive>
+    <value>0x0A</value>
+    <name>Tutorial</name>
+  </primitive>
+  <primitive>
+    <value>0x0B</value>
+    <name>Dist</name>
+  </primitive>
+  <primitive>
+    <value>0x0C</value>
+    <name>Dir</name>
+  </primitive>
+  <primitive>
+    <value>0x0D</value>
+    <name>Push Int</name>
+  </primitive>
+  <primitive>
+    <value>0x0E</value>
+    <name>Best Obj</name>
+  </primitive>
+  <primitive>
+    <value>0x0F</value>
+    <name>Break</name>
+  </primitive>
+  <primitive>
+    <value>0x10</value>
+    <name>Find Loc</name>
+  </primitive>
+  <primitive>
+    <value>0x11</value>
+    <name>Idle Input</name>
+  </primitive>
+  <primitive>
+    <value>0x12</value>
+    <name>RMOI</name>
+  </primitive>
+  <primitive>
+    <value>0x13</value>
+    <name>New Char</name>
+  </primitive>
+  <primitive>
+    <value>0x14</value>
+    <name>Run Fnct Tree</name>
+  </primitive>
+  <primitive>
+    <value>0x16</value>
+    <name>Turn Body</name>
+  </primitive>
+  <primitive>
+    <value>0x17</value>
+    <name>Sound</name>
+  </primitive>
+  <primitive>
+    <value>0x19</value>
+    <name>Budget</name>
+  </primitive>
+  <primitive>
+    <value>0x1A</value>
+    <name>Rel</name>
+  </primitive>
+  <primitive>
+    <value>0x1B</value>
+    <name>Goto Rel Pos</name>
+  </primitive>
+  <primitive>
+    <value>0x1C</value>
+    <name>RTBN</name>
+  </primitive>
+  <primitive>
+    <value>0x1D</value>
+    <name>Motive</name>
+  </primitive>
+  <primitive>
+    <value>0x1E</value>
+    <name>Gosub</name>
+  </primitive>
+  <primitive>
+    <value>0x1F</value>
+    <name>Set Next</name>
+  </primitive>
+  <primitive>
+    <value>0x20</value>
+    <name>Test Type</name>
+  </primitive>
+  <primitive>
+    <value>0x21</value>
+    <name>5 Worst </name>
+  </primitive>
+  <primitive>
+    <value>0x22</value>
+    <name>UI</name>
+  </primitive>
+  <primitive>
+    <value>0x23</value>
+    <name>Camera</name>
+  </primitive>
+  <primitive>
+    <value>0x24</value>
+    <name>Dialogue</name>
+  </primitive>
+  <primitive>
+    <value>0x25</value>
+    <name>Test Interact</name>
+  </primitive>
+  <primitive>
+    <value>0x2A</value>
+    <name>CNOI</name>
+  </primitive>
+  <primitive>
+    <value>0x2D</value>
+    <name>Goto Slot</name>
+  </primitive>
+  <primitive>
+    <value>0x2E</value>
+    <name>Snap</name>
+  </primitive>
+  <primitive>
+    <value>0x30</value>
+    <name>Stop Sounds</name>
+  </primitive>
+  <primitive>
+    <value>0x31</value>
+    <name>Notify SO</name>
+  </primitive>
+  <primitive>
+    <value>0x32</value>
+    <name>Alter Action</name>
+  </primitive>
+  <primitive>
+    <value>0x33</value>
+    <name>Inv</name>
+  </primitive>
+  <primitive>
+    <value>0x69</value>
+    <name>Ani Obj</name>
+  </primitive>
+  <primitive>
+    <value>0x6A</value>
+    <name>Ani Sim</name>
+  </primitive>
+  <primitive>
+    <value>0x6B</value>
+    <name>Ani Overlay</name>
+  </primitive>
+  <primitive>
+    <value>0x6D</value>
+    <name>Change Mat</name>
+  </primitive>
+  <primitive>
+    <value>0x6E</value>
+    <name>Look</name>
+  </primitive>
+  <primitive>
+    <value>0x6F</value>
+    <name>Light</name>
+  </primitive>
+  <primitive>
+    <value>0x70</value>
+    <name>Effect</name>
+  </primitive>
+  <primitive>
+    <value>0x71</value>
+    <name>Snap Into</name>
+  </primitive>
+  <primitive>
+    <value>0x72</value>
+    <name>Loco Ani</name>
+  </primitive>
+  <primitive>
+    <value>0x73</value>
+    <name>Debug</name>
+  </primitive>
+  <primitive>
+    <value>0x74</value>
+    <name>Reach/Put</name>
+  </primitive>
+  <primitive>
+    <value>0x75</value>
+    <name>Age</name>
+  </primitive>
+  <primitive>
+    <value>0x76</value>
+    <name>Array</name>
+  </primitive>
+  <primitive>
+    <value>0x77</value>
+    <name>Message</name>
+  </primitive>
+  <primitive>
+    <value>0x78</value>
+    <name>Ray</name>
+  </primitive>
+  <primitive>
+    <value>0x79</value>
+    <name>Outfit</name>
+  </primitive>
+  <primitive>
+    <value>0x7A</value>
+    <name>Timer</name>
+  </primitive>
+  <primitive>
+    <value>0x7B</value>
+    <name>Cinematic</name>
+  </primitive>
+  <primitive>
+    <value>0x7C</value>
+    <name>Wants</name>
+  </primitive>
+  <primitive>
+    <value>0x7D</value>
+    <name>Follow</name>
+  </primitive>
+  <primitive>
+    <value>0x7E</value>
+    <name>Lua</name>
+  </primitive>
+</primitives>

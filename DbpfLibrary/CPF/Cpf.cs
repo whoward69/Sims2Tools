@@ -16,6 +16,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -204,7 +205,7 @@ namespace Sims2Tools.DBPF.CPF
             }
         }
 
-        public List<string> GetItemNames()
+        public ReadOnlyCollection<string> GetItemNames()
         {
             List<string> names = new List<string>();
 
@@ -213,10 +214,10 @@ namespace Sims2Tools.DBPF.CPF
                 names.Add(items[i].Name);
             }
 
-            return names;
+            return names.AsReadOnly();
         }
 
-        public List<CpfItem> CloneItems()
+        public List<CpfItem> CloneItems() // Do NOT change this to ReadOnlyCollection, as we specifically want an alterable clone!
         {
             List<CpfItem> cloneItems = new List<CpfItem>(items.Count);
 

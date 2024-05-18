@@ -6,8 +6,11 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using DbpfCompare.Diff;
+using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BCON;
+using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
@@ -42,18 +45,24 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace DbpfCompare.Controls
 {
     public partial class ResCompareForm : Form
     {
-        private static readonly Color colourDiffers = Color.FromName(Properties.Settings.Default.CompareDiffers);
+        private static readonly Color colourHighlightDiffers = Color.FromName(Properties.Settings.Default.CompareDiffers);
 
-        private static readonly Brush brushDiffers = new SolidBrush(Color.FromName(Properties.Settings.Default.ResDiffers));
-        private static readonly Brush brushMissing = new SolidBrush(Color.FromName(Properties.Settings.Default.ResMissing));
-        private static readonly Brush brushSame = new SolidBrush(Color.FromName(Properties.Settings.Default.ResSame));
+        private static readonly Color colourDiffers = Color.FromName(Properties.Settings.Default.ResDiffers);
+        private static readonly Color colourMissing = Color.FromName(Properties.Settings.Default.ResMissing);
+        private static readonly Color colourSame = Color.FromName(Properties.Settings.Default.ResSame);
+
+        private static readonly Brush brushDiffers = new SolidBrush(colourDiffers);
+        private static readonly Brush brushMissing = new SolidBrush(colourMissing);
+        private static readonly Brush brushSame = new SolidBrush(colourSame);
 
         private readonly ResCompareData dataResCompare = new ResCompareData();
 
@@ -140,6 +149,124 @@ namespace DbpfCompare.Controls
 
                     row["LeftValue1"] = (index < leftTrcn.Count) ? leftTrcn.GetName(index) : "";
                     row["RightValue1"] = (index < rightTrcn.Count) ? rightTrcn.GetName(index) : "";
+
+                    dataResCompare.Append(row);
+                }
+            }
+            else if (nodeData.TypeID == Bhav.TYPE)
+            {
+                // BHAV - Table; Index, Left Value, Right Value
+                gridResCompare.Columns["colKey"].HeaderText = "Type";
+                gridResCompare.Columns["colLeftValue1"].HeaderText = "Left Value";
+                gridResCompare.Columns["colLeftValue2"].Visible = false;
+                gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
+                gridResCompare.Columns["colRightValue2"].Visible = false;
+
+                Bhav leftBhav = (Bhav)leftPackage.GetResourceByKey(nodeData.Key);
+                Bhav rightBhav = (Bhav)rightPackage.GetResourceByKey(nodeData.Key);
+
+                List<string> leftText = new List<string>
+                {
+                    leftBhav.DiffString()
+                };
+                foreach (Instruction inst in leftBhav.Instructions)
+                {
+                    leftText.Add(inst.DiffString(GameData.ShortPrimitivesByOpCode));
+                }
+
+                List<string> rightText = new List<string>
+                {
+                    rightBhav.DiffString()
+                };
+                foreach (Instruction inst in rightBhav.Instructions)
+                {
+                    rightText.Add(inst.DiffString(GameData.ShortPrimitivesByOpCode));
+                }
+
+                DiffItem[] diffItems = Diff.Diff.DiffText(leftText.ToArray(), rightText.ToArray());
+
+                int leftIndex = 0;
+                int rightIndex = 0;
+
+                foreach (DiffItem diffItem in diffItems)
+                {
+                    while (leftIndex < diffItem.startA)
+                    {
+                        DataRow row = dataResCompare.NewRow();
+                        row["Key"] = "Same";
+
+                        row["LeftValue1"] = leftText[leftIndex++];
+                        row["RightValue1"] = rightText[rightIndex++];
+
+                        dataResCompare.Append(row);
+                    }
+
+                    if (diffItem.deletedA > 0 && diffItem.insertedB > 0)
+                    {
+                        for (int i = 0; i < diffItem.deletedA; ++i)
+                        {
+                            // this is a change
+                            DataRow row = dataResCompare.NewRow();
+                            row["Key"] = "Change";
+
+                            row["LeftValue1"] = leftText[leftIndex++];
+                            row["RightValue1"] = rightText[rightIndex++];
+
+                            dataResCompare.Append(row);
+                        }
+                    }
+                    else if (diffItem.deletedA > 0)
+                    {
+                        for (int i = 0; i < diffItem.deletedA; ++i)
+                        {
+                            // this is "only on the left"
+                            DataRow row = dataResCompare.NewRow();
+                            row["Key"] = "Left Only";
+
+                            row["LeftValue1"] = leftText[leftIndex++];
+                            row["RightValue1"] = "";
+
+                            dataResCompare.Append(row);
+                        }
+                    }
+                    else if (diffItem.insertedB > 0)
+                    {
+                        for (int i = 0; i < diffItem.insertedB; ++i)
+                        {
+                            // this is "only on the right"
+                            DataRow row = dataResCompare.NewRow();
+                            row["Key"] = "Right Only";
+
+                            row["LeftValue1"] = "";
+                            row["RightValue1"] = rightText[rightIndex++];
+
+                            dataResCompare.Append(row);
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Bad DiffItem");
+                    }
+                }
+
+                while (leftIndex < leftText.Count)
+                {
+                    DataRow row = dataResCompare.NewRow();
+                    row["Key"] = (rightIndex < rightText.Count) ? "Same" : "Left Only";
+
+                    row["LeftValue1"] = leftText[leftIndex++];
+                    row["RightValue1"] = (rightIndex < rightText.Count) ? rightText[rightIndex++] : "";
+
+                    dataResCompare.Append(row);
+                }
+
+                while (rightIndex < rightText.Count)
+                {
+                    DataRow row = dataResCompare.NewRow();
+                    row["Key"] = "Right Only";
+
+                    row["LeftValue1"] = "";
+                    row["RightValue1"] = rightText[rightIndex++];
 
                     dataResCompare.Append(row);
                 }
@@ -333,8 +460,8 @@ namespace DbpfCompare.Controls
 
                 SortedList<byte, StrLanguage> allLanguages = new SortedList<byte, StrLanguage>();
 
-                List<StrLanguage> leftLanguages = leftStr.Languages;
-                List<StrLanguage> rightLanguages = rightStr.Languages;
+                ReadOnlyCollection<StrLanguage> leftLanguages = leftStr.Languages;
+                ReadOnlyCollection<StrLanguage> rightLanguages = rightStr.Languages;
 
                 foreach (StrLanguage lang in leftLanguages)
                 {
@@ -513,8 +640,8 @@ namespace DbpfCompare.Controls
 
             if (key == 0)
             {
-                List<string> leftNames = leftTxmt.MaterialDefinition.GetPropertyNames();
-                List<string> rightNames = rightTxmt.MaterialDefinition.GetPropertyNames();
+                ReadOnlyCollection<string> leftNames = leftTxmt.MaterialDefinition.GetPropertyNames();
+                ReadOnlyCollection<string> rightNames = rightTxmt.MaterialDefinition.GetPropertyNames();
 
                 foreach (string name in leftNames)
                 {
@@ -638,16 +765,19 @@ namespace DbpfCompare.Controls
 
         private void HighlightRows()
         {
-            foreach (DataGridViewRow row in gridResCompare.Rows)
+            if (nodeData.TypeID != Bhav.TYPE)
             {
-                string leftValue1 = row.Cells["colLeftValue1"].Value as string;
-                string leftValue2 = row.Cells["colLeftValue2"].Value as string;
-                string rightValue1 = row.Cells["colRightValue1"].Value as string;
-                string rightValue2 = row.Cells["colRightValue2"].Value as string;
-
-                if (!leftValue1.Equals(rightValue1) || (leftValue2 != null && !leftValue2.Equals(rightValue2)))
+                foreach (DataGridViewRow row in gridResCompare.Rows)
                 {
-                    row.DefaultCellStyle.BackColor = colourDiffers;
+                    string leftValue1 = row.Cells["colLeftValue1"].Value as string;
+                    string leftValue2 = row.Cells["colLeftValue2"].Value as string;
+                    string rightValue1 = row.Cells["colRightValue1"].Value as string;
+                    string rightValue2 = row.Cells["colRightValue2"].Value as string;
+
+                    if (!leftValue1.Equals(rightValue1) || (leftValue2 != null && !leftValue2.Equals(rightValue2)))
+                    {
+                        row.DefaultCellStyle.BackColor = colourHighlightDiffers;
+                    }
                 }
             }
         }
@@ -675,13 +805,13 @@ namespace DbpfCompare.Controls
 
                 if (!(row.Cells["colLeftValue1"].Value as string).Equals(row.Cells["colRightValue1"].Value as string))
                 {
-                    gridResCompare.DefaultCellStyle.SelectionBackColor = colourDiffers;
+                    gridResCompare.DefaultCellStyle.SelectionBackColor = colourHighlightDiffers;
                 }
                 else
                 {
                     if (row.Cells["colLeftValue2"].Value is string leftValue2 && !leftValue2.Equals(row.Cells["colRightValue2"].Value as string))
                     {
-                        gridResCompare.DefaultCellStyle.SelectionBackColor = colourDiffers;
+                        gridResCompare.DefaultCellStyle.SelectionBackColor = colourHighlightDiffers;
                     }
                     else
                     {
@@ -718,6 +848,130 @@ namespace DbpfCompare.Controls
             }
 
             HighlightRows();
+        }
+
+        private void OnCellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (nodeData.TypeID == Bhav.TYPE)
+            {
+                Graphics g = e.Graphics;
+                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+
+                using (Brush gridBrush = new SolidBrush(gridResCompare.GridColor), backColourBrush = new SolidBrush(e.CellStyle.BackColor), textColourBrush = new SolidBrush(e.CellStyle.ForeColor))
+                {
+                    using (Pen gridLinePen = new Pen(gridBrush))
+                    {
+                        // Erase the cell.
+                        g.FillRectangle(backColourBrush, e.CellBounds);
+
+                        // Draw the grid lines (only the right and bottom lines;
+                        // DataGridView takes care of the others).
+                        g.DrawLine(gridLinePen, e.CellBounds.Left, e.CellBounds.Bottom - 1, e.CellBounds.Right - 1, e.CellBounds.Bottom - 1);
+                        g.DrawLine(gridLinePen, e.CellBounds.Right - 1, e.CellBounds.Top, e.CellBounds.Right - 1, e.CellBounds.Bottom);
+
+                        // Draw the text content of the cell, ignoring alignment.
+                        if (e.Value != null)
+                        {
+                            float xPos = e.CellBounds.X + 2;
+                            float yPos = e.CellBounds.Y + 2;
+
+                            Font font = e.CellStyle.Font;
+
+                            if (e.ColumnIndex > 0 && e.RowIndex > 0 && e.RowIndex < gridResCompare.Rows.Count)
+                            {
+                                string leftText = gridResCompare.Rows[e.RowIndex].Cells["colLeftValue1"].Value as string;
+                                string rightText = gridResCompare.Rows[e.RowIndex].Cells["colRightValue1"].Value as string;
+
+                                if (string.IsNullOrEmpty(leftText) || string.IsNullOrEmpty(rightText))
+                                {
+                                    // Left or Right Only
+                                    g.DrawString(e.Value as string, font, brushDiffers, xPos, yPos, StringFormat.GenericTypographic);
+                                }
+                                else if (leftText.Equals(rightText))
+                                {
+                                    // Same
+                                    g.DrawString(e.Value as string, font, textColourBrush, xPos, yPos, StringFormat.GenericTypographic);
+                                }
+                                else
+                                {
+                                    Regex re = new Regex("([^ ;:,]+)([ ;:,]+)?");
+
+                                    List<string> leftWords = new List<string>();
+                                    foreach (Match match in re.Matches(leftText))
+                                    {
+                                        leftWords.Add(match.Groups[1].Value);
+                                        if (match.Groups.Count > 2)
+                                        {
+                                            leftWords.Add(match.Groups[2].Value);
+                                        }
+                                    }
+
+                                    List<string> rightWords = new List<string>();
+                                    foreach (Match match in re.Matches(rightText))
+                                    {
+                                        rightWords.Add(match.Groups[1].Value);
+                                        if (match.Groups.Count > 2)
+                                        {
+                                            rightWords.Add(match.Groups[2].Value);
+                                        }
+                                    }
+
+                                    DiffItem[] diffItems = Diff.Diff.DiffText(leftWords.ToArray(), rightWords.ToArray());
+
+                                    int leftIndex = 0;
+
+                                    string textRun = "";
+                                    List<string> words = (e.ColumnIndex > 2) ? rightWords : leftWords;
+
+                                    foreach (DiffItem diffItem in diffItems)
+                                    {
+                                        // We should only have same and changes, no left/right only
+                                        Trace.Assert(diffItem.deletedA == diffItem.insertedB);
+
+                                        while (leftIndex < diffItem.startA)
+                                        {
+                                            textRun = $"{textRun}{words[leftIndex++]}";
+                                        }
+
+                                        if (textRun.Length > 0)
+                                        {
+                                            g.DrawString(textRun, font, textColourBrush, xPos, yPos, StringFormat.GenericTypographic);
+                                            xPos += StringWidth(g, textRun, font);
+                                        }
+
+                                        textRun = "";
+                                        for (int i = 0; i < diffItem.deletedA; ++i)
+                                        {
+                                            textRun = $"{textRun}{words[leftIndex++]}";
+                                        }
+
+                                        g.DrawString(textRun, font, brushDiffers, xPos, yPos, StringFormat.GenericTypographic);
+                                        xPos += StringWidth(g, textRun, font);
+                                    }
+
+                                    textRun = "";
+                                    while (leftIndex < words.Count)
+                                    {
+                                        textRun = $"{textRun}{words[leftIndex++]}";
+                                    }
+
+                                    if (textRun.Length > 0)
+                                    {
+                                        g.DrawString(textRun, font, textColourBrush, xPos, yPos, StringFormat.GenericTypographic);
+                                    }
+                                }
+
+                                e.Handled = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private float StringWidth(Graphics g, string textRun, Font font)
+        {
+            return g.MeasureString(textRun, font, 10000, StringFormat.GenericTypographic).Width;
         }
 
         private void OnDropDownDrawItem(object sender, DrawItemEventArgs e)

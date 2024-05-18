@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SWAF
@@ -33,7 +34,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SWAF
         private uint maxFears = 0;
         private readonly Dictionary<uint, List<SwafItem>> history = new Dictionary<uint, List<SwafItem>>();
 
-        public List<SwafItem> items = new List<SwafItem>();
+        private readonly List<SwafItem> items = new List<SwafItem>();
 
         public uint Version { get { return version; } set { if (version != value) { SetVersion(value); } } }
         private void SetVersion(uint value) { if (!IsValidVersion(value)) throw new ArgumentOutOfRangeException("value"); version = value; }
@@ -47,9 +48,10 @@ namespace Sims2Tools.DBPF.Neighbourhood.SWAF
         public uint MaxFears { get { return maxFears; } set { if (maxFears != value) { SetMaxFears(value); } } }
         private void SetMaxFears(uint value) { if (version < 0x05) throw new InvalidOperationException(); maxFears = value; }
 
-        public List<SwafItem> LifetimeWants => this[SwafItem.SWAFItemType.LifetimeWants];
-        public List<SwafItem> Wants => this[SwafItem.SWAFItemType.Wants];
-        public List<SwafItem> Fears => this[SwafItem.SWAFItemType.Fears];
+        public ReadOnlyCollection<SwafItem> LifetimeWants => this[SwafItem.SWAFItemType.LifetimeWants].AsReadOnly();
+        public ReadOnlyCollection<SwafItem> Wants => this[SwafItem.SWAFItemType.Wants].AsReadOnly();
+        public ReadOnlyCollection<SwafItem> Fears => this[SwafItem.SWAFItemType.Fears].AsReadOnly();
+
         private List<SwafItem> this[SwafItem.SWAFItemType value] { get { List<SwafItem> res = new List<SwafItem>(); foreach (SwafItem item in items) if (item.ItemType == value) res.Add(item); return res; } }
 
         public Swaf(DBPFEntry entry, DbpfReader reader) : base(entry)

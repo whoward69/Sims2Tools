@@ -651,7 +651,7 @@ namespace HoodExporter
 
                                 if (menuItemSimImages.Checked)
                                 {
-                                    List<DBPFEntry> imgs = package.GetEntriesByType(Img.TYPE);
+                                    List<DBPFEntry> imgs = new List<DBPFEntry>(package.GetEntriesByType(Img.TYPE));
 
                                     foreach (DBPFEntry entry in package.GetEntriesByType(Jpg.TYPE))
                                     {
@@ -770,7 +770,7 @@ namespace HoodExporter
                     {
                         // if (menuItemLotImages.Checked)
                         {
-                            List<DBPFEntry> imgs = package.GetEntriesByType(Img.TYPE);
+                            List<DBPFEntry> imgs = new List<DBPFEntry>(package.GetEntriesByType(Img.TYPE));
 
                             foreach (DBPFEntry entry in package.GetEntriesByType(Jpg.TYPE))
                             {
@@ -848,7 +848,7 @@ namespace HoodExporter
                 {
                     using (DBPFFile package = new DBPFFile(thumbnailFile.FullName))
                     {
-                        List<DBPFEntry> imgs = package.GetEntriesByType(Img.TYPE);
+                        List<DBPFEntry> imgs = new List<DBPFEntry>(package.GetEntriesByType(Img.TYPE));
 
                         foreach (DBPFEntry entry in package.GetEntriesByType(Jpg.TYPE))
                         {

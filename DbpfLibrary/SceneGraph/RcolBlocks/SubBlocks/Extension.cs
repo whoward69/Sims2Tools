@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.SceneGraph.Geometry;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
@@ -326,7 +327,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             }
         }
 
-        public List<ExtensionItem> Items => items;
+        public ReadOnlyCollection<ExtensionItem> Items => items.AsReadOnly();
 
         public int Count => items.Count;
 
