@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SLOT
@@ -27,6 +28,8 @@ namespace Sims2Tools.DBPF.SLOT
         private uint version = 4;
 
         private List<SlotItem> items;
+
+        public ReadOnlyCollection<SlotItem> Slots => items.AsReadOnly();
 
         public Slot(DBPFEntry entry, DbpfReader reader) : base(entry)
         {

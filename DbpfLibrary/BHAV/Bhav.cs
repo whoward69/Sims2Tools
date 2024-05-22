@@ -70,8 +70,8 @@ namespace Sims2Tools.DBPF.BHAV
                 // inst.SetAttribute("entry", i.ToString()); // Adding this back in makes using WinDiff/BeyondCompare very hard!
                 inst.SetAttribute("opCode", Helper.Hex4PrefixString(item.OpCode));
                 inst.SetAttribute("nodeVersion", Helper.Hex4PrefixString(item.NodeVersion));
-                inst.SetAttribute("trueTarget", item.GetTarget(i, item.TrueTarget));
-                inst.SetAttribute("falseTarget", item.GetTarget(i, item.FalseTarget));
+                inst.SetAttribute("trueTarget", item.GetDeltaTarget(i, item.TrueTarget));
+                inst.SetAttribute("falseTarget", item.GetDeltaTarget(i, item.FalseTarget));
 
                 XmlElement ops = XmlHelper.CreateElement(inst, "operands");
                 for (int j = 0; j < 16; j++)

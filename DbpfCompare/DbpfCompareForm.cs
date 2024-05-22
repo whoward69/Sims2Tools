@@ -12,13 +12,16 @@ using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BCON;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.CTSS;
+using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.Neighbourhood.SDNA;
+using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
+using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.XFCH;
@@ -26,6 +29,7 @@ using Sims2Tools.DBPF.SceneGraph.XHTN;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XSTN;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
+using Sims2Tools.DBPF.SLOT;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
@@ -48,7 +52,6 @@ using System.Windows.Forms;
 
 namespace DbpfCompare
 {
-    // TODO - DBPF Compare - 9 - Support folders -> sub-folders -> .package files -> resources
     // TODO - DBPF Compare - 9 - Support "Save/Load project"
 
     public partial class DbpfCompareForm : Form
@@ -608,6 +611,9 @@ namespace DbpfCompare
                 if (nodeData.TypeID == Bcon.TYPE || nodeData.TypeID == Trcn.TYPE ||
                     nodeData.TypeID == Bhav.TYPE || nodeData.TypeID == Tprp.TYPE ||
                     nodeData.TypeID == Objd.TYPE || nodeData.TypeID == Objf.TYPE ||
+                    nodeData.TypeID == Glob.TYPE || nodeData.TypeID == Nref.TYPE ||
+                    nodeData.TypeID == Slot.TYPE ||
+                    nodeData.TypeID == Idr.TYPE ||
                     nodeData.TypeID == Str.TYPE || nodeData.TypeID == Ctss.TYPE || nodeData.TypeID == Ttas.TYPE ||
                     nodeData.TypeID == Txmt.TYPE ||
                     nodeData.TypeID == Binx.TYPE ||
@@ -621,7 +627,7 @@ namespace DbpfCompare
                     nodeData.TypeID == Xobj.TYPE ||
                     nodeData.TypeID == Xwnt.TYPE)
                 {
-                    (new ResCompareForm(nodeData, textLeftPath.Text, textRightPath.Text)).ShowDialog();
+                    (new ResCompareForm(nodeData, textLeftPath.Text, textRightPath.Text, menuItemExcludeSame.Checked)).ShowDialog();
 
                     if (nodeData.IsSame)
                     {

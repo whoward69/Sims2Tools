@@ -18,15 +18,11 @@ namespace DbpfCompare.Diff
 {
     public struct DiffItem
     {
-        /// <summary>Start Line number in Data A.</summary>
-        public int startA;
-        /// <summary>Start Line number in Data B.</summary>
-        public int startB;
+        public int startLeft;
+        public int deletedLeft;
 
-        /// <summary>Number of changes in Data A.</summary>
-        public int deletedA;
-        /// <summary>Number of changes in Data B.</summary>
-        public int insertedB;
+        public int startRight;
+        public int insertedRight;
     }
 
     /// This Class implements the Difference Algorithm published in
@@ -374,10 +370,10 @@ namespace DbpfCompare.Diff
                         // store a new difference-item
                         aItem = new DiffItem
                         {
-                            startA = StartA,
-                            startB = StartB,
-                            deletedA = LineA - StartA,
-                            insertedB = LineB - StartB
+                            startLeft = StartA,
+                            startRight = StartB,
+                            deletedLeft = LineA - StartA,
+                            insertedRight = LineB - StartB
                         };
                         a.Add(aItem);
                     }

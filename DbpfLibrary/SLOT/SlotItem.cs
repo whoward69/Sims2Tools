@@ -206,5 +206,10 @@ namespace Sims2Tools.DBPF.SLOT
             }
             return element;
         }
+
+        public string DiffString()
+        {
+            return $"{Type}; F1:{F1}; F2:{F2}; F3:{F3}; I1:{I1}; I2:{I2}; I3:{I3}; I4:{I4}; I5:{I5}; F4:{F4}; F5:{F5}; F6:{F6}; S1:{S1}; S2:{S2}; F7:{F7}; I7:{I7}; I8:{I8}; I9:{I9}; I10:{I10}";
+        }
     }
 }

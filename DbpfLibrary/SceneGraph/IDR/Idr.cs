@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Xml;
 
@@ -36,6 +37,8 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
         }
 
         private List<DBPFKey> items;
+
+        public ReadOnlyCollection<DBPFKey> Items => items.AsReadOnly();
 
         public int ItemCount => items.Count;
 
