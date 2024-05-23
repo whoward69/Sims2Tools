@@ -41,13 +41,13 @@ namespace DbpfCompare.Controls
             this.btnClose = new System.Windows.Forms.Button();
             this.btnKeepRight = new System.Windows.Forms.Button();
             this.gridResCompare = new System.Windows.Forms.DataGridView();
+            this.comboVariations = new System.Windows.Forms.ComboBox();
+            this.btnUseLeft = new System.Windows.Forms.Button();
             this.colKey = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colLeftValue1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colLeftValue2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colRightValue1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colRightValue2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.comboVariations = new System.Windows.Forms.ComboBox();
-            this.btnUseLeft = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.gridResCompare)).BeginInit();
             this.SuspendLayout();
             // 
@@ -106,58 +106,10 @@ namespace DbpfCompare.Controls
             this.gridResCompare.Size = new System.Drawing.Size(788, 409);
             this.gridResCompare.TabIndex = 2;
             this.gridResCompare.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.OnCellPainting);
+            this.gridResCompare.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnCellToolTipNeeded);
             this.gridResCompare.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnDataBindingComplete);
             this.gridResCompare.SelectionChanged += new System.EventHandler(this.OnSelectionChanged);
             this.gridResCompare.Sorted += new System.EventHandler(this.OnSorted);
-            // 
-            // colKey
-            // 
-            this.colKey.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colKey.DataPropertyName = "Key";
-            this.colKey.HeaderText = "Key";
-            this.colKey.Name = "colKey";
-            this.colKey.ReadOnly = true;
-            this.colKey.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.colKey.Width = 31;
-            // 
-            // colLeftValue1
-            // 
-            this.colLeftValue1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colLeftValue1.DataPropertyName = "LeftValue1";
-            this.colLeftValue1.HeaderText = "Left Value 1";
-            this.colLeftValue1.Name = "colLeftValue1";
-            this.colLeftValue1.ReadOnly = true;
-            this.colLeftValue1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.colLeftValue1.Width = 70;
-            // 
-            // colLeftValue2
-            // 
-            this.colLeftValue2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colLeftValue2.DataPropertyName = "LeftValue2";
-            this.colLeftValue2.HeaderText = "Left Value 2";
-            this.colLeftValue2.Name = "colLeftValue2";
-            this.colLeftValue2.ReadOnly = true;
-            this.colLeftValue2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.colLeftValue2.Width = 70;
-            // 
-            // colRightValue1
-            // 
-            this.colRightValue1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colRightValue1.DataPropertyName = "RightValue1";
-            this.colRightValue1.HeaderText = "Right Value 1";
-            this.colRightValue1.Name = "colRightValue1";
-            this.colRightValue1.ReadOnly = true;
-            this.colRightValue1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.colRightValue1.Width = 77;
-            // 
-            // colRightValue2
-            // 
-            this.colRightValue2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colRightValue2.DataPropertyName = "RightValue2";
-            this.colRightValue2.HeaderText = "Right Value 2";
-            this.colRightValue2.Name = "colRightValue2";
-            this.colRightValue2.ReadOnly = true;
-            this.colRightValue2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // comboVariations
             // 
@@ -182,6 +134,51 @@ namespace DbpfCompare.Controls
             this.btnUseLeft.Text = "Use Left";
             this.btnUseLeft.UseVisualStyleBackColor = true;
             this.btnUseLeft.Click += new System.EventHandler(this.OnUseLeft);
+            // 
+            // colKey
+            // 
+            this.colKey.DataPropertyName = "Key";
+            this.colKey.HeaderText = "Key";
+            this.colKey.Name = "colKey";
+            this.colKey.ReadOnly = true;
+            this.colKey.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colKey.Width = 31;
+            // 
+            // colLeftValue1
+            // 
+            this.colLeftValue1.DataPropertyName = "LeftValue1";
+            this.colLeftValue1.HeaderText = "Left Value 1";
+            this.colLeftValue1.Name = "colLeftValue1";
+            this.colLeftValue1.ReadOnly = true;
+            this.colLeftValue1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colLeftValue1.Width = 70;
+            // 
+            // colLeftValue2
+            // 
+            this.colLeftValue2.DataPropertyName = "LeftValue2";
+            this.colLeftValue2.HeaderText = "Left Value 2";
+            this.colLeftValue2.Name = "colLeftValue2";
+            this.colLeftValue2.ReadOnly = true;
+            this.colLeftValue2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colLeftValue2.Width = 70;
+            // 
+            // colRightValue1
+            // 
+            this.colRightValue1.DataPropertyName = "RightValue1";
+            this.colRightValue1.HeaderText = "Right Value 1";
+            this.colRightValue1.Name = "colRightValue1";
+            this.colRightValue1.ReadOnly = true;
+            this.colRightValue1.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.colRightValue1.Width = 77;
+            // 
+            // colRightValue2
+            // 
+            this.colRightValue2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colRightValue2.DataPropertyName = "RightValue2";
+            this.colRightValue2.HeaderText = "Right Value 2";
+            this.colRightValue2.Name = "colRightValue2";
+            this.colRightValue2.ReadOnly = true;
+            this.colRightValue2.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // ResCompareForm
             // 

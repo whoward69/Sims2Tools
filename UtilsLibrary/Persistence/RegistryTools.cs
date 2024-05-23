@@ -186,7 +186,17 @@ namespace Sims2Tools.Utils.Persistence
             sub_key.SetValue(Key, Value);
         }
 
-        public static void SaveSetting(string AppRegKey, string Key, object Value, RegistryValueKind valueKind)
+        public static object GetPopupSetting(string AppRegKey, Form frm, string Key, object DefaultValue)
+        {
+            return GetSetting(AppRegKey + $"\\Popup\\{frm.Name}", Key, DefaultValue);
+        }
+
+        public static void SavePopupSetting(string AppRegKey, Form frm, string Key, object Value)
+        {
+            SaveSetting(AppRegKey + $"\\Popup\\{frm.Name}", Key, Value);
+        }
+
+        private static void SaveSetting(string AppRegKey, string Key, object Value, RegistryValueKind valueKind)
         {
             RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("Software", true);
             RegistryKey sub_key = reg_key.CreateSubKey(AppRegKey);

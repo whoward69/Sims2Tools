@@ -21,14 +21,10 @@ namespace Sims2Tools.DBPF
     {
         protected bool _isDirty = false;
 
-        public override string KeyName
+        public void SetKeyNameDirty(string keyName)
         {
-            get => base.KeyName;
-            set
-            {
-                base.KeyName = value;
-                _isDirty = true;
-            }
+            base.KeyName = keyName;
+            _isDirty = true;
         }
 
 

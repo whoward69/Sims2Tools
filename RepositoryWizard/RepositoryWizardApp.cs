@@ -22,7 +22,7 @@ namespace RepositoryWizard
         public static readonly int AppVersionMinor = 4;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 0;
+        private static readonly int AppVersionDebug = 1;
 #endif
 
         private static readonly string AppVersionType = "b"; // a - alpha, b - beta, r - release

@@ -1340,6 +1340,7 @@ namespace RepositoryWizard
                 if (gridResources.SelectedRows[0].Cells["colId"].Visible)
                 {
                     gridResources.CurrentCell = gridResources.SelectedRows[0].Cells["colId"];
+                    gridResources.BeginEdit(true);
                 }
             }
         }

@@ -1043,31 +1043,31 @@ namespace SceneGraphPlus.Surface
             }
             else if (res is Cres cres)
             {
-                cres.KeyName = $"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}";
+                cres.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
                 UpdateOgnName(cres, cres.KeyName, setOgn, clearOgn);
             }
             else if (res is Shpe shpe)
             {
-                shpe.KeyName = $"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}";
+                shpe.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
                 UpdateOgnName(shpe, shpe.KeyName, setOgn, clearOgn);
             }
             else if (res is Gmnd gmnd)
             {
-                gmnd.KeyName = $"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}";
+                gmnd.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
                 UpdateOgnName(gmnd, gmnd.KeyName, setOgn, clearOgn);
             }
             else if (res is Gmdc gmdc)
             {
-                gmdc.KeyName = $"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}";
+                gmdc.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
             }
             else if (res is Txmt txmt)
             {
-                txmt.KeyName = $"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}";
+                txmt.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
                 txmt.MaterialDefinition.FileDescription = block.SgBaseName;
             }
             else if (res is Txtr txtr)
             {
-                txtr.KeyName = $"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}";
+                txtr.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
             }
             else
             {
