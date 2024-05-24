@@ -46,6 +46,7 @@ using Sims2Tools.DBPF.SceneGraph.LDIR;
 using Sims2Tools.DBPF.SceneGraph.LPNT;
 using Sims2Tools.DBPF.SceneGraph.LSPT;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
+using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
@@ -121,7 +122,7 @@ namespace Sims2Tools.DBPF.Package
             }
             else
             {
-                header = new DBPFHeader();
+                header = new DBPFHeader(PackagePath);
                 resourceCache = new DBPFResourceCache();
                 resourceIndex = new DBPFResourceIndex(header, resourceCache, null);
             }
@@ -136,7 +137,7 @@ namespace Sims2Tools.DBPF.Package
         {
             this.m_Reader = DbpfReader.FromStream(stream, length);
 
-            header = new DBPFHeader(m_Reader);
+            header = new DBPFHeader(PackagePath, m_Reader);
 
             resourceCache = new DBPFResourceCache();
             resourceIndex = new DBPFResourceIndex(header, resourceCache, m_Reader);
@@ -150,7 +151,7 @@ namespace Sims2Tools.DBPF.Package
 
                 resourceIndex.Serialize(writer);
 
-                foreach (DBPFEntry entry in resourceIndex.GetAllEntries())
+                foreach (DBPFEntry entry in resourceIndex.GetAllEntries(true))
                 {
                     if (resourceCache.IsResource(entry))
                     {
@@ -348,7 +349,7 @@ namespace Sims2Tools.DBPF.Package
 
         public List<DBPFEntry> GetAllEntries() // Do NOT change to ReadOnlyCollection, this copy List can be changed if needed
         {
-            return resourceIndex.GetAllEntries();
+            return resourceIndex.GetAllEntries(false);
         }
 
         public List<DBPFEntry> GetEntriesByType(TypeTypeID type) // Do NOT change to ReadOnlyCollection, this copy List can be changed if needed
@@ -364,8 +365,25 @@ namespace Sims2Tools.DBPF.Package
             }
             else
             {
-                // TODO - _library - doesn't work for RCOL based resources
-                return Helper.ToString(this.GetDbpfReader(entry).ReadBytes(Math.Min((int)entry.FileSize, 0x40)));
+                if (DBPFData.IsKnownRcolType(entry.TypeID))
+                {
+                    GenericRcol rcol;
+
+                    if (resourceCache.IsCached(entry))
+                    {
+                        rcol = (GenericRcol)resourceCache.GetResourceByKey(entry);
+                    }
+                    else
+                    {
+                        rcol = new GenericRcol(entry, this.GetDbpfReader(entry));
+                    }
+
+                    return rcol.KeyName;
+                }
+                else
+                {
+                    return Helper.ToString(this.GetDbpfReader(entry).ReadBytes(Math.Min((int)entry.FileSize, 0x40)));
+                }
             }
         }
 

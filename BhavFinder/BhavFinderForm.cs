@@ -358,6 +358,7 @@ namespace BhavFinder
             comboUsingOperand.SelectedIndex = 0;
             comboUsingSTR.SelectedIndex = 0;
             textUsingRegex.Text = "";
+            checkUsingIgnoreCase.Checked = false;
             UpdateForm();
         }
 
@@ -550,8 +551,14 @@ namespace BhavFinder
         {
             RegistryTools.LoadAppSettings(BhavFinderApp.RegistryKey, BhavFinderApp.AppVersionMajor, BhavFinderApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(BhavFinderApp.RegistryKey, this);
+
+            textFilePath.Text = RegistryTools.GetSetting(BhavFinderApp.RegistryKey, textFilePath.Name, "").ToString();
             checkShowNames.Checked = bool.Parse(RegistryTools.GetSetting(BhavFinderApp.RegistryKey, checkShowNames.Name, checkShowNames.Checked.ToString()).ToString());
             OnSwitchGroupChanged(checkShowNames, null);
+
+            menuItemRestoreFilters.Checked = ((int)RegistryTools.GetSetting(BhavFinderApp.RegistryKey + @"\Options", menuItemRestoreFilters.Name, 0) != 0);
+
+            if (menuItemRestoreFilters.Checked) LoadFilters();
 
             MyMruList = new MruList(BhavFinderApp.RegistryKey, menuItemRecentPackages, Properties.Settings.Default.MruSize, true, true);
             MyMruList.FileSelected += MyMruList_FileSelected;
@@ -600,7 +607,57 @@ namespace BhavFinder
         {
             RegistryTools.SaveAppSettings(BhavFinderApp.RegistryKey, BhavFinderApp.AppVersionMajor, BhavFinderApp.AppVersionMinor);
             RegistryTools.SaveFormSettings(BhavFinderApp.RegistryKey, this);
+
+            RegistryTools.SaveSetting(BhavFinderApp.RegistryKey, textFilePath.Name, textFilePath.Text);
             RegistryTools.SaveSetting(BhavFinderApp.RegistryKey, checkShowNames.Name, checkShowNames.Checked.ToString());
+
+            RegistryTools.SaveSetting(BhavFinderApp.RegistryKey + @"\Options", menuItemRestoreFilters.Name, menuItemRestoreFilters.Checked ? 1 : 0);
+
+            SaveFilters();
+        }
+
+        private void LoadFilters()
+        {
+            string regKey = BhavFinderApp.RegistryKey + @"\Filters";
+
+            comboOpCode.SelectedIndex = (int)RegistryTools.GetSetting(regKey, comboOpCode.Name, -1);
+            comboVersion.SelectedIndex = (int)RegistryTools.GetSetting(regKey, comboVersion.Name, -1);
+
+            for (int i = 0; i <= 15; ++i)
+            {
+                operands[i].Text = (string)RegistryTools.GetSetting(regKey, operands[i].Name, "");
+                masks[i].Text = (string)RegistryTools.GetSetting(regKey, masks[i].Name, "");
+            }
+
+            comboBhavInGroup.SelectedIndex = (int)RegistryTools.GetSetting(regKey, comboBhavInGroup.Name, -1);
+            comboOpCodeInGroup.SelectedIndex = (int)RegistryTools.GetSetting(regKey, comboOpCodeInGroup.Name, -1);
+
+            comboUsingOperand.SelectedIndex = (int)RegistryTools.GetSetting(regKey, comboUsingOperand.Name, -1);
+            comboUsingSTR.SelectedIndex = (int)RegistryTools.GetSetting(regKey, comboUsingSTR.Name, -1);
+            textUsingRegex.Text = (string)RegistryTools.GetSetting(regKey, textUsingRegex.Name, "");
+            checkUsingIgnoreCase.Checked = ((int)RegistryTools.GetSetting(regKey, checkUsingIgnoreCase.Name, 0) != 0);
+        }
+
+        private void SaveFilters()
+        {
+            string regKey = BhavFinderApp.RegistryKey + @"\Filters";
+
+            RegistryTools.SaveSetting(regKey, comboOpCode.Name, comboOpCode.SelectedIndex);
+            RegistryTools.SaveSetting(regKey, comboVersion.Name, comboVersion.SelectedIndex);
+
+            for (int i = 0; i <= 15; ++i)
+            {
+                RegistryTools.SaveSetting(regKey, operands[i].Name, operands[i].Text);
+                RegistryTools.SaveSetting(regKey, masks[i].Name, masks[i].Text);
+            }
+
+            RegistryTools.SaveSetting(regKey, comboBhavInGroup.Name, comboBhavInGroup.SelectedIndex);
+            RegistryTools.SaveSetting(regKey, comboOpCodeInGroup.Name, comboOpCodeInGroup.SelectedIndex);
+
+            RegistryTools.SaveSetting(regKey, comboUsingOperand.Name, comboUsingOperand.SelectedIndex);
+            RegistryTools.SaveSetting(regKey, comboUsingSTR.Name, comboUsingSTR.SelectedIndex);
+            RegistryTools.SaveSetting(regKey, textUsingRegex.Name, textUsingRegex.Text);
+            RegistryTools.SaveSetting(regKey, checkUsingIgnoreCase.Name, checkUsingIgnoreCase.Checked ? 1 : 0);
         }
 
         private void OnSwitchGroupChanged(object sender, EventArgs e)
@@ -644,19 +701,19 @@ namespace BhavFinder
 
                     try
                     {
-                        usingRegex = new Regex(textUsingRegex.Text);
+                        usingRegex = textUsingRegex.Text;
                         Match m = HexInstanceRegex.Match(comboUsingSTR.Text);
                         usingInstance = (TypeInstanceID)Convert.ToUInt32(m.Groups[2].ToString(), 16);
 
                         string sims2Path = Sims2ToolsLib.Sims2Path;
                         if (sims2Path.Length > 0)
                         {
-                            strLookupByIndexGlobal = BuildStrLookupTable(sims2Path + GameData.objectsSubPath, usingInstance, usingRegex);
+                            strLookupByIndexGlobal = BuildStrLookupTable(sims2Path + GameData.objectsSubPath, usingInstance, usingRegex, checkUsingIgnoreCase.Checked);
                         }
 
                         if (File.Exists(textFilePath.Text))
                         {
-                            strLookupByIndexLocal = BuildStrLookupTable(textFilePath.Text, usingInstance, usingRegex);
+                            strLookupByIndexLocal = BuildStrLookupTable(textFilePath.Text, usingInstance, usingRegex, checkUsingIgnoreCase.Checked);
                         }
                     }
                     catch (Exception ex)
@@ -691,7 +748,7 @@ namespace BhavFinder
                     {
                         try
                         {
-                            strLookupByIndexLocal = BuildStrLookupTable(packageFile, usingInstance, usingRegex);
+                            strLookupByIndexLocal = BuildStrLookupTable(packageFile, usingInstance, usingRegex, checkUsingIgnoreCase.Checked);
                         }
                         catch (Exception ex)
                         {
@@ -813,7 +870,7 @@ namespace BhavFinder
             btnGO.Text = "FIND &BHAVs";
         }
 
-        private Dictionary<int, HashSet<TypeGroupID>> BuildStrLookupTable(string packagePath, TypeInstanceID instanceID, Regex regex)
+        private Dictionary<int, HashSet<TypeGroupID>> BuildStrLookupTable(string packagePath, TypeInstanceID instanceID, string regex, bool ignoreCase)
         {
             Dictionary<int, HashSet<TypeGroupID>> lookup = new Dictionary<int, HashSet<TypeGroupID>>();
 
@@ -828,9 +885,8 @@ namespace BhavFinder
 
                         for (int i = 0; i < entries.Count; ++i)
                         {
-                            if (regex.IsMatch(entries[i].Title))
+                            if (Regex.IsMatch(entries[i].Title, regex, (ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None)))
                             {
-
                                 if (!lookup.TryGetValue(i, out HashSet<TypeGroupID> groups))
                                 {
                                     groups = new HashSet<TypeGroupID>();
@@ -999,6 +1055,15 @@ namespace BhavFinder
 
                 packageWriter.WriteLine($"</package>");
                 packageWriter.Close();
+            }
+        }
+
+        private void OnUsingIgnoreCaseChanged(object sender, EventArgs e)
+        {
+            if (!checkUsingIgnoreCase.Checked)
+            {
+                bhavFoundData.Clear();
+                lblProgress.Visible = false;
             }
         }
     }

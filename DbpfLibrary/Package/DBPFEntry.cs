@@ -45,7 +45,8 @@ namespace Sims2Tools.DBPF.Package
             set
             {
 #if DEBUG
-                // Some apps leave an entry in the CLST resource where the compressed size is the same as the data size, ie the data is NOT compressed. But we'll let the decompressor take care of it.
+                // Some apps leave an entry in the CLST resource where the compressed size is the same as the data size, ie the data is NOT compressed
+                // But we'll let the decompressor take care of it.
                 if (dataSize != value)
                 {
                     // logger.Debug($"Uncompressed size is the same as the data size for {this}");

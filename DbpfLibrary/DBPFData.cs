@@ -101,6 +101,7 @@ namespace Sims2Tools.DBPF
 
         private static readonly Dictionary<TypeTypeID, string> ModTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, string> ImgTypeNames = new Dictionary<TypeTypeID, string>();
+        private static readonly Dictionary<TypeTypeID, string> RcolTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, string> SgTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, string> OtherTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, string> AllTypeNames = new Dictionary<TypeTypeID, string>();
@@ -127,34 +128,30 @@ namespace Sims2Tools.DBPF
             ImgTypeNames.Add(Jpg.TYPE, Jpg.NAME);
             ImgTypeNames.Add(Thub.TYPE, Thub.NAME);
 
-            // SgTypeNames.Add(Anim.TYPE, Anim.NAME);
+            RcolTypeNames.Add(Anim.TYPE, Anim.NAME);
+            RcolTypeNames.Add(Cine.TYPE, Cine.NAME);
+            RcolTypeNames.Add(Cres.TYPE, Cres.NAME);
+            RcolTypeNames.Add(Gmdc.TYPE, Gmdc.NAME);
+            RcolTypeNames.Add(Gmnd.TYPE, Gmnd.NAME);
+            RcolTypeNames.Add(Lamb.TYPE, Lamb.NAME);
+            RcolTypeNames.Add(Ldir.TYPE, Ldir.NAME);
+            RcolTypeNames.Add(Lifo.TYPE, Lifo.NAME);
+            RcolTypeNames.Add(Lpnt.TYPE, Lpnt.NAME);
+            RcolTypeNames.Add(Lspt.TYPE, Lspt.NAME);
+            RcolTypeNames.Add(Shpe.TYPE, Shpe.NAME);
+            RcolTypeNames.Add(Txmt.TYPE, Txmt.NAME);
+            RcolTypeNames.Add(Txtr.TYPE, Txtr.NAME);
+
             SgTypeNames.Add(Binx.TYPE, Binx.NAME);
-            // SgTypeNames.Add(Cine.TYPE, Cine.NAME);
             SgTypeNames.Add(Coll.TYPE, Coll.NAME);
-            SgTypeNames.Add(Cres.TYPE, Cres.NAME);
-            SgTypeNames.Add(Gmdc.TYPE, Gmdc.NAME);
-            SgTypeNames.Add(Gmnd.TYPE, Gmnd.NAME);
             SgTypeNames.Add(Gzps.TYPE, Gzps.NAME);
             SgTypeNames.Add(Idr.TYPE, Idr.NAME);
-            SgTypeNames.Add(Lamb.TYPE, Lamb.NAME);
-            SgTypeNames.Add(Ldir.TYPE, Ldir.NAME);
-            // SgTypeNames.Add(Lifo.TYPE, Lifo.NAME);
-            SgTypeNames.Add(Lpnt.TYPE, Lpnt.NAME);
-            SgTypeNames.Add(Lspt.TYPE, Lspt.NAME);
             SgTypeNames.Add(Mmat.TYPE, Mmat.NAME);
-            SgTypeNames.Add(Shpe.TYPE, Shpe.NAME);
-            SgTypeNames.Add(Txmt.TYPE, Txmt.NAME);
-            SgTypeNames.Add(Txtr.TYPE, Txtr.NAME);
             SgTypeNames.Add(Xfch.TYPE, Xfch.NAME);
             SgTypeNames.Add(Xmol.TYPE, Xmol.NAME);
             SgTypeNames.Add(Xhtn.TYPE, Xhtn.NAME);
             SgTypeNames.Add(Xstn.TYPE, Xstn.NAME);
             SgTypeNames.Add(Xtol.TYPE, Xtol.NAME);
-
-            // Should probably be in SgTypeNames
-            OtherTypeNames.Add(Anim.TYPE, Anim.NAME);
-            OtherTypeNames.Add(Cine.TYPE, Cine.NAME);
-            OtherTypeNames.Add(Lifo.TYPE, Lifo.NAME);
 
             OtherTypeNames.Add(Bnfo.TYPE, Bnfo.NAME);
             OtherTypeNames.Add(Clst.TYPE, Clst.NAME);
@@ -178,6 +175,7 @@ namespace Sims2Tools.DBPF
 
             foreach (KeyValuePair<TypeTypeID, string> kvPair in ModTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, string> kvPair in ImgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
+            foreach (KeyValuePair<TypeTypeID, string> kvPair in RcolTypeNames) { SgTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, string> kvPair in SgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, string> kvPair in OtherTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
         }
@@ -222,6 +220,11 @@ namespace Sims2Tools.DBPF
         public static bool IsKnownImgType(TypeTypeID type)
         {
             return ImgTypeNames.ContainsKey(type);
+        }
+
+        public static bool IsKnownRcolType(TypeTypeID type)
+        {
+            return RcolTypeNames.ContainsKey(type);
         }
 
         public static bool IsKnownSgType(TypeTypeID type)

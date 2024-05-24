@@ -25,6 +25,9 @@ namespace Sims2Tools.DBPF.Package
 
         private int HeaderSize => (minorVersion >= 1) ? 96 : 92;
 
+        private readonly string packagePath;
+        internal string PackagePath => packagePath;
+
         // private uint dateCreated, dateModified;
 
         private uint majorVersion, minorVersion;
@@ -47,8 +50,10 @@ namespace Sims2Tools.DBPF.Package
         // public uint HoleIndexOffset => holeIndexOffset;
         // public uint HoleIndexSize => holeIndexSize;
 
-        internal DBPFHeader()
+        internal DBPFHeader(string packagePath)
         {
+            this.packagePath = packagePath;
+
             majorVersion = 1;
             minorVersion = 1;
 
@@ -60,7 +65,7 @@ namespace Sims2Tools.DBPF.Package
             resourceIndexSize = 0;
         }
 
-        internal DBPFHeader(DbpfReader reader)
+        internal DBPFHeader(string packagePath, DbpfReader reader) : this(packagePath)
         {
             Unserialize(reader);
         }

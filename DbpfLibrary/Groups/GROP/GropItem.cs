@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
+using System.Xml;
 
 namespace Sims2Tools.DBPF.Groups.GROP
 {
@@ -49,25 +50,28 @@ namespace Sims2Tools.DBPF.Groups.GROP
             }
         }
 
-        string AbsoluteFileName()
+        public XmlElement AddXml(XmlElement parent)
         {
-            string absFilename = filename;
+            XmlElement element = parent.OwnerDocument.CreateElement("entry");
+            parent.AppendChild(element);
 
-            /* TODO - _library - GropItem - AbsoluteFileName()
-            absFilename = absFilename.Replace("%userdatadir%", PathProvider.SimSavegameFolder.Trim().ToLower());
+            element.SetAttribute("fileName", FileName);
+            element.SetAttribute("unknown1", unknown1.ToString());
+            element.SetAttribute("localGroupID", LocalGroupID.ToString());
 
-            foreach (ExpansionItem ei in PathProvider.Global.Expansions)
+            XmlElement refGroups = parent.OwnerDocument.CreateElement("refGroups");
+            element.AppendChild(refGroups);
+
+            for (int i = 0; i < refGroupIDs.Length; i++)
             {
-                string add = ei.Version.ToString();
-                if (add == "0") add = "";
+                XmlElement refGroup = parent.OwnerDocument.CreateElement("refGroup");
+                refGroups.AppendChild(refGroup);
 
-                absFilename = absFilename.Replace("%gamedatadir" + add + "%", ei.InstallFolder.Trim().ToLower());
+                refGroup.SetAttribute("groupID", refGroupIDs[i].ToString());
             }
-            */
 
-            return absFilename;
+            return element;
         }
-
 
         public override string ToString()
         {

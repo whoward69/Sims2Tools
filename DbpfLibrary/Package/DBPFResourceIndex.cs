@@ -22,6 +22,8 @@ namespace Sims2Tools.DBPF.Package
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private readonly DBPFHeader header;
+
         private readonly uint /*indexMajorVersion,*/ indexMinorVersion;
         private readonly uint resourceIndexCount, resourceIndexOffset /*, resourceIndexSize*/;
 
@@ -29,6 +31,8 @@ namespace Sims2Tools.DBPF.Package
         private readonly Dictionary<DBPFKey, DBPFEntry> newEntriesByKey = new Dictionary<DBPFKey, DBPFEntry>();
 
         private readonly DBPFResourceCache resourceCache;
+
+        private readonly List<DBPFEntry> duplicates = new List<DBPFEntry>();
 
         private DBPFEntry clstEntry = null;
 
@@ -88,6 +92,8 @@ namespace Sims2Tools.DBPF.Package
             Debug.Assert(header != null, "Header cannot be null");
             Debug.Assert(resourceCache != null, "ResourceCache cannot be null");
 
+            this.header = header;
+
             this.resourceCache = resourceCache;
 
             //this.indexMajorVersion = header.IndexMajorVersion;
@@ -107,7 +113,7 @@ namespace Sims2Tools.DBPF.Package
             }
         }
 
-        internal List<DBPFEntry> GetAllEntries()
+        internal List<DBPFEntry> GetAllEntries(bool includeDuplicates)
         {
             List<DBPFEntry> result = new List<DBPFEntry>();
 
@@ -127,6 +133,14 @@ namespace Sims2Tools.DBPF.Package
                 result.Add(entry);
             }
 
+            if (includeDuplicates)
+            {
+                foreach (DBPFEntry entry in duplicates)
+                {
+                    result.Add(entry);
+                }
+            }
+
             return result;
         }
 
@@ -134,7 +148,7 @@ namespace Sims2Tools.DBPF.Package
         {
             List<DBPFEntry> result = new List<DBPFEntry>();
 
-            foreach (DBPFEntry entry in GetAllEntries())
+            foreach (DBPFEntry entry in GetAllEntries(false))
             {
                 if (entry.TypeID == type) result.Add(entry);
             }
@@ -146,7 +160,7 @@ namespace Sims2Tools.DBPF.Package
         {
             if (key != null)
             {
-                foreach (DBPFEntry entry in GetAllEntries())
+                foreach (DBPFEntry entry in GetAllEntries(false))
                 {
                     if (key.Equals(entry)) return entry;
                 }
@@ -157,7 +171,7 @@ namespace Sims2Tools.DBPF.Package
 
         internal DBPFEntry GetEntryByTGIR(int tgir)
         {
-            foreach (DBPFEntry entry in GetAllEntries())
+            foreach (DBPFEntry entry in GetAllEntries(false))
             {
                 if (entry.TGIRHash == tgir) return entry;
             }
@@ -182,11 +196,11 @@ namespace Sims2Tools.DBPF.Package
 
                 if (entriesByKey.ContainsKey(entry))
                 {
-                    logger.Error($"Duplicate resource {entry}");
+                    logger.Error($"Duplicate resource {entry} in {header.PackagePath}");
 
-                    // TODO - _library - fix duplicate resources
-                    // We could add the duplicate entries to a "duplicates list", not accessible via GetResourceByXyz methods, but written back out on save
-                    // At least that way we're not silently deleting resources as is happening now!
+                    // TODO - _library - duplicates - what should we do with duplicate resources?
+                    // Add to a "duplicates list", not accessible via GetResourceByXyz methods, but written back out on save
+                    duplicates.Add(entry);
                 }
 
                 entriesByKey[entry] = entry;
@@ -225,7 +239,7 @@ namespace Sims2Tools.DBPF.Package
 
             long posNextResource = posResIndex + Size;
 
-            foreach (DBPFEntry entry in GetAllEntries())
+            foreach (DBPFEntry entry in GetAllEntries(true))
             {
                 if (entry.TypeID != Clst.TYPE)
                 {
@@ -300,7 +314,7 @@ namespace Sims2Tools.DBPF.Package
         {
             uint count = 0;
 
-            foreach (DBPFEntry entry in GetAllEntries())
+            foreach (DBPFEntry entry in GetAllEntries(false))
             {
                 if (entry.TypeID != Clst.TYPE && entry.UncompressedSize > 0)
                 {
@@ -331,7 +345,11 @@ namespace Sims2Tools.DBPF.Package
                     DBPFKey key = new DBPFKey(TypeID, GroupID, InstanceID, ResourceID);
                     if (entriesByKey.ContainsKey(key))
                     {
-                        entriesByKey[key].UncompressedSize = uncompressedSize;
+                        if (entriesByKey[key].UncompressedSize == 0)
+                        {
+                            // TODO - _library - duplicates - a previous entry may have already set this!
+                            entriesByKey[key].UncompressedSize = uncompressedSize;
+                        }
                     }
 
                     done += ClstEntrySize;
@@ -343,7 +361,7 @@ namespace Sims2Tools.DBPF.Package
         {
             int count = 0;
 
-            foreach (DBPFEntry entry in GetAllEntries())
+            foreach (DBPFEntry entry in GetAllEntries(false))
             {
                 if (entry.TypeID != Clst.TYPE && entry.UncompressedSize > 0)
                 {

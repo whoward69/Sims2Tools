@@ -134,6 +134,10 @@ namespace BhavFinder
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.saveResultsDialog = new System.Windows.Forms.SaveFileDialog();
             this.bhavFinderWorker = new System.ComponentModel.BackgroundWorker();
+            this.lblUsingIgnoreCase = new System.Windows.Forms.Label();
+            this.checkUsingIgnoreCase = new System.Windows.Forms.CheckBox();
+            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemRestoreFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextOperands.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridFoundBhavs)).BeginInit();
             this.menuContextFoundBhavs.SuspendLayout();
@@ -816,7 +820,7 @@ namespace BhavFinder
             // 
             this.textUsingRegex.Location = new System.Drawing.Point(553, 211);
             this.textUsingRegex.Name = "textUsingRegex";
-            this.textUsingRegex.Size = new System.Drawing.Size(374, 21);
+            this.textUsingRegex.Size = new System.Drawing.Size(269, 21);
             this.textUsingRegex.TabIndex = 45;
             // 
             // btnUsingClear
@@ -850,7 +854,7 @@ namespace BhavFinder
             // lblShowNames
             // 
             this.lblShowNames.AutoSize = true;
-            this.lblShowNames.Location = new System.Drawing.Point(738, 260);
+            this.lblShowNames.Location = new System.Drawing.Point(745, 259);
             this.lblShowNames.Name = "lblShowNames";
             this.lblShowNames.Size = new System.Drawing.Size(159, 15);
             this.lblShowNames.TabIndex = 0;
@@ -1018,7 +1022,8 @@ namespace BhavFinder
             this.menuMain.BackColor = System.Drawing.SystemColors.MenuBar;
             this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
-            this.menuHelp});
+            this.menuHelp,
+            this.menuOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -1146,11 +1151,47 @@ namespace BhavFinder
             this.bhavFinderWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BhavFinderWorker_Progress);
             this.bhavFinderWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BhavFinderWorker_Completed);
             // 
+            // lblUsingIgnoreCase
+            // 
+            this.lblUsingIgnoreCase.AutoSize = true;
+            this.lblUsingIgnoreCase.Location = new System.Drawing.Point(828, 214);
+            this.lblUsingIgnoreCase.Name = "lblUsingIgnoreCase";
+            this.lblUsingIgnoreCase.Size = new System.Drawing.Size(76, 15);
+            this.lblUsingIgnoreCase.TabIndex = 49;
+            this.lblUsingIgnoreCase.Text = "Ignore Case:";
+            // 
+            // checkUsingIgnoreCase
+            // 
+            this.checkUsingIgnoreCase.AutoSize = true;
+            this.checkUsingIgnoreCase.Location = new System.Drawing.Point(910, 215);
+            this.checkUsingIgnoreCase.Name = "checkUsingIgnoreCase";
+            this.checkUsingIgnoreCase.Size = new System.Drawing.Size(15, 14);
+            this.checkUsingIgnoreCase.TabIndex = 50;
+            this.checkUsingIgnoreCase.UseVisualStyleBackColor = true;
+            this.checkUsingIgnoreCase.CheckedChanged += new System.EventHandler(this.OnUsingIgnoreCaseChanged);
+            // 
+            // menuOptions
+            // 
+            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemRestoreFilters});
+            this.menuOptions.Name = "menuOptions";
+            this.menuOptions.Size = new System.Drawing.Size(61, 20);
+            this.menuOptions.Text = "&Options";
+            // 
+            // menuItemRestoreFilters
+            // 
+            this.menuItemRestoreFilters.CheckOnClick = true;
+            this.menuItemRestoreFilters.Name = "menuItemRestoreFilters";
+            this.menuItemRestoreFilters.Size = new System.Drawing.Size(200, 22);
+            this.menuItemRestoreFilters.Text = "Restore Last Used &Filters";
+            // 
             // BhavFinderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1091, 691);
+            this.Controls.Add(this.checkUsingIgnoreCase);
+            this.Controls.Add(this.lblUsingIgnoreCase);
             this.Controls.Add(this.lblProgress);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.lblFilePath);
@@ -1326,6 +1367,10 @@ namespace BhavFinder
         private System.Windows.Forms.DataGridViewTextBoxColumn colBhavGroupInstance;
         private System.Windows.Forms.DataGridViewTextBoxColumn colBhavGroupName;
         private System.Windows.Forms.ToolStripMenuItem menuItemSelectFolder;
+        private System.Windows.Forms.Label lblUsingIgnoreCase;
+        private System.Windows.Forms.CheckBox checkUsingIgnoreCase;
+        private System.Windows.Forms.ToolStripMenuItem menuOptions;
+        private System.Windows.Forms.ToolStripMenuItem menuItemRestoreFilters;
     }
 }
 

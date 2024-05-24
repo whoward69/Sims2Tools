@@ -429,4 +429,21 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                     irb.Dispose();
         }
     }
+
+    public class GenericRcol : Rcol
+    {
+        public GenericRcol(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
+        {
+        }
+
+        public override XmlElement AddXml(XmlElement parent)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override SgResourceList SgNeededResources()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

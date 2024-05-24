@@ -21,8 +21,8 @@ namespace BhavFinder
     public partial class BhavFinderForm
     {
         private static Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal = null;
-        private static Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal = null; // TODO - BHAV Finder - would be quite useful if this was populated!
-        private Regex usingRegex;
+        private static Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal = null;
+        private string usingRegex;
         private TypeInstanceID usingInstance;
 
         private BhavFilter GetFilters()

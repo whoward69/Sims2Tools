@@ -56,7 +56,12 @@ namespace Sims2Tools.DBPF.Groups.GROP
         {
             XmlElement element = XmlHelper.CreateResElement(parent, NAME, this);
 
-            // TODO - _library - Grop - AddXml()
+            element.SetAttribute("id", ID.ToString());
+
+            foreach (GropItem item in items)
+            {
+                item.AddXml(element);
+            }
 
             return element;
         }
