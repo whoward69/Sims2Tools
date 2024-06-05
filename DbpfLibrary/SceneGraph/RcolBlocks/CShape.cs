@@ -82,17 +82,15 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         private readonly CShape parent;
 
-        private int unknown1;
+        private int lod;
         private byte unknown2;
         private int unknown3;
         private byte unknown4;
 
         private string filename;
 
-        public string FileName
-        {
-            get { return filename; }
-        }
+        public string FileName => filename;
+        public int LoD => lod;
 
         public ShapeItem(CShape parent)
         {
@@ -112,7 +110,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             readStart = reader.Position;
 #endif
 
-            unknown1 = reader.ReadInt32();
+            lod = reader.ReadInt32();
 
             unknown2 = reader.ReadByte();
 
@@ -159,7 +157,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             writeStart = writer.Position;
 #endif
 
-            writer.WriteInt32(unknown1);
+            writer.WriteInt32(lod);
 
             writer.WriteByte(unknown2);
 
@@ -183,7 +181,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override string ToString()
         {
-            string name = Helper.Hex4PrefixString((uint)unknown1) + " - " + Helper.Hex4PrefixString(unknown2);
+            string name = Helper.Hex4PrefixString((uint)lod) + " - " + Helper.Hex4PrefixString(unknown2);
 
             if ((parent.Version == 0x07) || (parent.Version == 0x06))
             {

@@ -17,5 +17,8 @@
     <Setting Name="CustomTokensColour" Type="System.String" Scope="User">
       <Value Profile="(Default)">OrangeRed</Value>
     </Setting>
+    <Setting Name="UnknownTokensColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Red</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

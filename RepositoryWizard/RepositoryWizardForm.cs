@@ -41,6 +41,7 @@ using Sims2Tools.Utils.NamedValue;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
@@ -67,6 +68,8 @@ namespace RepositoryWizard
 
         private readonly RepositoryWizardPackageData dataPackageFiles = new RepositoryWizardPackageData();
         private readonly RepositoryWizardResourceData dataResources = new RepositoryWizardResourceData();
+
+        private SortedList<string, RepoWizardClothingMesh> clothingMeshes;
 
         #region Dropdown Menu Items
         private readonly UintNamedValue[] typeItems = {
@@ -296,7 +299,7 @@ namespace RepositoryWizard
             {
                 if (Sims2ToolsLib.IsSims2HomePathSet && folder.StartsWith($"{Sims2ToolsLib.Sims2DownloadsPath}"))
                 {
-                    displayPath = $" - {folder.Substring(Sims2ToolsLib.Sims2HomePath.Length + 11)}";
+                    displayPath = $" - {folder.Substring(Sims2ToolsLib.Sims2HomePath.Length + 1)}";
                 }
                 else
                 {
@@ -326,6 +329,8 @@ namespace RepositoryWizard
 
         private void OnExitClicked(object sender, EventArgs e)
         {
+            if (repoWizardWorker.IsBusy) repoWizardWorker.CancelAsync();
+
             this.Close();
         }
 
@@ -800,6 +805,8 @@ namespace RepositoryWizard
             }
             else if (menuItemModeClothingStandalone.Checked)
             {
+                UpdateSaveAsState();
+
                 btnSaveAs.Text = "&Standalone";
 
                 textDeRepoMsgs.Visible = true;
@@ -863,7 +870,7 @@ namespace RepositoryWizard
                                 {
                                     if (!string.IsNullOrEmpty(textMesh.Text))
                                     {
-                                        saveAs = true;
+                                        saveAs = (comboMesh.Items.Count == 1 || comboMesh.SelectedIndex > 0);
                                     }
                                 }
                             }
@@ -898,95 +905,164 @@ namespace RepositoryWizard
             menuItemSaveAs.Enabled = btnSaveAs.Enabled = saveAs;
         }
 
-        private bool IsValidClothingMesh(string meshPackagePath, bool showErrorMsg)
-        {
-            bool isCresValid = false;
-            bool isShpeValid = false;
-            bool isGmdcValid = !menuItemVerifyGmdcSubsets.Checked;
+        /*
+         * Check for one or more valid meshes in the given .package file
+         * 
+         * A valid clothing mesh can only have one SHPE per CRES, one GMND per SHPE, and one GMDC per GMND
+         * 
+         * Sub-resources, do NOT have to be in the ame .package file (this allows us to support Maxis meshes)
+         * 
+         */
+        private string meshPackagePath;
 
+        private void GetValidClothingMeshes(string meshPackagePath)
+        {
             if (!string.IsNullOrWhiteSpace(meshPackagePath) && File.Exists(meshPackagePath))
             {
-                using (DBPFFile meshPackage = new DBPFFile(meshPackagePath))
+                Cursor = Cursors.WaitCursor;
+                menuMain.Enabled = false;
+                btnMesh.Enabled = false;
+                btnSaveAs.Enabled = false;
+
+                this.meshPackagePath = meshPackagePath;
+
+                repoWizardWorker.RunWorkerAsync();
+            }
+            else
+            {
+                logger.Info($"Package not found - {meshPackagePath}");
+
+                MsgBox.Show("Package not found.", "Error!", MessageBoxButtons.OK);
+            }
+        }
+
+        private void RepoWizardWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            // BackgroundWorker worker = sender as BackgroundWorker;
+
+            e.Result = LoadMeshes(meshPackagePath);
+        }
+
+        private void RepoWizardWorker_Progress(object sender, ProgressChangedEventArgs e)
+        {
+            if (e.ProgressPercentage != 0)
+            {
+            }
+
+            if (e.UserState != null)
+            {
+            }
+        }
+
+        private void RepoWizardWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Cursor = Cursors.Default;
+            menuMain.Enabled = true;
+            btnMesh.Enabled = true;
+
+            clothingMeshes = e.Result as SortedList<string, RepoWizardClothingMesh>;
+
+            if (clothingMeshes.Count == 0)
+            {
+                textMesh.Text = "";
+
+                logger.Info($"Package does not contain any valid meshes - {meshPackagePath}");
+
+                MsgBox.Show("Package does not contain any valid meshes.", "Error!", MessageBoxButtons.OK);
+            }
+            else
+            {
+                textMesh.Text = meshPackagePath;
+
+                if (textMesh.Text.Length > 0)
                 {
-                    List<DBPFEntry> cresKeys = meshPackage.GetEntriesByType(Cres.TYPE);
+                    textMesh.Select(textMesh.Text.Length, 0);
+                    textMesh.Focus();
+                    textMesh.ScrollToCaret();
+                }
 
-                    if (cresKeys.Count == 1)
+                PopulateClothingMeshes();
+
+                UpdateFormState();
+            }
+        }
+
+        private SortedList<string, RepoWizardClothingMesh> LoadMeshes(string meshPackagePath)
+        {
+            SortedList<string, RepoWizardClothingMesh> meshes = new SortedList<string, RepoWizardClothingMesh>();
+
+            using (DBPFFile meshPackage = new DBPFFile(meshPackagePath))
+            {
+                foreach (DBPFKey cresKey in meshPackage.GetEntriesByType(Cres.TYPE))
+                {
+                    Cres meshCres = (Cres)meshPackage.GetResourceByKey(cresKey);
+
+                    if (meshCres.KeyName.Contains("LOD15")) continue;
+
+                    if (meshCres != null && meshCres.ShpeKeys.Count == 1)
                     {
-                        isCresValid = true;
+                        DBPFKey shpeKey = meshCres.ShpeKeys[0];
+                        Shpe meshShpe = (Shpe)meshPackage.GetResourceByKey(shpeKey) ?? (Shpe)GameData.GetMaxisResource(Shpe.TYPE, shpeKey, true);
+                        Gmdc meshGmdc = null;
 
-                        Cres meshCres = (Cres)meshPackage.GetResourceByKey(cresKeys[0]);
+                        bool meshValid = true;
 
-                        if (meshCres.ShpeKeys.Count == 1)
+                        if (menuItemVerifyGmdcSubsets.Checked)
                         {
-                            isShpeValid = true;
+                            ReadOnlyCollection<string> gmndNames = meshShpe.GetGmndNames(0);
 
-                            if (menuItemVerifyGmdcSubsets.Checked)
+                            if (meshShpe != null && gmndNames.Count == 1)
                             {
-                                Shpe meshShpe = (Shpe)meshPackage.GetResourceByKey(meshCres.ShpeKeys[0]);
+                                Gmnd meshGmnd = (Gmnd)meshPackage.GetResourceByName(Gmnd.TYPE, gmndNames[0]) ?? (Gmnd)GameData.GetMaxisResource(Gmnd.TYPE, gmndNames[0], true);
 
-                                if (meshShpe.GmndNames.Count == 1)
+                                if (meshGmnd != null && meshGmnd.GmdcKeys.Count == 1)
                                 {
-                                    Gmnd meshGmnd = (Gmnd)meshPackage.GetResourceByName(Gmnd.TYPE, meshShpe.GmndNames[0]);
+                                    DBPFKey gmdcKey = meshGmnd.GmdcKeys[0];
+                                    meshGmdc = (Gmdc)meshPackage.GetResourceByKey(gmdcKey);
 
-                                    if (meshGmnd.GmdcKeys.Count == 1)
+                                    if (meshGmdc == null)
                                     {
-                                        isGmdcValid = (meshPackage.GetEntryByKey(meshGmnd.GmdcKeys[0]) != null);
+                                        meshGmdc = (Gmdc)GameData.GetMaxisResource(Gmdc.TYPE, gmdcKey);
+                                    }
+
+                                    if (meshGmdc != null)
+                                    {
                                     }
                                     else
                                     {
-                                        logger.Debug($"Mesh contains more than one GMDC resource - {meshPackagePath}");
-
-                                        if (showErrorMsg)
-                                        {
-                                            MsgBox.Show("Mesh contains more than one GMDC resource.", "Error!", MessageBoxButtons.OK);
-                                        }
+                                        logger.Info($"Mesh {cresKey} has missing GMDC resource - {meshPackagePath}");
+                                        meshValid = false;
                                     }
                                 }
                                 else
                                 {
-                                    logger.Debug($"Mesh contains more than one GMND resource - {meshPackagePath}");
-
-                                    if (showErrorMsg)
-                                    {
-                                        MsgBox.Show("Mesh contains more than one GMND resource.", "Error!", MessageBoxButtons.OK);
-                                    }
+                                    logger.Info($"Mesh {cresKey} has missing GMND resource or contains more than one GMDC resource - {meshPackagePath}");
+                                    meshValid = false;
                                 }
                             }
-                        }
-                        else
-                        {
-                            logger.Debug($"Mesh contains more than one SHPE resource - {meshPackagePath}");
-
-                            if (showErrorMsg)
+                            else
                             {
-                                MsgBox.Show("Mesh contains more than one SHPE resource.", "Error!", MessageBoxButtons.OK);
+                                logger.Info($"Mesh {cresKey} has missing SHPE resource or contains more than one GMND resource - {meshPackagePath}");
+                                meshValid = false;
                             }
+                        }
+
+                        if (meshShpe != null && meshValid)
+                        {
+                            RepoWizardClothingMesh clothingMesh = new RepoWizardClothingMesh(meshCres, meshShpe, meshGmdc);
+                            meshes.Add(clothingMesh.ToString(), clothingMesh);
                         }
                     }
                     else
                     {
-                        logger.Debug($"Package contains more than one CRES resource - {meshPackagePath}");
-
-                        if (showErrorMsg)
-                        {
-                            MsgBox.Show("Package contains more than one CRES resource.", "Error!", MessageBoxButtons.OK);
-                        }
+                        logger.Info($"Mesh {cresKey} has missing CRES resource or contains more than one SHPE resource - {meshPackagePath}");
                     }
-
-                    meshPackage.Close();
                 }
-            }
-            else
-            {
-                logger.Debug($"Package not found - {meshPackagePath}");
 
-                if (showErrorMsg)
-                {
-                    MsgBox.Show("Package not found.", "Error!", MessageBoxButtons.OK);
-                }
+                meshPackage.Close();
             }
 
-            return isCresValid && isShpeValid && isGmdcValid;
+            return meshes;
         }
 
         private bool IsValidObjectMaster(string masterPackagePath)
@@ -1239,9 +1315,12 @@ namespace RepositoryWizard
 
         private void OnVerifyMeshSubsetsClicked(object sender, EventArgs e)
         {
-            if ((sender as ToolStripMenuItem).Checked && !IsValidClothingMesh(textMesh.Text, true))
+            if ((sender as ToolStripMenuItem).Checked)
             {
-                textMesh.Text = "";
+                if (!string.IsNullOrEmpty(textMesh.Text))
+                {
+                    GetValidClothingMeshes(textMesh.Text);
+                }
             }
         }
         #endregion
@@ -1434,6 +1513,30 @@ namespace RepositoryWizard
             if ((ageFlags & 0x0010) == 0x0010) age += " ,Elders";
 
             return age.Length > 0 ? age.Substring(2) : "";
+        }
+
+        private string BuildAgeCodeString(uint ageCode)
+        {
+            switch (ageCode)
+            {
+                case 0x0020:
+                    return "B";
+                case 0x0001:
+                    return "P";
+                case 0x0002:
+                    return "C";
+                case 0x0004:
+                    return "T";
+                case 0x0040:
+                    return "YA";
+                case 0x0008:
+                case 0x0048:
+                    return "A";
+                case 0x0010:
+                    return "E";
+            }
+
+            return "X";
         }
 
         private string BuildCategoryString(uint categoryFlags)
@@ -1652,31 +1755,7 @@ namespace RepositoryWizard
                 }
                 else if (macro.Equals("agecode"))
                 {
-                    switch (EncodeAge())
-                    {
-                        case 0x0020:
-                            subst = "B";
-                            break;
-                        case 0x0001:
-                            subst = "P";
-                            break;
-                        case 0x0002:
-                            subst = "C";
-                            break;
-                        case 0x0004:
-                            subst = "T";
-                            break;
-                        case 0x0040:
-                            subst = "YA";
-                            break;
-                        case 0x0008:
-                        case 0x0048:
-                            subst = "A";
-                            break;
-                        case 0x0010:
-                            subst = "E";
-                            break;
-                    }
+                    subst = BuildAgeCodeString(EncodeAge());
                 }
                 else if (macro.Equals("age"))
                 {
@@ -1973,13 +2052,30 @@ namespace RepositoryWizard
         {
             if (openMeshDialog.ShowDialog() == DialogResult.OK)
             {
-                if (IsValidClothingMesh(openMeshDialog.FileName, true))
-                {
-                    textMesh.Text = openMeshDialog.FileName;
-                }
-
-                UpdateFormState();
+                GetValidClothingMeshes(openMeshDialog.FileName);
             }
+        }
+
+        private void PopulateClothingMeshes()
+        {
+            comboMesh.Items.Clear();
+
+            if (clothingMeshes.Count != 1)
+            {
+                comboMesh.Items.Add("(select ...)");
+            }
+
+            foreach (RepoWizardClothingMesh clothingMesh in clothingMeshes.Values)
+            {
+                comboMesh.Items.Add(clothingMesh);
+            }
+
+            ControlHelper.SetDropDownWidth(comboMesh);
+
+            comboMesh.SelectedIndex = 0;
+            comboMesh.Focus();
+
+            UpdateSaveAsState();
         }
 
         private void OnMasterButtonClicked(object sender, EventArgs e)
@@ -2152,25 +2248,7 @@ namespace RepositoryWizard
 
             if (menuItemModeClothing.Checked)
             {
-                DBPFKey newMeshCresKey;
-                Shpe newMeshShpe = null;
-                Gmdc newMeshGmdc = null;
-
-                using (DBPFFile meshPackage = new DBPFFile(textMesh.Text))
-                {
-                    // We did all the verification that these resources exist when we opened the mesh
-                    newMeshCresKey = meshPackage.GetEntriesByType(Cres.TYPE)[0];
-                    Cres meshCres = (Cres)meshPackage.GetResourceByKey(newMeshCresKey);
-                    newMeshShpe = (Shpe)meshPackage.GetResourceByKey(meshCres.ShpeKeys[0]);
-
-                    if (menuItemVerifyGmdcSubsets.Checked)
-                    {
-                        Gmnd newMeshGmnd = (Gmnd)meshPackage.GetResourceByName(Gmnd.TYPE, newMeshShpe.GmndNames[0]);
-                        newMeshGmdc = (Gmdc)meshPackage.GetResourceByKey(newMeshGmnd.GmdcKeys[0]);
-                    }
-
-                    meshPackage.Close();
-                }
+                RepoWizardClothingMesh clothingMesh = clothingMeshes.Values[(comboMesh.Items.Count == 1 ? 0 : (comboMesh.SelectedIndex - 1))];
 
                 if (menuItemAutoMerge.Checked)
                 {
@@ -2180,7 +2258,7 @@ namespace RepositoryWizard
 
                         foreach (DataGridViewRow row in gridResources.SelectedRows)
                         {
-                            int exitCode = SaveClothingRow(dbpfPackage, row, newMeshCresKey, newMeshShpe, menuItemVerifyShpeSubsets.Checked, newMeshGmdc, menuItemVerifyGmdcSubsets.Checked);
+                            int exitCode = SaveClothingRow(dbpfPackage, row, clothingMesh, menuItemVerifyShpeSubsets.Checked, menuItemVerifyGmdcSubsets.Checked);
 
                             if (exitCode == 1)
                             {
@@ -2219,7 +2297,7 @@ namespace RepositoryWizard
 
                         using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(rowPackageFile))
                         {
-                            exitCode = SaveClothingRow(dbpfPackage, row, newMeshCresKey, newMeshShpe, menuItemVerifyShpeSubsets.Checked, newMeshGmdc, menuItemVerifyGmdcSubsets.Checked);
+                            exitCode = SaveClothingRow(dbpfPackage, row, clothingMesh, menuItemVerifyShpeSubsets.Checked, menuItemVerifyGmdcSubsets.Checked);
 
                             if (exitCode == 1)
                             {
@@ -2473,7 +2551,7 @@ namespace RepositoryWizard
             }
         }
 
-        private int SaveClothingRow(CacheableDbpfFile dbpfPackage, DataGridViewRow row, DBPFKey newMeshCresKey, Shpe newMeshShpe, bool verifyShpeSubsets, Gmdc newMeshGmdc, bool verifyGmdcSubsets)
+        private int SaveClothingRow(CacheableDbpfFile dbpfPackage, DataGridViewRow row, RepoWizardClothingMesh clothingMesh, bool verifyShpeSubsets, bool verifyGmdcSubsets)
         {
             RepoWizardDbpfData selectedResource = row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
 
@@ -2503,7 +2581,7 @@ namespace RepositoryWizard
                     }
                 }
 
-                if (verifyShpeSubsets && !newMeshShpe.Subsets.Contains(subset))
+                if (verifyShpeSubsets && !clothingMesh.ShpeSubsets.Contains(subset))
                 {
                     logger.Warn($"Subset '{subset}' is missing in mesh's SHPE, skipping '{ExpandMacros(row, "{id}", false)}'");
                     if (MsgBox.Show($"Subset '{subset}' is missing in mesh's SHPE, skipping '{ExpandMacros(row, "{id}", false)}'\n\nPress 'OK' to ignore this resource or 'Cancel' to stop.", "Mesh error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
@@ -2514,7 +2592,7 @@ namespace RepositoryWizard
                     return 0;
                 }
 
-                if (verifyGmdcSubsets && !newMeshGmdc.Subsets.Contains(subset))
+                if (verifyGmdcSubsets && !clothingMesh.GmdcSubsets.Contains(subset))
                 {
                     logger.Warn($"Subset '{subset}' is missing in mesh's GMDC, skipping '{ExpandMacros(row, "{id}", false)}'");
                     if (MsgBox.Show($"Subset '{subset}' is missing in mesh's GMDC, skipping '{ExpandMacros(row, "{id}", false)}'\n\nPress 'OK' to ignore this resource or 'Cancel' to stop.", "Mesh error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
@@ -2580,8 +2658,8 @@ namespace RepositoryWizard
             Idr idr = selectedResource.CloneIdrForBinx(newGroupID);
 
             // Change CRES and SHPE refs to new mesh
-            idr.SetItem(gzps.GetItem("resourcekeyidx").UIntegerValue, newMeshCresKey);
-            idr.SetItem(gzps.GetItem("shapekeyidx").UIntegerValue, newMeshShpe);
+            idr.SetItem(gzps.GetItem("resourcekeyidx").UIntegerValue, clothingMesh.CresKey);
+            idr.SetItem(gzps.GetItem("shapekeyidx").UIntegerValue, clothingMesh.ShpeKey);
 
             // Change GZPS ref to new GZPS
             idr.SetItem(binx.ObjectIdx, new DBPFKey(gzps));
@@ -2763,6 +2841,8 @@ namespace RepositoryWizard
                     {
                         if (ckbDeRepoSplitFiles.Checked)
                         {
+                            Directory.CreateDirectory($"{package.PackageDir}\\{subFolderName}");
+
                             List<DBPFKey> processedCres = new List<DBPFKey>();
 
                             int index = 0;
@@ -2773,11 +2853,20 @@ namespace RepositoryWizard
                                 Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
                                 ++index;
 
+                                string gender = BuildGenderString(gzps.GetItem("gender").UIntegerValue).Substring(0, 1).ToLower();
+                                string age = BuildAgeCodeString(gzps.GetItem("age").UIntegerValue).ToLower();
+
+                                string splitPackageBase = $"{package.PackageNameNoExtn}_{index}_{age}{gender}";
+
                                 string gzpsName = gzps.Name;
                                 int pos = gzpsName.LastIndexOf("_");
-                                string suffix = (pos != -1) ? gzpsName.Substring(pos) : index.ToString();
 
-                                using (DBPFFile splitPackage = new DBPFFile($"{package.PackageDir}\\{package.PackageNameNoExtn}{suffix}.package"))
+                                if (pos != -1)
+                                {
+                                    splitPackageBase = $"{splitPackageBase}{gzpsName.Substring(pos)}";
+                                }
+
+                                using (DBPFFile splitPackage = new DBPFFile($"{package.PackageDir}\\{subFolderName}\\{splitPackageBase}.package"))
                                 {
                                     splitPackage.Commit(gzps, true);
                                     splitPackage.Commit(idr, true);
@@ -2803,7 +2892,7 @@ namespace RepositoryWizard
                                         }
                                     }
 
-                                    splitPackage.Update(subFolderName);
+                                    splitPackage.Update(false);
 
                                     splitPackage.Close();
                                 }
@@ -2816,32 +2905,27 @@ namespace RepositoryWizard
                                     {
                                         processedCres.Add(cresKey);
 
-                                        string meshId = (processedCres.Count == 1) ? "" : $"_{processedCres.Count}";
-                                        using (DBPFFile meshPackage = new DBPFFile($"{package.PackageDir}\\{package.PackageNameNoExtn}_MESH{meshId}.package"))
+                                        if (keyToPackage.TryGetValue(cresKey, out string cresPackageFile))
                                         {
-                                            Cres cres = (Cres)package.GetResourceByKey(cresKey);
-                                            meshPackage.Commit(cres, true);
+                                            string meshId = (processedCres.Count == 1) ? "" : $"_{processedCres.Count}";
 
-                                            foreach (DBPFKey shpeKey in cres.ShpeKeys)
+                                            if (cresPackageFile.Equals(package.PackagePath))
                                             {
-                                                Shpe shpe = (Shpe)package.GetResourceByKey(shpeKey);
-                                                meshPackage.Commit(shpe, true);
-
-                                                foreach (string gmndName in shpe.GmndNames)
+                                                CopyMesh(package, cresKey, $"{package.PackageDir}\\{package.PackageNameNoExtn}_MESH{meshId}.package", subFolderName);
+                                            }
+                                            else
+                                            {
+                                                using (DBPFFile originalMeshPackage = new DBPFFile(cresPackageFile))
                                                 {
-                                                    Gmnd gmnd = (Gmnd)package.GetResourceByName(Gmnd.TYPE, gmndName);
-                                                    meshPackage.Commit(gmnd, true);
+                                                    CopyMesh(originalMeshPackage, cresKey, $"{package.PackageDir}\\{package.PackageNameNoExtn}_MESH{meshId}.package", subFolderName);
 
-                                                    foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
-                                                    {
-                                                        meshPackage.Commit(gmdcKey, package.GetItemByKey(gmdcKey));
-                                                    }
+                                                    originalMeshPackage.Close();
                                                 }
                                             }
-
-                                            meshPackage.Update(subFolderName);
-
-                                            meshPackage.Close();
+                                        }
+                                        else
+                                        {
+                                            textDeRepoMsgs.AppendText($"No package file available for required mesh resource '{cresKey}'\r\n");
                                         }
                                     }
                                 }
@@ -2861,9 +2945,9 @@ namespace RepositoryWizard
 
             foreach (DBPFKey meshKey in allMeshKeys)
             {
-                if (keyToPackage.TryGetValue(meshKey, out string meshPackgeFile))
+                if (keyToPackage.TryGetValue(meshKey, out string meshPackageFile))
                 {
-                    allMeshPackageFiles.Add(meshPackgeFile);
+                    allMeshPackageFiles.Add(meshPackageFile);
                 }
                 else
                 {
@@ -2873,19 +2957,88 @@ namespace RepositoryWizard
 
             foreach (string meshPackageFile in allMeshPackageFiles)
             {
-                if (ckbDeRepoCopyMeshFiles.Checked && !ckbDeRepoSplitFiles.Checked)
+                if (!ckbDeRepoSplitFiles.Checked)
                 {
-                    FileInfo fi = new FileInfo(meshPackageFile);
+                    if (ckbDeRepoCopyMeshFiles.Checked)
+                    {
+                        FileInfo fi = new FileInfo(meshPackageFile);
 
-                    File.Copy(meshPackageFile, $"{lastFolder}\\{subFolderName}\\{fi.Name}", true);
-                }
-                else
-                {
-                    textDeRepoMsgs.AppendText($"Required mesh file '{meshPackageFile.Substring(rootFolder.Length + 1)}'\r\n");
+                        File.Copy(meshPackageFile, $"{lastFolder}\\{subFolderName}\\{fi.Name}", true);
+                    }
+                    else
+                    {
+                        textDeRepoMsgs.AppendText($"Required mesh file '{meshPackageFile.Substring(rootFolder.Length + 1)}'\r\n");
+                    }
                 }
             }
 
-            textDeRepoMsgs.AppendText($"Processed {count} files in {stopwatch.ElapsedMilliseconds / 1000.0} seconds\r\n");
+            textDeRepoMsgs.AppendText($"Processed {count} file{(count == 1 ? "" : "s")} in {stopwatch.ElapsedMilliseconds / 1000.0} seconds\r\n");
+        }
+
+        private void CopyMesh(DBPFFile originalMeshPackage, DBPFKey cresKey, string meshPackagePath, string subFolderName)
+        {
+            using (DBPFFile meshPackage = new DBPFFile(meshPackagePath))
+            {
+                Cres cres = (Cres)originalMeshPackage.GetResourceByKey(cresKey);
+
+                if (cres != null)
+                {
+                    meshPackage.Commit(cres, true);
+
+                    foreach (DBPFKey shpeKey in cres.ShpeKeys)
+                    {
+                        Shpe shpe = (Shpe)originalMeshPackage.GetResourceByKey(shpeKey);
+
+                        if (shpe != null)
+                        {
+                            meshPackage.Commit(shpe, true);
+
+                            foreach (string gmndName in shpe.GmndNames)
+                            {
+                                Gmnd gmnd = (Gmnd)originalMeshPackage.GetResourceByName(Gmnd.TYPE, gmndName);
+
+                                if (gmnd != null)
+                                {
+                                    meshPackage.Commit(gmnd, true);
+
+                                    foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
+                                    {
+                                        byte[] gmdcData = originalMeshPackage.GetItemByKey(gmdcKey);
+
+                                        if (gmdcData != null)
+                                        {
+                                            meshPackage.Commit(gmdcKey, gmdcData);
+                                        }
+                                        else
+                                        {
+                                            textDeRepoMsgs.AppendText($"Mesh package file {originalMeshPackage.PackageName} is missing required resource '{gmdcKey}'\r\n");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (gmndName.StartsWith("##"))
+                                    {
+                                        textDeRepoMsgs.AppendText($"Mesh package file {originalMeshPackage.PackageName} is missing required resource '{gmndName}'\r\n");
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            textDeRepoMsgs.AppendText($"Mesh package file {originalMeshPackage.PackageName} is missing required resource '{shpeKey}'\r\n");
+                        }
+                    }
+                }
+                else
+                {
+                    textDeRepoMsgs.AppendText($"Mesh package file {originalMeshPackage.PackageName} is missing required resource '{cresKey}'\r\n");
+                }
+
+                meshPackage.Update(subFolderName);
+
+                meshPackage.Close();
+            }
         }
 
         private bool DeRepoTxmt(DBPFFile package, Idr idr, uint i, Dictionary<DBPFKey, string> keyToPackage)
@@ -2920,6 +3073,11 @@ namespace RepositoryWizard
             }
 
             return true;
+        }
+
+        private void OnMeshChanged(object sender, EventArgs e)
+        {
+            UpdateFormState();
         }
 
         private bool DeRepoTxtr(DBPFFile package, Txmt txmt, string propName, Dictionary<DBPFKey, string> keyToPackage)

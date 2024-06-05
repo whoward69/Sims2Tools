@@ -526,7 +526,7 @@
     <name>Trait - Colour - Dislike Yellow</name>
   </token>
   
-  <!-- PickNMix Memories and Tokens -->
+  <!-- PickNMix Magazines, Memories and Tokens -->
   <token>
     <value>0x0089AD0A</value>
     <name>Memory - Abortion</name>
@@ -628,12 +628,24 @@
     <name>Token - Shower Outfit Selector</name>
   </token>
   <token>
+    <value>0x0089ADC4</value>
+    <name>Magazine - Puzzling Puzzles</name>
+  </token>
+  <token>
     <value>0x0089ADC7</value>
     <name>Token - Body Hair Overlay</name>
   </token>
   <token>
+    <value>0x0089ADC8</value>
+    <name>Magazine - Dance Diva</name>
+  </token>
+  <token>
     <value>0x0089ADCC</value>
     <name>Token - Lengua Materna Overlay</name>
+  </token>
+  <token>
+    <value>0x0089ADCE</value>
+    <name>Magazine - Pot Luck</name>
   </token>
   <token>
     <value>0x0089ADD2</value>
@@ -646,6 +658,22 @@
   <token>
     <value>0x0089ADD4</value>
     <name>Memory - Cherry Popping - Double</name>
+  </token>
+  <token>
+    <value>0x0089ADD8</value>
+    <name>Magazine - Splat And Blot</name>
+  </token>
+  <token>
+    <value>0x0089ADDA</value>
+    <name>Magazine - My Zen</name>
+  </token>
+  <token>
+    <value>0x0089ADDA</value>
+    <name>Magazine - Splat And Blot</name>
+  </token>
+  <token>
+    <value>0x0089ADE9</value>
+    <name>Memory - Flunked College</name>
   </token>
   <token>
     <value>0x008F6D14</value>

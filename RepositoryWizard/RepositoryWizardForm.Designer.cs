@@ -98,9 +98,6 @@ namespace RepositoryWizard
             this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackageIcon = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnSaveAs = new System.Windows.Forms.Button();
-            this.grpMesh = new System.Windows.Forms.GroupBox();
-            this.textMesh = new System.Windows.Forms.TextBox();
-            this.btnMesh = new System.Windows.Forms.Button();
             this.gridResources = new System.Windows.Forms.DataGridView();
             this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -165,13 +162,18 @@ namespace RepositoryWizard
             this.comboMasterSecondarySubset = new System.Windows.Forms.ComboBox();
             this.comboSlaveSecondarySubset = new System.Windows.Forms.ComboBox();
             this.textDeRepoMsgs = new System.Windows.Forms.TextBox();
+            this.grpMesh = new System.Windows.Forms.GroupBox();
+            this.comboMesh = new System.Windows.Forms.ComboBox();
+            this.textMesh = new System.Windows.Forms.TextBox();
+            this.btnMesh = new System.Windows.Forms.Button();
             this.grpDeRepoOptions = new System.Windows.Forms.GroupBox();
+            this.ckbDeRepoSplitFiles = new System.Windows.Forms.CheckBox();
             this.ckbDeRepoCopyMeshFiles = new System.Windows.Forms.CheckBox();
             this.lblNoModeSelected = new System.Windows.Forms.Label();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openMeshDialog = new System.Windows.Forms.OpenFileDialog();
             this.openMasterDialog = new System.Windows.Forms.OpenFileDialog();
-            this.ckbDeRepoSplitFiles = new System.Windows.Forms.CheckBox();
+            this.repoWizardWorker = new System.ComponentModel.BackgroundWorker();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -183,7 +185,6 @@ namespace RepositoryWizard
             this.splitTopLeftRight.Panel2.SuspendLayout();
             this.splitTopLeftRight.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).BeginInit();
-            this.grpMesh.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).BeginInit();
             this.panelClothingEditor.SuspendLayout();
             this.grpGzpsName.SuspendLayout();
@@ -199,6 +200,7 @@ namespace RepositoryWizard
             this.grpMaster.SuspendLayout();
             this.grpPrimarySubset.SuspendLayout();
             this.grpSecondarySubset.SuspendLayout();
+            this.grpMesh.SuspendLayout();
             this.grpDeRepoOptions.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -504,8 +506,8 @@ namespace RepositoryWizard
             this.splitTopBottom.Panel2.Controls.Add(this.panelClothingEditor);
             this.splitTopBottom.Panel2.Controls.Add(this.panelObjectEditor);
             this.splitTopBottom.Panel2.Controls.Add(this.textDeRepoMsgs);
-            this.splitTopBottom.Panel2.Controls.Add(this.grpDeRepoOptions);
             this.splitTopBottom.Panel2.Controls.Add(this.grpMesh);
+            this.splitTopBottom.Panel2.Controls.Add(this.grpDeRepoOptions);
             this.splitTopBottom.Size = new System.Drawing.Size(984, 537);
             this.splitTopBottom.SplitterDistance = 160;
             this.splitTopBottom.TabIndex = 1;
@@ -598,41 +600,6 @@ namespace RepositoryWizard
             this.btnSaveAs.Text = "&Save As";
             this.btnSaveAs.UseVisualStyleBackColor = true;
             this.btnSaveAs.Click += new System.EventHandler(this.OnSaveAsClicked);
-            // 
-            // grpMesh
-            // 
-            this.grpMesh.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpMesh.Controls.Add(this.textMesh);
-            this.grpMesh.Controls.Add(this.btnMesh);
-            this.grpMesh.Location = new System.Drawing.Point(4, 320);
-            this.grpMesh.Name = "grpMesh";
-            this.grpMesh.Size = new System.Drawing.Size(870, 50);
-            this.grpMesh.TabIndex = 26;
-            this.grpMesh.TabStop = false;
-            this.grpMesh.Text = "Target Mesh:";
-            // 
-            // textMesh
-            // 
-            this.textMesh.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textMesh.Location = new System.Drawing.Point(6, 20);
-            this.textMesh.Name = "textMesh";
-            this.textMesh.ReadOnly = true;
-            this.textMesh.Size = new System.Drawing.Size(752, 21);
-            this.textMesh.TabIndex = 0;
-            this.textMesh.TextChanged += new System.EventHandler(this.OnMeshTextChanged);
-            // 
-            // btnMesh
-            // 
-            this.btnMesh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMesh.Location = new System.Drawing.Point(764, 17);
-            this.btnMesh.Name = "btnMesh";
-            this.btnMesh.Size = new System.Drawing.Size(100, 26);
-            this.btnMesh.TabIndex = 26;
-            this.btnMesh.Text = "Select Mesh...";
-            this.btnMesh.UseVisualStyleBackColor = true;
-            this.btnMesh.Click += new System.EventHandler(this.OnMeshButtonClicked);
             // 
             // gridResources
             // 
@@ -1347,6 +1314,53 @@ namespace RepositoryWizard
             this.textDeRepoMsgs.TabIndex = 0;
             this.textDeRepoMsgs.WordWrap = false;
             // 
+            // grpMesh
+            // 
+            this.grpMesh.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpMesh.Controls.Add(this.comboMesh);
+            this.grpMesh.Controls.Add(this.textMesh);
+            this.grpMesh.Controls.Add(this.btnMesh);
+            this.grpMesh.Location = new System.Drawing.Point(4, 320);
+            this.grpMesh.Name = "grpMesh";
+            this.grpMesh.Size = new System.Drawing.Size(878, 50);
+            this.grpMesh.TabIndex = 26;
+            this.grpMesh.TabStop = false;
+            this.grpMesh.Text = "Target Mesh:";
+            // 
+            // comboMesh
+            // 
+            this.comboMesh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboMesh.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMesh.FormattingEnabled = true;
+            this.comboMesh.Location = new System.Drawing.Point(587, 19);
+            this.comboMesh.Name = "comboMesh";
+            this.comboMesh.Size = new System.Drawing.Size(222, 23);
+            this.comboMesh.TabIndex = 27;
+            this.comboMesh.SelectedIndexChanged += new System.EventHandler(this.OnMeshChanged);
+            // 
+            // textMesh
+            // 
+            this.textMesh.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textMesh.Location = new System.Drawing.Point(6, 20);
+            this.textMesh.Name = "textMesh";
+            this.textMesh.ReadOnly = true;
+            this.textMesh.Size = new System.Drawing.Size(575, 21);
+            this.textMesh.TabIndex = 0;
+            this.textMesh.TextChanged += new System.EventHandler(this.OnMeshTextChanged);
+            // 
+            // btnMesh
+            // 
+            this.btnMesh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMesh.Location = new System.Drawing.Point(815, 17);
+            this.btnMesh.Name = "btnMesh";
+            this.btnMesh.Size = new System.Drawing.Size(57, 26);
+            this.btnMesh.TabIndex = 26;
+            this.btnMesh.Text = "Mesh...";
+            this.btnMesh.UseVisualStyleBackColor = true;
+            this.btnMesh.Click += new System.EventHandler(this.OnMeshButtonClicked);
+            // 
             // grpDeRepoOptions
             // 
             this.grpDeRepoOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -1358,6 +1372,17 @@ namespace RepositoryWizard
             this.grpDeRepoOptions.TabIndex = 26;
             this.grpDeRepoOptions.TabStop = false;
             this.grpDeRepoOptions.Text = "Standalone Options:";
+            // 
+            // ckbDeRepoSplitFiles
+            // 
+            this.ckbDeRepoSplitFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ckbDeRepoSplitFiles.AutoSize = true;
+            this.ckbDeRepoSplitFiles.Location = new System.Drawing.Point(9, 22);
+            this.ckbDeRepoSplitFiles.Name = "ckbDeRepoSplitFiles";
+            this.ckbDeRepoSplitFiles.Size = new System.Drawing.Size(79, 19);
+            this.ckbDeRepoSplitFiles.TabIndex = 1;
+            this.ckbDeRepoSplitFiles.Text = "Split Files";
+            this.ckbDeRepoSplitFiles.UseVisualStyleBackColor = true;
             // 
             // ckbDeRepoCopyMeshFiles
             // 
@@ -1400,16 +1425,11 @@ namespace RepositoryWizard
             this.openMasterDialog.Filter = "DBPF Package|*.package";
             this.openMasterDialog.Title = "Select Master...";
             // 
-            // ckbDeRepoSplitFiles
+            // repoWizardWorker
             // 
-            this.ckbDeRepoSplitFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ckbDeRepoSplitFiles.AutoSize = true;
-            this.ckbDeRepoSplitFiles.Location = new System.Drawing.Point(9, 22);
-            this.ckbDeRepoSplitFiles.Name = "ckbDeRepoSplitFiles";
-            this.ckbDeRepoSplitFiles.Size = new System.Drawing.Size(79, 19);
-            this.ckbDeRepoSplitFiles.TabIndex = 1;
-            this.ckbDeRepoSplitFiles.Text = "Split Files";
-            this.ckbDeRepoSplitFiles.UseVisualStyleBackColor = true;
+            this.repoWizardWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.RepoWizardWorker_DoWork);
+            this.repoWizardWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.RepoWizardWorker_Progress);
+            this.repoWizardWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.RepoWizardWorker_Completed);
             // 
             // RepositoryWizardForm
             // 
@@ -1443,8 +1463,6 @@ namespace RepositoryWizard
             ((System.ComponentModel.ISupportInitialize)(this.splitTopLeftRight)).EndInit();
             this.splitTopLeftRight.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).EndInit();
-            this.grpMesh.ResumeLayout(false);
-            this.grpMesh.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridResources)).EndInit();
             this.panelClothingEditor.ResumeLayout(false);
             this.grpGzpsName.ResumeLayout(false);
@@ -1468,6 +1486,8 @@ namespace RepositoryWizard
             this.grpPrimarySubset.PerformLayout();
             this.grpSecondarySubset.ResumeLayout(false);
             this.grpSecondarySubset.PerformLayout();
+            this.grpMesh.ResumeLayout(false);
+            this.grpMesh.PerformLayout();
             this.grpDeRepoOptions.ResumeLayout(false);
             this.grpDeRepoOptions.PerformLayout();
             this.ResumeLayout(false);
@@ -1593,6 +1613,8 @@ namespace RepositoryWizard
         private System.Windows.Forms.GroupBox grpGzpsName;
         private System.Windows.Forms.TextBox textGzpsName;
         private System.Windows.Forms.CheckBox ckbDeRepoSplitFiles;
+        private System.Windows.Forms.ComboBox comboMesh;
+        private System.ComponentModel.BackgroundWorker repoWizardWorker;
     }
 }
 

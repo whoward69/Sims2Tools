@@ -21,6 +21,7 @@ using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
+using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
@@ -34,14 +35,15 @@ using System.Windows.Forms;
 
 namespace SceneGraphPlus
 {
-    // TODO - 6 - ability to delete orphan (and not cloned from) blocks
-    // TODO - 7 - what about STR# Model Names and Material Names
+    // TODO - SceneGraph Plus - 6 - ability to delete orphan (and not cloned from) blocks
+    // TODO - SceneGraph Plus - 7 - what about STR# Model Names and Material Names
 
     public partial class SceneGraphPlusForm : Form
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Mmat.TYPE, Gzps.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE };
+        // When adding to this List, search for "UnderstoodTypes"
+        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Mmat.TYPE, Gzps.TYPE, Xobj.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE };
 
         private readonly DrawingSurface surface;
 
@@ -328,11 +330,11 @@ namespace SceneGraphPlus
                 UpdateForm();
             }
 
-            // TODO - 8 - do this on a background thread
+            // TODO - SceneGraph Plus - 8 - do this on a background thread
             using (DBPFFile package = new DBPFFile(packageFile))
             {
-                // TODO - 5 - what about XMOL, XTOL, etc
-                // TODO - 9 - what about LIFO?
+                // TODO - SceneGraph Plus - 5 - what about XMOL, XTOL, etc
+                // TODO - SceneGraph Plus - 9 - what about LIFO?
                 foreach (TypeTypeID typeId in UnderstoodTypeIds)
                 {
                     foreach (DBPFEntry entry in package.GetEntriesByType(typeId))
@@ -443,6 +445,7 @@ namespace SceneGraphPlus
         {
             DBPFResource res = package.GetResourceByEntry(entry);
 
+            // "UnderstoodTypes" - when adding a new resource type, need to update this block
             if (res == null)
             {
                 startBlock.IsMissing = true;
@@ -481,6 +484,19 @@ namespace SceneGraphPlus
 
                         freeCol += DrawingSurface.ColumnGap;
                     }
+                }
+            }
+            else if (res is Xobj xobj)
+            {
+                // TODO - SceneGraph Plus - 4 - Test XOBJ (wallpapers and flooring)
+                // TODO - SceneGraph Plus - 5 - what about other XOBJ types
+                if (xobj.GetItem("type").SingleValue.Equals("wall") || xobj.GetItem("type").SingleValue.Equals("floor"))
+                {
+                    startBlock.BlockName = xobj.KeyName;
+
+                    startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, xobj.GetItem("material").StringValue), ref freeCol));
+
+                    freeCol += DrawingSurface.ColumnGap;
                 }
             }
             else if (res is Cres cres)

@@ -29,6 +29,8 @@ using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DbpfCache;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 
 namespace RepositoryWizard
@@ -419,6 +421,38 @@ namespace RepositoryWizard
         public bool Equals(RepoWizardDbpfData other)
         {
             return this.cpf.Equals(other.cpf);
+        }
+    }
+
+    public class RepoWizardClothingMesh
+    {
+        private readonly string name;
+        private readonly DBPFKey cresKey;
+        private readonly DBPFKey shpeKey;
+        private readonly List<string> shpeSubsets = new List<string>();
+        private readonly List<string> gmdcSubsets = new List<string>();
+
+        public DBPFKey CresKey => cresKey;
+        public DBPFKey ShpeKey => shpeKey;
+        public ReadOnlyCollection<string> ShpeSubsets => shpeSubsets.AsReadOnly();
+        public ReadOnlyCollection<string> GmdcSubsets => gmdcSubsets.AsReadOnly();
+
+        public RepoWizardClothingMesh(Cres cres, Shpe shpe, Gmdc gmdc)
+        {
+            this.cresKey = new DBPFKey(cres);
+            this.name = cres.KeyName;
+
+            if (name.EndsWith("_cres")) name = name.Substring(0, name.Length - 5);
+
+            this.shpeKey = new DBPFKey(shpe);
+            foreach (string shpeSubset in shpe.Subsets) shpeSubsets.Add(shpeSubset);
+
+            if (gmdc != null) foreach (string gmdcSubset in gmdc.Subsets) gmdcSubsets.Add(gmdcSubset);
+        }
+
+        public override string ToString()
+        {
+            return name;
         }
     }
 }

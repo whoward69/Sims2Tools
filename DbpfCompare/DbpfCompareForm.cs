@@ -52,8 +52,6 @@ using System.Windows.Forms;
 
 namespace DbpfCompare
 {
-    // TODO - DBPF Compare - 9 - Support "Save/Load project"
-
     public partial class DbpfCompareForm : Form
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -241,23 +239,23 @@ namespace DbpfCompare
             menuItemReloadPackage.Enabled = true;
         }
 
-        // TODO - DBPF Compare - 5 - should probably be on a worker thread
         private void GetAllNodeData()
         {
             allTypeData.Clear();
             allResourceData.Clear();
 
-            DBPFFile packageLeft = new DBPFFile(textLeftPath.Text);
-            DBPFFile packageRight = new DBPFFile(textRightPath.Text);
-
-            if (packageLeft != null && packageRight != null)
+            // Should probably be on a worker thread, but what the heck!
+            using (DBPFFile packageLeft = new DBPFFile(textLeftPath.Text), packageRight = new DBPFFile(textRightPath.Text))
             {
-                GetNodeData(packageLeft, packageLeft, packageRight);
-                GetNodeData(packageRight, packageLeft, packageRight);
-            }
+                if (packageLeft != null && packageRight != null)
+                {
+                    GetNodeData(packageLeft, packageLeft, packageRight);
+                    GetNodeData(packageRight, packageLeft, packageRight);
+                }
 
-            packageLeft?.Close();
-            packageRight?.Close();
+                packageLeft?.Close();
+                packageRight?.Close();
+            }
         }
 
         private void GetNodeData(DBPFFile package, DBPFFile packageLeft, DBPFFile packageRight)
@@ -564,29 +562,29 @@ namespace DbpfCompare
             }
         }
 
-        // TODO - DBPF Compare - 5 - should probably be on a worker thread
         private void OnSaveRightPackage(object sender, EventArgs e)
         {
-            DBPFFile packageLeft = new DBPFFile(textLeftPath.Text);
-            DBPFFile packageRight = new DBPFFile(textRightPath.Text);
-
-            if (packageLeft != null && packageRight != null)
+            // Should probably be on a worker thread, but I'm not going to let you cancel the action anyway!
+            using (DBPFFile packageLeft = new DBPFFile(textLeftPath.Text), packageRight = new DBPFFile(textRightPath.Text))
             {
-                foreach (DbpfCompareNodeResourceData nodeData in allResourceData.Values)
+                if (packageLeft != null && packageRight != null)
                 {
-                    if (nodeData.IsDirty)
+                    foreach (DbpfCompareNodeResourceData nodeData in allResourceData.Values)
                     {
-                        byte[] rawData = packageLeft.GetItemByKey(nodeData.Key);
+                        if (nodeData.IsDirty)
+                        {
+                            byte[] rawData = packageLeft.GetItemByKey(nodeData.Key);
 
-                        if (rawData != null) packageRight.Commit(nodeData.Key, rawData);
+                            if (rawData != null) packageRight.Commit(nodeData.Key, rawData);
+                        }
                     }
+
+                    packageRight.Update(menuItemAutoBackup.Checked);
                 }
 
-                packageRight.Update(menuItemAutoBackup.Checked);
+                packageLeft?.Close();
+                packageRight?.Close();
             }
-
-            packageLeft?.Close();
-            packageRight?.Close();
 
             // Assuming everything went OK, do a full reload
             PopulateTrees();

@@ -347,7 +347,6 @@ namespace Sims2Tools.DBPF.Package
                     {
                         if (entriesByKey[key].UncompressedSize == 0)
                         {
-                            // TODO - _library - duplicates - a previous entry may have already set this!
                             entriesByKey[key].UncompressedSize = uncompressedSize;
                         }
                     }

@@ -96,85 +96,107 @@ namespace DbpfCompare.Controls
         private void OnLoad(object sender, EventArgs e)
         {
             RegistryTools.LoadPopupSettings(DbpfCompareApp.RegistryKey, this);
+
+            for (int i = 0; i < 5; ++i)
+            {
+                gridResCompare.Columns[i].Width = (int)RegistryTools.GetPopupSetting(DbpfCompareApp.RegistryKey, this, $"Width{i}", gridResCompare.Columns[i].Width);
+            }
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
             RegistryTools.SavePopupSettings(DbpfCompareApp.RegistryKey, this);
+
+            for (int i = 0; i < 5; ++i)
+            {
+                RegistryTools.SavePopupSetting(DbpfCompareApp.RegistryKey, this, $"Width{i}", gridResCompare.Columns[i].Width);
+            }
         }
 
-        // TODO - DBPF Compare - 5 - should probably be on a worker thread
         private void OnShow(object sender, EventArgs e)
         {
             comboVariations.Visible = false;
 
-            DBPFFile leftPackage = new DBPFFile(leftPackagePath);
-            DBPFFile rightPackage = new DBPFFile(rightPackagePath);
+            // Should probably be on a worker thread, but hey, you're not doing anything until this loads anyway!
+            using (DBPFFile leftPackage = new DBPFFile(leftPackagePath), rightPackage = new DBPFFile(rightPackagePath))
+            {
+                if (leftPackage != null && rightPackage != null)
+                {
+                    if (nodeData.TypeID == Bcon.TYPE)
+                    {
+                        ShowBcon(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Trcn.TYPE)
+                    {
+                        ShowTrcn(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Bhav.TYPE)
+                    {
+                        ShowBhav(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Tprp.TYPE)
+                    {
+                        ShowTprp(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Objd.TYPE)
+                    {
+                        ShowObjd(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Objf.TYPE)
+                    {
+                        ShowObjf(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Glob.TYPE)
+                    {
+                        ShowGlob(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Nref.TYPE)
+                    {
+                        ShowNref(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Slot.TYPE)
+                    {
+                        ShowSlot(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Idr.TYPE)
+                    {
+                        ShowIdr(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Binx.TYPE ||
+                             nodeData.TypeID == Coll.TYPE ||
+                             nodeData.TypeID == Gzps.TYPE ||
+                             nodeData.TypeID == Mmat.TYPE ||
+                             nodeData.TypeID == Vers.TYPE ||
+                             nodeData.TypeID == Sdna.TYPE ||
+                             nodeData.TypeID == Xfch.TYPE || nodeData.TypeID == Xhtn.TYPE || nodeData.TypeID == Xmol.TYPE || nodeData.TypeID == Xstn.TYPE || nodeData.TypeID == Xtol.TYPE ||
+                             nodeData.TypeID == Xflr.TYPE || nodeData.TypeID == Xfnc.TYPE || nodeData.TypeID == Xrof.TYPE ||
+                             nodeData.TypeID == Xobj.TYPE ||
+                             nodeData.TypeID == Xwnt.TYPE)
+                    {
+                        ShowCpf(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Str.TYPE || nodeData.TypeID == Ctss.TYPE || nodeData.TypeID == Ttas.TYPE)
+                    {
+                        ShowStr(leftPackage, rightPackage);
+                    }
+                    else if (nodeData.TypeID == Txmt.TYPE)
+                    {
+                        ShowTxmt(leftPackage, rightPackage);
+                    }
+                }
 
-            if (nodeData.TypeID == Bcon.TYPE)
-            {
-                ShowBcon(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Trcn.TYPE)
-            {
-                ShowTrcn(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Bhav.TYPE)
-            {
-                ShowBhav(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Tprp.TYPE)
-            {
-                ShowTprp(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Objd.TYPE)
-            {
-                ShowObjd(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Objf.TYPE)
-            {
-                ShowObjf(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Glob.TYPE)
-            {
-                ShowGlob(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Nref.TYPE)
-            {
-                ShowNref(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Slot.TYPE)
-            {
-                ShowSlot(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Idr.TYPE)
-            {
-                ShowIdr(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Binx.TYPE ||
-                     nodeData.TypeID == Coll.TYPE ||
-                     nodeData.TypeID == Gzps.TYPE ||
-                     nodeData.TypeID == Mmat.TYPE ||
-                     nodeData.TypeID == Vers.TYPE ||
-                     nodeData.TypeID == Sdna.TYPE ||
-                     nodeData.TypeID == Xfch.TYPE || nodeData.TypeID == Xhtn.TYPE || nodeData.TypeID == Xmol.TYPE || nodeData.TypeID == Xstn.TYPE || nodeData.TypeID == Xtol.TYPE ||
-                     nodeData.TypeID == Xflr.TYPE || nodeData.TypeID == Xfnc.TYPE || nodeData.TypeID == Xrof.TYPE ||
-                     nodeData.TypeID == Xobj.TYPE ||
-                     nodeData.TypeID == Xwnt.TYPE)
-            {
-                ShowCpf(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Str.TYPE || nodeData.TypeID == Ctss.TYPE || nodeData.TypeID == Ttas.TYPE)
-            {
-                ShowStr(leftPackage, rightPackage);
-            }
-            else if (nodeData.TypeID == Txmt.TYPE)
-            {
-                ShowTxmt(leftPackage, rightPackage);
+                leftPackage?.Close();
+                rightPackage?.Close();
             }
 
-            leftPackage?.Close();
-            rightPackage?.Close();
+            if (gridResCompare.Columns["colRightValue2"].Visible)
+            {
+                gridResCompare.Columns["colRightValue1"].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            }
+            else
+            {
+                gridResCompare.Columns["colRightValue1"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            }
 
             HighlightRows();
         }
@@ -813,12 +835,6 @@ namespace DbpfCompare.Controls
 
         private void PopulateLanguage(MetaData.Languages lang, Str leftStr, Str rightStr)
         {
-            gridResCompare.Columns["colKey"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            gridResCompare.Columns["colLeftValue1"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            gridResCompare.Columns["colLeftValue2"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            gridResCompare.Columns["colRightValue1"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            gridResCompare.Columns["colRightValue2"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
             dataResCompare.Clear();
 
             List<StrItem> leftItems = leftStr.LanguageItems(lang);
@@ -859,10 +875,6 @@ namespace DbpfCompare.Controls
 
         private void PopulateMaterial(int key, Txmt leftTxmt, Txmt rightTxmt)
         {
-            gridResCompare.Columns["colKey"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            gridResCompare.Columns["colLeftValue1"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            gridResCompare.Columns["colRightValue1"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
             dataResCompare.Clear();
 
             if (key == 0)
@@ -1050,17 +1062,6 @@ namespace DbpfCompare.Controls
 
         private void OnDataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            for (int i = 0; i < gridResCompare.Columns.Count - 1; i++)
-            {
-                int colw = gridResCompare.Columns[i].Width;
-                gridResCompare.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-                gridResCompare.Columns[i].Width = colw;
-            }
-
-            if (!gridResCompare.Columns["colRightValue2"].Visible)
-            {
-                gridResCompare.Columns["colRightValue1"].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            }
         }
 
         private void OnComboVariationsChanged(object sender, EventArgs e)
@@ -1238,6 +1239,30 @@ namespace DbpfCompare.Controls
             g.DrawString(textRun, font, brush, xPos, yPos, StringFormat.GenericTypographic);
 
             return g.MeasureString(textRun, font, 10000, StringFormat.GenericTypographic).Width;
+        }
+
+        private void OnCellToolTipNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
+        {
+            if (nodeData.TypeID == Bhav.TYPE)
+            {
+                if (e.ColumnIndex == 1 || e.ColumnIndex == 3)
+                {
+                    int nodeIndex = -1;
+
+                    for (int i = 0; i < e.RowIndex; ++i)
+                    {
+                        if (!string.IsNullOrEmpty(dataResCompare.Rows[i][e.ColumnIndex] as string))
+                        {
+                            ++nodeIndex;
+                        }
+                    }
+
+                    if (nodeIndex >= 0)
+                    {
+                        e.ToolTipText = $"Node {Helper.Hex2PrefixString((uint)nodeIndex)} ({nodeIndex})";
+                    }
+                }
+            }
         }
 
         private void OnDropDownDrawItem(object sender, DrawItemEventArgs e)

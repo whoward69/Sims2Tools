@@ -14,8 +14,6 @@ using Sims2Tools.DBPF.SceneGraph.TXMT;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,32 +23,20 @@ namespace Sims2Tools.Cache
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static readonly string cacheBase = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Sims2Tools/.cache/scenegraph";
-
         private static readonly TypeTypeID[] sgCachedTypes = { Cres.TYPE, Shpe.TYPE, Txmt.TYPE };
-
-        static SceneGraphCache()
-        {
-            if (!Directory.Exists(cacheBase))
-            {
-                Directory.CreateDirectory(cacheBase);
-            }
-        }
 
         private ConcurrentDictionary<DBPFKey, int> packageIndexBySgKey;
         private ConcurrentDictionary<int, List<DBPFKey>> sgKeysByPackageIndex;
 
         private readonly PackageCache packageCache;
-        private readonly string cacheName;
 
         private bool complete = false;
 
         public bool Complete => complete;
 
-        public SceneGraphCache(PackageCache packageCache, string cacheName)
+        public SceneGraphCache(PackageCache packageCache)
         {
             this.packageCache = packageCache;
-            this.cacheName = cacheName;
         }
 
         public string GetPackagePath(DBPFKey key)
@@ -67,59 +53,13 @@ namespace Sims2Tools.Cache
         {
             if (packageCache.Deserialize())
             {
-                try
-                {
-                    using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Open))
-                    {
-                        packageIndexBySgKey = (ConcurrentDictionary<DBPFKey, int>)new BinaryFormatter().Deserialize(fs);
-                        sgKeysByPackageIndex = (ConcurrentDictionary<int, List<DBPFKey>>)new BinaryFormatter().Deserialize(fs);
-                    }
+                packageIndexBySgKey = new ConcurrentDictionary<DBPFKey, int>();
+                sgKeysByPackageIndex = new ConcurrentDictionary<int, List<DBPFKey>>();
 
-                    return true;
-                }
-                catch (Exception)
-                {
-                    try
-                    {
-                        File.Delete($"{cacheBase}/{cacheName}.bin");
-                    }
-                    catch (Exception) { }
+                await BuildCacheAsync(throttler);
 
-                    packageIndexBySgKey = new ConcurrentDictionary<DBPFKey, int>();
-                    sgKeysByPackageIndex = new ConcurrentDictionary<int, List<DBPFKey>>();
-
-                    await BuildCacheAsync(throttler);
-
-                    return true;
-                }
+                return true;
             }
-
-            return false;
-        }
-
-        // This should never be called, as we can't tell when the player changes their Downloads or SavedSims contents
-        private bool Serialize()
-        {
-            if (packageCache.Serialize())
-            {
-                try
-                {
-                    using (FileStream fs = File.Open($"{cacheBase}/{cacheName}.bin", FileMode.Create))
-                    {
-                        new BinaryFormatter().Serialize(fs, packageIndexBySgKey);
-                        new BinaryFormatter().Serialize(fs, sgKeysByPackageIndex);
-                    }
-
-                    return true;
-                }
-                catch (Exception) { }
-            }
-
-            try
-            {
-                File.Delete($"{cacheBase}/{cacheName}.bin");
-            }
-            catch (Exception) { }
 
             return false;
         }

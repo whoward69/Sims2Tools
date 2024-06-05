@@ -399,6 +399,10 @@ namespace LogWatcher
                                             line += " : " + GameData.GlobalObjectsByGUID[guid];
                                             colour = Properties.Settings.Default.GameTokensColour;
                                         }
+                                        else
+                                        {
+                                            colour = Properties.Settings.Default.UnknownTokensColour;
+                                        }
                                     }
                                     else if (reTokenProperty.IsMatch(line))
                                     {

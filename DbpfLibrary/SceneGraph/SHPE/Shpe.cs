@@ -83,6 +83,21 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
             }
         }
 
+        public ReadOnlyCollection<string> GetGmndNames(int maxLoD)
+        {
+            List<string> gmndKeys = new List<string>();
+
+            foreach (ShapeItem item in cShape.Items)
+            {
+                if (item.LoD <= maxLoD)
+                {
+                    gmndKeys.Add(item.FileName);
+                }
+            }
+
+            return gmndKeys.AsReadOnly();
+        }
+
         public ReadOnlyDictionary<string, string> TxmtKeyedNames
         {
             get

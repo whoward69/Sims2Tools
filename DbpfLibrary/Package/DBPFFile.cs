@@ -240,25 +240,28 @@ namespace Sims2Tools.DBPF.Package
         {
             int lastVersion = 0;
 
-            int packageLen = packagePath.Length;
-
-            foreach (string baseFile in Directory.GetFiles($"{packageDir}", $"{packageName}.*", SearchOption.TopDirectoryOnly))
+            if (Directory.Exists(packageDir))
             {
-                if (baseFile.EndsWith(".bak"))
-                {
-                    string versionPart = baseFile.Substring(packageLen, baseFile.Length - packageLen - 4);
+                int packageLen = packagePath.Length;
 
-                    if (versionPart.Length == 0)
+                foreach (string baseFile in Directory.GetFiles($"{packageDir}", $"{packageName}.*", SearchOption.TopDirectoryOnly))
+                {
+                    if (baseFile.EndsWith(".bak"))
                     {
-                        lastVersion = 1;
-                    }
-                    else if (versionPart.StartsWith(".V"))
-                    {
-                        if (int.TryParse(versionPart.Substring(2), out int thisVersion))
+                        string versionPart = baseFile.Substring(packageLen, baseFile.Length - packageLen - 4);
+
+                        if (versionPart.Length == 0)
                         {
-                            if (thisVersion > lastVersion)
+                            lastVersion = 1;
+                        }
+                        else if (versionPart.StartsWith(".V"))
+                        {
+                            if (int.TryParse(versionPart.Substring(2), out int thisVersion))
                             {
-                                lastVersion = thisVersion;
+                                if (thisVersion > lastVersion)
+                                {
+                                    lastVersion = thisVersion;
+                                }
                             }
                         }
                     }

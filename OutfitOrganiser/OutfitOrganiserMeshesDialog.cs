@@ -147,9 +147,9 @@ namespace OutfitOrganiser
                 meshRow["PackageName"] = NameNoExtn(packagePath);
 
                 meshRow["Subsets"] = (morphs.Length == 0) ? "Unknown" : morphs.Substring(0, morphs.Length - 2);
-                meshRow["CresName"] = (cresKey == null) ? "None" : (cresPackagePath == null ? $"Needs: {cresKey}" : NameNoExtn(cresPackagePath));
-                meshRow["ShpeName"] = (shpeKey == null) ? "None" : (shpePackagePath == null ? $"Needs: {shpeKey}" : NameNoExtn(shpePackagePath));
-                meshRow["TxmtName"] = (txmtKeys.Count == 0) ? "None" : (txtmPackageNames.Length == 0 ? $"Needs: {txmtKeys[0]}" : txtmPackageNames.Substring(0, txtmPackageNames.Length - 2));
+                meshRow["CresName"] = BuildMeshPartName(cresKey, cresPackagePath);
+                meshRow["ShpeName"] = BuildMeshPartName(shpeKey, shpePackagePath);
+                meshRow["TxmtName"] = BuildMaterialsName(txmtKeys, txtmPackageNames);
 
                 meshRow["PackagePath"] = packagePath;
                 meshRow["PackageIcon"] = null;
@@ -159,6 +159,52 @@ namespace OutfitOrganiser
                 meshRow["TxmtPath"] = (txtmPackagePaths.Length == 0 ? null : txtmPackagePaths.Substring(0, txtmPackagePaths.Length - 2));
 
                 dataMeshFiles.Rows.Add(meshRow);
+            }
+        }
+
+        private string BuildMeshPartName(DBPFKey key, string packagePath)
+        {
+            if (key == null)
+            {
+                return "None";
+            }
+            else if (packagePath == null)
+            {
+                if (key.GroupID == DBPFData.GROUP_SG_MAXIS)
+                {
+                    return $"Needs: Maxis {key}";
+                }
+                else
+                {
+                    return $"Needs: {key}";
+                }
+            }
+            else
+            {
+                return NameNoExtn(packagePath);
+            }
+        }
+
+        private string BuildMaterialsName(List<DBPFKey> txmtKeys, string txtmPackageNames)
+        {
+            if (txmtKeys.Count == 0)
+            {
+                return "None";
+            }
+            else if (txtmPackageNames.Length == 0)
+            {
+                string needs = "Needs: ";
+
+                foreach (DBPFKey key in txmtKeys)
+                {
+                    needs = $"{needs} {(key.GroupID == DBPFData.GROUP_SG_MAXIS ? "Maxis " : "")}{key}, ";
+                }
+
+                return needs.Substring(0, needs.Length - 2);
+            }
+            else
+            {
+                return txtmPackageNames.Substring(0, txtmPackageNames.Length - 2);
             }
         }
 

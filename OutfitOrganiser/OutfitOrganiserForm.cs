@@ -253,14 +253,17 @@ namespace OutfitOrganiser
         {
             XmlDocument configXmlDoc = new XmlDocument();
 
-            try
+            if (File.Exists(configXmlFile))
             {
-                configXmlDoc.Load(configXmlFile);
-                logger.Info($"Loaded config {configXmlFile}");
-            }
-            catch (Exception e)
-            {
-                logger.Warn($"Config {configXmlFile} is invalid!", e);
+                try
+                {
+                    configXmlDoc.Load(configXmlFile);
+                    logger.Info($"Loaded config {configXmlFile}");
+                }
+                catch (Exception e)
+                {
+                    logger.Warn($"Config {configXmlFile} is invalid!", e);
+                }
             }
 
             return configXmlDoc;
@@ -374,8 +377,8 @@ namespace OutfitOrganiser
                 MsgBox.Show("'Sims2HomePath' not set - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
             }
 
-            downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2DownloadsPath}", "downloads"), "downloads");
-            savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims", "savedsims"), "savedsims");
+            downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2DownloadsPath}"));
+            savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims"));
             meshCachesLoaded = false;
 
             if (menuItemAdvanced.Checked && menuItemPreloadMeshes.Checked) CacheMeshes();
@@ -429,7 +432,7 @@ namespace OutfitOrganiser
             {
                 if (Sims2ToolsLib.IsSims2HomePathSet && folder.StartsWith($"{Sims2ToolsLib.Sims2DownloadsPath}"))
                 {
-                    displayPath = $" - {folder.Substring(Sims2ToolsLib.Sims2HomePath.Length + 11)}";
+                    displayPath = $" - {folder.Substring(Sims2ToolsLib.Sims2HomePath.Length + 1)}";
                 }
                 else
                 {

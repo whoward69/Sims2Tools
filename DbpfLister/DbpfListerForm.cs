@@ -7,7 +7,13 @@ using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.CRES;
+using Sims2Tools.DBPF.SceneGraph.GMDC;
+using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.SHPE;
+using Sims2Tools.DBPF.SceneGraph.TXMT;
+using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
@@ -48,7 +54,12 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
-            DumpAllMaxisCres("C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            DumpAllMaxisResources(Cres.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            DumpAllMaxisResources(Shpe.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            DumpAllMaxisResources(Gmnd.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            DumpAllMaxisResources(Gmdc.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            DumpAllMaxisResources(Txmt.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            DumpAllMaxisResources(Txtr.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
 
             // GropTesting();
 
@@ -286,39 +297,52 @@ namespace DbpfLister
             }
         }
 
-        private void DumpAllMaxisCres(string baseFolder)
+        private void DumpAllMaxisResources(TypeTypeID typeID, string baseFolder)
         {
-            Regex re = new Regex("#0x[0-9a-f]+!(0x[0-9a-f]+_?)?age[0-9]_[0-9]_cres");
+            string suffix = $"_{DBPFData.TypeName(typeID).ToLower()}";
+            Regex re = new Regex($"#0x[0-9a-f]+!(0x[0-9a-f]+_?)?age[0-9]_[0-9]{suffix}");
 
-            textMessages.AppendText($"Type ID,Group ID,Instance ID,Resource ID,Name,Relative Path\r\n");
+            textMessages.AppendText($"Processing {DBPFData.TypeName(typeID)}\r\n");
 
-            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            using (StreamWriter writer = new StreamWriter($"C:/Users/whowa/Desktop/mesh{suffix}.csv"))
             {
-                if (
-                    packagePath.Contains("\\Characters\\") ||
-                    packagePath.Contains("\\Lots\\") ||
-                    packagePath.Contains("\\LotCatalog\\") ||
-                    packagePath.Contains("\\GlobalLots\\") ||
-                    packagePath.Contains("\\LotTemplates\\")
-                   ) continue;
+                writer.WriteLine("Type ID,Group ID,Instance ID,Resource ID,Name,Relative Path");
 
-                using (DBPFFile package = new DBPFFile(packagePath))
+                foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
                 {
-                    foreach (DBPFEntry entry in package.GetEntriesByType(Cres.TYPE))
+                    if (
+                        packagePath.Contains("\\Characters\\") ||
+                        packagePath.Contains("\\Lots\\") ||
+                        packagePath.Contains("\\LotCatalog\\") ||
+                        packagePath.Contains("\\GlobalLots\\") ||
+                        packagePath.Contains("\\LotTemplates\\")
+                       ) continue;
+
+                    if (
+                        packagePath.Contains("\\FaceInfo.package") ||
+                        packagePath.Contains("\\effects.package")
+                       ) continue;
+
+                    using (DBPFFile package = new DBPFFile(packagePath))
                     {
-                        Cres cres = (Cres)package.GetResourceByEntry(entry);
+                        foreach (DBPFEntry entry in package.GetEntriesByType(typeID))
+                        {
+                            Rcol rcol = (Rcol)package.GetResourceByEntry(entry);
 
-                        string name = cres.KeyName;
+                            string name = rcol.KeyName;
 
-                        if (re.IsMatch(name.ToLower())) continue;
+                            if (re.IsMatch(name.ToLower())) continue;
 
-                        if (name.EndsWith("_cres", StringComparison.OrdinalIgnoreCase)) name = name.Substring(0, name.Length - 5);
+                            if (name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)) name = name.Substring(0, name.Length - 5);
 
-                        textMessages.AppendText($"{cres.TypeID},{cres.GroupID},{cres.InstanceID},{cres.ResourceID},{name},{packagePath.Substring(baseFolder.Length + 1)}\r\n");
+                            writer.WriteLine($"{rcol.TypeID},{rcol.GroupID},{rcol.InstanceID},{rcol.ResourceID},{name},{packagePath.Substring(baseFolder.Length + 1)}");
+                        }
+
+                        package.Close();
                     }
-
-                    package.Close();
                 }
+
+                writer.Close();
             }
         }
 

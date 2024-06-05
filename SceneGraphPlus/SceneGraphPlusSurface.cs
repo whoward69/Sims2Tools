@@ -18,6 +18,7 @@ using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
+using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DbpfCache;
 using System;
 using System.Collections.Generic;
@@ -1033,6 +1034,7 @@ namespace SceneGraphPlus.Surface
 
         private void UpdateName(DBPFResource res, AbstractGraphBlock block, bool setOgn, bool clearOgn)
         {
+            // "UnderstoodTypes" - when adding a new resource type, need to update this block
             if (res is Mmat)
             {
                 // Name is derived from associated TXMT and can't be changed
@@ -1040,6 +1042,10 @@ namespace SceneGraphPlus.Surface
             else if (res is Gzps gzps)
             {
                 gzps.GetItem("name").StringValue = block.BlockName;
+            }
+            else if (res is Xobj xobj)
+            {
+                xobj.GetItem("name").StringValue = block.BlockName;
             }
             else if (res is Cres cres)
             {
@@ -1104,6 +1110,7 @@ namespace SceneGraphPlus.Surface
 
         private void UpdateRefToChild(CacheableDbpfFile package, DBPFResource res, AbstractGraphBlock endBlock, int index, string label)
         {
+            // "UnderstoodTypes" - when adding a new resource type, need to update this block
             if (res is Mmat mmat)
             {
                 Trace.Assert(endBlock.TypeId == Cres.TYPE || endBlock.TypeId == Txmt.TYPE, "Expecting CRES or TXMT for EndBlock");
@@ -1136,6 +1143,17 @@ namespace SceneGraphPlus.Surface
                     Trace.Assert(index < gzps.GetItem("numoverrides").UIntegerValue, "Override out of range");
 
                     idr.SetItem(gzps.GetItem($"override{index}resourcekeyidx").UIntegerValue, endBlock.Key);
+                }
+            }
+            else if (res is Xobj xobj)
+            {
+                Trace.Assert(endBlock.TypeId == Txmt.TYPE, "Expecting TXMT for EndBlock");
+
+                if (endBlock.TypeId == Txmt.TYPE)
+                {
+                    Trace.Assert(index == 0, "Override out of range");
+
+                    xobj.GetItem("material").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
                 }
             }
             else if (res is Cres cres)

@@ -825,7 +825,7 @@ namespace BhavFinder
             return found;
         }
 
-        private void BhavFinderWorker_Progress(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+        private void BhavFinderWorker_Progress(object sender, ProgressChangedEventArgs e)
         {
             if (e.ProgressPercentage != 0)
             {
@@ -838,7 +838,7 @@ namespace BhavFinder
             }
         }
 
-        private void BhavFinderWorker_Completed(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        private void BhavFinderWorker_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
             lblProgress.Visible = false;
             progressBar.Visible = false;
