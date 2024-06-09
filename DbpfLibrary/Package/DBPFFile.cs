@@ -690,6 +690,13 @@ namespace Sims2Tools.DBPF.Package
             {
                 res = new Grop(entry, reader);
             }
+            //
+            // UI Resources
+            //
+            else if (entry.TypeID == Ui.TYPE)
+            {
+                res = new Ui(entry, reader);
+            }
 
             return res;
         }

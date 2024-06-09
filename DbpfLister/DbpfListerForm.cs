@@ -6,18 +6,15 @@ using Sims2Tools.DBPF.Groups;
 using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
-using Sims2Tools.DBPF.SceneGraph.CRES;
-using Sims2Tools.DBPF.SceneGraph.GMDC;
-using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
-using Sims2Tools.DBPF.SceneGraph.SHPE;
-using Sims2Tools.DBPF.SceneGraph.TXMT;
-using Sims2Tools.DBPF.SceneGraph.TXTR;
+using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
+using Sims2Tools.DBPF.UI;
 using Sims2Tools.DBPF.Utils;
+using Sims2Tools.DBPF.XFLR;
 using Sims2Tools.Files;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -54,12 +51,18 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
-            DumpAllMaxisResources(Cres.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
-            DumpAllMaxisResources(Shpe.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
-            DumpAllMaxisResources(Gmnd.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
-            DumpAllMaxisResources(Gmdc.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
-            DumpAllMaxisResources(Txmt.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
-            DumpAllMaxisResources(Txtr.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            FindUi("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP9\\TSData\\Res\\UI\\ui.package");
+
+            // FindXflr("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // FindXmolNonMeshoverlay("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // DumpAllMaxisResources(Cres.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            // DumpAllMaxisResources(Shpe.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            // DumpAllMaxisResources(Gmnd.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            // DumpAllMaxisResources(Gmdc.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            // DumpAllMaxisResources(Txmt.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
+            // DumpAllMaxisResources(Txtr.TYPE, "C:/Program Files/EA Games/The Sims 2 Ultimate Collection");
 
             // GropTesting();
 
@@ -385,6 +388,73 @@ namespace DbpfLister
             }
         }
 
+        private void FindXflr(string baseFolder)
+        {
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Xflr.TYPE))
+                        {
+                            try
+                            {
+                                Xflr xflr = (Xflr)package.GetResourceByEntry(entry);
+
+                                textMessages.AppendText($"{entry} - {packagePath}\r\n");
+                            }
+                            catch (Exception e2)
+                            {
+                                textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+        }
+
+        private void FindXmolNonMeshoverlay(string baseFolder)
+        {
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Xmol.TYPE))
+                        {
+                            try
+                            {
+                                Xmol xmol = (Xmol)package.GetResourceByEntry(entry);
+
+                                if (!"meshoverlay".Equals(xmol.GetItem("type")?.StringValue.ToLower()))
+                                {
+                                    textMessages.AppendText($"{entry} - {packagePath}\r\n");
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                                textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+        }
+
         private void FindTTAB(string packagePath)
         {
             using (DBPFFile package = new DBPFFile(packagePath))
@@ -403,6 +473,27 @@ namespace DbpfLister
                                 textMessages.AppendText($"{entry}::{item.StringIndex} Autonomy {item.Autonomy} ({Helper.Hex8PrefixString(item.Autonomy)})\r\n");
                             }
                         }
+                    }
+                    catch (Exception e)
+                    {
+                        textMessages.AppendText($"EXCEPTION: {entry} - {e.Message}\r\n");
+                    }
+                }
+
+                package.Close();
+            }
+        }
+
+        private void FindUi(string packagePath)
+        {
+            using (DBPFFile package = new DBPFFile(packagePath))
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(Ui.TYPE))
+                {
+                    // Console.WriteLine(entry);
+                    try
+                    {
+                        Ui ui = (Ui)package.GetResourceByEntry(entry);
                     }
                     catch (Exception e)
                     {

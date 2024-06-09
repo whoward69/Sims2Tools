@@ -552,7 +552,7 @@ namespace OutfitOrganiser
             }
             set
             {
-                if (IsDefaultReplacement)
+                if (!IsDefaultReplacement)
                 {
                     if (idrForBinx != null)
                     {

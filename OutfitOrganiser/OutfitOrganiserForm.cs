@@ -1946,7 +1946,7 @@ namespace OutfitOrganiser
 
         private string BuildDestinationString(uint value)
         {
-            string destination = "N/A";
+            string destination = Helper.Hex8PrefixString(value);
 
             switch (value)
             {
@@ -2581,21 +2581,21 @@ namespace OutfitOrganiser
             {
                 if (cachedDestinationValue != newDestinationValue)
                 {
-                    comboDestination.SelectedIndex = 0;
+                    comboDestination.SelectedIndex = -1;
                 }
             }
             else
             {
                 cachedDestinationValue = newDestinationValue;
-                comboDestination.SelectedIndex = 0;
-                comboDestination.Enabled = false;
+                comboDestination.SelectedIndex = -1;
+                // comboDestination.Enabled = true;
 
                 foreach (object o in comboDestination.Items)
                 {
                     if ((o as UintNamedValue).Value == cachedDestinationValue)
                     {
                         comboDestination.SelectedItem = o;
-                        comboDestination.Enabled = true;
+                        // comboDestination.Enabled = true;
                         break;
                     }
                 }
@@ -2771,7 +2771,7 @@ namespace OutfitOrganiser
                 {
                     comboDestination.Enabled = (comboJewelry.SelectedIndex != 0);
 
-                    if (comboDestination.Enabled) UpdateSelectedRows((comboDestination.SelectedItem as UintNamedValue).Value, "destination");
+                    if (comboDestination.Enabled && comboDestination.SelectedIndex != -1) UpdateSelectedRows((comboDestination.SelectedItem as UintNamedValue).Value, "destination");
                     UpdateSelectedRows((comboJewelry.SelectedItem as UintNamedValue).Value, "jewelry");
 
                     ReloadEditor();
@@ -3571,6 +3571,8 @@ namespace OutfitOrganiser
 
         private void SaveAll()
         {
+            bool forceReload = false;
+
             foreach (DataGridViewRow packageRow in gridPackageFiles.Rows)
             {
                 string packagePath = packageRow.Cells["colPackagePath"].Value as string;
@@ -3582,9 +3584,10 @@ namespace OutfitOrganiser
                         if (package.Update(menuItemAutoBackup.Checked) == null)
                         {
                             MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!\n\nChanges are in the associated .temp file.", "Package Update Error!");
+
+                            forceReload = true;
                         }
 
-                        // Do this regardless, as the failed Update() will have written a temp/backup file and re-opened the locked file.
                         packageCache.SetClean(package);
 
                         foreach (DataGridViewRow resourceRow in gridResources.Rows)
@@ -3613,6 +3616,11 @@ namespace OutfitOrganiser
                     logger.Warn("Error trying to update cigen.package", e);
                     MsgBox.Show("Error trying to update cigen.package", "Package Update Error!");
                 }
+            }
+
+            if (forceReload)
+            {
+                DoWork_FillResourceGrid(lastFolder);
             }
         }
         #endregion
