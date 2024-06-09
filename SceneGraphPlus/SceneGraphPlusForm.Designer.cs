@@ -62,8 +62,8 @@ namespace SceneGraphPlus
             this.menuItemConnectorsOver = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemConnectorsUnder = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemClearOgn = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSetOgn = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemClearOptionalNames = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSetOptionalNames = new System.Windows.Forms.ToolStripMenuItem();
             this.menuGrid = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGridRealign = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -72,9 +72,11 @@ namespace SceneGraphPlus
             this.menuItemGridFine = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemGridDrop = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuPackages = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.btnSaveAll = new System.Windows.Forms.Button();
             this.btnFixTgi = new System.Windows.Forms.Button();
             this.textBlockName = new System.Windows.Forms.TextBox();
             this.lblBlockName = new System.Windows.Forms.Label();
@@ -87,7 +89,7 @@ namespace SceneGraphPlus
             this.lblBlockPackagePath = new System.Windows.Forms.Label();
             this.textBlockPackagePath = new System.Windows.Forms.TextBox();
             this.btnFixIssues = new System.Windows.Forms.Button();
-            this.menuPackages = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemPrefixOptionalNames = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel2.SuspendLayout();
@@ -257,8 +259,9 @@ namespace SceneGraphPlus
             this.menuItemConnectorsOver,
             this.menuItemConnectorsUnder,
             this.toolStripSeparator5,
-            this.menuItemClearOgn,
-            this.menuItemSetOgn});
+            this.menuItemClearOptionalNames,
+            this.menuItemSetOptionalNames,
+            this.menuItemPrefixOptionalNames});
             this.menuOptions.Name = "menuOptions";
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
@@ -302,21 +305,21 @@ namespace SceneGraphPlus
             this.toolStripSeparator5.Name = "toolStripSeparator5";
             this.toolStripSeparator5.Size = new System.Drawing.Size(278, 6);
             // 
-            // menuItemClearOgn
+            // menuItemClearOptionalNames
             // 
-            this.menuItemClearOgn.CheckOnClick = true;
-            this.menuItemClearOgn.Name = "menuItemClearOgn";
-            this.menuItemClearOgn.Size = new System.Drawing.Size(281, 22);
-            this.menuItemClearOgn.Text = "&Clear All Obj Graph Node Names";
-            this.menuItemClearOgn.Click += new System.EventHandler(this.OnClearAllOgn);
+            this.menuItemClearOptionalNames.CheckOnClick = true;
+            this.menuItemClearOptionalNames.Name = "menuItemClearOptionalNames";
+            this.menuItemClearOptionalNames.Size = new System.Drawing.Size(281, 22);
+            this.menuItemClearOptionalNames.Text = "&Clear All Optional Names";
+            this.menuItemClearOptionalNames.Click += new System.EventHandler(this.OnClearAllOptionalNames);
             // 
-            // menuItemSetOgn
+            // menuItemSetOptionalNames
             // 
-            this.menuItemSetOgn.CheckOnClick = true;
-            this.menuItemSetOgn.Name = "menuItemSetOgn";
-            this.menuItemSetOgn.Size = new System.Drawing.Size(281, 22);
-            this.menuItemSetOgn.Text = "Always &Set Obj Graph Node Names";
-            this.menuItemSetOgn.Click += new System.EventHandler(this.OnAlwaysSetOgn);
+            this.menuItemSetOptionalNames.CheckOnClick = true;
+            this.menuItemSetOptionalNames.Name = "menuItemSetOptionalNames";
+            this.menuItemSetOptionalNames.Size = new System.Drawing.Size(281, 22);
+            this.menuItemSetOptionalNames.Text = "Always &Set Optional Names";
+            this.menuItemSetOptionalNames.Click += new System.EventHandler(this.OnAlwaysSetOptionalNames);
             // 
             // menuGrid
             // 
@@ -382,6 +385,13 @@ namespace SceneGraphPlus
             this.menuItemGridDrop.Text = "&Drop To Grid";
             this.menuItemGridDrop.CheckedChanged += new System.EventHandler(this.OnGridDropChanged);
             // 
+            // menuPackages
+            // 
+            this.menuPackages.Name = "menuPackages";
+            this.menuPackages.Size = new System.Drawing.Size(68, 20);
+            this.menuPackages.Text = "&Packages";
+            this.menuPackages.DropDownOpening += new System.EventHandler(this.OnPackagesOpening);
+            // 
             // menuItemSeparator4
             // 
             this.menuItemSeparator4.Name = "menuItemSeparator4";
@@ -407,6 +417,7 @@ namespace SceneGraphPlus
             // 
             // splitContainer.Panel2
             // 
+            this.splitContainer.Panel2.Controls.Add(this.btnSaveAll);
             this.splitContainer.Panel2.Controls.Add(this.btnFixTgi);
             this.splitContainer.Panel2.Controls.Add(this.textBlockName);
             this.splitContainer.Panel2.Controls.Add(this.lblBlockName);
@@ -423,6 +434,17 @@ namespace SceneGraphPlus
             this.splitContainer.Size = new System.Drawing.Size(1157, 604);
             this.splitContainer.SplitterDistance = 500;
             this.splitContainer.TabIndex = 2;
+            // 
+            // btnSaveAll
+            // 
+            this.btnSaveAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSaveAll.Location = new System.Drawing.Point(1077, 5);
+            this.btnSaveAll.Name = "btnSaveAll";
+            this.btnSaveAll.Size = new System.Drawing.Size(71, 23);
+            this.btnSaveAll.TabIndex = 12;
+            this.btnSaveAll.Text = "Save All";
+            this.btnSaveAll.UseVisualStyleBackColor = true;
+            this.btnSaveAll.Click += new System.EventHandler(this.OnSaveAll);
             // 
             // btnFixTgi
             // 
@@ -539,8 +561,9 @@ namespace SceneGraphPlus
             this.textBlockPackagePath.Location = new System.Drawing.Point(101, 6);
             this.textBlockPackagePath.Name = "textBlockPackagePath";
             this.textBlockPackagePath.ReadOnly = true;
-            this.textBlockPackagePath.Size = new System.Drawing.Size(1047, 21);
+            this.textBlockPackagePath.Size = new System.Drawing.Size(970, 21);
             this.textBlockPackagePath.TabIndex = 0;
+            this.textBlockPackagePath.Click += new System.EventHandler(this.OnSaveAll);
             // 
             // btnFixIssues
             // 
@@ -553,12 +576,12 @@ namespace SceneGraphPlus
             this.btnFixIssues.UseVisualStyleBackColor = true;
             this.btnFixIssues.Click += new System.EventHandler(this.OnFixIssuesClicked);
             // 
-            // menuPackages
+            // menuItemPrefixOptionalNames
             // 
-            this.menuPackages.Name = "menuPackages";
-            this.menuPackages.Size = new System.Drawing.Size(68, 20);
-            this.menuPackages.Text = "&Packages";
-            this.menuPackages.DropDownOpening += new System.EventHandler(this.OnPackagesOpening);
+            this.menuItemPrefixOptionalNames.CheckOnClick = true;
+            this.menuItemPrefixOptionalNames.Name = "menuItemPrefixOptionalNames";
+            this.menuItemPrefixOptionalNames.Size = new System.Drawing.Size(281, 22);
+            this.menuItemPrefixOptionalNames.Text = "Optional Names Have Group &Prefix";
             // 
             // SceneGraphPlusForm
             // 
@@ -604,7 +627,7 @@ namespace SceneGraphPlus
         private System.Windows.Forms.OpenFileDialog selectFileDialog;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuOptions;
-        private System.Windows.Forms.ToolStripMenuItem menuItemClearOgn;
+        private System.Windows.Forms.ToolStripMenuItem menuItemClearOptionalNames;
         private System.Windows.Forms.SplitContainer splitContainer;
         private System.Windows.Forms.ToolStripMenuItem menuItemClearPackages;
         private System.Windows.Forms.ToolStripMenuItem menuGrid;
@@ -624,7 +647,7 @@ namespace SceneGraphPlus
         private System.Windows.Forms.TextBox textBlockSgName;
         private System.Windows.Forms.Label lblBlockSgName;
         private System.Windows.Forms.Button btnFixTgi;
-        private System.Windows.Forms.ToolStripMenuItem menuItemSetOgn;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSetOptionalNames;
         private System.Windows.Forms.TextBox textBlockName;
         private System.Windows.Forms.Label lblBlockName;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
@@ -640,5 +663,7 @@ namespace SceneGraphPlus
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.Button btnFixIssues;
         private System.Windows.Forms.ToolStripMenuItem menuPackages;
+        private System.Windows.Forms.Button btnSaveAll;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPrefixOptionalNames;
     }
 }

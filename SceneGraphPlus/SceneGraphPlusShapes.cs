@@ -9,6 +9,8 @@
 using SceneGraphPlus.Cache;
 using SceneGraphPlus.Surface;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.STR;
+using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,6 +24,19 @@ namespace SceneGraphPlus.Shapes
     public abstract class AbstractGraphShape
     {
         protected DrawingSurface surface;
+        private bool _dirty = false;
+
+        public virtual bool IsDirty => _dirty;
+
+        public virtual void SetDirty()
+        {
+            _dirty = true;
+        }
+
+        public virtual void SetClean()
+        {
+            _dirty = false;
+        }
 
         private bool borderVisible = false;
 
@@ -74,8 +89,10 @@ namespace SceneGraphPlus.Shapes
         protected AbstractGraphBlock startBlock = null;
         protected AbstractGraphBlock endBlock = null;
 
-        protected AbstractGraphConnector(DrawingSurface surface) : base(surface)
+        protected AbstractGraphConnector(DrawingSurface surface, AbstractGraphBlock startBlock, AbstractGraphBlock endBlock) : base(surface)
         {
+            this.startBlock = startBlock;
+            this.endBlock = endBlock;
         }
 
         public override Point Centre
@@ -108,22 +125,18 @@ namespace SceneGraphPlus.Shapes
             set => label = value;
         }
 
-        public AbstractGraphBlock StartBlock
-        {
-            get => startBlock;
-            set => startBlock = value;
-        }
+        public AbstractGraphBlock StartBlock => startBlock;
 
-        public AbstractGraphBlock EndBlock
-        {
-            get => endBlock;
-            set
-            {
-                endBlock?.DisconnectFrom(this);
+        public AbstractGraphBlock EndBlock => endBlock;
 
-                endBlock = value;
-                endBlock.ConnectedFrom(this);
-            }
+        public void SetEndBlock(AbstractGraphBlock block, bool makesDirty)
+        {
+            endBlock?.DisconnectFrom(this);
+
+            endBlock = block;
+            endBlock.ConnectedFrom(this);
+
+            if (makesDirty) SetDirty();
         }
 
         public Point StartPoint => StartBlock.BestStartPoint(EndBlock);
@@ -138,19 +151,19 @@ namespace SceneGraphPlus.Shapes
 
         public override string ToolTip
         {
-            get => label;
+            get => Label ?? (StartBlock.Key.TypeID == Str.TYPE ? $"{Helper.Hex4PrefixString(Index)} ({Index})" : null);
         }
 
         public override string ToString()
         {
-            return $"{StartBlock} -{(label != null ? $"({Label})" : "")}-> {EndBlock}";
+            return $"{StartBlock} -{(ToolTip != null ? $"({ToolTip})" : "")}-> {EndBlock}";
         }
     }
 
     public class BezierArrow : AbstractGraphConnector
     {
         // See - https://learn.microsoft.com/en-us/dotnet/api/system.drawing.graphics.drawbezier?view=net-8.0&viewFallbackFrom=dotnet-plat-ext-7.0
-        public BezierArrow(DrawingSurface surface) : base(surface) { }
+        public BezierArrow(DrawingSurface surface, AbstractGraphBlock startBlock, AbstractGraphBlock endBlock) : base(surface, startBlock, endBlock) { }
 
         public override GraphicsPath GetPath()
         {
@@ -332,16 +345,17 @@ namespace SceneGraphPlus.Shapes
         private BlockRef blockRef = null;
         private string blockName = null;
 
-        private bool dirty = false;
         private bool missing = false;
         private bool editing = false;
+        private bool deleted = false;
 
         private bool fileListValid = true;
 
         protected AbstractGraphBlock clonedFrom = null;
 
-        public bool IsDirty => (IsClone ? clonedFrom.IsDirty : dirty);
-        public void SetDirty()
+        public override bool IsDirty => (IsClone ? clonedFrom.IsDirty : (base.IsDirty || deleted));
+
+        public override void SetDirty()
         {
             if (IsClone)
             {
@@ -349,17 +363,24 @@ namespace SceneGraphPlus.Shapes
             }
             else
             {
-                dirty = true;
+                base.SetDirty();
             }
         }
 
-        public void SetClean()
+        public override void SetClean()
         {
             Trace.Assert(!IsClone, "Can't mark a clone as clean!");
 
             blockRef.SetClean();
 
-            dirty = false;
+            base.SetClean();
+        }
+
+        public bool IsDeleted => deleted;
+
+        public void Delete()
+        {
+            deleted = true;
         }
 
         protected BlockRef BlockRef => (IsClone ? clonedFrom.BlockRef : blockRef);
@@ -461,13 +482,15 @@ namespace SceneGraphPlus.Shapes
         {
             get
             {
-                if (BlockRef.SgFullName == null) return null;
+                string sgFullName = SgFullName;
 
-                int pos = BlockRef.SgFullName.IndexOf("!");
+                if (sgFullName == null) return null;
 
-                if (pos == -1) return BlockRef.SgFullName;
+                int pos = sgFullName.IndexOf("!");
 
-                string sgName = BlockRef.SgFullName.Substring(pos + 1);
+                if (pos == -1) return sgFullName;
+
+                string sgName = sgFullName.Substring(pos + 1);
 
                 pos = sgName.LastIndexOf("_");
 
@@ -477,7 +500,7 @@ namespace SceneGraphPlus.Shapes
             }
         }
 
-        public bool HasIssues => !dirty && !IsFileListValid;
+        public bool HasIssues => !IsDirty && !IsFileListValid;
 
         public void FixIssues()
         {
@@ -554,7 +577,7 @@ namespace SceneGraphPlus.Shapes
 
         public Color FillColour
         {
-            get => IsMaxis ? MaxisBlockColour : (IsMissing ? MissingBlockColour : (IsClone ? CloneBlockColour : fillColour));
+            get => IsMissing ? (IsMaxis ? MaxisBlockColour : MissingBlockColour) : (IsClone ? CloneBlockColour : fillColour);
             set => fillColour = value;
         }
 
@@ -579,7 +602,7 @@ namespace SceneGraphPlus.Shapes
 
         public void ConnectTo(int index, string label, AbstractGraphBlock endBlock)
         {
-            AbstractGraphConnector connector = new BezierArrow(surface) { StartBlock = this, EndBlock = endBlock, Index = index, Label = label };
+            AbstractGraphConnector connector = new BezierArrow(surface, this, endBlock) { Index = index, Label = label };
             outConnectors.Add(connector);
         }
 
@@ -706,6 +729,8 @@ namespace SceneGraphPlus.Shapes
 
         public virtual void Draw(Graphics g, bool hideMissingBlocks)
         {
+            if (IsDeleted) return;
+
             if (hideMissingBlocks)
             {
                 if (IsMissing) return;
@@ -726,7 +751,7 @@ namespace SceneGraphPlus.Shapes
 
             Font textFont = SystemFonts.DefaultFont;
 
-            if (dirty)
+            if (IsDirty)
             {
                 textFont = new Font(textFont, FontStyle.Bold);
             }
@@ -742,6 +767,8 @@ namespace SceneGraphPlus.Shapes
 
         public bool Equals(AbstractGraphBlock that)
         {
+            if (that == null) return false;
+
             if (this.IsClone && that.IsClone)
             {
                 return this == that;

@@ -18,8 +18,16 @@ using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
+using Sims2Tools.DBPF.SceneGraph.XMOL;
+using Sims2Tools.DBPF.SceneGraph.XTOL;
+using Sims2Tools.DBPF.STR;
+using Sims2Tools.DBPF.Utils;
+using Sims2Tools.DBPF.XFLR;
+using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
+using Sims2Tools.DBPF.XROF;
 using Sims2Tools.DbpfCache;
+using Sims2Tools.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,6 +53,9 @@ namespace SceneGraphPlus.Surface
         private readonly Label lblTooltip = new Label();
 
         private readonly ContextMenuStrip menuContextBlock;
+        private readonly ToolStripMenuItem menuItemContextDelete;
+        private readonly ToolStripMenuItem menuItemContextFixTgir;
+        private readonly ToolStripMenuItem menuItemContextFixFileList;
         private readonly ToolStripMenuItem menuItemContextCopySgName;
         private readonly ToolStripMenuItem menuItemContextClosePackage;
 
@@ -81,14 +92,32 @@ namespace SceneGraphPlus.Surface
 
             {
                 menuContextBlock = new ContextMenuStrip();
+                menuItemContextDelete = new ToolStripMenuItem();
+                menuItemContextFixTgir = new ToolStripMenuItem();
+                menuItemContextFixFileList = new ToolStripMenuItem();
                 menuItemContextCopySgName = new ToolStripMenuItem();
                 menuItemContextClosePackage = new ToolStripMenuItem();
                 menuContextBlock.SuspendLayout();
 
-                menuContextBlock.Items.AddRange(new ToolStripItem[] { menuItemContextCopySgName, menuItemContextClosePackage });
+                menuContextBlock.Items.AddRange(new ToolStripItem[] { menuItemContextDelete, menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextCopySgName, menuItemContextClosePackage });
                 menuContextBlock.Name = "menuContextBlock";
                 menuContextBlock.Size = new Size(223, 48);
                 menuContextBlock.Opening += new CancelEventHandler(OnContextBlockOpening);
+
+                menuItemContextDelete.Name = "menuItemContextDelete";
+                menuItemContextDelete.Size = new Size(222, 22);
+                menuItemContextDelete.Text = "Delete";
+                menuItemContextDelete.Click += new EventHandler(OnContextBlockDelete);
+
+                menuItemContextFixTgir.Name = "menuItemContextFixTgir";
+                menuItemContextFixTgir.Size = new Size(222, 22);
+                menuItemContextFixTgir.Text = "Fix TGI";
+                menuItemContextFixTgir.Click += new EventHandler(OnContextBlockFixTgir);
+
+                menuItemContextFixFileList.Name = "menuItemContextFixFileList";
+                menuItemContextFixFileList.Size = new Size(222, 22);
+                menuItemContextFixFileList.Text = "Fix File List";
+                menuItemContextFixFileList.Click += new EventHandler(OnContextBlockFixFileList);
 
                 menuItemContextCopySgName.Name = "menuItemContextCopySgName";
                 menuItemContextCopySgName.Size = new Size(222, 22);
@@ -132,7 +161,7 @@ namespace SceneGraphPlus.Surface
 
             DoubleBuffered = true;
 
-            Reset();
+            Reset(false);
         }
 
         public bool IsDirty
@@ -278,6 +307,13 @@ namespace SceneGraphPlus.Surface
         {
             if (shape is AbstractGraphBlock block)
             {
+                if (block.Equals(editBlock))
+                {
+                    editBlock = null;
+
+                    owningForm.UpdateEditor(editBlock);
+                }
+
                 blocks.Remove(block);
             }
             else if (shape is AbstractGraphConnector connector)
@@ -290,7 +326,7 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-        public void Reset()
+        public void Reset(bool flushEditor = true)
         {
             hideMissingBlocks = false;
 
@@ -308,6 +344,11 @@ namespace SceneGraphPlus.Surface
             connectors.Clear();
 
             Invalidate();
+
+            if (flushEditor)
+            {
+                owningForm.UpdateEditor(editBlock);
+            }
         }
 
         public int MinWidth => NextFreeCol - ColumnGap / 2;
@@ -389,38 +430,102 @@ namespace SceneGraphPlus.Surface
         {
             if (editBlock != null)
             {
-                editBlock.FixIssues();
-
-                Invalidate();
+                FixIssues(editBlock);
 
                 owningForm.UpdateEditor(editBlock);
             }
+        }
+
+        private void FixIssues(AbstractGraphBlock fixBlock)
+        {
+            fixBlock.FixIssues();
+
+            Invalidate();
         }
 
         public void FixEditingTgir()
         {
             if (editBlock != null)
             {
-                editBlock.FixTgir();
-
-                Invalidate();
+                FixTgir(editBlock);
 
                 owningForm.UpdateEditor(editBlock);
             }
         }
 
+        private void FixTgir(AbstractGraphBlock fixBlock)
+        {
+            fixBlock.FixTgir();
+
+            List<AbstractGraphBlock> relinkBlocks = new List<AbstractGraphBlock>();
+
+            foreach (AbstractGraphBlock block in blocks)
+            {
+                if (block.IsMissing)
+                {
+                    if (block.Key.Equals(fixBlock.Key))
+                    {
+                        relinkBlocks.Add(block);
+                    }
+                }
+            }
+
+            foreach (AbstractGraphBlock block in relinkBlocks)
+            {
+                // Clone the list of in connectors, so we can modify the original within the next loop
+                List<AbstractGraphConnector> inConnectors = block.GetInConnectors();
+                foreach (AbstractGraphConnector connector in inConnectors)
+                {
+                    connector.SetEndBlock(fixBlock, false);
+                    block.DisconnectFrom(connector);
+                }
+
+                block.Discard();
+            }
+
+            Invalidate();
+        }
+
         #region Context Menu
         private void OnContextBlockOpening(object sender, CancelEventArgs e)
         {
-            if (contextBlock != null)
+            if (contextBlock != null && !contextBlock.IsMissingOrClone)
             {
-                menuItemContextCopySgName.Enabled = (contextBlock?.SoleParent?.SgBaseName != null);
+                menuItemContextDelete.Enabled = (contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0);
+
+                menuItemContextFixTgir.Visible = !contextBlock.IsTgirValid;
+                menuItemContextFixFileList.Visible = !contextBlock.IsFileListValid;
+
+                menuItemContextCopySgName.Enabled = (contextBlock.SoleParent?.SgBaseName != null);
                 menuItemContextClosePackage.Enabled = !HasPendingEdits(contextBlock.PackagePath);
             }
             else
             {
                 e.Cancel = true;
             }
+        }
+
+        private void OnContextBlockDelete(object sender, EventArgs e)
+        {
+            Trace.Assert(contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0, "Cannot delete block with connectors");
+
+            contextBlock.Delete();
+
+            if (contextBlock.Equals(editBlock))
+            {
+                editBlock = null;
+                owningForm.UpdateEditor(editBlock);
+            }
+        }
+
+        private void OnContextBlockFixTgir(object sender, EventArgs e)
+        {
+            FixTgir(contextBlock);
+        }
+
+        private void OnContextBlockFixFileList(object sender, EventArgs e)
+        {
+            FixIssues(contextBlock);
         }
 
         private void OnContextBlockCopySgName(object sender, EventArgs e)
@@ -434,7 +539,10 @@ namespace SceneGraphPlus.Surface
 
                 Invalidate();
 
-                if (contextBlock.Equals(editBlock)) owningForm.UpdateEditor(editBlock);
+                if (contextBlock.Equals(editBlock))
+                {
+                    owningForm.UpdateEditor(editBlock);
+                }
             }
         }
 
@@ -483,7 +591,7 @@ namespace SceneGraphPlus.Surface
 
                 if (connector.Equals(contextConnector))
                 {
-                    connector.EndBlock = connector.EndBlock.MakeClone(new Point((ColumnGap / 8) * shiftMultiplier, (RowGap / 8) * shiftMultiplier));
+                    connector.SetEndBlock(connector.EndBlock.MakeClone(new Point((ColumnGap / 8) * shiftMultiplier, (RowGap / 8) * shiftMultiplier)), false);
 
                     ++shiftMultiplier;
                 }
@@ -613,11 +721,11 @@ namespace SceneGraphPlus.Surface
                             {
                                 dropOntoBlock.BorderVisible = false;
 
+                                // Clone the list of in connectors, so we can modify the original within the next loop
                                 List<AbstractGraphConnector> inConnectors = dropOntoBlock.GetInConnectors();
-
                                 foreach (AbstractGraphConnector connector in inConnectors)
                                 {
-                                    connector.EndBlock = selectedBlock;
+                                    connector.SetEndBlock(selectedBlock, true);
                                     dropOntoBlock.DisconnectFrom(connector);
 
                                     connector.StartBlock.SetDirty();
@@ -642,7 +750,7 @@ namespace SceneGraphPlus.Surface
 
                             AbstractGraphBlock disconnectedEndBlock = dropOntoConnector.EndBlock;
 
-                            dropOntoConnector.EndBlock = selectedBlock;
+                            dropOntoConnector.SetEndBlock(selectedBlock, true);
 
                             dropOntoConnector.StartBlock.SetDirty();
 
@@ -910,6 +1018,8 @@ namespace SceneGraphPlus.Surface
 
             // Any selected block (being dragged) is always on top
             selectedBlock?.Draw(e.Graphics, false);
+
+            owningForm.UpdateForm();
         }
 
         private void PaintBlocks(Graphics g)
@@ -960,7 +1070,7 @@ namespace SceneGraphPlus.Surface
         #endregion
 
         #region Save
-        public void SaveAll(bool autoBackup, bool setOgn, bool clearOgn)
+        public void SaveAll(bool autoBackup, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames)
         {
             DbpfFileCache packageCache = new DbpfFileCache();
             Dictionary<string, List<AbstractGraphBlock>> dirtyBlocks = new Dictionary<string, List<AbstractGraphBlock>>();
@@ -986,35 +1096,50 @@ namespace SceneGraphPlus.Surface
             {
                 CacheableDbpfFile package = packageCache.GetOrAdd(kvPair.Key);
 
-                // ... firstly update the dirty blocks' names and outbound refs ...
+                // ... firstly delete any blocks ...
                 foreach (AbstractGraphBlock block in kvPair.Value)
                 {
-                    DBPFResource res = package.GetResourceByKey(block.OriginalKey);
-                    Trace.Assert(res != null, $"Missing resource for {block.OriginalKey}");
-
-                    UpdateName(res, block, setOgn, clearOgn);
-                    UpdateRefsToChildren(package, res, block);
-
-                    package.Remove(block.OriginalKey);
-
-                    if (res is Rcol rcol)
+                    if (block.IsDeleted)
                     {
-                        rcol.FixTGIR();
-                    }
-
-                    package.Commit(res);
-                }
-
-                // ... secondly update any block that references the dirty blocks where the dirty block's name has changed ...
-                foreach (AbstractGraphBlock block in kvPair.Value)
-                {
-                    if (block.BlockName == null && !block.SgOriginalName.Equals(block.SgFullName))
-                    {
-                        UpdateRefsFromParents(packageCache, block);
+                        package.Remove(block.OriginalKey);
                     }
                 }
 
-                // ... thirdly, mark the dirty blocks as clean
+                // ... secondly update the dirty blocks' names and outbound refs ...
+                foreach (AbstractGraphBlock block in kvPair.Value)
+                {
+                    if (!block.IsDeleted)
+                    {
+                        DBPFResource res = package.GetResourceByKey(block.OriginalKey);
+                        Trace.Assert(res != null, $"Missing resource for {block.OriginalKey}");
+
+                        UpdateName(res, block, alwaysSetNames, alwaysClearNames, prefixNames);
+                        UpdateRefsToChildren(package, res, block);
+
+                        package.Remove(block.OriginalKey);
+
+                        if (res is Rcol rcol)
+                        {
+                            rcol.FixTGIR();
+                        }
+
+                        package.Commit(res);
+                    }
+                }
+
+                // ... thirdly update any block that references the dirty blocks where the dirty block's name has changed ...
+                foreach (AbstractGraphBlock block in kvPair.Value)
+                {
+                    if (!block.IsDeleted)
+                    {
+                        if (block.BlockName == null && !block.SgOriginalName.Equals(block.SgFullName))
+                        {
+                            UpdateRefsFromParents(packageCache, block);
+                        }
+                    }
+                }
+
+                // ... lastly, mark the dirty blocks as clean
                 foreach (AbstractGraphBlock block in kvPair.Value)
                 {
                     block.SetClean();
@@ -1024,7 +1149,10 @@ namespace SceneGraphPlus.Surface
             // Finally, save every package that was updated
             foreach (CacheableDbpfFile package in packageCache)
             {
-                package.Update(autoBackup);
+                if (package.Update(autoBackup) == null)
+                {
+                    MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!\n\nChanges are in the associated .temp file.", "Package Update Error!");
+                }
 
                 package.Close();
             }
@@ -1032,10 +1160,14 @@ namespace SceneGraphPlus.Surface
             Invalidate();
         }
 
-        private void UpdateName(DBPFResource res, AbstractGraphBlock block, bool setOgn, bool clearOgn)
+        private void UpdateName(DBPFResource res, AbstractGraphBlock block, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames)
         {
             // "UnderstoodTypes" - when adding a new resource type, need to update this block
-            if (res is Mmat)
+            if (res is Str str)
+            {
+                str.SetKeyNameDirty(block.BlockName);
+            }
+            else if (res is Mmat)
             {
                 // Name is derived from associated TXMT and can't be changed
             }
@@ -1043,24 +1175,44 @@ namespace SceneGraphPlus.Surface
             {
                 gzps.GetItem("name").StringValue = block.BlockName;
             }
+            else if (res is Xfnc xfnc)
+            {
+                xfnc.GetItem("name").StringValue = block.BlockName;
+            }
+            else if (res is Xmol xmol)
+            {
+                xmol.GetItem("name").StringValue = block.BlockName;
+            }
+            else if (res is Xtol xtol)
+            {
+                xtol.GetItem("name").StringValue = block.BlockName;
+            }
             else if (res is Xobj xobj)
             {
                 xobj.GetItem("name").StringValue = block.BlockName;
             }
+            else if (res is Xrof xrof)
+            {
+                xrof.GetItem("name").StringValue = block.BlockName;
+            }
+            else if (res is Xflr xflr)
+            {
+                xflr.GetItem("name").StringValue = block.BlockName;
+            }
             else if (res is Cres cres)
             {
                 cres.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
-                UpdateOgnName(cres, cres.KeyName, setOgn, clearOgn);
+                UpdateOgnName(cres, cres.KeyName, alwaysSetNames, alwaysClearNames, prefixNames);
             }
             else if (res is Shpe shpe)
             {
                 shpe.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
-                UpdateOgnName(shpe, shpe.KeyName, setOgn, clearOgn);
+                UpdateOgnName(shpe, shpe.KeyName, alwaysSetNames, alwaysClearNames, prefixNames);
             }
             else if (res is Gmnd gmnd)
             {
                 gmnd.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
-                UpdateOgnName(gmnd, gmnd.KeyName, setOgn, clearOgn);
+                UpdateOgnName(gmnd, gmnd.KeyName, alwaysSetNames, alwaysClearNames, prefixNames);
             }
             else if (res is Gmdc gmdc)
             {
@@ -1069,7 +1221,7 @@ namespace SceneGraphPlus.Surface
             else if (res is Txmt txmt)
             {
                 txmt.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
-                txmt.MaterialDefinition.FileDescription = block.SgBaseName;
+                UpdateMaterialName(txmt, txmt.KeyName, alwaysSetNames, alwaysClearNames, prefixNames);
             }
             else if (res is Txtr txtr)
             {
@@ -1081,15 +1233,31 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-        private void UpdateOgnName(Rcol rcol, string ognName, bool setOgn, bool clearOgn)
+        private void UpdateOgnName(Rcol rcol, string name, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames)
         {
-            if (clearOgn)
+            if (alwaysClearNames)
             {
                 rcol.OgnName = "";
             }
-            else if (setOgn || !string.IsNullOrEmpty(rcol.OgnName))
+            else if (alwaysSetNames || !string.IsNullOrEmpty(rcol.OgnName))
             {
-                rcol.OgnName = ognName;
+                if (!prefixNames) name = Hashes.StripHashFromName(name);
+
+                rcol.OgnName = name;
+            }
+        }
+
+        private void UpdateMaterialName(Txmt txmt, string name, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames)
+        {
+            if (alwaysClearNames)
+            {
+                txmt.MaterialDefinition.FileDescription = "";
+            }
+            else if (alwaysSetNames || !string.IsNullOrEmpty(txmt.MaterialDefinition.FileDescription))
+            {
+                if (!prefixNames) name = Hashes.StripHashFromName(name);
+
+                txmt.MaterialDefinition.FileDescription = name;
             }
         }
 
@@ -1111,7 +1279,25 @@ namespace SceneGraphPlus.Surface
         private void UpdateRefToChild(CacheableDbpfFile package, DBPFResource res, AbstractGraphBlock endBlock, int index, string label)
         {
             // "UnderstoodTypes" - when adding a new resource type, need to update this block
-            if (res is Mmat mmat)
+            if (res is Str str)
+            {
+                Trace.Assert(endBlock.TypeId == Cres.TYPE || endBlock.TypeId == Txmt.TYPE, "Expecting CRES or TXMT for EndBlock");
+
+                List<StrItem> items = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default);
+                Trace.Assert(index < items.Count, "Index out of range");
+
+                if (endBlock.TypeId == Cres.TYPE)
+                {
+                    Trace.Assert(str.InstanceID == (TypeInstanceID)0x0085, "CRES expected for Model Names only");
+                }
+                else if (endBlock.TypeId == Txmt.TYPE)
+                {
+                    Trace.Assert(str.InstanceID == (TypeInstanceID)0x0088, "TXMT expected for Material Names only");
+                }
+
+                items[index].Title = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+            }
+            else if (res is Mmat mmat)
             {
                 Trace.Assert(endBlock.TypeId == Cres.TYPE || endBlock.TypeId == Txmt.TYPE, "Expecting CRES or TXMT for EndBlock");
                 if (endBlock.TypeId == Cres.TYPE)
@@ -1145,15 +1331,128 @@ namespace SceneGraphPlus.Surface
                     idr.SetItem(gzps.GetItem($"override{index}resourcekeyidx").UIntegerValue, endBlock.Key);
                 }
             }
+            else if (res is Xfnc xfnc)
+            {
+                Trace.Assert(endBlock.TypeId == Cres.TYPE, "Expecting CRES for EndBlock");
+
+                if (endBlock.TypeId == Cres.TYPE)
+                {
+                    Trace.Assert(index <= 2, "Invalid XFNC CRES index");
+                    if (index == 0)
+                    {
+                        xfnc.GetItem("post").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    }
+                    else if (index == 1)
+                    {
+                        xfnc.GetItem("rail").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    }
+                    else if (index == 2)
+                    {
+                        xfnc.GetItem("diagrail").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    }
+                }
+            }
+            else if (res is Xmol xmol)
+            {
+                Trace.Assert(endBlock.TypeId == Cres.TYPE || endBlock.TypeId == Shpe.TYPE || endBlock.TypeId == Txmt.TYPE, "Expecting CRES, SHPE or TXMT for EndBlock");
+
+                Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, xmol));
+                Trace.Assert(idr != null, "Cannot find associated 3IDR");
+
+                if (endBlock.TypeId == Cres.TYPE)
+                {
+                    Trace.Assert(index <= 1, "Invalid XMOL CRES index");
+                    if (index == 0)
+                    {
+                        idr.SetItem(xmol.GetItem("resourcekeyidx").UIntegerValue, endBlock.Key);
+                    }
+                    else if (index == 1)
+                    {
+                        idr.SetItem(xmol.GetItem("maskresourcekeyidx").UIntegerValue, endBlock.Key);
+                    }
+                }
+                else if (endBlock.TypeId == Shpe.TYPE)
+                {
+                    Trace.Assert(index <= 1, "Invalid XMOL SHPE index");
+                    if (index == 0)
+                    {
+                        idr.SetItem(xmol.GetItem("shapekeyidx").UIntegerValue, endBlock.Key);
+                    }
+                    else if (index == 1)
+                    {
+                        idr.SetItem(xmol.GetItem("maskshapekeyidx").UIntegerValue, endBlock.Key);
+                    }
+                }
+                else if (endBlock.TypeId == Txmt.TYPE)
+                {
+                    Trace.Assert(index < xmol.GetItem("numoverrides").UIntegerValue, "Override out of range");
+
+                    idr.SetItem(xmol.GetItem($"override{index}resourcekeyidx").UIntegerValue, endBlock.Key);
+                }
+            }
+            else if (res is Xtol xtol)
+            {
+                Trace.Assert(endBlock.TypeId == Txmt.TYPE, "Expecting TXMT for EndBlock");
+
+                Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, xtol));
+                Trace.Assert(idr != null, "Cannot find associated 3IDR");
+
+                if (endBlock.TypeId == Txmt.TYPE)
+                {
+                    idr.SetItem(xtol.GetItem("materialkeyidx").UIntegerValue, endBlock.Key);
+                }
+            }
             else if (res is Xobj xobj)
             {
                 Trace.Assert(endBlock.TypeId == Txmt.TYPE, "Expecting TXMT for EndBlock");
 
                 if (endBlock.TypeId == Txmt.TYPE)
                 {
-                    Trace.Assert(index == 0, "Override out of range");
+                    Trace.Assert(index == 0, "Invalid XOBJ TXMT index");
 
                     xobj.GetItem("material").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                }
+            }
+            else if (res is Xrof xrof)
+            {
+                Trace.Assert(endBlock.TypeId == Txtr.TYPE, "Expecting TXTR for EndBlock");
+
+                if (endBlock.TypeId == Txmt.TYPE)
+                {
+                    Trace.Assert(index <= 4, "Invalid XROF TXTR index");
+                    if (index == 0)
+                    {
+                        xrof.GetItem("texturetop").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    }
+                    else if (index == 1)
+                    {
+                        xrof.GetItem("texturetopbump").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    }
+                    else if (index == 2)
+                    {
+                        xrof.GetItem("textureedges").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    }
+                    else if (index == 3)
+                    {
+                        xrof.GetItem("texturetrim").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    }
+                    else if (index == 4)
+                    {
+                        xrof.GetItem("textureunder").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    }
+                }
+            }
+            else if (res is Xflr xflr)
+            {
+                Trace.Assert(endBlock.TypeId == Txtr.TYPE, "Expecting TXTR for EndBlock");
+
+                if (endBlock.TypeId == Txmt.TYPE)
+                {
+                    Trace.Assert(index == 0, "Invalid XFLR TXTR index");
+                    if (index == 0)
+                    {
+                        xflr.GetItem("texturetname").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    }
                 }
             }
             else if (res is Cres cres)
@@ -1181,7 +1480,7 @@ namespace SceneGraphPlus.Surface
             else if (res is Txmt txmt)
             {
                 Trace.Assert(endBlock.TypeId == Txtr.TYPE, "Expecting TXTR for EndBlock");
-                txmt.MaterialDefinition.SetProperty(label, MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId));
+                txmt.MaterialDefinition.SetProperty(label, MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName));
                 txmt.MaterialDefinition.AddFile(MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName));
             }
             else
@@ -1192,7 +1491,7 @@ namespace SceneGraphPlus.Surface
 
         private string MakeSgName(TypeGroupID groupId, string name)
         {
-            return (groupId == DBPFData.GROUP_SG_MAXIS) ? name : $"##{groupId}!{name}";
+            return (groupId == DBPFData.GROUP_SG_MAXIS) ? name : $"##{groupId.ToString().ToLower()}!{name}";
         }
 
         private string MakeSgName(TypeGroupID groupId, string name, TypeTypeID typeId)

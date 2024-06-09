@@ -37,102 +37,6 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
-        public string MmatBlockColour {
-            get {
-                return ((string)(this["MmatBlockColour"]));
-            }
-            set {
-                this["MmatBlockColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("RoyalBlue")]
-        public string CresBlockColour {
-            get {
-                return ((string)(this["CresBlockColour"]));
-            }
-            set {
-                this["CresBlockColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("GreenYellow")]
-        public string ShpeBlockColour {
-            get {
-                return ((string)(this["ShpeBlockColour"]));
-            }
-            set {
-                this["ShpeBlockColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Yellow")]
-        public string GmndBlockColour {
-            get {
-                return ((string)(this["GmndBlockColour"]));
-            }
-            set {
-                this["GmndBlockColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Thistle")]
-        public string GmdcBlockColour {
-            get {
-                return ((string)(this["GmdcBlockColour"]));
-            }
-            set {
-                this["GmdcBlockColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Orange")]
-        public string TxmtBlockColour {
-            get {
-                return ((string)(this["TxmtBlockColour"]));
-            }
-            set {
-                this["TxmtBlockColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MediumVioletRed")]
-        public string TxtrBlockColour {
-            get {
-                return ((string)(this["TxtrBlockColour"]));
-            }
-            set {
-                this["TxtrBlockColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MediumPurple")]
-        public string GzpsBlockColour {
-            get {
-                return ((string)(this["GzpsBlockColour"]));
-            }
-            set {
-                this["GzpsBlockColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public int ColumnGap {
             get {
@@ -157,150 +61,6 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int MmatRow {
-            get {
-                return ((int)(this["MmatRow"]));
-            }
-            set {
-                this["MmatRow"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
-        public int CresRow {
-            get {
-                return ((int)(this["CresRow"]));
-            }
-            set {
-                this["CresRow"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
-        public int ShpeRow {
-            get {
-                return ((int)(this["ShpeRow"]));
-            }
-            set {
-                this["ShpeRow"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
-        public int GmndRow {
-            get {
-                return ((int)(this["GmndRow"]));
-            }
-            set {
-                this["GmndRow"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public int GmdcRow {
-            get {
-                return ((int)(this["GmdcRow"]));
-            }
-            set {
-                this["GmdcRow"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
-        public int TxmtRow {
-            get {
-                return ((int)(this["TxmtRow"]));
-            }
-            set {
-                this["TxmtRow"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public int TxtrRow {
-            get {
-                return ((int)(this["TxtrRow"]));
-            }
-            set {
-                this["TxtrRow"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int GzpsRow {
-            get {
-                return ((int)(this["GzpsRow"]));
-            }
-            set {
-                this["GzpsRow"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("80")]
-        public int BlockWidth {
-            get {
-                return ((int)(this["BlockWidth"]));
-            }
-            set {
-                this["BlockWidth"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("40")]
-        public int BlockHeight {
-            get {
-                return ((int)(this["BlockHeight"]));
-            }
-            set {
-                this["BlockHeight"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6")]
-        public int OverflowRow {
-            get {
-                return ((int)(this["OverflowRow"]));
-            }
-            set {
-                this["OverflowRow"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("White")]
-        public string BadTgirColour {
-            get {
-                return ((string)(this["BadTgirColour"]));
-            }
-            set {
-                this["BadTgirColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("DimGray")]
         public string ConnectorColour {
             get {
@@ -313,18 +73,6 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("SaddleBrown")]
-        public string MultiConnectorColour {
-            get {
-                return ((string)(this["MultiConnectorColour"]));
-            }
-            set {
-                this["MultiConnectorColour"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public int ConnectorWidth {
             get {
@@ -332,6 +80,18 @@ namespace SceneGraphPlus.Properties {
             }
             set {
                 this["ConnectorWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SaddleBrown")]
+        public string MultiConnectorColour {
+            get {
+                return ((string)(this["MultiConnectorColour"]));
+            }
+            set {
+                this["MultiConnectorColour"] = value;
             }
         }
         
@@ -409,6 +169,54 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("80")]
+        public int BlockWidth {
+            get {
+                return ((int)(this["BlockWidth"]));
+            }
+            set {
+                this["BlockWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        public int BlockHeight {
+            get {
+                return ((int)(this["BlockHeight"]));
+            }
+            set {
+                this["BlockHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("White")]
+        public string BadTgirColour {
+            get {
+                return ((string)(this["BadTgirColour"]));
+            }
+            set {
+                this["BadTgirColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Gray")]
+        public string MaxisBlockColour {
+            get {
+                return ((string)(this["MaxisBlockColour"]));
+            }
+            set {
+                this["MaxisBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("LightGray")]
         public string MissingBlockColour {
             get {
@@ -433,13 +241,373 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Gray")]
-        public string MaxisBlockColour {
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public int OverflowRow {
             get {
-                return ((string)(this["MaxisBlockColour"]));
+                return ((int)(this["OverflowRow"]));
             }
             set {
-                this["MaxisBlockColour"] = value;
+                this["OverflowRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        public string MmatBlockColour {
+            get {
+                return ((string)(this["MmatBlockColour"]));
+            }
+            set {
+                this["MmatBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int MmatRow {
+            get {
+                return ((int)(this["MmatRow"]));
+            }
+            set {
+                this["MmatRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("RoyalBlue")]
+        public string CresBlockColour {
+            get {
+                return ((string)(this["CresBlockColour"]));
+            }
+            set {
+                this["CresBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int CresRow {
+            get {
+                return ((int)(this["CresRow"]));
+            }
+            set {
+                this["CresRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("GreenYellow")]
+        public string ShpeBlockColour {
+            get {
+                return ((string)(this["ShpeBlockColour"]));
+            }
+            set {
+                this["ShpeBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int ShpeRow {
+            get {
+                return ((int)(this["ShpeRow"]));
+            }
+            set {
+                this["ShpeRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Yellow")]
+        public string GmndBlockColour {
+            get {
+                return ((string)(this["GmndBlockColour"]));
+            }
+            set {
+                this["GmndBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int GmndRow {
+            get {
+                return ((int)(this["GmndRow"]));
+            }
+            set {
+                this["GmndRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Thistle")]
+        public string GmdcBlockColour {
+            get {
+                return ((string)(this["GmdcBlockColour"]));
+            }
+            set {
+                this["GmdcBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int GmdcRow {
+            get {
+                return ((int)(this["GmdcRow"]));
+            }
+            set {
+                this["GmdcRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Orange")]
+        public string TxmtBlockColour {
+            get {
+                return ((string)(this["TxmtBlockColour"]));
+            }
+            set {
+                this["TxmtBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int TxmtRow {
+            get {
+                return ((int)(this["TxmtRow"]));
+            }
+            set {
+                this["TxmtRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MediumVioletRed")]
+        public string TxtrBlockColour {
+            get {
+                return ((string)(this["TxtrBlockColour"]));
+            }
+            set {
+                this["TxtrBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int TxtrRow {
+            get {
+                return ((int)(this["TxtrRow"]));
+            }
+            set {
+                this["TxtrRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MediumPurple")]
+        public string GzpsBlockColour {
+            get {
+                return ((string)(this["GzpsBlockColour"]));
+            }
+            set {
+                this["GzpsBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int GzpsRow {
+            get {
+                return ((int)(this["GzpsRow"]));
+            }
+            set {
+                this["GzpsRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        public string XobjBlockColour {
+            get {
+                return ((string)(this["XobjBlockColour"]));
+            }
+            set {
+                this["XobjBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int XobjRow {
+            get {
+                return ((int)(this["XobjRow"]));
+            }
+            set {
+                this["XobjRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        public string XmolBlockColour {
+            get {
+                return ((string)(this["XmolBlockColour"]));
+            }
+            set {
+                this["XmolBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int XmolRow {
+            get {
+                return ((int)(this["XmolRow"]));
+            }
+            set {
+                this["XmolRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        public string XtolBlockColour {
+            get {
+                return ((string)(this["XtolBlockColour"]));
+            }
+            set {
+                this["XtolBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int XtolRow {
+            get {
+                return ((int)(this["XtolRow"]));
+            }
+            set {
+                this["XtolRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        public string XfncBlockColour {
+            get {
+                return ((string)(this["XfncBlockColour"]));
+            }
+            set {
+                this["XfncBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int XfncRow {
+            get {
+                return ((int)(this["XfncRow"]));
+            }
+            set {
+                this["XfncRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        public string XrofBlockColour {
+            get {
+                return ((string)(this["XrofBlockColour"]));
+            }
+            set {
+                this["XrofBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int XrofRow {
+            get {
+                return ((int)(this["XrofRow"]));
+            }
+            set {
+                this["XrofRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SpringGreen")]
+        public string StrBlockColour {
+            get {
+                return ((string)(this["StrBlockColour"]));
+            }
+            set {
+                this["StrBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int StrRow {
+            get {
+                return ((int)(this["StrRow"]));
+            }
+            set {
+                this["StrRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        public string XflrBlockColour {
+            get {
+                return ((string)(this["XflrBlockColour"]));
+            }
+            set {
+                this["XflrBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int XflrRow {
+            get {
+                return ((int)(this["XflrRow"]));
+            }
+            set {
+                this["XflrRow"] = value;
             }
         }
     }

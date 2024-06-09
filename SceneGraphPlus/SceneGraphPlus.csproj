@@ -70,6 +70,7 @@
     <Compile Include="SceneGraphPlusCache.cs" />
     <Compile Include="SceneGraphPlusSurface.cs" />
     <Compile Include="SceneGraphPlusShapes.cs" />
+    <Compile Include="Settings.cs" />
     <EmbeddedResource Include="SceneGraphPlusForm.resx">
       <DependentUpon>SceneGraphPlusForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -128,8 +128,6 @@ namespace SceneGraphPlus.Cache
         {
             if (sgName == null) return null;
 
-            sgName = sgName.ToLower();
-
             if (!sgName.StartsWith("##"))
             {
                 sgName = $"##{groupId.ToString().ToLower()}!{sgName}";
@@ -137,7 +135,7 @@ namespace SceneGraphPlus.Cache
 
             string typeName = $"_{DBPFData.TypeName(typeId).ToLower()}";
 
-            if (!sgName.EndsWith(typeName))
+            if (!sgName.EndsWith(typeName, StringComparison.OrdinalIgnoreCase))
             {
                 sgName = $"{sgName}{typeName}";
             }
@@ -171,7 +169,7 @@ namespace SceneGraphPlus.Cache
 
         public override int GetHashCode()
         {
-            return (key != null) ? key.GetHashCode() : sgName.GetHashCode();
+            return (key != null) ? key.GetHashCode() : sgName.ToLower().GetHashCode();
         }
 
         public bool Equals(BlockRef that)
@@ -198,7 +196,7 @@ namespace SceneGraphPlus.Cache
             {
                 if (this.typeId == that.typeId)
                 {
-                    return this.sgName.Equals(that.sgName);
+                    return this.sgName.ToLower().Equals(that.sgName.ToLower());
                 }
                 else
                 {
@@ -219,7 +217,7 @@ namespace SceneGraphPlus.Cache
             }
             else
             {
-                return this.sgName.CompareTo(that.sgName);
+                return this.sgName.ToLower().CompareTo(that.sgName.ToLower());
             }
         }
 

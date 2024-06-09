@@ -21,7 +21,13 @@ using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
+using Sims2Tools.DBPF.SceneGraph.XMOL;
+using Sims2Tools.DBPF.SceneGraph.XTOL;
+using Sims2Tools.DBPF.STR;
+using Sims2Tools.DBPF.XFLR;
+using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
+using Sims2Tools.DBPF.XROF;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
@@ -35,15 +41,15 @@ using System.Windows.Forms;
 
 namespace SceneGraphPlus
 {
-    // TODO - SceneGraph Plus - 6 - ability to delete orphan (and not cloned from) blocks
-    // TODO - SceneGraph Plus - 7 - what about STR# Model Names and Material Names
-
     public partial class SceneGraphPlusForm : Form
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        // When adding to this List, search for "UnderstoodTypes"
-        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Mmat.TYPE, Gzps.TYPE, Xobj.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE };
+        // When adding to this List, search for "UnderstoodTypes" (both this file and the Surface file)
+        // When adding to this List, also need to add XyzBlockColour and XyzRow to the Settings.settings file (see https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors?view=windowsdesktop-8.0 for colour names)
+        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE };
+        // TODO - SceneGraph Plus - what about lights? (need to understand a lot more about lights first!)
+        // TODO - SceneGraph Plus - what about LIFO? (needs CImageData.Unserialize() completeing to support MipMaps)
 
         private readonly DrawingSurface surface;
 
@@ -80,8 +86,9 @@ namespace SceneGraphPlus
 
             menuItemConnectorsOver.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemConnectorsOver.Name, 1) != 0);
             menuItemConnectorsUnder.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemConnectorsUnder.Name, 0) != 0); OnConnectorsOverUnderClicked(menuItemConnectorsUnder, null);
-            menuItemClearOgn.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemClearOgn.Name, 0) != 0);
-            menuItemSetOgn.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemSetOgn.Name, 0) != 0);
+            menuItemClearOptionalNames.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemClearOptionalNames.Name, 0) != 0);
+            menuItemSetOptionalNames.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemSetOptionalNames.Name, 0) != 0);
+            menuItemPrefixOptionalNames.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixOptionalNames.Name, 0) != 0);
 
             menuItemGridCoarse.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridCoarse.Name, 0) != 0); if (menuItemGridCoarse.Checked) lastGridItem = menuItemGridCoarse;
             menuItemGridNormal.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridNormal.Name, 1) != 0); if (menuItemGridNormal.Checked) lastGridItem = menuItemGridNormal;
@@ -112,8 +119,9 @@ namespace SceneGraphPlus
 
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemConnectorsOver.Name, menuItemConnectorsOver.Checked ? 1 : 0);
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemConnectorsUnder.Name, menuItemConnectorsUnder.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemClearOgn.Name, menuItemClearOgn.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemSetOgn.Name, menuItemSetOgn.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemClearOptionalNames.Name, menuItemClearOptionalNames.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemSetOptionalNames.Name, menuItemSetOptionalNames.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixOptionalNames.Name, menuItemPrefixOptionalNames.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridCoarse.Name, menuItemGridCoarse.Checked ? 1 : 0);
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridNormal.Name, menuItemGridNormal.Checked ? 1 : 0);
@@ -165,7 +173,7 @@ namespace SceneGraphPlus
 
         private void MyMruList_FileSelected(string package)
         {
-            AddPackage(package);
+            AddPackages(new string[] { package });
         }
 
         private void OnPackagesOpening(object sender, EventArgs e)
@@ -190,9 +198,11 @@ namespace SceneGraphPlus
             }
         }
 
-        private void UpdateForm()
+        public void UpdateForm()
         {
             string title = SceneGraphPlusApp.AppTitle;
+
+            btnSaveAll.Enabled = surface.IsDirty;
 
             menuPackages.Enabled = (packageFiles.Count > 0);
 
@@ -211,6 +221,12 @@ namespace SceneGraphPlus
                 title = $"{title} plus {packageFiles.Count - 2} other{((packageFiles.Count == 3) ? "" : "s")}";
             }
 
+            menuItemClearOptionalNames.Visible = menuItemSetOptionalNames.Visible = menuItemPrefixOptionalNames.Visible = toolStripSeparator5.Visible = menuItemAdvanced.Checked;
+
+            menuItemGridCoarse.Visible = menuItemGridNormal.Visible = menuItemGridFine.Visible = toolStripSeparator2.Visible = menuItemAdvanced.Checked;
+
+            menuPackages.Visible = menuItemAdvanced.Checked;
+
             this.Text = title;
         }
 
@@ -226,6 +242,9 @@ namespace SceneGraphPlus
 
             btnFixTgi.Visible = false;
             btnFixIssues.Visible = false;
+
+            textBlockPackagePath.Text = "";
+            textBlockKey.Text = "";
 
             if (block == null) return;
 
@@ -270,7 +289,7 @@ namespace SceneGraphPlus
 
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
-
+            UpdateForm();
         }
 
         private void OnClearClicked(object sender, EventArgs e)
@@ -290,10 +309,7 @@ namespace SceneGraphPlus
 
             Reset();
 
-            foreach (string packageFile in packageFiles)
-            {
-                AddPackage(packageFile, true);
-            }
+            AddPackages(packageFiles.ToArray(), true);
         }
 
         private void OnPackageClicked(object sender, EventArgs e)
@@ -314,7 +330,16 @@ namespace SceneGraphPlus
             selectFileDialog.FileName = "*.package";
             if (selectFileDialog.ShowDialog() == DialogResult.OK)
             {
-                AddPackage(selectFileDialog.FileName);
+                AddPackages(new string[] { selectFileDialog.FileName });
+            }
+        }
+
+        private void AddPackages(string[] packageFiles, bool reloading = false)
+        {
+            // TODO - SceneGraph Plus - should really do this on a background thread
+            foreach (string packageFile in packageFiles)
+            {
+                AddPackage(packageFile, reloading);
             }
         }
 
@@ -330,45 +355,24 @@ namespace SceneGraphPlus
                 UpdateForm();
             }
 
-            // TODO - SceneGraph Plus - 8 - do this on a background thread
             using (DBPFFile package = new DBPFFile(packageFile))
             {
-                // TODO - SceneGraph Plus - 5 - what about XMOL, XTOL, etc
-                // TODO - SceneGraph Plus - 9 - what about LIFO?
                 foreach (TypeTypeID typeId in UnderstoodTypeIds)
                 {
-                    foreach (DBPFEntry entry in package.GetEntriesByType(typeId))
+                    if (typeId != Str.TYPE)
                     {
-                        int freeCol = surface.NextFreeCol;
-
-                        BlockRef blockRefByKey = new BlockRef(package, typeId, entry);
-
-                        if (blockCache.TryGetValue(blockRefByKey, out AbstractGraphBlock block))
+                        foreach (DBPFEntry entry in package.GetEntriesByType(typeId))
                         {
-                            if (block.IsMissing)
-                            {
-                                UpdateBlockByKey(block, package, blockRefByKey, ref freeCol);
-                            }
+                            ProcessEntry(package, entry);
                         }
-                        else
+                    }
+                    else
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(typeId))
                         {
-                            DBPFResource res = package.GetResourceByEntry(entry);
-
-                            BlockRef blockRefBySgName = new BlockRef(package, typeId, entry)
+                            if (entry.InstanceID == (TypeInstanceID)0x0085 || entry.InstanceID == (TypeInstanceID)0x0088)
                             {
-                                SgFullName = res.KeyName
-                            };
-
-                            if (blockRefBySgName.IsTgirValid && blockCache.TryGetValue(blockRefBySgName, out block))
-                            {
-                                if (block.IsMissing)
-                                {
-                                    UpdateBlockByKey(block, package, blockRefByKey, ref freeCol);
-                                }
-                            }
-                            else
-                            {
-                                AddBlockByKey(package, new BlockRef(package, typeId, entry), ref freeCol);
+                                ProcessEntry(package, entry);
                             }
                         }
                     }
@@ -380,6 +384,42 @@ namespace SceneGraphPlus
             surface.ResizeToFit();
 
             surface.Invalidate();
+        }
+
+        private void ProcessEntry(DBPFFile package, DBPFEntry entry)
+        {
+            int freeCol = surface.NextFreeCol;
+
+            BlockRef blockRefByKey = new BlockRef(package, entry.TypeID, entry);
+
+            if (blockCache.TryGetValue(blockRefByKey, out AbstractGraphBlock block))
+            {
+                if (block.IsMissing)
+                {
+                    UpdateBlockByKey(block, package, blockRefByKey, ref freeCol);
+                }
+            }
+            else
+            {
+                DBPFResource res = package.GetResourceByEntry(entry);
+
+                BlockRef blockRefBySgName = new BlockRef(package, entry.TypeID, entry)
+                {
+                    SgFullName = res.KeyName
+                };
+
+                if (blockRefBySgName.IsTgirValid && blockCache.TryGetValue(blockRefBySgName, out block))
+                {
+                    if (block.IsMissing)
+                    {
+                        UpdateBlockByKey(block, package, blockRefByKey, ref freeCol);
+                    }
+                }
+                else
+                {
+                    AddBlockByKey(package, new BlockRef(package, entry.TypeID, entry), ref freeCol);
+                }
+            }
         }
 
         private AbstractGraphBlock AddBlockByName(DBPFFile package, BlockRef blockRef, ref int freeCol)
@@ -425,7 +465,7 @@ namespace SceneGraphPlus
         {
             AbstractGraphBlock startBlock = new RoundedRect(surface, blockRef) { Text = DBPFData.TypeName(blockRef.TypeId), Centre = new Point(freeCol, RowForType(blockRef.TypeId)), FillColour = ColourForType(blockRef.TypeId) };
 
-            ProcessEntry(startBlock, package, entry, ref freeCol);
+            ProcessBlock(startBlock, package, entry, ref freeCol);
 
             return startBlock;
         }
@@ -436,12 +476,12 @@ namespace SceneGraphPlus
 
             startBlock.IsMissing = false;
 
-            ProcessEntry(startBlock, package, entry, ref freeCol);
+            ProcessBlock(startBlock, package, entry, ref freeCol);
 
             if (blockRef.Key != null && !blockCache.ContainsKey(blockRef)) blockCache.Add(blockRef, startBlock);
         }
 
-        private void ProcessEntry(AbstractGraphBlock startBlock, DBPFFile package, DBPFEntry entry, ref int freeCol)
+        private void ProcessBlock(AbstractGraphBlock startBlock, DBPFFile package, DBPFEntry entry, ref int freeCol)
         {
             DBPFResource res = package.GetResourceByEntry(entry);
 
@@ -449,6 +489,26 @@ namespace SceneGraphPlus
             if (res == null)
             {
                 startBlock.IsMissing = true;
+            }
+            else if (res is Str str)
+            {
+                startBlock.BlockName = str.KeyName;
+
+                TypeTypeID connectionTypeId = (entry.InstanceID == (TypeInstanceID)0x0085) ? Cres.TYPE : Txmt.TYPE;
+
+                List<StrItem> items = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default);
+
+                for (int index = 0; index < items.Count; ++index)
+                {
+                    string link = items[index].Title;
+
+                    if (!string.IsNullOrEmpty(link))
+                    {
+                        startBlock.ConnectTo(index, null, AddBlockByKey(package, new BlockRef(package, connectionTypeId, DBPFData.GROUP_SG_MAXIS, link), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+                }
             }
             else if (res is Mmat mmat)
             {
@@ -486,15 +546,119 @@ namespace SceneGraphPlus
                     }
                 }
             }
+            else if (res is Xfnc xfnc)
+            {
+                string type = xfnc.GetItem("type")?.StringValue?.ToLower();
+
+                if (type != null && type.Equals("fence"))
+                {
+                    startBlock.BlockName = xfnc.KeyName;
+
+                    startBlock.ConnectTo(0, "post", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("post").StringValue), ref freeCol));
+                    freeCol += DrawingSurface.ColumnGap;
+                    startBlock.ConnectTo(1, "rail", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("rail").StringValue), ref freeCol));
+                    freeCol += DrawingSurface.ColumnGap;
+                    startBlock.ConnectTo(2, "diagrail", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("diagrail").StringValue), ref freeCol));
+
+                    freeCol += DrawingSurface.ColumnGap;
+                }
+            }
+            else if (res is Xmol xmol)
+            {
+                string type = xmol.GetItem("type")?.StringValue?.ToLower();
+
+                if (type != null && type.Equals("meshoverlay"))
+                {
+                    startBlock.BlockName = xmol.Name;
+
+                    Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+
+                    if (idr != null)
+                    {
+                        startBlock.ConnectTo(0, "mesh", AddBlockByKey(package, new BlockRef(package, Cres.TYPE, idr.GetItem(xmol.GetItem("resourcekeyidx").UIntegerValue)), ref freeCol));
+                        freeCol += DrawingSurface.ColumnGap;
+                        startBlock.ConnectTo(1, "mask", AddBlockByKey(package, new BlockRef(package, Cres.TYPE, idr.GetItem(xmol.GetItem("maskresourcekeyidx").UIntegerValue)), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+
+                        startBlock.ConnectTo(0, "mesh", AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, idr.GetItem(xmol.GetItem("shapekeyidx").UIntegerValue)), ref freeCol));
+                        freeCol += DrawingSurface.ColumnGap;
+                        startBlock.ConnectTo(1, "mask", AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, idr.GetItem(xmol.GetItem("maskshapekeyidx").UIntegerValue)), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+
+                        uint entries = xmol.GetItem("numoverrides").UIntegerValue;
+
+                        for (int index = 0; index < entries; ++index)
+                        {
+                            startBlock.ConnectTo(index, xmol.GetItem($"override{index}subset").StringValue, AddBlockByKey(package, new BlockRef(package, Txmt.TYPE, idr.GetItem(xmol.GetItem($"override{index}resourcekeyidx").UIntegerValue)), ref freeCol));
+
+                            freeCol += DrawingSurface.ColumnGap;
+                        }
+                    }
+                }
+            }
+            else if (res is Xtol xtol)
+            {
+                string type = xtol.GetItem("type")?.StringValue?.ToLower();
+
+                if (type != null && type.Equals("textureoverlay"))
+                {
+                    startBlock.BlockName = xtol.Name;
+
+                    Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+
+                    if (idr != null)
+                    {
+                        startBlock.ConnectTo(0, null, AddBlockByKey(package, new BlockRef(package, Txmt.TYPE, idr.GetItem(xtol.GetItem("materialkeyidx").UIntegerValue)), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+                }
+            }
             else if (res is Xobj xobj)
             {
-                // TODO - SceneGraph Plus - 4 - Test XOBJ (wallpapers and flooring)
-                // TODO - SceneGraph Plus - 5 - what about other XOBJ types
-                if (xobj.GetItem("type").SingleValue.Equals("wall") || xobj.GetItem("type").SingleValue.Equals("floor"))
+                string type = xobj.GetItem("type")?.StringValue?.ToLower();
+
+                if (type != null && (type.Equals("wall") || type.Equals("floor")))
                 {
                     startBlock.BlockName = xobj.KeyName;
 
                     startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, xobj.GetItem("material").StringValue), ref freeCol));
+
+                    freeCol += DrawingSurface.ColumnGap;
+                }
+            }
+            else if (res is Xrof xrof)
+            {
+                string type = xrof.GetItem("type")?.StringValue?.ToLower();
+
+                if (type != null && (type.Equals("roof")))
+                {
+                    startBlock.BlockName = xrof.KeyName;
+
+                    startBlock.ConnectTo(0, "texturetop", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetop").StringValue), ref freeCol));
+                    freeCol += DrawingSurface.ColumnGap;
+                    startBlock.ConnectTo(1, "texturetopbump", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetopbump").StringValue), ref freeCol));
+                    freeCol += DrawingSurface.ColumnGap;
+                    startBlock.ConnectTo(2, "textureedges", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("textureedges").StringValue), ref freeCol));
+                    freeCol += DrawingSurface.ColumnGap;
+                    startBlock.ConnectTo(3, "texturetrim", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetrim").StringValue), ref freeCol));
+                    freeCol += DrawingSurface.ColumnGap;
+                    startBlock.ConnectTo(4, "textureunder", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("textureunder").StringValue), ref freeCol));
+
+                    freeCol += DrawingSurface.ColumnGap;
+                }
+            }
+            else if (res is Xflr xflr)
+            {
+                string type = xflr.GetItem("type")?.StringValue?.ToLower();
+
+                if (type != null && (type.Equals("terrainpaint")))
+                {
+                    startBlock.BlockName = xflr.KeyName;
+
+                    startBlock.ConnectTo(0, "texturetname", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xflr.GetItem("texturetname").StringValue), ref freeCol));
 
                     freeCol += DrawingSurface.ColumnGap;
                 }
@@ -597,8 +761,16 @@ namespace SceneGraphPlus
 
         private void OnDragEnter(object sender, DragEventArgs e)
         {
-            // Regex rePackageName = new Regex(@"\.((package((\.V[1-9][0-9]*)?\.bak)?)|(bak|temp))$");
-            Regex rePackageName = new Regex(@"\.package$");
+            Regex rePackageName;
+
+            if (menuItemAdvanced.Checked)
+            {
+                rePackageName = new Regex(@"\.((package((\.V[1-9][0-9]*)?\.bak)?)|(bak|temp))$");
+            }
+            else
+            {
+                rePackageName = new Regex(@"\.package$");
+            }
 
             DataObject data = e.Data as DataObject;
 
@@ -631,10 +803,7 @@ namespace SceneGraphPlus
 
                 if (rawFiles != null)
                 {
-                    foreach (string rawFile in rawFiles)
-                    {
-                        AddPackage(rawFile);
-                    }
+                    AddPackages(rawFiles);
                 }
             }
         }
@@ -729,19 +898,19 @@ namespace SceneGraphPlus
             surface.FixEditingTgir();
         }
 
-        private void OnClearAllOgn(object sender, EventArgs e)
+        private void OnClearAllOptionalNames(object sender, EventArgs e)
         {
-            if (menuItemClearOgn.Checked)
+            if (menuItemClearOptionalNames.Checked)
             {
-                menuItemSetOgn.Checked = false;
+                menuItemSetOptionalNames.Checked = false;
             }
         }
 
-        private void OnAlwaysSetOgn(object sender, EventArgs e)
+        private void OnAlwaysSetOptionalNames(object sender, EventArgs e)
         {
-            if (menuItemSetOgn.Checked)
+            if (menuItemSetOptionalNames.Checked)
             {
-                menuItemClearOgn.Checked = false;
+                menuItemClearOptionalNames.Checked = false;
             }
         }
 
@@ -766,7 +935,7 @@ namespace SceneGraphPlus
 
         private void OnSaveAll(object sender, EventArgs e)
         {
-            surface.SaveAll(menuItemAutoBackup.Checked, menuItemSetOgn.Checked, menuItemClearOgn.Checked);
+            surface.SaveAll(menuItemAutoBackup.Checked, menuItemSetOptionalNames.Checked, menuItemClearOptionalNames.Checked, menuItemPrefixOptionalNames.Checked);
         }
     }
 }
