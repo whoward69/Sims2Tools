@@ -37,6 +37,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             BlockClasses.Add(CGeometryDataContainer.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CGeometryDataContainer", true));
             BlockClasses.Add(CGeometryNode.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CGeometryNode", true));
             BlockClasses.Add(CImageData.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CImageData", true));
+            BlockClasses.Add(CLevelInfo.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CLevelInfo", true));
             BlockClasses.Add(CLightRefNode.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CLightRefNode", true));
             BlockClasses.Add(CMaterialDefinition.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CMaterialDefinition", true));
             BlockClasses.Add(CPointLight.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CPointLight", true));
@@ -172,8 +173,19 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
                 return "";
             }
+        }
 
-            set => base.KeyName = value;
+        public override void SetKeyName(string keyName)
+        {
+            if (blocks.Count > 0)
+            {
+                if (blocks[0].NameResource != null)
+                {
+                    blocks[0].NameResource.FileName = keyName;
+                }
+            }
+
+            base.SetKeyName(keyName);
         }
 
         public Rcol(DBPFEntry entry, DbpfReader reader) : base(entry)

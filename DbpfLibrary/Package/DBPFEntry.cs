@@ -12,7 +12,7 @@
 
 namespace Sims2Tools.DBPF.Package
 {
-    public class DBPFEntry : DBPFKey
+    public class DBPFEntry : DBPFKey // Adding IEquatable<DBPFEntry> here is problematic as it overrides DBPFKey.Equals() and we don't really want all the hassle that comes by doing that!
     {
 #if DEBUG
         // private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -63,6 +63,19 @@ namespace Sims2Tools.DBPF.Package
 
         public DBPFEntry(IDBPFKey key) : base(key)
         {
+        }
+
+        public bool IsEquivalent(DBPFEntry that)
+        {
+            if (that == null) return false;
+
+            if (this.TypeID == that.TypeID && this.GroupID == that.GroupID &&
+                this.ResourceID == that.ResourceID && this.InstanceID == that.InstanceID)
+            {
+                return (this.FileOffset == that.FileOffset && this.FileSize == that.FileSize);
+            }
+
+            return false;
         }
     }
 }

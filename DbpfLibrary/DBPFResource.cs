@@ -21,9 +21,9 @@ namespace Sims2Tools.DBPF
     {
         protected bool _isDirty = false;
 
-        public void SetKeyNameDirty(string keyName)
+        public virtual void SetKeyName(string keyName)
         {
-            base.KeyName = keyName;
+            base._keyName = keyName;
             _isDirty = true;
         }
 

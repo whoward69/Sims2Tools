@@ -137,7 +137,7 @@ namespace Sims2Tools.DBPF.STR
 
             if (!languages.ContainsKey(l)) languages.Add(l, new List<StrItem>());
 
-            ((List<StrItem>)languages[l]).Add(new StrItem(l, title, desc));
+            languages[l].Add(new StrItem(l, title, desc));
         }
 
         public uint FileSize => (uint)(1 + DbpfWriter.PLength(title) + DbpfWriter.PLength(desc));

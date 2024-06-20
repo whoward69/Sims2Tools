@@ -149,17 +149,13 @@ namespace Sims2Tools.DBPF
 
     public abstract class DBPFNamedKey : DBPFKey, IDBPFNamedKey
     {
-        private string keyName;
+        protected string _keyName;
 
-        public virtual string KeyName
-        {
-            get => keyName;
-            set => keyName = value;
-        }
+        public virtual string KeyName => _keyName;
 
         public DBPFNamedKey(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID, string keyName) : base(typeID, groupID, instanceID, resourceID)
         {
-            this.keyName = keyName;
+            this._keyName = keyName;
         }
 
         public DBPFNamedKey(IDBPFKey key, string keyName) : this(key.TypeID, key.GroupID, key.InstanceID, key.ResourceID, keyName)

@@ -270,7 +270,7 @@ namespace GeneticsChanger
                     menuItemGeneticEyes.Checked = false;
                     e.Handled = true;
                 }
-                /* TODO - _genetics_changer - Hair
+                /* TODO - _z_genetics_changer - Hair
                 else if (e.KeyCode == Keys.F5)
                 {
                     menuItemGeneticSkins.Checked = false;
@@ -2269,7 +2269,7 @@ namespace GeneticsChanger
                         }
                     }
                 }
-                /* TODO - _genetics_changer - Hair
+                /* TODO - _z_genetics_changer - Hair
                 else if (geneticData.HasThumbnail(cigenCache))
                 {
                     if (openThumbnailDialog.ShowDialog() == DialogResult.OK)
@@ -2301,7 +2301,7 @@ namespace GeneticsChanger
 
             if (selectedRow.Cells["colGeneticData"].Value is GeneticDbpfData geneticData)
             {
-                // TODO - _genetics_changer - Hair
+                // TODO - _z_genetics_changer - Hair
                 //cigenCache.DeleteThumbnail(geneticData.ThumbnailOwner);
 
                 if (IsCigenDirty())

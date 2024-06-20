@@ -102,6 +102,14 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public void AddFile(string name)
         {
+            foreach (string file in fileList)
+            {
+                if (file.Equals(name))
+                {
+                    return;
+                }
+            }
+
             fileList.Add(name);
             _isDirty = true;
         }

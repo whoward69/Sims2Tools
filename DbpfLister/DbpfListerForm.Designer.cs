@@ -32,6 +32,8 @@
             this.textMessages = new System.Windows.Forms.TextBox();
             this.btnGo = new System.Windows.Forms.Button();
             this.btnCopy = new System.Windows.Forms.Button();
+            this.pictBox = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pictBox)).BeginInit();
             this.SuspendLayout();
             // 
             // textMessages
@@ -74,11 +76,21 @@
             this.btnCopy.UseVisualStyleBackColor = true;
             this.btnCopy.Click += new System.EventHandler(this.OnCopyClicked);
             // 
+            // pictBox
+            // 
+            this.pictBox.Location = new System.Drawing.Point(8, 8);
+            this.pictBox.Name = "pictBox";
+            this.pictBox.Size = new System.Drawing.Size(256, 256);
+            this.pictBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictBox.TabIndex = 3;
+            this.pictBox.TabStop = false;
+            // 
             // DbpfListerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.pictBox);
             this.Controls.Add(this.btnCopy);
             this.Controls.Add(this.btnGo);
             this.Controls.Add(this.textMessages);
@@ -86,6 +98,7 @@
             this.Name = "DbpfListerForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
             this.Load += new System.EventHandler(this.OnLoad);
+            ((System.ComponentModel.ISupportInitialize)(this.pictBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -96,6 +109,7 @@
         private System.Windows.Forms.TextBox textMessages;
         private System.Windows.Forms.Button btnGo;
         private System.Windows.Forms.Button btnCopy;
+        private System.Windows.Forms.PictureBox pictBox;
     }
 }
 

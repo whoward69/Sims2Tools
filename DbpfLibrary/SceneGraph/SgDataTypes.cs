@@ -18,6 +18,7 @@ using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
@@ -45,7 +46,7 @@ namespace Sims2Tools.DBPF.SceneGraph
 #endif
 
 #if DEBUG
-        private static readonly List<TypeTypeID> ImmuneTypes = new List<TypeTypeID>(new TypeTypeID[] { Objd.TYPE, Cres.TYPE, Gmdc.TYPE, Gmnd.TYPE, Shpe.TYPE, Txmt.TYPE, Txtr.TYPE });
+        private static readonly List<TypeTypeID> ImmuneTypes = new List<TypeTypeID>(new TypeTypeID[] { Mmat.TYPE, Objd.TYPE, Cres.TYPE, Gmdc.TYPE, Gmnd.TYPE, Shpe.TYPE, Txmt.TYPE, Txtr.TYPE });
 #endif
 
         public static string SgHash(TypeTypeID typeID, TypeGroupID groupID, TypeResourceID resourceID, TypeInstanceID instanceID)
@@ -187,8 +188,6 @@ namespace Sims2Tools.DBPF.SceneGraph
         protected readonly List<uint> sgIdrIndexes = new List<uint>(1);
 
         public override string KeyName => Name ?? base.KeyName;
-
-        public string Name => this.GetItem("name")?.StringValue;
 
         public SgRefCpf(DBPFEntry entry) : base(entry)
         {

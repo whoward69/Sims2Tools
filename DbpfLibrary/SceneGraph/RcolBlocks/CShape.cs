@@ -34,14 +34,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public string FileName
         {
-            get { return filename; }
-            internal set { filename = value; }
+            get => filename;
+            internal set => filename = value;
         }
 
-        public byte[] Data
-        {
-            get { return data; }
-        }
+        public string Material => FileName;
+
+        public byte[] Data => data;
 
         public ShapePart()
         {
@@ -89,18 +88,29 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         private string filename;
 
-        public string FileName => filename;
+        public string FileName
+        {
+            get => filename;
+            internal set => filename = value;
+        }
+
         public int LoD => lod;
 
         public ShapeItem(CShape parent)
         {
             this.parent = parent;
+
             filename = "";
+
+            lod = 0;
+            unknown2 = 0x01;
+
+            unknown3 = 0;
+            unknown4 = 0;
         }
 
-        public ShapeItem(CShape parent, string filename)
+        public ShapeItem(CShape parent, string filename) : this(parent)
         {
-            this.parent = parent;
             this.filename = filename;
         }
 
@@ -243,7 +253,21 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public void AddItem(string filename)
         {
+            foreach (ShapeItem item in items)
+            {
+                if (item.FileName.Equals(filename))
+                {
+                    return;
+                }
+            }
+
             items.Add(new ShapeItem(this, filename));
+            _isDirty = true;
+        }
+
+        public void UpdateItem(int index, string filename)
+        {
+            items[index].FileName = filename;
             _isDirty = true;
         }
 
@@ -255,7 +279,27 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public void AddPart(string subset, string filename)
         {
+            foreach (ShapePart part in parts)
+            {
+                if (part.Subset.Equals(subset))
+                {
+                    if (!part.FileName.Equals(filename))
+                    {
+                        part.FileName = filename;
+                        _isDirty = true;
+                    }
+
+                    return;
+                }
+            }
+
             parts.Add(new ShapePart(subset, filename));
+            _isDirty = true;
+        }
+
+        public void UpdatePart(int index, string filename)
+        {
+            parts[index].FileName = filename;
             _isDirty = true;
         }
 

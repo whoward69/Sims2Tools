@@ -12,6 +12,8 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Xml;
 
@@ -22,6 +24,10 @@ namespace Sims2Tools.DBPF.UI
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x00000000;
         public const string NAME = "UI";
+
+        private readonly List<string> lines = new List<string>();
+
+        public ReadOnlyCollection<string> Lines => lines.AsReadOnly();
 
         public Ui(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
@@ -40,7 +46,7 @@ namespace Sims2Tools.DBPF.UI
 
                         while ((line = strr.ReadLine()) != null)
                         {
-                            // TODO - _library - store the UI lines somewhere
+                            lines.Add(line);
                         }
 
                         strr.Close();

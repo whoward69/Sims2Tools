@@ -7,7 +7,10 @@ using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.SHPE;
+using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TTAB;
@@ -19,6 +22,7 @@ using Sims2Tools.Files;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -31,13 +35,14 @@ namespace DbpfLister
         {
             InitializeComponent();
             this.Text = DbpfListerApp.AppTitle;
+
+            pictBox.Visible = false;
         }
 
         private void OnLoad(object sender, EventArgs e)
         {
             RegistryTools.LoadAppSettings(DbpfListerApp.RegistryKey, DbpfListerApp.AppVersionMajor, DbpfListerApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(DbpfListerApp.RegistryKey, this);
-
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
@@ -51,7 +56,14 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
-            FindUi("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP9\\TSData\\Res\\UI\\ui.package");
+            FindLifo("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads");
+
+            // FindTxtr("C:\\Users\\whowa\\Desktop\\SG Test Stuff\\Multi-SHPE\\WH_SimTurner.package");
+            // FindTxtr("C:\\Users\\whowa\\Desktop\\SG Test Stuff\\Candyshop Panties\\1_WH_Materials_CandyShop_Panties.package");
+
+            // FindMultiGmnd("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP9\\TSData\\Res\\Objects");
+
+            // FindUi("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP9\\TSData\\Res\\UI\\ui.package");
 
             // FindXflr("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
@@ -82,6 +94,52 @@ namespace DbpfLister
         private void OnCopyClicked(object sender, EventArgs e)
         {
             Clipboard.SetText(textMessages.Text);
+        }
+
+        private void FindTxtr(string packagePath)
+        {
+            try
+            {
+                using (DBPFFile package = new DBPFFile(packagePath))
+                {
+                    foreach (DBPFEntry entry in package.GetEntriesByType(Txtr.TYPE))
+                    {
+                        try
+                        {
+                            Txtr txtr = (Txtr)package.GetResourceByEntry(entry);
+
+                            Image image = txtr.ImageData?.LargestTexture?.Texture;
+
+                            if (image != null)
+                            {
+                                int maxWidth = 512;
+                                int maxHeight = maxWidth * image.Width / image.Height;
+
+                                pictBox.Width = Math.Min(maxWidth, image.Width);
+                                pictBox.Height = Math.Min(maxHeight, image.Height);
+
+                                pictBox.Image = image;
+
+                                pictBox.Visible = true;
+
+                                break;
+                            }
+
+                            textMessages.AppendText($"{entry} - {packagePath}\r\n");
+                        }
+                        catch (Exception e2)
+                        {
+                            textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                        }
+                    }
+
+                    package.Close();
+                }
+            }
+            catch (Exception e1)
+            {
+                textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+            }
         }
 
         private void GropTesting()
@@ -403,6 +461,76 @@ namespace DbpfLister
                                 Xflr xflr = (Xflr)package.GetResourceByEntry(entry);
 
                                 textMessages.AppendText($"{entry} - {packagePath}\r\n");
+                            }
+                            catch (Exception e2)
+                            {
+                                textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+        }
+
+        private void FindLifo(string baseFolder)
+        {
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Lifo.TYPE))
+                        {
+                            try
+                            {
+                                Lifo lifo = (Lifo)package.GetResourceByEntry(entry);
+
+                                textMessages.AppendText($"{entry} - {packagePath}\r\n");
+                            }
+                            catch (Exception e2)
+                            {
+                                textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+        }
+
+        private void FindMultiGmnd(string baseFolder)
+        {
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Shpe.TYPE))
+                        {
+                            try
+                            {
+                                Shpe shpe = (Shpe)package.GetResourceByEntry(entry);
+
+                                if (shpe.Shape.Items.Count != 1)
+                                {
+                                    if (!shpe.Shape.Items[1].FileName.ToLower().Contains("lod"))
+                                    {
+                                        textMessages.AppendText($"{shpe.Shape.Items.Count} - {entry} - {packagePath}\r\n");
+                                    }
+                                }
                             }
                             catch (Exception e2)
                             {

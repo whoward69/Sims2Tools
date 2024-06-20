@@ -58,11 +58,6 @@ namespace Sims2Tools.DBPF.SceneGraph.MMAT
             get { return this.GetItem("modelName").StringValue; }
         }
 
-        public string Name
-        {
-            get { return this.GetItem("name").StringValue; }
-        }
-
         public TypeGUID ObjectGUID => (TypeGUID)this.GetItem("objectGUID").UIntegerValue;
 
         public int ObjectStateIndex

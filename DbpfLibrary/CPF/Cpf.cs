@@ -29,6 +29,8 @@ namespace Sims2Tools.DBPF.CPF
 
         private List<CpfItem> items;
 
+        public string Name => this.GetItem("name")?.StringValue;
+
         public override bool IsDirty
         {
             get
@@ -91,7 +93,7 @@ namespace Sims2Tools.DBPF.CPF
             }
 
             string name = GetItem("name")?.StringValue;
-            if (name != null) this.KeyName = name;
+            if (name != null) this._keyName = name;
         }
 
         protected void UnserializeXml(DbpfReader reader, int len)

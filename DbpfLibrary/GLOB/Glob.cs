@@ -42,7 +42,7 @@ namespace Sims2Tools.DBPF.GLOB
 
         protected void Unserialize(DbpfReader reader)
         {
-            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
+            this._keyName = Helper.ToString(reader.ReadBytes(0x40));
 
             byte len = reader.ReadByte();
             semiglobal = reader.ReadBytes(len);

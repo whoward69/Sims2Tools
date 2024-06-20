@@ -26,6 +26,7 @@ using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
+using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.XFCH;
 using Sims2Tools.DBPF.SceneGraph.XHTN;
@@ -70,19 +71,20 @@ namespace DbpfCompare.Controls
 
         private readonly ResCompareData dataResCompare = new ResCompareData();
 
-        private readonly DbpfCompareNodeResourceData nodeData;
+        private readonly DbpfCompareNodeResourceData leftNodeData, rightNodeData;
         private readonly string leftPackagePath, rightPackagePath;
 
         private readonly bool excludeSame = false;
 
         private DBPFResource leftRes, rightRes;
 
-        public ResCompareForm(DbpfCompareNodeResourceData nodeData, string leftPackagePath, string rightPackagePath, bool excludeSame)
+        public ResCompareForm(DbpfCompareNodeResourceData leftNodeData, string leftPackagePath, DbpfCompareNodeResourceData rightNodeData, string rightPackagePath, bool excludeSame)
         {
             InitializeComponent();
 
-            this.nodeData = nodeData;
+            this.leftNodeData = leftNodeData;
             this.leftPackagePath = leftPackagePath;
+            this.rightNodeData = rightNodeData;
             this.rightPackagePath = rightPackagePath;
 
             // this.excludeSame = excludeSame;
@@ -90,7 +92,7 @@ namespace DbpfCompare.Controls
             gridResCompare.DataSource = dataResCompare;
             dataResCompare.Clear();
 
-            this.Text = nodeData.Key.ToString();
+            this.Text = leftNodeData.Key.ToString();
         }
 
         private void OnLoad(object sender, EventArgs e)
@@ -122,64 +124,68 @@ namespace DbpfCompare.Controls
             {
                 if (leftPackage != null && rightPackage != null)
                 {
-                    if (nodeData.TypeID == Bcon.TYPE)
+                    if (leftNodeData.TypeID == Bcon.TYPE)
                     {
                         ShowBcon(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Trcn.TYPE)
+                    else if (leftNodeData.TypeID == Trcn.TYPE)
                     {
                         ShowTrcn(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Bhav.TYPE)
+                    else if (leftNodeData.TypeID == Bhav.TYPE)
                     {
                         ShowBhav(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Tprp.TYPE)
+                    else if (leftNodeData.TypeID == Tprp.TYPE)
                     {
                         ShowTprp(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Objd.TYPE)
+                    else if (leftNodeData.TypeID == Objd.TYPE)
                     {
                         ShowObjd(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Objf.TYPE)
+                    else if (leftNodeData.TypeID == Objf.TYPE)
                     {
                         ShowObjf(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Glob.TYPE)
+                    else if (leftNodeData.TypeID == Glob.TYPE)
                     {
                         ShowGlob(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Nref.TYPE)
+                    else if (leftNodeData.TypeID == Nref.TYPE)
                     {
                         ShowNref(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Slot.TYPE)
+                    else if (leftNodeData.TypeID == Slot.TYPE)
                     {
                         ShowSlot(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Idr.TYPE)
+                    else if (leftNodeData.TypeID == Idr.TYPE)
                     {
                         ShowIdr(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Binx.TYPE ||
-                             nodeData.TypeID == Coll.TYPE ||
-                             nodeData.TypeID == Gzps.TYPE ||
-                             nodeData.TypeID == Mmat.TYPE ||
-                             nodeData.TypeID == Vers.TYPE ||
-                             nodeData.TypeID == Sdna.TYPE ||
-                             nodeData.TypeID == Xfch.TYPE || nodeData.TypeID == Xhtn.TYPE || nodeData.TypeID == Xmol.TYPE || nodeData.TypeID == Xstn.TYPE || nodeData.TypeID == Xtol.TYPE ||
-                             nodeData.TypeID == Xflr.TYPE || nodeData.TypeID == Xfnc.TYPE || nodeData.TypeID == Xrof.TYPE ||
-                             nodeData.TypeID == Xobj.TYPE ||
-                             nodeData.TypeID == Xwnt.TYPE)
+                    else if (leftNodeData.TypeID == Binx.TYPE ||
+                             leftNodeData.TypeID == Coll.TYPE ||
+                             leftNodeData.TypeID == Gzps.TYPE ||
+                             leftNodeData.TypeID == Mmat.TYPE ||
+                             leftNodeData.TypeID == Vers.TYPE ||
+                             leftNodeData.TypeID == Sdna.TYPE ||
+                             leftNodeData.TypeID == Xfch.TYPE || leftNodeData.TypeID == Xhtn.TYPE || leftNodeData.TypeID == Xmol.TYPE || leftNodeData.TypeID == Xstn.TYPE || leftNodeData.TypeID == Xtol.TYPE ||
+                             leftNodeData.TypeID == Xflr.TYPE || leftNodeData.TypeID == Xfnc.TYPE || leftNodeData.TypeID == Xrof.TYPE ||
+                             leftNodeData.TypeID == Xobj.TYPE ||
+                             leftNodeData.TypeID == Xwnt.TYPE)
                     {
                         ShowCpf(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Str.TYPE || nodeData.TypeID == Ctss.TYPE || nodeData.TypeID == Ttas.TYPE)
+                    else if (leftNodeData.TypeID == Str.TYPE || leftNodeData.TypeID == Ctss.TYPE || leftNodeData.TypeID == Ttas.TYPE)
                     {
                         ShowStr(leftPackage, rightPackage);
                     }
-                    else if (nodeData.TypeID == Txmt.TYPE)
+                    else if (leftNodeData.TypeID == Shpe.TYPE)
+                    {
+                        ShowShpe(leftPackage, rightPackage);
+                    }
+                    else if (leftNodeData.TypeID == Txmt.TYPE)
                     {
                         ShowTxmt(leftPackage, rightPackage);
                     }
@@ -210,8 +216,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
             gridResCompare.Columns["colRightValue2"].Visible = false;
 
-            Bcon leftBcon = (Bcon)leftPackage.GetResourceByKey(nodeData.Key);
-            Bcon rightBcon = (Bcon)rightPackage.GetResourceByKey(nodeData.Key);
+            Bcon leftBcon = (Bcon)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Bcon rightBcon = (Bcon)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             int entries = Math.Max(leftBcon.Count, rightBcon.Count);
 
@@ -236,8 +242,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Name";
             gridResCompare.Columns["colRightValue2"].Visible = false;
 
-            Trcn leftTrcn = (Trcn)leftPackage.GetResourceByKey(nodeData.Key);
-            Trcn rightTrcn = (Trcn)rightPackage.GetResourceByKey(nodeData.Key);
+            Trcn leftTrcn = (Trcn)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Trcn rightTrcn = (Trcn)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             int entries = Math.Max(leftTrcn.Count, rightTrcn.Count);
 
@@ -262,8 +268,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
             gridResCompare.Columns["colRightValue2"].Visible = false;
 
-            Bhav leftBhav = (Bhav)leftPackage.GetResourceByKey(nodeData.Key);
-            Bhav rightBhav = (Bhav)rightPackage.GetResourceByKey(nodeData.Key);
+            Bhav leftBhav = (Bhav)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Bhav rightBhav = (Bhav)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             List<string> leftText = new List<string>
                 {
@@ -295,8 +301,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
             gridResCompare.Columns["colRightValue2"].Visible = false;
 
-            Slot leftSlot = (Slot)leftPackage.GetResourceByKey(nodeData.Key);
-            Slot rightSlot = (Slot)rightPackage.GetResourceByKey(nodeData.Key);
+            Slot leftSlot = (Slot)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Slot rightSlot = (Slot)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             List<string> leftText = new List<string>();
             foreach (SlotItem slotItem in leftSlot.Slots)
@@ -322,8 +328,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
             gridResCompare.Columns["colRightValue2"].Visible = false;
 
-            Idr leftIdr = (Idr)leftPackage.GetResourceByKey(nodeData.Key);
-            Idr rightIdr = (Idr)rightPackage.GetResourceByKey(nodeData.Key);
+            Idr leftIdr = (Idr)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Idr rightIdr = (Idr)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             List<string> leftText = new List<string>();
             foreach (DBPFKey key in leftIdr.Items)
@@ -471,8 +477,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Name";
             gridResCompare.Columns["colRightValue2"].Visible = false;
 
-            Tprp leftTprp = (Tprp)leftPackage.GetResourceByKey(nodeData.Key);
-            Tprp rightTprp = (Tprp)rightPackage.GetResourceByKey(nodeData.Key);
+            Tprp leftTprp = (Tprp)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Tprp rightTprp = (Tprp)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             int paramEntries = Math.Max(leftTprp.ParamCount, rightTprp.ParamCount);
 
@@ -510,8 +516,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
             gridResCompare.Columns["colRightValue2"].Visible = false;
 
-            Objd leftObjd = (Objd)leftPackage.GetResourceByKey(nodeData.Key);
-            Objd rightObjd = (Objd)rightPackage.GetResourceByKey(nodeData.Key);
+            Objd leftObjd = (Objd)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Objd rightObjd = (Objd)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             DataRow row;
 
@@ -593,8 +599,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Guardian";
             gridResCompare.Columns["colRightValue2"].HeaderText = "Right Action";
 
-            Objf leftObjf = (Objf)leftPackage.GetResourceByKey(nodeData.Key);
-            Objf rightObjf = (Objf)rightPackage.GetResourceByKey(nodeData.Key);
+            Objf leftObjf = (Objf)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Objf rightObjf = (Objf)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             for (ObjfIndex index = ObjfIndex.init; index <= ObjfIndex.extractObjectInfoFromInvToken; ++index)
             {
@@ -622,8 +628,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
             gridResCompare.Columns["colRightValue2"].Visible = false;
 
-            Glob leftGlob = (Glob)leftPackage.GetResourceByKey(nodeData.Key);
-            Glob rightGlob = (Glob)rightPackage.GetResourceByKey(nodeData.Key);
+            Glob leftGlob = (Glob)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Glob rightGlob = (Glob)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             DataRow row = dataResCompare.NewRow();
             row["Key"] = "Semi-Globals";
@@ -643,8 +649,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
             gridResCompare.Columns["colRightValue2"].Visible = false;
 
-            Nref leftNref = (Nref)leftPackage.GetResourceByKey(nodeData.Key);
-            Nref rightNref = (Nref)rightPackage.GetResourceByKey(nodeData.Key);
+            Nref leftNref = (Nref)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Nref rightNref = (Nref)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             DataRow row = dataResCompare.NewRow();
             row["Key"] = "Name";
@@ -664,8 +670,8 @@ namespace DbpfCompare.Controls
             gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
             gridResCompare.Columns["colRightValue2"].Visible = false;
 
-            Cpf leftCpf = (Cpf)leftPackage.GetResourceByKey(nodeData.Key);
-            Cpf rightCpf = (Cpf)rightPackage.GetResourceByKey(nodeData.Key);
+            Cpf leftCpf = (Cpf)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Cpf rightCpf = (Cpf)rightPackage.GetResourceByKey(rightNodeData.Key);
 
             foreach (string leftName in leftCpf.GetItemNames())
             {
@@ -704,8 +710,8 @@ namespace DbpfCompare.Controls
 
             comboVariations.Visible = true;
 
-            leftRes = leftPackage.GetResourceByKey(nodeData.Key);
-            rightRes = rightPackage.GetResourceByKey(nodeData.Key);
+            leftRes = leftPackage.GetResourceByKey(leftNodeData.Key);
+            rightRes = rightPackage.GetResourceByKey(rightNodeData.Key);
 
             Str leftStr = (Str)leftRes;
             Str rightStr = (Str)rightRes;
@@ -781,13 +787,14 @@ namespace DbpfCompare.Controls
 
             comboVariations.Visible = true;
 
-            leftRes = leftPackage.GetResourceByKey(nodeData.Key);
-            rightRes = rightPackage.GetResourceByKey(nodeData.Key);
+            leftRes = leftPackage.GetResourceByKey(leftNodeData.Key);
+            rightRes = rightPackage.GetResourceByKey(rightNodeData.Key);
 
             CMaterialDefinition leftMatDef = ((Txmt)leftRes).MaterialDefinition;
             CMaterialDefinition rightMatDef = ((Txmt)rightRes).MaterialDefinition;
 
             comboVariations.Items.Clear();
+            int comboIndex = -1;
 
             DbpfNodeState propsState = DbpfNodeState.Same;
             if (leftMatDef.GetPropertyNames().Count != rightMatDef.GetPropertyNames().Count)
@@ -806,6 +813,7 @@ namespace DbpfCompare.Controls
                 }
             }
             comboVariations.Items.Add(new DropDownMaterial(propsState, "Properties"));
+            if (comboIndex == -1 && propsState != DbpfNodeState.Same) comboIndex = 0;
 
             DbpfNodeState filesState = DbpfNodeState.Same;
             if (leftMatDef.FileList.Count != rightMatDef.FileList.Count)
@@ -824,13 +832,82 @@ namespace DbpfCompare.Controls
                 }
             }
             comboVariations.Items.Add(new DropDownMaterial(filesState, "Files"));
+            if (comboIndex == -1 && filesState != DbpfNodeState.Same) comboIndex = 1;
 
             DbpfNodeState defState = (leftMatDef.Version != rightMatDef.Version ||
                                       !leftMatDef.MaterialType.Equals(rightMatDef.MaterialType) ||
                                       !leftMatDef.FileDescription.Equals(rightMatDef.FileDescription)) ? DbpfNodeState.Different : DbpfNodeState.Same;
             comboVariations.Items.Add(new DropDownMaterial(defState, "Definition"));
+            if (comboIndex == -1 && defState != DbpfNodeState.Same) comboIndex = 2;
 
-            comboVariations.SelectedIndex = 0;
+            comboVariations.SelectedIndex = (comboIndex == -1 ? 0 : comboIndex);
+        }
+
+        private void ShowShpe(DBPFFile leftPackage, DBPFFile rightPackage)
+        {
+            // SHPE - Drop-Down for Parts/Items/Details, Table; Cols - Name/Index, Left Value, Right Value
+            gridResCompare.Columns["colKey"].HeaderText = "Name/Index";
+            gridResCompare.Columns["colLeftValue1"].HeaderText = "Left Value";
+            gridResCompare.Columns["colLeftValue2"].Visible = false;
+            gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
+            gridResCompare.Columns["colRightValue2"].Visible = false;
+
+            comboVariations.Visible = true;
+
+            leftRes = leftPackage.GetResourceByKey(leftNodeData.Key);
+            rightRes = rightPackage.GetResourceByKey(rightNodeData.Key);
+
+            CShape leftShape = ((Shpe)leftRes).Shape;
+            CShape rightShape = ((Shpe)rightRes).Shape;
+
+            comboVariations.Items.Clear();
+            int comboIndex = -1;
+
+            DbpfNodeState partsState = DbpfNodeState.Same;
+            if (leftShape.Parts.Count != rightShape.Parts.Count)
+            {
+                partsState = DbpfNodeState.Different;
+            }
+            else
+            {
+                foreach (ShapePart part in leftShape.Parts)
+                {
+                    if (!part.Material.Equals(rightShape.GetSubsetMaterial(part.Subset)))
+                    {
+                        partsState = DbpfNodeState.Different;
+                        break;
+                    }
+                }
+            }
+            comboVariations.Items.Add(new DropDownShape(partsState, "Parts"));
+            if (comboIndex == -1 && partsState != DbpfNodeState.Same) comboIndex = 0;
+
+            DbpfNodeState itemsState = DbpfNodeState.Same;
+            if (leftShape.Items.Count != rightShape.Items.Count)
+            {
+                itemsState = DbpfNodeState.Different;
+            }
+            else
+            {
+                for (int index = 0; index < leftShape.Items.Count; ++index)
+                {
+                    if (!leftShape.Items[index].FileName.Equals(rightShape.Items[index].FileName))
+                    {
+                        itemsState = DbpfNodeState.Different;
+                        break;
+                    }
+                }
+            }
+            comboVariations.Items.Add(new DropDownShape(itemsState, "Items"));
+            if (comboIndex == -1 && itemsState != DbpfNodeState.Same) comboIndex = 1;
+
+            DbpfNodeState defState = (leftShape.Version != rightShape.Version ||
+                                      leftShape.Lod != rightShape.Lod ||
+                                      !leftShape.ObjectGraphNode.Equals(rightShape.ObjectGraphNode)) ? DbpfNodeState.Different : DbpfNodeState.Same;
+            comboVariations.Items.Add(new DropDownShape(defState, "Definition"));
+            if (comboIndex == -1 && defState != DbpfNodeState.Same) comboIndex = 2;
+
+            comboVariations.SelectedIndex = (comboIndex == -1 ? 0 : comboIndex);
         }
 
         private void PopulateLanguage(MetaData.Languages lang, Str leftStr, Str rightStr)
@@ -968,6 +1045,95 @@ namespace DbpfCompare.Controls
             }
         }
 
+        private void PopulateShape(int key, Shpe leftShpe, Shpe rightShpe)
+        {
+            dataResCompare.Clear();
+
+            if (key == 0)
+            {
+                ReadOnlyCollection<ShapePart> leftParts = leftShpe.Shape.Parts;
+                ReadOnlyCollection<ShapePart> rightParts = rightShpe.Shape.Parts;
+
+                List<string> leftSubsets = new List<string>();
+                List<string> rightSubsets = new List<string>();
+                SortedList<string, string> allSubsets = new SortedList<string, string>();
+
+                foreach (ShapePart part in leftParts)
+                {
+                    leftSubsets.Add(part.Subset);
+                    allSubsets.Add(part.Subset, part.Subset);
+                }
+
+                foreach (ShapePart part in rightParts)
+                {
+                    rightSubsets.Add(part.Subset);
+
+                    if (!allSubsets.ContainsKey(part.Subset))
+                    {
+                        allSubsets.Add(part.Subset, part.Subset);
+                    }
+                }
+
+                foreach (string subset in allSubsets.Values)
+                {
+                    DataRow row = dataResCompare.NewRow();
+                    row["Key"] = subset;
+
+                    row["LeftValue1"] = leftSubsets.Contains(subset) ? leftShpe.Shape.GetSubsetMaterial(subset) : "";
+                    row["RightValue1"] = rightSubsets.Contains(subset) ? rightShpe.Shape.GetSubsetMaterial(subset) : "";
+
+                    dataResCompare.Append(row);
+                }
+            }
+            else if (key == 1)
+            {
+                ReadOnlyCollection<ShapeItem> leftItems = leftShpe.Shape.Items;
+                ReadOnlyCollection<ShapeItem> rightItems = rightShpe.Shape.Items;
+
+                for (int index = 0; index < leftItems.Count; ++index)
+                {
+                    DataRow row = dataResCompare.NewRow();
+                    row["Key"] = index;
+
+                    row["LeftValue1"] = leftItems[index].FileName;
+                    row["RightValue1"] = index < rightItems.Count ? rightItems[index].FileName : "";
+
+                    dataResCompare.Append(row);
+                }
+
+                for (int index = leftItems.Count; index < rightItems.Count; ++index)
+                {
+                    DataRow row = dataResCompare.NewRow();
+                    row["Key"] = index;
+
+                    row["LeftValue1"] = "";
+                    row["RightValue1"] = rightItems[index].FileName;
+
+                    dataResCompare.Append(row);
+                }
+            }
+            else
+            {
+                DataRow row = dataResCompare.NewRow();
+                row["Key"] = "Version";
+                row["LeftValue1"] = Helper.Hex8PrefixString(leftShpe.Shape.Version);
+                row["RightValue1"] = Helper.Hex8PrefixString(rightShpe.Shape.Version);
+                dataResCompare.Append(row);
+
+                row = dataResCompare.NewRow();
+                row["Key"] = "OGN Filename";
+                row["LeftValue1"] = leftShpe.Shape.ObjectGraphNode.FileName;
+                row["RightValue1"] = rightShpe.Shape.ObjectGraphNode.FileName;
+                dataResCompare.Append(row);
+
+                row = dataResCompare.NewRow();
+                row["Key"] = "LoD";
+                row["LeftValue1"] = leftShpe.Shape.Lod;
+                row["RightValue1"] = rightShpe.Shape.Lod;
+                dataResCompare.Append(row);
+            }
+        }
+
         private string GetGuardian(Objf objf, ObjfIndex index)
         {
             string guardian = "";
@@ -1023,13 +1189,20 @@ namespace DbpfCompare.Controls
 
         private void OnKeepRight(object sender, EventArgs e)
         {
-            nodeData.SetSame();
+            leftNodeData.SetSame();
+            rightNodeData.SetSame();
             this.Close();
         }
 
         private void OnUseLeft(object sender, EventArgs e)
         {
-            nodeData.SetCopyLeftToRight();
+            leftNodeData.SetCopyLeftToRight();
+
+            if (!leftNodeData.Equals(rightNodeData))
+            {
+                rightNodeData.SetToBeDeleted();
+            }
+
             this.Close();
         }
 
@@ -1074,13 +1247,17 @@ namespace DbpfCompare.Controls
             {
                 PopulateMaterial(comboVariations.SelectedIndex, (Txmt)leftRes, (Txmt)rightRes);
             }
+            else if (comboVariations.SelectedItem is DropDownShape)
+            {
+                PopulateShape(comboVariations.SelectedIndex, (Shpe)leftRes, (Shpe)rightRes);
+            }
 
             HighlightRows();
         }
 
         private void OnCellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            if (nodeData.TypeID == Bhav.TYPE || nodeData.TypeID == Slot.TYPE || nodeData.TypeID == Idr.TYPE)
+            if (leftNodeData.TypeID == Bhav.TYPE || leftNodeData.TypeID == Slot.TYPE || leftNodeData.TypeID == Idr.TYPE)
             {
                 Graphics g = e.Graphics;
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
@@ -1243,7 +1420,7 @@ namespace DbpfCompare.Controls
 
         private void OnCellToolTipNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
         {
-            if (nodeData.TypeID == Bhav.TYPE)
+            if (leftNodeData.TypeID == Bhav.TYPE)
             {
                 if (e.ColumnIndex == 1 || e.ColumnIndex == 3)
                 {
@@ -1357,6 +1534,21 @@ namespace DbpfCompare.Controls
         private readonly string name;
 
         internal DropDownMaterial(DbpfNodeState state, string name) : base(state)
+        {
+            this.name = name;
+        }
+
+        public override string ToString()
+        {
+            return name;
+        }
+    }
+
+    internal class DropDownShape : DropDownItem
+    {
+        private readonly string name;
+
+        internal DropDownShape(DbpfNodeState state, string name) : base(state)
         {
             this.name = name;
         }

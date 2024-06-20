@@ -47,6 +47,8 @@ namespace DbpfCompare
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemSaveRightPackage = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemSaveAsCsv = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,12 +70,12 @@ namespace DbpfCompare
             this.textRightPath = new System.Windows.Forms.TextBox();
             this.linkedTreeViewRight = new DbpfCompare.Controls.LinkedTreeView();
             this.menuContextResource = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuItemContextSelectLeft = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemContextCompare = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemContextCopyRight = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTipPaths = new System.Windows.Forms.ToolTip(this.components);
             this.menuContextType = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemContextCopyAllMissingRight = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSaveAsCsv = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.saveCsvDialog = new System.Windows.Forms.SaveFileDialog();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
@@ -162,6 +164,20 @@ namespace DbpfCompare
             // 
             this.menuItemSeparator3.Name = "menuItemSeparator3";
             this.menuItemSeparator3.Size = new System.Drawing.Size(213, 6);
+            // 
+            // menuItemSaveAsCsv
+            // 
+            this.menuItemSaveAsCsv.Name = "menuItemSaveAsCsv";
+            this.menuItemSaveAsCsv.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.S)));
+            this.menuItemSaveAsCsv.Size = new System.Drawing.Size(216, 22);
+            this.menuItemSaveAsCsv.Text = "Save &As CSV...";
+            this.menuItemSaveAsCsv.Click += new System.EventHandler(this.OnSaveAsCsv);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(213, 6);
             // 
             // menuItemConfiguration
             // 
@@ -357,19 +373,37 @@ namespace DbpfCompare
             this.linkedTreeViewRight.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
             this.linkedTreeViewRight.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
             this.linkedTreeViewRight.DoubleClick += new System.EventHandler(this.OnDoubleClick);
+            this.linkedTreeViewRight.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnTreeViewMouseClick);
             // 
             // menuContextResource
             // 
             this.menuContextResource.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemContextSelectLeft,
+            this.menuItemContextCompare,
             this.menuItemContextCopyRight});
             this.menuContextResource.Name = "menuContextResource";
-            this.menuContextResource.Size = new System.Drawing.Size(149, 26);
+            this.menuContextResource.Size = new System.Drawing.Size(209, 92);
             this.menuContextResource.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextResourceOpening);
+            this.menuContextResource.Opened += new System.EventHandler(this.OnContextResourceOpened);
+            // 
+            // menuItemContextSelectLeft
+            // 
+            this.menuItemContextSelectLeft.Name = "menuItemContextSelectLeft";
+            this.menuItemContextSelectLeft.Size = new System.Drawing.Size(208, 22);
+            this.menuItemContextSelectLeft.Text = "Select Left Compare";
+            this.menuItemContextSelectLeft.Click += new System.EventHandler(this.OnContextSelectLeft);
+            // 
+            // menuItemContextCompare
+            // 
+            this.menuItemContextCompare.Name = "menuItemContextCompare";
+            this.menuItemContextCompare.Size = new System.Drawing.Size(208, 22);
+            this.menuItemContextCompare.Text = "Compare To Selected Left";
+            this.menuItemContextCompare.Click += new System.EventHandler(this.OnContextCompare);
             // 
             // menuItemContextCopyRight
             // 
             this.menuItemContextCopyRight.Name = "menuItemContextCopyRight";
-            this.menuItemContextCopyRight.Size = new System.Drawing.Size(148, 22);
+            this.menuItemContextCopyRight.Size = new System.Drawing.Size(208, 22);
             this.menuItemContextCopyRight.Text = "Copy To Right";
             this.menuItemContextCopyRight.Click += new System.EventHandler(this.OnContextCopyRight);
             // 
@@ -387,20 +421,6 @@ namespace DbpfCompare
             this.menuItemContextCopyAllMissingRight.Size = new System.Drawing.Size(209, 22);
             this.menuItemContextCopyAllMissingRight.Text = "Copy All Missing To Right";
             this.menuItemContextCopyAllMissingRight.Click += new System.EventHandler(this.OnContextCopyAllMissingRight);
-            // 
-            // menuItemSaveAsCsv
-            // 
-            this.menuItemSaveAsCsv.Name = "menuItemSaveAsCsv";
-            this.menuItemSaveAsCsv.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
-            | System.Windows.Forms.Keys.S)));
-            this.menuItemSaveAsCsv.Size = new System.Drawing.Size(216, 22);
-            this.menuItemSaveAsCsv.Text = "Save &As CSV...";
-            this.menuItemSaveAsCsv.Click += new System.EventHandler(this.OnSaveAsCsv);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(213, 6);
             // 
             // saveCsvDialog
             // 
@@ -478,5 +498,7 @@ namespace DbpfCompare
         private System.Windows.Forms.ToolStripMenuItem menuItemSaveAsCsv;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.SaveFileDialog saveCsvDialog;
+        private System.Windows.Forms.ToolStripMenuItem menuItemContextSelectLeft;
+        private System.Windows.Forms.ToolStripMenuItem menuItemContextCompare;
     }
 }

@@ -398,7 +398,7 @@ namespace ObjectRelocator
                 if (res is Cpf cpf)
                 {
                     cpf.GetItem("name").StringValue = value;
-                    cpf.KeyName = value;
+                    cpf.SetKeyName(value);
                 }
 
                 UpdatePackage();

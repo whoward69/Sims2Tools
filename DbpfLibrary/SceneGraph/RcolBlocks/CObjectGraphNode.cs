@@ -13,13 +13,14 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph
 {
-    public class ObjectGraphNodeItem
+    public class ObjectGraphNodeItem : IEquatable<ObjectGraphNodeItem>
     {
         private byte enabled;
         private byte depend;
@@ -60,9 +61,14 @@ namespace Sims2Tools.DBPF.SceneGraph
         }
 
         public override string ToString() => $"{index}: {Helper.Hex2PrefixString(enabled)}, {Helper.Hex2PrefixString(depend)}";
+
+        public bool Equals(ObjectGraphNodeItem that)
+        {
+            return (this.index == that.index && this.enabled == that.enabled && this.depend == that.depend);
+        }
     }
 
-    public class CObjectGraphNode : AbstractRcolBlock
+    public class CObjectGraphNode : AbstractRcolBlock, IEquatable<CObjectGraphNode>
     {
         private List<ObjectGraphNodeItem> items;
         private string filename = "No OGN Name";
@@ -170,6 +176,27 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public override void Dispose()
         {
+        }
+
+        public bool Equals(CObjectGraphNode that)
+        {
+            if (this.Version == that.Version && this.FileName.Equals(that.FileName))
+            {
+                if (this.Items.Count == that.Items.Count)
+                {
+                    for (int index = 0; index < this.Items.Count; ++index)
+                    {
+                        if (!this.Items[index].Equals(that.Items[index]))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

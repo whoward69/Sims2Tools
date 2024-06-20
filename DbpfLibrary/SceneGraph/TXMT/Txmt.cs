@@ -66,6 +66,15 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
                     }
                 }
             }
+
+            if (cMaterialDefinition == null)
+            {
+#if DEBUG
+                throw new Exception($"cMaterialDefinition not found in {this}");
+#else
+                logger.Warn($"cMaterialDefinition not found in {this}");
+#endif
+            }
         }
 
         public ReadOnlyDictionary<string, string> TxtrKeyedNames

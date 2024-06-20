@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.CLST;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Logger;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -20,7 +21,7 @@ namespace Sims2Tools.DBPF.Package
 {
     internal class DBPFResourceIndex
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly IDBPFLogger logger;
 
         private readonly DBPFHeader header;
 
@@ -79,19 +80,35 @@ namespace Sims2Tools.DBPF.Package
                     }
                 }
 
+                count += duplicates.Count;
+
                 return (uint)(count + (anyCompressed ? 1 : 0));
             }
+        }
+
+        public bool IsDuplicate(DBPFEntry entry)
+        {
+            foreach (DBPFEntry duplicate in duplicates)
+            {
+                if (entry.IsEquivalent(duplicate))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal uint Offset => ClstSize();
 
         internal uint Size => Count * IndexEntrySize;
 
-        internal DBPFResourceIndex(DBPFHeader header, DBPFResourceCache resourceCache, DbpfReader reader)
+        internal DBPFResourceIndex(IDBPFLogger logger, DBPFHeader header, DBPFResourceCache resourceCache, DbpfReader reader)
         {
             Debug.Assert(header != null, "Header cannot be null");
             Debug.Assert(resourceCache != null, "ResourceCache cannot be null");
 
+            this.logger = logger;
             this.header = header;
 
             this.resourceCache = resourceCache;
@@ -198,12 +215,13 @@ namespace Sims2Tools.DBPF.Package
                 {
                     logger.Error($"Duplicate resource {entry} in {header.PackagePath}");
 
-                    // TODO - _library - duplicates - what should we do with duplicate resources?
                     // Add to a "duplicates list", not accessible via GetResourceByXyz methods, but written back out on save
                     duplicates.Add(entry);
                 }
-
-                entriesByKey[entry] = entry;
+                else
+                {
+                    entriesByKey[entry] = entry;
+                }
 
                 if (entry.TypeID == Clst.TYPE)
                 {
@@ -314,7 +332,7 @@ namespace Sims2Tools.DBPF.Package
         {
             uint count = 0;
 
-            foreach (DBPFEntry entry in GetAllEntries(false))
+            foreach (DBPFEntry entry in GetAllEntries(true))
             {
                 if (entry.TypeID != Clst.TYPE && entry.UncompressedSize > 0)
                 {
@@ -360,7 +378,7 @@ namespace Sims2Tools.DBPF.Package
         {
             int count = 0;
 
-            foreach (DBPFEntry entry in GetAllEntries(false))
+            foreach (DBPFEntry entry in GetAllEntries(true))
             {
                 if (entry.TypeID != Clst.TYPE && entry.UncompressedSize > 0)
                 {

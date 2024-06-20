@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Logger;
 using System;
 using System.Diagnostics;
 
@@ -20,7 +21,7 @@ namespace Sims2Tools.DBPF.Package
     internal class DBPFHeader
     {
 #pragma warning disable IDE0052 // Remove unread private members
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly IDBPFLogger logger;
 #pragma warning restore IDE0052 // Remove unread private members
 
         private int HeaderSize => (minorVersion >= 1) ? 96 : 92;
@@ -50,8 +51,9 @@ namespace Sims2Tools.DBPF.Package
         // public uint HoleIndexOffset => holeIndexOffset;
         // public uint HoleIndexSize => holeIndexSize;
 
-        internal DBPFHeader(string packagePath)
+        internal DBPFHeader(IDBPFLogger logger, string packagePath)
         {
+            this.logger = logger;
             this.packagePath = packagePath;
 
             majorVersion = 1;
@@ -65,7 +67,7 @@ namespace Sims2Tools.DBPF.Package
             resourceIndexSize = 0;
         }
 
-        internal DBPFHeader(string packagePath, DbpfReader reader) : this(packagePath)
+        internal DBPFHeader(IDBPFLogger logger, string packagePath, DbpfReader reader) : this(logger, packagePath)
         {
             Unserialize(reader);
         }

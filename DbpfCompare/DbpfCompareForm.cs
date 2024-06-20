@@ -23,6 +23,7 @@ using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
+using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.XFCH;
 using Sims2Tools.DBPF.SceneGraph.XHTN;
@@ -45,6 +46,7 @@ using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -64,6 +66,30 @@ namespace DbpfCompare
 
         private readonly Dictionary<TypeTypeID, DbpfCompareNodeTypeData> allTypeData = new Dictionary<TypeTypeID, DbpfCompareNodeTypeData>();
         private readonly SortedList<DBPFKey, DbpfCompareNodeResourceData> allResourceData = new SortedList<DBPFKey, DbpfCompareNodeResourceData>();
+
+        private DbpfCompareNodeResourceData leftSelectedNodeData = null;
+
+        private readonly List<TypeTypeID> comparableTypes = new List<TypeTypeID>(new TypeTypeID[] {
+            Bcon.TYPE, Trcn.TYPE,
+            Bhav.TYPE, Tprp.TYPE,
+            Objd.TYPE, Objf.TYPE,
+            Glob.TYPE, Nref.TYPE,
+            Slot.TYPE,
+            Idr.TYPE,
+            Str.TYPE, Ctss.TYPE, Ttas.TYPE,
+            Shpe.TYPE,
+            Txmt.TYPE,
+            Binx.TYPE,
+            Coll.TYPE,
+            Gzps.TYPE,
+            Mmat.TYPE,
+            Vers.TYPE,
+            Sdna.TYPE,
+            Xfch.TYPE, Xhtn.TYPE, Xmol.TYPE, Xstn.TYPE, Xtol.TYPE,
+            Xflr.TYPE, Xfnc.TYPE, Xrof.TYPE,
+            Xobj.TYPE,
+            Xwnt.TYPE
+        });
 
         private bool IsDirty
         {
@@ -237,6 +263,8 @@ namespace DbpfCompare
             menuItemSelectLeftPackage.Enabled = true;
             menuItemSelectRightPackage.Enabled = true;
             menuItemReloadPackage.Enabled = true;
+
+            leftSelectedNodeData = null;
         }
 
         private void GetAllNodeData()
@@ -377,6 +405,10 @@ namespace DbpfCompare
 
                         if (typeColour == colourSame) typeColour = colourMissing;
                     }
+                }
+                else if (nodeData.IsToBeDeleted)
+                {
+                    // Do nothing
                 }
                 else
                 {
@@ -543,7 +575,41 @@ namespace DbpfCompare
         {
             DbpfCompareNodeResourceData nodeData = (DbpfCompareNodeResourceData)mouseNode?.Tag;
 
+            bool isLeftNode = mouseNode.TreeView.Name.Equals(linkedTreeViewLeft.Name);
+
+            if (!isLeftNode)
+            {
+                e.Cancel = (leftSelectedNodeData == null || leftSelectedNodeData.TypeID != nodeData.TypeID);
+            }
+        }
+
+        private void OnContextResourceOpened(object sender, EventArgs e)
+        {
+            DbpfCompareNodeResourceData nodeData = (DbpfCompareNodeResourceData)mouseNode?.Tag;
+
+            bool isLeftNode = mouseNode.TreeView.Name.Equals(linkedTreeViewLeft.Name);
+
+            menuItemContextSelectLeft.Visible = isLeftNode;
+            menuItemContextCompare.Visible = !isLeftNode;
+
+            menuItemContextSelectLeft.Enabled = comparableTypes.Contains(nodeData.TypeID);
+
+            menuItemContextCopyRight.Visible = isLeftNode;
             menuItemContextCopyRight.Enabled = (nodeData != null && (nodeData.IsDifferent || nodeData.IsRightMissing));
+        }
+
+        private void OnContextSelectLeft(object sender, EventArgs e)
+        {
+            leftSelectedNodeData = (DbpfCompareNodeResourceData)mouseNode?.Tag;
+        }
+
+        private void OnContextCompare(object sender, EventArgs e)
+        {
+            DbpfCompareNodeResourceData nodeData = (DbpfCompareNodeResourceData)mouseNode?.Tag;
+
+            Trace.Assert(leftSelectedNodeData.TypeID == nodeData?.TypeID, "Can't compare different resource types!");
+
+            CompareNodes(leftSelectedNodeData, nodeData);
         }
 
         private void OnContextCopyRight(object sender, EventArgs e)
@@ -573,9 +639,16 @@ namespace DbpfCompare
                     {
                         if (nodeData.IsDirty)
                         {
-                            byte[] rawData = packageLeft.GetItemByKey(nodeData.Key);
+                            if (nodeData.IsToBeCopied)
+                            {
+                                byte[] rawData = packageLeft.GetItemByKey(nodeData.Key);
 
-                            if (rawData != null) packageRight.Commit(nodeData.Key, rawData);
+                                if (rawData != null) packageRight.Commit(nodeData.Key, rawData);
+                            }
+                            else if (nodeData.IsToBeDeleted)
+                            {
+                                packageRight.Remove(nodeData.Key);
+                            }
                         }
                     }
 
@@ -606,36 +679,24 @@ namespace DbpfCompare
         {
             if ((sender as LinkedTreeView)?.SelectedNode?.Tag is DbpfCompareNodeResourceData nodeData && nodeData.IsDifferent)
             {
-                if (nodeData.TypeID == Bcon.TYPE || nodeData.TypeID == Trcn.TYPE ||
-                    nodeData.TypeID == Bhav.TYPE || nodeData.TypeID == Tprp.TYPE ||
-                    nodeData.TypeID == Objd.TYPE || nodeData.TypeID == Objf.TYPE ||
-                    nodeData.TypeID == Glob.TYPE || nodeData.TypeID == Nref.TYPE ||
-                    nodeData.TypeID == Slot.TYPE ||
-                    nodeData.TypeID == Idr.TYPE ||
-                    nodeData.TypeID == Str.TYPE || nodeData.TypeID == Ctss.TYPE || nodeData.TypeID == Ttas.TYPE ||
-                    nodeData.TypeID == Txmt.TYPE ||
-                    nodeData.TypeID == Binx.TYPE ||
-                    nodeData.TypeID == Coll.TYPE ||
-                    nodeData.TypeID == Gzps.TYPE ||
-                    nodeData.TypeID == Mmat.TYPE ||
-                    nodeData.TypeID == Vers.TYPE ||
-                    nodeData.TypeID == Sdna.TYPE ||
-                    nodeData.TypeID == Xfch.TYPE || nodeData.TypeID == Xhtn.TYPE || nodeData.TypeID == Xmol.TYPE || nodeData.TypeID == Xstn.TYPE || nodeData.TypeID == Xtol.TYPE ||
-                    nodeData.TypeID == Xflr.TYPE || nodeData.TypeID == Xfnc.TYPE || nodeData.TypeID == Xrof.TYPE ||
-                    nodeData.TypeID == Xobj.TYPE ||
-                    nodeData.TypeID == Xwnt.TYPE)
+                if (comparableTypes.Contains(nodeData.TypeID))
                 {
-                    (new ResCompareForm(nodeData, textLeftPath.Text, textRightPath.Text, menuItemExcludeSame.Checked)).ShowDialog();
-
-                    if (nodeData.IsSame)
-                    {
-                        DbpfCompareNodeTypeData typeData = nodeData.LeftNode().Parent.Tag as DbpfCompareNodeTypeData;
-
-                        UpdateLinkedTrees(false);
-
-                        typeData.EnsureVisible();
-                    }
+                    CompareNodes(nodeData, nodeData);
                 }
+            }
+        }
+
+        private void CompareNodes(DbpfCompareNodeResourceData leftNodeData, DbpfCompareNodeResourceData rightNodeData)
+        {
+            (new ResCompareForm(leftNodeData, textLeftPath.Text, rightNodeData, textRightPath.Text, menuItemExcludeSame.Checked)).ShowDialog();
+
+            if (leftNodeData.IsSame)
+            {
+                DbpfCompareNodeTypeData typeData = leftNodeData.LeftNode().Parent.Tag as DbpfCompareNodeTypeData;
+
+                UpdateLinkedTrees(false);
+
+                typeData.EnsureVisible();
             }
         }
 

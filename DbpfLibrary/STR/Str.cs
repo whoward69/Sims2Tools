@@ -198,7 +198,7 @@ namespace Sims2Tools.DBPF.STR
             // Why? Some resources have a declared length less than the actual amount of data in them!
             // if (length <= 0x40) return;
 
-            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
+            this._keyName = Helper.ToString(reader.ReadBytes(0x40));
 
             format = (MetaData.FormatCode)reader.ReadUInt16();
             if (format != MetaData.FormatCode.normal) return;

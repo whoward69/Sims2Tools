@@ -101,7 +101,7 @@ namespace Sims2Tools.DBPF.OBJD
         {
             long startPos = reader.Position;
 
-            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
+            this._keyName = Helper.ToString(reader.ReadBytes(0x40));
 
             if (length >= 0x54)
             {

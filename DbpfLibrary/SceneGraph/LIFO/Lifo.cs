@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using System;
 using System.Xml;
 
@@ -24,14 +25,38 @@ namespace Sims2Tools.DBPF.SceneGraph.LIFO
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xED534136;
         public const string NAME = "LIFO";
 
+#if !DEBUG
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+#endif
+
+        private readonly CLevelInfo cLevelInfo = null;
+        public CLevelInfo LevelInfo => cLevelInfo;
+
         public Lifo(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
-            throw new NotImplementedException();
+            foreach (IRcolBlock block in Blocks)
+            {
+                if (block.BlockID == CLevelInfo.TYPE)
+                {
+                    if (cLevelInfo == null)
+                    {
+                        cLevelInfo = block as CLevelInfo;
+                    }
+                    else
+                    {
+#if DEBUG
+                        throw new Exception($"2nd cLevelInfo found in {this}");
+#else
+                        logger.Warn($"2nd cLevelInfo found in {this}");
+#endif
+                    }
+                }
+            }
         }
 
         public override SgResourceList SgNeededResources()
         {
-            throw new NotImplementedException();
+            return new SgResourceList();
         }
 
         public override XmlElement AddXml(XmlElement parent)

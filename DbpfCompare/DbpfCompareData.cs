@@ -18,7 +18,8 @@ namespace DbpfCompare
         LeftMissing,
         RightMissing,
         Different,
-        CopyLeftToRight
+        CopyLeftToRight,
+        ToBeDeleted
     }
 
     internal class DbpfCompareNodeTypeData
@@ -144,7 +145,9 @@ namespace DbpfCompare
 
         internal DBPFKey Key => key;
 
-        internal bool IsDirty => (state == DbpfNodeState.CopyLeftToRight);
+        internal bool IsToBeCopied => (state == DbpfNodeState.CopyLeftToRight);
+        internal bool IsToBeDeleted => (state == DbpfNodeState.ToBeDeleted);
+        internal bool IsDirty => (IsToBeCopied || IsToBeDeleted);
 
         internal bool IsSame => (state == DbpfNodeState.Same || state == DbpfNodeState.CopyLeftToRight);
         internal bool IsLeftMissing => (state == DbpfNodeState.LeftMissing);
@@ -174,6 +177,11 @@ namespace DbpfCompare
 
             rightNode.Text = RightString();
             rightNode.ForeColor = DbpfCompareForm.colourSame;
+        }
+
+        internal void SetToBeDeleted()
+        {
+            state = DbpfNodeState.ToBeDeleted;
         }
 
         internal void EnsureVisible()
@@ -206,7 +214,8 @@ namespace DbpfCompare
                 {
                     Text = RightString(),
                     ForeColor = IsDifferent ? DbpfCompareForm.colourDiffers : (IsLeftMissing ? DbpfCompareForm.colourMissing : DbpfCompareForm.colourSame),
-                    Tag = this
+                    Tag = this,
+                    ContextMenuStrip = contextMenu
                 };
             }
 

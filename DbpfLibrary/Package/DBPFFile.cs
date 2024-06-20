@@ -20,6 +20,7 @@ using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.JPG;
 using Sims2Tools.DBPF.Images.THUB;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.Logger;
 using Sims2Tools.DBPF.Neighbourhood.BNFO;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.FAMT;
@@ -43,6 +44,7 @@ using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.LAMB;
 using Sims2Tools.DBPF.SceneGraph.LDIR;
+using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.LPNT;
 using Sims2Tools.DBPF.SceneGraph.LSPT;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
@@ -80,7 +82,7 @@ namespace Sims2Tools.DBPF.Package
     // See also - https://modthesims.info/wiki.php?title=DBPF/Source_Code and https://modthesims.info/wiki.php?title=DBPF
     public class DBPFFile : IDisposable
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly IDBPFLogger logger = new DBPFLogger(log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType));
 
         private static readonly Encoding encoding = new UTF8Encoding(false, true);
         public static Encoding Encoding => encoding;
@@ -107,7 +109,11 @@ namespace Sims2Tools.DBPF.Package
 
         public void SetClean() => resourceIndex.SetClean();
 
-        public DBPFFile(string packagePath)
+        public DBPFFile(string packagePath) : this(logger, packagePath)
+        {
+        }
+
+        private DBPFFile(IDBPFLogger logger, string packagePath)
         {
             this.packagePath = packagePath;
 
@@ -122,9 +128,9 @@ namespace Sims2Tools.DBPF.Package
             }
             else
             {
-                header = new DBPFHeader(PackagePath);
-                resourceCache = new DBPFResourceCache();
-                resourceIndex = new DBPFResourceIndex(header, resourceCache, null);
+                header = new DBPFHeader(logger, PackagePath);
+                resourceCache = new DBPFResourceCache(logger);
+                resourceIndex = new DBPFResourceIndex(logger, header, resourceCache, null);
             }
         }
 
@@ -137,10 +143,10 @@ namespace Sims2Tools.DBPF.Package
         {
             this.m_Reader = DbpfReader.FromStream(stream, length);
 
-            header = new DBPFHeader(PackagePath, m_Reader);
+            header = new DBPFHeader(logger, PackagePath, m_Reader);
 
-            resourceCache = new DBPFResourceCache();
-            resourceIndex = new DBPFResourceIndex(header, resourceCache, m_Reader);
+            resourceCache = new DBPFResourceCache(logger);
+            resourceIndex = new DBPFResourceIndex(logger, header, resourceCache, m_Reader);
         }
 
         protected void Write(Stream stream)
@@ -153,7 +159,12 @@ namespace Sims2Tools.DBPF.Package
 
                 foreach (DBPFEntry entry in resourceIndex.GetAllEntries(true))
                 {
-                    if (resourceCache.IsResource(entry))
+                    if (resourceIndex.IsDuplicate(entry))
+                    {
+                        m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
+                        writer.WriteBytes(m_Reader.ReadBytes((int)entry.FileSize));
+                    }
+                    else if (resourceCache.IsResource(entry))
                     {
                         long bytesBefore = writer.Position;
                         resourceCache.GetResourceByKey(entry).Serialize(writer);
@@ -631,6 +642,10 @@ namespace Sims2Tools.DBPF.Package
             else if (entry.TypeID == Ldir.TYPE)
             {
                 res = new Ldir(entry, reader);
+            }
+            else if (entry.TypeID == Lifo.TYPE)
+            {
+                res = new Lifo(entry, reader);
             }
             else if (entry.TypeID == Lpnt.TYPE)
             {

@@ -69,7 +69,7 @@ namespace Sims2Tools.DBPF.OBJF
 
         protected void Unserialize(DbpfReader reader)
         {
-            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
+            this._keyName = Helper.ToString(reader.ReadBytes(0x40));
 
             this.items = null;
             this.header = new uint[3];

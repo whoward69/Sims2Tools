@@ -42,7 +42,7 @@ namespace Sims2Tools.DBPF.BHAV
 
         protected void Unserialize(DbpfReader reader)
         {
-            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
+            this._keyName = Helper.ToString(reader.ReadBytes(0x40));
 
             this.header.Unserialize(reader);
 

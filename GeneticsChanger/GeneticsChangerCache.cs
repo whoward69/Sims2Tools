@@ -114,7 +114,7 @@ namespace GeneticsChanger
 
                     if (res != null)
                     {
-                        // TODO - _genetics_changer - XHTN/GZPS (hair)
+                        // TODO - _z_genetics_changer - XHTN/GZPS (hair)
                         if (res is Xstn || res is Xtol)
                         {
                             Cpf cpf = res as Cpf;

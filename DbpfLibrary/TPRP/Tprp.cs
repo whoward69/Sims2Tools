@@ -64,7 +64,7 @@ namespace Sims2Tools.DBPF.TPRP
         {
             this.duff = false;
 
-            this.KeyName = Helper.ToString(reader.ReadBytes(0x40));
+            this._keyName = Helper.ToString(reader.ReadBytes(0x40));
 
             this.header = new uint[3];
             this.header[0] = reader.ReadUInt32();
