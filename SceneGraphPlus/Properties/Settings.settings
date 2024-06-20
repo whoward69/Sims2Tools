@@ -108,31 +108,31 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="XobjBlockColour" Type="System.String" Scope="User">
-      <Value Profile="(Default)">MediumOrchid</Value>
+      <Value Profile="(Default)">DeepPink</Value>
     </Setting>
     <Setting Name="XobjRow" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="XmolBlockColour" Type="System.String" Scope="User">
-      <Value Profile="(Default)">MediumOrchid</Value>
+      <Value Profile="(Default)">DeepPink</Value>
     </Setting>
     <Setting Name="XmolRow" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="XtolBlockColour" Type="System.String" Scope="User">
-      <Value Profile="(Default)">MediumOrchid</Value>
+      <Value Profile="(Default)">DeepPink</Value>
     </Setting>
     <Setting Name="XtolRow" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="XfncBlockColour" Type="System.String" Scope="User">
-      <Value Profile="(Default)">MediumOrchid</Value>
+      <Value Profile="(Default)">DeepPink</Value>
     </Setting>
     <Setting Name="XfncRow" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="XrofBlockColour" Type="System.String" Scope="User">
-      <Value Profile="(Default)">MediumOrchid</Value>
+      <Value Profile="(Default)">DeepPink</Value>
     </Setting>
     <Setting Name="XrofRow" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
@@ -144,10 +144,16 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="XflrBlockColour" Type="System.String" Scope="User">
-      <Value Profile="(Default)">MediumOrchid</Value>
+      <Value Profile="(Default)">DeepPink</Value>
     </Setting>
     <Setting Name="XflrRow" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="LifoBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PaleVioletRed</Value>
+    </Setting>
+    <Setting Name="LifoRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6</Value>
     </Setting>
   </Settings>
 </SettingsFile>

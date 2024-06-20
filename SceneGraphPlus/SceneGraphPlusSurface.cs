@@ -8,11 +8,13 @@
 
 using SceneGraphPlus.Shapes;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
@@ -53,6 +55,7 @@ namespace SceneGraphPlus.Surface
         private readonly Label lblTooltip = new Label();
 
         private readonly ContextMenuStrip menuContextBlock;
+        private readonly ToolStripMenuItem menuItemContextTexture;
         private readonly ToolStripMenuItem menuItemContextDelete;
         private readonly ToolStripMenuItem menuItemContextFixTgir;
         private readonly ToolStripMenuItem menuItemContextFixFileList;
@@ -70,7 +73,6 @@ namespace SceneGraphPlus.Surface
         private AbstractGraphBlock editBlock = null;
         private List<AbstractGraphBlock> dropOntoBlocks = new List<AbstractGraphBlock>();
         private AbstractGraphBlock contextBlock = null;
-
 
         private AbstractGraphConnector hoverConnector = null;
         private AbstractGraphConnector dropOntoConnector = null;
@@ -92,6 +94,7 @@ namespace SceneGraphPlus.Surface
 
             {
                 menuContextBlock = new ContextMenuStrip();
+                menuItemContextTexture = new ToolStripMenuItem();
                 menuItemContextDelete = new ToolStripMenuItem();
                 menuItemContextFixTgir = new ToolStripMenuItem();
                 menuItemContextFixFileList = new ToolStripMenuItem();
@@ -99,10 +102,15 @@ namespace SceneGraphPlus.Surface
                 menuItemContextClosePackage = new ToolStripMenuItem();
                 menuContextBlock.SuspendLayout();
 
-                menuContextBlock.Items.AddRange(new ToolStripItem[] { menuItemContextDelete, menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextCopySgName, menuItemContextClosePackage });
+                menuContextBlock.Items.AddRange(new ToolStripItem[] { menuItemContextTexture, menuItemContextDelete, menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextCopySgName, menuItemContextClosePackage });
                 menuContextBlock.Name = "menuContextBlock";
                 menuContextBlock.Size = new Size(223, 48);
                 menuContextBlock.Opening += new CancelEventHandler(OnContextBlockOpening);
+
+                menuItemContextTexture.Name = "menuItemContextTexture";
+                menuItemContextTexture.Size = new Size(222, 22);
+                menuItemContextTexture.Text = "Show Texture";
+                menuItemContextTexture.Click += new EventHandler(OnContextBlockTexture);
 
                 menuItemContextDelete.Name = "menuItemContextDelete";
                 menuItemContextDelete.Size = new Size(222, 22);
@@ -400,12 +408,29 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-        public void ChangeEditingSgName(string sgName)
+        public void ChangeEditingSgName(string sgName, bool prefixLowerCase)
         {
             if (editBlock != null)
             {
-                editBlock.SgFullName = sgName;
+                editBlock.SetSgFullName(sgName, prefixLowerCase);
                 editBlock.SetDirty();
+
+                foreach (AbstractGraphConnector connector in editBlock.GetInConnectors())
+                {
+                    connector.StartBlock.SetDirty();
+                }
+
+                if (editBlock.TypeId == Txtr.TYPE)
+                {
+                    if (Xflr.TYPE == editBlock.SoleParent?.TypeId)
+                    {
+                        // Special case - also update the associated _detail TXTR
+                        AbstractGraphBlock detailTxtrBlock = editBlock.SoleParent.OutConnectorByLabel("texturetname_detail").EndBlock;
+
+                        detailTxtrBlock.SetSgFullName($"{sgName}_detail", prefixLowerCase);
+                        detailTxtrBlock.SetDirty();
+                    }
+                }
 
                 Invalidate();
 
@@ -491,12 +516,14 @@ namespace SceneGraphPlus.Surface
         {
             if (contextBlock != null && !contextBlock.IsMissingOrClone)
             {
-                menuItemContextDelete.Enabled = (contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0);
+                menuItemContextTexture.Visible = (contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE);
+
+                menuItemContextDelete.Enabled = (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0);
 
                 menuItemContextFixTgir.Visible = !contextBlock.IsTgirValid;
-                menuItemContextFixFileList.Visible = !contextBlock.IsFileListValid;
+                menuItemContextFixFileList.Visible = !contextBlock.IsDirty && !contextBlock.IsFileListValid;
 
-                menuItemContextCopySgName.Enabled = (contextBlock.SoleParent?.SgBaseName != null);
+                menuItemContextCopySgName.Enabled = (contextBlock.SoleRcolParent?.SgBaseName != null);
                 menuItemContextClosePackage.Enabled = !HasPendingEdits(contextBlock.PackagePath);
             }
             else
@@ -505,9 +532,17 @@ namespace SceneGraphPlus.Surface
             }
         }
 
+        private void OnContextBlockTexture(object sender, EventArgs e)
+        {
+            Trace.Assert(contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE, "Expected TXMT, TXTR or LIFO");
+
+            owningForm.DisplayTexture(contextBlock);
+        }
+
         private void OnContextBlockDelete(object sender, EventArgs e)
         {
             Trace.Assert(contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0, "Cannot delete block with connectors");
+            Trace.Assert(contextBlock.IsEditable, "Cannot delete a 'read-only' block");
 
             contextBlock.Delete();
 
@@ -530,11 +565,11 @@ namespace SceneGraphPlus.Surface
 
         private void OnContextBlockCopySgName(object sender, EventArgs e)
         {
-            string sgName = contextBlock.SoleParent?.SgBaseName;
+            string sgName = contextBlock.SoleRcolParent?.SgBaseName;
 
             if (sgName != null)
             {
-                contextBlock.SgFullName = sgName;
+                contextBlock.SetSgFullName(sgName, owningForm.IsPrefixLowerCase);
                 contextBlock.SetDirty();
 
                 Invalidate();
@@ -937,7 +972,11 @@ namespace SceneGraphPlus.Surface
                 {
                     for (int i = 0; i < connectors.Count; ++i)
                     {
-                        if (connectors[i].HitTest(e.Location))
+                        AbstractGraphConnector connector = connectors[i];
+
+                        if (hideMissingBlocks && (connector.StartBlock.IsMissing || connector.EndBlock.IsMissing)) continue;
+
+                        if (connector.HitTest(e.Location))
                         {
                             currentHoverConnector = connectors[i];
                             break;
@@ -1070,7 +1109,7 @@ namespace SceneGraphPlus.Surface
         #endregion
 
         #region Save
-        public void SaveAll(bool autoBackup, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames)
+        public void SaveAll(bool autoBackup, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames, bool prefixLowerCase)
         {
             DbpfFileCache packageCache = new DbpfFileCache();
             Dictionary<string, List<AbstractGraphBlock>> dirtyBlocks = new Dictionary<string, List<AbstractGraphBlock>>();
@@ -1105,7 +1144,7 @@ namespace SceneGraphPlus.Surface
                     }
                 }
 
-                // ... secondly update the dirty blocks' names and outbound refs ...
+                // ... secondly update the dirty blocks' outbound refs ...
                 foreach (AbstractGraphBlock block in kvPair.Value)
                 {
                     if (!block.IsDeleted)
@@ -1113,15 +1152,7 @@ namespace SceneGraphPlus.Surface
                         DBPFResource res = package.GetResourceByKey(block.OriginalKey);
                         Trace.Assert(res != null, $"Missing resource for {block.OriginalKey}");
 
-                        UpdateName(res, block, alwaysSetNames, alwaysClearNames, prefixNames);
-                        UpdateRefsToChildren(package, res, block);
-
-                        package.Remove(block.OriginalKey);
-
-                        if (res is Rcol rcol)
-                        {
-                            rcol.FixTGIR();
-                        }
+                        UpdateRefsToChildren(package, res, block, prefixLowerCase);
 
                         package.Commit(res);
                     }
@@ -1134,8 +1165,29 @@ namespace SceneGraphPlus.Surface
                     {
                         if (block.BlockName == null && !block.SgOriginalName.Equals(block.SgFullName))
                         {
-                            UpdateRefsFromParents(packageCache, block);
+                            UpdateRefsFromParents(packageCache, block, prefixLowerCase);
                         }
+                    }
+                }
+
+                // ... fourthly update the dirty blocks' names, have to DO THIS LAST as it can change the TGIR of the block ...
+                foreach (AbstractGraphBlock block in kvPair.Value)
+                {
+                    if (!block.IsDeleted)
+                    {
+                        DBPFResource res = package.GetResourceByKey(block.OriginalKey);
+                        Trace.Assert(res != null, $"Missing resource for {block.OriginalKey}");
+
+                        UpdateName(res, block, alwaysSetNames, alwaysClearNames, prefixNames, prefixLowerCase);
+
+                        package.Remove(block.OriginalKey);
+
+                        if (res is Rcol rcol)
+                        {
+                            rcol.FixTGIR();
+                        }
+
+                        package.Commit(res);
                     }
                 }
 
@@ -1160,72 +1212,47 @@ namespace SceneGraphPlus.Surface
             Invalidate();
         }
 
-        private void UpdateName(DBPFResource res, AbstractGraphBlock block, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames)
+        private void UpdateName(DBPFResource res, AbstractGraphBlock block, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames, bool prefixLowerCase)
         {
             // "UnderstoodTypes" - when adding a new resource type, need to update this block
             if (res is Str str)
             {
-                str.SetKeyNameDirty(block.BlockName);
+                str.SetKeyName(block.BlockName);
             }
             else if (res is Mmat)
             {
                 // Name is derived from associated TXMT and can't be changed
             }
-            else if (res is Gzps gzps)
+            else if (res is Cpf cpf) // Do this AFTER MMAT
             {
-                gzps.GetItem("name").StringValue = block.BlockName;
+                if (res is Gzps || res is Xfnc || res is Xmol || res is Xtol || res is Xobj || res is Xrof || res is Xflr)
+                {
+                    cpf.GetItem("name").StringValue = block.BlockName;
+                }
+                else
+                {
+                    Trace.Assert(true, $"Unsupported CPF resource {res}");
+                }
             }
-            else if (res is Xfnc xfnc)
+            else if (res is Rcol rcol)
             {
-                xfnc.GetItem("name").StringValue = block.BlockName;
-            }
-            else if (res is Xmol xmol)
-            {
-                xmol.GetItem("name").StringValue = block.BlockName;
-            }
-            else if (res is Xtol xtol)
-            {
-                xtol.GetItem("name").StringValue = block.BlockName;
-            }
-            else if (res is Xobj xobj)
-            {
-                xobj.GetItem("name").StringValue = block.BlockName;
-            }
-            else if (res is Xrof xrof)
-            {
-                xrof.GetItem("name").StringValue = block.BlockName;
-            }
-            else if (res is Xflr xflr)
-            {
-                xflr.GetItem("name").StringValue = block.BlockName;
-            }
-            else if (res is Cres cres)
-            {
-                cres.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
-                UpdateOgnName(cres, cres.KeyName, alwaysSetNames, alwaysClearNames, prefixNames);
-            }
-            else if (res is Shpe shpe)
-            {
-                shpe.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
-                UpdateOgnName(shpe, shpe.KeyName, alwaysSetNames, alwaysClearNames, prefixNames);
-            }
-            else if (res is Gmnd gmnd)
-            {
-                gmnd.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
-                UpdateOgnName(gmnd, gmnd.KeyName, alwaysSetNames, alwaysClearNames, prefixNames);
-            }
-            else if (res is Gmdc gmdc)
-            {
-                gmdc.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
-            }
-            else if (res is Txmt txmt)
-            {
-                txmt.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
-                UpdateMaterialName(txmt, txmt.KeyName, alwaysSetNames, alwaysClearNames, prefixNames);
-            }
-            else if (res is Txtr txtr)
-            {
-                txtr.SetKeyNameDirty($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId)}");
+                if (res is Cres || res is Shpe || res is Gmnd || res is Gmdc || res is Txmt || res is Txtr || res is Lifo)
+                {
+                    rcol.SetKeyName($"{block.SgBaseName}_{DBPFData.TypeName(block.TypeId).ToLower()}");
+
+                    if (res is Cres || res is Shpe || res is Gmnd)
+                    {
+                        UpdateOgnName(rcol, rcol.KeyName, alwaysSetNames, alwaysClearNames, prefixNames, prefixLowerCase);
+                    }
+                    else if (res is Txmt txmt)
+                    {
+                        UpdateMaterialName(txmt, block.SgBaseName, alwaysSetNames, alwaysClearNames, prefixNames, prefixLowerCase);
+                    }
+                }
+                else
+                {
+                    Trace.Assert(true, $"Unsupported RCOL resource {res}");
+                }
             }
             else
             {
@@ -1233,7 +1260,7 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-        private void UpdateOgnName(Rcol rcol, string name, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames)
+        private void UpdateOgnName(Rcol rcol, string basename, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames, bool prefixLowerCase)
         {
             if (alwaysClearNames)
             {
@@ -1241,13 +1268,25 @@ namespace SceneGraphPlus.Surface
             }
             else if (alwaysSetNames || !string.IsNullOrEmpty(rcol.OgnName))
             {
-                if (!prefixNames) name = Hashes.StripHashFromName(name);
+                basename = Hashes.StripHashFromName(basename);
 
-                rcol.OgnName = name;
+                if (prefixNames)
+                {
+                    if (prefixLowerCase)
+                    {
+                        basename = $"##{rcol.GroupID.ToString().ToLower()}!{basename}";
+                    }
+                    else
+                    {
+                        basename = $"##{rcol.GroupID.ToString().ToUpper()}!{basename}";
+                    }
+                }
+
+                rcol.OgnName = basename;
             }
         }
 
-        private void UpdateMaterialName(Txmt txmt, string name, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames)
+        private void UpdateMaterialName(Txmt txmt, string basename, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames, bool prefixLowerCase)
         {
             if (alwaysClearNames)
             {
@@ -1255,28 +1294,35 @@ namespace SceneGraphPlus.Surface
             }
             else if (alwaysSetNames || !string.IsNullOrEmpty(txmt.MaterialDefinition.FileDescription))
             {
-                if (!prefixNames) name = Hashes.StripHashFromName(name);
+                if (prefixNames)
+                {
+                    if (prefixLowerCase)
+                    {
+                        basename = $"##{txmt.GroupID.ToString().ToLower()}!{basename}";
+                    }
+                    else
+                    {
+                        basename = $"##{txmt.GroupID.ToString().ToUpper()}!{basename}";
+                    }
+                }
 
-                txmt.MaterialDefinition.FileDescription = name;
+                txmt.MaterialDefinition.FileDescription = basename;
             }
         }
 
-        private void UpdateRefsToChildren(CacheableDbpfFile package, DBPFResource res, AbstractGraphBlock block)
+        private void UpdateRefsToChildren(CacheableDbpfFile package, DBPFResource res, AbstractGraphBlock block, bool prefixLowerCase)
         {
-            (res as Shpe)?.Shape.ClearItems();
-            (res as Shpe)?.Shape.ClearParts();
-
             (res as Txmt)?.MaterialDefinition.ClearFiles();
 
             foreach (AbstractGraphConnector connector in block.OutConnectors)
             {
                 Trace.Assert(connector.StartBlock == block, "Out connector is not for this block!");
 
-                UpdateRefToChild(package, res, connector.EndBlock, connector.Index, connector.Label);
+                UpdateRefToChild(package, res, connector.EndBlock, connector.Index, connector.Label, prefixLowerCase);
             }
         }
 
-        private void UpdateRefToChild(CacheableDbpfFile package, DBPFResource res, AbstractGraphBlock endBlock, int index, string label)
+        private void UpdateRefToChild(CacheableDbpfFile package, DBPFResource res, AbstractGraphBlock endBlock, int index, string label, bool prefixLowerCase)
         {
             // "UnderstoodTypes" - when adding a new resource type, need to update this block
             if (res is Str str)
@@ -1295,7 +1341,7 @@ namespace SceneGraphPlus.Surface
                     Trace.Assert(str.InstanceID == (TypeInstanceID)0x0088, "TXMT expected for Material Names only");
                 }
 
-                items[index].Title = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                items[index].Title = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
             }
             else if (res is Mmat mmat)
             {
@@ -1306,7 +1352,7 @@ namespace SceneGraphPlus.Surface
                 }
                 else if (endBlock.TypeId == Txmt.TYPE)
                 {
-                    mmat.GetItem("name").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    mmat.GetItem("name").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId, prefixLowerCase);
                 }
             }
             else if (res is Gzps gzps)
@@ -1330,6 +1376,8 @@ namespace SceneGraphPlus.Surface
 
                     idr.SetItem(gzps.GetItem($"override{index}resourcekeyidx").UIntegerValue, endBlock.Key);
                 }
+
+                package.Commit(idr);
             }
             else if (res is Xfnc xfnc)
             {
@@ -1340,15 +1388,15 @@ namespace SceneGraphPlus.Surface
                     Trace.Assert(index <= 2, "Invalid XFNC CRES index");
                     if (index == 0)
                     {
-                        xfnc.GetItem("post").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                        xfnc.GetItem("post").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
                     }
                     else if (index == 1)
                     {
-                        xfnc.GetItem("rail").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                        xfnc.GetItem("rail").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
                     }
                     else if (index == 2)
                     {
-                        xfnc.GetItem("diagrail").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                        xfnc.GetItem("diagrail").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
                     }
                 }
             }
@@ -1389,6 +1437,8 @@ namespace SceneGraphPlus.Surface
 
                     idr.SetItem(xmol.GetItem($"override{index}resourcekeyidx").UIntegerValue, endBlock.Key);
                 }
+
+                package.Commit(idr);
             }
             else if (res is Xtol xtol)
             {
@@ -1401,6 +1451,8 @@ namespace SceneGraphPlus.Surface
                 {
                     idr.SetItem(xtol.GetItem("materialkeyidx").UIntegerValue, endBlock.Key);
                 }
+
+                package.Commit(idr);
             }
             else if (res is Xobj xobj)
             {
@@ -1410,35 +1462,35 @@ namespace SceneGraphPlus.Surface
                 {
                     Trace.Assert(index == 0, "Invalid XOBJ TXMT index");
 
-                    xobj.GetItem("material").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                    xobj.GetItem("material").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId, prefixLowerCase);
                 }
             }
             else if (res is Xrof xrof)
             {
                 Trace.Assert(endBlock.TypeId == Txtr.TYPE, "Expecting TXTR for EndBlock");
 
-                if (endBlock.TypeId == Txmt.TYPE)
+                if (endBlock.TypeId == Txtr.TYPE)
                 {
                     Trace.Assert(index <= 4, "Invalid XROF TXTR index");
                     if (index == 0)
                     {
-                        xrof.GetItem("texturetop").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                        xrof.GetItem("texturetop").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
                     }
                     else if (index == 1)
                     {
-                        xrof.GetItem("texturetopbump").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                        xrof.GetItem("texturetopbump").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
                     }
                     else if (index == 2)
                     {
-                        xrof.GetItem("textureedges").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                        xrof.GetItem("textureedges").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
                     }
                     else if (index == 3)
                     {
-                        xrof.GetItem("texturetrim").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                        xrof.GetItem("texturetrim").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
                     }
                     else if (index == 4)
                     {
-                        xrof.GetItem("textureunder").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                        xrof.GetItem("textureunder").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
                     }
                 }
             }
@@ -1446,12 +1498,16 @@ namespace SceneGraphPlus.Surface
             {
                 Trace.Assert(endBlock.TypeId == Txtr.TYPE, "Expecting TXTR for EndBlock");
 
-                if (endBlock.TypeId == Txmt.TYPE)
+                if (endBlock.TypeId == Txtr.TYPE)
                 {
-                    Trace.Assert(index == 0, "Invalid XFLR TXTR index");
+                    Trace.Assert(index <= 1, "Invalid XFLR TXTR index");
                     if (index == 0)
                     {
-                        xflr.GetItem("texturetname").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId);
+                        xflr.GetItem("texturetname").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
+                    }
+                    else if (index == 1)
+                    {
+                        // This is the link to "_detail" TXTR, and the name changes was handled while editing
                     }
                 }
             }
@@ -1465,11 +1521,13 @@ namespace SceneGraphPlus.Surface
                 Trace.Assert(endBlock.TypeId == Gmnd.TYPE || endBlock.TypeId == Txmt.TYPE, "Expecting GMND or TXMT for EndBlock");
                 if (endBlock.TypeId == Gmnd.TYPE)
                 {
-                    shpe.Shape.AddItem(MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId));
+                    Trace.Assert(index <= shpe.Shape.Items.Count, $"Invalid Item index {index}");
+                    shpe.Shape.UpdateItem(index, MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId, prefixLowerCase));
                 }
                 else if (endBlock.TypeId == Txmt.TYPE)
                 {
-                    shpe.Shape.AddPart(label, MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName));
+                    Trace.Assert(index <= shpe.Shape.Parts.Count, $"Invalid Part index {index}");
+                    shpe.Shape.UpdatePart(index, MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase));
                 }
             }
             else if (res is Gmnd gmnd)
@@ -1477,29 +1535,56 @@ namespace SceneGraphPlus.Surface
                 Trace.Assert(endBlock.TypeId == Gmdc.TYPE, "Expecting GMDC for EndBlock");
                 gmnd.SetGmdcKey(index, endBlock.Key);
             }
+            else if (res is Gmdc)
+            {
+                Trace.Assert(false, "GMDC's do not have child resources");
+            }
             else if (res is Txmt txmt)
             {
                 Trace.Assert(endBlock.TypeId == Txtr.TYPE, "Expecting TXTR for EndBlock");
-                txmt.MaterialDefinition.SetProperty(label, MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName));
-                txmt.MaterialDefinition.AddFile(MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName));
+                txmt.MaterialDefinition.SetProperty(label, MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase));
+                txmt.MaterialDefinition.AddFile(MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase));
+            }
+            else if (res is Txtr txtr)
+            {
+                Trace.Assert(endBlock.TypeId == Lifo.TYPE, "Expecting LIFO for EndBlock");
+                txtr.ImageData.SetLifoRef(index, MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, Lifo.TYPE, prefixLowerCase));
+            }
+            else if (res is Lifo)
+            {
+                Trace.Assert(false, "LIFO's do not have child resources");
             }
             else
             {
-                Trace.Assert(true, $"Unsupported resource {res}");
+                Trace.Assert(false, $"Unsupported resource {res}");
             }
         }
 
-        private string MakeSgName(TypeGroupID groupId, string name)
+        private string MakeSgName(TypeGroupID groupId, string name, bool prefixLowerCase)
         {
-            return (groupId == DBPFData.GROUP_SG_MAXIS) ? name : $"##{groupId.ToString().ToLower()}!{name}";
+            if (groupId == DBPFData.GROUP_SG_MAXIS)
+            {
+                return name;
+            }
+            else
+            {
+                if (prefixLowerCase)
+                {
+                    return $"##{groupId.ToString().ToLower()}!{name}";
+                }
+                else
+                {
+                    return $"##{groupId.ToString().ToUpper()}!{name}";
+                }
+            }
         }
 
-        private string MakeSgName(TypeGroupID groupId, string name, TypeTypeID typeId)
+        private string MakeSgName(TypeGroupID groupId, string name, TypeTypeID typeId, bool prefixLowerCase)
         {
-            return $"{MakeSgName(groupId, name)}_{DBPFData.TypeName(typeId).ToLower()}";
+            return $"{MakeSgName(groupId, name, prefixLowerCase)}_{DBPFData.TypeName(typeId).ToLower()}";
         }
 
-        private void UpdateRefsFromParents(DbpfFileCache packageCache, AbstractGraphBlock block)
+        private void UpdateRefsFromParents(DbpfFileCache packageCache, AbstractGraphBlock block, bool prefixLowerCase)
         {
             foreach (AbstractGraphConnector connector in block.GetInConnectors())
             {
@@ -1510,7 +1595,7 @@ namespace SceneGraphPlus.Surface
                 DBPFResource parentRes = package.GetResourceByKey(connector.StartBlock.OriginalKey);
                 Trace.Assert(parentRes != null, "Can't locate parent resource");
 
-                UpdateRefToChild(package, parentRes, connector.EndBlock, connector.Index, connector.Label);
+                UpdateRefToChild(package, parentRes, connector.EndBlock, connector.Index, connector.Label, prefixLowerCase);
 
                 package.Commit(parentRes);
             }

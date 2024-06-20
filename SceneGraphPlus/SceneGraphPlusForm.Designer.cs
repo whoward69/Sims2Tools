@@ -64,6 +64,8 @@ namespace SceneGraphPlus
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemClearOptionalNames = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSetOptionalNames = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemPrefixOptionalNames = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemPrefixLowerCase = new System.Windows.Forms.ToolStripMenuItem();
             this.menuGrid = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGridRealign = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -89,7 +91,6 @@ namespace SceneGraphPlus
             this.lblBlockPackagePath = new System.Windows.Forms.Label();
             this.textBlockPackagePath = new System.Windows.Forms.TextBox();
             this.btnFixIssues = new System.Windows.Forms.Button();
-            this.menuItemPrefixOptionalNames = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel2.SuspendLayout();
@@ -108,7 +109,7 @@ namespace SceneGraphPlus
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
-            this.menuMain.Size = new System.Drawing.Size(1163, 24);
+            this.menuMain.Size = new System.Drawing.Size(884, 24);
             this.menuMain.TabIndex = 0;
             this.menuMain.Text = "menuStrip";
             // 
@@ -261,7 +262,8 @@ namespace SceneGraphPlus
             this.toolStripSeparator5,
             this.menuItemClearOptionalNames,
             this.menuItemSetOptionalNames,
-            this.menuItemPrefixOptionalNames});
+            this.menuItemPrefixOptionalNames,
+            this.menuItemPrefixLowerCase});
             this.menuOptions.Name = "menuOptions";
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
@@ -320,6 +322,20 @@ namespace SceneGraphPlus
             this.menuItemSetOptionalNames.Size = new System.Drawing.Size(281, 22);
             this.menuItemSetOptionalNames.Text = "Always &Set Optional Names";
             this.menuItemSetOptionalNames.Click += new System.EventHandler(this.OnAlwaysSetOptionalNames);
+            // 
+            // menuItemPrefixOptionalNames
+            // 
+            this.menuItemPrefixOptionalNames.CheckOnClick = true;
+            this.menuItemPrefixOptionalNames.Name = "menuItemPrefixOptionalNames";
+            this.menuItemPrefixOptionalNames.Size = new System.Drawing.Size(281, 22);
+            this.menuItemPrefixOptionalNames.Text = "Optional Names Have Group &Prefix";
+            // 
+            // menuItemPrefixLowerCase
+            // 
+            this.menuItemPrefixLowerCase.CheckOnClick = true;
+            this.menuItemPrefixLowerCase.Name = "menuItemPrefixLowerCase";
+            this.menuItemPrefixLowerCase.Size = new System.Drawing.Size(281, 22);
+            this.menuItemPrefixLowerCase.Text = "Group Prefix is Lower Case";
             // 
             // menuGrid
             // 
@@ -397,6 +413,10 @@ namespace SceneGraphPlus
             this.menuItemSeparator4.Name = "menuItemSeparator4";
             this.menuItemSeparator4.Size = new System.Drawing.Size(232, 6);
             // 
+            // selectFileDialog
+            // 
+            this.selectFileDialog.Multiselect = true;
+            // 
             // splitContainer
             // 
             this.splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -431,14 +451,14 @@ namespace SceneGraphPlus
             this.splitContainer.Panel2.Controls.Add(this.textBlockPackagePath);
             this.splitContainer.Panel2.Controls.Add(this.btnFixIssues);
             this.splitContainer.Panel2MinSize = 100;
-            this.splitContainer.Size = new System.Drawing.Size(1157, 604);
+            this.splitContainer.Size = new System.Drawing.Size(878, 604);
             this.splitContainer.SplitterDistance = 500;
             this.splitContainer.TabIndex = 2;
             // 
             // btnSaveAll
             // 
             this.btnSaveAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSaveAll.Location = new System.Drawing.Point(1077, 5);
+            this.btnSaveAll.Location = new System.Drawing.Point(798, 5);
             this.btnSaveAll.Name = "btnSaveAll";
             this.btnSaveAll.Size = new System.Drawing.Size(71, 23);
             this.btnSaveAll.TabIndex = 12;
@@ -449,7 +469,7 @@ namespace SceneGraphPlus
             // btnFixTgi
             // 
             this.btnFixTgi.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFixTgi.Location = new System.Drawing.Point(602, 32);
+            this.btnFixTgi.Location = new System.Drawing.Point(377, 31);
             this.btnFixTgi.Name = "btnFixTgi";
             this.btnFixTgi.Size = new System.Drawing.Size(71, 23);
             this.btnFixTgi.TabIndex = 8;
@@ -460,10 +480,10 @@ namespace SceneGraphPlus
             // textBlockName
             // 
             this.textBlockName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBlockName.Location = new System.Drawing.Point(679, 32);
+            this.textBlockName.Location = new System.Drawing.Point(454, 32);
             this.textBlockName.MinimumSize = new System.Drawing.Size(100, 21);
             this.textBlockName.Name = "textBlockName";
-            this.textBlockName.Size = new System.Drawing.Size(469, 21);
+            this.textBlockName.Size = new System.Drawing.Size(415, 21);
             this.textBlockName.TabIndex = 10;
             this.textBlockName.TextChanged += new System.EventHandler(this.OnNameChanged);
             // 
@@ -471,7 +491,7 @@ namespace SceneGraphPlus
             // 
             this.lblBlockName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblBlockName.AutoSize = true;
-            this.lblBlockName.Location = new System.Drawing.Point(619, 35);
+            this.lblBlockName.Location = new System.Drawing.Point(404, 36);
             this.lblBlockName.Name = "lblBlockName";
             this.lblBlockName.Size = new System.Drawing.Size(44, 15);
             this.lblBlockName.TabIndex = 9;
@@ -481,10 +501,10 @@ namespace SceneGraphPlus
             // textBlockSgName
             // 
             this.textBlockSgName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBlockSgName.Location = new System.Drawing.Point(679, 60);
+            this.textBlockSgName.Location = new System.Drawing.Point(454, 60);
             this.textBlockSgName.MinimumSize = new System.Drawing.Size(100, 21);
             this.textBlockSgName.Name = "textBlockSgName";
-            this.textBlockSgName.Size = new System.Drawing.Size(469, 21);
+            this.textBlockSgName.Size = new System.Drawing.Size(415, 21);
             this.textBlockSgName.TabIndex = 7;
             this.textBlockSgName.TextChanged += new System.EventHandler(this.OnSgNameChanged);
             // 
@@ -492,7 +512,7 @@ namespace SceneGraphPlus
             // 
             this.lblBlockSgName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblBlockSgName.AutoSize = true;
-            this.lblBlockSgName.Location = new System.Drawing.Point(609, 63);
+            this.lblBlockSgName.Location = new System.Drawing.Point(384, 63);
             this.lblBlockSgName.Name = "lblBlockSgName";
             this.lblBlockSgName.Size = new System.Drawing.Size(64, 15);
             this.lblBlockSgName.TabIndex = 6;
@@ -518,7 +538,7 @@ namespace SceneGraphPlus
             this.textBlockFullSgName.MinimumSize = new System.Drawing.Size(100, 21);
             this.textBlockFullSgName.Name = "textBlockFullSgName";
             this.textBlockFullSgName.ReadOnly = true;
-            this.textBlockFullSgName.Size = new System.Drawing.Size(492, 21);
+            this.textBlockFullSgName.Size = new System.Drawing.Size(270, 21);
             this.textBlockFullSgName.TabIndex = 4;
             // 
             // textBlockKey
@@ -530,8 +550,9 @@ namespace SceneGraphPlus
             this.textBlockKey.MinimumSize = new System.Drawing.Size(100, 21);
             this.textBlockKey.Name = "textBlockKey";
             this.textBlockKey.ReadOnly = true;
-            this.textBlockKey.Size = new System.Drawing.Size(492, 21);
+            this.textBlockKey.Size = new System.Drawing.Size(270, 21);
             this.textBlockKey.TabIndex = 3;
+            this.textBlockKey.Text = "TXMT-0x5FED322E-0xC414F49F-0xFF1E510D";
             // 
             // lblBlockKey
             // 
@@ -561,14 +582,14 @@ namespace SceneGraphPlus
             this.textBlockPackagePath.Location = new System.Drawing.Point(101, 6);
             this.textBlockPackagePath.Name = "textBlockPackagePath";
             this.textBlockPackagePath.ReadOnly = true;
-            this.textBlockPackagePath.Size = new System.Drawing.Size(970, 21);
+            this.textBlockPackagePath.Size = new System.Drawing.Size(691, 21);
             this.textBlockPackagePath.TabIndex = 0;
             this.textBlockPackagePath.Click += new System.EventHandler(this.OnSaveAll);
             // 
             // btnFixIssues
             // 
             this.btnFixIssues.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFixIssues.Location = new System.Drawing.Point(602, 32);
+            this.btnFixIssues.Location = new System.Drawing.Point(377, 31);
             this.btnFixIssues.Name = "btnFixIssues";
             this.btnFixIssues.Size = new System.Drawing.Size(71, 23);
             this.btnFixIssues.TabIndex = 11;
@@ -576,18 +597,11 @@ namespace SceneGraphPlus
             this.btnFixIssues.UseVisualStyleBackColor = true;
             this.btnFixIssues.Click += new System.EventHandler(this.OnFixIssuesClicked);
             // 
-            // menuItemPrefixOptionalNames
-            // 
-            this.menuItemPrefixOptionalNames.CheckOnClick = true;
-            this.menuItemPrefixOptionalNames.Name = "menuItemPrefixOptionalNames";
-            this.menuItemPrefixOptionalNames.Size = new System.Drawing.Size(281, 22);
-            this.menuItemPrefixOptionalNames.Text = "Optional Names Have Group &Prefix";
-            // 
             // SceneGraphPlusForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1163, 634);
+            this.ClientSize = new System.Drawing.Size(884, 634);
             this.Controls.Add(this.menuMain);
             this.Controls.Add(this.splitContainer);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -665,5 +679,6 @@ namespace SceneGraphPlus
         private System.Windows.Forms.ToolStripMenuItem menuPackages;
         private System.Windows.Forms.Button btnSaveAll;
         private System.Windows.Forms.ToolStripMenuItem menuItemPrefixOptionalNames;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPrefixLowerCase;
     }
 }

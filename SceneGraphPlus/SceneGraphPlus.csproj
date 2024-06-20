@@ -59,6 +59,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dialogs\TextureDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\TextureDialog.Designer.cs">
+      <DependentUpon>TextureDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="SceneGraphPlusApp.cs" />
     <Compile Include="SceneGraphPlusForm.cs">
       <SubType>Form</SubType>
@@ -71,6 +77,9 @@
     <Compile Include="SceneGraphPlusSurface.cs" />
     <Compile Include="SceneGraphPlusShapes.cs" />
     <Compile Include="Settings.cs" />
+    <EmbeddedResource Include="Dialogs\TextureDialog.resx">
+      <DependentUpon>TextureDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SceneGraphPlusForm.resx">
       <DependentUpon>SceneGraphPlusForm.cs</DependentUpon>
     </EmbeddedResource>

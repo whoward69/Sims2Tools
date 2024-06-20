@@ -346,6 +346,7 @@ namespace SceneGraphPlus.Shapes
         private string blockName = null;
 
         private bool missing = false;
+        private bool editable = true; // This should be called "readonly" but hey, that's a reserved word!
         private bool editing = false;
         private bool deleted = false;
 
@@ -374,6 +375,12 @@ namespace SceneGraphPlus.Shapes
             blockRef.SetClean();
 
             base.SetClean();
+        }
+
+        public bool IsEditable
+        {
+            get => editable;
+            set => editable = value;
         }
 
         public bool IsDeleted => deleted;
@@ -413,6 +420,25 @@ namespace SceneGraphPlus.Shapes
         private readonly List<AbstractGraphConnector> inConnectors = new List<AbstractGraphConnector>(); // Connectors this is the EndBlock of
 
         public AbstractGraphBlock SoleParent => (inConnectors.Count == 1) ? inConnectors[0].StartBlock : null;
+        public AbstractGraphBlock SoleRcolParent
+        {
+            get
+            {
+                AbstractGraphBlock rcolBlock = null;
+
+                foreach (AbstractGraphConnector connector in inConnectors)
+                {
+                    if (DBPFData.IsKnownRcolType(connector.StartBlock.TypeId))
+                    {
+                        if (rcolBlock != null) return null;
+
+                        rcolBlock = connector.StartBlock;
+                    }
+                }
+
+                return rcolBlock;
+            }
+        }
 
         protected AbstractGraphBlock(DrawingSurface surface) : base(surface)
         {
@@ -428,7 +454,13 @@ namespace SceneGraphPlus.Shapes
         public void ReplaceBlockRef(BlockRef blockRef)
         {
             Trace.Assert(!IsClone, "Cannot replace a clone's BlockRef");
-            Trace.Assert((this.blockRef.Key == null && blockRef.SgFullName != null) || (this.blockRef.SgFullName == null && this.blockRef.Key != null), "Bad BlockRef replacement");
+
+            // Use this.blockRef here and not BlockRef as we want the non-clone redirected value
+
+            if (!(this.blockRef.Key != null && this.blockRef.Key.Equals(blockRef.Key)))
+            {
+                Trace.Assert((this.blockRef.Key == null && blockRef.SgFullName != null) || (this.blockRef.SgFullName == null && this.blockRef.Key != null), "Bad BlockRef replacement");
+            }
 
             this.blockRef = blockRef;
         }
@@ -440,9 +472,9 @@ namespace SceneGraphPlus.Shapes
 
         public bool IsTgirValid => BlockRef.IsTgirValid;
 
-        public void UpdateSgName(string sgName)
+        public void UpdateSgName(string sgName, bool prefixLowerCase)
         {
-            BlockRef.SgFullName = sgName;
+            BlockRef.SetSgFullName(sgName, prefixLowerCase);
         }
 
         public bool IsFileListValid
@@ -470,12 +502,12 @@ namespace SceneGraphPlus.Shapes
         public string SgFullName
         {
             get => BlockRef.SgFullName;
-            set
-            {
-                BlockRef.SgFullName = value;
-                BlockRef.FixTgir();
-                SetDirty();
-            }
+        }
+        public void SetSgFullName(string value, bool prefixLowerCase)
+        {
+            BlockRef.SetSgFullName(value, prefixLowerCase);
+            BlockRef.FixTgir();
+            SetDirty();
         }
 
         public string SgBaseName
@@ -600,10 +632,27 @@ namespace SceneGraphPlus.Shapes
 
         public List<AbstractGraphConnector> OutConnectors => outConnectors;
 
-        public void ConnectTo(int index, string label, AbstractGraphBlock endBlock)
+        public AbstractGraphConnector OutConnectorByLabel(string label)
+        {
+            foreach (AbstractGraphConnector connector in outConnectors)
+            {
+                if (connector.Label.Equals(label))
+                {
+                    return connector;
+                }
+            }
+
+            return null;
+        }
+
+        public AbstractGraphConnector ConnectTo(int index, string label, AbstractGraphBlock endBlock)
         {
             AbstractGraphConnector connector = new BezierArrow(surface, this, endBlock) { Index = index, Label = label };
             outConnectors.Add(connector);
+
+            endBlock.ConnectedFrom(connector);
+
+            return connector;
         }
 
         public void ConnectedFrom(AbstractGraphConnector connector)

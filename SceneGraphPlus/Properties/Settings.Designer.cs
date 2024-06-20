@@ -445,7 +445,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DeepPink")]
         public string XobjBlockColour {
             get {
                 return ((string)(this["XobjBlockColour"]));
@@ -469,7 +469,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DeepPink")]
         public string XmolBlockColour {
             get {
                 return ((string)(this["XmolBlockColour"]));
@@ -493,7 +493,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DeepPink")]
         public string XtolBlockColour {
             get {
                 return ((string)(this["XtolBlockColour"]));
@@ -517,7 +517,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DeepPink")]
         public string XfncBlockColour {
             get {
                 return ((string)(this["XfncBlockColour"]));
@@ -541,7 +541,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DeepPink")]
         public string XrofBlockColour {
             get {
                 return ((string)(this["XrofBlockColour"]));
@@ -589,7 +589,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("MediumOrchid")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DeepPink")]
         public string XflrBlockColour {
             get {
                 return ((string)(this["XflrBlockColour"]));
@@ -608,6 +608,30 @@ namespace SceneGraphPlus.Properties {
             }
             set {
                 this["XflrRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PaleVioletRed")]
+        public string LifoBlockColour {
+            get {
+                return ((string)(this["LifoBlockColour"]));
+            }
+            set {
+                this["LifoBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public int LifoRow {
+            get {
+                return ((int)(this["LifoRow"]));
+            }
+            set {
+                this["LifoRow"] = value;
             }
         }
     }

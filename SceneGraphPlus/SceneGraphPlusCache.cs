@@ -76,7 +76,7 @@ namespace SceneGraphPlus.Cache
             this.sgOriginalName = this.sgName;
         }
 
-        internal BlockRef(DBPFFile package, TypeTypeID typeId, TypeGroupID groupId, string sgName) : this(package, typeId)
+        internal BlockRef(DBPFFile package, TypeTypeID typeId, TypeGroupID groupId, string sgName, bool prefixLowerCase) : this(package, typeId)
         {
             TypeGroupID sgGroupId = groupId;
 
@@ -89,10 +89,11 @@ namespace SceneGraphPlus.Cache
                 sgGroupId = (TypeGroupID)Convert.ToUInt32(sgGroupString, 16);
             }
 
-            this.sgName = NormalizeSgName(typeId, sgGroupId, sgName);
+            this.sgName = NormalizeSgName(typeId, sgGroupId, sgName, prefixLowerCase);
             this.sgOriginalName = this.sgName;
             this.key = new DBPFKey(typeId, sgGroupId, DBPFData.INSTANCE_NULL, DBPFData.RESOURCE_NULL);
             FixTgir();
+            this.originalKey = this.key;
         }
 
         public void SetClean()
@@ -106,31 +107,38 @@ namespace SceneGraphPlus.Cache
         public string SgFullName
         {
             get => sgName;
-            set
+        }
+        public void SetSgFullName(string value, bool prefixLowerCase)
+        {
+            if (key != null)
             {
-                if (key != null)
-                {
-                    sgName = NormalizeSgName(key.TypeID, key.GroupID, value);
-                }
-                else
-                {
-                    sgName = value;
-                }
-
-                if (sgOriginalName == null) this.sgOriginalName = this.sgName;
+                sgName = NormalizeSgName(key.TypeID, key.GroupID, value, prefixLowerCase);
             }
+            else
+            {
+                sgName = value;
+            }
+
+            if (sgOriginalName == null) this.sgOriginalName = this.sgName;
         }
         public DBPFKey OriginalKey => originalKey;
         public DBPFKey Key => key;
         public string PackagePath => packagePath;
 
-        private string NormalizeSgName(TypeTypeID typeId, TypeGroupID groupId, string sgName)
+        private string NormalizeSgName(TypeTypeID typeId, TypeGroupID groupId, string sgName, bool prefixLowerCase)
         {
             if (sgName == null) return null;
 
             if (!sgName.StartsWith("##"))
             {
-                sgName = $"##{groupId.ToString().ToLower()}!{sgName}";
+                if (prefixLowerCase)
+                {
+                    sgName = $"##{groupId.ToString().ToLower()}!{sgName}";
+                }
+                else
+                {
+                    sgName = $"##{groupId.ToString().ToUpper()}!{sgName}";
+                }
             }
 
             string typeName = $"_{DBPFData.TypeName(typeId).ToLower()}";
