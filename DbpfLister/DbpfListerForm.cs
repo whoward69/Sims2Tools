@@ -1,5 +1,6 @@
 ﻿using Sims2Tools;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Groups;
@@ -56,7 +57,25 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
-            FindLifo("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Double Deluxe\\Base\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\University Life\\EP1\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Double Deluxe\\EP2\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Best of Business\\EP3\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP1\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Glamour Life Stuff\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\EP4\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Seasons\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Double Deluxe\\SP4\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Best of Business\\SP5\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Bon Voyage\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\University Life\\SP6\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Free Time\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Best of Business\\SP7\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\University Life\\SP8\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Apartment Life\\TSData\\Res\\Objects\\objects.package");
+            FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP9\\TSData\\Res\\Objects\\objects.package");
+
+            // FindLifo("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads");
 
             // FindTxtr("C:\\Users\\whowa\\Desktop\\SG Test Stuff\\Multi-SHPE\\WH_SimTurner.package");
             // FindTxtr("C:\\Users\\whowa\\Desktop\\SG Test Stuff\\Candyshop Panties\\1_WH_Materials_CandyShop_Panties.package");
@@ -580,6 +599,61 @@ namespace DbpfLister
                 {
                     textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
                 }
+            }
+        }
+
+        private void FindNodeVersions(string packagePath)
+        {
+            textMessages.AppendText($"--- {packagePath}\r\n");
+
+            SortedDictionary<int, SortedList<int, int>> nodeVersionsByPrimitive = new SortedDictionary<int, SortedList<int, int>>();
+
+            using (DBPFFile package = new DBPFFile(packagePath))
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(Bhav.TYPE))
+                {
+                    Bhav bhav = (Bhav)package.GetResourceByEntry(entry);
+
+                    foreach (Instruction instruction in bhav.Instructions)
+                    {
+                        if (instruction.OpCode > 0x00FF) continue;
+
+                        if (!nodeVersionsByPrimitive.ContainsKey(instruction.OpCode))
+                        {
+                            nodeVersionsByPrimitive.Add(instruction.OpCode, new SortedList<int, int>());
+                        }
+
+                        SortedList<int, int> nodeVersions = nodeVersionsByPrimitive[instruction.OpCode];
+
+                        if (!nodeVersions.ContainsKey(instruction.NodeVersion))
+                        {
+                            nodeVersions.Add(instruction.NodeVersion, 0);
+                        }
+
+                        nodeVersions[instruction.NodeVersion] += 1;
+                    }
+                }
+
+                package.Close();
+            }
+
+            foreach (int primitive in nodeVersionsByPrimitive.Keys)
+            {
+                if (nodeVersionsByPrimitive[primitive].Count == 1) continue;
+
+                textMessages.AppendText($"{Helper.Hex4PrefixString(primitive)}:");
+
+                SortedList<int, int> nodeVersions = nodeVersionsByPrimitive[primitive];
+
+                bool addComma = false;
+                foreach (int version in nodeVersions.Keys)
+                {
+                    textMessages.AppendText($"{(addComma ? "," : "")} {version} ({nodeVersions[version]})");
+
+                    addComma = true;
+                }
+
+                textMessages.AppendText("\r\n");
             }
         }
 

@@ -38,6 +38,8 @@ namespace HoodExporter
         private List<Serializer> resultDocs;
 
         private static DBPFFile objectsPackage = null;
+        private static Dictionary<TypeGUID, string> customPackagePathByGuid = null;
+        private static Dictionary<TypeGUID, int> customTgirByGuid = null;
 
         public static void Shutdown()
         {
@@ -119,6 +121,49 @@ namespace HoodExporter
                 Ctss ctss = (Ctss)objectsPackage.GetResourceByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
 
                 return ctss?.LanguageItems(MetaData.Languages.Default);
+            }
+            else
+            {
+                if (customPackagePathByGuid == null)
+                {
+                    if (Directory.Exists(Sims2ToolsLib.Sims2DownloadsPath))
+                    {
+                        customPackagePathByGuid = new Dictionary<TypeGUID, string>();
+                        customTgirByGuid = new Dictionary<TypeGUID, int>();
+
+                        foreach (string packagePath in Directory.GetFiles(Sims2ToolsLib.Sims2DownloadsPath, "*.package", SearchOption.AllDirectories))
+                        {
+                            using (DBPFFile package = new DBPFFile(packagePath))
+                            {
+                                foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
+                                {
+                                    Objd objd = (Objd)package.GetResourceByEntry(entry);
+
+                                    if (!customPackagePathByGuid.ContainsKey(objd.Guid))
+                                    {
+                                        customPackagePathByGuid.Add(objd.Guid, packagePath);
+                                        customTgirByGuid.Add(objd.Guid, entry.TGIRHash);
+                                    }
+                                }
+
+                                package.Close();
+                            }
+                        }
+                    }
+                }
+
+                if (customPackagePathByGuid != null && customPackagePathByGuid.ContainsKey(guid))
+                {
+                    using (DBPFFile package = new DBPFFile(customPackagePathByGuid[guid]))
+                    {
+                        Objd objd = (Objd)package.GetResourceByTGIR(customTgirByGuid[guid]);
+                        Ctss ctss = (Ctss)package.GetResourceByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
+
+                        package.Close();
+
+                        return ctss?.LanguageItems(MetaData.Languages.Default);
+                    }
+                }
             }
 
             return null;

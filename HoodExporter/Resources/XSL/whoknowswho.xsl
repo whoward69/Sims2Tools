@@ -4,19 +4,12 @@
   <xsl:output name="csv" method="text" omit-xml-declaration="yes" indent="no"/>
 
   <!-- Output strings -->
-  <xsl:variable name="space">
-    <xsl:text> </xsl:text>
-  </xsl:variable>
-  <xsl:variable name="quote">
-    <xsl:text>"</xsl:text>
-  </xsl:variable>
-  <xsl:variable name="separator">
-    <xsl:text>,</xsl:text>
-  </xsl:variable>
-  <xsl:variable name="newLine">
-    <xsl:text>
-</xsl:text>
-  </xsl:variable>
+  <xsl:variable name="space"><xsl:text> </xsl:text></xsl:variable>
+  <xsl:variable name="quote"><xsl:text>"</xsl:text></xsl:variable>
+  <xsl:variable name="csvQuote"><xsl:text>""</xsl:text></xsl:variable>
+  <xsl:variable name="separator"><xsl:text>,</xsl:text></xsl:variable>
+  <xsl:variable name="newLine"><xsl:text>
+</xsl:text></xsl:variable>
 
   <!-- Ignore anything not explicitly matched or selected -->
   <xsl:template match="/|@*|node()|comment()" priority="0">

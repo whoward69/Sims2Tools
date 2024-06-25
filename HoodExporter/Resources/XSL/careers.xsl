@@ -16,95 +16,84 @@
     <xsl:apply-templates select="@*|node()"/>
   </xsl:template>
 
-  <!-- Create the Memories.csv file -->
+  <!-- Create the Careers.csv file -->
   <xsl:template match="main" priority="1">
     <xsl:variable name="hoodCode" select="./idno/@ownerName"/>
     <xsl:variable name="hoodName" select="./ctss/language[1]/item[@index='0x0000']/text"/>
 
-    <xsl:result-document format="csv" href="Memories.csv">
-      <xsl:text>"Memory GUID","Memory Name","Memory Title","Owner ID","Owner Name","About GUID","About Name"</xsl:text>
+    <xsl:result-document format="csv" href="Careers.csv">
+      <xsl:text>"Sim GUID","Sim ID","Family Name","Given Name","Age","School","Grade","Job","Level","Performance"</xsl:text>
       <xsl:value-of select="$newLine"/>
 
-      <xsl:apply-templates select="./ngbh/sims/tokens/standard/item[@flags='0x0003']" mode="memories">
-      </xsl:apply-templates>
+      <xsl:apply-templates select="/hood/main/sdsc[string-length(normalize-space(familyName)) gt 0]" mode="careers"/>
     </xsl:result-document>
   </xsl:template>
 
-  <!-- Find all the memories -->
-  <xsl:template match="item" mode="memories">
+  <!-- Find all the careers data -->
+  <xsl:template match="sdsc" mode="careers">
     <xsl:value-of select="$quote"/>
-    <xsl:value-of select="@guid"/>
-    <xsl:value-of select="$quote"/>
-
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="$quote"/>
-    <xsl:value-of select="sims2tools:asObjectName(@guid)"/>
+    <xsl:value-of select="@simGuid"/>
     <xsl:value-of select="$quote"/>
 
     <xsl:value-of select="$separator"/>
     <xsl:value-of select="$quote"/>
-    <xsl:value-of select="sims2tools:asObjectTitle(@guid)"/>
+    <xsl:value-of select="@simId"/>
     <xsl:value-of select="$quote"/>
 
     <xsl:value-of select="$separator"/>
     <xsl:value-of select="$quote"/>
-    <xsl:value-of select="sims2tools:asHex(./data/@i4)"/>
+    <xsl:value-of select="familyName"/>
     <xsl:value-of select="$quote"/>
 
     <xsl:value-of select="$separator"/>
-    <xsl:call-template name="ownerName">
-      <xsl:with-param name="ownerId" select="sims2tools:asHex(./data/@i4)"/>
-    </xsl:call-template>
-
-    <xsl:value-of select="$separator"/>
     <xsl:value-of select="$quote"/>
-    <xsl:value-of select="concat(sims2tools:asHex(./data/@i6, 4),sims2tools:asHexNoPrefix(./data/@i5, 4))"/>
+    <xsl:value-of select="givenName"/>
     <xsl:value-of select="$quote"/>
 
     <xsl:value-of select="$separator"/>
-    <xsl:call-template name="aboutName">
-      <xsl:with-param name="aboutGuid" select="concat(sims2tools:asHex(./data/@i6, 4),sims2tools:asHexNoPrefix(./data/@i5, 4))"/>
-    </xsl:call-template>
+    <xsl:value-of select="$quote"/>
+    <xsl:value-of select="base/@lifestage"/>
+    <xsl:value-of select="$quote"/>
 
-  <xsl:value-of select="$newLine"/>
-  </xsl:template>
-  
-  <xsl:template name="ownerName">
-    <xsl:param name="ownerId"/>
-    <xsl:variable name="owner" select="/hood/main/sdsc[@simId=$ownerId]"/>
-    
+    <xsl:value-of select="$separator"/>
     <xsl:value-of select="$quote"/>
     <xsl:choose>
-      <xsl:when test="$owner">
-        <xsl:value-of select="$owner/givenName"/>
-        <xsl:value-of select="$space"/>
-        <xsl:value-of select="$owner/familyName"/>
+      <xsl:when test="starts-with(base/career/@school, '0x')">
+        <xsl:value-of select="sims2tools:asObjectTitle(base/career/@school)"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$ownerId"/>
+        <xsl:value-of select="base/career/@school"/>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:value-of select="$quote"/>
-  </xsl:template>
 
-  <xsl:template name="aboutName">
-    <xsl:param name="aboutGuid"/>
-    <xsl:variable name="owner" select="/hood/main/sdsc[@simGuid=$aboutGuid]"/>
-    
+    <xsl:value-of select="$separator"/>
+    <xsl:value-of select="$quote"/>
+    <xsl:value-of select="base/career/@schoolGrade"/>
+    <xsl:value-of select="$quote"/>
+
+    <xsl:value-of select="$separator"/>
     <xsl:value-of select="$quote"/>
     <xsl:choose>
-      <xsl:when test="$aboutGuid = '0x6DD33865'">
-        <xsl:value-of select="'Mystery Sim'"/>
-      </xsl:when>
-      <xsl:when test="$owner">
-        <xsl:value-of select="$owner/givenName"/>
-        <xsl:value-of select="$space"/>
-        <xsl:value-of select="$owner/familyName"/>
+      <xsl:when test="starts-with(base/career/@job, '0x')">
+        <xsl:value-of select="sims2tools:asObjectTitle(base/career/@job)"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="$aboutGuid"/>
+        <xsl:value-of select="base/career/@job"/>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:value-of select="$quote"/>
+
+    <xsl:value-of select="$separator"/>
+    <xsl:value-of select="$quote"/>
+    <xsl:value-of select="base/career/@jobLevel"/>
+    <xsl:value-of select="$quote"/>
+
+    <xsl:value-of select="$separator"/>
+    <xsl:value-of select="$quote"/>
+    <xsl:value-of select="base/career/@jobPerformance"/>
+    <xsl:value-of select="$quote"/>
+
+    <xsl:value-of select="$newLine"/>
   </xsl:template>
 </xsl:stylesheet>

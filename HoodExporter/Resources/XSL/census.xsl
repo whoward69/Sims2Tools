@@ -6,6 +6,7 @@
   <!-- Output strings -->
   <xsl:variable name="space"><xsl:text> </xsl:text></xsl:variable>
   <xsl:variable name="quote"><xsl:text>"</xsl:text></xsl:variable>
+  <xsl:variable name="csvQuote"><xsl:text>""</xsl:text></xsl:variable>
   <xsl:variable name="separator"><xsl:text>,</xsl:text></xsl:variable>
   <xsl:variable name="newLine"><xsl:text>
 </xsl:text></xsl:variable>

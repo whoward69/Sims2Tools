@@ -5,6 +5,7 @@
 
   <!-- Output strings -->
   <xsl:variable name="quote"><xsl:text>"</xsl:text></xsl:variable>
+  <xsl:variable name="csvQuote"><xsl:text>""</xsl:text></xsl:variable>
   <xsl:variable name="separator"><xsl:text>,</xsl:text></xsl:variable>
   <xsl:variable name="newLine"><xsl:text>
 </xsl:text></xsl:variable>
@@ -14,12 +15,12 @@
     <xsl:apply-templates select="@*|node()"/>
   </xsl:template>
 
-  <!-- Create the ExportedLots.txt and ExportedSims.txt files -->
+  <!-- Create the ExportedLots.csv and ExportedSims.csv files -->
   <xsl:template match="main" priority="1">
     <xsl:variable name="hoodCode" select="./idno/@ownerName"/>
     <xsl:variable name="hoodName" select="./ctss/language[1]/item[@index='0x0000']/text"/>
 
-    <xsl:result-document format="csv" href="ExportedLots.txt">
+    <xsl:result-document format="csv" href="ExportedLots.csv">
       <xsl:text>hood,HoodName,LotInstance,HouseNumber,HouseName</xsl:text>
       <xsl:value-of select="$newLine"/>
 
@@ -29,7 +30,7 @@
       </xsl:apply-templates>
     </xsl:result-document>
 
-    <xsl:result-document format="csv" href="ExportedSims.txt">
+    <xsl:result-document format="csv" href="ExportedSims.csv">
       <xsl:text>hood,HoodName,NID,FirstName,LastName,SimDescription,FamilyInstance,HouseholdName,HouseNumber,AvailableCharacterData,Unlinked,ParentA,ParentB,Spouse,BodyType,NPCType,SchoolType,Grade,CareerPerformance,Career,CareerLevel,ZodiacSign,Aspiration,Gender,LifeSection,AgeDaysLeft,PrevAgeDays,AgeDuration,BlizLifelinePoints,LifelinePoints,LifelineScore,GenActive,GenNeat,GenNice,GenOutgoing,GenPlayful,Active,Neat,Nice,Outgoing,Playful,Animals,Crime,Culture,Entertainment,Environment,Fashion,FemalePreference,Food,Health,MalePreference,Money,Paranormal,Politics,School,Scifi,Sports,Toys,Travel,Weather,Work,Body,Charisma,Cleaning,Cooking,Creativity,Fatness,Logic,Mechanical,Romance,IsAtUniversity,UniEffort,UniGrade,UniTime,UniSemester,UniInfluence,UniMajor,Species,Salary,PrimaryAspiration,SecondaryAspiration,HobbyPredestined,LifetimeWant</xsl:text>
       <xsl:value-of select="$newLine"/>
 
@@ -40,46 +41,46 @@
     </xsl:result-document>
   </xsl:template>
 
-  <!-- Per lot data for ExportedLots.txt -->
+  <!-- Per lot data for ExportedLots.csv -->
   <xsl:template match="ltxt" mode="exportLots">
     <xsl:param name="hoodCode"/>
     <xsl:param name="hoodName"/>
 
     <xsl:value-of select="$hoodCode"/>
     <xsl:value-of select="$separator"/>
-    <xsl:value-of select="concat($quote, $hoodName, $quote)"/>
+    <xsl:value-of select="concat($quote, replace($hoodName, $quote, $csvQuote), $quote)"/>
     <xsl:value-of select="$separator"/>
     <xsl:value-of select="sims2tools:asInt(./@lotId)"/>
     <xsl:value-of select="$separator"/>
     <xsl:value-of select="sims2tools:asInt(./@lotId)"/>
     <xsl:value-of select="$separator"/>
-    <xsl:value-of select="concat($quote, ./name, $quote)"/>
+    <xsl:value-of select="concat($quote, replace(./name, $quote, $csvQuote), $quote)"/>
     <xsl:value-of select="$newLine"/>
   </xsl:template>
 
-  <!-- Per sim data for ExportedSims.txt -->
+  <!-- Per sim data for ExportedSims.csv -->
   <xsl:template match="sdsc" mode="exportSims">
     <xsl:param name="hoodCode"/>
     <xsl:param name="hoodName"/>
-	
-	<xsl:variable name="simId" select="./@simId"/>
-	<xsl:variable name="familyId" select="./@familyId"/>
+
+    <xsl:variable name="simId" select="./@simId"/>
+    <xsl:variable name="familyId" select="./@familyId"/>
 
     <xsl:value-of select="$hoodCode"/>
     <xsl:value-of select="$separator"/>
-    <xsl:value-of select="concat($quote, $hoodName, $quote)"/>
+    <xsl:value-of select="concat($quote, replace($hoodName, $quote, $csvQuote), $quote)"/>
     <xsl:value-of select="$separator"/>
     <xsl:value-of select="sims2tools:asInt($simId)"/>
     <xsl:value-of select="$separator"/>
-    <xsl:value-of select="concat($quote, ./givenName, $quote)"/>
+    <xsl:value-of select="concat($quote, replace(./givenName, $quote, $csvQuote), $quote)"/>
     <xsl:value-of select="$separator"/>
-    <xsl:value-of select="concat($quote, ./familyName, $quote)"/>
+    <xsl:value-of select="concat($quote, replace(./familyName, $quote, $csvQuote), $quote)"/>
     <xsl:value-of select="$separator"/>
-    <xsl:value-of select="concat($quote, ./description, $quote)"/>
+    <xsl:value-of select="concat($quote, replace(./description, $quote, $csvQuote), $quote)"/>
     <xsl:value-of select="$separator"/>
     <xsl:value-of select="sims2tools:asInt($familyId)"/>
     <xsl:value-of select="$separator"/>
-    <xsl:value-of select="concat($quote, //str[@instanceId=$familyId]/language[1]/item[@index='0x0000']/text, $quote)"/>
+    <xsl:value-of select="concat($quote, replace(//str[@instanceId=$familyId]/language[1]/item[@index='0x0000']/text, $quote, $csvQuote), $quote)"/>
     <xsl:value-of select="$separator"/>
     <xsl:value-of select="sims2tools:asInt(//fami[@familyId=$familyId]/@lotId)"/>
     <xsl:value-of select="$separator"/>
@@ -207,28 +208,28 @@
     <xsl:value-of select="$separator"/>
     <xsl:value-of select="sims2tools:asYesNo(./uni/@onCampus, 1)"/>
     <xsl:value-of select="$separator"/>
-	<xsl:if test="./uni/@onCampus = 1">
-    <xsl:value-of select="./uni/@effort"/>
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="./uni/@grade"/>
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="./uni/@time"/>
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="./uni/@semester"/>
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="./uni/@influence"/>
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="./uni/@major"/>
-    <xsl:value-of select="$separator"/>
-	</xsl:if>
-	<xsl:if test="./uni/@onCampus != 1">
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="$separator"/>
-    <xsl:value-of select="$separator"/>
-	</xsl:if>
+    <xsl:if test="./uni/@onCampus = 1">
+      <xsl:value-of select="./uni/@effort"/>
+      <xsl:value-of select="$separator"/>
+      <xsl:value-of select="./uni/@grade"/>
+      <xsl:value-of select="$separator"/>
+      <xsl:value-of select="./uni/@time"/>
+      <xsl:value-of select="$separator"/>
+      <xsl:value-of select="./uni/@semester"/>
+      <xsl:value-of select="$separator"/>
+      <xsl:value-of select="./uni/@influence"/>
+      <xsl:value-of select="$separator"/>
+      <xsl:value-of select="./uni/@major"/>
+      <xsl:value-of select="$separator"/>
+    </xsl:if>
+    <xsl:if test="./uni/@onCampus != 1">
+      <xsl:value-of select="$separator"/>
+      <xsl:value-of select="$separator"/>
+      <xsl:value-of select="$separator"/>
+      <xsl:value-of select="$separator"/>
+      <xsl:value-of select="$separator"/>
+      <xsl:value-of select="$separator"/>
+    </xsl:if>
     <xsl:value-of select="./nl/@species"/>
     <xsl:value-of select="$separator"/>
     <xsl:value-of select="./ofb/@salary"/>
