@@ -613,6 +613,7 @@ namespace SceneGraphPlus
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
             this.Load += new System.EventHandler(this.OnLoad);
+            this.Resize += new System.EventHandler(this.OnFormResize);
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
             this.splitContainer.Panel2.ResumeLayout(false);

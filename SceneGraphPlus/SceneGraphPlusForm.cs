@@ -61,6 +61,8 @@ namespace SceneGraphPlus
         private MruList MyMruList;
         private Updater MyUpdater;
 
+        private FormWindowState lastWindowState;
+
         public bool IsPrefixLowerCase => menuItemPrefixLowerCase.Checked;
 
         public SceneGraphPlusForm()
@@ -111,6 +113,8 @@ namespace SceneGraphPlus
 
             UpdateForm();
             UpdateEditor(null);
+
+            lastWindowState = WindowState;
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
@@ -143,6 +147,26 @@ namespace SceneGraphPlus
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
 
             if (textureDialog != null && !textureDialog.IsDisposed) textureDialog.Close();
+        }
+
+        private void OnFormResize(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                if (textureDialog != null && !textureDialog.IsDisposed && textureDialog.Visible)
+                {
+                    textureDialog.WindowState = FormWindowState.Minimized;
+                }
+            }
+            else if (lastWindowState != WindowState)
+            {
+                if (textureDialog != null && !textureDialog.IsDisposed && textureDialog.Visible)
+                {
+                    textureDialog.WindowState = FormWindowState.Normal;
+                }
+            }
+
+            lastWindowState = WindowState;
         }
 
         private bool CheckDirty(string reason)
@@ -293,7 +317,7 @@ namespace SceneGraphPlus
                 btnFixIssues.Visible = !btnFixTgi.Visible && block.HasIssues;
             }
 
-            if (textureDialog.Visible)
+            if (textureDialog != null && !textureDialog.IsDisposed && textureDialog.Visible)
             {
                 DisplayTexture(block);
             }
@@ -334,6 +358,7 @@ namespace SceneGraphPlus
             if (block != null)
             {
                 textureDialog.SetTextureFromKey(block.PackagePath, block.OriginalKey, block.SgFullName);
+                textureDialog.Focus();
             }
             else
             {

@@ -32,7 +32,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 #endif
 
-        private static readonly string[] txtrPropKeys = { "stdMatBaseTextureName", "stdMatNormalMapTextureName", "stdMatEnvCubeTextureName" };
+        internal static readonly string[] txtrPropKeys = { "stdMatBaseTextureName", "stdMatNormalMapTextureName", "stdMatEnvCubeTextureName" };
 
         private readonly CMaterialDefinition cMaterialDefinition = null;
         public CMaterialDefinition MaterialDefinition => cMaterialDefinition;

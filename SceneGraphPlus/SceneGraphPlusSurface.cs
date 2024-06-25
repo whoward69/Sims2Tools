@@ -432,7 +432,7 @@ namespace SceneGraphPlus.Surface
                     }
                 }
 
-                Invalidate();
+                FixIssues(editBlock);
 
                 owningForm.UpdateEditor(editBlock);
             }
@@ -445,7 +445,7 @@ namespace SceneGraphPlus.Surface
                 editBlock.BlockName = name;
                 editBlock.SetDirty();
 
-                Invalidate();
+                FixIssues(editBlock);
 
                 owningForm.UpdateEditor(editBlock);
             }
@@ -727,13 +727,17 @@ namespace SceneGraphPlus.Surface
                     }
                 }
 
-                if (contextConnector != null)
+                if (connectorsOver && contextConnector != null)
                 {
                     menuContextConnector.Show(Cursor.Position);
                 }
                 else if (contextBlock != null)
                 {
                     menuContextBlock.Show(Cursor.Position);
+                }
+                else if (!connectorsOver && contextConnector != null)
+                {
+                    menuContextConnector.Show(Cursor.Position);
                 }
             }
 

@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.TXMT;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -192,9 +193,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             {
                 bool found = false;
 
-                foreach (MaterialDefinitionProperty prop in properties)
+                foreach (string txtrProp in Txmt.txtrPropKeys)
                 {
-                    if (prop.Value.Equals(fileRef))
+                    if (fileRef.Equals(GetProperty(txtrProp)))
                     {
                         found = true;
                         break;

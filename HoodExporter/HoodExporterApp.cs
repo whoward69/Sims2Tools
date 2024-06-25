@@ -19,7 +19,7 @@ namespace HoodExporter
         public static string AppName = "Hood Exporter";
 
         public static int AppVersionMajor = 2;
-        public static int AppVersionMinor = 1;
+        public static int AppVersionMinor = 2;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;
