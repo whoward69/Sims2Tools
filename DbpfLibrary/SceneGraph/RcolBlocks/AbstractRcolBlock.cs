@@ -162,4 +162,15 @@ namespace Sims2Tools.DBPF.SceneGraph
             ogn.Parent = parent;
         }
     }
+
+    public abstract class AbstractLightRcolBlock : AbstractGraphRcolBlock
+    {
+        public abstract string Name { get; }
+
+        public abstract LightT LightT { get; }
+
+        public AbstractLightRcolBlock(Rcol parent) : base(parent)
+        {
+        }
+    }
 }

@@ -138,7 +138,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             }
         }
 
-        protected ReadOnlyCollection<DBPFKey> ReferencedFiles => reffiles.AsReadOnly();
+        public ReadOnlyCollection<DBPFKey> ReferencedFiles => reffiles.AsReadOnly();
 
         protected void SetReferencedFile(int index, DBPFKey key)
         {

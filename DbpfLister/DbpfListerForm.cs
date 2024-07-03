@@ -7,6 +7,7 @@ using Sims2Tools.DBPF.Groups;
 using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
+using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
@@ -57,6 +58,9 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
+            FindCresNonShpeRefs("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            /*
             FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Double Deluxe\\Base\\TSData\\Res\\Objects\\objects.package");
             FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\University Life\\EP1\\TSData\\Res\\Objects\\objects.package");
             FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Double Deluxe\\EP2\\TSData\\Res\\Objects\\objects.package");
@@ -74,6 +78,7 @@ namespace DbpfLister
             FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\University Life\\SP8\\TSData\\Res\\Objects\\objects.package");
             FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Apartment Life\\TSData\\Res\\Objects\\objects.package");
             FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP9\\TSData\\Res\\Objects\\objects.package");
+            */
 
             // FindLifo("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads");
 
@@ -461,6 +466,54 @@ namespace DbpfLister
                     }
 
                     package.Close();
+                }
+            }
+        }
+
+        private void FindCresNonShpeRefs(string baseFolder)
+        {
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    bool breakOut = false;
+
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Cres.TYPE))
+                        {
+                            try
+                            {
+                                Cres cres = (Cres)package.GetResourceByEntry(entry);
+
+                                foreach (DBPFKey refKey in cres.ReferencedFiles)
+                                {
+                                    if (refKey.TypeID != Cres.TYPE && refKey.TypeID != Shpe.TYPE
+                                        // && refKey.TypeID != Lpnt.TYPE && refKey.TypeID != Lamb.TYPE && refKey.TypeID != Lspt.TYPE && refKey.TypeID != Ldir.TYPE
+                                        )
+                                    {
+                                        textMessages.AppendText($"{entry}\t{refKey}\t{packagePath}\r\n");
+
+                                        // breakOut = true;
+
+                                        if (breakOut) break;
+                                    }
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                                // textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+
+                            if (breakOut) break;
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    // textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
                 }
             }
         }

@@ -17,7 +17,7 @@ using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 {
-    public class CDirectionalLight : AbstractGraphRcolBlock
+    public class CDirectionalLight : AbstractLightRcolBlock
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xC9C81BA3;
@@ -33,13 +33,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         private float green;
         private float blue;
 
+        public override string Name => unknown2;
+
         public StandardLightBase StandardLightBase => slb;
 
-        public LightT LightT => lt;
+        public override LightT LightT => lt;
 
         public ReferentNode ReferentNode => rn;
-
-        public string Name => unknown2;
 
         public float Val1 => unknown3;
 
@@ -116,24 +116,23 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 #endif
         }
 
-        public override uint FileSize
+        public override uint FileSize => GetFileSize();
+
+        private uint GetFileSize()
         {
-            get
-            {
-                long size = 4;
+            long size = 4;
 
-                size += DbpfWriter.Length(slb.BlockName) + 4 + slb.FileSize;
-                size += DbpfWriter.Length(NameResource.BlockName) + 4 + NameResource.FileSize;
-                size += DbpfWriter.Length(lt.BlockName) + 4 + lt.FileSize;
-                size += DbpfWriter.Length(rn.BlockName) + 4 + rn.FileSize;
-                size += DbpfWriter.Length(ogn.BlockName) + 4 + ogn.FileSize;
+            size += DbpfWriter.Length(slb.BlockName) + 4 + slb.FileSize;
+            size += DbpfWriter.Length(NameResource.BlockName) + 4 + NameResource.FileSize;
+            size += DbpfWriter.Length(lt.BlockName) + 4 + lt.FileSize;
+            size += DbpfWriter.Length(rn.BlockName) + 4 + rn.FileSize;
+            size += DbpfWriter.Length(ogn.BlockName) + 4 + ogn.FileSize;
 
-                size += DbpfWriter.Length(unknown2) + 4 + 4;
+            size += DbpfWriter.Length(unknown2) + 4 + 4;
 
-                size += 4 + 4 + 4;
+            size += 4 + 4 + 4;
 
-                return (uint)size;
-            }
+            return (uint)size;
         }
 
         public override void Serialize(DbpfWriter writer)
@@ -175,7 +174,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 #if DEBUG
             writeEnd = writer.Position;
 
-            Debug.Assert((writeEnd - writeStart) == FileSize);
+            Debug.Assert((writeEnd - writeStart) == GetFileSize());
             if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
 #endif
         }

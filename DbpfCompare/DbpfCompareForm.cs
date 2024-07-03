@@ -22,6 +22,10 @@ using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.LAMB;
+using Sims2Tools.DBPF.SceneGraph.LDIR;
+using Sims2Tools.DBPF.SceneGraph.LPNT;
+using Sims2Tools.DBPF.SceneGraph.LSPT;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
@@ -88,7 +92,8 @@ namespace DbpfCompare
             Xfch.TYPE, Xhtn.TYPE, Xmol.TYPE, Xstn.TYPE, Xtol.TYPE,
             Xflr.TYPE, Xfnc.TYPE, Xrof.TYPE,
             Xobj.TYPE,
-            Xwnt.TYPE
+            Xwnt.TYPE,
+            Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE
         });
 
         private bool IsDirty

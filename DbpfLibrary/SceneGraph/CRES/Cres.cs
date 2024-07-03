@@ -12,7 +12,10 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.LAMB;
+using Sims2Tools.DBPF.SceneGraph.LDIR;
 using Sims2Tools.DBPF.SceneGraph.LPNT;
+using Sims2Tools.DBPF.SceneGraph.LSPT;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
@@ -109,6 +112,44 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
             }
         }
 
+        public ReadOnlyCollection<DBPFKey> LghtKeys
+        {
+            get
+            {
+                List<DBPFKey> lghtKeys = new List<DBPFKey>();
+
+                foreach (DBPFKey key in ReferencedFiles)
+                {
+                    if (key.TypeID == Lamb.TYPE || key.TypeID == Ldir.TYPE || key.TypeID == Lpnt.TYPE || key.TypeID == Lspt.TYPE)
+                    {
+                        lghtKeys.Add(key);
+                    }
+                }
+
+                return lghtKeys.AsReadOnly();
+            }
+        }
+
+        public void SetLghtKey(int index, DBPFKey key)
+        {
+            int idxLght = 0;
+
+            for (int i = 0; i < ReferencedFiles.Count; ++i)
+            {
+                TypeTypeID typeId = ReferencedFiles[i].TypeID;
+
+                if (typeId == Lamb.TYPE || typeId == Ldir.TYPE || typeId == Lpnt.TYPE || typeId == Lspt.TYPE)
+                {
+                    if (idxLght == index)
+                    {
+                        SetReferencedFile(i, key);
+                        return;
+                    }
+
+                    ++idxLght;
+                }
+            }
+        }
         public override SgResourceList SgNeededResources()
         {
             SgResourceList needed = new SgResourceList();

@@ -22,6 +22,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.SceneGraph.XHTN;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
@@ -3115,12 +3116,18 @@ namespace OutfitOrganiser
                     if (colName.Equals("colType") || colName.Equals("colTitle") || colName.Equals("colName") || colName.Equals("colFilename") || colName.Equals("colTooltip"))
                     {
                         Image thumbnail = null;
+                        Txtr txtr = null;
 
                         if (sender == gridResources)
                         {
                             OutfitDbpfData outfitData = row.Cells["colOutfitData"].Value as OutfitDbpfData;
                             Cpf thumbnailOwner = outfitData?.ThumbnailOwner;
                             thumbnail = (thumbnailOwner != null) ? GetResourceThumbnail(thumbnailOwner) : outfitData?.Thumbnail;
+
+                            if (thumbnail == null)
+                            {
+                                // TODO - Outfit Organiser - try to get the associated TXTR
+                            }
                         }
                         else if (sender == gridPackageFiles)
                         {
@@ -3151,6 +3158,11 @@ namespace OutfitOrganiser
                                                         {
                                                             thumbnail = GetResourceThumbnail(cpf);
                                                             if (thumbnail != null) break;
+
+                                                            if (txtr == null)
+                                                            {
+                                                                // TODO - Outfit Organiser - try to get the associated TXTR
+                                                            }
                                                         }
                                                     }
                                                 }

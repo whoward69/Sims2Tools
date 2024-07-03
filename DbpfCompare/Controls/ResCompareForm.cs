@@ -20,10 +20,16 @@ using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.LAMB;
+using Sims2Tools.DBPF.SceneGraph.LDIR;
+using Sims2Tools.DBPF.SceneGraph.LGHT;
+using Sims2Tools.DBPF.SceneGraph.LPNT;
+using Sims2Tools.DBPF.SceneGraph.LSPT;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
@@ -188,6 +194,10 @@ namespace DbpfCompare.Controls
                     else if (leftNodeData.TypeID == Txmt.TYPE)
                     {
                         ShowTxmt(leftPackage, rightPackage);
+                    }
+                    else if (leftNodeData.TypeID == Lamb.TYPE || leftNodeData.TypeID == Ldir.TYPE || leftNodeData.TypeID == Lpnt.TYPE || leftNodeData.TypeID == Lspt.TYPE)
+                    {
+                        ShowLight(leftPackage, rightPackage);
                     }
                 }
 
@@ -908,6 +918,150 @@ namespace DbpfCompare.Controls
             if (comboIndex == -1 && defState != DbpfNodeState.Same) comboIndex = 2;
 
             comboVariations.SelectedIndex = (comboIndex == -1 ? 0 : comboIndex);
+        }
+
+        private void ShowLight(DBPFFile leftPackage, DBPFFile rightPackage)
+        {
+            // Light - Table; Name, Left Value, Right Value
+            gridResCompare.Columns["colKey"].HeaderText = "Name";
+            gridResCompare.Columns["colLeftValue1"].HeaderText = "Left Value";
+            gridResCompare.Columns["colLeftValue2"].Visible = false;
+            gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
+            gridResCompare.Columns["colRightValue2"].Visible = false;
+
+            AbstractLightRcolBlock leftBaseLight = ((Lght)leftPackage.GetResourceByKey(leftNodeData.Key)).BaseLight;
+            AbstractLightRcolBlock rightBaseLight = ((Lght)rightPackage.GetResourceByKey(rightNodeData.Key)).BaseLight;
+
+            CDirectionalLight leftDirLight = leftBaseLight as CDirectionalLight;
+            CDirectionalLight rightDirLight = rightBaseLight as CDirectionalLight;
+
+            DataRow row;
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "Version";
+            row["LeftValue1"] = leftDirLight.Version;
+            row["RightValue1"] = rightDirLight.Version;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "Name";
+            row["LeftValue1"] = leftDirLight.Name;
+            row["RightValue1"] = rightDirLight.Name;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "Red";
+            row["LeftValue1"] = leftDirLight.Red;
+            row["RightValue1"] = rightDirLight.Red;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "Green";
+            row["LeftValue1"] = leftDirLight.Green;
+            row["RightValue1"] = rightDirLight.Green;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "Blue";
+            row["LeftValue1"] = leftDirLight.Blue;
+            row["RightValue1"] = rightDirLight.Blue;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "Val1 (unknown3)";
+            row["LeftValue1"] = leftDirLight.Val1;
+            row["RightValue1"] = rightDirLight.Val1;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "Val2 (unknown4)";
+            row["LeftValue1"] = leftDirLight.Val2;
+            row["RightValue1"] = rightDirLight.Val2;
+            dataResCompare.Append(row);
+
+            if (leftBaseLight is CPointLight leftPointLight && rightBaseLight is CPointLight rightPointLight)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Val6 (unknown8)";
+                row["LeftValue1"] = leftPointLight.Val6;
+                row["RightValue1"] = rightPointLight.Val6;
+                dataResCompare.Append(row);
+
+                row = dataResCompare.NewRow();
+                row["Key"] = "Val7 (unknown9)";
+                row["LeftValue1"] = leftPointLight.Val7;
+                row["RightValue1"] = rightPointLight.Val7;
+                dataResCompare.Append(row);
+
+                if (leftBaseLight is CSpotLight leftSpotLight && rightBaseLight is CSpotLight rightSpotLight)
+                {
+                    row = dataResCompare.NewRow();
+                    row["Key"] = "Val8 (unknown10)";
+                    row["LeftValue1"] = leftSpotLight.Val8;
+                    row["RightValue1"] = rightSpotLight.Val8;
+                    dataResCompare.Append(row);
+
+                    row = dataResCompare.NewRow();
+                    row["Key"] = "Val9 (unknown11)";
+                    row["LeftValue1"] = leftSpotLight.Val9;
+                    row["RightValue1"] = rightSpotLight.Val9;
+                    dataResCompare.Append(row);
+                }
+            }
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "NameResource:Version";
+            row["LeftValue1"] = leftDirLight.NameResource.Version;
+            row["RightValue1"] = rightDirLight.NameResource.Version;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "NameResource:FileName";
+            row["LeftValue1"] = leftDirLight.NameResource.FileName;
+            row["RightValue1"] = rightDirLight.NameResource.FileName;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "ObjectGraphNode:Version";
+            row["LeftValue1"] = leftDirLight.ObjectGraphNode.Version;
+            row["RightValue1"] = rightDirLight.ObjectGraphNode.Version;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "ObjectGraphNode:FileName";
+            row["LeftValue1"] = leftDirLight.ObjectGraphNode.FileName;
+            row["RightValue1"] = rightDirLight.ObjectGraphNode.FileName;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "LightT:Version";
+            row["LeftValue1"] = leftDirLight.LightT.Version;
+            row["RightValue1"] = rightDirLight.LightT.Version;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "LightT:NameResource:Version";
+            row["LeftValue1"] = leftDirLight.LightT.NameResource.Version;
+            row["RightValue1"] = rightDirLight.LightT.NameResource.Version;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "LightT:NameResource:FileName";
+            row["LeftValue1"] = leftDirLight.LightT.NameResource.FileName;
+            row["RightValue1"] = rightDirLight.LightT.NameResource.FileName;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "StandardLightBase:Version";
+            row["LeftValue1"] = leftDirLight.StandardLightBase.Version;
+            row["RightValue1"] = rightDirLight.StandardLightBase.Version;
+            dataResCompare.Append(row);
+
+            row = dataResCompare.NewRow();
+            row["Key"] = "ReferentNode:Version";
+            row["LeftValue1"] = leftDirLight.ReferentNode.Version;
+            row["RightValue1"] = rightDirLight.ReferentNode.Version;
+            dataResCompare.Append(row);
         }
 
         private void PopulateLanguage(MetaData.Languages lang, Str leftStr, Str rightStr)
