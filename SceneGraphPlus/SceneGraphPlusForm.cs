@@ -17,7 +17,12 @@ using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.LAMB;
+using Sims2Tools.DBPF.SceneGraph.LDIR;
+using Sims2Tools.DBPF.SceneGraph.LGHT;
 using Sims2Tools.DBPF.SceneGraph.LIFO;
+using Sims2Tools.DBPF.SceneGraph.LPNT;
+using Sims2Tools.DBPF.SceneGraph.LSPT;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
@@ -47,9 +52,8 @@ namespace SceneGraphPlus
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         // When adding to this List, search for "UnderstoodTypes" (both this file and the Surface file)
-        // UnderstoodTypes - also need to add XyzBlockColour and XyzRow to the Settings.settings file (see https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors?view=windowsdesktop-8.0 for colour names)
-        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE };
-        // TODO - SceneGraph Plus - 8 - what about lights? (need to understand a lot more about lights first!)
+        // UnderstoodTypes - also need to add TypeBlockColour and TypeRow to the Settings.settings file (see https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors?view=windowsdesktop-8.0 for colour names)
+        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE };
 
         private readonly DrawingSurface surface;
 
@@ -79,7 +83,7 @@ namespace SceneGraphPlus
             surface.Location = new Point(0, 0);
             surface.Size = new Size(splitContainer.Panel1.Size.Width, splitContainer.Panel1.Size.Height);
             surface.BackColor = Color.White;
-            surface.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left; // | AnchorStyles.Right;
+            surface.Anchor = AnchorStyles.Top | AnchorStyles.Left; // | AnchorStyles.Bottom; // | AnchorStyles.Right;
         }
 
         private void OnLoad(object sender, EventArgs e)
@@ -310,7 +314,7 @@ namespace SceneGraphPlus
                 textBlockFullSgName.Text = block.SgFullName;
                 textBlockSgName.Text = block.SgBaseName;
 
-                textBlockSgName.ReadOnly = (!block.IsEditable);
+                textBlockSgName.ReadOnly = (!block.IsEditable || block.TypeId == Lamb.TYPE || block.TypeId == Ldir.TYPE || block.TypeId == Lpnt.TYPE || block.TypeId == Lspt.TYPE);
                 textBlockSgName.BorderStyle = (textBlockSgName.ReadOnly ? BorderStyle.FixedSingle : BorderStyle.Fixed3D);
 
                 btnFixTgi.Visible = !block.IsTgirValid;
@@ -376,6 +380,8 @@ namespace SceneGraphPlus
 
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
+            surface.AdvancedMode = menuItemAdvanced.Checked;
+
             UpdateForm();
         }
 
@@ -508,7 +514,7 @@ namespace SceneGraphPlus
             }
         }
 
-        private AbstractGraphBlock AddBlockByName(DBPFFile package, BlockRef blockRef, ref int freeCol)
+        private AbstractGraphBlock AddBlockByName(DBPFFile package, BlockRef blockRef, ref int freeCol, AbstractGraphBlock parentBlock = null)
         {
             if (blockCache.TryGetValue(blockRef, out AbstractGraphBlock block))
             {
@@ -518,7 +524,7 @@ namespace SceneGraphPlus
 
             DBPFEntry entry = package.GetEntryByName(blockRef.TypeId, blockRef.SgFullName);
 
-            block = AddBlockByKey(package, new BlockRef(package, blockRef.TypeId, entry), ref freeCol);
+            block = AddBlockByKey(package, new BlockRef(package, blockRef.TypeId, entry), ref freeCol, parentBlock);
 
             if (entry == null)
             {
@@ -530,7 +536,7 @@ namespace SceneGraphPlus
             return block;
         }
 
-        private AbstractGraphBlock AddBlockByKey(DBPFFile package, BlockRef blockRef, ref int freeCol)
+        private AbstractGraphBlock AddBlockByKey(DBPFFile package, BlockRef blockRef, ref int freeCol, AbstractGraphBlock parentBlock = null)
         {
             if (blockRef.Key != null && blockCache.TryGetValue(blockRef, out AbstractGraphBlock block))
             {
@@ -540,35 +546,35 @@ namespace SceneGraphPlus
 
             DBPFEntry entry = package.GetEntryByKey(blockRef.Key);
 
-            block = AddBlockByEntry(package, blockRef, entry, ref freeCol);
+            block = AddBlockByEntry(package, blockRef, entry, ref freeCol, parentBlock);
 
             if (blockRef.Key != null) blockCache.Add(blockRef, block);
 
             return block;
         }
 
-        private AbstractGraphBlock AddBlockByEntry(DBPFFile package, BlockRef blockRef, DBPFEntry entry, ref int freeCol)
+        private AbstractGraphBlock AddBlockByEntry(DBPFFile package, BlockRef blockRef, DBPFEntry entry, ref int freeCol, AbstractGraphBlock parentBlock = null)
         {
             AbstractGraphBlock startBlock = new RoundedRect(surface, blockRef) { Text = DBPFData.TypeName(blockRef.TypeId), Centre = new Point(freeCol, RowForType(blockRef.TypeId)), FillColour = ColourForType(blockRef.TypeId) };
 
-            ProcessBlock(startBlock, package, entry, ref freeCol);
+            ProcessBlock(startBlock, package, entry, ref freeCol, parentBlock);
 
             return startBlock;
         }
 
-        private void UpdateBlockByKey(AbstractGraphBlock startBlock, DBPFFile package, BlockRef blockRef, ref int freeCol)
+        private void UpdateBlockByKey(AbstractGraphBlock startBlock, DBPFFile package, BlockRef blockRef, ref int freeCol, AbstractGraphBlock parentBlock = null)
         {
             DBPFEntry entry = package.GetEntryByKey(blockRef.Key);
 
             startBlock.IsMissing = false;
             startBlock.ReplaceBlockRef(blockRef);
 
-            ProcessBlock(startBlock, package, entry, ref freeCol);
+            ProcessBlock(startBlock, package, entry, ref freeCol, parentBlock);
 
             if (blockRef.Key != null && !blockCache.ContainsKey(blockRef)) blockCache.Add(blockRef, startBlock);
         }
 
-        private void ProcessBlock(AbstractGraphBlock startBlock, DBPFFile package, DBPFEntry entry, ref int freeCol)
+        private void ProcessBlock(AbstractGraphBlock startBlock, DBPFFile package, DBPFEntry entry, ref int freeCol, AbstractGraphBlock parentBlock)
         {
             DBPFResource res = package.GetResourceByEntry(entry);
 
@@ -758,6 +764,8 @@ namespace SceneGraphPlus
             {
                 startBlock.UpdateSgName(cres.KeyName, menuItemPrefixLowerCase.Checked);
 
+                // NOTE - a CRES can also reference another CRES, but only seen in Maxis lot packages
+
                 int index = 0;
                 foreach (DBPFKey shpeKey in cres.ShpeKeys)
                 {
@@ -767,6 +775,18 @@ namespace SceneGraphPlus
                 }
 
                 if (cres.ShpeKeys.Count > 0) freeCol -= DrawingSurface.ColumnGap;
+
+                index = 0;
+                foreach (DBPFKey lghtKey in cres.LghtKeys)
+                {
+                    AbstractGraphBlock lightBlock = AddBlockByKey(package, new BlockRef(package, lghtKey.TypeID, lghtKey), ref freeCol, startBlock);
+
+                    startBlock.ConnectTo(index++, lightBlock.strData, lightBlock);
+
+                    freeCol += DrawingSurface.ColumnGap;
+                }
+
+                if (cres.LghtKeys.Count > 0) freeCol -= DrawingSurface.ColumnGap;
             }
             else if (res is Shpe shpe)
             {
@@ -845,6 +865,14 @@ namespace SceneGraphPlus
             else if (res is Lifo lifo)
             {
                 startBlock.UpdateSgName(lifo.KeyName, menuItemPrefixLowerCase.Checked);
+            }
+            else if (res is Lght lght)
+            {
+                // LAMB, LDIR, LPNT and LSPT
+                startBlock.UpdateSgName(lght.KeyName, menuItemPrefixLowerCase.Checked);
+                startBlock.IsLightValid = lght.IsLightValid(parentBlock?.SgBaseName);
+
+                startBlock.strData = lght.BaseLight.Name;
             }
         }
 

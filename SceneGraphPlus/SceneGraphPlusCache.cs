@@ -9,6 +9,10 @@
 using SceneGraphPlus.Shapes;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.LAMB;
+using Sims2Tools.DBPF.SceneGraph.LDIR;
+using Sims2Tools.DBPF.SceneGraph.LPNT;
+using Sims2Tools.DBPF.SceneGraph.LSPT;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
@@ -141,7 +145,7 @@ namespace SceneGraphPlus.Cache
                 }
             }
 
-            string typeName = $"_{DBPFData.TypeName(typeId).ToLower()}";
+            string typeName = (typeId == Lamb.TYPE || typeId == Ldir.TYPE || typeId == Lpnt.TYPE || typeId == Lspt.TYPE) ? "_lght" : $"_{DBPFData.TypeName(typeId).ToLower()}";
 
             if (!sgName.EndsWith(typeName, StringComparison.OrdinalIgnoreCase))
             {
@@ -149,6 +153,18 @@ namespace SceneGraphPlus.Cache
             }
 
             return sgName;
+        }
+
+        public bool IsOriginalTgirValid
+        {
+            get
+            {
+                string name = Hashes.StripHashFromName(sgOriginalName);
+
+                if (string.IsNullOrEmpty(name) || originalKey == null) return true;
+
+                return (Hashes.InstanceIDHash(name) == originalKey.InstanceID && Hashes.ResourceIDHash(name) == originalKey.ResourceID);
+            }
         }
 
         public bool IsTgirValid

@@ -155,5 +155,29 @@
     <Setting Name="LifoRow" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">6</Value>
     </Setting>
+    <Setting Name="LambBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tan</Value>
+    </Setting>
+    <Setting Name="LambRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
+    <Setting Name="LdirBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tan</Value>
+    </Setting>
+    <Setting Name="LdirRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
+    <Setting Name="LpntBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tan</Value>
+    </Setting>
+    <Setting Name="LpntRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
+    <Setting Name="LsptBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Tan</Value>
+    </Setting>
+    <Setting Name="LsptRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">6</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

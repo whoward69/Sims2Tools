@@ -634,5 +634,101 @@ namespace SceneGraphPlus.Properties {
                 this["LifoRow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Tan")]
+        public string LambBlockColour {
+            get {
+                return ((string)(this["LambBlockColour"]));
+            }
+            set {
+                this["LambBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public int LambRow {
+            get {
+                return ((int)(this["LambRow"]));
+            }
+            set {
+                this["LambRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Tan")]
+        public string LdirBlockColour {
+            get {
+                return ((string)(this["LdirBlockColour"]));
+            }
+            set {
+                this["LdirBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public int LdirRow {
+            get {
+                return ((int)(this["LdirRow"]));
+            }
+            set {
+                this["LdirRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Tan")]
+        public string LpntBlockColour {
+            get {
+                return ((string)(this["LpntBlockColour"]));
+            }
+            set {
+                this["LpntBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public int LpntRow {
+            get {
+                return ((int)(this["LpntRow"]));
+            }
+            set {
+                this["LpntRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Tan")]
+        public string LsptBlockColour {
+            get {
+                return ((string)(this["LsptBlockColour"]));
+            }
+            set {
+                this["LsptBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        public int LsptRow {
+            get {
+                return ((int)(this["LsptRow"]));
+            }
+            set {
+                this["LsptRow"] = value;
+            }
+        }
     }
 }

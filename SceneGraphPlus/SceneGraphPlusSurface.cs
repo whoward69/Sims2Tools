@@ -14,7 +14,12 @@ using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.LAMB;
+using Sims2Tools.DBPF.SceneGraph.LDIR;
+using Sims2Tools.DBPF.SceneGraph.LGHT;
 using Sims2Tools.DBPF.SceneGraph.LIFO;
+using Sims2Tools.DBPF.SceneGraph.LPNT;
+using Sims2Tools.DBPF.SceneGraph.LSPT;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
@@ -57,8 +62,10 @@ namespace SceneGraphPlus.Surface
         private readonly ContextMenuStrip menuContextBlock;
         private readonly ToolStripMenuItem menuItemContextTexture;
         private readonly ToolStripMenuItem menuItemContextDelete;
+        private readonly ToolStripMenuItem menuItemContextHide;
         private readonly ToolStripMenuItem menuItemContextFixTgir;
         private readonly ToolStripMenuItem menuItemContextFixFileList;
+        private readonly ToolStripMenuItem menuItemContextFixLight;
         private readonly ToolStripMenuItem menuItemContextCopySgName;
         private readonly ToolStripMenuItem menuItemContextClosePackage;
 
@@ -84,6 +91,7 @@ namespace SceneGraphPlus.Surface
         private bool dropToGrid = false;
         private float gridScale = 1.0f;
 
+        private bool advancedMode = false;
         private bool hideMissingBlocks = false;
         private bool connectorsOver = true;
 
@@ -96,13 +104,15 @@ namespace SceneGraphPlus.Surface
                 menuContextBlock = new ContextMenuStrip();
                 menuItemContextTexture = new ToolStripMenuItem();
                 menuItemContextDelete = new ToolStripMenuItem();
+                menuItemContextHide = new ToolStripMenuItem();
                 menuItemContextFixTgir = new ToolStripMenuItem();
                 menuItemContextFixFileList = new ToolStripMenuItem();
+                menuItemContextFixLight = new ToolStripMenuItem();
                 menuItemContextCopySgName = new ToolStripMenuItem();
                 menuItemContextClosePackage = new ToolStripMenuItem();
                 menuContextBlock.SuspendLayout();
 
-                menuContextBlock.Items.AddRange(new ToolStripItem[] { menuItemContextTexture, menuItemContextDelete, menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextCopySgName, menuItemContextClosePackage });
+                menuContextBlock.Items.AddRange(new ToolStripItem[] { menuItemContextTexture, menuItemContextDelete, menuItemContextHide, menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextFixLight, menuItemContextCopySgName, menuItemContextClosePackage });
                 menuContextBlock.Name = "menuContextBlock";
                 menuContextBlock.Size = new Size(223, 48);
                 menuContextBlock.Opening += new CancelEventHandler(OnContextBlockOpening);
@@ -117,6 +127,11 @@ namespace SceneGraphPlus.Surface
                 menuItemContextDelete.Text = "Delete";
                 menuItemContextDelete.Click += new EventHandler(OnContextBlockDelete);
 
+                menuItemContextHide.Name = "menuItemContextHide";
+                menuItemContextHide.Size = new Size(222, 22);
+                menuItemContextHide.Text = "Hide";
+                menuItemContextHide.Click += new EventHandler(OnContextBlockHide);
+
                 menuItemContextFixTgir.Name = "menuItemContextFixTgir";
                 menuItemContextFixTgir.Size = new Size(222, 22);
                 menuItemContextFixTgir.Text = "Fix TGI";
@@ -126,6 +141,11 @@ namespace SceneGraphPlus.Surface
                 menuItemContextFixFileList.Size = new Size(222, 22);
                 menuItemContextFixFileList.Text = "Fix File List";
                 menuItemContextFixFileList.Click += new EventHandler(OnContextBlockFixFileList);
+
+                menuItemContextFixLight.Name = "menuItemContextFixLight";
+                menuItemContextFixLight.Size = new Size(222, 22);
+                menuItemContextFixLight.Text = "Fix Light";
+                menuItemContextFixLight.Click += new EventHandler(OnContextBlockFixLight);
 
                 menuItemContextCopySgName.Name = "menuItemContextCopySgName";
                 menuItemContextCopySgName.Size = new Size(222, 22);
@@ -205,6 +225,16 @@ namespace SceneGraphPlus.Surface
             set
             {
                 hideMissingBlocks = value;
+
+                Invalidate();
+            }
+        }
+
+        public bool AdvancedMode
+        {
+            set
+            {
+                advancedMode = value;
 
                 Invalidate();
             }
@@ -412,29 +442,47 @@ namespace SceneGraphPlus.Surface
         {
             if (editBlock != null)
             {
-                editBlock.SetSgFullName(sgName, prefixLowerCase);
-                editBlock.SetDirty();
+                ChangeSgName(editBlock, sgName, prefixLowerCase);
 
-                foreach (AbstractGraphConnector connector in editBlock.GetInConnectors())
+                owningForm.UpdateEditor(editBlock);
+            }
+        }
+
+        private void ChangeSgName(AbstractGraphBlock block, string sgName, bool prefixLowerCase)
+        {
+            if (block != null)
+            {
+                block.SetSgFullName(sgName, prefixLowerCase);
+                block.SetDirty();
+
+                foreach (AbstractGraphConnector connector in block.GetInConnectors())
                 {
                     connector.StartBlock.SetDirty();
                 }
 
-                if (editBlock.TypeId == Txtr.TYPE)
+                if (block.TypeId == Txtr.TYPE)
                 {
-                    if (Xflr.TYPE == editBlock.SoleParent?.TypeId)
+                    if (Xflr.TYPE == block.SoleParent?.TypeId)
                     {
                         // Special case - also update the associated _detail TXTR
-                        AbstractGraphBlock detailTxtrBlock = editBlock.SoleParent.OutConnectorByLabel("texturetname_detail").EndBlock;
+                        AbstractGraphBlock detailTxtrBlock = block.SoleParent.OutConnectorByLabel("texturetname_detail").EndBlock;
 
                         detailTxtrBlock.SetSgFullName($"{sgName}_detail", prefixLowerCase);
                         detailTxtrBlock.SetDirty();
                     }
                 }
+                else if (block.TypeId == Cres.TYPE)
+                {
+                    foreach (AbstractGraphConnector connector in block.OutConnectors)
+                    {
+                        if (connector.EndBlock.TypeId == Lamb.TYPE || connector.EndBlock.TypeId == Ldir.TYPE || connector.EndBlock.TypeId == Lpnt.TYPE || connector.EndBlock.TypeId == Lspt.TYPE)
+                        {
+                            ChangeSgName(connector.EndBlock, $"{sgName}_{connector.Label}_lght", prefixLowerCase);
+                        }
+                    }
+                }
 
-                FixIssues(editBlock);
-
-                owningForm.UpdateEditor(editBlock);
+                FixIssues(block);
             }
         }
 
@@ -463,7 +511,28 @@ namespace SceneGraphPlus.Surface
 
         private void FixIssues(AbstractGraphBlock fixBlock)
         {
-            fixBlock.FixIssues();
+            if (!fixBlock.IsLightValid)
+            {
+                string cresName = fixBlock.GetInConnectors()[0].StartBlock.SgBaseName;
+                string lightName = fixBlock.GetInConnectors()[0].Label;
+
+                Trace.Assert(!string.IsNullOrWhiteSpace(cresName), "Invalid CRES name");
+                Trace.Assert(!string.IsNullOrWhiteSpace(lightName), "Invalid light name");
+
+                if (!fixBlock.SgBaseName.Equals($"{cresName}_{lightName}", StringComparison.OrdinalIgnoreCase))
+                {
+                    ChangeSgName(fixBlock, $"{cresName}_{lightName}_lght", owningForm.IsPrefixLowerCase);
+                }
+
+                // Any issues with cLightT.Name and OGN are caught as the light is updated in the .package file
+
+                fixBlock.IsLightValid = true;
+                fixBlock.SetDirty();
+            }
+            else if (fixBlock.TypeId == Txmt.TYPE)
+            {
+                fixBlock.FixFileListIssues();
+            }
 
             Invalidate();
         }
@@ -518,12 +587,18 @@ namespace SceneGraphPlus.Surface
             {
                 menuItemContextTexture.Visible = (contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE);
 
+                menuItemContextDelete.Visible = advancedMode;
                 menuItemContextDelete.Enabled = (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0);
 
-                menuItemContextFixTgir.Visible = !contextBlock.IsTgirValid;
-                menuItemContextFixFileList.Visible = !contextBlock.IsDirty && !contextBlock.IsFileListValid;
+                menuItemContextHide.Visible = advancedMode;
+                menuItemContextHide.Enabled = (contextBlock.GetInConnectors().Count == 0);
 
-                menuItemContextCopySgName.Enabled = (contextBlock.SoleRcolParent?.SgBaseName != null);
+                menuItemContextFixTgir.Visible = !contextBlock.IsTgirValid;
+                menuItemContextFixFileList.Visible = (contextBlock.TypeId == Txmt.TYPE) && !contextBlock.IsDirty && !contextBlock.IsFileListValid;
+                menuItemContextFixLight.Visible = (contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE) && !contextBlock.IsDirty && !contextBlock.IsLightValid;
+
+                menuItemContextCopySgName.Visible = (contextBlock.SoleRcolParent != null);
+                menuItemContextCopySgName.Enabled = (contextBlock.SoleRcolParent?.SgBaseName != null && !(contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE));
                 menuItemContextClosePackage.Enabled = !HasPendingEdits(contextBlock.PackagePath);
             }
             else
@@ -553,12 +628,30 @@ namespace SceneGraphPlus.Surface
             }
         }
 
+        private void OnContextBlockHide(object sender, EventArgs e)
+        {
+            Trace.Assert(contextBlock.GetInConnectors().Count == 0, "Cannot hide block with in connectors");
+
+            contextBlock.Hide();
+
+            if (contextBlock.Equals(editBlock))
+            {
+                editBlock = null;
+                owningForm.UpdateEditor(editBlock);
+            }
+        }
+
         private void OnContextBlockFixTgir(object sender, EventArgs e)
         {
             FixTgir(contextBlock);
         }
 
         private void OnContextBlockFixFileList(object sender, EventArgs e)
+        {
+            FixIssues(contextBlock);
+        }
+
+        private void OnContextBlockFixLight(object sender, EventArgs e)
         {
             FixIssues(contextBlock);
         }
@@ -1191,7 +1284,7 @@ namespace SceneGraphPlus.Surface
                             rcol.FixTGIR();
                         }
 
-                        package.Commit(res);
+                        package.Commit(res, !block.IsOriginalTgirValid);
                     }
                 }
 
@@ -1235,7 +1328,27 @@ namespace SceneGraphPlus.Surface
                 }
                 else
                 {
-                    Trace.Assert(true, $"Unsupported CPF resource {res}");
+                    Trace.Assert(false, $"Unsupported CPF resource {res}");
+                }
+            }
+            else if (res is Lght lght)
+            {
+                List<AbstractGraphConnector> inConnectors = block.GetInConnectors();
+                Trace.Assert(inConnectors.Count == 1, $"Multiple 'in connectors' for light {block.SgFullName}");
+                Trace.Assert(inConnectors[0].StartBlock.TypeId == Cres.TYPE, $"Expected a parent CRES for light {block.SgFullName}");
+
+                if (!lght.IsLightValid(inConnectors[0].StartBlock.SgBaseName))
+                {
+                    lght.SetKeyName($"{block.SgBaseName}_lght");
+                    lght.OgnName = "";
+                    lght.BaseLight.LightT.NameResource.FileName = lght.KeyName;
+                }
+                else if (!block.IsOriginalTgirValid)
+                {
+                }
+                else
+                {
+                    Trace.Assert(false, "Attempting to update the name of a light (LPNT, LSPT, LAMB, LDIR) resource");
                 }
             }
             else if (res is Rcol rcol)
@@ -1255,12 +1368,12 @@ namespace SceneGraphPlus.Surface
                 }
                 else
                 {
-                    Trace.Assert(true, $"Unsupported RCOL resource {res}");
+                    Trace.Assert(false, $"Unsupported RCOL resource {res}");
                 }
             }
             else
             {
-                Trace.Assert(true, $"Unsupported resource {res}");
+                Trace.Assert(false, $"Unsupported resource {res}");
             }
         }
 
@@ -1517,8 +1630,15 @@ namespace SceneGraphPlus.Surface
             }
             else if (res is Cres cres)
             {
-                Trace.Assert(endBlock.TypeId == Shpe.TYPE, "Expecting SHPE for EndBlock");
-                cres.SetShpeKey(index, endBlock.Key);
+                Trace.Assert(endBlock.TypeId == Shpe.TYPE || endBlock.TypeId == Lamb.TYPE || endBlock.TypeId == Ldir.TYPE || endBlock.TypeId == Lpnt.TYPE || endBlock.TypeId == Lspt.TYPE, "Expecting SHPE or LGHT for EndBlock");
+                if (endBlock.TypeId == Shpe.TYPE)
+                {
+                    cres.SetShpeKey(index, endBlock.Key);
+                }
+                else if (endBlock.TypeId == Lamb.TYPE || endBlock.TypeId == Ldir.TYPE || endBlock.TypeId == Lpnt.TYPE || endBlock.TypeId == Lspt.TYPE)
+                {
+                    cres.SetLghtKey(index, endBlock.Key);
+                }
             }
             else if (res is Shpe shpe)
             {
@@ -1557,6 +1677,10 @@ namespace SceneGraphPlus.Surface
             else if (res is Lifo)
             {
                 Trace.Assert(false, "LIFO's do not have child resources");
+            }
+            else if (res is Lght)
+            {
+                Trace.Assert(false, "Lights (LAMB, LDIR, LPNT, LSPT) do not have child resources");
             }
             else
             {

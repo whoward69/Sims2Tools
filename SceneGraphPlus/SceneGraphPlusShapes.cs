@@ -40,6 +40,8 @@ namespace SceneGraphPlus.Shapes
 
         private bool borderVisible = false;
 
+        public string strData; // Any old shit that needs to be stored for later use.
+
         protected AbstractGraphShape(DrawingSurface surface)
         {
             this.surface = surface;
@@ -349,8 +351,10 @@ namespace SceneGraphPlus.Shapes
         private bool editable = true; // This should be called "readonly" but hey, that's a reserved word!
         private bool editing = false;
         private bool deleted = false;
+        private bool hidden = false;
 
         private bool fileListValid = true;
+        private bool lightValid = true;
 
         protected AbstractGraphBlock clonedFrom = null;
 
@@ -388,6 +392,18 @@ namespace SceneGraphPlus.Shapes
         public void Delete()
         {
             deleted = true;
+        }
+
+        public bool IsHidden => (hidden || IsMissing);
+
+        public void Hide()
+        {
+            hidden = true;
+        }
+
+        public void Unhide()
+        {
+            hidden = false;
         }
 
         protected BlockRef BlockRef => (IsClone ? clonedFrom.BlockRef : blockRef);
@@ -470,6 +486,7 @@ namespace SceneGraphPlus.Shapes
             missing = true;
         }
 
+        public bool IsOriginalTgirValid => BlockRef.IsOriginalTgirValid;
         public bool IsTgirValid => BlockRef.IsTgirValid;
 
         public void UpdateSgName(string sgName, bool prefixLowerCase)
@@ -489,6 +506,22 @@ namespace SceneGraphPlus.Shapes
                 else
                 {
                     fileListValid = value;
+                }
+            }
+        }
+
+        public bool IsLightValid
+        {
+            get => (IsClone ? clonedFrom.IsLightValid : lightValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsLightValid = value;
+                }
+                else
+                {
+                    lightValid = value;
                 }
             }
         }
@@ -532,11 +565,12 @@ namespace SceneGraphPlus.Shapes
             }
         }
 
-        public bool HasIssues => !IsDirty && !IsFileListValid;
+        public bool HasIssues => !IsDirty && !(IsFileListValid && IsLightValid);
 
-        public void FixIssues()
+        public void FixFileListIssues()
         {
             IsFileListValid = true;
+
             SetDirty();
         }
 
@@ -544,7 +578,7 @@ namespace SceneGraphPlus.Shapes
         public void FixTgir()
         {
             BlockRef.FixTgir();
-            FixIssues();
+            FixFileListIssues();
             SetDirty();
         }
 
@@ -782,7 +816,7 @@ namespace SceneGraphPlus.Shapes
 
             if (hideMissingBlocks)
             {
-                if (IsMissing) return;
+                if (IsHidden) return;
             }
 
             GraphicsPath path = GetPath();
@@ -804,7 +838,7 @@ namespace SceneGraphPlus.Shapes
             {
                 textFont = new Font(textFont, FontStyle.Bold);
             }
-            else if (!fileListValid)
+            else if (!(fileListValid && lightValid))
             {
                 textFont = new Font(textFont, FontStyle.Underline);
             }
