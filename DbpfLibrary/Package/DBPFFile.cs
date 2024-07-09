@@ -35,6 +35,7 @@ using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.SceneGraph;
+using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.CRES;
@@ -607,6 +608,10 @@ namespace Sims2Tools.DBPF.Package
             //
             // SceneGraph resources
             //
+            else if (entry.TypeID == Aged.TYPE)
+            {
+                res = new Aged(entry, reader);
+            }
             else if (entry.TypeID == Binx.TYPE)
             {
                 res = new Binx(entry, reader);

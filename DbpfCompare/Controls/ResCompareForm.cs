@@ -21,6 +21,7 @@ using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph;
+using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
@@ -170,7 +171,8 @@ namespace DbpfCompare.Controls
                     {
                         ShowIdr(leftPackage, rightPackage);
                     }
-                    else if (leftNodeData.TypeID == Binx.TYPE ||
+                    else if (leftNodeData.TypeID == Aged.TYPE ||
+                             leftNodeData.TypeID == Binx.TYPE ||
                              leftNodeData.TypeID == Coll.TYPE ||
                              leftNodeData.TypeID == Gzps.TYPE ||
                              leftNodeData.TypeID == Mmat.TYPE ||

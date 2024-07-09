@@ -30,6 +30,14 @@ namespace Sims2Tools.DBPF.CPF
         private List<CpfItem> items;
 
         public string Name => this.GetItem("name")?.StringValue;
+        public uint Age
+        {
+            get { CpfItem item = this.GetItem("age"); return item != null ? item.UIntegerValue : 0; }
+        }
+        public uint Gender
+        {
+            get { CpfItem item = this.GetItem("gender"); return item != null ? item.UIntegerValue : 0; }
+        }
 
         public override bool IsDirty
         {

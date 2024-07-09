@@ -18,6 +18,7 @@ using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
@@ -83,6 +84,7 @@ namespace DbpfCompare
             Str.TYPE, Ctss.TYPE, Ttas.TYPE,
             Shpe.TYPE,
             Txmt.TYPE,
+            Aged.TYPE,
             Binx.TYPE,
             Coll.TYPE,
             Gzps.TYPE,

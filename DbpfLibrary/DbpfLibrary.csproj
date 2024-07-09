@@ -85,6 +85,7 @@
     <Compile Include="Groups\GROP\Grop.cs" />
     <Compile Include="Images\DdsLoader.cs" />
     <Compile Include="Logger\DBPFLogger.cs" />
+    <Compile Include="SceneGraph\AGED\Aged.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\MipMap.cs" />
     <Compile Include="Images\THUB\Thub.cs" />
     <Compile Include="OBJF\ObjfIndex.cs" />

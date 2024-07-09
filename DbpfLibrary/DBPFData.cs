@@ -33,6 +33,7 @@ using Sims2Tools.DBPF.Neighbourhood.SWAF;
 using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
+using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.ANIM;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.CINE;
@@ -88,6 +89,7 @@ namespace Sims2Tools.DBPF
 
         public static TypeGroupID GROUP_SG_MAXIS = (TypeGroupID)0x1C0532FA;
         public static TypeGroupID GROUP_SG_LOCAL = (TypeGroupID)0x1C050000;
+        public static TypeGroupID GROUP_GZPS_MAXIS = (TypeGroupID)0x2C17B74A;
         public static TypeGroupID GROUP_COLLECTIONS = (TypeGroupID)0x0FFEFEFE;
         public static TypeGroupID GROUP_BONVOYAGE = (TypeGroupID)0x4F184AA9;
 
@@ -142,6 +144,7 @@ namespace Sims2Tools.DBPF
             RcolTypeNames.Add(Txmt.TYPE, Txmt.NAME);
             RcolTypeNames.Add(Txtr.TYPE, Txtr.NAME);
 
+            SgTypeNames.Add(Aged.TYPE, Aged.NAME);
             SgTypeNames.Add(Binx.TYPE, Binx.NAME);
             SgTypeNames.Add(Coll.TYPE, Coll.NAME);
             SgTypeNames.Add(Gzps.TYPE, Gzps.NAME);
