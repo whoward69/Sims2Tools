@@ -12,6 +12,7 @@ using SceneGraphPlus.Surface;
 using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
@@ -35,6 +36,7 @@ using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DBPF.XROF;
 using Sims2Tools.Dialogs;
+using Sims2Tools.Helpers;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -53,7 +55,7 @@ namespace SceneGraphPlus
 
         // When adding to this List, search for "UnderstoodTypes" (both this file and the Surface file)
         // UnderstoodTypes - also need to add TypeBlockColour and TypeRow to the Settings.settings file (see https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors?view=windowsdesktop-8.0 for colour names)
-        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE };
+        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Aged.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE };
 
         private readonly DrawingSurface surface;
 
@@ -68,6 +70,7 @@ namespace SceneGraphPlus
         private FormWindowState lastWindowState;
 
         public bool IsPrefixLowerCase => menuItemPrefixLowerCase.Checked;
+        public bool IsAdvancedMode => menuItemAdvanced.Checked;
 
         public SceneGraphPlusForm()
         {
@@ -301,7 +304,7 @@ namespace SceneGraphPlus
                 textBlockName.Visible = true;
                 textBlockName.Text = block.BlockName;
 
-                textBlockName.ReadOnly = (!block.IsEditable || block.TypeId == Mmat.TYPE);
+                textBlockName.ReadOnly = (!block.IsEditable || block.TypeId == Mmat.TYPE || block.TypeId == Aged.TYPE);
                 textBlockName.BorderStyle = (textBlockName.ReadOnly ? BorderStyle.FixedSingle : BorderStyle.Fixed3D);
             }
             else
@@ -613,8 +616,38 @@ namespace SceneGraphPlus
 
                 startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("name").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
             }
+            else if (res is Aged aged)
+            {
+                startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(aged.Age)}{CpfHelper.GenderCode(aged.Gender)}";
+                startBlock.BlockName = $"{CpfHelper.AgeName(aged.Age)} {CpfHelper.GenderName(aged.Gender)}".ToLower();
+
+                Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+
+                if (idr != null)
+                {
+                    int index = 0;
+
+                    foreach (DBPFKey itemKey in idr.Items)
+                    {
+                        if (UnderstoodTypeIds.Contains(itemKey.TypeID))
+                        {
+                            AbstractGraphConnector connector = startBlock.ConnectTo(index, null, AddBlockByKey(package, new BlockRef(package, itemKey.TypeID, itemKey), ref freeCol));
+
+                            if (connector.EndBlock.TypeId == Gzps.TYPE && connector.EndBlock.SoleParent != null)
+                            {
+                                connector.EndBlock.Centre = new Point(connector.EndBlock.Centre.X, connector.EndBlock.Centre.Y + DrawingSurface.RowGap / 2);
+                            }
+
+                            freeCol += DrawingSurface.ColumnGap;
+                        }
+
+                        index++;
+                    }
+                }
+            }
             else if (res is Gzps gzps)
             {
+                startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(gzps.Age)}{CpfHelper.GenderCode(gzps.Gender)}";
                 startBlock.BlockName = gzps.Name;
 
                 Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));

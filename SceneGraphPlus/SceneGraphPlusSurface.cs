@@ -9,6 +9,7 @@
 using SceneGraphPlus.Shapes;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
+using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
@@ -62,6 +63,7 @@ namespace SceneGraphPlus.Surface
         private readonly ContextMenuStrip menuContextBlock;
         private readonly ToolStripMenuItem menuItemContextTexture;
         private readonly ToolStripMenuItem menuItemContextDelete;
+        private readonly ToolStripMenuItem menuItemContextDeleteChain;
         private readonly ToolStripMenuItem menuItemContextHide;
         private readonly ToolStripMenuItem menuItemContextFixTgir;
         private readonly ToolStripMenuItem menuItemContextFixFileList;
@@ -76,6 +78,7 @@ namespace SceneGraphPlus.Surface
         private readonly List<AbstractGraphConnector> connectors = new List<AbstractGraphConnector>();
 
         private AbstractGraphBlock selectedBlock = null;
+        private HashSet<AbstractGraphBlock> selectedBlockChain = null;
         private AbstractGraphBlock hoverBlock = null;
         private AbstractGraphBlock editBlock = null;
         private List<AbstractGraphBlock> dropOntoBlocks = new List<AbstractGraphBlock>();
@@ -104,6 +107,7 @@ namespace SceneGraphPlus.Surface
                 menuContextBlock = new ContextMenuStrip();
                 menuItemContextTexture = new ToolStripMenuItem();
                 menuItemContextDelete = new ToolStripMenuItem();
+                menuItemContextDeleteChain = new ToolStripMenuItem();
                 menuItemContextHide = new ToolStripMenuItem();
                 menuItemContextFixTgir = new ToolStripMenuItem();
                 menuItemContextFixFileList = new ToolStripMenuItem();
@@ -112,7 +116,7 @@ namespace SceneGraphPlus.Surface
                 menuItemContextClosePackage = new ToolStripMenuItem();
                 menuContextBlock.SuspendLayout();
 
-                menuContextBlock.Items.AddRange(new ToolStripItem[] { menuItemContextTexture, menuItemContextDelete, menuItemContextHide, menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextFixLight, menuItemContextCopySgName, menuItemContextClosePackage });
+                menuContextBlock.Items.AddRange(new ToolStripItem[] { menuItemContextTexture, menuItemContextDelete, menuItemContextDeleteChain, menuItemContextHide, menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextFixLight, menuItemContextCopySgName, menuItemContextClosePackage });
                 menuContextBlock.Name = "menuContextBlock";
                 menuContextBlock.Size = new Size(223, 48);
                 menuContextBlock.Opening += new CancelEventHandler(OnContextBlockOpening);
@@ -126,6 +130,11 @@ namespace SceneGraphPlus.Surface
                 menuItemContextDelete.Size = new Size(222, 22);
                 menuItemContextDelete.Text = "Delete";
                 menuItemContextDelete.Click += new EventHandler(OnContextBlockDelete);
+
+                menuItemContextDeleteChain.Name = "menuItemContextDeleteChain";
+                menuItemContextDeleteChain.Size = new Size(222, 22);
+                menuItemContextDeleteChain.Text = "Delete Chain";
+                menuItemContextDeleteChain.Click += new EventHandler(OnContextBlockDeleteChain);
 
                 menuItemContextHide.Name = "menuItemContextHide";
                 menuItemContextHide.Size = new Size(222, 22);
@@ -200,7 +209,10 @@ namespace SceneGraphPlus.Surface
                 {
                     if (block.IsMissingOrClone) continue;
 
-                    if (block.IsDirty) return true;
+                    if (block.IsDirty)
+                    {
+                        return true;
+                    }
                 }
 
                 return false;
@@ -304,7 +316,21 @@ namespace SceneGraphPlus.Surface
         private void RealignChain(AbstractGraphBlock startBlock, ref int freeCol)
         {
             int startCol = freeCol;
-            startBlock.Centre = new Point(startCol, owningForm.RowForType(startBlock.TypeId));
+            int startRow = owningForm.RowForType(startBlock.TypeId);
+
+            if (startBlock.TypeId == Gzps.TYPE)
+            {
+                foreach (AbstractGraphConnector inConnector in startBlock.GetInConnectors())
+                {
+                    if (inConnector.StartBlock.TypeId == Aged.TYPE)
+                    {
+                        startRow += RowGap / 2;
+                        break;
+                    }
+                }
+            }
+
+            startBlock.Centre = new Point(startCol, startRow);
 
             realignedBlocks.Add(startBlock, startBlock);
 
@@ -370,6 +396,7 @@ namespace SceneGraphPlus.Surface
 
             editBlock = null;
             selectedBlock = null;
+            selectedBlockChain = null;
             hoverBlock = null;
             dropOntoBlocks.Clear();
             contextBlock = null;
@@ -415,7 +442,6 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-
         public int NextFreeRow
         {
             get
@@ -436,6 +462,28 @@ namespace SceneGraphPlus.Surface
 
                 return highestY + (RowGap / 2);
             }
+        }
+
+        private HashSet<AbstractGraphBlock> GetBlockChain(AbstractGraphBlock startBlock)
+        {
+            HashSet<AbstractGraphBlock> chain = GetOutBlockChain(startBlock);
+
+            return chain;
+        }
+
+        private HashSet<AbstractGraphBlock> GetOutBlockChain(AbstractGraphBlock startBlock)
+        {
+            HashSet<AbstractGraphBlock> chain = new HashSet<AbstractGraphBlock>
+            {
+                startBlock
+            };
+
+            foreach (AbstractGraphConnector connector in startBlock.OutConnectors)
+            {
+                chain.UnionWith(GetOutBlockChain(connector.EndBlock));
+            }
+
+            return chain;
         }
 
         public void ChangeEditingSgName(string sgName, bool prefixLowerCase)
@@ -590,6 +638,22 @@ namespace SceneGraphPlus.Surface
                 menuItemContextDelete.Visible = advancedMode;
                 menuItemContextDelete.Enabled = (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0);
 
+                menuItemContextDeleteChain.Visible = advancedMode;
+                menuItemContextDeleteChain.Enabled = false;
+                if (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0)
+                {
+                    menuItemContextDeleteChain.Enabled = true;
+
+                    foreach (AbstractGraphBlock block in GetBlockChain(contextBlock))
+                    {
+                        if (!block.IsEditable)
+                        {
+                            menuItemContextDeleteChain.Enabled = false;
+                            break;
+                        }
+                    }
+                }
+
                 menuItemContextHide.Visible = advancedMode;
                 menuItemContextHide.Enabled = (contextBlock.GetInConnectors().Count == 0);
 
@@ -622,6 +686,38 @@ namespace SceneGraphPlus.Surface
             contextBlock.Delete();
 
             if (contextBlock.Equals(editBlock))
+            {
+                editBlock = null;
+                owningForm.UpdateEditor(editBlock);
+            }
+        }
+
+        private void OnContextBlockDeleteChain(object sender, EventArgs e)
+        {
+            Trace.Assert(contextBlock.GetInConnectors().Count == 0, "Cannot delete chain with in connectors");
+
+            DeleteChain(contextBlock);
+
+            Invalidate();
+        }
+
+        private void DeleteChain(AbstractGraphBlock startBlock)
+        {
+            Trace.Assert(contextBlock.IsEditable, "Cannot delete a 'read-only' block");
+
+            foreach (AbstractGraphConnector connector in startBlock.GetOutConnectors()) // GetOutConnectors() allows us to use DisconnectFrom() below
+            {
+                if (connector.EndBlock.GetInConnectors().Count == 1)
+                {
+                    DeleteChain(connector.EndBlock);
+
+                    connector.EndBlock.DisconnectFrom(connector);
+                }
+            }
+
+            startBlock.Delete();
+
+            if (startBlock.Equals(editBlock))
             {
                 editBlock = null;
                 owningForm.UpdateEditor(editBlock);
@@ -906,19 +1002,36 @@ namespace SceneGraphPlus.Surface
                         int offsetX = (gridX == ColumnGap) ? ColumnGap / 2 : 0;
                         int offsetY = (gridY == RowGap) ? RowGap / 2 : 0;
 
+                        Point newCentre;
+
                         if (gridScale <= 1.0f)
                         {
-                            selectedBlock.Centre = new Point(((selectedBlock.Centre.X + gridX / 2) / gridX) * gridX - offsetX, ((selectedBlock.Centre.Y + gridY / 2) / gridY) * gridY - offsetY);
+                            newCentre = new Point(((selectedBlock.Centre.X + gridX / 2) / gridX) * gridX - offsetX, ((selectedBlock.Centre.Y + gridY / 2) / gridY) * gridY - offsetY);
                         }
                         else
                         {
-                            selectedBlock.Centre = new Point(((selectedBlock.Centre.X + gridX) / gridX) * gridX - offsetX, ((selectedBlock.Centre.Y + gridY) / gridY) * gridY - offsetY);
+                            newCentre = new Point(((selectedBlock.Centre.X + gridX) / gridX) * gridX - offsetX, ((selectedBlock.Centre.Y + gridY) / gridY) * gridY - offsetY);
+                        }
+
+                        Point delta = new Point(newCentre.X - selectedBlock.Centre.X, newCentre.Y - selectedBlock.Centre.Y);
+
+                        if (selectedBlockChain != null)
+                        {
+                            foreach (AbstractGraphBlock block in selectedBlockChain)
+                            {
+                                block.Move(delta);
+                            }
+                        }
+                        else
+                        {
+                            selectedBlock.Centre = newCentre;
                         }
 
                         this.Invalidate();
                     }
 
                     selectedBlock = null;
+                    selectedBlockChain = null;
                     moving = false;
                 }
             }
@@ -935,11 +1048,34 @@ namespace SceneGraphPlus.Surface
             {
                 lblTooltip.Visible = false;
 
-                selectedBlock.Move(new Point(e.X - previousPoint.X, e.Y - previousPoint.Y));
+                Point delta = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
+
+                if (Form.ModifierKeys == Keys.Alt)
+                {
+                    if (owningForm.IsAdvancedMode)
+                    {
+                        if (selectedBlockChain == null)
+                        {
+                            selectedBlockChain = GetBlockChain(selectedBlock);
+                        }
+
+                        foreach (AbstractGraphBlock block in selectedBlockChain)
+                        {
+                            block.Move(delta);
+                        }
+                    }
+                }
+                else
+                {
+                    selectedBlock.Move(delta);
+                }
 
                 previousPoint = e.Location;
 
-                if (!selectedBlock.IsMissingOrClone)
+                bool canDrop = (!selectedBlock.IsClone) && (Form.ModifierKeys != Keys.Alt);
+                if (!owningForm.IsAdvancedMode && selectedBlock.IsMissing) canDrop = false;
+
+                if (canDrop)
                 {
                     if (Form.ModifierKeys == Keys.Shift)
                     {
@@ -1235,7 +1371,7 @@ namespace SceneGraphPlus.Surface
                 // ... firstly delete any blocks ...
                 foreach (AbstractGraphBlock block in kvPair.Value)
                 {
-                    if (block.IsDeleted)
+                    if (block.IsDeleteMe)
                     {
                         package.Remove(block.OriginalKey);
                     }
@@ -1284,7 +1420,7 @@ namespace SceneGraphPlus.Surface
                             rcol.FixTGIR();
                         }
 
-                        package.Commit(res, !block.IsOriginalTgirValid);
+                        package.Commit(res, true); // ALWAYS commit, as we removed the resource above
                     }
                 }
 
@@ -1320,7 +1456,11 @@ namespace SceneGraphPlus.Surface
             {
                 // Name is derived from associated TXMT and can't be changed
             }
-            else if (res is Cpf cpf) // Do this AFTER MMAT
+            else if (res is Aged)
+            {
+                // AGED has no name
+            }
+            else if (res is Cpf cpf) // Do this AFTER MMAT and AGED
             {
                 if (res is Gzps || res is Xfnc || res is Xmol || res is Xtol || res is Xobj || res is Xrof || res is Xflr)
                 {
@@ -1469,8 +1609,19 @@ namespace SceneGraphPlus.Surface
                 }
                 else if (endBlock.TypeId == Txmt.TYPE)
                 {
-                    mmat.GetItem("name").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, endBlock.TypeId, prefixLowerCase);
+                    mmat.GetItem("name").StringValue = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
                 }
+            }
+            else if (res is Aged aged)
+            {
+                Trace.Assert(SceneGraphPlusForm.UnderstoodTypeIds.Contains(endBlock.TypeId), $"Unexpected {DBPFData.TypeName(endBlock.TypeId)} for EndBlock");
+
+                Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, aged));
+                Trace.Assert(idr != null, "Cannot find associated 3IDR");
+
+                idr.SetItem((uint)index, endBlock.Key);
+
+                package.Commit(idr);
             }
             else if (res is Gzps gzps)
             {

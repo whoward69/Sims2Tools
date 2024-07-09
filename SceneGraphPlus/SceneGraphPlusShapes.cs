@@ -9,6 +9,7 @@
 using SceneGraphPlus.Cache;
 using SceneGraphPlus.Surface;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using System;
@@ -230,6 +231,8 @@ namespace SceneGraphPlus.Shapes
 
         public override void Draw(Graphics g, bool hideMissingBlocks, int count)
         {
+            if (StartBlock.IsDeleted || StartBlock.IsDeleteMe || EndBlock.IsDeleted || EndBlock.IsDeleteMe) return;
+
             if (hideMissingBlocks)
             {
                 if (StartBlock.IsMissing || EndBlock.IsMissing) return;
@@ -325,6 +328,8 @@ namespace SceneGraphPlus.Shapes
 
         public override bool HitTest(Point p)
         {
+            if (StartBlock.IsDeleted || StartBlock.IsDeleteMe || EndBlock.IsDeleted || EndBlock.IsDeleteMe) return false;
+
             return GetPath().IsOutlineVisible(p, new Pen(Color.Black, ConnectorDetectWidth));
         }
 
@@ -350,6 +355,7 @@ namespace SceneGraphPlus.Shapes
         private bool missing = false;
         private bool editable = true; // This should be called "readonly" but hey, that's a reserved word!
         private bool editing = false;
+        private bool deleteMe = false;
         private bool deleted = false;
         private bool hidden = false;
 
@@ -358,7 +364,7 @@ namespace SceneGraphPlus.Shapes
 
         protected AbstractGraphBlock clonedFrom = null;
 
-        public override bool IsDirty => (IsClone ? clonedFrom.IsDirty : (base.IsDirty || deleted));
+        public override bool IsDirty => (IsClone ? clonedFrom.IsDirty : (base.IsDirty || deleteMe));
 
         public override void SetDirty()
         {
@@ -379,6 +385,8 @@ namespace SceneGraphPlus.Shapes
             blockRef.SetClean();
 
             base.SetClean();
+
+            deleteMe = false;
         }
 
         public bool IsEditable
@@ -387,10 +395,12 @@ namespace SceneGraphPlus.Shapes
             set => editable = value;
         }
 
+        public bool IsDeleteMe => deleteMe;
         public bool IsDeleted => deleted;
 
         public void Delete()
         {
+            deleteMe = true;
             deleted = true;
         }
 
@@ -592,7 +602,7 @@ namespace SceneGraphPlus.Shapes
 
         public bool IsMaxis
         {
-            get => (BlockRef.Key.GroupID == DBPFData.GROUP_SG_MAXIS);
+            get => (BlockRef.Key.GroupID == DBPFData.GROUP_SG_MAXIS || (BlockRef.Key.TypeID == Gzps.TYPE && BlockRef.Key.GroupID == DBPFData.GROUP_GZPS_MAXIS));
         }
 
         public bool IsClone
@@ -665,6 +675,18 @@ namespace SceneGraphPlus.Shapes
         }
 
         public List<AbstractGraphConnector> OutConnectors => outConnectors;
+
+        public List<AbstractGraphConnector> GetOutConnectors()
+        {
+            List<AbstractGraphConnector> connectors = new List<AbstractGraphConnector>();
+
+            foreach (AbstractGraphConnector connector in outConnectors)
+            {
+                connectors.Add(connector);
+            }
+
+            return connectors;
+        }
 
         public AbstractGraphConnector OutConnectorByLabel(string label)
         {
@@ -799,6 +821,8 @@ namespace SceneGraphPlus.Shapes
 
         public override bool HitTest(Point p)
         {
+            if (IsDeleted || IsDeleteMe) return false;
+
             bool result = false;
             using (GraphicsPath path = GetPath())
                 result = path.IsVisible(p);

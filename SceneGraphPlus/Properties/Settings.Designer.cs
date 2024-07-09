@@ -730,5 +730,29 @@ namespace SceneGraphPlus.Properties {
                 this["LsptRow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ForestGreen")]
+        public string AgedBlockColour {
+            get {
+                return ((string)(this["AgedBlockColour"]));
+            }
+            set {
+                this["AgedBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int AgedRow {
+            get {
+                return ((int)(this["AgedRow"]));
+            }
+            set {
+                this["AgedRow"] = value;
+            }
+        }
     }
 }
