@@ -91,6 +91,7 @@ namespace SceneGraphPlus
             this.lblBlockPackagePath = new System.Windows.Forms.Label();
             this.textBlockPackagePath = new System.Windows.Forms.TextBox();
             this.btnFixIssues = new System.Windows.Forms.Button();
+            this.menuItemFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel2.SuspendLayout();
@@ -236,26 +237,27 @@ namespace SceneGraphPlus
             // 
             this.menuItemAdvanced.CheckOnClick = true;
             this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
             this.menuItemAdvanced.Text = "Advanced";
             this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(141, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemAutoBackup
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
             this.menuItemAutoBackup.Text = "Auto-Backup";
             // 
             // menuOptions
             // 
             this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemHideMissing,
+            this.menuItemFilters,
             this.toolStripSeparator4,
             this.menuItemConnectorsOver,
             this.menuItemConnectorsUnder,
@@ -597,6 +599,13 @@ namespace SceneGraphPlus
             this.btnFixIssues.UseVisualStyleBackColor = true;
             this.btnFixIssues.Click += new System.EventHandler(this.OnFixIssuesClicked);
             // 
+            // menuItemFilters
+            // 
+            this.menuItemFilters.Name = "menuItemFilters";
+            this.menuItemFilters.Size = new System.Drawing.Size(281, 22);
+            this.menuItemFilters.Text = "&Filters...";
+            this.menuItemFilters.Click += new System.EventHandler(this.OnFilterBlocks);
+            // 
             // SceneGraphPlusForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -681,5 +690,6 @@ namespace SceneGraphPlus
         private System.Windows.Forms.Button btnSaveAll;
         private System.Windows.Forms.ToolStripMenuItem menuItemPrefixOptionalNames;
         private System.Windows.Forms.ToolStripMenuItem menuItemPrefixLowerCase;
+        private System.Windows.Forms.ToolStripMenuItem menuItemFilters;
     }
 }

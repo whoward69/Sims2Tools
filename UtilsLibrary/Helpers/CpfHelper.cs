@@ -54,9 +54,9 @@ namespace Sims2Tools.Helpers
                 case 0x0020:
                     return "B";
                 case 0x0040:
-                    return "YA";
+                    return "Y";
                 case 0x0048:
-                    return "A";
+                    return "AY";
             }
 
             return "?";

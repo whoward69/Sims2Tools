@@ -232,6 +232,7 @@ namespace SceneGraphPlus.Shapes
         public override void Draw(Graphics g, bool hideMissingBlocks, int count)
         {
             if (StartBlock.IsDeleted || StartBlock.IsDeleteMe || EndBlock.IsDeleted || EndBlock.IsDeleteMe) return;
+            if (StartBlock.IsHidden || EndBlock.IsHidden) return;
 
             if (hideMissingBlocks)
             {
@@ -329,6 +330,7 @@ namespace SceneGraphPlus.Shapes
         public override bool HitTest(Point p)
         {
             if (StartBlock.IsDeleted || StartBlock.IsDeleteMe || EndBlock.IsDeleted || EndBlock.IsDeleteMe) return false;
+            if (StartBlock.IsHidden || EndBlock.IsHidden) return false;
 
             return GetPath().IsOutlineVisible(p, new Pen(Color.Black, ConnectorDetectWidth));
         }
@@ -358,6 +360,7 @@ namespace SceneGraphPlus.Shapes
         private bool deleteMe = false;
         private bool deleted = false;
         private bool hidden = false;
+        private bool filtered = false;
 
         private bool fileListValid = true;
         private bool lightValid = true;
@@ -404,16 +407,16 @@ namespace SceneGraphPlus.Shapes
             deleted = true;
         }
 
-        public bool IsHidden => (hidden || IsMissing);
+        public bool IsHidden => hidden || filtered;
 
         public void Hide()
         {
             hidden = true;
         }
 
-        public void Unhide()
+        public void Filter(bool value)
         {
-            hidden = false;
+            filtered = value;
         }
 
         protected BlockRef BlockRef => (IsClone ? clonedFrom.BlockRef : blockRef);
@@ -590,6 +593,11 @@ namespace SceneGraphPlus.Shapes
             BlockRef.FixTgir();
             FixFileListIssues();
             SetDirty();
+
+            foreach (AbstractGraphConnector inConnector in inConnectors)
+            {
+                inConnector.StartBlock.SetDirty();
+            }
         }
 
         public TypeTypeID TypeId => BlockRef.TypeId;
@@ -822,6 +830,7 @@ namespace SceneGraphPlus.Shapes
         public override bool HitTest(Point p)
         {
             if (IsDeleted || IsDeleteMe) return false;
+            if (IsHidden) return false;
 
             bool result = false;
             using (GraphicsPath path = GetPath())
@@ -837,10 +846,11 @@ namespace SceneGraphPlus.Shapes
         public virtual void Draw(Graphics g, bool hideMissingBlocks)
         {
             if (IsDeleted) return;
+            if (IsHidden) return;
 
             if (hideMissingBlocks)
             {
-                if (IsHidden) return;
+                if (IsMissing) return;
             }
 
             GraphicsPath path = GetPath();
@@ -867,9 +877,25 @@ namespace SceneGraphPlus.Shapes
                 textFont = new Font(textFont, FontStyle.Underline);
             }
 
-            Size textSize = TextRenderer.MeasureText(Text, textFont);
+            string text = Text;
 
-            g.DrawString(Text, textFont, new SolidBrush(TextColor), new Point(Centre.X - textSize.Width / 2, Centre.Y - textSize.Height / 2));
+            if (text.Contains("\n"))
+            {
+                int pos = text.IndexOf("\n");
+                string text1 = text.Substring(0, pos);
+                string text2 = text.Substring(pos + 1);
+
+                Size text1Size = TextRenderer.MeasureText(text1, textFont);
+                g.DrawString(text1, textFont, new SolidBrush(TextColor), new Point(Centre.X - text1Size.Width / 2, Centre.Y - 1 - text1Size.Height));
+
+                Size text2Size = TextRenderer.MeasureText(text2, textFont);
+                g.DrawString(text2, textFont, new SolidBrush(TextColor), new Point(Centre.X - text2Size.Width / 2, Centre.Y + 1));
+            }
+            else
+            {
+                Size textSize = TextRenderer.MeasureText(text, textFont);
+                g.DrawString(text, textFont, new SolidBrush(TextColor), new Point(Centre.X - textSize.Width / 2, Centre.Y - textSize.Height / 2));
+            }
         }
 
         public bool Equals(AbstractGraphBlock that)

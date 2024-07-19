@@ -6,7 +6,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-namespace SceneGraphPlus
+namespace SceneGraphPlus.Dialogs
 {
     public partial class TextureDialog
     {

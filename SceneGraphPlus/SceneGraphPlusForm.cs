@@ -7,6 +7,7 @@
  */
 
 using SceneGraphPlus.Cache;
+using SceneGraphPlus.Dialogs;
 using SceneGraphPlus.Shapes;
 using SceneGraphPlus.Surface;
 using Sims2Tools;
@@ -58,6 +59,7 @@ namespace SceneGraphPlus
         public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Aged.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE };
 
         private readonly DrawingSurface surface;
+        private readonly FiltersDialog filtersDialog = new FiltersDialog();
 
         private readonly List<string> packageFiles = new List<string>();
         private readonly BlockCache blockCache = new BlockCache();
@@ -68,6 +70,8 @@ namespace SceneGraphPlus
         private Updater MyUpdater;
 
         private FormWindowState lastWindowState;
+
+        private readonly BlockFilters blockFilters = new BlockFilters();
 
         public bool IsPrefixLowerCase => menuItemPrefixLowerCase.Checked;
         public bool IsAdvancedMode => menuItemAdvanced.Checked;
@@ -437,6 +441,8 @@ namespace SceneGraphPlus
             {
                 AddPackage(packageFile, reloading);
             }
+
+            surface.ApplyFilters(blockFilters);
         }
 
         private void AddPackage(string packageFile, bool reloading = false)
@@ -476,8 +482,6 @@ namespace SceneGraphPlus
 
                 package.Close();
             }
-
-            surface.ResizeToFit();
 
             surface.Invalidate();
         }
@@ -650,6 +654,13 @@ namespace SceneGraphPlus
                 startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(gzps.Age)}{CpfHelper.GenderCode(gzps.Gender)}";
                 startBlock.BlockName = gzps.Name;
 
+                uint entries = gzps.GetItem("numoverrides").UIntegerValue;
+
+                if (entries == 1)
+                {
+                    startBlock.Text = $"{startBlock.Text}\n{gzps.GetItem($"override0subset").StringValue}";
+                }
+
                 Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
 
                 if (idr != null)
@@ -661,8 +672,6 @@ namespace SceneGraphPlus
                     startBlock.ConnectTo(0, "shape", AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, idr.GetItem(gzps.GetItem("shapekeyidx").UIntegerValue)), ref freeCol));
 
                     freeCol += DrawingSurface.ColumnGap;
-
-                    uint entries = gzps.GetItem("numoverrides").UIntegerValue;
 
                     for (int index = 0; index < entries; ++index)
                     {
@@ -1085,6 +1094,23 @@ namespace SceneGraphPlus
         private void OnHideMissingBlocks(object sender, EventArgs e)
         {
             surface.HideMissingBlocks = menuItemHideMissing.Checked;
+        }
+
+        private void OnFilterBlocks(object sender, EventArgs e)
+        {
+            if (filtersDialog.Visible)
+            {
+                filtersDialog.Focus();
+            }
+            else
+            {
+                filtersDialog.Show(blockFilters, surface);
+            }
+        }
+
+        public void CloseFilters()
+        {
+            filtersDialog.Hide();
         }
 
         private void OnConnectorsOverUnderClicked(object sender, EventArgs e)

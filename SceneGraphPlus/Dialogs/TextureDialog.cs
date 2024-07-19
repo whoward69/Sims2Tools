@@ -18,7 +18,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace SceneGraphPlus
+namespace SceneGraphPlus.Dialogs
 {
     public partial class TextureDialog : Form
     {

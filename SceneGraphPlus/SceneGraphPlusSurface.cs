@@ -6,10 +6,12 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Microsoft.WindowsAPICodePack.Dialogs;
 using SceneGraphPlus.Shapes;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.SceneGraph.AGED;
+using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
@@ -36,6 +38,7 @@ using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DBPF.XROF;
 using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
+using Sims2Tools.Exporter;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -60,11 +63,15 @@ namespace SceneGraphPlus.Surface
 
         private readonly Label lblTooltip = new Label();
 
+        private readonly CommonOpenFileDialog selectPathDialog;
+
         private readonly ContextMenuStrip menuContextBlock;
         private readonly ToolStripMenuItem menuItemContextTexture;
         private readonly ToolStripMenuItem menuItemContextDelete;
         private readonly ToolStripMenuItem menuItemContextDeleteChain;
+        private readonly ToolStripMenuItem menuItemContextExtract;
         private readonly ToolStripMenuItem menuItemContextHide;
+        private readonly ToolStripMenuItem menuItemContextHideChain;
         private readonly ToolStripMenuItem menuItemContextFixTgir;
         private readonly ToolStripMenuItem menuItemContextFixFileList;
         private readonly ToolStripMenuItem menuItemContextFixLight;
@@ -109,6 +116,8 @@ namespace SceneGraphPlus.Surface
                 menuItemContextDelete = new ToolStripMenuItem();
                 menuItemContextDeleteChain = new ToolStripMenuItem();
                 menuItemContextHide = new ToolStripMenuItem();
+                menuItemContextHideChain = new ToolStripMenuItem();
+                menuItemContextExtract = new ToolStripMenuItem();
                 menuItemContextFixTgir = new ToolStripMenuItem();
                 menuItemContextFixFileList = new ToolStripMenuItem();
                 menuItemContextFixLight = new ToolStripMenuItem();
@@ -116,7 +125,14 @@ namespace SceneGraphPlus.Surface
                 menuItemContextClosePackage = new ToolStripMenuItem();
                 menuContextBlock.SuspendLayout();
 
-                menuContextBlock.Items.AddRange(new ToolStripItem[] { menuItemContextTexture, menuItemContextDelete, menuItemContextDeleteChain, menuItemContextHide, menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextFixLight, menuItemContextCopySgName, menuItemContextClosePackage });
+                menuContextBlock.Items.AddRange(new ToolStripItem[] {
+                    menuItemContextTexture, 
+                    menuItemContextHide, menuItemContextHideChain, 
+                    menuItemContextExtract, 
+                    menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextFixLight, 
+                    menuItemContextCopySgName, 
+                    menuItemContextClosePackage, 
+                    menuItemContextDelete, menuItemContextDeleteChain });
                 menuContextBlock.Name = "menuContextBlock";
                 menuContextBlock.Size = new Size(223, 48);
                 menuContextBlock.Opening += new CancelEventHandler(OnContextBlockOpening);
@@ -140,6 +156,16 @@ namespace SceneGraphPlus.Surface
                 menuItemContextHide.Size = new Size(222, 22);
                 menuItemContextHide.Text = "Hide";
                 menuItemContextHide.Click += new EventHandler(OnContextBlockHide);
+
+                menuItemContextHideChain.Name = "menuItemContextHideChain";
+                menuItemContextHideChain.Size = new Size(222, 22);
+                menuItemContextHideChain.Text = "Hide Chain";
+                menuItemContextHideChain.Click += new EventHandler(OnContextBlockHideChain);
+
+                menuItemContextExtract.Name = "menuItemContextExtract";
+                menuItemContextExtract.Size = new Size(222, 22);
+                menuItemContextExtract.Text = "Extract";
+                menuItemContextExtract.Click += new EventHandler(OnContextBlockExtract);
 
                 menuItemContextFixTgir.Name = "menuItemContextFixTgir";
                 menuItemContextFixTgir.Size = new Size(222, 22);
@@ -195,6 +221,11 @@ namespace SceneGraphPlus.Surface
                 lblTooltip.BackColor = ConnectorPopupBackColour;
                 lblTooltip.ForeColor = ConnectorPopupTextColour;
             }
+
+            selectPathDialog = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true
+            };
 
             DoubleBuffered = true;
 
@@ -296,7 +327,7 @@ namespace SceneGraphPlus.Surface
                 {
                     if (block.TypeId == typeId)
                     {
-                        if (hideMissingBlocks && block.IsMissing)
+                        if (block.IsHidden || (hideMissingBlocks && block.IsMissing))
                         {
                             realignedBlocks.Add(block, block);
                         }
@@ -657,6 +688,21 @@ namespace SceneGraphPlus.Surface
                 menuItemContextHide.Visible = advancedMode;
                 menuItemContextHide.Enabled = (contextBlock.GetInConnectors().Count == 0);
 
+                menuItemContextHideChain.Visible = advancedMode;
+                menuItemContextHideChain.Enabled = (contextBlock.GetInConnectors().Count == 0);
+
+                menuItemContextExtract.Visible = false;
+                if (contextBlock.TypeId == Cres.TYPE)
+                {
+                    menuItemContextExtract.Text = "Extract Mesh";
+                    menuItemContextExtract.Visible = true;
+                }
+                else if (contextBlock.TypeId == Gzps.TYPE || contextBlock.TypeId == Mmat.TYPE)
+                {
+                    menuItemContextExtract.Text = "Extract Recolour";
+                    menuItemContextExtract.Visible = true;
+                }
+
                 menuItemContextFixTgir.Visible = !contextBlock.IsTgirValid;
                 menuItemContextFixFileList.Visible = (contextBlock.TypeId == Txmt.TYPE) && !contextBlock.IsDirty && !contextBlock.IsFileListValid;
                 menuItemContextFixLight.Visible = (contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE) && !contextBlock.IsDirty && !contextBlock.IsLightValid;
@@ -734,6 +780,134 @@ namespace SceneGraphPlus.Surface
             {
                 editBlock = null;
                 owningForm.UpdateEditor(editBlock);
+            }
+
+            Invalidate();
+        }
+
+        private void OnContextBlockHideChain(object sender, EventArgs e)
+        {
+            Trace.Assert(contextBlock.GetInConnectors().Count == 0, "Cannot hide chain with in connectors");
+
+            HideChain(contextBlock);
+
+            Invalidate();
+        }
+
+        private void HideChain(AbstractGraphBlock startBlock)
+        {
+            startBlock.Hide();
+
+            foreach (AbstractGraphConnector outConnector in startBlock.OutConnectors)
+            {
+                List<AbstractGraphConnector> visibleInConnectors = new List<AbstractGraphConnector>();
+
+                foreach (AbstractGraphConnector inConnector in outConnector.EndBlock.GetInConnectors())
+                {
+                    if (!inConnector.StartBlock.IsHidden)
+                    {
+                        visibleInConnectors.Add(inConnector);
+                    }
+                }
+
+                if (visibleInConnectors.Count == 0)
+                {
+                    HideChain(outConnector.EndBlock);
+                }
+            }
+
+            if (startBlock.Equals(editBlock))
+            {
+                editBlock = null;
+                owningForm.UpdateEditor(editBlock);
+            }
+        }
+
+        public void CloseFilters()
+        {
+            owningForm.CloseFilters();
+        }
+
+        public void ApplyFilters(BlockFilters filters)
+        {
+            // Do NOT merge these two loops!!!
+            foreach (AbstractGraphBlock block in blocks)
+            {
+                block.Filter(false);
+            }
+
+            foreach (AbstractGraphBlock block in blocks)
+            {
+                if (block.TypeId == Gzps.TYPE)
+                {
+                    if (filters.Exclude(block.Text))
+                    {
+                        FilterChain(block);
+                    }
+                }
+            }
+        }
+
+        private void FilterChain(AbstractGraphBlock startBlock)
+        {
+            startBlock.Filter(true);
+
+            foreach (AbstractGraphConnector outConnector in startBlock.OutConnectors)
+            {
+                List<AbstractGraphConnector> visibleInConnectors = new List<AbstractGraphConnector>();
+
+                foreach (AbstractGraphConnector inConnector in outConnector.EndBlock.GetInConnectors())
+                {
+                    if (!inConnector.StartBlock.IsHidden)
+                    {
+                        visibleInConnectors.Add(inConnector);
+                    }
+                }
+
+                if (visibleInConnectors.Count == 0)
+                {
+                    FilterChain(outConnector.EndBlock);
+                }
+            }
+
+            if (startBlock.Equals(editBlock))
+            {
+                editBlock = null;
+                owningForm.UpdateEditor(editBlock);
+            }
+        }
+
+        private void OnContextBlockExtract(object sender, EventArgs e)
+        {
+            if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                Exporter exporter = new Exporter();
+
+                exporter.Open(selectPathDialog.FileName);
+
+                foreach (AbstractGraphBlock block in GetBlockChain(contextBlock))
+                {
+                    if (contextBlock.TypeId == Cres.TYPE && (block.TypeId == Cres.TYPE || block.TypeId == Shpe.TYPE || block.TypeId == Gmnd.TYPE || block.TypeId == Gmdc.TYPE))
+                    {
+                        exporter.Export(block.PackagePath, block.Key);
+                    }
+                    else if (contextBlock.TypeId == Mmat.TYPE && (block.TypeId == Mmat.TYPE || block.TypeId == Txmt.TYPE || block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE))
+                    {
+                        exporter.Export(block.PackagePath, block.Key);
+                    }
+                    else if (contextBlock.TypeId == Gzps.TYPE && (block.TypeId == Gzps.TYPE || block.TypeId == Txmt.TYPE || block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE))
+                    {
+                        if (block.TypeId == Gzps.TYPE)
+                        {
+                            exporter.Export(block.PackagePath, new DBPFKey(Idr.TYPE, block.Key));
+                            exporter.Export(block.PackagePath, new DBPFKey(Binx.TYPE, block.Key));
+                        }
+
+                        exporter.Export(block.PackagePath, block.Key);
+                    }
+                }
+
+                exporter.Close();
             }
         }
 
@@ -1273,6 +1447,13 @@ namespace SceneGraphPlus.Surface
         #endregion
 
         #region Paint
+        public new void Invalidate()
+        {
+            base.Invalidate();
+
+            ResizeToFit();
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;

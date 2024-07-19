@@ -294,6 +294,8 @@ namespace Sims2Tools.DBPF.Package
 
         private byte[] GetItemByEntry(DBPFEntry entry)
         {
+            if (entry == null) return null;
+
             uint uncompressedSize = entry.UncompressedSize;
 
             m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
@@ -345,6 +347,11 @@ namespace Sims2Tools.DBPF.Package
             DBPFEntry entry = GetEntryByKey(key);
 
             return (entry != null) ? GetItemByEntry(entry) : null;
+        }
+
+        public byte[] GetOriginalItemByKey(DBPFKey key)
+        {
+            return GetItemByEntry(GetEntryByKey(key));
         }
 
         public byte[] GetOriginalItemByEntry(DBPFEntry entry)

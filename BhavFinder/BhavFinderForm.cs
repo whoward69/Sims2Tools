@@ -19,6 +19,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
+using Sims2Tools.Exporter;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -1000,61 +1001,19 @@ namespace BhavFinder
         {
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                string extractPath = selectPathDialog.FileName;
+                Exporter exporter = new Exporter();
 
-                string bhavSubPath = "42484156 - Behaviour Function";
-                string dataFilePath = $"{extractPath}\\{bhavSubPath}";
-
-                Directory.CreateDirectory(dataFilePath);
-
-                StreamWriter packageWriter = new StreamWriter($"{extractPath}\\package.xml");
-                packageWriter.WriteLine($"<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-                packageWriter.WriteLine($"<package type=\"2\">");
+                exporter.Open(selectPathDialog.FileName);
 
                 foreach (DataGridViewRow row in gridFoundBhavs.SelectedRows)
                 {
-                    string dbpfPath = row.Cells["colBhavDbpfPath"].Value as string;
+                    string packagePath = row.Cells["colBhavDbpfPath"].Value as string;
+                    DBPFEntry entry = row.Cells["colBhavDbpfEntry"].Value as DBPFEntry;
 
-                    using (DBPFFile package = new DBPFFile(dbpfPath))
-                    {
-                        DBPFEntry entry = row.Cells["colBhavDbpfEntry"].Value as DBPFEntry;
-                        string dataFileName = $"{entry.ResourceID.Hex8String()}-{entry.GroupID.Hex8String()}-{entry.InstanceID.Hex8String()}.simpe";
-
-                        byte[] data = package.GetOriginalItemByEntry(entry);
-
-                        Stream dataWriter = new FileStream($"{dataFilePath}\\{dataFileName}", FileMode.OpenOrCreate, FileAccess.Write);
-                        dataWriter.Write(data, 0, data.Length);
-                        dataWriter.Close();
-
-                        StreamWriter xmlWriter = new StreamWriter($"{dataFilePath}\\{dataFileName}.xml");
-                        xmlWriter.WriteLine($"<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
-                        xmlWriter.WriteLine($"<package type=\"2\">");
-                        xmlWriter.WriteLine($"    <packedfile path=\"\" name=\"{dataFileName}\">");
-                        xmlWriter.WriteLine($"        <type>");
-                        xmlWriter.WriteLine($"            <number>1112031574</number>");
-                        xmlWriter.WriteLine($"        </type>");
-                        xmlWriter.WriteLine($"        <classid>0</classid>");
-                        xmlWriter.WriteLine($"        <group>{entry.GroupID.IntString()}</group>");
-                        xmlWriter.WriteLine($"        <instance>{entry.InstanceID.IntString()}</instance>");
-                        xmlWriter.WriteLine($"    </packedfile>");
-                        xmlWriter.WriteLine($"</package>");
-                        xmlWriter.Close();
-
-                        packageWriter.WriteLine($"    <packedfile path=\"42484156 - Behaviour Function\" name=\"{dataFileName}\">");
-                        packageWriter.WriteLine($"        <type>");
-                        packageWriter.WriteLine($"            <number>1112031574</number>");
-                        packageWriter.WriteLine($"        </type>");
-                        packageWriter.WriteLine($"        <classid>0</classid>");
-                        packageWriter.WriteLine($"        <group>{entry.GroupID.IntString()}</group>");
-                        packageWriter.WriteLine($"        <instance>{entry.InstanceID.IntString()}</instance>");
-                        packageWriter.WriteLine($"    </packedfile>");
-
-                        package.Close();
-                    }
+                    exporter.Export(packagePath, entry);
                 }
 
-                packageWriter.WriteLine($"</package>");
-                packageWriter.Close();
+                exporter.Close();
             }
         }
 
