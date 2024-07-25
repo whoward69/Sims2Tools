@@ -126,12 +126,12 @@ namespace SceneGraphPlus.Surface
                 menuContextBlock.SuspendLayout();
 
                 menuContextBlock.Items.AddRange(new ToolStripItem[] {
-                    menuItemContextTexture, 
-                    menuItemContextHide, menuItemContextHideChain, 
-                    menuItemContextExtract, 
-                    menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextFixLight, 
-                    menuItemContextCopySgName, 
-                    menuItemContextClosePackage, 
+                    menuItemContextTexture,
+                    menuItemContextHide, menuItemContextHideChain,
+                    menuItemContextExtract,
+                    menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextFixLight,
+                    menuItemContextCopySgName,
+                    menuItemContextClosePackage,
                     menuItemContextDelete, menuItemContextDeleteChain });
                 menuContextBlock.Name = "menuContextBlock";
                 menuContextBlock.Size = new Size(223, 48);
@@ -838,7 +838,7 @@ namespace SceneGraphPlus.Surface
 
             foreach (AbstractGraphBlock block in blocks)
             {
-                if (block.TypeId == Gzps.TYPE)
+                if (block.TypeId == Gzps.TYPE || block.TypeId == Aged.TYPE)
                 {
                     if (filters.Exclude(block.Text))
                     {
@@ -881,6 +881,7 @@ namespace SceneGraphPlus.Surface
         {
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
+                // TODO - SceneGraph Plus - 3 - Expand export to work with Maxis resources
                 Exporter exporter = new Exporter();
 
                 exporter.Open(selectPathDialog.FileName);

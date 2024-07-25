@@ -17,7 +17,7 @@ namespace SceneGraphPlus
         public static string AppName = "SceneGraph PLUS";
 
         public static int AppVersionMajor = 1;
-        public static int AppVersionMinor = 3;
+        public static int AppVersionMinor = 4;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;
@@ -42,6 +42,8 @@ namespace SceneGraphPlus
         [STAThread]
         static void Main()
         {
+            log4net.Config.XmlConfigurator.Configure();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new SceneGraphPlusForm());

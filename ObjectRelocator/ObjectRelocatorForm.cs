@@ -38,7 +38,7 @@ namespace ObjectRelocator
 {
     public partial class ObjectRelocatorForm : Form
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly ushort QuarterTileOn = 0x0023;
         private static readonly ushort QuarterTileOff = 0x0001;

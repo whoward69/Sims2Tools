@@ -24,7 +24,7 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
 
     public class Cgn1 : DBPFResource
     {
-        // private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        // private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x43494745;
         public const string NAME = "CGN1";

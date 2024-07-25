@@ -178,7 +178,7 @@ namespace SgChecker
     public class KnownSgResources
     {
 #if DEBUG
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 #endif
 
         private readonly Dictionary<TypeTypeID, KnownSgResourcesByType> knownSgResourcesByType = new Dictionary<TypeTypeID, KnownSgResourcesByType>();

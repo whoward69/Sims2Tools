@@ -27,7 +27,7 @@ namespace Sims2Tools.DBPF.Images.IMG
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x856DDBAC;
         public const string NAME = "IMG";
 
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /* public static Image SetAlpha(Image img)
         {

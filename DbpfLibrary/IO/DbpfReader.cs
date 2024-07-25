@@ -20,7 +20,7 @@ namespace Sims2Tools.DBPF.IO
 {
     public class DbpfReader : IDisposable
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly Stream m_stream;
         private readonly BinaryReader m_reader;

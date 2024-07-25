@@ -50,7 +50,7 @@ namespace OutfitOrganiser
 {
     public partial class OutfitOrganiserForm : Form
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly DbpfFileCache packageCache = new DbpfFileCache();
 
@@ -657,7 +657,9 @@ namespace OutfitOrganiser
 
             sender.VisualMode = ProgressBarDisplayMode.CustomText;
 
+#if !DEBUG
             try
+#endif
             {
                 if (workPackage.UpdateFolders)
                 {
@@ -759,6 +761,7 @@ namespace OutfitOrganiser
                     }
                 }
             }
+#if !DEBUG
             catch (Exception ex)
             {
                 logger.Error(ex.Message);
@@ -769,6 +772,7 @@ namespace OutfitOrganiser
                     throw ex;
                 }
             }
+#endif
         }
 
         private void AddToGrid(ProgressDialog sender, CacheableDbpfFile package, OutfitDbpfData outfitData)
@@ -1543,7 +1547,7 @@ namespace OutfitOrganiser
 
             if (key != null)
             {
-                thumbnail = cigenCache.GetThumbnail(key);
+                thumbnail = cigenCache?.GetThumbnail(key);
 
                 if (cigenCache != null && thumbnail == null)
                 {

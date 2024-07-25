@@ -20,7 +20,7 @@ namespace LogWatcher.Controls
 {
     public partial class LogViewer : UserControl
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly Dictionary<int, string> dataGlobal = new Dictionary<int, string>();
         private static readonly Dictionary<int, string> dataGeneral = new Dictionary<int, string>();

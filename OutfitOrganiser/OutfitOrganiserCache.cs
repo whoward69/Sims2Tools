@@ -34,7 +34,7 @@ namespace OutfitOrganiser
 {
     public class OutfitDbpfData : IEquatable<OutfitDbpfData>
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static DbpfFileCache cache;
         public static void SetCache(DbpfFileCache cache)
@@ -187,7 +187,16 @@ namespace OutfitOrganiser
             if (!IsDefaultReplacement)
             {
                 // This could be in a different group/.package
-                this.str = (Str)package.GetResourceByKey(idrForBinx.GetItem(binx.GetItem("stringsetidx").UIntegerValue));
+                DBPFKey key = idrForBinx.GetItem(binx.GetItem("stringsetidx").UIntegerValue);
+
+                if (key.TypeID == Str.TYPE)
+                {
+                    this.str = (Str)package.GetResourceByKey(key);
+                }
+                else
+                {
+                    logger.Warn($"Got {DBPFData.TypeName(key.TypeID)} when expecting STR#");
+                }
             }
 
             uint itemType = ItemType;

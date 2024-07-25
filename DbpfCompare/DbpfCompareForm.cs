@@ -61,7 +61,7 @@ namespace DbpfCompare
 {
     public partial class DbpfCompareForm : Form
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         internal static readonly Color colourDiffers = Color.FromName(Properties.Settings.Default.ResDiffers);
         internal static readonly Color colourMissing = Color.FromName(Properties.Settings.Default.ResMissing);

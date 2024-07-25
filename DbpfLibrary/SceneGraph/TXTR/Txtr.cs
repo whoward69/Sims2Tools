@@ -26,7 +26,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
         public const string NAME = "TXTR";
 
 #if !DEBUG
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 #endif
 
         private readonly CImageData cImageData = null;

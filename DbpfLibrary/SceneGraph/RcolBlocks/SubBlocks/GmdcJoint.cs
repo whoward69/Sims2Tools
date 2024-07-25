@@ -20,7 +20,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 {
     public class GmdcJoint : GmdcLinkBlock
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly List<Vector3f> verts = new List<Vector3f>();
         private readonly List<int> items = new List<int>();

@@ -52,14 +52,14 @@ namespace SceneGraphPlus
 {
     public partial class SceneGraphPlusForm : Form
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         // When adding to this List, search for "UnderstoodTypes" (both this file and the Surface file)
         // UnderstoodTypes - also need to add TypeBlockColour and TypeRow to the Settings.settings file (see https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors?view=windowsdesktop-8.0 for colour names)
         public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Aged.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE };
 
         private readonly DrawingSurface surface;
-        private readonly FiltersDialog filtersDialog = new FiltersDialog();
+        private FiltersDialog filtersDialog = null;
 
         private readonly List<string> packageFiles = new List<string>();
         private readonly BlockCache blockCache = new BlockCache();
@@ -656,7 +656,7 @@ namespace SceneGraphPlus
 
                 uint entries = gzps.GetItem("numoverrides").UIntegerValue;
 
-                if (entries == 1)
+                if (entries >= 1)
                 {
                     startBlock.Text = $"{startBlock.Text}\n{gzps.GetItem($"override0subset").StringValue}";
                 }
@@ -1098,6 +1098,11 @@ namespace SceneGraphPlus
 
         private void OnFilterBlocks(object sender, EventArgs e)
         {
+            if (filtersDialog == null || filtersDialog.IsDisposed)
+            {
+                filtersDialog = new FiltersDialog();
+            }
+
             if (filtersDialog.Visible)
             {
                 filtersDialog.Focus();

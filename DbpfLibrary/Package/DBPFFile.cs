@@ -83,7 +83,7 @@ namespace Sims2Tools.DBPF.Package
     // See also - https://modthesims.info/wiki.php?title=DBPF/Source_Code and https://modthesims.info/wiki.php?title=DBPF
     public class DBPFFile : IDisposable
     {
-        private static readonly IDBPFLogger logger = new DBPFLogger(log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType));
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static readonly Encoding encoding = new UTF8Encoding(false, true);
         public static Encoding Encoding => encoding;

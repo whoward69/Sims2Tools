@@ -22,7 +22,7 @@ namespace Sims2Tools.DBPF.Groups.GROP
 
     public class Grop : DBPFResource
     {
-        // private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        // private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x54535053;
         public const string NAME = "GROP";

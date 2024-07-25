@@ -260,6 +260,8 @@ namespace SceneGraphPlus.Dialogs
             this.MinimizeBox = false;
             this.Name = "FiltersDialog";
             this.Text = "Filters";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
+            this.Load += new System.EventHandler(this.OnLoad);
             this.grpAge.ResumeLayout(false);
             this.grpAge.PerformLayout();
             this.grpGender.ResumeLayout(false);

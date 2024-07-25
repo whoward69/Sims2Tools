@@ -52,7 +52,7 @@ namespace HcduPlus
 {
     public partial class HcduPlusForm : Form
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly HcduPlusDataByPackage dataByPackage = new HcduPlusDataByPackage();
         private readonly HcduPlusDataByResource dataByResource = new HcduPlusDataByResource();

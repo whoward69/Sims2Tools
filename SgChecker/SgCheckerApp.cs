@@ -42,11 +42,13 @@ namespace SgChecker
         public static string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\SgChecker";
 
         // Configuration is in App.config
-        // private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        // private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [STAThread]
         static void Main()
         {
+            log4net.Config.XmlConfigurator.Configure();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new SgCheckerForm());

@@ -8,6 +8,7 @@
 
 using SceneGraphPlus.Shapes;
 using SceneGraphPlus.Surface;
+using Sims2Tools.Utils.Persistence;
 using System;
 using System.Windows.Forms;
 
@@ -21,6 +22,16 @@ namespace SceneGraphPlus.Dialogs
         public FiltersDialog()
         {
             InitializeComponent();
+        }
+
+        private void OnLoad(object sender, EventArgs e)
+        {
+            RegistryTools.LoadPopupSettings(SceneGraphPlusApp.RegistryKey, this);
+        }
+
+        private void OnFormClosing(object sender, FormClosingEventArgs e)
+        {
+            RegistryTools.SavePopupSettings(SceneGraphPlusApp.RegistryKey, this);
         }
 
         public void Show(BlockFilters filters, DrawingSurface surface)
