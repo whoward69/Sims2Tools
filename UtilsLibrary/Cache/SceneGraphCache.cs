@@ -23,7 +23,7 @@ namespace Sims2Tools.Cache
     {
         private static readonly DBPF.Logger.IDBPFLogger logger = DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static readonly TypeTypeID[] sgCachedTypes = { Cres.TYPE, Shpe.TYPE, Txmt.TYPE };
+        private readonly TypeTypeID[] sgCachedTypes = { Cres.TYPE, Shpe.TYPE, Txmt.TYPE };
 
         private ConcurrentDictionary<DBPFKey, int> packageIndexBySgKey;
         private ConcurrentDictionary<int, List<DBPFKey>> sgKeysByPackageIndex;
@@ -37,6 +37,11 @@ namespace Sims2Tools.Cache
         public SceneGraphCache(PackageCache packageCache)
         {
             this.packageCache = packageCache;
+        }
+
+        public SceneGraphCache(PackageCache packageCache, TypeTypeID[] sgCachedTypes) : this(packageCache)
+        {
+            this.sgCachedTypes = sgCachedTypes;
         }
 
         public string GetPackagePath(DBPFKey key)

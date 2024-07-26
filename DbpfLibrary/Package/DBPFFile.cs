@@ -235,8 +235,10 @@ namespace Sims2Tools.DBPF.Package
                         File.Copy(updateName, originalName, true);
                         File.Delete(updateName);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        logger.Warn($"Failed to update {originalName}", e);
+
                         // SimPe propbably has the file open!
                         backupName = null;
                     }

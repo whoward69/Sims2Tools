@@ -332,6 +332,37 @@ namespace Sims2Tools
         static private string lastGameDir = null;
         static public string LastGameDir => lastGameDir;
 
+        static public string GetMaxisPackagePath(TypeTypeID typeId, DBPFKey refKey, bool startingWithLastGameDir = false)
+        {
+            DBPFKey resKey = new DBPFKey(typeId, refKey.GroupID, refKey.InstanceID, refKey.ResourceID);
+
+            List<string> packageFiles = packagesByType[typeId];
+
+            if (packageFiles != null)
+            {
+                foreach (string packageFile in packageFiles)
+                {
+                    if (startingWithLastGameDir)
+                    {
+                        DBPFResource res = GetMaxisResourceByKey(lastGameDir, packageFile, resKey);
+
+                        if (res != null) return $"{lastGameDir}{packageFile}";
+                    }
+
+                    foreach (string gameFolder in gameFolders)
+                    {
+                        if (startingWithLastGameDir && gameFolder.Equals(lastGameDir)) continue;
+
+                        DBPFResource res = GetMaxisResourceByKey(gameFolder, packageFile, resKey);
+
+                        if (res != null) return $"{gameFolder}{packageFile}";
+                    }
+                }
+            }
+
+            return null;
+        }
+
         static public DBPFResource GetMaxisResource(TypeTypeID typeId, DBPFKey refKey, bool startingWithLastGameDir = false)
         {
             DBPFKey resKey = new DBPFKey(typeId, refKey.GroupID, refKey.InstanceID, refKey.ResourceID);

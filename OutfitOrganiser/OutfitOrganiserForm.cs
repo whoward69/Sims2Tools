@@ -22,7 +22,6 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
-using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.SceneGraph.XHTN;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
@@ -1452,6 +1451,7 @@ namespace OutfitOrganiser
         private void OnLoadMeshesNowClicked(object sender, EventArgs e)
         {
             CacheMeshes();
+            SetTitle(lastFolder);
         }
 
         private void OnPreloadMeshesClicked(object sender, EventArgs e)
@@ -2897,77 +2897,113 @@ namespace OutfitOrganiser
         #region Checkbox Events
         private void OnCatEverydayClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatEveryday.Checked, "category", 0x0007);
+            OnCatClicked(sender, 0x0007);
         }
 
         private void OnCatFormalClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatFormal.Checked, "category", 0x0020);
+            OnCatClicked(sender, 0x0020);
         }
 
         private void OnCatGymClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatGym.Checked, "category", 0x0200);
+            OnCatClicked(sender, 0x0200);
         }
 
         private void OnCatMaternityClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatMaternity.Checked, "category", 0x0100);
+            OnCatClicked(sender, 0x0100);
         }
 
         private void OnCatOuterwearClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatOuterwear.Checked, "category", 0x1000);
+            OnCatClicked(sender, 0x1000);
         }
 
         private void OnCatPJsClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatPJs.Checked, "category", 0x0010);
+            OnCatClicked(sender, 0x0010);
         }
 
         private void OnCatSwimwearClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatSwimwear.Checked, "category", 0x0008);
+            OnCatClicked(sender, 0x0008);
         }
 
         private void OnCatUnderwearClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatUnderwear.Checked, "category", 0x0040);
+            OnCatClicked(sender, 0x0040);
+        }
+
+        private void OnCatClicked(object sender, ushort data)
+        {
+            if (sender is CheckBox ckbBox)
+            {
+                if (Form.ModifierKeys == Keys.Control)
+                {
+                    ckbCatEveryday.Checked = ckbCatFormal.Checked = ckbCatGym.Checked = ckbCatMaternity.Checked = ckbCatOuterwear.Checked = ckbCatPJs.Checked = ckbCatSwimwear.Checked = ckbCatUnderwear.Checked = false;
+                    ckbBox.Checked = true;
+
+                    if (IsAutoUpdate) UpdateSelectedRows(data, "category");
+                }
+                else
+                {
+                    if (IsAutoUpdate) UpdateSelectedRows(ckbBox.Checked, "category", data);
+                }
+            }
         }
 
         private void OnAgeBabiesClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeBabies.Checked, "age", 0x0020);
+            OnAgeClicked(sender, 0x0020);
         }
 
         private void OnAgeToddlersClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeToddlers.Checked, "age", 0x0001);
+            OnAgeClicked(sender, 0x0001);
         }
 
         private void OnAgeChildrenClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeChildren.Checked, "age", 0x0002);
+            OnAgeClicked(sender, 0x0002);
         }
 
         private void OnAgeTeensClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeTeens.Checked, "age", 0x0004);
+            OnAgeClicked(sender, 0x0004);
         }
 
         private void OnAgeYoungAdultsClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeYoungAdults.Checked, "age", 0x0040);
+            OnAgeClicked(sender, 0x0040);
         }
 
         private void OnAgeAdultsClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeAdults.Checked, "age", 0x0008);
+            OnAgeClicked(sender, 0x0008);
         }
 
         private void OnAgeEldersClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeElders.Checked, "age", 0x0010);
+            OnAgeClicked(sender, 0x0010);
+        }
+
+        private void OnAgeClicked(object sender, ushort data)
+        {
+            if (sender is CheckBox ckbBox)
+            {
+                if (Form.ModifierKeys == Keys.Control)
+                {
+                    ckbAgeBabies.Checked = ckbAgeToddlers.Checked = ckbAgeChildren.Checked = ckbAgeTeens.Checked = ckbAgeYoungAdults.Checked = ckbAgeAdults.Checked = ckbAgeElders.Checked = false;
+                    ckbBox.Checked = true;
+
+                    if (IsAutoUpdate) UpdateSelectedRows(data, "age");
+                }
+                else
+                {
+                    if (IsAutoUpdate) UpdateSelectedRows(ckbBox.Checked, "age", data);
+                }
+            }
         }
         #endregion
 
@@ -3120,18 +3156,12 @@ namespace OutfitOrganiser
                     if (colName.Equals("colType") || colName.Equals("colTitle") || colName.Equals("colName") || colName.Equals("colFilename") || colName.Equals("colTooltip"))
                     {
                         Image thumbnail = null;
-                        Txtr txtr = null;
 
                         if (sender == gridResources)
                         {
                             OutfitDbpfData outfitData = row.Cells["colOutfitData"].Value as OutfitDbpfData;
                             Cpf thumbnailOwner = outfitData?.ThumbnailOwner;
                             thumbnail = (thumbnailOwner != null) ? GetResourceThumbnail(thumbnailOwner) : outfitData?.Thumbnail;
-
-                            if (thumbnail == null)
-                            {
-                                // TODO - Outfit Organiser - try to get the associated TXTR
-                            }
                         }
                         else if (sender == gridPackageFiles)
                         {
@@ -3161,12 +3191,8 @@ namespace OutfitOrganiser
                                                         if ((cpf.GetItem("outfit")?.UIntegerValue & 0x1D) != 0x00)
                                                         {
                                                             thumbnail = GetResourceThumbnail(cpf);
-                                                            if (thumbnail != null) break;
 
-                                                            if (txtr == null)
-                                                            {
-                                                                // TODO - Outfit Organiser - try to get the associated TXTR
-                                                            }
+                                                            if (thumbnail != null) break;
                                                         }
                                                     }
                                                 }
