@@ -356,6 +356,7 @@ namespace BsokEditor
             sender.SetProgress(0, "Loading Objects");
 
             string[] packages = Directory.GetFiles(folder, "*.package", SearchOption.AllDirectories);
+            List<DBPFKey> seenBinx = new List<DBPFKey>();
 
             uint total = (uint)packages.Length;
             uint done = 0;
@@ -371,9 +372,7 @@ namespace BsokEditor
                     {
                         sender.VisualMode = ProgressBarDisplayMode.Percentage;
 
-                        List<DBPFEntry> resources = package.GetEntriesByType(Binx.TYPE);
-
-                        foreach (DBPFEntry entry in resources)
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Binx.TYPE))
                         {
                             if (sender.CancellationPending)
                             {
@@ -381,7 +380,16 @@ namespace BsokEditor
                                 return;
                             }
 
+                            if (seenBinx.Contains(entry))
+                            {
+                                string path = packageFile.Substring(folder.Length + 1);
+                                MsgBox.Show($"Skipping {entry} in \"{path}\"", "Duplicate BINX encountered");
+                                break;
+                            }
+
                             Binx binx = (Binx)package.GetResourceByEntry(entry);
+                            seenBinx.Add(entry);
+
                             Idr idr = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(binx.InstanceID, DBPFData.RESOURCE_NULL, Idr.TYPE, binx.GroupID));
 
                             if (IsBsokPackage(package, binx, idr, out Cpf cpf))
@@ -1424,82 +1432,118 @@ namespace BsokEditor
         #region Checkbox Events
         private void OnCatEverydayClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatEveryday.Checked, "category", 0x0007);
+            OnCatClicked(sender, 0x0007);
         }
 
         private void OnCatFormalClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatFormal.Checked, "category", 0x0020);
+            OnCatClicked(sender, 0x0020);
         }
 
         private void OnCatGymClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatGym.Checked, "category", 0x0200);
+            OnCatClicked(sender, 0x0200);
         }
 
         private void OnCatMaternityClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatMaternity.Checked, "category", 0x0100);
+            OnCatClicked(sender, 0x0100);
         }
 
         private void OnCatOuterwearClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatOuterwear.Checked, "category", 0x1000);
+            OnCatClicked(sender, 0x1000);
         }
 
         private void OnCatPJsClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatPJs.Checked, "category", 0x0010);
+            OnCatClicked(sender, 0x0010);
         }
 
         private void OnCatNakedClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatNaked.Checked, "category", 0x0080);
+            OnCatClicked(sender, 0x0080);
         }
 
         private void OnCatSwimwearClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatSwimwear.Checked, "category", 0x0008);
+            OnCatClicked(sender, 0x0008);
         }
 
         private void OnCatUnderwearClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbCatUnderwear.Checked, "category", 0x0040);
+            OnCatClicked(sender, 0x0040);
+        }
+
+        private void OnCatClicked(object sender, ushort data)
+        {
+            if (sender is CheckBox ckbBox)
+            {
+                if (Form.ModifierKeys == Keys.Control)
+                {
+                    ckbCatEveryday.Checked = ckbCatFormal.Checked = ckbCatGym.Checked = ckbCatMaternity.Checked = ckbCatNaked.Checked = ckbCatOuterwear.Checked = ckbCatPJs.Checked = ckbCatSwimwear.Checked = ckbCatUnderwear.Checked = false;
+                    ckbBox.Checked = true;
+
+                    if (IsAutoUpdate) UpdateSelectedRows(data, "category");
+                }
+                else
+                {
+                    if (IsAutoUpdate) UpdateSelectedRows(ckbBox.Checked, "category", data);
+                }
+            }
         }
 
         private void OnAgeBabiesClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeBabies.Checked, "age", 0x0020);
+            OnAgeClicked(sender, 0x0020);
         }
 
         private void OnAgeToddlersClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeToddlers.Checked, "age", 0x0001);
+            OnAgeClicked(sender, 0x0001);
         }
 
         private void OnAgeChildrenClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeChildren.Checked, "age", 0x0002);
+            OnAgeClicked(sender, 0x0002);
         }
 
         private void OnAgeTeensClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeTeens.Checked, "age", 0x0004);
+            OnAgeClicked(sender, 0x0004);
         }
 
         private void OnAgeYoungAdultsClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeYoungAdults.Checked, "age", 0x0040);
+            OnAgeClicked(sender, 0x0040);
         }
 
         private void OnAgeAdultsClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeAdults.Checked, "age", 0x0008);
+            OnAgeClicked(sender, 0x0008);
         }
 
         private void OnAgeEldersClicked(object sender, EventArgs e)
         {
-            if (IsAutoUpdate) UpdateSelectedRows(ckbAgeElders.Checked, "age", 0x0010);
+            OnAgeClicked(sender, 0x0010);
+        }
+
+        private void OnAgeClicked(object sender, ushort data)
+        {
+            if (sender is CheckBox ckbBox)
+            {
+                if (Form.ModifierKeys == Keys.Control)
+                {
+                    ckbAgeBabies.Checked = ckbAgeToddlers.Checked = ckbAgeChildren.Checked = ckbAgeTeens.Checked = ckbAgeYoungAdults.Checked = ckbAgeAdults.Checked = ckbAgeElders.Checked = false;
+                    ckbBox.Checked = true;
+
+                    if (IsAutoUpdate) UpdateSelectedRows(data, "age");
+                }
+                else
+                {
+                    if (IsAutoUpdate) UpdateSelectedRows(ckbBox.Checked, "age", data);
+                }
+            }
         }
         #endregion
 
