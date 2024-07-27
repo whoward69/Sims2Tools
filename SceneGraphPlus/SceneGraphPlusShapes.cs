@@ -163,10 +163,10 @@ namespace SceneGraphPlus.Shapes
         }
     }
 
-    public class BezierArrow : AbstractGraphConnector
+    public class BezierConnector : AbstractGraphConnector
     {
         // See - https://learn.microsoft.com/en-us/dotnet/api/system.drawing.graphics.drawbezier?view=net-8.0&viewFallbackFrom=dotnet-plat-ext-7.0
-        public BezierArrow(DrawingSurface surface, AbstractGraphBlock startBlock, AbstractGraphBlock endBlock) : base(surface, startBlock, endBlock) { }
+        public BezierConnector(DrawingSurface surface, AbstractGraphBlock startBlock, AbstractGraphBlock endBlock) : base(surface, startBlock, endBlock) { }
 
         public override GraphicsPath GetPath()
         {
@@ -348,6 +348,8 @@ namespace SceneGraphPlus.Shapes
         public static readonly Color MissingBlockColour = Color.FromName(Properties.Settings.Default.MissingBlockColour);
         public static readonly Color CloneBlockColour = Color.FromName(Properties.Settings.Default.CloneBlockColour);
 
+        public static readonly Color AvailableEdgeColour = Color.FromName(Properties.Settings.Default.AvailableEdgeColour);
+
         public static readonly int BlockWidth = Properties.Settings.Default.BlockWidth;
         public static readonly int BlockHeight = Properties.Settings.Default.BlockHeight;
 
@@ -355,6 +357,7 @@ namespace SceneGraphPlus.Shapes
         private string blockName = null;
 
         private bool missing = false;
+        private bool available = false;
         private bool editable = true; // This should be called "readonly" but hey, that's a reserved word!
         private bool editing = false;
         private bool deleteMe = false;
@@ -620,6 +623,12 @@ namespace SceneGraphPlus.Shapes
 
         public bool IsMissingOrClone => IsMissing || IsClone;
 
+        public bool IsAvailable
+        {
+            get => (IsMissing && available);
+            set => available = value;
+        }
+
         public bool IsEditing
         {
             get => editing;
@@ -644,7 +653,7 @@ namespace SceneGraphPlus.Shapes
 
         public override string ToolTip
         {
-            get => $"{(BlockName ?? SgFullName)}\r\n{BlockRef}";
+            get => $"{(BlockName ?? SgFullName)}\r\n{((Key != null) ? Key.ToString() : SgFullName)} {(IsMissing ? "from" : "in")} {BlockRef.PackageName}";
         }
 
         public override Point Centre
@@ -711,7 +720,7 @@ namespace SceneGraphPlus.Shapes
 
         public AbstractGraphConnector ConnectTo(int index, string label, AbstractGraphBlock endBlock)
         {
-            AbstractGraphConnector connector = new BezierArrow(surface, this, endBlock) { Index = index, Label = label };
+            AbstractGraphConnector connector = new BezierConnector(surface, this, endBlock) { Index = index, Label = label };
             outConnectors.Add(connector);
 
             endBlock.ConnectedFrom(connector);
@@ -865,6 +874,10 @@ namespace SceneGraphPlus.Shapes
             {
                 g.DrawPath(new Pen(Color.Black, 2), path);
             }
+            else if (IsAvailable)
+            {
+                g.DrawPath(new Pen(AvailableEdgeColour, 2), path);
+            }
 
             Font textFont = SystemFonts.DefaultFont;
 
@@ -925,6 +938,29 @@ namespace SceneGraphPlus.Shapes
             return Text;
         }
 
+        public new void Discard()
+        {
+            while (outConnectors.Count > 0)
+            {
+                AbstractGraphConnector outConnector = outConnectors[0];
+                outConnectors.RemoveAt(0);
+
+                outConnector.EndBlock.DisconnectFrom(outConnector);
+                outConnector.Discard();
+            }
+
+            while (inConnectors.Count > 0)
+            {
+                AbstractGraphConnector inConnector = inConnectors[0];
+                inConnectors.RemoveAt(0);
+
+                DisconnectFrom(inConnector);
+                inConnector.Discard();
+            }
+
+            base.Discard();
+        }
+
         public void Dispose()
         {
             while (outConnectors.Count > 0)
@@ -941,7 +977,7 @@ namespace SceneGraphPlus.Shapes
         }
     }
 
-    public class RoundedRect : AbstractGraphBlock
+    public class RoundedBlock : AbstractGraphBlock
     {
         private int radius = 10;
 
@@ -951,18 +987,23 @@ namespace SceneGraphPlus.Shapes
             set => radius = value;
         }
 
-        private RoundedRect(DrawingSurface surface, AbstractGraphBlock clonedFrom) : base(surface)
+        private RoundedBlock(DrawingSurface surface, AbstractGraphBlock clonedFrom) : base(surface)
         {
             this.clonedFrom = clonedFrom;
             this.Text = clonedFrom.Text;
         }
 
-        public RoundedRect(DrawingSurface surface, BlockRef blockRef) : base(surface, blockRef) { }
+        public RoundedBlock(DrawingSurface surface, BlockRef blockRef) : base(surface, blockRef) { }
 
 
         public override AbstractGraphBlock MakeClone(Point delta)
         {
-            AbstractGraphBlock clone = new RoundedRect(surface, this);
+            AbstractGraphBlock clone = new RoundedBlock(surface, this);
+
+            foreach (AbstractGraphConnector connector in OutConnectors)
+            {
+                clone.ConnectTo(connector.Index, connector.Label, connector.EndBlock);
+            }
 
             delta.Offset(this.Centre);
             clone.Move(delta);

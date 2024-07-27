@@ -233,6 +233,7 @@
     <Compile Include="Utils\HashAlgorithmParameters.cs" />
     <Compile Include="Utils\Hashes.cs" />
     <Compile Include="Utils\Helper.cs" />
+    <Compile Include="Utils\Win32Processes.cs" />
     <Compile Include="Utils\MetaData.cs" />
     <Compile Include="Utils\WrappedByteArray.cs" />
     <Compile Include="Utils\XmlHelper.cs" />

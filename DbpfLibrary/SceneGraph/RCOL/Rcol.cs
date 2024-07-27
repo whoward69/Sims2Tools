@@ -143,7 +143,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
         protected void SetReferencedFile(int index, DBPFKey key)
         {
             Trace.Assert(!duff, "RCOL is duff!");
-            Trace.Assert(index >= 0 && index < reffiles.Count, "reffiles[index] is invalid!");
+            Debug.Assert(index >= 0 && index < reffiles.Count, "reffiles[index] is invalid!");
 
             reffiles[index] = key;
 

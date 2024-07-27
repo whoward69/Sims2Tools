@@ -262,7 +262,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 }
             }
 
-            Trace.Assert(false, $"Invalid lifo index - {index}");
+            Debug.Assert(false, $"Invalid lifo index - {index}");
 #endif
         }
 

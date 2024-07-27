@@ -54,12 +54,18 @@ namespace Sims2Tools.DbpfCache
 
         public void Close()
         {
-            if (!isCached) package.Close();
+            if (!isCached)
+            {
+                package.Close();
+            }
         }
 
         public void Dispose()
         {
-            if (!isCached) package.Dispose();
+            if (!isCached)
+            {
+                package.Dispose();
+            }
         }
     }
 

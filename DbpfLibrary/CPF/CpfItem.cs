@@ -474,7 +474,7 @@ namespace Sims2Tools.DBPF.CPF
                 writer.WriteBytes(val);
             }
 
-            Trace.Assert(this.FileSize == (writer.Position - bytesBefore), $"Serialize data != FileSize for {this}");
+            Debug.Assert(this.FileSize == (writer.Position - bytesBefore), $"Serialize data != FileSize for {this}");
         }
 
         public override string ToString()

@@ -2012,8 +2012,31 @@ namespace RepositoryWizard
         #endregion
 
         #region Checkbox Events
-        private void OnCheckboxClicked(object sender, EventArgs e)
+        private void OnCategoryClicked(object sender, EventArgs e)
         {
+            if (sender is CheckBox ckbBox)
+            {
+                if (Form.ModifierKeys == Keys.Control)
+                {
+                    ckbCatEveryday.Checked = ckbCatFormal.Checked = ckbCatGym.Checked = ckbCatMaternity.Checked = ckbCatOuterwear.Checked = ckbCatPJs.Checked = ckbCatSwimwear.Checked = ckbCatUnderwear.Checked = false;
+                    ckbBox.Checked = true;
+                }
+            }
+
+            UpdateSaveAsState();
+        }
+
+        private void OnAgeClicked(object sender, EventArgs e)
+        {
+            if (sender is CheckBox ckbBox)
+            {
+                if (Form.ModifierKeys == Keys.Control)
+                {
+                    ckbAgeBabies.Checked = ckbAgeToddlers.Checked = ckbAgeChildren.Checked = ckbAgeTeens.Checked = ckbAgeYoungAdults.Checked = ckbAgeAdults.Checked = ckbAgeElders.Checked = false;
+                    ckbBox.Checked = true;
+                }
+            }
+
             UpdateSaveAsState();
         }
         #endregion

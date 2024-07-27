@@ -8,6 +8,7 @@
 
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SceneGraphPlus.Shapes;
+using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.SceneGraph.AGED;
@@ -62,6 +63,7 @@ namespace SceneGraphPlus.Surface
         private readonly SceneGraphPlusForm owningForm;
 
         private readonly Label lblTooltip = new Label();
+        private readonly PictureBox picThumbnail = new PictureBox();
 
         private readonly CommonOpenFileDialog selectPathDialog;
 
@@ -77,6 +79,8 @@ namespace SceneGraphPlus.Surface
         private readonly ToolStripMenuItem menuItemContextFixLight;
         private readonly ToolStripMenuItem menuItemContextCopySgName;
         private readonly ToolStripMenuItem menuItemContextClosePackage;
+        private readonly ToolStripMenuItem menuItemContextOpenPackage;
+        private readonly ToolStripMenuItem menuItemContextSplitBlock;
 
         private readonly ContextMenuStrip menuContextConnector;
         private readonly ToolStripMenuItem menuItemContextSplitMulti;
@@ -123,6 +127,8 @@ namespace SceneGraphPlus.Surface
                 menuItemContextFixLight = new ToolStripMenuItem();
                 menuItemContextCopySgName = new ToolStripMenuItem();
                 menuItemContextClosePackage = new ToolStripMenuItem();
+                menuItemContextOpenPackage = new ToolStripMenuItem();
+                menuItemContextSplitBlock = new ToolStripMenuItem();
                 menuContextBlock.SuspendLayout();
 
                 menuContextBlock.Items.AddRange(new ToolStripItem[] {
@@ -131,7 +137,8 @@ namespace SceneGraphPlus.Surface
                     menuItemContextExtract,
                     menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextFixLight,
                     menuItemContextCopySgName,
-                    menuItemContextClosePackage,
+                    menuItemContextClosePackage, menuItemContextOpenPackage,
+                    menuItemContextSplitBlock,
                     menuItemContextDelete, menuItemContextDeleteChain });
                 menuContextBlock.Name = "menuContextBlock";
                 menuContextBlock.Size = new Size(223, 48);
@@ -192,6 +199,16 @@ namespace SceneGraphPlus.Surface
                 menuItemContextClosePackage.Text = "Close Associated Package";
                 menuItemContextClosePackage.Click += new EventHandler(OnContextBlockClosePackage);
 
+                menuItemContextOpenPackage.Name = "menuItemContextOpenPackage";
+                menuItemContextOpenPackage.Size = new Size(222, 22);
+                menuItemContextOpenPackage.Text = "Open Associated Package";
+                menuItemContextOpenPackage.Click += new EventHandler(OnContextBlockOpenPackage);
+
+                menuItemContextSplitBlock.Name = "menuItemContextSplitBlock";
+                menuItemContextSplitBlock.Size = new Size(222, 22);
+                menuItemContextSplitBlock.Text = "Make Clone(s)";
+                menuItemContextSplitBlock.Click += new EventHandler(OnContextBlockSplitBlock);
+
                 menuContextBlock.ResumeLayout(false);
             }
 
@@ -214,12 +231,19 @@ namespace SceneGraphPlus.Surface
             }
 
             {
-                this.Controls.Add(lblTooltip);
                 lblTooltip.Visible = false;
                 lblTooltip.AutoSize = true;
                 lblTooltip.BorderStyle = BorderStyle.FixedSingle;
                 lblTooltip.BackColor = ConnectorPopupBackColour;
                 lblTooltip.ForeColor = ConnectorPopupTextColour;
+                this.Controls.Add(lblTooltip);
+
+                picThumbnail.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+                picThumbnail.Location = new System.Drawing.Point(10, 40);
+                picThumbnail.Size = new System.Drawing.Size(192, 192);
+                picThumbnail.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+                picThumbnail.Visible = false;
+                this.Controls.Add(picThumbnail);
             }
 
             selectPathDialog = new CommonOpenFileDialog
@@ -662,54 +686,93 @@ namespace SceneGraphPlus.Surface
         #region Context Menu
         private void OnContextBlockOpening(object sender, CancelEventArgs e)
         {
-            if (contextBlock != null && !contextBlock.IsMissingOrClone)
+            if (contextBlock != null)
             {
-                menuItemContextTexture.Visible = (contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE);
-
-                menuItemContextDelete.Visible = advancedMode;
-                menuItemContextDelete.Enabled = (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0);
-
-                menuItemContextDeleteChain.Visible = advancedMode;
-                menuItemContextDeleteChain.Enabled = false;
-                if (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0)
+                if (!contextBlock.IsMissingOrClone)
                 {
-                    menuItemContextDeleteChain.Enabled = true;
+                    menuItemContextTexture.Visible = (contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE);
 
-                    foreach (AbstractGraphBlock block in GetBlockChain(contextBlock))
+                    menuItemContextDelete.Visible = advancedMode;
+                    menuItemContextDelete.Enabled = (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0);
+
+                    menuItemContextDeleteChain.Visible = advancedMode;
+                    menuItemContextDeleteChain.Enabled = false;
+                    if (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0)
                     {
-                        if (!block.IsEditable)
+                        menuItemContextDeleteChain.Enabled = true;
+
+                        foreach (AbstractGraphBlock block in GetBlockChain(contextBlock))
                         {
-                            menuItemContextDeleteChain.Enabled = false;
-                            break;
+                            if (!block.IsEditable)
+                            {
+                                menuItemContextDeleteChain.Enabled = false;
+                                break;
+                            }
                         }
                     }
+
+                    menuItemContextHide.Visible = advancedMode;
+                    menuItemContextHide.Enabled = (contextBlock.GetInConnectors().Count == 0);
+
+                    menuItemContextHideChain.Visible = advancedMode;
+                    menuItemContextHideChain.Enabled = (contextBlock.GetInConnectors().Count == 0);
+
+                    menuItemContextExtract.Visible = false;
+                    if (contextBlock.TypeId == Cres.TYPE)
+                    {
+                        menuItemContextExtract.Text = "Extract Mesh";
+                        menuItemContextExtract.Visible = true;
+                    }
+                    else if (contextBlock.TypeId == Gzps.TYPE || contextBlock.TypeId == Mmat.TYPE)
+                    {
+                        menuItemContextExtract.Text = "Extract Recolour";
+                        menuItemContextExtract.Visible = true;
+                    }
+
+                    menuItemContextFixTgir.Visible = !contextBlock.IsTgirValid;
+                    menuItemContextFixFileList.Visible = (contextBlock.TypeId == Txmt.TYPE) && !contextBlock.IsDirty && !contextBlock.IsFileListValid;
+                    menuItemContextFixLight.Visible = (contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE) && !contextBlock.IsDirty && !contextBlock.IsLightValid;
+
+                    menuItemContextCopySgName.Visible = (contextBlock.SoleRcolParent != null);
+                    menuItemContextCopySgName.Enabled = (contextBlock.SoleRcolParent?.SgBaseName != null && !(contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE));
+
+                    menuItemContextClosePackage.Visible = true;
+                    menuItemContextClosePackage.Enabled = !HasPendingEdits(contextBlock.PackagePath);
+                    menuItemContextOpenPackage.Visible = false;
+
+                    menuItemContextSplitBlock.Visible = advancedMode;
+                    menuItemContextSplitBlock.Enabled = (contextBlock.GetInConnectors().Count > 1);
                 }
-
-                menuItemContextHide.Visible = advancedMode;
-                menuItemContextHide.Enabled = (contextBlock.GetInConnectors().Count == 0);
-
-                menuItemContextHideChain.Visible = advancedMode;
-                menuItemContextHideChain.Enabled = (contextBlock.GetInConnectors().Count == 0);
-
-                menuItemContextExtract.Visible = false;
-                if (contextBlock.TypeId == Cres.TYPE)
+                else
                 {
-                    menuItemContextExtract.Text = "Extract Mesh";
-                    menuItemContextExtract.Visible = true;
-                }
-                else if (contextBlock.TypeId == Gzps.TYPE || contextBlock.TypeId == Mmat.TYPE)
-                {
-                    menuItemContextExtract.Text = "Extract Recolour";
-                    menuItemContextExtract.Visible = true;
-                }
+                    foreach (ToolStripItem item in menuContextBlock.Items)
+                    {
+                        item.Visible = false;
+                    }
 
-                menuItemContextFixTgir.Visible = !contextBlock.IsTgirValid;
-                menuItemContextFixFileList.Visible = (contextBlock.TypeId == Txmt.TYPE) && !contextBlock.IsDirty && !contextBlock.IsFileListValid;
-                menuItemContextFixLight.Visible = (contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE) && !contextBlock.IsDirty && !contextBlock.IsLightValid;
-
-                menuItemContextCopySgName.Visible = (contextBlock.SoleRcolParent != null);
-                menuItemContextCopySgName.Enabled = (contextBlock.SoleRcolParent?.SgBaseName != null && !(contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE));
-                menuItemContextClosePackage.Enabled = !HasPendingEdits(contextBlock.PackagePath);
+                    if (contextBlock.IsAvailable)
+                    {
+                        menuItemContextOpenPackage.Visible = true;
+                        menuItemContextOpenPackage.Enabled = true;
+                    }
+                    else if (contextBlock.IsMaxis && contextBlock.TypeId == Cres.TYPE)
+                    {
+                        if (GameData.GetMaxisResource(contextBlock.TypeId, contextBlock.Key) != null)
+                        {
+                            menuItemContextExtract.Text = "Extract Maxis Mesh";
+                            menuItemContextExtract.Visible = true;
+                            menuItemContextExtract.Enabled = true;
+                        }
+                        else
+                        {
+                            e.Cancel = true;
+                        }
+                    }
+                    else
+                    {
+                        e.Cancel = true;
+                    }
+                }
             }
             else
             {
@@ -881,34 +944,93 @@ namespace SceneGraphPlus.Surface
         {
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                // TODO - SceneGraph Plus - 3 - Expand export to work with Maxis resources
                 Exporter exporter = new Exporter();
 
                 exporter.Open(selectPathDialog.FileName);
 
-                foreach (AbstractGraphBlock block in GetBlockChain(contextBlock))
+                if (contextBlock.IsMaxis)
                 {
-                    if (contextBlock.TypeId == Cres.TYPE && (block.TypeId == Cres.TYPE || block.TypeId == Shpe.TYPE || block.TypeId == Gmnd.TYPE || block.TypeId == Gmdc.TYPE))
-                    {
-                        exporter.Export(block.PackagePath, block.Key);
-                    }
-                    else if (contextBlock.TypeId == Mmat.TYPE && (block.TypeId == Mmat.TYPE || block.TypeId == Txmt.TYPE || block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE))
-                    {
-                        exporter.Export(block.PackagePath, block.Key);
-                    }
-                    else if (contextBlock.TypeId == Gzps.TYPE && (block.TypeId == Gzps.TYPE || block.TypeId == Txmt.TYPE || block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE))
-                    {
-                        if (block.TypeId == Gzps.TYPE)
-                        {
-                            exporter.Export(block.PackagePath, new DBPFKey(Idr.TYPE, block.Key));
-                            exporter.Export(block.PackagePath, new DBPFKey(Binx.TYPE, block.Key));
-                        }
-
-                        exporter.Export(block.PackagePath, block.Key);
-                    }
+                    ExtractMaxisMesh(exporter);
+                }
+                else
+                {
+                    ExtractCustomMesh(exporter);
                 }
 
                 exporter.Close();
+            }
+        }
+
+        private void ExtractCustomMesh(Exporter exporter)
+        {
+            foreach (AbstractGraphBlock block in GetBlockChain(contextBlock))
+            {
+                if (contextBlock.TypeId == Cres.TYPE && (block.TypeId == Cres.TYPE || block.TypeId == Shpe.TYPE || block.TypeId == Gmnd.TYPE || block.TypeId == Gmdc.TYPE))
+                {
+                    exporter.Export(block.PackagePath, block.Key);
+                }
+                else if (contextBlock.TypeId == Mmat.TYPE && (block.TypeId == Mmat.TYPE || block.TypeId == Txmt.TYPE || block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE))
+                {
+                    exporter.Export(block.PackagePath, block.Key);
+                }
+                else if (contextBlock.TypeId == Gzps.TYPE && (block.TypeId == Gzps.TYPE || block.TypeId == Txmt.TYPE || block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE))
+                {
+                    if (block.TypeId == Gzps.TYPE)
+                    {
+                        exporter.Export(block.PackagePath, new DBPFKey(Idr.TYPE, block.Key));
+                        exporter.Export(block.PackagePath, new DBPFKey(Binx.TYPE, block.Key));
+                    }
+
+                    exporter.Export(block.PackagePath, block.Key);
+                }
+            }
+        }
+
+        private void ExtractMaxisMesh(Exporter exporter)
+        {
+            DBPFKey cresKey = contextBlock.Key;
+
+            string maxisPath = GameData.GetMaxisPackagePath(Cres.TYPE, cresKey, true);
+
+            if (maxisPath != null)
+            {
+                Cres cres = (Cres)GameData.GetMaxisResource(Cres.TYPE, cresKey, true);
+
+                exporter.Export(maxisPath, cres);
+
+                foreach (DBPFKey shpeKey in cres.ShpeKeys)
+                {
+                    maxisPath = GameData.GetMaxisPackagePath(Shpe.TYPE, shpeKey, true);
+
+                    if (maxisPath != null)
+                    {
+                        Shpe shpe = (Shpe)GameData.GetMaxisResource(Shpe.TYPE, shpeKey, true);
+
+                        exporter.Export(maxisPath, shpe);
+
+                        foreach (string gmndName in shpe.GmndNames)
+                        {
+                            Gmnd gmnd = (Gmnd)GameData.GetMaxisResource(Gmnd.TYPE, gmndName, true);
+
+                            if (gmnd != null)
+                            {
+                                maxisPath = GameData.GetMaxisPackagePath(Gmnd.TYPE, gmnd, true);
+
+                                exporter.Export(maxisPath, gmnd);
+
+                                foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
+                                {
+                                    maxisPath = GameData.GetMaxisPackagePath(Gmdc.TYPE, gmdcKey, true);
+
+                                    if (maxisPath != null)
+                                    {
+                                        exporter.Export(maxisPath, gmdcKey);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -943,6 +1065,36 @@ namespace SceneGraphPlus.Surface
                     owningForm.UpdateEditor(editBlock);
                 }
             }
+        }
+
+        private void OnContextBlockSplitBlock(object sender, EventArgs e)
+        {
+            int shiftMultiplier = 0;
+
+            foreach (AbstractGraphConnector connector in contextBlock.GetInConnectors())
+            {
+                if (shiftMultiplier > 0)
+                {
+                    connector.SetEndBlock(connector.EndBlock.MakeClone(new Point((ColumnGap / 8) * shiftMultiplier, (RowGap / 8) * shiftMultiplier)), false);
+                }
+
+                ++shiftMultiplier;
+            }
+        }
+
+        private void OnContextBlockOpenPackage(object sender, EventArgs e)
+        {
+            owningForm.OpenPackage(contextBlock.Key);
+        }
+
+        public void UpdateAvailableBlocks()
+        {
+            foreach (AbstractGraphBlock block in blocks)
+            {
+                block.IsAvailable = owningForm.IsAvailable(block.Key);
+            }
+
+            Invalidate();
         }
 
         private void OnContextBlockClosePackage(object sender, EventArgs e)
@@ -1005,7 +1157,7 @@ namespace SceneGraphPlus.Surface
             {
                 if (dropOntoBlocks.Count != 0)
                 {
-                    lblTooltip.Visible = false;
+                    lblTooltip.Visible = picThumbnail.Visible = false;
 
                     foreach (AbstractGraphBlock dropOntoBlock in dropOntoBlocks)
                     {
@@ -1021,7 +1173,7 @@ namespace SceneGraphPlus.Surface
             {
                 if (dropOntoConnector != null)
                 {
-                    lblTooltip.Visible = false;
+                    lblTooltip.Visible = picThumbnail.Visible = false;
 
                     dropOntoConnector.BorderVisible = false;
 
@@ -1066,7 +1218,7 @@ namespace SceneGraphPlus.Surface
             }
             else if (e.Button == MouseButtons.Right)
             {
-                lblTooltip.Visible = false;
+                lblTooltip.Visible = picThumbnail.Visible = false;
 
                 contextBlock = null;
                 contextConnector = null;
@@ -1114,7 +1266,7 @@ namespace SceneGraphPlus.Surface
             {
                 if (moving)
                 {
-                    lblTooltip.Visible = false;
+                    lblTooltip.Visible = picThumbnail.Visible = false;
 
                     if (Form.ModifierKeys == Keys.Shift)
                     {
@@ -1142,7 +1294,7 @@ namespace SceneGraphPlus.Surface
 
                             dropOntoBlocks.Clear();
 
-                            this.Invalidate();
+                            Invalidate();
                         }
                     }
                     else if (Form.ModifierKeys == Keys.Control)
@@ -1221,7 +1373,7 @@ namespace SceneGraphPlus.Surface
         {
             if (moving)
             {
-                lblTooltip.Visible = false;
+                lblTooltip.Visible = picThumbnail.Visible = false;
 
                 Point delta = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
 
@@ -1346,15 +1498,33 @@ namespace SceneGraphPlus.Surface
 
                         hoverBlock = currentHoverBlock;
 
-                        string toolTip = hoverBlock.ToolTip;
+                        Point popupLocation = this.PointToClient(MousePosition);
+                        popupLocation.Offset(12, 20);
 
-                        if (!string.IsNullOrEmpty(toolTip))
+                        Image thumbnail = null;
+
+                        if (Form.ModifierKeys == Keys.Shift)
                         {
-                            Point popupLocation = this.PointToClient(MousePosition);
-                            popupLocation.Offset(12, 20);
-                            lblTooltip.Location = popupLocation;
-                            lblTooltip.Text = toolTip;
-                            lblTooltip.Visible = true;
+                            thumbnail = owningForm.GetThumbnail(currentHoverBlock.Key);
+
+                            if (thumbnail != null)
+                            {
+                                picThumbnail.Location = popupLocation;
+                                picThumbnail.Image = thumbnail;
+                                picThumbnail.Visible = true;
+                            }
+                        }
+
+                        if (thumbnail == null)
+                        {
+                            string toolTip = hoverBlock.ToolTip;
+
+                            if (!string.IsNullOrEmpty(toolTip))
+                            {
+                                lblTooltip.Location = popupLocation;
+                                lblTooltip.Text = toolTip;
+                                lblTooltip.Visible = true;
+                            }
                         }
 
                         this.Invalidate();
@@ -1364,7 +1534,7 @@ namespace SceneGraphPlus.Surface
                 {
                     if (hoverBlock != null)
                     {
-                        lblTooltip.Visible = false;
+                        lblTooltip.Visible = picThumbnail.Visible = false;
 
                         hoverBlock.BorderVisible = false;
 
@@ -1432,7 +1602,7 @@ namespace SceneGraphPlus.Surface
                 {
                     if (hoverConnector != null)
                     {
-                        lblTooltip.Visible = false;
+                        lblTooltip.Visible = picThumbnail.Visible = false;
 
                         hoverConnector.BorderVisible = false;
 
@@ -1527,7 +1697,7 @@ namespace SceneGraphPlus.Surface
         public void SaveAll(bool autoBackup, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames, bool prefixLowerCase)
         {
             DbpfFileCache packageCache = new DbpfFileCache();
-            Dictionary<string, List<AbstractGraphBlock>> dirtyBlocks = new Dictionary<string, List<AbstractGraphBlock>>();
+            Dictionary<string, List<AbstractGraphBlock>> dirtyBlocksByPackage = new Dictionary<string, List<AbstractGraphBlock>>();
 
             // Find all the dirty blocks by package
             foreach (AbstractGraphBlock block in blocks)
@@ -1536,17 +1706,17 @@ namespace SceneGraphPlus.Surface
 
                 if (block.IsDirty)
                 {
-                    if (!dirtyBlocks.ContainsKey(block.PackagePath))
+                    if (!dirtyBlocksByPackage.ContainsKey(block.PackagePath))
                     {
-                        dirtyBlocks.Add(block.PackagePath, new List<AbstractGraphBlock>());
+                        dirtyBlocksByPackage.Add(block.PackagePath, new List<AbstractGraphBlock>());
                     }
 
-                    dirtyBlocks[block.PackagePath].Add(block);
+                    dirtyBlocksByPackage[block.PackagePath].Add(block);
                 }
             }
 
             // For each package that has dirty blocks ...
-            foreach (KeyValuePair<string, List<AbstractGraphBlock>> kvPair in dirtyBlocks)
+            foreach (KeyValuePair<string, List<AbstractGraphBlock>> kvPair in dirtyBlocksByPackage)
             {
                 CacheableDbpfFile package = packageCache.GetOrAdd(kvPair.Key);
 
@@ -1565,7 +1735,7 @@ namespace SceneGraphPlus.Surface
                     if (!block.IsDeleted)
                     {
                         DBPFResource res = package.GetResourceByKey(block.OriginalKey);
-                        Trace.Assert(res != null, $"Missing resource for {block.OriginalKey}");
+                        Trace.Assert(res != null, $"Refs: Missing resource for {block.OriginalKey}");
 
                         UpdateRefsToChildren(package, res, block, prefixLowerCase);
 
@@ -1591,7 +1761,7 @@ namespace SceneGraphPlus.Surface
                     if (!block.IsDeleted)
                     {
                         DBPFResource res = package.GetResourceByKey(block.OriginalKey);
-                        Trace.Assert(res != null, $"Missing resource for {block.OriginalKey}");
+                        Trace.Assert(res != null, $"Name: Missing resource for {block.OriginalKey}");
 
                         UpdateName(res, block, alwaysSetNames, alwaysClearNames, prefixNames, prefixLowerCase);
 
@@ -1614,13 +1784,16 @@ namespace SceneGraphPlus.Surface
             }
 
             // Finally, save every package that was updated
-            foreach (CacheableDbpfFile package in packageCache)
+            foreach (string packagePath in dirtyBlocksByPackage.Keys)
             {
+                CacheableDbpfFile package = packageCache.GetOrOpen(packagePath);
+
                 if (package.Update(autoBackup) == null)
                 {
                     MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!\n\nChanges are in the associated .temp file.", "Package Update Error!");
                 }
 
+                packageCache.SetClean(package);
                 package.Close();
             }
 

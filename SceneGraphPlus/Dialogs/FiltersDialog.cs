@@ -89,5 +89,25 @@ namespace SceneGraphPlus.Dialogs
         {
             surface.RealignAll();
         }
+
+        private void OnGenderClicked(object sender, EventArgs e)
+        {
+            if (Form.ModifierKeys == Keys.Control)
+            {
+                ckbGenderFemale.Checked = ckbGenderMale.Checked = ckbGenderUnisex.Checked = false;
+
+                (sender as CheckBox).Checked = true;
+            }
+        }
+
+        private void OnAgeClicked(object sender, EventArgs e)
+        {
+            if (Form.ModifierKeys == Keys.Control)
+            {
+                ckbAgeBabies.Checked = ckbAgeToddlers.Checked = ckbAgeChildren.Checked = ckbAgeTeens.Checked = ckbAgeYoungAdults.Checked = ckbAgeAdults.Checked = ckbAgeElders.Checked = false;
+
+                (sender as CheckBox).Checked = true;
+            }
+        }
     }
 }

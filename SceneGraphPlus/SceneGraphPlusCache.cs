@@ -128,6 +128,7 @@ namespace SceneGraphPlus.Cache
         public DBPFKey OriginalKey => originalKey;
         public DBPFKey Key => key;
         public string PackagePath => packagePath;
+        public string PackageName => packageName;
 
         private string NormalizeSgName(TypeTypeID typeId, TypeGroupID groupId, string sgName, bool prefixLowerCase)
         {

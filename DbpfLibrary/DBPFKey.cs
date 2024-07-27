@@ -50,7 +50,7 @@ namespace Sims2Tools.DBPF
         public bool IsTGIRValid(string sgName)
         {
             string name = Hashes.StripHashFromName(sgName);
-            Trace.Assert(!string.IsNullOrEmpty(name), "SG Name cannot be blank!");
+            Debug.Assert(!string.IsNullOrEmpty(name), "SG Name cannot be blank!");
 
             return (Hashes.InstanceIDHash(name) == InstanceID && Hashes.ResourceIDHash(name) == ResourceID);
         }

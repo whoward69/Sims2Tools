@@ -83,6 +83,7 @@ namespace SceneGraphPlus.Dialogs
             this.ckbAgeYoungAdults.TabIndex = 8;
             this.ckbAgeYoungAdults.Text = "Young Adults";
             this.ckbAgeYoungAdults.UseVisualStyleBackColor = true;
+            this.ckbAgeYoungAdults.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeBabies
             // 
@@ -93,6 +94,7 @@ namespace SceneGraphPlus.Dialogs
             this.ckbAgeBabies.TabIndex = 7;
             this.ckbAgeBabies.Text = "Babies";
             this.ckbAgeBabies.UseVisualStyleBackColor = true;
+            this.ckbAgeBabies.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeToddlers
             // 
@@ -103,6 +105,7 @@ namespace SceneGraphPlus.Dialogs
             this.ckbAgeToddlers.TabIndex = 6;
             this.ckbAgeToddlers.Text = "Toddlers";
             this.ckbAgeToddlers.UseVisualStyleBackColor = true;
+            this.ckbAgeToddlers.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeElders
             // 
@@ -113,6 +116,7 @@ namespace SceneGraphPlus.Dialogs
             this.ckbAgeElders.TabIndex = 4;
             this.ckbAgeElders.Text = "Elders";
             this.ckbAgeElders.UseVisualStyleBackColor = true;
+            this.ckbAgeElders.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeAdults
             // 
@@ -123,6 +127,7 @@ namespace SceneGraphPlus.Dialogs
             this.ckbAgeAdults.TabIndex = 3;
             this.ckbAgeAdults.Text = "Adults";
             this.ckbAgeAdults.UseVisualStyleBackColor = true;
+            this.ckbAgeAdults.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeTeens
             // 
@@ -133,6 +138,7 @@ namespace SceneGraphPlus.Dialogs
             this.ckbAgeTeens.TabIndex = 2;
             this.ckbAgeTeens.Text = "Teens";
             this.ckbAgeTeens.UseVisualStyleBackColor = true;
+            this.ckbAgeTeens.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeChildren
             // 
@@ -143,6 +149,7 @@ namespace SceneGraphPlus.Dialogs
             this.ckbAgeChildren.TabIndex = 1;
             this.ckbAgeChildren.Text = "Children";
             this.ckbAgeChildren.UseVisualStyleBackColor = true;
+            this.ckbAgeChildren.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // grpGender
             // 
@@ -165,6 +172,7 @@ namespace SceneGraphPlus.Dialogs
             this.ckbGenderFemale.TabIndex = 7;
             this.ckbGenderFemale.Text = "Female";
             this.ckbGenderFemale.UseVisualStyleBackColor = true;
+            this.ckbGenderFemale.Click += new System.EventHandler(this.OnGenderClicked);
             // 
             // ckbGenderMale
             // 
@@ -175,6 +183,7 @@ namespace SceneGraphPlus.Dialogs
             this.ckbGenderMale.TabIndex = 6;
             this.ckbGenderMale.Text = "Male";
             this.ckbGenderMale.UseVisualStyleBackColor = true;
+            this.ckbGenderMale.Click += new System.EventHandler(this.OnGenderClicked);
             // 
             // ckbGenderUnisex
             // 
@@ -185,6 +194,7 @@ namespace SceneGraphPlus.Dialogs
             this.ckbGenderUnisex.TabIndex = 1;
             this.ckbGenderUnisex.Text = "Unisex";
             this.ckbGenderUnisex.UseVisualStyleBackColor = true;
+            this.ckbGenderUnisex.Click += new System.EventHandler(this.OnGenderClicked);
             // 
             // grpSubset
             // 

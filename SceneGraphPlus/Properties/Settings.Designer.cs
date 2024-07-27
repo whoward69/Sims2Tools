@@ -754,5 +754,17 @@ namespace SceneGraphPlus.Properties {
                 this["AgedRow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Gray")]
+        public string AvailableEdgeColour {
+            get {
+                return ((string)(this["AvailableEdgeColour"]));
+            }
+            set {
+                this["AvailableEdgeColour"] = value;
+            }
+        }
     }
 }

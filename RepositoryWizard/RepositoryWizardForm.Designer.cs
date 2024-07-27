@@ -918,7 +918,7 @@ namespace RepositoryWizard
             this.ckbCatSwimwear.TabIndex = 8;
             this.ckbCatSwimwear.Text = "Swimwear";
             this.ckbCatSwimwear.UseVisualStyleBackColor = true;
-            this.ckbCatSwimwear.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbCatSwimwear.Click += new System.EventHandler(this.OnCategoryClicked);
             // 
             // ckbCatUnderwear
             // 
@@ -929,7 +929,7 @@ namespace RepositoryWizard
             this.ckbCatUnderwear.TabIndex = 6;
             this.ckbCatUnderwear.Text = "Underwear";
             this.ckbCatUnderwear.UseVisualStyleBackColor = true;
-            this.ckbCatUnderwear.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbCatUnderwear.Click += new System.EventHandler(this.OnCategoryClicked);
             // 
             // ckbCatPJs
             // 
@@ -940,7 +940,7 @@ namespace RepositoryWizard
             this.ckbCatPJs.TabIndex = 5;
             this.ckbCatPJs.Text = "PJs";
             this.ckbCatPJs.UseVisualStyleBackColor = true;
-            this.ckbCatPJs.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbCatPJs.Click += new System.EventHandler(this.OnCategoryClicked);
             // 
             // ckbCatOuterwear
             // 
@@ -951,7 +951,7 @@ namespace RepositoryWizard
             this.ckbCatOuterwear.TabIndex = 4;
             this.ckbCatOuterwear.Text = "Outerwear";
             this.ckbCatOuterwear.UseVisualStyleBackColor = true;
-            this.ckbCatOuterwear.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbCatOuterwear.Click += new System.EventHandler(this.OnCategoryClicked);
             // 
             // ckbCatMaternity
             // 
@@ -962,7 +962,7 @@ namespace RepositoryWizard
             this.ckbCatMaternity.TabIndex = 3;
             this.ckbCatMaternity.Text = "Maternity";
             this.ckbCatMaternity.UseVisualStyleBackColor = true;
-            this.ckbCatMaternity.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbCatMaternity.Click += new System.EventHandler(this.OnCategoryClicked);
             // 
             // ckbCatGym
             // 
@@ -973,7 +973,7 @@ namespace RepositoryWizard
             this.ckbCatGym.TabIndex = 2;
             this.ckbCatGym.Text = "Gym";
             this.ckbCatGym.UseVisualStyleBackColor = true;
-            this.ckbCatGym.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbCatGym.Click += new System.EventHandler(this.OnCategoryClicked);
             // 
             // ckbCatFormal
             // 
@@ -984,7 +984,7 @@ namespace RepositoryWizard
             this.ckbCatFormal.TabIndex = 1;
             this.ckbCatFormal.Text = "Formal";
             this.ckbCatFormal.UseVisualStyleBackColor = true;
-            this.ckbCatFormal.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbCatFormal.Click += new System.EventHandler(this.OnCategoryClicked);
             // 
             // ckbCatEveryday
             // 
@@ -995,7 +995,7 @@ namespace RepositoryWizard
             this.ckbCatEveryday.TabIndex = 0;
             this.ckbCatEveryday.Text = "Everyday";
             this.ckbCatEveryday.UseVisualStyleBackColor = true;
-            this.ckbCatEveryday.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbCatEveryday.Click += new System.EventHandler(this.OnCategoryClicked);
             // 
             // grpType
             // 
@@ -1061,7 +1061,7 @@ namespace RepositoryWizard
             this.ckbAgeYoungAdults.TabIndex = 8;
             this.ckbAgeYoungAdults.Text = "Young Adults";
             this.ckbAgeYoungAdults.UseVisualStyleBackColor = true;
-            this.ckbAgeYoungAdults.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbAgeYoungAdults.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeBabies
             // 
@@ -1072,7 +1072,7 @@ namespace RepositoryWizard
             this.ckbAgeBabies.TabIndex = 7;
             this.ckbAgeBabies.Text = "Babies";
             this.ckbAgeBabies.UseVisualStyleBackColor = true;
-            this.ckbAgeBabies.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbAgeBabies.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeToddlers
             // 
@@ -1083,7 +1083,7 @@ namespace RepositoryWizard
             this.ckbAgeToddlers.TabIndex = 6;
             this.ckbAgeToddlers.Text = "Toddlers";
             this.ckbAgeToddlers.UseVisualStyleBackColor = true;
-            this.ckbAgeToddlers.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbAgeToddlers.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeElders
             // 
@@ -1094,7 +1094,7 @@ namespace RepositoryWizard
             this.ckbAgeElders.TabIndex = 4;
             this.ckbAgeElders.Text = "Elders";
             this.ckbAgeElders.UseVisualStyleBackColor = true;
-            this.ckbAgeElders.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbAgeElders.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeAdults
             // 
@@ -1105,7 +1105,7 @@ namespace RepositoryWizard
             this.ckbAgeAdults.TabIndex = 3;
             this.ckbAgeAdults.Text = "Adults";
             this.ckbAgeAdults.UseVisualStyleBackColor = true;
-            this.ckbAgeAdults.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbAgeAdults.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeTeens
             // 
@@ -1116,7 +1116,7 @@ namespace RepositoryWizard
             this.ckbAgeTeens.TabIndex = 2;
             this.ckbAgeTeens.Text = "Teens";
             this.ckbAgeTeens.UseVisualStyleBackColor = true;
-            this.ckbAgeTeens.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbAgeTeens.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // ckbAgeChildren
             // 
@@ -1127,7 +1127,7 @@ namespace RepositoryWizard
             this.ckbAgeChildren.TabIndex = 1;
             this.ckbAgeChildren.Text = "Children";
             this.ckbAgeChildren.UseVisualStyleBackColor = true;
-            this.ckbAgeChildren.Click += new System.EventHandler(this.OnCheckboxClicked);
+            this.ckbAgeChildren.Click += new System.EventHandler(this.OnAgeClicked);
             // 
             // grpShoe
             // 

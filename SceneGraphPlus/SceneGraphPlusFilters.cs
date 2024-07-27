@@ -12,7 +12,7 @@ namespace SceneGraphPlus.Shapes
 {
     public class BlockFilters
     {
-        private readonly Regex reCpfName = new Regex("^(GZPS|AGED)( ([BPCTYAE][Y]?)([FMU])(\n(.*))?)?$");
+        private readonly Regex reCpfName = new Regex("^(GZPS|AGED)( ([BPCTYAE?][Y]?)([FMU?])(\n(.*))?)?$");
 
         public bool Female { get; set; }
         public bool Male { get; set; }

@@ -237,7 +237,12 @@ namespace Sims2Tools.DBPF.Package
                     }
                     catch (Exception e)
                     {
-                        logger.Warn($"Failed to update {originalName}", e);
+                        logger.Error($"Failed to update {originalName}", e);
+
+                        foreach (Process proc in Win32Processes.GetProcessesLockingFile(originalName))
+                        {
+                            logger.Info($"Locked by: {proc.MainModule.FileName}");
+                        }
 
                         // SimPe propbably has the file open!
                         backupName = null;

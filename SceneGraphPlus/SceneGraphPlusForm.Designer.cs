@@ -46,7 +46,6 @@ namespace SceneGraphPlus
             this.menuItemRecentPackages = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemSaveAll = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,6 +57,7 @@ namespace SceneGraphPlus
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemHideMissing = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConnectorsOver = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemConnectorsUnder = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,6 +66,9 @@ namespace SceneGraphPlus
             this.menuItemSetOptionalNames = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemPrefixOptionalNames = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemPrefixLowerCase = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemPreloadMeshes = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemLoadMeshesNow = new System.Windows.Forms.ToolStripMenuItem();
             this.menuGrid = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGridRealign = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -75,6 +78,7 @@ namespace SceneGraphPlus
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemGridDrop = new System.Windows.Forms.ToolStripMenuItem();
             this.menuPackages = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
@@ -91,7 +95,6 @@ namespace SceneGraphPlus
             this.lblBlockPackagePath = new System.Windows.Forms.Label();
             this.textBlockPackagePath = new System.Windows.Forms.TextBox();
             this.btnFixIssues = new System.Windows.Forms.Button();
-            this.menuItemFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel2.SuspendLayout();
@@ -124,7 +127,6 @@ namespace SceneGraphPlus
             this.menuItemRecentPackages,
             this.menuItemSeparator2,
             this.menuItemSaveAll,
-            this.toolStripSeparator7,
             this.menuItemConfiguration,
             this.toolStripSeparator1,
             this.menuItemExit});
@@ -181,11 +183,6 @@ namespace SceneGraphPlus
             this.menuItemSaveAll.Text = "&Save All";
             this.menuItemSaveAll.Click += new System.EventHandler(this.OnSaveAll);
             // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(201, 6);
-            // 
             // menuItemConfiguration
             // 
             this.menuItemConfiguration.Name = "menuItemConfiguration";
@@ -237,20 +234,20 @@ namespace SceneGraphPlus
             // 
             this.menuItemAdvanced.CheckOnClick = true;
             this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
             this.menuItemAdvanced.Text = "Advanced";
             this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(141, 6);
             // 
             // menuItemAutoBackup
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
             this.menuItemAutoBackup.Text = "Auto-Backup";
             // 
             // menuOptions
@@ -265,10 +262,14 @@ namespace SceneGraphPlus
             this.menuItemClearOptionalNames,
             this.menuItemSetOptionalNames,
             this.menuItemPrefixOptionalNames,
-            this.menuItemPrefixLowerCase});
+            this.menuItemPrefixLowerCase,
+            this.toolStripSeparator7,
+            this.menuItemPreloadMeshes,
+            this.menuItemLoadMeshesNow});
             this.menuOptions.Name = "menuOptions";
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
+            this.menuOptions.DropDownOpening += new System.EventHandler(this.OnOptionsMenuOpening);
             // 
             // menuItemHideMissing
             // 
@@ -278,6 +279,13 @@ namespace SceneGraphPlus
             this.menuItemHideMissing.Size = new System.Drawing.Size(281, 22);
             this.menuItemHideMissing.Text = "&Hide Missing Blocks";
             this.menuItemHideMissing.Click += new System.EventHandler(this.OnHideMissingBlocks);
+            // 
+            // menuItemFilters
+            // 
+            this.menuItemFilters.Name = "menuItemFilters";
+            this.menuItemFilters.Size = new System.Drawing.Size(281, 22);
+            this.menuItemFilters.Text = "&Filters...";
+            this.menuItemFilters.Click += new System.EventHandler(this.OnFilterBlocks);
             // 
             // toolStripSeparator4
             // 
@@ -338,6 +346,26 @@ namespace SceneGraphPlus
             this.menuItemPrefixLowerCase.Name = "menuItemPrefixLowerCase";
             this.menuItemPrefixLowerCase.Size = new System.Drawing.Size(281, 22);
             this.menuItemPrefixLowerCase.Text = "Group Prefix is Lower Case";
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(278, 6);
+            // 
+            // menuItemPreloadMeshes
+            // 
+            this.menuItemPreloadMeshes.CheckOnClick = true;
+            this.menuItemPreloadMeshes.Name = "menuItemPreloadMeshes";
+            this.menuItemPreloadMeshes.Size = new System.Drawing.Size(281, 22);
+            this.menuItemPreloadMeshes.Text = "Preload SG Cache";
+            this.menuItemPreloadMeshes.Click += new System.EventHandler(this.OnPreloadMeshesClicked);
+            // 
+            // menuItemLoadMeshesNow
+            // 
+            this.menuItemLoadMeshesNow.Name = "menuItemLoadMeshesNow";
+            this.menuItemLoadMeshesNow.Size = new System.Drawing.Size(281, 22);
+            this.menuItemLoadMeshesNow.Text = "Load SG Cache Now";
+            this.menuItemLoadMeshesNow.Click += new System.EventHandler(this.OnLoadMeshesNowClicked);
             // 
             // menuGrid
             // 
@@ -409,6 +437,11 @@ namespace SceneGraphPlus
             this.menuPackages.Size = new System.Drawing.Size(68, 20);
             this.menuPackages.Text = "&Packages";
             this.menuPackages.DropDownOpening += new System.EventHandler(this.OnPackagesOpening);
+            // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(201, 6);
             // 
             // menuItemSeparator4
             // 
@@ -586,7 +619,6 @@ namespace SceneGraphPlus
             this.textBlockPackagePath.ReadOnly = true;
             this.textBlockPackagePath.Size = new System.Drawing.Size(691, 21);
             this.textBlockPackagePath.TabIndex = 0;
-            this.textBlockPackagePath.Click += new System.EventHandler(this.OnSaveAll);
             // 
             // btnFixIssues
             // 
@@ -598,13 +630,6 @@ namespace SceneGraphPlus
             this.btnFixIssues.Text = "Fix Issues";
             this.btnFixIssues.UseVisualStyleBackColor = true;
             this.btnFixIssues.Click += new System.EventHandler(this.OnFixIssuesClicked);
-            // 
-            // menuItemFilters
-            // 
-            this.menuItemFilters.Name = "menuItemFilters";
-            this.menuItemFilters.Size = new System.Drawing.Size(281, 22);
-            this.menuItemFilters.Text = "&Filters...";
-            this.menuItemFilters.Click += new System.EventHandler(this.OnFilterBlocks);
             // 
             // SceneGraphPlusForm
             // 
@@ -691,5 +716,8 @@ namespace SceneGraphPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemPrefixOptionalNames;
         private System.Windows.Forms.ToolStripMenuItem menuItemPrefixLowerCase;
         private System.Windows.Forms.ToolStripMenuItem menuItemFilters;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
+        private System.Windows.Forms.ToolStripMenuItem menuItemLoadMeshesNow;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPreloadMeshes;
     }
 }

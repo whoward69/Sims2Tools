@@ -11,7 +11,10 @@ using SceneGraphPlus.Dialogs;
 using SceneGraphPlus.Shapes;
 using SceneGraphPlus.Surface;
 using Sims2Tools;
+using Sims2Tools.Cache;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.Cigen;
+using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.CRES;
@@ -45,6 +48,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
@@ -57,6 +62,8 @@ namespace SceneGraphPlus
         // When adding to this List, search for "UnderstoodTypes" (both this file and the Surface file)
         // UnderstoodTypes - also need to add TypeBlockColour and TypeRow to the Settings.settings file (see https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors?view=windowsdesktop-8.0 for colour names)
         public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Aged.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE };
+
+        private CigenFile cigenCache = null;
 
         private readonly DrawingSurface surface;
         private FiltersDialog filtersDialog = null;
@@ -93,6 +100,17 @@ namespace SceneGraphPlus
             surface.Anchor = AnchorStyles.Top | AnchorStyles.Left; // | AnchorStyles.Bottom; // | AnchorStyles.Right;
         }
 
+        public new void Dispose()
+        {
+            if (cigenCache != null)
+            {
+                cigenCache.Close();
+                cigenCache = null;
+            }
+
+            base.Dispose();
+        }
+
         private void OnLoad(object sender, EventArgs e)
         {
             RegistryTools.LoadAppSettings(SceneGraphPlusApp.RegistryKey, SceneGraphPlusApp.AppVersionMajor, SceneGraphPlusApp.AppVersionMinor);
@@ -110,6 +128,7 @@ namespace SceneGraphPlus
             menuItemSetOptionalNames.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemSetOptionalNames.Name, 0) != 0);
             menuItemPrefixOptionalNames.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixOptionalNames.Name, 0) != 0);
             menuItemPrefixLowerCase.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixLowerCase.Name, 1) != 0);
+            menuItemPreloadMeshes.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, 0) != 0);
 
             menuItemGridCoarse.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridCoarse.Name, 0) != 0); if (menuItemGridCoarse.Checked) lastGridItem = menuItemGridCoarse;
             menuItemGridNormal.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridNormal.Name, 1) != 0); if (menuItemGridNormal.Checked) lastGridItem = menuItemGridNormal;
@@ -121,6 +140,32 @@ namespace SceneGraphPlus
 
             MyUpdater = new Updater(SceneGraphPlusApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
+
+            if (Sims2ToolsLib.IsSims2HomePathSet)
+            {
+                string cigenPath = $"{Sims2ToolsLib.Sims2HomePath}\\cigen.package";
+
+                if (File.Exists(cigenPath))
+                {
+                    cigenCache = new CigenFile(cigenPath);
+                }
+                else
+                {
+                    logger.Warn("'cigen.package' not found - thumbnails will NOT display.");
+                    MsgBox.Show("'cigen.package' not found - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                }
+            }
+            else
+            {
+                logger.Warn("'Sims2HomePath' not set - thumbnails will NOT display.");
+                MsgBox.Show("'Sims2HomePath' not set - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+            }
+
+            downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2DownloadsPath}"), UnderstoodTypeIds.ToArray());
+            savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims"), UnderstoodTypeIds.ToArray());
+            meshCachesLoaded = false;
+
+            if (menuItemAdvanced.Checked && menuItemPreloadMeshes.Checked) CacheMeshes();
 
             UpdateForm();
             UpdateEditor(null);
@@ -148,6 +193,7 @@ namespace SceneGraphPlus
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemSetOptionalNames.Name, menuItemSetOptionalNames.Checked ? 1 : 0);
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixOptionalNames.Name, menuItemPrefixOptionalNames.Checked ? 1 : 0);
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixLowerCase.Name, menuItemPrefixLowerCase.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridCoarse.Name, menuItemGridCoarse.Checked ? 1 : 0);
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridNormal.Name, menuItemGridNormal.Checked ? 1 : 0);
@@ -276,7 +322,29 @@ namespace SceneGraphPlus
 
             menuPackages.Visible = menuItemAdvanced.Checked;
 
+            if (menuItemAdvanced.Checked)
+            {
+                if (meshCachesLoaded)
+                {
+                    title = $"{title} - SG Cache Loaded";
+                }
+                else if (meshCachesLoading)
+                {
+                    title = $"{title} - SG Cache Loading...";
+                }
+            }
+
             this.Text = title;
+        }
+
+        public void UpdateAvailableBlocks()
+        {
+            surface.UpdateAvailableBlocks();
+        }
+
+        public bool IsAvailable(DBPFKey key)
+        {
+            return (meshCachesLoaded && (downloadsSgCache.GetPackagePath(key) ?? savedsimsSgCache.GetPackagePath(key)) != null);
         }
 
         public void UpdateEditor(AbstractGraphBlock block)
@@ -299,7 +367,26 @@ namespace SceneGraphPlus
 
             ignoreUpdates = true;
 
-            textBlockPackagePath.Text = block.PackagePath;
+            if (!block.IsMaxis)
+            {
+                if (block.IsMissing)
+                {
+                    if (meshCachesLoaded)
+                    {
+                        string cachePackagePath = downloadsSgCache.GetPackagePath(block.Key) ?? savedsimsSgCache.GetPackagePath(block.Key);
+
+                        if (cachePackagePath != null)
+                        {
+                            textBlockPackagePath.Text = cachePackagePath;
+                        }
+                    }
+                }
+                else
+                {
+                    textBlockPackagePath.Text = block.PackagePath;
+                }
+            }
+
             textBlockKey.Text = block.KeyName;
 
             if (block.BlockName != null)
@@ -377,6 +464,11 @@ namespace SceneGraphPlus
             }
         }
 
+        public Image GetThumbnail(DBPFKey key)
+        {
+            return cigenCache?.GetThumbnail(key);
+        }
+
         private void Reset()
         {
             blockCache.Clear();
@@ -388,6 +480,19 @@ namespace SceneGraphPlus
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
             surface.AdvancedMode = menuItemAdvanced.Checked;
+
+            if (menuItemAdvanced.Checked)
+            {
+                toolStripSeparator8.Visible = true;
+                menuItemLoadMeshesNow.Visible = true;
+                menuItemPreloadMeshes.Visible = true;
+            }
+            else
+            {
+                toolStripSeparator8.Visible = false;
+                menuItemLoadMeshesNow.Visible = false;
+                menuItemPreloadMeshes.Visible = false;
+            }
 
             UpdateForm();
         }
@@ -425,6 +530,16 @@ namespace SceneGraphPlus
             }
         }
 
+        public void OpenPackage(DBPFKey keyToOpen)
+        {
+            string packagePath = downloadsSgCache.GetPackagePath(keyToOpen) ?? savedsimsSgCache.GetPackagePath(keyToOpen);
+
+            if (packagePath != null)
+            {
+                AddPackages(new string[] { packagePath });
+            }
+        }
+
         private void OnSelectClicked(object sender, EventArgs e)
         {
             selectFileDialog.FileName = "*.package";
@@ -436,7 +551,7 @@ namespace SceneGraphPlus
 
         private void AddPackages(string[] packageFiles, bool reloading = false)
         {
-            // TODO - SceneGraph Plus - 4 - should really do this on a background thread
+            // Should probably do this on a background thread
             foreach (string packageFile in packageFiles)
             {
                 AddPackage(packageFile, reloading);
@@ -562,7 +677,7 @@ namespace SceneGraphPlus
 
         private AbstractGraphBlock AddBlockByEntry(DBPFFile package, BlockRef blockRef, DBPFEntry entry, ref int freeCol, AbstractGraphBlock parentBlock = null)
         {
-            AbstractGraphBlock startBlock = new RoundedRect(surface, blockRef) { Text = DBPFData.TypeName(blockRef.TypeId), Centre = new Point(freeCol, RowForType(blockRef.TypeId)), FillColour = ColourForType(blockRef.TypeId) };
+            AbstractGraphBlock startBlock = new RoundedBlock(surface, blockRef) { Text = DBPFData.TypeName(blockRef.TypeId), Centre = new Point(freeCol, RowForType(blockRef.TypeId)), FillColour = ColourForType(blockRef.TypeId) };
 
             ProcessBlock(startBlock, package, entry, ref freeCol, parentBlock);
 
@@ -589,6 +704,8 @@ namespace SceneGraphPlus
             if (res == null)
             {
                 startBlock.IsMissing = true;
+
+                startBlock.IsAvailable = IsAvailable(startBlock.Key);
             }
             else if (res is Str str)
             {
@@ -624,6 +741,15 @@ namespace SceneGraphPlus
             {
                 startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(aged.Age)}{CpfHelper.GenderCode(aged.Gender)}";
                 startBlock.BlockName = $"{CpfHelper.AgeName(aged.Age)} {CpfHelper.GenderName(aged.Gender)}".ToLower();
+
+                foreach (DBPFEntry objdEntry in package.GetEntriesByType(Objd.TYPE))
+                {
+                    if (objdEntry.GroupID == res.GroupID)
+                    {
+                        startBlock.BlockName = package.GetFilenameByEntry(objdEntry);
+                        break;
+                    }
+                }
 
                 Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
 
@@ -1135,6 +1261,61 @@ namespace SceneGraphPlus
         private void OnSaveAll(object sender, EventArgs e)
         {
             surface.SaveAll(menuItemAutoBackup.Checked, menuItemSetOptionalNames.Checked, menuItemClearOptionalNames.Checked, menuItemPrefixOptionalNames.Checked, menuItemPrefixLowerCase.Checked);
+        }
+
+        #region Meshes Cache
+        private bool meshCachesLoaded = false;
+        private bool meshCachesLoading = false;
+        private SceneGraphCache downloadsSgCache;
+        private SceneGraphCache savedsimsSgCache;
+
+        private void OnLoadMeshesNowClicked(object sender, EventArgs e)
+        {
+            CacheMeshes();
+            UpdateForm();
+        }
+
+        private void OnPreloadMeshesClicked(object sender, EventArgs e)
+        {
+            if (menuItemPreloadMeshes.Checked && !meshCachesLoaded)
+            {
+                CacheMeshes();
+            }
+        }
+
+        private void CacheMeshes()
+        {
+            if (!meshCachesLoaded && !meshCachesLoading)
+            {
+                int usableCores = Math.Max(1, System.Environment.ProcessorCount - 2);
+                SemaphoreSlim throttler = new SemaphoreSlim(initialCount: usableCores);
+
+                meshCachesLoading = true;
+
+                List<Task> cacheTasks = new List<Task>(2)
+                {
+                    downloadsSgCache.DeserializeAsync(throttler),
+                    savedsimsSgCache.DeserializeAsync(throttler)
+                };
+
+                Task.WhenAll(cacheTasks).ContinueWith(t =>
+                {
+                    // Run on the main thread (using any available button)
+                    btnFixIssues.BeginInvoke((Action)(() =>
+                    {
+                        meshCachesLoaded = true;
+                        meshCachesLoading = false;
+                        UpdateAvailableBlocks();
+                        UpdateForm();
+                    }));
+                });
+            }
+        }
+        #endregion
+
+        private void OnOptionsMenuOpening(object sender, EventArgs e)
+        {
+            menuItemLoadMeshesNow.Enabled = !(meshCachesLoaded || meshCachesLoading);
         }
     }
 }

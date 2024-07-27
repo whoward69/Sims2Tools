@@ -185,5 +185,8 @@
     <Setting Name="AgedRow" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
+    <Setting Name="AvailableEdgeColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Gray</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
