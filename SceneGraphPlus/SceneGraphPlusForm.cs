@@ -469,6 +469,27 @@ namespace SceneGraphPlus
             return cigenCache?.GetThumbnail(key);
         }
 
+        public string GetAvailablePath(DBPFKey key)
+        {
+            string availablePath = downloadsSgCache.GetPackagePath(key);
+
+            if (availablePath != null)
+            {
+                availablePath = availablePath.Substring(Sims2ToolsLib.Sims2DownloadsPath.Length + 1);
+            }
+            else
+            {
+                availablePath = savedsimsSgCache.GetPackagePath(key);
+
+                if (availablePath != null)
+                {
+                    availablePath = availablePath.Substring($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims".Length + 1);
+                }
+            }
+
+            return availablePath ?? "";
+        }
+
         private void Reset()
         {
             blockCache.Clear();

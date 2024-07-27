@@ -170,11 +170,14 @@ namespace Sims2Tools.DBPF.BHAV
 
         public string DiffString(SortedDictionary<string, string> primNames)
         {
-            string opCode = Helper.Hex2PrefixString(opcode);
-
-            if (primNames.ContainsKey(opCode))
+            if (opcode <= 0x00FF)
             {
-                return $"{primNames[opCode]}; NV:{nodeversion}; Operands:{Helper.Hex2PrefixString(operands[0])},{Helper.Hex2PrefixString(operands[1])},{Helper.Hex2PrefixString(operands[2])},{Helper.Hex2PrefixString(operands[3])},{Helper.Hex2PrefixString(operands[4])},{Helper.Hex2PrefixString(operands[5])},{Helper.Hex2PrefixString(operands[6])},{Helper.Hex2PrefixString(operands[7])},{Helper.Hex2PrefixString(operands[8])},{Helper.Hex2PrefixString(operands[9])},{Helper.Hex2PrefixString(operands[10])},{Helper.Hex2PrefixString(operands[11])},{Helper.Hex2PrefixString(operands[12])},{Helper.Hex2PrefixString(operands[13])},{Helper.Hex2PrefixString(operands[14])},{Helper.Hex2PrefixString(operands[15])}; True:{GetDeltaTarget(index, TrueTarget)}; False:{GetDeltaTarget(index, FalseTarget)}";
+                string opCode = Helper.Hex2PrefixString(opcode);
+
+                if (primNames.ContainsKey(opCode))
+                {
+                    return $"{primNames[opCode]}; NV:{nodeversion}; Operands:{Helper.Hex2PrefixString(operands[0])},{Helper.Hex2PrefixString(operands[1])},{Helper.Hex2PrefixString(operands[2])},{Helper.Hex2PrefixString(operands[3])},{Helper.Hex2PrefixString(operands[4])},{Helper.Hex2PrefixString(operands[5])},{Helper.Hex2PrefixString(operands[6])},{Helper.Hex2PrefixString(operands[7])},{Helper.Hex2PrefixString(operands[8])},{Helper.Hex2PrefixString(operands[9])},{Helper.Hex2PrefixString(operands[10])},{Helper.Hex2PrefixString(operands[11])},{Helper.Hex2PrefixString(operands[12])},{Helper.Hex2PrefixString(operands[13])},{Helper.Hex2PrefixString(operands[14])},{Helper.Hex2PrefixString(operands[15])}; True:{GetDeltaTarget(index, TrueTarget)}; False:{GetDeltaTarget(index, FalseTarget)}";
+                }
             }
 
             return DiffString();

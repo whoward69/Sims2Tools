@@ -653,7 +653,12 @@ namespace SceneGraphPlus.Shapes
 
         public override string ToolTip
         {
-            get => $"{(BlockName ?? SgFullName)}\r\n{((Key != null) ? Key.ToString() : SgFullName)} {(IsMissing ? "from" : "in")} {BlockRef.PackageName}";
+            get
+            {
+                string name = BlockName ?? SgFullName;
+
+                return $"{name}{(name != null ? "\r\n" : "")}{((Key != null) ? Key.ToString() : SgFullName)} {(IsMissing ? "from" : "in")} {BlockRef.PackageName}";
+            }
         }
 
         public override Point Centre

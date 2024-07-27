@@ -750,27 +750,34 @@ namespace SceneGraphPlus.Surface
                         item.Visible = false;
                     }
 
+                    e.Cancel = true;
+
                     if (contextBlock.IsAvailable)
                     {
                         menuItemContextOpenPackage.Visible = true;
                         menuItemContextOpenPackage.Enabled = true;
+
+                        e.Cancel = false;
                     }
-                    else if (contextBlock.IsMaxis && contextBlock.TypeId == Cres.TYPE)
+
+                    if (contextBlock.IsMaxis && contextBlock.TypeId == Cres.TYPE)
                     {
                         if (GameData.GetMaxisResource(contextBlock.TypeId, contextBlock.Key) != null)
                         {
                             menuItemContextExtract.Text = "Extract Maxis Mesh";
                             menuItemContextExtract.Visible = true;
                             menuItemContextExtract.Enabled = true;
-                        }
-                        else
-                        {
-                            e.Cancel = true;
+
+                            e.Cancel = false;
                         }
                     }
-                    else
+
+                    if (advancedMode && contextBlock.GetInConnectors().Count > 1)
                     {
-                        e.Cancel = true;
+                        menuItemContextSplitBlock.Visible = true;
+                        menuItemContextSplitBlock.Enabled = true;
+
+                        e.Cancel = false;
                     }
                 }
             }
@@ -1505,7 +1512,7 @@ namespace SceneGraphPlus.Surface
 
                         if (Form.ModifierKeys == Keys.Shift)
                         {
-                            thumbnail = owningForm.GetThumbnail(currentHoverBlock.Key);
+                            thumbnail = owningForm.GetThumbnail(hoverBlock.Key);
 
                             if (thumbnail != null)
                             {
@@ -1521,6 +1528,11 @@ namespace SceneGraphPlus.Surface
 
                             if (!string.IsNullOrEmpty(toolTip))
                             {
+                                if (hoverBlock.IsAvailable)
+                                {
+                                    toolTip = $"{toolTip}\r\nin {owningForm.GetAvailablePath(hoverBlock.Key)}";
+                                }
+
                                 lblTooltip.Location = popupLocation;
                                 lblTooltip.Text = toolTip;
                                 lblTooltip.Visible = true;
