@@ -109,5 +109,11 @@ namespace SceneGraphPlus.Dialogs
                 (sender as CheckBox).Checked = true;
             }
         }
+
+        private void OnAllClicked(object sender, EventArgs e)
+        {
+            ckbGenderFemale.Checked = ckbGenderMale.Checked = ckbGenderUnisex.Checked = true;
+            ckbAgeBabies.Checked = ckbAgeToddlers.Checked = ckbAgeChildren.Checked = ckbAgeTeens.Checked = ckbAgeYoungAdults.Checked = ckbAgeAdults.Checked = ckbAgeElders.Checked = true;
+        }
     }
 }

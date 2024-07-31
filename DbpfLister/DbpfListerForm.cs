@@ -1,11 +1,13 @@
 ﻿using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
+using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Groups;
 using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.IDR;
@@ -58,7 +60,9 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
-            FindCresNonShpeRefs("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+            FindAgedNonLsOne("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // FindCresNonShpeRefs("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
             /*
             FindNodeVersions("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Double Deluxe\\Base\\TSData\\Res\\Objects\\objects.package");
@@ -637,6 +641,53 @@ namespace DbpfLister
                                 if (!"meshoverlay".Equals(xmol.GetItem("type")?.StringValue.ToLower()))
                                 {
                                     textMessages.AppendText($"{entry} - {packagePath}\r\n");
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                                textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+        }
+
+        private void FindAgedNonLsOne(string baseFolder)
+        {
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Aged.TYPE))
+                        {
+                            try
+                            {
+                                Aged aged = (Aged)package.GetResourceByEntry(entry);
+
+                                CpfItem item = aged.GetItem("listcnt");
+
+                                if (item != null)
+                                {
+                                    int cnt = (int)item.UIntegerValue;
+
+                                    for (int i = 0; i < cnt; ++i)
+                                    {
+                                        string lsValue = aged.GetItem($"ls{i}")?.StringValue;
+
+                                        if (!string.IsNullOrEmpty(lsValue) && !lsValue.Equals("1"))
+                                        {
+                                            textMessages.AppendText($"{entry} - {packagePath}\r\n");
+                                        }
+                                    }
                                 }
                             }
                             catch (Exception e2)

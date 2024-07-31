@@ -205,7 +205,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Gray")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DarkGray")]
         public string MaxisBlockColour {
             get {
                 return ((string)(this["MaxisBlockColour"]));
@@ -757,7 +757,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Gray")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DimGray")]
         public string AvailableEdgeColour {
             get {
                 return ((string)(this["AvailableEdgeColour"]));

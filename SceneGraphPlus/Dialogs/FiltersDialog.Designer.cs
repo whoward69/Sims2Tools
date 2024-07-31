@@ -53,6 +53,7 @@ namespace SceneGraphPlus.Dialogs
             this.btnOK = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnRealign = new System.Windows.Forms.Button();
+            this.btnAll = new System.Windows.Forms.Button();
             this.grpAge.SuspendLayout();
             this.grpGender.SuspendLayout();
             this.grpSubset.SuspendLayout();
@@ -234,7 +235,7 @@ namespace SceneGraphPlus.Dialogs
             // btnApply
             // 
             this.btnApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnApply.Location = new System.Drawing.Point(340, 124);
+            this.btnApply.Location = new System.Drawing.Point(252, 122);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(82, 26);
             this.btnApply.TabIndex = 29;
@@ -245,7 +246,7 @@ namespace SceneGraphPlus.Dialogs
             // btnRealign
             // 
             this.btnRealign.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRealign.Location = new System.Drawing.Point(252, 124);
+            this.btnRealign.Location = new System.Drawing.Point(340, 122);
             this.btnRealign.Name = "btnRealign";
             this.btnRealign.Size = new System.Drawing.Size(82, 26);
             this.btnRealign.TabIndex = 30;
@@ -253,10 +254,22 @@ namespace SceneGraphPlus.Dialogs
             this.btnRealign.UseVisualStyleBackColor = true;
             this.btnRealign.Click += new System.EventHandler(this.OnRealign);
             // 
+            // btnAll
+            // 
+            this.btnAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnAll.Location = new System.Drawing.Point(57, 157);
+            this.btnAll.Name = "btnAll";
+            this.btnAll.Size = new System.Drawing.Size(82, 26);
+            this.btnAll.TabIndex = 31;
+            this.btnAll.Text = "All";
+            this.btnAll.UseVisualStyleBackColor = true;
+            this.btnAll.Click += new System.EventHandler(this.OnAllClicked);
+            // 
             // FiltersDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.ClientSize = new System.Drawing.Size(434, 194);
+            this.Controls.Add(this.btnAll);
             this.Controls.Add(this.btnRealign);
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.btnOK);
@@ -269,7 +282,7 @@ namespace SceneGraphPlus.Dialogs
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FiltersDialog";
-            this.Text = "Filters";
+            this.Text = "Filters - AGED/GZPS/XMOL/XTOL only";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
             this.Load += new System.EventHandler(this.OnLoad);
             this.grpAge.ResumeLayout(false);
@@ -300,5 +313,6 @@ namespace SceneGraphPlus.Dialogs
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnApply;
         private System.Windows.Forms.Button btnRealign;
+        private System.Windows.Forms.Button btnAll;
     }
 }

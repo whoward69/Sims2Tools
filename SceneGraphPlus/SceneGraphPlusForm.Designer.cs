@@ -283,6 +283,7 @@ namespace SceneGraphPlus
             // menuItemFilters
             // 
             this.menuItemFilters.Name = "menuItemFilters";
+            this.menuItemFilters.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
             this.menuItemFilters.Size = new System.Drawing.Size(281, 22);
             this.menuItemFilters.Text = "&Filters...";
             this.menuItemFilters.Click += new System.EventHandler(this.OnFilterBlocks);

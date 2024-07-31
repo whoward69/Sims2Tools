@@ -130,11 +130,11 @@ namespace SceneGraphPlus.Cache
         public string PackagePath => packagePath;
         public string PackageName => packageName;
 
-        private string NormalizeSgName(TypeTypeID typeId, TypeGroupID groupId, string sgName, bool prefixLowerCase)
+        public static string NormalizeSgName(TypeTypeID typeId, TypeGroupID groupId, string sgName, bool prefixLowerCase)
         {
             if (sgName == null) return null;
 
-            if (!sgName.StartsWith("##"))
+            if (!sgName.StartsWith("##") && groupId != DBPFData.GROUP_SG_MAXIS)
             {
                 if (prefixLowerCase)
                 {
@@ -151,6 +151,26 @@ namespace SceneGraphPlus.Cache
             if (!sgName.EndsWith(typeName, StringComparison.OrdinalIgnoreCase))
             {
                 sgName = $"{sgName}{typeName}";
+            }
+
+            return sgName;
+        }
+
+        public static string MinimiseSgName(string sgName)
+        {
+            if (sgName == null) return null;
+
+            int pos = sgName.IndexOf("!");
+            if (pos != -1)
+            {
+                sgName = sgName.Substring(pos + 1);
+            }
+
+            pos = sgName.LastIndexOf("_");
+
+            if (pos != -1)
+            {
+                sgName = sgName.Substring(0, pos);
             }
 
             return sgName;

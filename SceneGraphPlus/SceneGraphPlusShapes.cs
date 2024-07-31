@@ -559,27 +559,7 @@ namespace SceneGraphPlus.Shapes
             SetDirty();
         }
 
-        public string SgBaseName
-        {
-            get
-            {
-                string sgFullName = SgFullName;
-
-                if (sgFullName == null) return null;
-
-                int pos = sgFullName.IndexOf("!");
-
-                if (pos == -1) return sgFullName;
-
-                string sgName = sgFullName.Substring(pos + 1);
-
-                pos = sgName.LastIndexOf("_");
-
-                if (pos == -1) return sgName;
-
-                return sgName.Substring(0, pos);
-            }
-        }
+        public string SgBaseName => BlockRef.MinimiseSgName(SgFullName);
 
         public bool HasIssues => !IsDirty && !(IsFileListValid && IsLightValid);
 

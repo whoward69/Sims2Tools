@@ -55,6 +55,8 @@ using System.Windows.Forms;
 
 namespace SceneGraphPlus
 {
+    // TODO - SceneGraph Plus - 2 - right-click on a missing/maxis block to manually enter new G-R-I values
+
     public partial class SceneGraphPlusForm : Form
     {
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -204,6 +206,7 @@ namespace SceneGraphPlus
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
 
             if (textureDialog != null && !textureDialog.IsDisposed) textureDialog.Close();
+            if (filtersDialog != null && !filtersDialog.IsDisposed) filtersDialog.Close();
         }
 
         private void OnFormResize(object sender, EventArgs e)
@@ -344,7 +347,23 @@ namespace SceneGraphPlus
 
         public bool IsAvailable(DBPFKey key)
         {
-            return (meshCachesLoaded && (downloadsSgCache.GetPackagePath(key) ?? savedsimsSgCache.GetPackagePath(key)) != null);
+            bool available = false;
+
+            // Only check if the user has committed to loading the mesh caches - both for custom and Maxis resources
+            if (key != null && meshCachesLoaded)
+            {
+                available = (downloadsSgCache.GetPackagePath(key) ?? savedsimsSgCache.GetPackagePath(key)) != null;
+
+                if (!available)
+                {
+                    if (key.GroupID == DBPFData.GROUP_GZPS_MAXIS || key.GroupID == DBPFData.GROUP_SG_MAXIS)
+                    {
+                        available = GameData.GetMaxisPackagePath(key.TypeID, key) != null;
+                    }
+                }
+            }
+
+            return available;
         }
 
         public void UpdateEditor(AbstractGraphBlock block)
@@ -366,28 +385,6 @@ namespace SceneGraphPlus
             if (block == null) return;
 
             ignoreUpdates = true;
-
-            if (!block.IsMaxis)
-            {
-                if (block.IsMissing)
-                {
-                    if (meshCachesLoaded)
-                    {
-                        string cachePackagePath = downloadsSgCache.GetPackagePath(block.Key) ?? savedsimsSgCache.GetPackagePath(block.Key);
-
-                        if (cachePackagePath != null)
-                        {
-                            textBlockPackagePath.Text = cachePackagePath;
-                        }
-                    }
-                }
-                else
-                {
-                    textBlockPackagePath.Text = block.PackagePath;
-                }
-            }
-
-            textBlockKey.Text = block.KeyName;
 
             if (block.BlockName != null)
             {
@@ -413,6 +410,109 @@ namespace SceneGraphPlus
 
                 btnFixTgi.Visible = !block.IsTgirValid;
                 btnFixIssues.Visible = !btnFixTgi.Visible && block.HasIssues;
+            }
+
+            textBlockKey.Text = block.KeyName;
+
+            if (!block.IsMaxis)
+            {
+                if (block.IsMissing)
+                {
+                    if (meshCachesLoaded)
+                    {
+                        string cachePackagePath = downloadsSgCache.GetPackagePath(block.Key) ?? savedsimsSgCache.GetPackagePath(block.Key);
+
+                        if (cachePackagePath != null)
+                        {
+                            textBlockPackagePath.Text = cachePackagePath;
+
+                            using (DBPFFile cachePackage = new DBPFFile(cachePackagePath))
+                            {
+                                DBPFResource res = cachePackage.GetResourceByKey(block.Key);
+
+                                if (res != null)
+                                {
+                                    string blockName = GetResourceName(res);
+                                    if (blockName != null)
+                                    {
+                                        textBlockName.Text = blockName;
+                                        lblBlockName.Visible = textBlockName.Visible = true;
+                                        textBlockName.ReadOnly = true;
+                                        textBlockName.BorderStyle = BorderStyle.FixedSingle;
+                                    }
+                                    else
+                                    {
+
+                                    }
+
+                                    string blockSgName = GetResourceSgName(res);
+                                    if (blockSgName != null)
+                                    {
+                                        textBlockSgName.Text = BlockRef.MinimiseSgName(blockSgName);
+                                        textBlockSgName.ReadOnly = true;
+                                        textBlockSgName.BorderStyle = BorderStyle.FixedSingle;
+
+                                        textBlockFullSgName.Text = BlockRef.NormalizeSgName(res.TypeID, res.GroupID, blockSgName, menuItemPrefixLowerCase.Checked); ;
+                                    }
+                                    else
+                                    {
+                                        lblBlockSgName.Visible = textBlockSgName.Visible = false;
+                                    }
+                                }
+
+                                cachePackage.Close();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    textBlockPackagePath.Text = block.PackagePath;
+                }
+            }
+            else
+            {
+                if (meshCachesLoaded)
+                {
+                    string maxisPackagePath = GameData.GetMaxisPackagePath(block.TypeId, block.Key);
+
+                    if (maxisPackagePath != null)
+                    {
+                        textBlockPackagePath.Text = maxisPackagePath;
+
+                        DBPFResource maxisRes = GameData.GetMaxisResource(block.TypeId, block.Key, true);
+
+                        if (maxisRes != null)
+                        {
+                            string blockName = GetResourceName(maxisRes);
+                            if (blockName != null)
+                            {
+                                textBlockName.Text = blockName;
+                                lblBlockName.Visible = textBlockName.Visible = true;
+                                textBlockName.ReadOnly = true;
+                                textBlockName.BorderStyle = BorderStyle.FixedSingle;
+                            }
+                            else
+                            {
+
+                            }
+
+                            string blockSgName = GetResourceSgName(maxisRes);
+                            if (blockSgName != null)
+                            {
+                                textBlockSgName.Text = BlockRef.MinimiseSgName(blockSgName);
+                                textBlockSgName.ReadOnly = true;
+                                textBlockSgName.BorderStyle = BorderStyle.FixedSingle;
+
+                                textBlockFullSgName.Text = BlockRef.NormalizeSgName(maxisRes.TypeID, maxisRes.GroupID, blockSgName, menuItemPrefixLowerCase.Checked); ;
+                            }
+                            else
+                            {
+                                lblBlockSgName.Visible = textBlockSgName.Visible = false;
+                            }
+                        }
+                    }
+                }
             }
 
             if (textureDialog != null && !textureDialog.IsDisposed && textureDialog.Visible)
@@ -721,112 +821,374 @@ namespace SceneGraphPlus
         {
             DBPFResource res = package.GetResourceByEntry(entry);
 
-            // "UnderstoodTypes" - when adding a new resource type, need to update this block
             if (res == null)
             {
                 startBlock.IsMissing = true;
 
                 startBlock.IsAvailable = IsAvailable(startBlock.Key);
             }
-            else if (res is Str str)
+            else
             {
-                startBlock.BlockName = str.KeyName;
+                string blockName = GetResourceName(res);
+                if (blockName != null) startBlock.BlockName = blockName;
 
-                TypeTypeID connectionTypeId = (entry.InstanceID == (TypeInstanceID)0x0085) ? Cres.TYPE : Txmt.TYPE;
+                string blockSgName = GetResourceSgName(res);
+                if (blockSgName != null) startBlock.UpdateSgName(blockSgName, menuItemPrefixLowerCase.Checked);
 
-                List<StrItem> items = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default);
-
-                for (int index = 0; index < items.Count; ++index)
+                // "UnderstoodTypes" - when adding a new resource type, need to update this block
+                if (res is Str str)
                 {
-                    string link = items[index].Title;
+                    TypeTypeID connectionTypeId = (entry.InstanceID == (TypeInstanceID)0x0085) ? Cres.TYPE : Txmt.TYPE;
 
-                    if (!string.IsNullOrEmpty(link))
+                    List<StrItem> items = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default);
+
+                    for (int index = 0; index < items.Count; ++index)
                     {
-                        startBlock.ConnectTo(index, null, AddBlockByKey(package, new BlockRef(package, connectionTypeId, DBPFData.GROUP_SG_MAXIS, link, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        string link = items[index].Title;
 
-                        freeCol += DrawingSurface.ColumnGap;
-                    }
-                }
-            }
-            else if (res is Mmat mmat)
-            {
-                startBlock.BlockName = mmat.Name;
-
-                startBlock.ConnectTo(0, "model", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("modelName").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-
-                freeCol += DrawingSurface.ColumnGap;
-
-                startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("name").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-            }
-            else if (res is Aged aged)
-            {
-                startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(aged.Age)}{CpfHelper.GenderCode(aged.Gender)}";
-                startBlock.BlockName = $"{CpfHelper.AgeName(aged.Age)} {CpfHelper.GenderName(aged.Gender)}".ToLower();
-
-                foreach (DBPFEntry objdEntry in package.GetEntriesByType(Objd.TYPE))
-                {
-                    if (objdEntry.GroupID == res.GroupID)
-                    {
-                        startBlock.BlockName = package.GetFilenameByEntry(objdEntry);
-                        break;
-                    }
-                }
-
-                Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
-
-                if (idr != null)
-                {
-                    int index = 0;
-
-                    foreach (DBPFKey itemKey in idr.Items)
-                    {
-                        if (UnderstoodTypeIds.Contains(itemKey.TypeID))
+                        if (!string.IsNullOrEmpty(link))
                         {
-                            AbstractGraphConnector connector = startBlock.ConnectTo(index, null, AddBlockByKey(package, new BlockRef(package, itemKey.TypeID, itemKey), ref freeCol));
-
-                            if (connector.EndBlock.TypeId == Gzps.TYPE && connector.EndBlock.SoleParent != null)
-                            {
-                                connector.EndBlock.Centre = new Point(connector.EndBlock.Centre.X, connector.EndBlock.Centre.Y + DrawingSurface.RowGap / 2);
-                            }
+                            startBlock.ConnectTo(index, null, AddBlockByKey(package, new BlockRef(package, connectionTypeId, DBPFData.GROUP_SG_MAXIS, link, menuItemPrefixLowerCase.Checked), ref freeCol));
 
                             freeCol += DrawingSurface.ColumnGap;
                         }
-
-                        index++;
                     }
                 }
-            }
-            else if (res is Gzps gzps)
-            {
-                startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(gzps.Age)}{CpfHelper.GenderCode(gzps.Gender)}";
-                startBlock.BlockName = gzps.Name;
-
-                uint entries = gzps.GetItem("numoverrides").UIntegerValue;
-
-                if (entries >= 1)
+                else if (res is Mmat mmat)
                 {
-                    startBlock.Text = $"{startBlock.Text}\n{gzps.GetItem($"override0subset").StringValue}";
+                    startBlock.ConnectTo(0, "model", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("modelName").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+
+                    freeCol += DrawingSurface.ColumnGap;
+
+                    startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("name").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
                 }
-
-                Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
-
-                if (idr != null)
+                else if (res is Aged aged)
                 {
-                    startBlock.ConnectTo(0, "model", AddBlockByKey(package, new BlockRef(package, Cres.TYPE, idr.GetItem(gzps.GetItem("resourcekeyidx").UIntegerValue)), ref freeCol));
+                    startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(aged.Age)}{CpfHelper.GenderCode(aged.Gender)}";
 
-                    freeCol += DrawingSurface.ColumnGap;
-
-                    startBlock.ConnectTo(0, "shape", AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, idr.GetItem(gzps.GetItem("shapekeyidx").UIntegerValue)), ref freeCol));
-
-                    freeCol += DrawingSurface.ColumnGap;
-
-                    for (int index = 0; index < entries; ++index)
+                    foreach (DBPFEntry objdEntry in package.GetEntriesByType(Objd.TYPE))
                     {
-                        startBlock.ConnectTo(index, gzps.GetItem($"override{index}subset").StringValue, AddBlockByKey(package, new BlockRef(package, Txmt.TYPE, idr.GetItem(gzps.GetItem($"override{index}resourcekeyidx").UIntegerValue)), ref freeCol));
+                        if (objdEntry.GroupID == res.GroupID)
+                        {
+                            startBlock.BlockName = package.GetFilenameByEntry(objdEntry);
+                            break;
+                        }
+                    }
+
+                    Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+
+                    if (idr != null)
+                    {
+                        startBlock.ConnectTo(0, "skeleton", AddBlockByKey(package, new BlockRef(package, Cres.TYPE, idr.GetItem(aged.GetItem("skeletonkeyidx").UIntegerValue)), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+
+                        uint entries = aged.GetItem("listcnt").UIntegerValue;
+
+                        for (int index = 0; index < entries; ++index)
+                        {
+                            string lsValue = aged.GetItem($"ls{index}").StringValue;
+
+                            if (lsValue != null)
+                            {
+                                try
+                                {
+                                    uint subEntries = UInt32.Parse(lsValue);
+
+                                    for (int subIndex = 0; subIndex < subEntries; ++subIndex)
+                                    {
+                                        uint itemIndex = aged.GetItem($"le{index}_{subIndex}").UIntegerValue;
+                                        DBPFKey itemKey = idr.GetItem(itemIndex);
+
+                                        if (UnderstoodTypeIds.Contains(itemKey.TypeID))
+                                        {
+                                            string label = DecodeLkValue(aged.GetItem($"lk{index}").StringValue);
+
+                                            AbstractGraphConnector connector = startBlock.ConnectTo((int)itemIndex, label, AddBlockByKey(package, new BlockRef(package, itemKey.TypeID, itemKey), ref freeCol));
+
+                                            if (connector.EndBlock.TypeId == Gzps.TYPE && connector.EndBlock.SoleParent != null)
+                                            {
+                                                connector.EndBlock.Centre = new Point(connector.EndBlock.Centre.X, connector.EndBlock.Centre.Y + DrawingSurface.RowGap / 2);
+                                            }
+
+                                            freeCol += DrawingSurface.ColumnGap;
+                                        }
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    logger.Warn($"{aged}: ls{index}=\"{lsValue}\" is not a number!");
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (res is Gzps gzps)
+                {
+                    startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(gzps.Age)}{CpfHelper.GenderCode(gzps.Gender)}";
+
+                    uint entries = gzps.GetItem("numoverrides").UIntegerValue;
+
+                    if (entries >= 1)
+                    {
+                        startBlock.Text = $"{startBlock.Text}\n{gzps.GetItem($"override0subset").StringValue}";
+                    }
+
+                    Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+
+                    if (idr != null)
+                    {
+                        startBlock.ConnectTo(0, "model", AddBlockByKey(package, new BlockRef(package, Cres.TYPE, idr.GetItem(gzps.GetItem("resourcekeyidx").UIntegerValue)), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+
+                        startBlock.ConnectTo(0, "shape", AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, idr.GetItem(gzps.GetItem("shapekeyidx").UIntegerValue)), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+
+                        for (int index = 0; index < entries; ++index)
+                        {
+                            startBlock.ConnectTo(index, gzps.GetItem($"override{index}subset").StringValue, AddBlockByKey(package, new BlockRef(package, Txmt.TYPE, idr.GetItem(gzps.GetItem($"override{index}resourcekeyidx").UIntegerValue)), ref freeCol));
+
+                            freeCol += DrawingSurface.ColumnGap;
+                        }
+                    }
+                }
+                else if (res is Xfnc xfnc)
+                {
+                    string type = xfnc.GetItem("type")?.StringValue?.ToLower();
+
+                    if (type != null && type.Equals("fence"))
+                    {
+                        startBlock.ConnectTo(0, "post", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("post").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        freeCol += DrawingSurface.ColumnGap;
+                        startBlock.ConnectTo(1, "rail", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("rail").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        freeCol += DrawingSurface.ColumnGap;
+                        startBlock.ConnectTo(2, "diagrail", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("diagrail").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
 
                         freeCol += DrawingSurface.ColumnGap;
                     }
                 }
+                else if (res is Xmol xmol)
+                {
+                    string type = xmol.GetItem("type")?.StringValue?.ToLower();
+
+                    if (type != null && type.Equals("meshoverlay"))
+                    {
+                        startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(xmol.Age)}{CpfHelper.GenderCode(xmol.Gender)}";
+
+                        Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+
+                        if (idr != null)
+                        {
+                            startBlock.ConnectTo(0, "mesh", AddBlockByKey(package, new BlockRef(package, Cres.TYPE, idr.GetItem(xmol.GetItem("resourcekeyidx").UIntegerValue)), ref freeCol));
+                            freeCol += DrawingSurface.ColumnGap;
+                            startBlock.ConnectTo(1, "mask", AddBlockByKey(package, new BlockRef(package, Cres.TYPE, idr.GetItem(xmol.GetItem("maskresourcekeyidx").UIntegerValue)), ref freeCol));
+
+                            freeCol += DrawingSurface.ColumnGap;
+
+                            startBlock.ConnectTo(0, "mesh", AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, idr.GetItem(xmol.GetItem("shapekeyidx").UIntegerValue)), ref freeCol));
+                            freeCol += DrawingSurface.ColumnGap;
+                            startBlock.ConnectTo(1, "mask", AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, idr.GetItem(xmol.GetItem("maskshapekeyidx").UIntegerValue)), ref freeCol));
+
+                            freeCol += DrawingSurface.ColumnGap;
+
+                            uint entries = xmol.GetItem("numoverrides").UIntegerValue;
+
+                            for (int index = 0; index < entries; ++index)
+                            {
+                                startBlock.ConnectTo(index, xmol.GetItem($"override{index}subset").StringValue, AddBlockByKey(package, new BlockRef(package, Txmt.TYPE, idr.GetItem(xmol.GetItem($"override{index}resourcekeyidx").UIntegerValue)), ref freeCol));
+
+                                freeCol += DrawingSurface.ColumnGap;
+                            }
+                        }
+                    }
+                }
+                else if (res is Xtol xtol)
+                {
+                    string type = xtol.GetItem("type")?.StringValue?.ToLower();
+
+                    if (type != null && type.Equals("textureoverlay"))
+                    {
+                        startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(xtol.Age)}{CpfHelper.GenderCode(xtol.Gender)}";
+
+                        Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+
+                        if (idr != null)
+                        {
+                            startBlock.ConnectTo(0, "material", AddBlockByKey(package, new BlockRef(package, Txmt.TYPE, idr.GetItem(xtol.GetItem("materialkeyidx").UIntegerValue)), ref freeCol));
+
+                            freeCol += DrawingSurface.ColumnGap;
+                        }
+                    }
+                }
+                else if (res is Xobj xobj)
+                {
+                    string type = xobj.GetItem("type")?.StringValue?.ToLower();
+
+                    if (type != null && (type.Equals("wall") || type.Equals("floor")))
+                    {
+                        startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, xobj.GetItem("material").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+                }
+                else if (res is Xrof xrof)
+                {
+                    string type = xrof.GetItem("type")?.StringValue?.ToLower();
+
+                    if (type != null && (type.Equals("roof")))
+                    {
+                        startBlock.ConnectTo(0, "texturetop", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetop").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        freeCol += DrawingSurface.ColumnGap;
+                        startBlock.ConnectTo(1, "texturetopbump", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetopbump").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        freeCol += DrawingSurface.ColumnGap;
+                        startBlock.ConnectTo(2, "textureedges", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("textureedges").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        freeCol += DrawingSurface.ColumnGap;
+                        startBlock.ConnectTo(3, "texturetrim", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetrim").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        freeCol += DrawingSurface.ColumnGap;
+                        startBlock.ConnectTo(4, "textureunder", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("textureunder").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+                }
+                else if (res is Xflr xflr)
+                {
+                    string type = xflr.GetItem("type")?.StringValue?.ToLower();
+
+                    if (type != null && (type.Equals("terrainpaint")))
+                    {
+                        startBlock.ConnectTo(0, "texturetname", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xflr.GetItem("texturetname").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        freeCol += DrawingSurface.ColumnGap;
+                        AbstractGraphConnector detailConnector = startBlock.ConnectTo(1, "texturetname_detail", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, $"{xflr.GetItem("texturetname").StringValue}_detail", menuItemPrefixLowerCase.Checked), ref freeCol));
+
+                        detailConnector.EndBlock.IsEditable = false;
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+                }
+                else if (res is Cres cres)
+                {
+                    // NOTE - a CRES can also reference another CRES, but only seen in Maxis lot packages
+
+                    int index = 0;
+                    foreach (DBPFKey shpeKey in cres.ShpeKeys)
+                    {
+                        startBlock.ConnectTo(index++, null, AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, shpeKey), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+
+                    if (cres.ShpeKeys.Count > 0) freeCol -= DrawingSurface.ColumnGap;
+
+                    index = 0;
+                    foreach (DBPFKey lghtKey in cres.LghtKeys)
+                    {
+                        AbstractGraphBlock lightBlock = AddBlockByKey(package, new BlockRef(package, lghtKey.TypeID, lghtKey), ref freeCol, startBlock);
+
+                        startBlock.ConnectTo(index++, lightBlock.strData, lightBlock);
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+
+                    if (cres.LghtKeys.Count > 0) freeCol -= DrawingSurface.ColumnGap;
+                }
+                else if (res is Shpe shpe)
+                {
+                    int index = 0;
+                    foreach (string gmndName in shpe.GmndNames)
+                    {
+                        startBlock.ConnectTo(index++, null, AddBlockByName(package, new BlockRef(package, Gmnd.TYPE, DBPFData.GROUP_SG_MAXIS, gmndName, menuItemPrefixLowerCase.Checked), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+
+                    IReadOnlyDictionary<string, string> txmtKeyedNames = shpe.TxmtKeyedNames;
+
+                    index = 0;
+                    foreach (KeyValuePair<string, string> kvPair in txmtKeyedNames)
+                    {
+                        startBlock.ConnectTo(index++, kvPair.Key, AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, kvPair.Value, menuItemPrefixLowerCase.Checked), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+
+                    if ((shpe.GmndNames.Count + txmtKeyedNames.Count) > 0) freeCol -= DrawingSurface.ColumnGap;
+                }
+                else if (res is Gmnd gmnd)
+                {
+                    int index = 0;
+                    foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
+                    {
+                        startBlock.ConnectTo(index++, null, AddBlockByKey(package, new BlockRef(package, Gmdc.TYPE, gmdcKey), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+
+                    if (gmnd.GmdcKeys.Count > 0) freeCol -= DrawingSurface.ColumnGap;
+                }
+                else if (res is Gmdc gmdc)
+                {
+                }
+                else if (res is Txmt txmt)
+                {
+                    IReadOnlyDictionary<string, string> txtrKeyedNames = txmt.TxtrKeyedNames;
+
+                    int index = 0;
+                    foreach (KeyValuePair<string, string> kvPair in txtrKeyedNames)
+                    {
+                        startBlock.ConnectTo(index++, kvPair.Key, AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, kvPair.Value, menuItemPrefixLowerCase.Checked), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+
+                    if (txtrKeyedNames.Count > 0) freeCol -= DrawingSurface.ColumnGap;
+
+                    startBlock.IsFileListValid = txmt.IsFileListValid;
+                }
+                else if (res is Txtr txtr)
+                {
+                    int index = 0;
+                    foreach (string lifoRef in txtr.ImageData.GetLifoRefs())
+                    {
+                        startBlock.ConnectTo(index++, null, AddBlockByName(package, new BlockRef(package, Lifo.TYPE, DBPFData.GROUP_SG_MAXIS, lifoRef, menuItemPrefixLowerCase.Checked), ref freeCol));
+
+                        freeCol += DrawingSurface.ColumnGap;
+                    }
+
+                    if (txtr.ImageData.GetLifoRefs().Count > 0) freeCol -= DrawingSurface.ColumnGap;
+                }
+                else if (res is Lifo lifo)
+                {
+                }
+                else if (res is Lght lght)
+                {
+                    // LAMB, LDIR, LPNT and LSPT
+                    startBlock.IsLightValid = lght.IsLightValid(parentBlock?.SgBaseName);
+
+                    startBlock.strData = lght.BaseLight.Name;
+                }
+            }
+        }
+
+        private string GetResourceName(DBPFResource res)
+        {
+            // "UnderstoodTypes" - when adding a new resource type, need to update this block
+            if (res is Str str)
+            {
+                return str.KeyName;
+            }
+            else if (res is Mmat mmat)
+            {
+                return mmat.Name;
+            }
+            else if (res is Aged aged)
+            {
+                return $"{CpfHelper.AgeName(aged.Age)} {CpfHelper.GenderName(aged.Gender)}".ToLower();
+            }
+            else if (res is Gzps gzps)
+            {
+                return gzps.Name;
             }
             else if (res is Xfnc xfnc)
             {
@@ -834,16 +1196,10 @@ namespace SceneGraphPlus
 
                 if (type != null && type.Equals("fence"))
                 {
-                    startBlock.BlockName = xfnc.Name;
-
-                    startBlock.ConnectTo(0, "post", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("post").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-                    freeCol += DrawingSurface.ColumnGap;
-                    startBlock.ConnectTo(1, "rail", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("rail").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-                    freeCol += DrawingSurface.ColumnGap;
-                    startBlock.ConnectTo(2, "diagrail", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("diagrail").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-
-                    freeCol += DrawingSurface.ColumnGap;
+                    return xfnc.Name;
                 }
+
+                return null;
             }
             else if (res is Xmol xmol)
             {
@@ -851,34 +1207,10 @@ namespace SceneGraphPlus
 
                 if (type != null && type.Equals("meshoverlay"))
                 {
-                    startBlock.BlockName = xmol.Name;
-
-                    Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
-
-                    if (idr != null)
-                    {
-                        startBlock.ConnectTo(0, "mesh", AddBlockByKey(package, new BlockRef(package, Cres.TYPE, idr.GetItem(xmol.GetItem("resourcekeyidx").UIntegerValue)), ref freeCol));
-                        freeCol += DrawingSurface.ColumnGap;
-                        startBlock.ConnectTo(1, "mask", AddBlockByKey(package, new BlockRef(package, Cres.TYPE, idr.GetItem(xmol.GetItem("maskresourcekeyidx").UIntegerValue)), ref freeCol));
-
-                        freeCol += DrawingSurface.ColumnGap;
-
-                        startBlock.ConnectTo(0, "mesh", AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, idr.GetItem(xmol.GetItem("shapekeyidx").UIntegerValue)), ref freeCol));
-                        freeCol += DrawingSurface.ColumnGap;
-                        startBlock.ConnectTo(1, "mask", AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, idr.GetItem(xmol.GetItem("maskshapekeyidx").UIntegerValue)), ref freeCol));
-
-                        freeCol += DrawingSurface.ColumnGap;
-
-                        uint entries = xmol.GetItem("numoverrides").UIntegerValue;
-
-                        for (int index = 0; index < entries; ++index)
-                        {
-                            startBlock.ConnectTo(index, xmol.GetItem($"override{index}subset").StringValue, AddBlockByKey(package, new BlockRef(package, Txmt.TYPE, idr.GetItem(xmol.GetItem($"override{index}resourcekeyidx").UIntegerValue)), ref freeCol));
-
-                            freeCol += DrawingSurface.ColumnGap;
-                        }
-                    }
+                    return xmol.Name;
                 }
+
+                return null;
             }
             else if (res is Xtol xtol)
             {
@@ -886,17 +1218,10 @@ namespace SceneGraphPlus
 
                 if (type != null && type.Equals("textureoverlay"))
                 {
-                    startBlock.BlockName = xtol.Name;
-
-                    Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
-
-                    if (idr != null)
-                    {
-                        startBlock.ConnectTo(0, "material", AddBlockByKey(package, new BlockRef(package, Txmt.TYPE, idr.GetItem(xtol.GetItem("materialkeyidx").UIntegerValue)), ref freeCol));
-
-                        freeCol += DrawingSurface.ColumnGap;
-                    }
+                    return xtol.Name;
                 }
+
+                return null;
             }
             else if (res is Xobj xobj)
             {
@@ -904,12 +1229,10 @@ namespace SceneGraphPlus
 
                 if (type != null && (type.Equals("wall") || type.Equals("floor")))
                 {
-                    startBlock.BlockName = xobj.Name;
-
-                    startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, xobj.GetItem("material").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-
-                    freeCol += DrawingSurface.ColumnGap;
+                    return xobj.Name;
                 }
+
+                return null;
             }
             else if (res is Xrof xrof)
             {
@@ -917,20 +1240,10 @@ namespace SceneGraphPlus
 
                 if (type != null && (type.Equals("roof")))
                 {
-                    startBlock.BlockName = xrof.Name;
-
-                    startBlock.ConnectTo(0, "texturetop", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetop").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-                    freeCol += DrawingSurface.ColumnGap;
-                    startBlock.ConnectTo(1, "texturetopbump", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetopbump").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-                    freeCol += DrawingSurface.ColumnGap;
-                    startBlock.ConnectTo(2, "textureedges", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("textureedges").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-                    freeCol += DrawingSurface.ColumnGap;
-                    startBlock.ConnectTo(3, "texturetrim", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetrim").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-                    freeCol += DrawingSurface.ColumnGap;
-                    startBlock.ConnectTo(4, "textureunder", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("textureunder").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-
-                    freeCol += DrawingSurface.ColumnGap;
+                    return xrof.Name;
                 }
+
+                return null;
             }
             else if (res is Xflr xflr)
             {
@@ -938,131 +1251,187 @@ namespace SceneGraphPlus
 
                 if (type != null && (type.Equals("terrainpaint")))
                 {
-                    startBlock.BlockName = xflr.Name;
-
-                    startBlock.ConnectTo(0, "texturetname", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xflr.GetItem("texturetname").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-                    freeCol += DrawingSurface.ColumnGap;
-                    AbstractGraphConnector detailConnector = startBlock.ConnectTo(1, "texturetname_detail", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, $"{xflr.GetItem("texturetname").StringValue}_detail", menuItemPrefixLowerCase.Checked), ref freeCol));
-
-                    detailConnector.EndBlock.IsEditable = false;
-
-                    freeCol += DrawingSurface.ColumnGap;
+                    return xflr.Name;
                 }
+
+                return null;
+            }
+            else if (res is Cres)
+            {
+                return null;
+            }
+            else if (res is Shpe)
+            {
+                return null;
+            }
+            else if (res is Gmnd)
+            {
+                return null;
+            }
+            else if (res is Gmdc)
+            {
+                return null;
+            }
+            else if (res is Txmt)
+            {
+                return null;
+            }
+            else if (res is Txtr)
+            {
+                return null;
+            }
+            else if (res is Lifo)
+            {
+                return null;
+            }
+            else if (res is Lght)
+            {
+                // LAMB, LDIR, LPNT and LSPT
+                return null;
+            }
+
+            return null;
+        }
+
+
+        private string GetResourceSgName(DBPFResource res)
+        {
+            // "UnderstoodTypes" - when adding a new resource type, need to update this block
+            if (res is Str)
+            {
+                return null;
+            }
+            else if (res is Mmat)
+            {
+                return null;
+            }
+            else if (res is Aged)
+            {
+                return null;
+            }
+            else if (res is Gzps)
+            {
+                return null;
+            }
+            else if (res is Xfnc)
+            {
+                return null;
+            }
+            else if (res is Xmol)
+            {
+                return null;
+            }
+            else if (res is Xtol)
+            {
+                return null;
+            }
+            else if (res is Xobj)
+            {
+                return null;
+            }
+            else if (res is Xrof)
+            {
+                return null;
+            }
+            else if (res is Xflr)
+            {
+                return null;
             }
             else if (res is Cres cres)
             {
-                startBlock.UpdateSgName(cres.KeyName, menuItemPrefixLowerCase.Checked);
-
-                // NOTE - a CRES can also reference another CRES, but only seen in Maxis lot packages
-
-                int index = 0;
-                foreach (DBPFKey shpeKey in cres.ShpeKeys)
-                {
-                    startBlock.ConnectTo(index++, null, AddBlockByKey(package, new BlockRef(package, Shpe.TYPE, shpeKey), ref freeCol));
-
-                    freeCol += DrawingSurface.ColumnGap;
-                }
-
-                if (cres.ShpeKeys.Count > 0) freeCol -= DrawingSurface.ColumnGap;
-
-                index = 0;
-                foreach (DBPFKey lghtKey in cres.LghtKeys)
-                {
-                    AbstractGraphBlock lightBlock = AddBlockByKey(package, new BlockRef(package, lghtKey.TypeID, lghtKey), ref freeCol, startBlock);
-
-                    startBlock.ConnectTo(index++, lightBlock.strData, lightBlock);
-
-                    freeCol += DrawingSurface.ColumnGap;
-                }
-
-                if (cres.LghtKeys.Count > 0) freeCol -= DrawingSurface.ColumnGap;
+                return cres.KeyName;
             }
             else if (res is Shpe shpe)
             {
-                startBlock.UpdateSgName(shpe.KeyName, menuItemPrefixLowerCase.Checked);
-
-                int index = 0;
-                foreach (string gmndName in shpe.GmndNames)
-                {
-                    startBlock.ConnectTo(index++, null, AddBlockByName(package, new BlockRef(package, Gmnd.TYPE, DBPFData.GROUP_SG_MAXIS, gmndName, menuItemPrefixLowerCase.Checked), ref freeCol));
-
-                    freeCol += DrawingSurface.ColumnGap;
-                }
-
-                IReadOnlyDictionary<string, string> txmtKeyedNames = shpe.TxmtKeyedNames;
-
-                index = 0;
-                foreach (KeyValuePair<string, string> kvPair in txmtKeyedNames)
-                {
-                    startBlock.ConnectTo(index++, kvPair.Key, AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, kvPair.Value, menuItemPrefixLowerCase.Checked), ref freeCol));
-
-                    freeCol += DrawingSurface.ColumnGap;
-                }
-
-                if ((shpe.GmndNames.Count + txmtKeyedNames.Count) > 0) freeCol -= DrawingSurface.ColumnGap;
+                return shpe.KeyName;
             }
             else if (res is Gmnd gmnd)
             {
-                startBlock.UpdateSgName(gmnd.KeyName, menuItemPrefixLowerCase.Checked);
-
-                int index = 0;
-                foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
-                {
-                    startBlock.ConnectTo(index++, null, AddBlockByKey(package, new BlockRef(package, Gmdc.TYPE, gmdcKey), ref freeCol));
-
-                    freeCol += DrawingSurface.ColumnGap;
-                }
-
-                if (gmnd.GmdcKeys.Count > 0) freeCol -= DrawingSurface.ColumnGap;
+                return gmnd.KeyName;
             }
             else if (res is Gmdc gmdc)
             {
-                startBlock.UpdateSgName(gmdc.KeyName, menuItemPrefixLowerCase.Checked);
+                return gmdc.KeyName;
             }
             else if (res is Txmt txmt)
             {
-                startBlock.UpdateSgName(txmt.KeyName, menuItemPrefixLowerCase.Checked);
-
-                IReadOnlyDictionary<string, string> txtrKeyedNames = txmt.TxtrKeyedNames;
-
-                int index = 0;
-                foreach (KeyValuePair<string, string> kvPair in txtrKeyedNames)
-                {
-                    startBlock.ConnectTo(index++, kvPair.Key, AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, kvPair.Value, menuItemPrefixLowerCase.Checked), ref freeCol));
-
-                    freeCol += DrawingSurface.ColumnGap;
-                }
-
-                if (txtrKeyedNames.Count > 0) freeCol -= DrawingSurface.ColumnGap;
-
-                startBlock.IsFileListValid = txmt.IsFileListValid;
+                return txmt.KeyName;
             }
             else if (res is Txtr txtr)
             {
-                startBlock.UpdateSgName(txtr.KeyName, menuItemPrefixLowerCase.Checked);
-
-                int index = 0;
-                foreach (string lifoRef in txtr.ImageData.GetLifoRefs())
-                {
-                    startBlock.ConnectTo(index++, null, AddBlockByName(package, new BlockRef(package, Lifo.TYPE, DBPFData.GROUP_SG_MAXIS, lifoRef, menuItemPrefixLowerCase.Checked), ref freeCol));
-
-                    freeCol += DrawingSurface.ColumnGap;
-                }
-
-                if (txtr.ImageData.GetLifoRefs().Count > 0) freeCol -= DrawingSurface.ColumnGap;
+                return txtr.KeyName;
             }
             else if (res is Lifo lifo)
             {
-                startBlock.UpdateSgName(lifo.KeyName, menuItemPrefixLowerCase.Checked);
+                return lifo.KeyName;
             }
             else if (res is Lght lght)
             {
                 // LAMB, LDIR, LPNT and LSPT
-                startBlock.UpdateSgName(lght.KeyName, menuItemPrefixLowerCase.Checked);
-                startBlock.IsLightValid = lght.IsLightValid(parentBlock?.SgBaseName);
-
-                startBlock.strData = lght.BaseLight.Name;
+                return lght.KeyName;
             }
+
+            return null;
+        }
+
+        private string DecodeLkValue(string lkValue)
+        {
+            string decode = "";
+
+            try
+            {
+                uint lk = UInt32.Parse(lkValue);
+
+                uint lkLo = lk & 0x0000FFFF;
+                uint lkHi = (lk & 0xFFFF0000) >> 16;
+
+                if ((lkHi & 0x0007) == 0x0007)
+                {
+                    decode = $"{decode}, Everyday";
+                }
+                else
+                {
+                    if ((lkHi & 0x0001) == 0x0001) decode = $"{decode}, Casual1";
+                    if ((lkHi & 0x0002) == 0x0002) decode = $"{decode}, Casual2";
+                    if ((lkHi & 0x0004) == 0x0004) decode = $"{decode}, Casual3";
+                }
+
+                if ((lkHi & 0x0008) == 0x0008) decode = $"{decode}, Swimwear";
+                if ((lkHi & 0x0010) == 0x0010) decode = $"{decode}, PJs";
+                if ((lkHi & 0x0020) == 0x0020) decode = $"{decode}, Formal";
+                if ((lkHi & 0x0040) == 0x0040) decode = $"{decode}, Underwear";
+                if ((lkHi & 0x0080) == 0x0080) decode = $"{decode}, Skintone";
+                if ((lkHi & 0x0100) == 0x0100) decode = $"{decode}, Maternity";
+                if ((lkHi & 0x0200) == 0x0200) decode = $"{decode}, Activewear";
+                if ((lkHi & 0x0400) == 0x0400) decode = $"{decode}, Try On";
+                if ((lkHi & 0x0800) == 0x0800) decode = $"{decode}, Naked";
+                if ((lkHi & 0x1000) == 0x1000) decode = $"{decode}, Outerwear";
+
+                if (decode.Length > 2) decode = $"{decode.Substring(2)} - ";
+
+                if ((lkLo & 0x0001) == 0x0001) decode = $"{decode}Hair, ";
+                if ((lkLo & 0x0002) == 0x0002) decode = $"{decode}Face, ";
+                if ((lkLo & 0x0004) == 0x0004) decode = $"{decode}Top, ";
+                if ((lkLo & 0x0008) == 0x0008) decode = $"{decode}Body, ";
+                if ((lkLo & 0x0010) == 0x0010) decode = $"{decode}Bottom, ";
+                if ((lkLo & 0x0020) == 0x0020) decode = $"{decode}Accessory, ";
+                if ((lkLo & 0x0040) == 0x0040) decode = $"{decode}TailLong, ";
+                if ((lkLo & 0x0080) == 0x0080) decode = $"{decode}EarsUp, ";
+                if ((lkLo & 0x0100) == 0x0100) decode = $"{decode}TailShort, ";
+                if ((lkLo & 0x0200) == 0x0200) decode = $"{decode}EarsDown, ";
+                if ((lkLo & 0x0400) == 0x0400) decode = $"{decode}BrushTailLong, ";
+                if ((lkLo & 0x0800) == 0x0800) decode = $"{decode}BrushTailShort, ";
+                if ((lkLo & 0x1000) == 0x1000) decode = $"{decode}SpitzTail, ";
+                if ((lkLo & 0x2000) == 0x2000) decode = $"{decode}BrushSpitzTail, ";
+
+                if (decode.EndsWith(", ")) decode = decode.Substring(0, decode.Length - 2);
+            }
+            catch (Exception)
+            {
+                decode = lkValue;
+            }
+
+            return decode;
         }
 
         public int RowForType(TypeTypeID typeId)

@@ -48,7 +48,7 @@
       <Value Profile="(Default)">White</Value>
     </Setting>
     <Setting Name="MaxisBlockColour" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Gray</Value>
+      <Value Profile="(Default)">DarkGray</Value>
     </Setting>
     <Setting Name="MissingBlockColour" Type="System.String" Scope="User">
       <Value Profile="(Default)">LightGray</Value>
@@ -186,7 +186,7 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="AvailableEdgeColour" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Gray</Value>
+      <Value Profile="(Default)">DimGray</Value>
     </Setting>
   </Settings>
 </SettingsFile>

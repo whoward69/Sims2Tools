@@ -752,7 +752,7 @@ namespace SceneGraphPlus.Surface
 
                     e.Cancel = true;
 
-                    if (contextBlock.IsAvailable)
+                    if (contextBlock.IsAvailable && !contextBlock.IsMaxis)
                     {
                         menuItemContextOpenPackage.Visible = true;
                         menuItemContextOpenPackage.Enabled = true;
@@ -908,7 +908,7 @@ namespace SceneGraphPlus.Surface
 
             foreach (AbstractGraphBlock block in blocks)
             {
-                if (block.TypeId == Gzps.TYPE || block.TypeId == Aged.TYPE)
+                if (block.TypeId == Gzps.TYPE || block.TypeId == Aged.TYPE || block.TypeId == Xmol.TYPE || block.TypeId == Xtol.TYPE)
                 {
                     if (filters.Exclude(block.Text))
                     {
@@ -961,14 +961,14 @@ namespace SceneGraphPlus.Surface
                 }
                 else
                 {
-                    ExtractCustomMesh(exporter);
+                    ExtractCustomMeshOrRecolour(exporter);
                 }
 
                 exporter.Close();
             }
         }
 
-        private void ExtractCustomMesh(Exporter exporter)
+        private void ExtractCustomMeshOrRecolour(Exporter exporter)
         {
             foreach (AbstractGraphBlock block in GetBlockChain(contextBlock))
             {
@@ -995,43 +995,47 @@ namespace SceneGraphPlus.Surface
 
         private void ExtractMaxisMesh(Exporter exporter)
         {
-            DBPFKey cresKey = contextBlock.Key;
-
-            string maxisPath = GameData.GetMaxisPackagePath(Cres.TYPE, cresKey, true);
-
-            if (maxisPath != null)
+            // TODO - SceneGraph Plus - 3 - extend this to include GZPS and MMAT recolours
+            if (contextBlock.TypeId == Cres.TYPE)
             {
-                Cres cres = (Cres)GameData.GetMaxisResource(Cres.TYPE, cresKey, true);
+                DBPFKey cresKey = contextBlock.Key;
 
-                exporter.Export(maxisPath, cres);
+                string maxisPath = GameData.GetMaxisPackagePath(Cres.TYPE, cresKey, true);
 
-                foreach (DBPFKey shpeKey in cres.ShpeKeys)
+                if (maxisPath != null)
                 {
-                    maxisPath = GameData.GetMaxisPackagePath(Shpe.TYPE, shpeKey, true);
+                    Cres cres = (Cres)GameData.GetMaxisResource(Cres.TYPE, cresKey, true);
 
-                    if (maxisPath != null)
+                    exporter.Export(maxisPath, cres);
+
+                    foreach (DBPFKey shpeKey in cres.ShpeKeys)
                     {
-                        Shpe shpe = (Shpe)GameData.GetMaxisResource(Shpe.TYPE, shpeKey, true);
+                        maxisPath = GameData.GetMaxisPackagePath(Shpe.TYPE, shpeKey, true);
 
-                        exporter.Export(maxisPath, shpe);
-
-                        foreach (string gmndName in shpe.GmndNames)
+                        if (maxisPath != null)
                         {
-                            Gmnd gmnd = (Gmnd)GameData.GetMaxisResource(Gmnd.TYPE, gmndName, true);
+                            Shpe shpe = (Shpe)GameData.GetMaxisResource(Shpe.TYPE, shpeKey, true);
 
-                            if (gmnd != null)
+                            exporter.Export(maxisPath, shpe);
+
+                            foreach (string gmndName in shpe.GmndNames)
                             {
-                                maxisPath = GameData.GetMaxisPackagePath(Gmnd.TYPE, gmnd, true);
+                                Gmnd gmnd = (Gmnd)GameData.GetMaxisResource(Gmnd.TYPE, gmndName, true);
 
-                                exporter.Export(maxisPath, gmnd);
-
-                                foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
+                                if (gmnd != null)
                                 {
-                                    maxisPath = GameData.GetMaxisPackagePath(Gmdc.TYPE, gmdcKey, true);
+                                    maxisPath = GameData.GetMaxisPackagePath(Gmnd.TYPE, gmnd, true);
 
-                                    if (maxisPath != null)
+                                    exporter.Export(maxisPath, gmnd);
+
+                                    foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
                                     {
-                                        exporter.Export(maxisPath, gmdcKey);
+                                        maxisPath = GameData.GetMaxisPackagePath(Gmdc.TYPE, gmdcKey, true);
+
+                                        if (maxisPath != null)
+                                        {
+                                            exporter.Export(maxisPath, gmdcKey);
+                                        }
                                     }
                                 }
                             }
@@ -1912,11 +1916,13 @@ namespace SceneGraphPlus.Surface
 
         private void UpdateMaterialName(Txmt txmt, string basename, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames, bool prefixLowerCase)
         {
-            if (alwaysClearNames)
+            /* if (alwaysClearNames)
             {
+                // This will cause the game to crash if the Type is SimSkin (and possibly others)
                 txmt.MaterialDefinition.FileDescription = "";
             }
-            else if (alwaysSetNames || !string.IsNullOrEmpty(txmt.MaterialDefinition.FileDescription))
+            else */
+            if (alwaysSetNames || !string.IsNullOrEmpty(txmt.MaterialDefinition.FileDescription))
             {
                 if (prefixNames)
                 {

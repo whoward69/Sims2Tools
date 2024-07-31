@@ -187,25 +187,28 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 }
             }
 
-            fileListValid = true;
+            fileListValid = !string.IsNullOrWhiteSpace(fldsc);
 
-            foreach (string fileRef in fileList)
+            if (fileListValid)
             {
-                bool found = false;
-
-                foreach (string txtrProp in Txmt.txtrPropKeys)
+                foreach (string fileRef in fileList)
                 {
-                    if (fileRef.Equals(GetProperty(txtrProp)))
+                    bool found = false;
+
+                    foreach (string txtrProp in Txmt.txtrPropKeys)
                     {
-                        found = true;
+                        if (fileRef.Equals(GetProperty(txtrProp)))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        fileListValid = false;
                         break;
                     }
-                }
-
-                if (!found)
-                {
-                    fileListValid = false;
-                    break;
                 }
             }
 
