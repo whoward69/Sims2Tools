@@ -56,6 +56,7 @@ namespace BsokEditor
         private bool ignoreEdits = false;
 
         private bool IsAutoUpdate => (!dataLoading && !ignoreEdits);
+        public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
         #region Constructor and Dispose
         public BsokEditorForm()
@@ -270,7 +271,7 @@ namespace BsokEditor
             RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowCategoryShoe.Name, menuItemShowCategoryShoe.Checked ? 1 : 0);
             RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowGenderAge.Name, menuItemShowGenderAge.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
             RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
         }
 
@@ -505,6 +506,7 @@ namespace BsokEditor
 
             return false;
         }
+
         private void LoadBsokProductComboBoxes()
         {
             bool oldDataLoading = dataLoading;
@@ -523,10 +525,10 @@ namespace BsokEditor
             }
 
             cachedBsokValue = "";
+            textSearch.Text = "";
 
             dataLoading = oldDataLoading;
         }
-
         #endregion
 
         #region Form State
@@ -670,6 +672,11 @@ namespace BsokEditor
         #endregion
 
         #region Mode Menu Actions
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+        }
+
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
         }
@@ -996,11 +1003,11 @@ namespace BsokEditor
         {
             ignoreEdits = true;
 
-            if (!bsokGenreLocked) comboBsokGenre.SelectedIndex = -1;
-            if (!bsokStyleLocked) comboBsokStyle.SelectedIndex = -1;
+            comboBsokGenre.SelectedIndex = -1;
+            comboBsokStyle.SelectedIndex = -1;
             comboBsokGroup.SelectedIndex = -1;
             comboBsokShape.SelectedIndex = -1;
-            if (!bsokRolesLocked) comboBsokRoles.SelectedIndex = -1;
+            comboBsokRoles.SelectedIndex = -1;
 
             comboGender.SelectedIndex = -1;
 
@@ -1069,11 +1076,11 @@ namespace BsokEditor
             {
                 if (!cachedBsokValue.Equals(newBsokValue))
                 {
-                    if (!bsokGenreLocked) comboBsokGenre.SelectedIndex = -1;
-                    if (!bsokStyleLocked) comboBsokStyle.SelectedIndex = -1;
+                    comboBsokGenre.SelectedIndex = -1;
+                    comboBsokStyle.SelectedIndex = -1;
                     comboBsokGroup.SelectedIndex = -1;
                     comboBsokShape.SelectedIndex = -1;
-                    if (!bsokRolesLocked) comboBsokRoles.SelectedIndex = -1;
+                    comboBsokRoles.SelectedIndex = -1;
                 }
             }
             else
@@ -1084,58 +1091,15 @@ namespace BsokEditor
 
                 if (node != null)
                 {
-                    foreach (object o in comboBsokGenre.Items)
-                    {
-                        if ((o as XmlValue).Equals(node))
-                        {
-                            comboBsokGenre.SelectedItem = o;
-                            break;
-                        }
-                    }
-
-                    foreach (object o in comboBsokStyle.Items)
-                    {
-                        if ((o as XmlValue).Equals(node))
-                        {
-                            comboBsokStyle.SelectedItem = o;
-                            break;
-                        }
-                    }
-
-                    foreach (object o in comboBsokGroup.Items)
-                    {
-                        if ((o as XmlValue).Equals(node))
-                        {
-                            comboBsokGroup.SelectedItem = o;
-                            break;
-                        }
-                    }
-
-                    foreach (object o in comboBsokShape.Items)
-                    {
-                        if ((o as XmlValue).Equals(node))
-                        {
-                            comboBsokShape.SelectedItem = o;
-                            break;
-                        }
-                    }
-
-                    foreach (object o in comboBsokRoles.Items)
-                    {
-                        if ((o as XmlValue).Equals(node))
-                        {
-                            comboBsokRoles.SelectedItem = o;
-                            break;
-                        }
-                    }
+                    SelectDropDowns(node);
                 }
                 else
                 {
-                    AutoSelectDropDown(comboBsokGenre, bsokGenreLocked);
-                    AutoSelectDropDown(comboBsokStyle, bsokStyleLocked);
-                    AutoSelectDropDown(comboBsokGroup, false);
-                    AutoSelectDropDown(comboBsokShape, false);
-                    AutoSelectDropDown(comboBsokRoles, bsokRolesLocked);
+                    AutoSelectDropDown(comboBsokGenre);
+                    AutoSelectDropDown(comboBsokStyle);
+                    AutoSelectDropDown(comboBsokGroup);
+                    AutoSelectDropDown(comboBsokShape);
+                    AutoSelectDropDown(comboBsokRoles);
                 }
             }
 
@@ -1221,7 +1185,55 @@ namespace BsokEditor
             ignoreEdits = false;
         }
 
-        private void AutoSelectDropDown(ComboBox comboBsok, bool locked)
+        private void SelectDropDowns(XmlNode node)
+        {
+            foreach (object o in comboBsokGenre.Items)
+            {
+                if ((o as XmlValue).Equals(node))
+                {
+                    comboBsokGenre.SelectedItem = o;
+                    break;
+                }
+            }
+
+            foreach (object o in comboBsokStyle.Items)
+            {
+                if ((o as XmlValue).Equals(node))
+                {
+                    comboBsokStyle.SelectedItem = o;
+                    break;
+                }
+            }
+
+            foreach (object o in comboBsokGroup.Items)
+            {
+                if ((o as XmlValue).Equals(node))
+                {
+                    comboBsokGroup.SelectedItem = o;
+                    break;
+                }
+            }
+
+            foreach (object o in comboBsokShape.Items)
+            {
+                if ((o as XmlValue).Equals(node))
+                {
+                    comboBsokShape.SelectedItem = o;
+                    break;
+                }
+            }
+
+            foreach (object o in comboBsokRoles.Items)
+            {
+                if ((o as XmlValue).Equals(node))
+                {
+                    comboBsokRoles.SelectedItem = o;
+                    break;
+                }
+            }
+        }
+
+        private void AutoSelectDropDown(ComboBox comboBsok)
         {
             if (comboBsok.Items.Count == 1)
             {
@@ -1229,7 +1241,7 @@ namespace BsokEditor
             }
             else
             {
-                if (!locked && comboBsok.Items.Count > 0) comboBsok.SelectedIndex = 0;
+                if (comboBsok.Items.Count > 0) comboBsok.SelectedIndex = 0;
             }
         }
         #endregion
@@ -1239,7 +1251,6 @@ namespace BsokEditor
         {
             if (comboBsokGenre.SelectedIndex != -1)
             {
-                UpdateLockButtons();
                 BsokLevelChanged(comboBsokGenre, comboBsokStyle);
             }
 
@@ -1250,7 +1261,6 @@ namespace BsokEditor
         {
             if (comboBsokStyle.SelectedIndex != -1)
             {
-                UpdateLockButtons();
                 BsokLevelChanged(comboBsokStyle, comboBsokGroup);
             }
 
@@ -1261,7 +1271,6 @@ namespace BsokEditor
         {
             if (comboBsokGroup.SelectedIndex != -1)
             {
-                UpdateLockButtons();
                 BsokLevelChanged(comboBsokGroup, comboBsokShape);
             }
 
@@ -1272,7 +1281,6 @@ namespace BsokEditor
         {
             if (comboBsokShape.SelectedIndex != -1)
             {
-                UpdateLockButtons();
                 BsokLevelChanged(comboBsokShape, comboBsokRoles);
             }
 
@@ -1283,7 +1291,6 @@ namespace BsokEditor
         {
             if (comboBsokRoles.SelectedIndex != -1)
             {
-                UpdateLockButtons();
             }
 
             if (IsAutoUpdate && comboBsokRoles.SelectedItem != null && (comboBsokRoles.SelectedItem as XmlValue).Element != null) UpdateSelectedRowsForcingUInt32((comboBsokRoles.SelectedItem as XmlValue).Element.GetAttribute("code"), "product");
@@ -1293,8 +1300,6 @@ namespace BsokEditor
         {
             bool oldDataLoading = dataLoading;
             dataLoading = true;
-
-            int oldSelectedIndex = comboBsokChild.SelectedIndex;
 
             comboBsokChild.Items.Clear();
 
@@ -1337,71 +1342,9 @@ namespace BsokEditor
                 }
             }
 
-            if (comboBsokChild == comboBsokGenre && bsokGenreLocked && comboBsokChild.Items.Count > oldSelectedIndex)
-            {
-                comboBsokChild.SelectedIndex = oldSelectedIndex;
-            }
-            else if (comboBsokChild == comboBsokStyle && bsokStyleLocked && comboBsokChild.Items.Count > oldSelectedIndex)
-            {
-                comboBsokChild.SelectedIndex = oldSelectedIndex;
-            }
-            else if (comboBsokChild == comboBsokRoles && bsokRolesLocked && comboBsokChild.Items.Count > oldSelectedIndex)
-            {
-                comboBsokChild.SelectedIndex = oldSelectedIndex;
-            }
-            else
-            {
-                comboBsokChild.SelectedIndex = Math.Min(comboBsokChild.Items.Count - 1, (singular ? (((comboBsokParent.SelectedItem as XmlValue).Element == null) ? -1 : 0) : 1));
-            }
+            comboBsokChild.SelectedIndex = Math.Min(comboBsokChild.Items.Count - 1, (singular ? (((comboBsokParent.SelectedItem as XmlValue).Element == null) ? -1 : 0) : 1));
 
             dataLoading = oldDataLoading;
-        }
-        #endregion
-
-        #region BSOK Lock Events
-        private bool bsokGenreLocked = true;
-        private bool bsokStyleLocked = true;
-        private bool bsokRolesLocked = true;
-
-        private void OnBsokGenreLockClicked(object sender, EventArgs e)
-        {
-            bsokGenreLocked = !bsokGenreLocked;
-
-            UpdateLockButtons();
-        }
-
-        private void OnBsokStyleLockClicked(object sender, EventArgs e)
-        {
-            bsokStyleLocked = !bsokStyleLocked;
-
-            UpdateLockButtons();
-        }
-
-        private void OnBsokRoleLockClicked(object sender, EventArgs e)
-        {
-            bsokRolesLocked = !bsokRolesLocked;
-
-            UpdateLockButtons();
-        }
-
-        private void UpdateLockButtons()
-        {
-            Image ln = Properties.Resources.Padlock_locked_16;
-            Image lg = Properties.Resources.Padlock_locked_gray_16;
-            Image un = Properties.Resources.Padlock_unlocked_16;
-            Image ug = Properties.Resources.Padlock_unlocked_gray_16;
-
-            btnBsokGenre.Enabled = false; // (comboBsokGenre.Items.Count > 1);
-            btnBsokStyle.Enabled = false; // (comboBsokStyle.Items.Count > 1);
-            btnBsokRoles.Enabled = false; // (comboBsokRoles.Items.Count > 1);
-
-            bsokGenreLocked = bsokGenreLocked || (comboBsokGenre.Items.Count <= 1);
-            bsokStyleLocked = bsokStyleLocked || (comboBsokStyle.Items.Count <= 1);
-            bsokRolesLocked = bsokRolesLocked || (comboBsokRoles.Items.Count <= 1);
-
-            btnBsokGenre.Image = (btnBsokGenre.Enabled) ? (bsokGenreLocked ? ln : un) : (bsokGenreLocked ? lg : ug);
-            btnBsokStyle.Image = (btnBsokStyle.Enabled) ? (bsokStyleLocked ? ln : un) : (bsokStyleLocked ? lg : ug);
-            btnBsokRoles.Image = (btnBsokRoles.Enabled) ? (bsokRolesLocked ? ln : un) : (bsokRolesLocked ? lg : ug);
         }
         #endregion
 
@@ -1610,6 +1553,19 @@ namespace BsokEditor
             if (highlightRow != null)
             {
                 highlightRow.DefaultCellStyle.BackColor = highlightColor;
+            }
+        }
+
+        private void OnSearchChanged(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(textSearch.Text))
+            {
+                XmlNode node = bsokXml?.SelectSingleNode($"//*[contains(translate(@name, 'ABCDEFGHIJKLMNOPQRSTUVWXZY', 'abcdefghijklmnopqrstuvwxyz'),'{textSearch.Text.ToLower()}')]");
+
+                if (node != null)
+                {
+                    SelectDropDowns(node);
+                }
             }
         }
 

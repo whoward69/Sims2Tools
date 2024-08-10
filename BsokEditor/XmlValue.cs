@@ -37,6 +37,8 @@ namespace BsokEditor
             while (!element.LocalName.Equals(node.LocalName))
             {
                 node = node.ParentNode;
+
+                if (node == null) return false;
             }
 
             return this.compName.Equals(node.Attributes.GetNamedItem("name").Value);

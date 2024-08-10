@@ -156,43 +156,10 @@
   <metadata name="menuContextGrid.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>127, 17</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="btnBsokRoles.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        DwAACw8BkvkDpQAAAAd0SU1FB+YBEQkaDG9GxgoAAAEZSURBVDhPlZLPikZQGIfnmgxZKKOU5hIs7ZWU
-        UpS97FiwUraugCuws1OSwkKycAn+zNtxmjmfz3zTPKvz/t73cQ7H20Gw73vTNJqmfSJUVa2qCkLcRjwI
-        4zjyPA9zWZblea7rOsdxXdfhNuJHgCf5vi/L8rquZ7Jtm6IoruuSmzwItm1DG9coCYIA9rkXAMuyPM/D
-        BSIMQ8Mw/iHA6AmuL0d6FoB7AaI4jkVRlCQJXvRCFEXfDhbmeX7/HYqi+r4/J7EwDAOkuI8myBKo6/qc
-        vBeKoijLkmEYXL8WaJqepmlZFpZlzwR4JcAiSZI0Tck9/zgSXBbcOi4QVwF+O1KANVkCbduek1iAz+w4
-        jiAIH09AaJom/iOP4wtLIgnCaUjP+wAAAABJRU5ErkJggg==
-</value>
-  </data>
-  <data name="btnBsokStyle.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        DwAACw8BkvkDpQAAAAd0SU1FB+YBEQkaDG9GxgoAAAEZSURBVDhPlZLPikZQGIfnmgxZKKOU5hIs7ZWU
-        UpS97FiwUraugCuws1OSwkKycAn+zNtxmjmfz3zTPKvz/t73cQ7H20Gw73vTNJqmfSJUVa2qCkLcRjwI
-        4zjyPA9zWZblea7rOsdxXdfhNuJHgCf5vi/L8rquZ7Jtm6IoruuSmzwItm1DG9coCYIA9rkXAMuyPM/D
-        BSIMQ8Mw/iHA6AmuL0d6FoB7AaI4jkVRlCQJXvRCFEXfDhbmeX7/HYqi+r4/J7EwDAOkuI8myBKo6/qc
-        vBeKoijLkmEYXL8WaJqepmlZFpZlzwR4JcAiSZI0Tck9/zgSXBbcOi4QVwF+O1KANVkCbduek1iAz+w4
-        jiAIH09AaJom/iOP4wtLIgnCaUjP+wAAAABJRU5ErkJggg==
-</value>
-  </data>
-  <data name="btnBsokGenre.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        DwAACw8BkvkDpQAAAAd0SU1FB+YBEQkaDG9GxgoAAAEZSURBVDhPlZLPikZQGIfnmgxZKKOU5hIs7ZWU
-        UpS97FiwUraugCuws1OSwkKycAn+zNtxmjmfz3zTPKvz/t73cQ7H20Gw73vTNJqmfSJUVa2qCkLcRjwI
-        4zjyPA9zWZblea7rOsdxXdfhNuJHgCf5vi/L8rquZ7Jtm6IoruuSmzwItm1DG9coCYIA9rkXAMuyPM/D
-        BSIMQ8Mw/iHA6AmuL0d6FoB7AaI4jkVRlCQJXvRCFEXfDhbmeX7/HYqi+r4/J7EwDAOkuI8myBKo6/qc
-        vBeKoijLkmEYXL8WaJqepmlZFpZlzwR4JcAiSZI0Tck9/zgSXBbcOi4QVwF+O1KANVkCbduek1iAz+w4
-        jiAIH09AaJom/iOP4wtLIgnCaUjP+wAAAABJRU5ErkJggg==
-</value>
-  </data>
   <metadata name="saveAsFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>275, 17</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAEAKioAAAEAIAAIHQAAFgAAACgAAAAqAAAAVAAAAAEAIAAAAAAAkBsAAMMOAADDDgAAAAAAAAAA
