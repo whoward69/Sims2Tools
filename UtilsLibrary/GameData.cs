@@ -117,12 +117,19 @@ namespace Sims2Tools
             { "Textures.package", new List<TypeTypeID> { Txtr.TYPE, Lifo.TYPE } },
 
             { "CarryForward.sgfiles.package", new List<TypeTypeID> { Anim.TYPE, Gmdc.TYPE, Gmnd.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE, Txmt.TYPE, Cres.TYPE, Shpe.TYPE, Txtr.TYPE } },
+
+            { "CASFace.package", new List<TypeTypeID> { Cres.TYPE, Shpe.TYPE, Gmdc.TYPE, Gmnd.TYPE, Txmt.TYPE } },
+
+            { "LightRigs.package", new List<TypeTypeID> { Cres.TYPE, Shpe.TYPE, Gmdc.TYPE, Gmnd.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE, Anim.TYPE } },
         };
         static public Dictionary<string, List<TypeTypeID>> TypesBy3dPackage => typesBy3dPackage;
 
-        // This is in TSData/Res/Catalog/Bins
+        // These are in TSData/Res/Catalog/Bins
         static private readonly Dictionary<string, List<TypeTypeID>> typesByBinsPackage = new Dictionary<string, List<TypeTypeID>> {
             { "globalcatbin.bundle.package", new List<TypeTypeID> { Gmdc.TYPE, Gmnd.TYPE, Txmt.TYPE, Cres.TYPE, Shpe.TYPE, Idr.TYPE, Binx.TYPE, Gzps.TYPE } },
+
+            { "H05.bundle.package", new List<TypeTypeID> { Anim.TYPE, Gmdc.TYPE, Gmnd.TYPE, Lifo.TYPE, Lpnt.TYPE, Lspt.TYPE, Txmt.TYPE, Cres.TYPE, Shpe.TYPE, Txtr.TYPE } },
+            { "H06.bundle.package", new List<TypeTypeID> { Anim.TYPE, Gmdc.TYPE, Gmnd.TYPE, Lifo.TYPE, Lpnt.TYPE, Txmt.TYPE, Cres.TYPE, Shpe.TYPE, Txtr.TYPE } },
         };
         static public Dictionary<string, List<TypeTypeID>> TypesByBinsPackage => typesByBinsPackage;
 
@@ -334,6 +341,8 @@ namespace Sims2Tools
 
         static public string GetMaxisPackagePath(TypeTypeID typeId, DBPFKey refKey, bool startingWithLastGameDir = false)
         {
+            if (!packagesByType.ContainsKey(typeId)) return null;
+
             DBPFKey resKey = new DBPFKey(typeId, refKey.GroupID, refKey.InstanceID, refKey.ResourceID);
 
             List<string> packageFiles = packagesByType[typeId];

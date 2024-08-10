@@ -766,5 +766,77 @@ namespace SceneGraphPlus.Properties {
                 this["AvailableEdgeColour"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DodgerBlue")]
+        public string HlsBlockColour {
+            get {
+                return ((string)(this["HlsBlockColour"]));
+            }
+            set {
+                this["HlsBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int HlsRow {
+            get {
+                return ((int)(this["HlsRow"]));
+            }
+            set {
+                this["HlsRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("SkyBlue")]
+        public string TrksBlockColour {
+            get {
+                return ((string)(this["TrksBlockColour"]));
+            }
+            set {
+                this["TrksBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int TrksRow {
+            get {
+                return ((int)(this["TrksRow"]));
+            }
+            set {
+                this["TrksRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LightSeaGreen")]
+        public string AudioBlockColour {
+            get {
+                return ((string)(this["AudioBlockColour"]));
+            }
+            set {
+                this["AudioBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int AudioRow {
+            get {
+                return ((int)(this["AudioRow"]));
+            }
+            set {
+                this["AudioRow"] = value;
+            }
+        }
     }
 }

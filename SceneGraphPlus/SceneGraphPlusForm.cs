@@ -34,7 +34,11 @@ using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
+using Sims2Tools.DBPF.Sounds;
+using Sims2Tools.DBPF.Sounds.HLS;
+using Sims2Tools.DBPF.Sounds.TRKS;
 using Sims2Tools.DBPF.STR;
+using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFLR;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
@@ -63,7 +67,7 @@ namespace SceneGraphPlus
 
         // When adding to this List, search for "UnderstoodTypes" (both this file and the Surface file)
         // UnderstoodTypes - also need to add TypeBlockColour and TypeRow to the Settings.settings file (see https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors?view=windowsdesktop-8.0 for colour names)
-        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Aged.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE };
+        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Aged.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE, Hls.TYPE, Trks.TYPE, Audio.TYPE };
 
         private CigenFile cigenCache = null;
 
@@ -83,7 +87,7 @@ namespace SceneGraphPlus
         private readonly BlockFilters blockFilters = new BlockFilters();
 
         public bool IsPrefixLowerCase => menuItemPrefixLowerCase.Checked;
-        public bool IsAdvancedMode => menuItemAdvanced.Checked;
+        public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
         public SceneGraphPlusForm()
         {
@@ -167,7 +171,7 @@ namespace SceneGraphPlus
             savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims"), UnderstoodTypeIds.ToArray());
             meshCachesLoaded = false;
 
-            if (menuItemAdvanced.Checked && menuItemPreloadMeshes.Checked) CacheMeshes();
+            if (IsAdvancedMode && menuItemPreloadMeshes.Checked) CacheMeshes();
 
             UpdateForm();
             UpdateEditor(null);
@@ -202,7 +206,7 @@ namespace SceneGraphPlus
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridFine.Name, menuItemGridFine.Checked ? 1 : 0);
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridDrop.Name, menuItemGridDrop.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
             RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
 
             if (textureDialog != null && !textureDialog.IsDisposed) textureDialog.Close();
@@ -248,6 +252,11 @@ namespace SceneGraphPlus
 
             menuItemSelectPackage.Enabled = menuItemRecentPackages.Enabled = !surface.IsDirty;
             menuItemSaveAll.Enabled = surface.IsDirty;
+        }
+
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -319,13 +328,13 @@ namespace SceneGraphPlus
                 title = $"{title} plus {packageFiles.Count - 2} other{((packageFiles.Count == 3) ? "" : "s")}";
             }
 
-            menuItemClearOptionalNames.Visible = menuItemSetOptionalNames.Visible = menuItemPrefixOptionalNames.Visible = menuItemPrefixLowerCase.Visible = toolStripSeparator5.Visible = menuItemAdvanced.Checked;
+            menuItemClearOptionalNames.Visible = menuItemSetOptionalNames.Visible = menuItemPrefixOptionalNames.Visible = menuItemPrefixLowerCase.Visible = toolStripSeparator5.Visible = IsAdvancedMode;
 
-            menuItemGridCoarse.Visible = menuItemGridNormal.Visible = menuItemGridFine.Visible = toolStripSeparator2.Visible = menuItemAdvanced.Checked;
+            menuItemGridCoarse.Visible = menuItemGridNormal.Visible = menuItemGridFine.Visible = toolStripSeparator2.Visible = IsAdvancedMode;
 
-            menuPackages.Visible = menuItemAdvanced.Checked;
+            menuPackages.Visible = IsAdvancedMode;
 
-            if (menuItemAdvanced.Checked)
+            if (IsAdvancedMode)
             {
                 if (meshCachesLoaded)
                 {
@@ -386,7 +395,7 @@ namespace SceneGraphPlus
 
             ignoreUpdates = true;
 
-            if (block.BlockName != null)
+            if (block.BlockName != null || (block.TypeId == Hls.TYPE || block.TypeId == Trks.TYPE || block.TypeId == Audio.TYPE))
             {
                 lblBlockName.Visible = true;
                 textBlockName.Visible = true;
@@ -600,9 +609,9 @@ namespace SceneGraphPlus
 
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
-            surface.AdvancedMode = menuItemAdvanced.Checked;
+            surface.AdvancedMode = IsAdvancedMode;
 
-            if (menuItemAdvanced.Checked)
+            if (IsAdvancedMode)
             {
                 toolStripSeparator8.Visible = true;
                 menuItemLoadMeshesNow.Visible = true;
@@ -708,7 +717,7 @@ namespace SceneGraphPlus
                     {
                         foreach (DBPFEntry entry in package.GetEntriesByType(typeId))
                         {
-                            if (entry.InstanceID == (TypeInstanceID)0x0085 || entry.InstanceID == (TypeInstanceID)0x0088)
+                            if (entry.InstanceID == (TypeInstanceID)0x0085 || entry.InstanceID == (TypeInstanceID)0x0088 || entry.InstanceID == (TypeInstanceID)0x4132)
                             {
                                 ProcessEntry(package, entry);
                             }
@@ -838,26 +847,38 @@ namespace SceneGraphPlus
                 // "UnderstoodTypes" - when adding a new resource type, need to update this block
                 if (res is Str str)
                 {
-                    TypeTypeID connectionTypeId = (entry.InstanceID == (TypeInstanceID)0x0085) ? Cres.TYPE : Txmt.TYPE;
+                    TypeTypeID connectionTypeId = DBPFData.TYPE_NULL;
+                    if (entry.InstanceID == (TypeInstanceID)0x0085) connectionTypeId = Cres.TYPE;
+                    else if (entry.InstanceID == (TypeInstanceID)0x0088) connectionTypeId = Txmt.TYPE;
+                    else if (entry.InstanceID == (TypeInstanceID)0x4132) connectionTypeId = Hls.TYPE;
 
-                    List<StrItem> items = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default);
-
-                    for (int index = 0; index < items.Count; ++index)
+                    if (connectionTypeId != DBPFData.TYPE_NULL)
                     {
-                        string link = items[index].Title;
+                        List<StrItem> items = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default);
 
-                        if (!string.IsNullOrEmpty(link))
+                        for (int index = 0; index < items.Count; ++index)
                         {
-                            startBlock.ConnectTo(index, null, AddBlockByKey(package, new BlockRef(package, connectionTypeId, DBPFData.GROUP_SG_MAXIS, link, menuItemPrefixLowerCase.Checked), ref freeCol));
+                            string link = items[index].Title;
 
-                            freeCol += DrawingSurface.ColumnGap;
+                            if (!string.IsNullOrWhiteSpace(link))
+                            {
+                                if (connectionTypeId == Hls.TYPE)
+                                {
+                                    startBlock.ConnectTo(index, link, AddBlockByKey(package, new BlockRef(package, connectionTypeId, new DBPFKey(connectionTypeId, (TypeGroupID)0xEB8AB356, Hashes.InstanceIDHash(link), Hashes.ResourceIDHash(link))), ref freeCol));
+                                }
+                                else
+                                {
+                                    startBlock.ConnectTo(index, link, AddBlockByKey(package, new BlockRef(package, connectionTypeId, DBPFData.GROUP_SG_MAXIS, link, menuItemPrefixLowerCase.Checked), ref freeCol));
+                                }
+
+                                freeCol += DrawingSurface.ColumnGap;
+                            }
                         }
                     }
                 }
                 else if (res is Mmat mmat)
                 {
                     startBlock.ConnectTo(0, "model", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("modelName").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
-
                     freeCol += DrawingSurface.ColumnGap;
 
                     startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("name").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
@@ -1127,7 +1148,7 @@ namespace SceneGraphPlus
 
                     if (gmnd.GmdcKeys.Count > 0) freeCol -= DrawingSurface.ColumnGap;
                 }
-                else if (res is Gmdc gmdc)
+                else if (res is Gmdc)
                 {
                 }
                 else if (res is Txmt txmt)
@@ -1158,7 +1179,7 @@ namespace SceneGraphPlus
 
                     if (txtr.ImageData.GetLifoRefs().Count > 0) freeCol -= DrawingSurface.ColumnGap;
                 }
-                else if (res is Lifo lifo)
+                else if (res is Lifo)
                 {
                 }
                 else if (res is Lght lght)
@@ -1167,6 +1188,47 @@ namespace SceneGraphPlus
                     startBlock.IsLightValid = lght.IsLightValid(parentBlock?.SgBaseName);
 
                     startBlock.strData = lght.BaseLight.Name;
+                }
+                else if (res is Hls hls)
+                {
+                    if (hls.Items.Length > 0)
+                    {
+                        for (int i = 0; i < hls.Items.Length; ++i)
+                        {
+                            HlsItem item = hls.Items[i];
+                            startBlock.ConnectTo(i, null, AddBlockByKey(package, new BlockRef(package, Trks.TYPE, new DBPFKey(Trks.TYPE, (TypeGroupID)0xEB8AB356, item.InstanceLo, item.InstanceHi)), ref freeCol));
+                            freeCol += DrawingSurface.ColumnGap;
+                        }
+                    }
+                }
+                else if (res is Trks trks)
+                {
+                    TypeInstanceID instanceLo = (TypeInstanceID)trks.GetItemUInteger("0xff3c2160");
+                    TypeResourceID instanceHi = (TypeResourceID)trks.GetItemUInteger("0xff99d2d5");
+
+                    startBlock.ConnectTo(0, "ini", AddBlockByKey(package, new BlockRef(package, Audio.TYPE, new DBPFKey(Audio.TYPE, (TypeGroupID)0xADD550A7, instanceLo, instanceHi)), ref freeCol));
+                    freeCol += DrawingSurface.ColumnGap;
+                    startBlock.ConnectTo(1, "audio", AddBlockByKey(package, new BlockRef(package, Audio.TYPE, new DBPFKey(Audio.TYPE, (TypeGroupID)0x0B8AB3CD, instanceLo, instanceHi)), ref freeCol));
+                    freeCol += DrawingSurface.ColumnGap;
+                }
+                else if (res is Audio audio)
+                {
+                    if (audio.IsXA)
+                    {
+                        startBlock.Text = "XA";
+                    }
+                    else if (audio.IsSPX)
+                    {
+                        startBlock.Text = "SPX";
+                    }
+                    else if (audio.IsINI)
+                    {
+                        startBlock.Text = "INI";
+                    }
+                    else if (audio.IsMP3)
+                    {
+                        startBlock.Text = "MP3";
+                    }
                 }
             }
         }
@@ -1289,6 +1351,18 @@ namespace SceneGraphPlus
                 // LAMB, LDIR, LPNT and LSPT
                 return null;
             }
+            else if (res is Hls)
+            {
+                return null;
+            }
+            else if (res is Trks)
+            {
+                return null;
+            }
+            else if (res is Audio)
+            {
+                return null;
+            }
 
             return null;
         }
@@ -1369,6 +1443,18 @@ namespace SceneGraphPlus
             {
                 // LAMB, LDIR, LPNT and LSPT
                 return lght.KeyName;
+            }
+            else if (res is Hls)
+            {
+                return null;
+            }
+            else if (res is Trks)
+            {
+                return null;
+            }
+            else if (res is Audio)
+            {
+                return null;
             }
 
             return null;
@@ -1456,7 +1542,7 @@ namespace SceneGraphPlus
 
             Regex rePackageName;
 
-            if (menuItemAdvanced.Checked)
+            if (IsAdvancedMode)
             {
                 rePackageName = new Regex(@"\.((package((\.V[1-9][0-9]*)?\.bak)?)|(bak|temp))$");
             }

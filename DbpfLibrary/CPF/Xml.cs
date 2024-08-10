@@ -16,60 +16,27 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
+using System.Text;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.CPF
 {
-    public abstract class Cpf : DBPFResource, IDisposable
+    public abstract class Xml : DBPFResource, IDisposable
     {
-        private static readonly byte[] SIGNATURE = { 0xE0, 0x50, 0xE7, 0xCB, 0x02, 0x00 };
-
         private List<CpfItem> items;
 
-        public string Name => this.GetItem("name")?.StringValue;
-        public uint Age
-        {
-            get { CpfItem item = this.GetItem("age"); return item != null ? item.UIntegerValue : 0; }
-        }
-        public uint Gender
-        {
-            get { CpfItem item = this.GetItem("gender"); return item != null ? item.UIntegerValue : 0; }
-        }
+        private string xml = null;
+        private readonly string rootEleName = "cGZPropertySetUint32";
 
-        public override bool IsDirty
-        {
-            get
-            {
-                if (base.IsDirty) return true;
+        public string Name => this.GetItemString("name");
 
-                foreach (CpfItem item in items)
-                {
-                    if (item.IsDirty) return true;
-                }
-
-                return false;
-            }
-        }
-
-        public override void SetClean()
-        {
-            base.SetClean();
-
-            foreach (CpfItem item in items)
-            {
-                item.SetClean();
-            }
-        }
-
-        public Cpf(DBPFEntry entry) : base(entry)
+        public Xml(DBPFEntry entry) : base(entry)
         {
             items = new List<CpfItem>();
         }
 
-        public Cpf(DBPFEntry entry, DbpfReader reader) : base(entry)
+        public Xml(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             items = new List<CpfItem>();
 
@@ -78,30 +45,7 @@ namespace Sims2Tools.DBPF.CPF
 
         internal void Unserialize(DbpfReader reader, int len)
         {
-            long pos = reader.Position;
-
-            byte[] id = reader.ReadBytes(0x06);
-
-            if (Enumerable.SequenceEqual(id, SIGNATURE))
-            {
-                uint entries = reader.ReadUInt32();
-
-                items = new List<CpfItem>((int)entries);
-
-                for (int i = 0; i < entries; i++)
-                {
-                    items.Add(new CpfItem(reader));
-                }
-            }
-            else
-            {
-                reader.Seek(SeekOrigin.Begin, pos);
-
-                UnserializeXml(reader, len);
-            }
-
-            string name = GetItem("name")?.StringValue;
-            if (name != null) this._keyName = name;
+            UnserializeXml(reader, len);
         }
 
         private void UnserializeXml(DbpfReader reader, int len)
@@ -115,7 +59,7 @@ namespace Sims2Tools.DBPF.CPF
                         XmlDocument xmlfile = new XmlDocument();
                         xmlfile.Load(strr);
 
-                        XmlNodeList XMLData = xmlfile.GetElementsByTagName("cGZPropertySetString");
+                        XmlNodeList XMLData = xmlfile.GetElementsByTagName(rootEleName);
                         items = new List<CpfItem>();
 
                         for (int i = 0; i < XMLData.Count; i++)
@@ -191,74 +135,75 @@ namespace Sims2Tools.DBPF.CPF
         {
             get
             {
-                uint size = (uint)SIGNATURE.Length;
-                size += 4; // Count of entries as UInt32
-
-                for (int i = 0; i < items.Count; i++)
+                if (xml == null)
                 {
-                    size += items[i].FileSize;
+                    BuildXml();
                 }
 
-                return size;
+                return (uint)UTF8Encoding.UTF8.GetBytes(xml).Length;
             }
         }
 
         public override void Serialize(DbpfWriter writer)
         {
-            writer.WriteBytes(SIGNATURE);
-
-            writer.WriteUInt32((uint)items.Count);
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                items[i].Serialize(writer);
-            }
+            SerializeXml(writer);
         }
 
-        public ReadOnlyCollection<string> GetItemNames()
+        private void SerializeXml(DbpfWriter writer)
         {
-            List<string> names = new List<string>();
-
-            for (int i = 0; i < items.Count; ++i)
+            if (xml == null)
             {
-                names.Add(items[i].Name);
+                BuildXml();
             }
 
-            return names.AsReadOnly();
+            writer.WriteBytes(UTF8Encoding.UTF8.GetBytes(xml));
         }
 
-        public List<CpfItem> CloneItems() // Do NOT change this to ReadOnlyCollection, as we specifically want an alterable clone!
+        private void BuildXml()
         {
-            List<CpfItem> cloneItems = new List<CpfItem>(items.Count);
+            xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n";
 
-            for (int i = 0; i < items.Count; ++i)
+            xml += $"<{rootEleName}>\r\n";
+
+            foreach (CpfItem item in items)
             {
-                cloneItems.Add(items[i].Clone());
+                string eleName = null;
+                string value = null;
+
+                switch (item.DataType)
+                {
+                    case MetaData.DataTypes.dtSingle:
+                        eleName = "AnyFloat32";
+                        value = item.SingleValue.ToString();
+                        break;
+                    case MetaData.DataTypes.dtInteger:
+                        eleName = "AnySint32";
+                        value = item.IntegerValue.ToString();
+                        break;
+                    case MetaData.DataTypes.dtUInteger:
+                        eleName = "AnyUint32";
+                        value = item.UIntegerValue.ToString();
+                        break;
+                    case MetaData.DataTypes.dtString:
+                        eleName = "AnyString";
+                        value = item.StringValue;
+                        break;
+                    case MetaData.DataTypes.dtBoolean:
+                        eleName = "AnyBoolean";
+                        value = item.BooleanValue.ToString();
+                        break;
+                }
+
+                if (eleName != null)
+                {
+                    xml += $"  <{eleName} key=\"{item.Name}\" type=\"{Helper.Hex8PrefixString((uint)item.DataType).ToLower()}\">{value}</{eleName}>\r\n";
+                }
             }
 
-            return cloneItems;
+            xml += $"</{rootEleName}>\r\n";
         }
 
-        public void AddItems(List<CpfItem> newItems)
-        {
-            foreach (CpfItem newItem in newItems)
-            {
-                AddItem(newItem);
-            }
-        }
-
-        public CpfItem AddItem(CpfItem item)
-        {
-            if (item != null)
-            {
-                items.Add(item);
-                _isDirty = true;
-            }
-
-            return item;
-        }
-
-        public CpfItem GetItem(string name)
+        private CpfItem GetItem(string name)
         {
             foreach (CpfItem item in this.items)
                 if (item.Name == name) return item;
@@ -266,12 +211,24 @@ namespace Sims2Tools.DBPF.CPF
             return null;
         }
 
-        public CpfItem GetOrAddItem(string name, MetaData.DataTypes datatype)
+        public uint GetItemUInteger(string name)
         {
-            foreach (CpfItem item in this.items)
-                if (item.Name == name) return item;
+            CpfItem item = GetItem(name);
 
-            return AddItem(new CpfItem(name, datatype));
+            return (item != null ? item.UIntegerValue : 0);
+        }
+
+        public string GetItemString(string name)
+        {
+            return GetItem(name)?.StringValue;
+        }
+
+        public void SetItemUInteger(string name, uint value)
+        {
+            GetItem(name).UIntegerValue = value;
+            _isDirty = true;
+
+            xml = null;
         }
 
         protected XmlElement AddXml(XmlElement parent, string name)

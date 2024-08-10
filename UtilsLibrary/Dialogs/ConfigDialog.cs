@@ -50,6 +50,8 @@ namespace Sims2Tools
 
             textSimPePath.Text = Sims2ToolsLib.SimPePath;
 
+            ckbAllAdvancedMode.Checked = Sims2ToolsLib.AllAdvancedMode;
+
             UpdateFormState();
         }
 
@@ -113,6 +115,8 @@ namespace Sims2Tools
             Sims2ToolsLib.Sims2Path = textSims2Path.Text;
             Sims2ToolsLib.Sims2HomePath = textSims2HomePath.Text;
             Sims2ToolsLib.SimPePath = textSimPePath.Text;
+
+            Sims2ToolsLib.AllAdvancedMode = ckbAllAdvancedMode.Checked;
 
             // As updating the global objects is a long process, it's worth checking that one of these actually changed
             if (!(textSims2Path.Text.Equals(oldSims2Path) && textSims2HomePath.Text.Equals(oldSims2HomePath) && textSimPePath.Text.Equals(oldSimPePath)))

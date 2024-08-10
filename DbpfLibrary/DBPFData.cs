@@ -58,6 +58,9 @@ using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XSTN;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.SLOT;
+using Sims2Tools.DBPF.Sounds;
+using Sims2Tools.DBPF.Sounds.HLS;
+using Sims2Tools.DBPF.Sounds.TRKS;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
@@ -172,6 +175,10 @@ namespace Sims2Tools.DBPF
             OtherTypeNames.Add(Xobj.TYPE, Xobj.NAME);
             OtherTypeNames.Add(Xrof.TYPE, Xrof.NAME);
             OtherTypeNames.Add(Xwnt.TYPE, Xwnt.NAME);
+
+            OtherTypeNames.Add(Hls.TYPE, Hls.NAME);
+            OtherTypeNames.Add(Trks.TYPE, Trks.NAME);
+            OtherTypeNames.Add(Audio.TYPE, Audio.NAME);
 
             OtherTypeNames.Add(Cgn1.TYPE, Cgn1.NAME);
             OtherTypeNames.Add(Grop.TYPE, Grop.NAME);

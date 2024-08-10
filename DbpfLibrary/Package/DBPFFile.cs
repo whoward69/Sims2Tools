@@ -59,6 +59,9 @@ using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XSTN;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.SLOT;
+using Sims2Tools.DBPF.Sounds;
+using Sims2Tools.DBPF.Sounds.HLS;
+using Sims2Tools.DBPF.Sounds.TRKS;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TPRP;
 using Sims2Tools.DBPF.TRCN;
@@ -575,6 +578,21 @@ namespace Sims2Tools.DBPF.Package
                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Wall])
             {
                 res = new Thub(entry, reader);
+            }
+            //
+            // Sound resources
+            //
+            else if (entry.TypeID == Hls.TYPE)
+            {
+                res = new Hls(entry, reader);
+            }
+            else if (entry.TypeID == Trks.TYPE)
+            {
+                res = new Trks(entry, reader);
+            }
+            else if (entry.TypeID == Audio.TYPE)
+            {
+                res = new Audio(entry, reader);
             }
             //
             // Neighbourhood resources

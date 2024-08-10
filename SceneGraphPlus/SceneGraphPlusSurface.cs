@@ -31,6 +31,9 @@ using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
+using Sims2Tools.DBPF.Sounds;
+using Sims2Tools.DBPF.Sounds.HLS;
+using Sims2Tools.DBPF.Sounds.TRKS;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFLR;
@@ -597,6 +600,19 @@ namespace SceneGraphPlus.Surface
                 editBlock.SetDirty();
 
                 FixIssues(editBlock);
+
+                if (editBlock.TypeId == Hls.TYPE || editBlock.TypeId == Trks.TYPE || editBlock.TypeId == Audio.TYPE)
+                {
+                    foreach (AbstractGraphConnector connector in editBlock.SoleParent.OutConnectors)
+                    {
+                        connector.EndBlock.UpdateSoundName(name);
+                    }
+
+                    foreach (AbstractGraphConnector connector in editBlock.GetInConnectors())
+                    {
+                        connector.StartBlock.SetDirty();
+                    }
+                }
 
                 owningForm.UpdateEditor(editBlock);
             }
@@ -1764,7 +1780,7 @@ namespace SceneGraphPlus.Surface
                 {
                     if (!block.IsDeleted)
                     {
-                        if (block.BlockName == null && !block.SgOriginalName.Equals(block.SgFullName))
+                        if (block.BlockName == null && block.SgOriginalName != null && !block.SgOriginalName.Equals(block.SgFullName))
                         {
                             UpdateRefsFromParents(packageCache, block, prefixLowerCase);
                         }
@@ -1786,6 +1802,10 @@ namespace SceneGraphPlus.Surface
                         if (res is Rcol rcol)
                         {
                             rcol.FixTGIR();
+                        }
+                        else if (res is Hls || res is Trks || res is Audio)
+                        {
+                            res.ChangeIR(block.Key.InstanceID, block.Key.ResourceID);
                         }
 
                         package.Commit(res, true); // ALWAYS commit, as we removed the resource above
@@ -1830,6 +1850,18 @@ namespace SceneGraphPlus.Surface
             else if (res is Aged)
             {
                 // AGED has no name
+            }
+            else if (res is Hls)
+            {
+                // HLS has no name
+            }
+            else if (res is Trks)
+            {
+                // TRKS has no name
+            }
+            else if (res is Audio)
+            {
+                // AUDIO has no name
             }
             else if (res is Cpf cpf) // Do this AFTER MMAT and AGED
             {
@@ -1957,21 +1989,30 @@ namespace SceneGraphPlus.Surface
             // "UnderstoodTypes" - when adding a new resource type, need to update this block
             if (res is Str str)
             {
-                Trace.Assert(endBlock.TypeId == Cres.TYPE || endBlock.TypeId == Txmt.TYPE, "Expecting CRES or TXMT for EndBlock");
+                Trace.Assert(endBlock.TypeId == Cres.TYPE || endBlock.TypeId == Txmt.TYPE || endBlock.TypeId == Hls.TYPE, "Expecting CRES, TXMT or HLS for EndBlock");
 
                 List<StrItem> items = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default);
                 Trace.Assert(index < items.Count, "Index out of range");
 
-                if (endBlock.TypeId == Cres.TYPE)
+                if (endBlock.TypeId == Hls.TYPE)
                 {
-                    Trace.Assert(str.InstanceID == (TypeInstanceID)0x0085, "CRES expected for Model Names only");
-                }
-                else if (endBlock.TypeId == Txmt.TYPE)
-                {
-                    Trace.Assert(str.InstanceID == (TypeInstanceID)0x0088, "TXMT expected for Material Names only");
-                }
+                    Trace.Assert(str.InstanceID == (TypeInstanceID)0x4132, "HLS expected for Sounds");
 
-                items[index].Title = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
+                    items[index].Title = endBlock.BlockName;
+                }
+                else
+                {
+                    if (endBlock.TypeId == Cres.TYPE)
+                    {
+                        Trace.Assert(str.InstanceID == (TypeInstanceID)0x0085, "CRES expected for Model Names");
+                    }
+                    else if (endBlock.TypeId == Txmt.TYPE)
+                    {
+                        Trace.Assert(str.InstanceID == (TypeInstanceID)0x0088, "TXMT expected for Material Names");
+                    }
+
+                    items[index].Title = MakeSgName(endBlock.Key.GroupID, endBlock.SgBaseName, prefixLowerCase);
+                }
             }
             else if (res is Mmat mmat)
             {
@@ -2205,6 +2246,22 @@ namespace SceneGraphPlus.Surface
             else if (res is Lght)
             {
                 Trace.Assert(false, "Lights (LAMB, LDIR, LPNT, LSPT) do not have child resources");
+            }
+            else if (res is Hls hls)
+            {
+                Trace.Assert(endBlock.TypeId == Trks.TYPE, "Expecting TRKS for EndBlock");
+                hls.Items[index].InstanceLo = endBlock.Key.InstanceID;
+                hls.Items[index].InstanceHi = endBlock.Key.ResourceID;
+            }
+            else if (res is Trks trks)
+            {
+                Trace.Assert(endBlock.TypeId == Audio.TYPE, "Expecting AUDIO for EndBlock");
+                trks.SetItemUInteger("0xff3c2160", endBlock.Key.InstanceID.AsUInt());
+                trks.SetItemUInteger("0xff99d2d5", endBlock.Key.ResourceID.AsUInt());
+            }
+            else if (res is Audio)
+            {
+                Trace.Assert(false, "AUDIO's do not have child resources");
             }
             else
             {

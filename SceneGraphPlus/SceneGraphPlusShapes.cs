@@ -510,6 +510,13 @@ namespace SceneGraphPlus.Shapes
             BlockRef.SetSgFullName(sgName, prefixLowerCase);
         }
 
+        public void UpdateSoundName(string name)
+        {
+            blockRef.SetSoundKey(name);
+
+            SetDirty();
+        }
+
         public bool IsFileListValid
         {
             get => (IsClone ? clonedFrom.IsFileListValid : fileListValid);

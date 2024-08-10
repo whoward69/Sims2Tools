@@ -86,22 +86,15 @@ namespace Sims2Tools.DBPF.CPF
                 switch (DataType)
                 {
                     case MetaData.DataTypes.dtSingle:
-                        {
-                            return AsSingle().ToString();
-                        }
+                        return AsSingle().ToString();
                     case MetaData.DataTypes.dtInteger:
-                    case Data.MetaData.DataTypes.dtUInteger:
-                        {
-                            return Helper.Hex8PrefixString((uint)AsInteger());
-                        }
+                        return AsInteger().ToString();
+                    case MetaData.DataTypes.dtUInteger:
+                        return Helper.Hex8PrefixString(AsUInteger());
                     case MetaData.DataTypes.dtString:
-                        {
-                            return AsString();
-                        }
+                        return AsString();
                     default:
-                        {
-                            return "";
-                        }
+                        return "";
                 }
             }
 
@@ -184,7 +177,7 @@ namespace Sims2Tools.DBPF.CPF
                             return Convert.ToInt32(AsSingle());
                         }
                     case MetaData.DataTypes.dtInteger:
-                    case Data.MetaData.DataTypes.dtUInteger:
+                    case MetaData.DataTypes.dtUInteger:
                         {
                             return AsInteger();
                         }
@@ -242,7 +235,7 @@ namespace Sims2Tools.DBPF.CPF
                             return AsSingle();
                         }
                     case MetaData.DataTypes.dtInteger:
-                    case Data.MetaData.DataTypes.dtUInteger:
+                    case MetaData.DataTypes.dtUInteger:
                         {
                             return AsInteger();
                         }
@@ -290,7 +283,7 @@ namespace Sims2Tools.DBPF.CPF
                             return (AsSingle() != 0.0);
                         }
                     case MetaData.DataTypes.dtInteger:
-                    case Data.MetaData.DataTypes.dtUInteger:
+                    case MetaData.DataTypes.dtUInteger:
                         {
                             return (AsInteger() != 0);
                         }
@@ -339,26 +332,16 @@ namespace Sims2Tools.DBPF.CPF
             {
                 switch (datatype)
                 {
-                    case Data.MetaData.DataTypes.dtUInteger:
-                        {
-                            return UIntegerValue;
-                        }
-                    case Data.MetaData.DataTypes.dtInteger:
-                        {
-                            return IntegerValue;
-                        }
-                    case Data.MetaData.DataTypes.dtSingle:
-                        {
-                            return SingleValue;
-                        }
-                    case Data.MetaData.DataTypes.dtBoolean:
-                        {
-                            return BooleanValue;
-                        }
+                    case MetaData.DataTypes.dtUInteger:
+                        return UIntegerValue;
+                    case MetaData.DataTypes.dtInteger:
+                        return IntegerValue;
+                    case MetaData.DataTypes.dtSingle:
+                        return SingleValue;
+                    case MetaData.DataTypes.dtBoolean:
+                        return BooleanValue;
                     default:
-                        {
-                            return StringValue;
-                        }
+                        return StringValue;
                 }
             }
         }

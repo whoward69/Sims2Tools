@@ -108,10 +108,7 @@ namespace SceneGraphPlus.Cache
 
         public TypeTypeID TypeId => typeId;
         public string SgOriginalName => sgOriginalName;
-        public string SgFullName
-        {
-            get => sgName;
-        }
+        public string SgFullName => sgName;
         public void SetSgFullName(string value, bool prefixLowerCase)
         {
             if (key != null)
@@ -124,6 +121,10 @@ namespace SceneGraphPlus.Cache
             }
 
             if (sgOriginalName == null) this.sgOriginalName = this.sgName;
+        }
+        public void SetSoundKey(string name)
+        {
+            key = new DBPFKey(key.TypeID, key.GroupID, Hashes.InstanceIDHash(name), Hashes.ResourceIDHash(name));
         }
         public DBPFKey OriginalKey => originalKey;
         public DBPFKey Key => key;

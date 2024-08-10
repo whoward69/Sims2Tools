@@ -66,6 +66,12 @@ namespace Sims2Tools.DBPF
             }
         }
 
+        public void ChangeIR(TypeInstanceID instanceID, TypeResourceID resourceID)
+        {
+            this.instanceID = instanceID;
+            this.resourceID = resourceID;
+        }
+
         public int TGIHash
         {
             get

@@ -6,6 +6,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Microsoft.Win32;
 using Sims2Tools.Cache;
 using Sims2Tools.Utils.Persistence;
 
@@ -22,6 +23,8 @@ namespace Sims2Tools
 
         private static readonly string SimPeKey = @"Ambertation\SimPe\Settings";
 
+        private static readonly string AllAdvancedModeKey = "AllAdvancedMode";
+
         private static readonly string CreatorNickNameKey = "CreatorNickName";
         private static readonly string CreatorGuidKey = "CreatorGUID";
 
@@ -29,7 +32,7 @@ namespace Sims2Tools
         {
             get
             {
-                string path = RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.Sims2PathKey, "") as string;
+                string path = RegistryTools.GetSetting(RegistryKey, Sims2PathKey, "") as string;
 
                 // Better to do this here rather than in the setter as a user can edit the registry directly
                 return path.EndsWith(@"\") ? path.Substring(0, path.Length - 1) : path;
@@ -38,11 +41,11 @@ namespace Sims2Tools
             {
                 if (value == null)
                 {
-                    RegistryTools.DeleteSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2PathKey);
+                    RegistryTools.DeleteSetting(RegistryKey, Sims2PathKey);
                 }
                 else
                 {
-                    RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2PathKey, value);
+                    RegistryTools.SaveSetting(RegistryKey, Sims2PathKey, value);
                 }
 
                 GameDataCache.Invalidate();
@@ -51,14 +54,14 @@ namespace Sims2Tools
 
         public static bool IsSims2HomePathSet
         {
-            get => RegistryTools.IsSet(RegistryKey, Sims2ToolsLib.Sims2HomePathKey);
+            get => RegistryTools.IsSet(RegistryKey, Sims2HomePathKey);
         }
 
         public static string Sims2HomePath
         {
             get
             {
-                string path = RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.Sims2HomePathKey, "") as string;
+                string path = RegistryTools.GetSetting(RegistryKey, Sims2HomePathKey, "") as string;
 
                 // Better to do this here rather than in the setter as a user can edit the registry directly
                 return path.EndsWith(@"\") ? path.Substring(0, path.Length - 1) : path;
@@ -67,11 +70,11 @@ namespace Sims2Tools
             {
                 if (value == null)
                 {
-                    RegistryTools.DeleteSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2HomePathKey);
+                    RegistryTools.DeleteSetting(RegistryKey, Sims2HomePathKey);
                 }
                 else
                 {
-                    RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.Sims2HomePathKey, value);
+                    RegistryTools.SaveSetting(RegistryKey, Sims2HomePathKey, value);
                 }
 
                 GameDataCache.Invalidate();
@@ -94,8 +97,8 @@ namespace Sims2Tools
         {
             get
             {
-                string simPePath = RegistryTools.GetSetting(Sims2ToolsLib.SimPeKey, "Path", "") as string;
-                string path = RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.SimPePathKey, simPePath) as string;
+                string simPePath = RegistryTools.GetSetting(SimPeKey, "Path", "") as string;
+                string path = RegistryTools.GetSetting(RegistryKey, SimPePathKey, simPePath) as string;
 
                 if (path.Length == 0) path = simPePath;
 
@@ -106,29 +109,59 @@ namespace Sims2Tools
             {
                 if (value == null)
                 {
-                    RegistryTools.DeleteSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.SimPePathKey);
+                    RegistryTools.DeleteSetting(RegistryKey, SimPePathKey);
                 }
                 else
                 {
-                    RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.SimPePathKey, value);
+                    RegistryTools.SaveSetting(RegistryKey, SimPePathKey, value);
                 }
             }
         }
+
+        public static bool AllAdvancedMode
+        {
+            get
+            {
+                return (((int)RegistryTools.GetSetting(RegistryKey, AllAdvancedModeKey, 0)) != 0);
+            }
+            set
+            {
+                RegistryTools.SaveSetting(RegistryKey, AllAdvancedModeKey, value ? 1 : 0);
+
+                if (value)
+                {
+                    RegistryKey regKey = Registry.CurrentUser.OpenSubKey("Software", true);
+                    RegistryKey myKey = regKey.CreateSubKey(Sims2ToolsLib.RegistryKey);
+
+                    foreach (string appKeyName in myKey.GetSubKeyNames())
+                    {
+                        RegistryKey appKey = myKey.CreateSubKey(appKeyName);
+
+                        if (appKey.OpenSubKey("Mode") != null)
+                        {
+                            RegistryKey modeKey = appKey.CreateSubKey("Mode");
+                            modeKey.SetValue("menuItemAdvanced", 1);
+                        }
+                    }
+                }
+            }
+        }
+
         public static string CreatorNickName
         {
             get
             {
-                return RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.CreatorNickNameKey, "") as string;
+                return RegistryTools.GetSetting(RegistryKey, CreatorNickNameKey, "") as string;
             }
             set
             {
                 if (value == null)
                 {
-                    RegistryTools.DeleteSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.CreatorNickNameKey);
+                    RegistryTools.DeleteSetting(RegistryKey, CreatorNickNameKey);
                 }
                 else
                 {
-                    RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.CreatorNickNameKey, value);
+                    RegistryTools.SaveSetting(RegistryKey, CreatorNickNameKey, value);
                 }
             }
         }
@@ -137,17 +170,17 @@ namespace Sims2Tools
         {
             get
             {
-                return RegistryTools.GetSetting(RegistryKey, Sims2ToolsLib.CreatorGuidKey, "00000000-0000-0000-0000-000000000000") as string;
+                return RegistryTools.GetSetting(RegistryKey, CreatorGuidKey, "00000000-0000-0000-0000-000000000000") as string;
             }
             set
             {
                 if (value == null)
                 {
-                    RegistryTools.DeleteSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.CreatorGuidKey);
+                    RegistryTools.DeleteSetting(RegistryKey, CreatorGuidKey);
                 }
                 else
                 {
-                    RegistryTools.SaveSetting(Sims2ToolsLib.RegistryKey, Sims2ToolsLib.CreatorGuidKey, value);
+                    RegistryTools.SaveSetting(RegistryKey, CreatorGuidKey, value);
                 }
             }
         }

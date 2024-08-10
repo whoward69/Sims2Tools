@@ -57,6 +57,8 @@ namespace BsokEditor
             this.menuItemShowCategoryShoe = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowNakedCategory = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewResources = new System.Windows.Forms.DataGridView();
             this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -86,10 +88,9 @@ namespace BsokEditor
             this.ckbCatFormal = new System.Windows.Forms.CheckBox();
             this.ckbCatEveryday = new System.Windows.Forms.CheckBox();
             this.panelEditor = new System.Windows.Forms.Panel();
+            this.grpSearch = new System.Windows.Forms.GroupBox();
+            this.textSearch = new System.Windows.Forms.TextBox();
             this.grpBsok = new System.Windows.Forms.GroupBox();
-            this.btnBsokRoles = new System.Windows.Forms.Button();
-            this.btnBsokStyle = new System.Windows.Forms.Button();
-            this.btnBsokGenre = new System.Windows.Forms.Button();
             this.comboBsokRoles = new System.Windows.Forms.ComboBox();
             this.comboBsokShape = new System.Windows.Forms.ComboBox();
             this.comboBsokGroup = new System.Windows.Forms.ComboBox();
@@ -107,13 +108,12 @@ namespace BsokEditor
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextGrid.SuspendLayout();
             this.grpCategory.SuspendLayout();
             this.panelEditor.SuspendLayout();
+            this.grpSearch.SuspendLayout();
             this.grpBsok.SuspendLayout();
             this.grpGender.SuspendLayout();
             this.grpShoe.SuspendLayout();
@@ -126,8 +126,8 @@ namespace BsokEditor
             this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
             this.menuHelp,
-            this.menuOptions,
-            this.menuMode});
+            this.menuMode,
+            this.menuOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -262,6 +262,20 @@ namespace BsokEditor
             this.menuMode.Name = "menuMode";
             this.menuMode.Size = new System.Drawing.Size(50, 20);
             this.menuMode.Text = "&Mode";
+            this.menuMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAdvanced.Text = "Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemAutoBackup
             // 
@@ -419,9 +433,9 @@ namespace BsokEditor
             // 
             this.comboBsokGenre.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBsokGenre.FormattingEnabled = true;
-            this.comboBsokGenre.Location = new System.Drawing.Point(32, 20);
+            this.comboBsokGenre.Location = new System.Drawing.Point(8, 20);
             this.comboBsokGenre.Name = "comboBsokGenre";
-            this.comboBsokGenre.Size = new System.Drawing.Size(333, 23);
+            this.comboBsokGenre.Size = new System.Drawing.Size(357, 23);
             this.comboBsokGenre.TabIndex = 5;
             this.comboBsokGenre.SelectedIndexChanged += new System.EventHandler(this.OnBsokGenreChanged);
             // 
@@ -566,6 +580,7 @@ namespace BsokEditor
             // 
             this.panelEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelEditor.Controls.Add(this.grpSearch);
             this.panelEditor.Controls.Add(this.grpCategory);
             this.panelEditor.Controls.Add(this.grpBsok);
             this.panelEditor.Controls.Add(this.grpGender);
@@ -578,11 +593,26 @@ namespace BsokEditor
             this.panelEditor.Size = new System.Drawing.Size(905, 170);
             this.panelEditor.TabIndex = 25;
             // 
+            // grpSearch
+            // 
+            this.grpSearch.Controls.Add(this.textSearch);
+            this.grpSearch.Location = new System.Drawing.Point(393, 80);
+            this.grpSearch.Name = "grpSearch";
+            this.grpSearch.Size = new System.Drawing.Size(75, 50);
+            this.grpSearch.TabIndex = 8;
+            this.grpSearch.TabStop = false;
+            this.grpSearch.Text = "Search:";
+            // 
+            // textSearch
+            // 
+            this.textSearch.Location = new System.Drawing.Point(5, 21);
+            this.textSearch.Name = "textSearch";
+            this.textSearch.Size = new System.Drawing.Size(65, 21);
+            this.textSearch.TabIndex = 0;
+            this.textSearch.TextChanged += new System.EventHandler(this.OnSearchChanged);
+            // 
             // grpBsok
             // 
-            this.grpBsok.Controls.Add(this.btnBsokRoles);
-            this.grpBsok.Controls.Add(this.btnBsokStyle);
-            this.grpBsok.Controls.Add(this.btnBsokGenre);
             this.grpBsok.Controls.Add(this.comboBsokRoles);
             this.grpBsok.Controls.Add(this.comboBsokShape);
             this.grpBsok.Controls.Add(this.comboBsokGroup);
@@ -595,43 +625,13 @@ namespace BsokEditor
             this.grpBsok.TabStop = false;
             this.grpBsok.Text = "BSOK Product:";
             // 
-            // btnBsokRoles
-            // 
-            this.btnBsokRoles.Image = ((System.Drawing.Image)(resources.GetObject("btnBsokRoles.Image")));
-            this.btnBsokRoles.Location = new System.Drawing.Point(5, 140);
-            this.btnBsokRoles.Name = "btnBsokRoles";
-            this.btnBsokRoles.Size = new System.Drawing.Size(22, 23);
-            this.btnBsokRoles.TabIndex = 14;
-            this.btnBsokRoles.UseVisualStyleBackColor = true;
-            this.btnBsokRoles.Click += new System.EventHandler(this.OnBsokRoleLockClicked);
-            // 
-            // btnBsokStyle
-            // 
-            this.btnBsokStyle.Image = ((System.Drawing.Image)(resources.GetObject("btnBsokStyle.Image")));
-            this.btnBsokStyle.Location = new System.Drawing.Point(5, 50);
-            this.btnBsokStyle.Name = "btnBsokStyle";
-            this.btnBsokStyle.Size = new System.Drawing.Size(22, 23);
-            this.btnBsokStyle.TabIndex = 11;
-            this.btnBsokStyle.UseVisualStyleBackColor = true;
-            this.btnBsokStyle.Click += new System.EventHandler(this.OnBsokStyleLockClicked);
-            // 
-            // btnBsokGenre
-            // 
-            this.btnBsokGenre.Image = ((System.Drawing.Image)(resources.GetObject("btnBsokGenre.Image")));
-            this.btnBsokGenre.Location = new System.Drawing.Point(5, 20);
-            this.btnBsokGenre.Name = "btnBsokGenre";
-            this.btnBsokGenre.Size = new System.Drawing.Size(22, 23);
-            this.btnBsokGenre.TabIndex = 10;
-            this.btnBsokGenre.UseVisualStyleBackColor = true;
-            this.btnBsokGenre.Click += new System.EventHandler(this.OnBsokGenreLockClicked);
-            // 
             // comboBsokRoles
             // 
             this.comboBsokRoles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBsokRoles.FormattingEnabled = true;
-            this.comboBsokRoles.Location = new System.Drawing.Point(32, 140);
+            this.comboBsokRoles.Location = new System.Drawing.Point(8, 140);
             this.comboBsokRoles.Name = "comboBsokRoles";
-            this.comboBsokRoles.Size = new System.Drawing.Size(333, 23);
+            this.comboBsokRoles.Size = new System.Drawing.Size(357, 23);
             this.comboBsokRoles.TabIndex = 9;
             this.comboBsokRoles.SelectedIndexChanged += new System.EventHandler(this.OnBsokRoleChanged);
             // 
@@ -639,9 +639,9 @@ namespace BsokEditor
             // 
             this.comboBsokShape.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBsokShape.FormattingEnabled = true;
-            this.comboBsokShape.Location = new System.Drawing.Point(32, 110);
+            this.comboBsokShape.Location = new System.Drawing.Point(8, 110);
             this.comboBsokShape.Name = "comboBsokShape";
-            this.comboBsokShape.Size = new System.Drawing.Size(333, 23);
+            this.comboBsokShape.Size = new System.Drawing.Size(357, 23);
             this.comboBsokShape.TabIndex = 8;
             this.comboBsokShape.SelectedIndexChanged += new System.EventHandler(this.OnBsokShapeChanged);
             // 
@@ -649,9 +649,9 @@ namespace BsokEditor
             // 
             this.comboBsokGroup.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBsokGroup.FormattingEnabled = true;
-            this.comboBsokGroup.Location = new System.Drawing.Point(32, 80);
+            this.comboBsokGroup.Location = new System.Drawing.Point(8, 80);
             this.comboBsokGroup.Name = "comboBsokGroup";
-            this.comboBsokGroup.Size = new System.Drawing.Size(333, 23);
+            this.comboBsokGroup.Size = new System.Drawing.Size(357, 23);
             this.comboBsokGroup.TabIndex = 7;
             this.comboBsokGroup.SelectedIndexChanged += new System.EventHandler(this.OnBsokGroupChanged);
             // 
@@ -659,9 +659,9 @@ namespace BsokEditor
             // 
             this.comboBsokStyle.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBsokStyle.FormattingEnabled = true;
-            this.comboBsokStyle.Location = new System.Drawing.Point(32, 50);
+            this.comboBsokStyle.Location = new System.Drawing.Point(8, 50);
             this.comboBsokStyle.Name = "comboBsokStyle";
-            this.comboBsokStyle.Size = new System.Drawing.Size(333, 23);
+            this.comboBsokStyle.Size = new System.Drawing.Size(357, 23);
             this.comboBsokStyle.TabIndex = 6;
             this.comboBsokStyle.SelectedIndexChanged += new System.EventHandler(this.OnBsokStyleChanged);
             // 
@@ -670,7 +670,7 @@ namespace BsokEditor
             this.grpGender.Controls.Add(this.comboGender);
             this.grpGender.Location = new System.Drawing.Point(393, 0);
             this.grpGender.Name = "grpGender";
-            this.grpGender.Size = new System.Drawing.Size(75, 171);
+            this.grpGender.Size = new System.Drawing.Size(75, 50);
             this.grpGender.TabIndex = 6;
             this.grpGender.TabStop = false;
             this.grpGender.Text = "Gender:";
@@ -804,19 +804,6 @@ namespace BsokEditor
             this.thumbBox.TabStop = false;
             this.thumbBox.Visible = false;
             // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
-            // 
-            // menuItemAdvanced
-            // 
-            this.menuItemAdvanced.CheckOnClick = true;
-            this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAdvanced.Text = "Advanced";
-            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
-            // 
             // BsokEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -842,6 +829,8 @@ namespace BsokEditor
             this.grpCategory.ResumeLayout(false);
             this.grpCategory.PerformLayout();
             this.panelEditor.ResumeLayout(false);
+            this.grpSearch.ResumeLayout(false);
+            this.grpSearch.PerformLayout();
             this.grpBsok.ResumeLayout(false);
             this.grpGender.ResumeLayout(false);
             this.grpShoe.ResumeLayout(false);
@@ -882,9 +871,6 @@ namespace BsokEditor
         private System.Windows.Forms.GroupBox grpCategory;
         private System.Windows.Forms.GroupBox grpShoe;
         private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.Button btnBsokGenre;
-        private System.Windows.Forms.Button btnBsokStyle;
-        private System.Windows.Forms.Button btnBsokRoles;
         private System.Windows.Forms.ComboBox comboBsokGenre;
         private System.Windows.Forms.ComboBox comboBsokStyle;
         private System.Windows.Forms.ComboBox comboBsokGroup;
@@ -925,5 +911,7 @@ namespace BsokEditor
         private System.Windows.Forms.DataGridViewTextBoxColumn colResRef;
         private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.GroupBox grpSearch;
+        private System.Windows.Forms.TextBox textSearch;
     }
 }

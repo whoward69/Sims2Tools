@@ -50,6 +50,7 @@ namespace Sims2Tools
             this.textSims2HomePath = new System.Windows.Forms.TextBox();
             this.btnSimsHomeSelect = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
+            this.ckbAllAdvancedMode = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // lblSims2Path
@@ -89,10 +90,10 @@ namespace Sims2Tools
             this.lblSimPEPath.TabIndex = 0;
             this.lblSimPEPath.Text = "SimPE Install Path:";
             // 
-            // textSimPEPath
+            // textSimPePath
             // 
             this.textSimPePath.Location = new System.Drawing.Point(127, 89);
-            this.textSimPePath.Name = "textSimPEPath";
+            this.textSimPePath.Name = "textSimPePath";
             this.textSimPePath.Size = new System.Drawing.Size(530, 21);
             this.textSimPePath.TabIndex = 3;
             this.textSimPePath.TextChanged += new System.EventHandler(this.OnTextChanged);
@@ -158,12 +159,23 @@ namespace Sims2Tools
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
+            // ckbAllAdvanceMode
+            // 
+            this.ckbAllAdvancedMode.AutoSize = true;
+            this.ckbAllAdvancedMode.Location = new System.Drawing.Point(127, 134);
+            this.ckbAllAdvancedMode.Name = "ckbAllAdvanceMode";
+            this.ckbAllAdvancedMode.Size = new System.Drawing.Size(160, 19);
+            this.ckbAllAdvancedMode.TabIndex = 10;
+            this.ckbAllAdvancedMode.Text = "All Apps Advanced Mode";
+            this.ckbAllAdvancedMode.UseVisualStyleBackColor = true;
+            // 
             // ConfigDialog
             // 
             this.AcceptButton = this.btnConfigOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(820, 169);
+            this.Controls.Add(this.ckbAllAdvancedMode);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.lblSims2Path);
             this.Controls.Add(this.textSims2Path);
@@ -203,5 +215,6 @@ namespace Sims2Tools
         private System.Windows.Forms.TextBox textSims2HomePath;
         private System.Windows.Forms.Button btnSimsHomeSelect;
         private System.Windows.Forms.Button btnCancel;
+        private System.Windows.Forms.CheckBox ckbAllAdvancedMode;
     }
 }
