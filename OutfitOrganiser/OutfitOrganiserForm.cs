@@ -174,6 +174,7 @@ namespace OutfitOrganiser
         private bool ignoreEdits = false;
 
         private bool IsAutoUpdate => (!dataLoading && !ignoreEdits);
+        public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
         #region Constructor and Dispose
         public OutfitOrganiserForm()
@@ -381,7 +382,7 @@ namespace OutfitOrganiser
             savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims"));
             meshCachesLoaded = false;
 
-            if (menuItemAdvanced.Checked && menuItemPreloadMeshes.Checked) CacheMeshes();
+            if (IsAdvancedMode && menuItemPreloadMeshes.Checked) CacheMeshes();
 
             SetTitle(lastFolder);
         }
@@ -420,7 +421,7 @@ namespace OutfitOrganiser
 
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
             RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
         }
 
@@ -459,7 +460,7 @@ namespace OutfitOrganiser
                 lblNoOutfitSelected.Visible = true;
             }
 
-            if (menuItemAdvanced.Checked)
+            if (IsAdvancedMode)
             {
                 if (meshCachesLoaded)
                 {
@@ -725,7 +726,7 @@ namespace OutfitOrganiser
                                 AddToGrid(sender, package, OutfitDbpfData.Create(package, binxEntry));
                             }
 
-                            if (menuItemAdvanced.Checked)
+                            if (IsAdvancedMode)
                             {
                                 bool startFromLastGameDir = false;
 
@@ -1464,9 +1465,14 @@ namespace OutfitOrganiser
         #endregion
 
         #region Mode Menu Actions
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+        }
+
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
-            if (menuItemAdvanced.Checked)
+            if (IsAdvancedMode)
             {
                 toolStripSeparator3.Visible = true;
                 menuItemLoadMeshesNow.Visible = true;

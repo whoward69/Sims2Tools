@@ -88,6 +88,7 @@ namespace GeneticsChanger
         private bool ignoreEdits = false;
 
         private bool IsAutoUpdate => (!dataLoading && !ignoreEdits);
+        public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
         #region Constructor and Dispose
         public GeneticsChangerForm()
@@ -210,7 +211,7 @@ namespace GeneticsChanger
             RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
             RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
             RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
         }
 
@@ -1094,6 +1095,11 @@ namespace GeneticsChanger
         #endregion
 
         #region Mode Menu Actions
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+        }
+
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
         }

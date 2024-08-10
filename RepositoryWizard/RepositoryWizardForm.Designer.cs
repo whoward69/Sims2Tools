@@ -326,6 +326,7 @@ namespace RepositoryWizard
             this.menuItemMode.Name = "menuItemMode";
             this.menuItemMode.Size = new System.Drawing.Size(50, 20);
             this.menuItemMode.Text = "&Mode";
+            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
             // 
             // menuItemModeClothing
             // 

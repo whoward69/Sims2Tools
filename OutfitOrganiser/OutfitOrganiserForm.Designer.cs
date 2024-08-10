@@ -134,6 +134,7 @@ namespace OutfitOrganiser
             this.grpAccessories = new System.Windows.Forms.GroupBox();
             this.comboJewelry = new System.Windows.Forms.ComboBox();
             this.comboDestination = new System.Windows.Forms.ComboBox();
+            this.comboAccessoryBin = new System.Windows.Forms.ComboBox();
             this.grpMakeup = new System.Windows.Forms.GroupBox();
             this.comboMakeupSubtype = new System.Windows.Forms.ComboBox();
             this.comboMakeupLayer = new System.Windows.Forms.ComboBox();
@@ -183,7 +184,6 @@ namespace OutfitOrganiser
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
             this.lblNoOutfitSelected = new System.Windows.Forms.Label();
-            this.comboAccessoryBin = new System.Windows.Forms.ComboBox();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -219,11 +219,11 @@ namespace OutfitOrganiser
             this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
             this.menuHelp,
+            this.menuItemMode,
             this.menuItemOutfits,
             this.menuItemFolder,
             this.menuItemPackage,
-            this.menuItemOptions,
-            this.menuItemMode});
+            this.menuItemOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -540,25 +540,26 @@ namespace OutfitOrganiser
             this.menuItemMode.Name = "menuItemMode";
             this.menuItemMode.Size = new System.Drawing.Size(50, 20);
             this.menuItemMode.Text = "&Mode";
+            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
             // 
             // menuItemAdvanced
             // 
             this.menuItemAdvanced.CheckOnClick = true;
             this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
             this.menuItemAdvanced.Text = "Advanced";
             this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(141, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemAutoBackup
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
             this.menuItemAutoBackup.Text = "Auto-Backup";
             // 
             // saveFileDialog
@@ -1109,6 +1110,17 @@ namespace OutfitOrganiser
             this.comboDestination.TabIndex = 8;
             this.comboDestination.SelectedIndexChanged += new System.EventHandler(this.OnDestinationChanged);
             // 
+            // comboAccessoryBin
+            // 
+            this.comboAccessoryBin.FormattingEnabled = true;
+            this.comboAccessoryBin.Location = new System.Drawing.Point(5, 78);
+            this.comboAccessoryBin.Name = "comboAccessoryBin";
+            this.comboAccessoryBin.Size = new System.Drawing.Size(125, 23);
+            this.comboAccessoryBin.TabIndex = 9;
+            this.comboAccessoryBin.SelectedIndexChanged += new System.EventHandler(this.OnAccessoryBinChanged);
+            this.comboAccessoryBin.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.comboAccessoryBin.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnAccessoryBinKeyUp);
+            // 
             // grpMakeup
             // 
             this.grpMakeup.Controls.Add(this.comboMakeupSubtype);
@@ -1558,17 +1570,6 @@ namespace OutfitOrganiser
             this.lblNoOutfitSelected.Text = "No Outfits Selected!";
             this.lblNoOutfitSelected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblNoOutfitSelected.Visible = false;
-            // 
-            // comboAccessoryBin
-            // 
-            this.comboAccessoryBin.FormattingEnabled = true;
-            this.comboAccessoryBin.Location = new System.Drawing.Point(5, 78);
-            this.comboAccessoryBin.Name = "comboAccessoryBin";
-            this.comboAccessoryBin.Size = new System.Drawing.Size(125, 23);
-            this.comboAccessoryBin.TabIndex = 9;
-            this.comboAccessoryBin.SelectedIndexChanged += new System.EventHandler(this.OnAccessoryBinChanged);
-            this.comboAccessoryBin.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
-            this.comboAccessoryBin.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnAccessoryBinKeyUp);
             // 
             // OutfitOrganiserForm
             // 

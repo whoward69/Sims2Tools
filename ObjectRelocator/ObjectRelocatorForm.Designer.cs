@@ -304,6 +304,7 @@ namespace ObjectRelocator
             this.menuMode.Name = "menuMode";
             this.menuMode.Size = new System.Drawing.Size(50, 20);
             this.menuMode.Text = "&Mode";
+            this.menuMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
             // 
             // menuItemBuyMode
             // 

@@ -127,6 +127,8 @@ namespace RepositoryWizard
 
         private bool dataLoading = false;
 
+        public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
+
         #region Constructor and Dispose
         public RepositoryWizardForm()
         {
@@ -271,7 +273,7 @@ namespace RepositoryWizard
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothing.Name, menuItemModeClothing.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeObject.Name, menuItemModeObject.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothingStandalone.Name, menuItemModeClothingStandalone.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoMerge.Name, menuItemAutoMerge.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemDeleteLocalOrphans.Name, menuItemDeleteLocalOrphans.Checked ? 1 : 0);
@@ -1258,6 +1260,11 @@ namespace RepositoryWizard
         #endregion
 
         #region Mode Menu Actions
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+        }
+
         private bool inModeUpdate = false;
         private void OnModeSelectedChanged(object sender, EventArgs e)
         {
@@ -1278,7 +1285,7 @@ namespace RepositoryWizard
 
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
-            grpGzpsName.Visible = menuItemAdvanced.Checked;
+            grpGzpsName.Visible = IsAdvancedMode;
         }
         #endregion
 
@@ -1763,7 +1770,7 @@ namespace RepositoryWizard
                 }
                 else if (macro.Equals("type"))
                 {
-                    if (menuItemAdvanced.Checked && comboType.Enabled)
+                    if (IsAdvancedMode && comboType.Enabled)
                     {
                         subst = (comboType.SelectedItem as UintNamedValue).Name;
                     }
@@ -2585,7 +2592,7 @@ namespace RepositoryWizard
              */
             Gzps gzps = (Gzps)selectedResource.CloneCpf(newGroupID);
 
-            if (menuItemAdvanced.Checked && comboType.Enabled)
+            if (IsAdvancedMode && comboType.Enabled)
             {
                 gzps.GetOrAddItem("outfit", MetaData.DataTypes.dtUInteger).UIntegerValue = (comboType.SelectedItem as UintNamedValue).Value;
             }
@@ -2595,7 +2602,7 @@ namespace RepositoryWizard
             {
                 string subset = gzps.GetItem($"override{i}subset").StringValue;
 
-                if (menuItemAdvanced.Checked && comboType.Enabled)
+                if (IsAdvancedMode && comboType.Enabled)
                 {
                     if (subset.Equals("body"))
                     {

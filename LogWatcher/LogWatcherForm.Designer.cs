@@ -36,7 +36,6 @@ namespace LogWatcher
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogWatcherForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -68,7 +67,7 @@ namespace LogWatcher
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.logDirWatcher = new System.IO.FileSystemWatcher();
-            this.menuContextTab = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextTab = new System.Windows.Forms.ContextMenuStrip();
             this.renameContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sep1ContextMenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.closeContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();

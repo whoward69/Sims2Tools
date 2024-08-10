@@ -142,6 +142,8 @@ namespace ObjectRelocator
         }
         #endregion
 
+        public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
+
         #region Constructor and Dispose
         public ObjectRelocatorForm()
         {
@@ -244,7 +246,7 @@ namespace ObjectRelocator
 
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, menuItemRecurse.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, menuItemAdvanced.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemMakeReplacements.Name, menuItemMakeReplacements.Checked ? 1 : 0);
@@ -768,6 +770,11 @@ namespace ObjectRelocator
         #endregion
 
         #region Mode Menu Actions
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+        }
+
         private void OnBuyBuildModeClicked(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItemMode = sender as ToolStripMenuItem;
@@ -812,22 +819,22 @@ namespace ObjectRelocator
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
             // Option menu entries
-            menuItemShowHoodView.Visible = menuItemAdvanced.Checked;
-            menuItemSeparatorModels.Visible = menuItemAdvanced.Checked;
-            menuItemModifyAllModels.Visible = menuItemAdvanced.Checked;
-            menuItemSeparatorFilters.Visible = menuItemAdvanced.Checked;
-            menuItemDisableBuildModeSortFilters.Visible = menuItemAdvanced.Checked;
+            menuItemShowHoodView.Visible = IsAdvancedMode;
+            menuItemSeparatorModels.Visible = IsAdvancedMode;
+            menuItemModifyAllModels.Visible = IsAdvancedMode;
+            menuItemSeparatorFilters.Visible = IsAdvancedMode;
+            menuItemDisableBuildModeSortFilters.Visible = IsAdvancedMode;
 
             // Right-click context menu entries
-            menuItemContextStripCTSSCrap.Visible = menuItemAdvanced.Checked;
-            toolStripSeparatorHood.Visible = menuItemAdvanced.Checked;
-            menuItemContextHoodVisible.Visible = menuItemAdvanced.Checked;
-            menuItemContextHoodInvisible.Visible = menuItemAdvanced.Checked;
-            toolStripSeparatorCamera.Visible = menuItemAdvanced.Checked;
-            menuItemContextRemoveThumbCamera.Visible = menuItemAdvanced.Checked;
+            menuItemContextStripCTSSCrap.Visible = IsAdvancedMode;
+            toolStripSeparatorHood.Visible = IsAdvancedMode;
+            menuItemContextHoodVisible.Visible = IsAdvancedMode;
+            menuItemContextHoodInvisible.Visible = IsAdvancedMode;
+            toolStripSeparatorCamera.Visible = IsAdvancedMode;
+            menuItemContextRemoveThumbCamera.Visible = IsAdvancedMode;
 
             // Resource grid columns
-            if (menuItemAdvanced.Checked)
+            if (IsAdvancedMode)
             {
                 gridViewResources.Columns["colHoodView"].Visible = menuItemShowHoodView.Checked;
             }

@@ -41,6 +41,7 @@ namespace GeneticsChanger
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GeneticsChangerForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,6 +73,8 @@ namespace GeneticsChanger
             this.menuItemShowResTitle = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowResFilename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
@@ -82,7 +85,7 @@ namespace GeneticsChanger
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackageIcon = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextPackages = new System.Windows.Forms.ContextMenuStrip();
+            this.menuContextPackages = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuContextPkgRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgMove = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgMerge = new System.Windows.Forms.ToolStripMenuItem();
@@ -132,7 +135,7 @@ namespace GeneticsChanger
             this.colTownie = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTooltip = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colGeneticData = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextResources = new System.Windows.Forms.ContextMenuStrip();
+            this.menuContextResources = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuContextResRestore = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuContextResSaveThumb = new System.Windows.Forms.ToolStripMenuItem();
@@ -140,15 +143,13 @@ namespace GeneticsChanger
             this.menuContextResDeleteThumb = new System.Windows.Forms.ToolStripMenuItem();
             this.grpHairtone = new System.Windows.Forms.GroupBox();
             this.comboHairtone = new System.Windows.Forms.ComboBox();
-            this.menuContextFolders = new System.Windows.Forms.ContextMenuStrip();
+            this.menuContextFolders = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuContextDirRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDirAdd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDirMove = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDirDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -180,11 +181,11 @@ namespace GeneticsChanger
             this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
             this.menuHelp,
+            this.menuItemMode,
             this.menuItemGenetics,
             this.menuItemFolder,
             this.menuItemPackage,
-            this.menuItemOptions,
-            this.menuItemMode});
+            this.menuItemOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -429,6 +430,20 @@ namespace GeneticsChanger
             this.menuItemMode.Name = "menuItemMode";
             this.menuItemMode.Size = new System.Drawing.Size(50, 20);
             this.menuItemMode.Text = "&Mode";
+            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAdvanced.Text = "Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemAutoBackup
             // 
@@ -1197,19 +1212,6 @@ namespace GeneticsChanger
             this.openThumbnailDialog.Filter = "JPG file|*.jpg|PNG file|*.png|BMP file|*.bmp|All files|*.*";
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
-            // 
-            // menuItemAdvanced
-            // 
-            this.menuItemAdvanced.CheckOnClick = true;
-            this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAdvanced.Text = "Advanced";
-            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // GeneticsChangerForm
             // 
