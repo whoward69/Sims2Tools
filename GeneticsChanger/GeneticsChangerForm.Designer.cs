@@ -410,7 +410,7 @@ namespace GeneticsChanger
             this.menuItemShowResTitle.CheckOnClick = true;
             this.menuItemShowResTitle.Name = "menuItemShowResTitle";
             this.menuItemShowResTitle.Size = new System.Drawing.Size(205, 22);
-            this.menuItemShowResTitle.Text = "Show Resource &Title";
+            this.menuItemShowResTitle.Text = "Show &Title";
             this.menuItemShowResTitle.Click += new System.EventHandler(this.OnShowResTitleClicked);
             // 
             // menuItemShowResFilename
@@ -418,7 +418,7 @@ namespace GeneticsChanger
             this.menuItemShowResFilename.CheckOnClick = true;
             this.menuItemShowResFilename.Name = "menuItemShowResFilename";
             this.menuItemShowResFilename.Size = new System.Drawing.Size(205, 22);
-            this.menuItemShowResFilename.Text = "Show Resource &Filename";
+            this.menuItemShowResFilename.Text = "Show &Filename";
             this.menuItemShowResFilename.Click += new System.EventHandler(this.OnShowResFilenameClicked);
             // 
             // menuItemMode

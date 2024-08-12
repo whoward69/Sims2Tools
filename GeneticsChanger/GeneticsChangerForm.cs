@@ -271,15 +271,6 @@ namespace GeneticsChanger
                     menuItemGeneticEyes.Checked = false;
                     e.Handled = true;
                 }
-                /* TODO - _z_genetics_changer - Hair
-                else if (e.KeyCode == Keys.F5)
-                {
-                    menuItemGeneticSkins.Checked = false;
-                    menuItemGeneticHair.Checked = true;
-                    menuItemGeneticEyes.Checked = false;
-                    e.Handled = true;
-                }
-                */
                 else if (e.KeyCode == Keys.F6)
                 {
                     menuItemGeneticSkins.Checked = false;
@@ -2311,28 +2302,6 @@ namespace GeneticsChanger
                         }
                     }
                 }
-                /* TODO - _z_genetics_changer - Hair
-                else if (geneticData.HasThumbnail(cigenCache))
-                {
-                    if (openThumbnailDialog.ShowDialog() == DialogResult.OK)
-                    {
-                        try
-                        {
-                            cigenCache.ReplaceThumbnail(geneticData.ThumbnailOwner, Image.FromFile(openThumbnailDialog.FileName));
-
-                            if (IsCigenDirty())
-                            {
-                                menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.Warn(ex);
-                            MsgBox.Show($"Unable to open/read {openThumbnailDialog.FileName}", "Thumbnail Error");
-                        }
-                    }
-                }
-                */
             }
         }
 
@@ -2343,9 +2312,6 @@ namespace GeneticsChanger
 
             if (selectedRow.Cells["colGeneticData"].Value is GeneticDbpfData geneticData)
             {
-                // TODO - _z_genetics_changer - Hair
-                //cigenCache.DeleteThumbnail(geneticData.ThumbnailOwner);
-
                 if (IsCigenDirty())
                 {
                     menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
