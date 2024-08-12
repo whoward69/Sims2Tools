@@ -81,11 +81,9 @@ namespace DbpfCompare.Controls
         private readonly DbpfCompareNodeResourceData leftNodeData, rightNodeData;
         private readonly string leftPackagePath, rightPackagePath;
 
-        private readonly bool excludeSame = false;
-
         private DBPFResource leftRes, rightRes;
 
-        public ResCompareForm(DbpfCompareNodeResourceData leftNodeData, string leftPackagePath, DbpfCompareNodeResourceData rightNodeData, string rightPackagePath, bool excludeSame)
+        public ResCompareForm(DbpfCompareNodeResourceData leftNodeData, string leftPackagePath, DbpfCompareNodeResourceData rightNodeData, string rightPackagePath)
         {
             InitializeComponent();
 
@@ -93,8 +91,6 @@ namespace DbpfCompare.Controls
             this.leftPackagePath = leftPackagePath;
             this.rightNodeData = rightNodeData;
             this.rightPackagePath = rightPackagePath;
-
-            // this.excludeSame = excludeSame;
 
             gridResCompare.DataSource = dataResCompare;
             dataResCompare.Clear();
@@ -533,7 +529,7 @@ namespace DbpfCompare.Controls
 
             DataRow row;
 
-            if (!excludeSame || leftObjd.Guid != rightObjd.Guid)
+            if (leftObjd.Guid != rightObjd.Guid)
             {
                 row = dataResCompare.NewRow();
                 row["Key"] = "GUID";
@@ -542,7 +538,7 @@ namespace DbpfCompare.Controls
                 dataResCompare.Append(row);
             }
 
-            if (!excludeSame || leftObjd.OriginalGuid != rightObjd.OriginalGuid)
+            if (leftObjd.OriginalGuid != rightObjd.OriginalGuid)
             {
                 row = dataResCompare.NewRow();
                 row["Key"] = "Original GUID";
@@ -551,7 +547,7 @@ namespace DbpfCompare.Controls
                 dataResCompare.Append(row);
             }
 
-            if (!excludeSame || leftObjd.ProxyGuid != rightObjd.ProxyGuid)
+            if (leftObjd.ProxyGuid != rightObjd.ProxyGuid)
             {
                 row = dataResCompare.NewRow();
                 row["Key"] = "Fallback GUID";
@@ -560,7 +556,7 @@ namespace DbpfCompare.Controls
                 dataResCompare.Append(row);
             }
 
-            if (!excludeSame || leftObjd.DiagonalGuid != rightObjd.DiagonalGuid)
+            if (leftObjd.DiagonalGuid != rightObjd.DiagonalGuid)
             {
                 row = dataResCompare.NewRow();
                 row["Key"] = "Diagonal GUID";
@@ -569,7 +565,7 @@ namespace DbpfCompare.Controls
                 dataResCompare.Append(row);
             }
 
-            if (!excludeSame || leftObjd.GridGuid != rightObjd.GridGuid)
+            if (leftObjd.GridGuid != rightObjd.GridGuid)
             {
                 row = dataResCompare.NewRow();
                 row["Key"] = "Grid Align GUID";
@@ -578,7 +574,7 @@ namespace DbpfCompare.Controls
                 dataResCompare.Append(row);
             }
 
-            if (!excludeSame || leftObjd.Type != rightObjd.Type)
+            if (leftObjd.Type != rightObjd.Type)
             {
                 row = dataResCompare.NewRow();
                 row["Key"] = "Object Type";
@@ -589,7 +585,7 @@ namespace DbpfCompare.Controls
 
             for (ObjdIndex index = ObjdIndex.Version1; index <= ObjdIndex.Requirements; ++index)
             {
-                if (!excludeSame || leftObjd.GetRawData(index) != rightObjd.GetRawData(index))
+                if (leftObjd.GetRawData(index) != rightObjd.GetRawData(index))
                 {
                     row = dataResCompare.NewRow();
                     row["Key"] = index.ToString();
@@ -616,7 +612,7 @@ namespace DbpfCompare.Controls
 
             for (ObjfIndex index = ObjfIndex.init; index <= ObjfIndex.extractObjectInfoFromInvToken; ++index)
             {
-                if (!excludeSame || (GetGuardian(leftObjf, index) != GetGuardian(rightObjf, index) || GetAction(leftObjf, index) != GetAction(rightObjf, index)))
+                if (GetGuardian(leftObjf, index) != GetGuardian(rightObjf, index) || GetAction(leftObjf, index) != GetAction(rightObjf, index))
                 {
                     DataRow row = dataResCompare.NewRow();
                     row["Key"] = index.ToString();

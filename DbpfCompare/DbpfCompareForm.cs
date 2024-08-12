@@ -695,7 +695,7 @@ namespace DbpfCompare
 
         private void CompareNodes(DbpfCompareNodeResourceData leftNodeData, DbpfCompareNodeResourceData rightNodeData)
         {
-            (new ResCompareForm(leftNodeData, textLeftPath.Text, rightNodeData, textRightPath.Text, menuItemExcludeSame.Checked)).ShowDialog();
+            (new ResCompareForm(leftNodeData, textLeftPath.Text, rightNodeData, textRightPath.Text)).ShowDialog();
 
             if (leftNodeData.IsSame)
             {

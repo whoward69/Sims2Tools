@@ -506,7 +506,7 @@ namespace DbpfLister
                             }
                             catch (Exception e2)
                             {
-                                // textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                                textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
                             }
 
                             if (breakOut) break;
@@ -517,7 +517,7 @@ namespace DbpfLister
                 }
                 catch (Exception e1)
                 {
-                    // textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
                 }
             }
         }

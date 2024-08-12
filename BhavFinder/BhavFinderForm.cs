@@ -466,15 +466,15 @@ namespace BhavFinder
                 {
                     var records = new List<object>();
 
-                    foreach (DataGridViewRow row in gridFoundBhavs.Rows)
+                    foreach (DataGridViewRow foundRow in gridFoundBhavs.Rows)
                     {
                         records.Add(new
                         {
-                            PackageName = row.Cells["colBhavPackage"].Value as string,
-                            Instance = row.Cells["colBhavInstance"].Value as string,
-                            Name = row.Cells["colBhavName"].Value as string,
-                            Group = row.Cells["colBhavGroupInstance"].Value as string,
-                            Object = row.Cells["colBhavGroupName"].Value as string
+                            PackageName = foundRow.Cells["colBhavPackage"].Value as string,
+                            Instance = foundRow.Cells["colBhavInstance"].Value as string,
+                            Name = foundRow.Cells["colBhavName"].Value as string,
+                            Group = foundRow.Cells["colBhavGroupInstance"].Value as string,
+                            Object = foundRow.Cells["colBhavGroupName"].Value as string
                         });
                     }
 
@@ -798,16 +798,16 @@ namespace BhavFinder
 
                         if (filter.IsWanted(bhav))
                         {
-                            DataRow row = bhavFoundData.NewRow();
-                            row["Package"] = fi.Name;
-                            row["DbpfPath"] = packagePath;
-                            row["DbpfEntry"] = entry;
-                            row["Instance"] = entry.InstanceID.ToShortString();
-                            row["Name"] = bhav.KeyName;
-                            row["GroupInstance"] = entry.GroupID.ToString();
-                            row["GroupName"] = GameData.GroupName(entry.GroupID, localObjectsByGroupID);
+                            DataRow foundRow = bhavFoundData.NewRow();
+                            foundRow["Package"] = fi.Name;
+                            foundRow["DbpfPath"] = packagePath;
+                            foundRow["DbpfEntry"] = entry;
+                            foundRow["Instance"] = entry.InstanceID.ToShortString();
+                            foundRow["Name"] = bhav.KeyName;
+                            foundRow["GroupInstance"] = entry.GroupID.ToString();
+                            foundRow["GroupName"] = GameData.GroupName(entry.GroupID, localObjectsByGroupID);
 
-                            worker.ReportProgress((reportPercent) ? percentComplete : 0, row);
+                            worker.ReportProgress((reportPercent) ? percentComplete : 0, foundRow);
 #if DEBUG
                             if (reportPercent && bhavs.Count < 30) System.Threading.Thread.Sleep(300);
 #endif
@@ -1005,10 +1005,10 @@ namespace BhavFinder
 
                 exporter.Open(selectPathDialog.FileName);
 
-                foreach (DataGridViewRow row in gridFoundBhavs.SelectedRows)
+                foreach (DataGridViewRow foundRow in gridFoundBhavs.SelectedRows)
                 {
-                    string packagePath = row.Cells["colBhavDbpfPath"].Value as string;
-                    DBPFEntry entry = row.Cells["colBhavDbpfEntry"].Value as DBPFEntry;
+                    string packagePath = foundRow.Cells["colBhavDbpfPath"].Value as string;
+                    DBPFEntry entry = foundRow.Cells["colBhavDbpfEntry"].Value as DBPFEntry;
 
                     exporter.Export(packagePath, entry);
                 }

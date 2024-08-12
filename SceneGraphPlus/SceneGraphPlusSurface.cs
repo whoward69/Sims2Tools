@@ -1948,13 +1948,12 @@ namespace SceneGraphPlus.Surface
 
         private void UpdateMaterialName(Txmt txmt, string basename, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames, bool prefixLowerCase)
         {
-            /* if (alwaysClearNames)
+            if (alwaysClearNames)
             {
                 // This will cause the game to crash if the Type is SimSkin (and possibly others)
-                txmt.MaterialDefinition.FileDescription = "";
+                // txmt.MaterialDefinition.FileDescription = "";
             }
-            else */
-            if (alwaysSetNames || !string.IsNullOrEmpty(txmt.MaterialDefinition.FileDescription))
+            else if (alwaysSetNames || !string.IsNullOrEmpty(txmt.MaterialDefinition.FileDescription))
             {
                 if (prefixNames)
                 {
