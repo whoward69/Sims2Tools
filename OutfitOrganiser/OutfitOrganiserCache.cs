@@ -20,6 +20,7 @@ using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
+using Sims2Tools.DBPF.SceneGraph.XSTN;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
@@ -58,6 +59,9 @@ namespace OutfitOrganiser
         private readonly bool isClothing = false;
         private readonly bool isHair = false;
         private readonly bool isMakeUp = false;
+        private readonly bool isSkin = false;
+        private readonly bool isEyes = false;
+
         private readonly bool hasShoe = false;
 
         public string PackagePath => packagePath;
@@ -70,6 +74,9 @@ namespace OutfitOrganiser
         public bool IsClothing => isClothing;
         public bool IsHair => isHair;
         public bool IsMakeUp => isMakeUp;
+        public bool IsSkin => isSkin;
+        public bool IsEyes => isEyes;
+
         public bool HasShoe => hasShoe;
 
         public bool IsDirty => (cpf.IsDirty || (str != null && str.IsDirty) || idrForCpf.IsDirty || (binx != null && binx.IsDirty) || (idrForBinx != null && idrForBinx.IsDirty));
@@ -138,7 +145,7 @@ namespace OutfitOrganiser
 
             if (binx != null && idrForBinx != null && res != null)
             {
-                if (res is Gzps || res is Xmol || res is Xtol)
+                if (res is Gzps || res is Xmol || res is Xtol || res is Xstn)
                 {
                     Cpf cpf = res as Cpf;
                     Idr idrForCpf = idrForBinx;
@@ -205,16 +212,19 @@ namespace OutfitOrganiser
             isClothing = (itemType == 0x04 || itemType == 0x08 || itemType == 0x10);
             isHair = (itemType == 0x01);
             isMakeUp = (itemType == 0x02) && (subtype <= 0x07 && subtype != 0x05);
+            isSkin = (cpf is Xstn);
+            isEyes = (cpf is Xtol && subtype == 0x03);
+
             hasShoe = (itemType == 0x08 || itemType == 0x10);
         }
 
-        public Cpf ThumbnailOwner => cpf is Xtol ? null : cpf;
+        public Cpf ThumbnailOwner => (cpf is Xtol || cpf is Xstn) ? null : cpf;
 
         public Image Thumbnail
         {
             get
             {
-                if (!(cpf is Xtol)) return null;
+                if (!(cpf is Xtol || cpf is Xstn)) return null;
 
                 if (binx == null || idrForBinx == null) return null;
 
@@ -630,6 +640,20 @@ namespace OutfitOrganiser
             set
             {
                 cpf.GetOrAddItem("bin", MetaData.DataTypes.dtUInteger).UIntegerValue = value;
+                UpdatePackage();
+            }
+        }
+
+        public float Genetic
+        {
+            get
+            {
+                CpfItem cpfItem = cpf.GetItem("genetic");
+                return (cpfItem == null) ? 0 : cpfItem.SingleValue;
+            }
+            set
+            {
+                cpf.GetOrAddItem("genetic", MetaData.DataTypes.dtSingle).SingleValue = value;
                 UpdatePackage();
             }
         }

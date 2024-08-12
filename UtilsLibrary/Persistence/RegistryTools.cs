@@ -162,6 +162,23 @@ namespace Sims2Tools.Utils.Persistence
             }
         }
 
+        public static void SetAllAdvancedMode()
+        {
+            RegistryKey regKey = Registry.CurrentUser.OpenSubKey("Software", true);
+            RegistryKey myKey = regKey.CreateSubKey(Sims2ToolsLib.RegistryKey);
+
+            foreach (string appKeyName in myKey.GetSubKeyNames())
+            {
+                RegistryKey appKey = myKey.CreateSubKey(appKeyName);
+
+                if (appKey.OpenSubKey("Mode") != null)
+                {
+                    RegistryKey modeKey = appKey.CreateSubKey("Mode");
+                    modeKey.SetValue("menuItemAdvanced", 1);
+                }
+            }
+        }
+
         public static bool IsSet(string AppRegKey, string Key)
         {
             RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("Software", true);

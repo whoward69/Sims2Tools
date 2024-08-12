@@ -56,11 +56,18 @@ namespace OutfitOrganiser
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOutfits = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOutfitClothing = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOutfitHair = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOutfitAccessory = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOutfitMakeUp = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemGenetics = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemGeneticsSkins = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemGeneticsEyes = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemDirRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemDirAdd = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,10 +89,6 @@ namespace OutfitOrganiser
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemPreloadMeshes = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemLoadMeshesNow = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.splitTopBottom = new System.Windows.Forms.SplitContainer();
@@ -131,6 +134,9 @@ namespace OutfitOrganiser
             this.ckbAgeTeens = new System.Windows.Forms.CheckBox();
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.btnSaveAll = new System.Windows.Forms.Button();
+            this.grpGenetics = new System.Windows.Forms.GroupBox();
+            this.comboGeneticsSkins = new System.Windows.Forms.ComboBox();
+            this.comboGeneticsEyes = new System.Windows.Forms.ComboBox();
             this.grpAccessories = new System.Windows.Forms.GroupBox();
             this.comboJewelry = new System.Windows.Forms.ComboBox();
             this.comboDestination = new System.Windows.Forms.ComboBox();
@@ -162,6 +168,7 @@ namespace OutfitOrganiser
             this.colMakeupLayerStr = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colMakeupLayerInt = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colMakeupBin = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colGenetic = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSort = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colShown = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTownie = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -204,6 +211,7 @@ namespace OutfitOrganiser
             this.grpGender.SuspendLayout();
             this.grpShown.SuspendLayout();
             this.grpAge.SuspendLayout();
+            this.grpGenetics.SuspendLayout();
             this.grpAccessories.SuspendLayout();
             this.grpMakeup.SuspendLayout();
             this.grpShoe.SuspendLayout();
@@ -221,6 +229,7 @@ namespace OutfitOrganiser
             this.menuHelp,
             this.menuItemMode,
             this.menuItemOutfits,
+            this.menuItemGenetics,
             this.menuItemFolder,
             this.menuItemPackage,
             this.menuItemOptions});
@@ -315,6 +324,37 @@ namespace OutfitOrganiser
             this.menuItemAbout.Text = "About...";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
             // 
+            // menuItemMode
+            // 
+            this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAdvanced,
+            this.toolStripSeparator6,
+            this.menuItemAutoBackup});
+            this.menuItemMode.Name = "menuItemMode";
+            this.menuItemMode.Size = new System.Drawing.Size(50, 20);
+            this.menuItemMode.Text = "&Mode";
+            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAdvanced.Text = "Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(141, 6);
+            // 
+            // menuItemAutoBackup
+            // 
+            this.menuItemAutoBackup.CheckOnClick = true;
+            this.menuItemAutoBackup.Name = "menuItemAutoBackup";
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoBackup.Text = "Auto-Backup";
+            // 
             // menuItemOutfits
             // 
             this.menuItemOutfits.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -328,7 +368,6 @@ namespace OutfitOrganiser
             // 
             // menuItemOutfitClothing
             // 
-            this.menuItemOutfitClothing.CheckOnClick = true;
             this.menuItemOutfitClothing.Name = "menuItemOutfitClothing";
             this.menuItemOutfitClothing.ShortcutKeys = System.Windows.Forms.Keys.F4;
             this.menuItemOutfitClothing.Size = new System.Drawing.Size(154, 22);
@@ -337,7 +376,6 @@ namespace OutfitOrganiser
             // 
             // menuItemOutfitHair
             // 
-            this.menuItemOutfitHair.CheckOnClick = true;
             this.menuItemOutfitHair.Name = "menuItemOutfitHair";
             this.menuItemOutfitHair.ShortcutKeys = System.Windows.Forms.Keys.F5;
             this.menuItemOutfitHair.Size = new System.Drawing.Size(154, 22);
@@ -346,7 +384,6 @@ namespace OutfitOrganiser
             // 
             // menuItemOutfitAccessory
             // 
-            this.menuItemOutfitAccessory.CheckOnClick = true;
             this.menuItemOutfitAccessory.Name = "menuItemOutfitAccessory";
             this.menuItemOutfitAccessory.ShortcutKeys = System.Windows.Forms.Keys.F6;
             this.menuItemOutfitAccessory.Size = new System.Drawing.Size(154, 22);
@@ -355,12 +392,38 @@ namespace OutfitOrganiser
             // 
             // menuItemOutfitMakeUp
             // 
-            this.menuItemOutfitMakeUp.CheckOnClick = true;
             this.menuItemOutfitMakeUp.Name = "menuItemOutfitMakeUp";
             this.menuItemOutfitMakeUp.ShortcutKeys = System.Windows.Forms.Keys.F7;
             this.menuItemOutfitMakeUp.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitMakeUp.Text = "&Make-Up";
             this.menuItemOutfitMakeUp.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
+            // 
+            // menuItemGenetics
+            // 
+            this.menuItemGenetics.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemGeneticsSkins,
+            this.menuItemGeneticsEyes});
+            this.menuItemGenetics.Name = "menuItemGenetics";
+            this.menuItemGenetics.Size = new System.Drawing.Size(64, 20);
+            this.menuItemGenetics.Text = "&Genetics";
+            // 
+            // menuItemGeneticsSkins
+            // 
+            this.menuItemGeneticsSkins.CheckOnClick = true;
+            this.menuItemGeneticsSkins.Name = "menuItemGeneticsSkins";
+            this.menuItemGeneticsSkins.ShortcutKeys = System.Windows.Forms.Keys.F8;
+            this.menuItemGeneticsSkins.Size = new System.Drawing.Size(180, 22);
+            this.menuItemGeneticsSkins.Text = "&Skins";
+            this.menuItemGeneticsSkins.Click += new System.EventHandler(this.OnGeneticsSelectedChanged);
+            // 
+            // menuItemGeneticsEyes
+            // 
+            this.menuItemGeneticsEyes.CheckOnClick = true;
+            this.menuItemGeneticsEyes.Name = "menuItemGeneticsEyes";
+            this.menuItemGeneticsEyes.ShortcutKeys = System.Windows.Forms.Keys.F9;
+            this.menuItemGeneticsEyes.Size = new System.Drawing.Size(180, 22);
+            this.menuItemGeneticsEyes.Text = "&Eyes";
+            this.menuItemGeneticsEyes.Click += new System.EventHandler(this.OnGeneticsSelectedChanged);
             // 
             // menuItemFolder
             // 
@@ -465,7 +528,7 @@ namespace OutfitOrganiser
             this.menuItemShowResTitle.CheckOnClick = true;
             this.menuItemShowResTitle.Name = "menuItemShowResTitle";
             this.menuItemShowResTitle.Size = new System.Drawing.Size(258, 22);
-            this.menuItemShowResTitle.Text = "Show Resource &Title";
+            this.menuItemShowResTitle.Text = "Show &Title";
             this.menuItemShowResTitle.Click += new System.EventHandler(this.OnShowResTitleClicked);
             // 
             // menuItemShowResFilename
@@ -473,7 +536,7 @@ namespace OutfitOrganiser
             this.menuItemShowResFilename.CheckOnClick = true;
             this.menuItemShowResFilename.Name = "menuItemShowResFilename";
             this.menuItemShowResFilename.Size = new System.Drawing.Size(258, 22);
-            this.menuItemShowResFilename.Text = "Show Resource &Filename";
+            this.menuItemShowResFilename.Text = "Show &Filename";
             this.menuItemShowResFilename.Click += new System.EventHandler(this.OnShowResFilenameClicked);
             // 
             // menuItemShowResProduct
@@ -481,7 +544,7 @@ namespace OutfitOrganiser
             this.menuItemShowResProduct.CheckOnClick = true;
             this.menuItemShowResProduct.Name = "menuItemShowResProduct";
             this.menuItemShowResProduct.Size = new System.Drawing.Size(258, 22);
-            this.menuItemShowResProduct.Text = "Show Resource &Product";
+            this.menuItemShowResProduct.Text = "Show &Product";
             this.menuItemShowResProduct.Click += new System.EventHandler(this.OnShowResProductClicked);
             // 
             // toolStripSeparator5
@@ -530,37 +593,6 @@ namespace OutfitOrganiser
             this.menuItemLoadMeshesNow.Size = new System.Drawing.Size(258, 22);
             this.menuItemLoadMeshesNow.Text = "Load Meshes Now";
             this.menuItemLoadMeshesNow.Click += new System.EventHandler(this.OnLoadMeshesNowClicked);
-            // 
-            // menuItemMode
-            // 
-            this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemAdvanced,
-            this.toolStripSeparator6,
-            this.menuItemAutoBackup});
-            this.menuItemMode.Name = "menuItemMode";
-            this.menuItemMode.Size = new System.Drawing.Size(50, 20);
-            this.menuItemMode.Text = "&Mode";
-            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
-            // 
-            // menuItemAdvanced
-            // 
-            this.menuItemAdvanced.CheckOnClick = true;
-            this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAdvanced.Text = "Advanced";
-            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
-            // 
-            // toolStripSeparator6
-            // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
-            // 
-            // menuItemAutoBackup
-            // 
-            this.menuItemAutoBackup.CheckOnClick = true;
-            this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAutoBackup.Text = "Auto-Backup";
             // 
             // saveFileDialog
             // 
@@ -736,6 +768,7 @@ namespace OutfitOrganiser
             this.panelEditor.Controls.Add(this.grpShown);
             this.panelEditor.Controls.Add(this.grpAge);
             this.panelEditor.Controls.Add(this.btnSaveAll);
+            this.panelEditor.Controls.Add(this.grpGenetics);
             this.panelEditor.Controls.Add(this.grpAccessories);
             this.panelEditor.Controls.Add(this.grpMakeup);
             this.panelEditor.Controls.Add(this.grpShoe);
@@ -1078,6 +1111,39 @@ namespace OutfitOrganiser
             this.btnSaveAll.UseVisualStyleBackColor = true;
             this.btnSaveAll.Click += new System.EventHandler(this.OnSaveAllClicked);
             // 
+            // grpGenetics
+            // 
+            this.grpGenetics.Controls.Add(this.comboGeneticsSkins);
+            this.grpGenetics.Controls.Add(this.comboGeneticsEyes);
+            this.grpGenetics.Location = new System.Drawing.Point(310, 0);
+            this.grpGenetics.Name = "grpGenetics";
+            this.grpGenetics.Size = new System.Drawing.Size(135, 50);
+            this.grpGenetics.TabIndex = 29;
+            this.grpGenetics.TabStop = false;
+            this.grpGenetics.Text = "Genetics:";
+            // 
+            // comboGeneticsSkins
+            // 
+            this.comboGeneticsSkins.FormattingEnabled = true;
+            this.comboGeneticsSkins.Location = new System.Drawing.Point(6, 20);
+            this.comboGeneticsSkins.Name = "comboGeneticsSkins";
+            this.comboGeneticsSkins.Size = new System.Drawing.Size(125, 23);
+            this.comboGeneticsSkins.TabIndex = 10;
+            this.comboGeneticsSkins.SelectedIndexChanged += new System.EventHandler(this.OnGeneticSkinChanged);
+            this.comboGeneticsSkins.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.comboGeneticsSkins.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnGeneticSkinKeyUp);
+            // 
+            // comboGeneticsEyes
+            // 
+            this.comboGeneticsEyes.FormattingEnabled = true;
+            this.comboGeneticsEyes.Location = new System.Drawing.Point(6, 20);
+            this.comboGeneticsEyes.Name = "comboGeneticsEyes";
+            this.comboGeneticsEyes.Size = new System.Drawing.Size(125, 23);
+            this.comboGeneticsEyes.TabIndex = 10;
+            this.comboGeneticsEyes.SelectedIndexChanged += new System.EventHandler(this.OnGeneticSkinChanged);
+            this.comboGeneticsEyes.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.comboGeneticsEyes.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnGeneticSkinKeyUp);
+            // 
             // grpAccessories
             // 
             this.grpAccessories.Controls.Add(this.comboJewelry);
@@ -1251,6 +1317,7 @@ namespace OutfitOrganiser
             this.colMakeupLayerStr,
             this.colMakeupLayerInt,
             this.colMakeupBin,
+            this.colGenetic,
             this.colSort,
             this.colShown,
             this.colTownie,
@@ -1392,6 +1459,13 @@ namespace OutfitOrganiser
             this.colMakeupBin.HeaderText = "Makeup Bin";
             this.colMakeupBin.Name = "colMakeupBin";
             this.colMakeupBin.ReadOnly = true;
+            // 
+            // colGenetic
+            // 
+            this.colGenetic.DataPropertyName = "Genetic";
+            this.colGenetic.HeaderText = "Genetic";
+            this.colGenetic.Name = "colGenetic";
+            this.colGenetic.ReadOnly = true;
             // 
             // colSort
             // 
@@ -1615,6 +1689,7 @@ namespace OutfitOrganiser
             this.grpShown.ResumeLayout(false);
             this.grpAge.ResumeLayout(false);
             this.grpAge.PerformLayout();
+            this.grpGenetics.ResumeLayout(false);
             this.grpAccessories.ResumeLayout(false);
             this.grpMakeup.ResumeLayout(false);
             this.grpMakeup.PerformLayout();
@@ -1717,6 +1792,9 @@ namespace OutfitOrganiser
         private System.Windows.Forms.ToolStripMenuItem menuItemOutfitHair;
         private System.Windows.Forms.ToolStripMenuItem menuItemOutfitAccessory;
         private System.Windows.Forms.ToolStripMenuItem menuItemOutfitMakeUp;
+        private System.Windows.Forms.ToolStripMenuItem menuItemGenetics;
+        private System.Windows.Forms.ToolStripMenuItem menuItemGeneticsSkins;
+        private System.Windows.Forms.ToolStripMenuItem menuItemGeneticsEyes;
         private System.Windows.Forms.ToolStripMenuItem menuItemOptions;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowResTitle;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowResFilename;
@@ -1744,6 +1822,13 @@ namespace OutfitOrganiser
         private System.Windows.Forms.Button btnTownify;
         private System.Windows.Forms.ToolStripMenuItem menuContextResRepair;
         private System.Windows.Forms.Label lblNoOutfitSelected;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPreloadMeshes;
+        private System.Windows.Forms.GroupBox grpMultipleOutfits;
+        private System.Windows.Forms.TextBox textMultipleOutfits;
+        private System.Windows.Forms.ComboBox comboAccessoryBin;
+        private System.Windows.Forms.GroupBox grpGenetics;
         private System.Windows.Forms.DataGridViewTextBoxColumn colVisible;
         private System.Windows.Forms.DataGridViewTextBoxColumn colType;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTitle;
@@ -1761,17 +1846,14 @@ namespace OutfitOrganiser
         private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupLayerStr;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupLayerInt;
         private System.Windows.Forms.DataGridViewTextBoxColumn colMakeupBin;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colGenetic;
         private System.Windows.Forms.DataGridViewTextBoxColumn colSort;
         private System.Windows.Forms.DataGridViewTextBoxColumn colShown;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTownie;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTooltip;
         private System.Windows.Forms.DataGridViewTextBoxColumn colOutfitData;
-        private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripMenuItem menuItemPreloadMeshes;
-        private System.Windows.Forms.GroupBox grpMultipleOutfits;
-        private System.Windows.Forms.TextBox textMultipleOutfits;
-        private System.Windows.Forms.ComboBox comboAccessoryBin;
+        private System.Windows.Forms.ComboBox comboGeneticsSkins;
+        private System.Windows.Forms.ComboBox comboGeneticsEyes;
     }
 }
 

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config>
+  <genetics>
+    <skins>
+      <skin name="Custom (0.0)" value="0.0"/>
+      <skin name="S1 (0.1)" value="0.1"/>
+      <skin name="S2 (0.3)" value="0.3"/>
+      <skin name="S3 (0.6)" value="0.6"/>
+      <skin name="S4 (0.9)" value="0.9"/>
+    </skins>
+    <eyes>
+      <eye name="Custom (0.0)" value="0.0"/>
+      <eye name="Brown/Dk Blue (1.0)" value="1.0"/>
+      <eye name="Blue/Green/Gray (2.0)" value="2.0"/>
+    </eyes>
+  </genetics>
+</config>

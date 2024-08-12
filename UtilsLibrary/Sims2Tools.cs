@@ -6,7 +6,6 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Microsoft.Win32;
 using Sims2Tools.Cache;
 using Sims2Tools.Utils.Persistence;
 
@@ -130,19 +129,7 @@ namespace Sims2Tools
 
                 if (value)
                 {
-                    RegistryKey regKey = Registry.CurrentUser.OpenSubKey("Software", true);
-                    RegistryKey myKey = regKey.CreateSubKey(Sims2ToolsLib.RegistryKey);
-
-                    foreach (string appKeyName in myKey.GetSubKeyNames())
-                    {
-                        RegistryKey appKey = myKey.CreateSubKey(appKeyName);
-
-                        if (appKey.OpenSubKey("Mode") != null)
-                        {
-                            RegistryKey modeKey = appKey.CreateSubKey("Mode");
-                            modeKey.SetValue("menuItemAdvanced", 1);
-                        }
-                    }
+                    RegistryTools.SetAllAdvancedMode();
                 }
             }
         }

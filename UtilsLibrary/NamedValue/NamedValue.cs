@@ -64,6 +64,31 @@ namespace Sims2Tools.Utils.NamedValue
         }
     }
 
+    public class FloatNamedValue : IEquatable<FloatNamedValue>
+    {
+        private readonly float value;
+        private readonly string name;
+
+        public FloatNamedValue(string name, float value)
+        {
+            this.name = name;
+            this.value = value;
+        }
+
+        public string Name => name;
+        public float Value => value;
+
+        public bool Equals(FloatNamedValue other)
+        {
+            return (this.value == other.value);
+        }
+
+        public override string ToString()
+        {
+            return name;
+        }
+    }
+
     public class KeyNamedValue : IEquatable<KeyNamedValue>
     {
         private readonly DBPFKey value;

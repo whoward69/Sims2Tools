@@ -56,9 +56,9 @@ namespace OutfitOrganiser
 
             gridMeshFiles.DataSource = dataMeshFiles;
 
-            foreach (DataGridViewRow selectedRow in gridResources.SelectedRows)
+            foreach (DataGridViewRow selectedResourceRow in gridResources.SelectedRows)
             {
-                OutfitDbpfData outfitData = selectedRow.Cells["colOutfitData"].Value as OutfitDbpfData;
+                OutfitDbpfData outfitData = selectedResourceRow.Cells["colOutfitData"].Value as OutfitDbpfData;
 
                 DBPFKey cresKey = outfitData.CresKey;
                 DBPFKey shpeKey = outfitData.ShpeKey;
@@ -260,16 +260,16 @@ namespace OutfitOrganiser
             {
                 if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < grid.RowCount && e.ColumnIndex < grid.ColumnCount)
                 {
-                    DataGridViewRow row = grid.Rows[e.RowIndex];
-                    string colName = row.Cells[e.ColumnIndex].OwningColumn.Name;
+                    DataGridViewRow meshRow = grid.Rows[e.RowIndex];
+                    string colName = meshRow.Cells[e.ColumnIndex].OwningColumn.Name;
 
                     if (colName.Equals("colPackageName"))
                     {
-                        Image thumbnail = row.Cells["colPackageIcon"].Value as Image;
+                        Image thumbnail = meshRow.Cells["colPackageIcon"].Value as Image;
 
                         if (thumbnail == null)
                         {
-                            using (CacheableDbpfFile package = packageCache.GetOrOpen(row.Cells["colPackagePath"].Value as string))
+                            using (CacheableDbpfFile package = packageCache.GetOrOpen(meshRow.Cells["colPackagePath"].Value as string))
                             {
                                 foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                 {
@@ -302,7 +302,7 @@ namespace OutfitOrganiser
                                 package.Close();
                             }
 
-                            row.Cells["colPackageIcon"].Value = thumbnail;
+                            meshRow.Cells["colPackageIcon"].Value = thumbnail;
                         }
 
                         if (thumbnail != null)
@@ -331,24 +331,24 @@ namespace OutfitOrganiser
 
                 if (index < dataMeshFiles.Rows.Count)
                 {
-                    DataGridViewRow row = gridMeshFiles.Rows[index];
-                    string colName = row.Cells[e.ColumnIndex].OwningColumn.Name;
+                    DataGridViewRow meshRow = gridMeshFiles.Rows[index];
+                    string colName = meshRow.Cells[e.ColumnIndex].OwningColumn.Name;
 
                     if (colName.Equals("colPackageName"))
                     {
-                        e.ToolTipText = row.Cells["colPackagePath"].Value as string;
+                        e.ToolTipText = meshRow.Cells["colPackagePath"].Value as string;
                     }
                     else if (colName.Equals("colCresName"))
                     {
-                        e.ToolTipText = row.Cells["colCresPath"].Value as string;
+                        e.ToolTipText = meshRow.Cells["colCresPath"].Value as string;
                     }
                     else if (colName.Equals("colShpeName"))
                     {
-                        e.ToolTipText = row.Cells["colShpePath"].Value as string;
+                        e.ToolTipText = meshRow.Cells["colShpePath"].Value as string;
                     }
                     else if (colName.Equals("colTxmtName"))
                     {
-                        e.ToolTipText = row.Cells["colTxmtPath"].Value as string;
+                        e.ToolTipText = meshRow.Cells["colTxmtPath"].Value as string;
                     }
                 }
             }
@@ -384,19 +384,19 @@ namespace OutfitOrganiser
                 {
                     var records = new List<object>();
 
-                    foreach (DataGridViewRow row in gridMeshFiles.Rows)
+                    foreach (DataGridViewRow meshRow in gridMeshFiles.Rows)
                     {
                         records.Add(new
                         {
-                            PackageName = row.Cells["colPackageName"].Value as string,
-                            PackagePath = row.Cells["colPackagePath"].Value as string,
-                            Subsets = row.Cells["colSubsets"].Value as string,
-                            MeshName = row.Cells["colCresName"].Value as string,
-                            MeshPath = row.Cells["colCresPath"].Value as string,
-                            TextureName = row.Cells["colTxmtName"].Value as string,
-                            TexturePath = row.Cells["colTxmtPath"].Value as string,
-                            ShapeName = row.Cells["colShpeName"].Value as string,
-                            ShapePath = row.Cells["colShpePath"].Value as string
+                            PackageName = meshRow.Cells["colPackageName"].Value as string,
+                            PackagePath = meshRow.Cells["colPackagePath"].Value as string,
+                            Subsets = meshRow.Cells["colSubsets"].Value as string,
+                            MeshName = meshRow.Cells["colCresName"].Value as string,
+                            MeshPath = meshRow.Cells["colCresPath"].Value as string,
+                            TextureName = meshRow.Cells["colTxmtName"].Value as string,
+                            TexturePath = meshRow.Cells["colTxmtPath"].Value as string,
+                            ShapeName = meshRow.Cells["colShpeName"].Value as string,
+                            ShapePath = meshRow.Cells["colShpePath"].Value as string
                         });
                     }
 

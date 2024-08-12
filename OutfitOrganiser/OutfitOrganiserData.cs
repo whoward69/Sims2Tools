@@ -50,6 +50,7 @@ namespace OutfitOrganiser
             this.Columns.Add(new DataColumn("LayerStr", typeof(string)));
             this.Columns.Add(new DataColumn("LayerInt", typeof(uint)));
             this.Columns.Add(new DataColumn("MakeupBin", typeof(uint)));
+            this.Columns.Add(new DataColumn("Genetic", typeof(float)));
             this.Columns.Add(new DataColumn("Sort", typeof(uint)));
             this.Columns.Add(new DataColumn("Shown", typeof(string)));
             this.Columns.Add(new DataColumn("Townie", typeof(string)));
