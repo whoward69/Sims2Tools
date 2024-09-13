@@ -190,6 +190,12 @@ namespace RepositoryWizard
             {
                 RegistryTools.DeleteSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyShpeSubsets.Name);
             }
+
+            RegistryTools.DeleteSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemWizardClothing.Name);
+            RegistryTools.DeleteSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemWizardObject.Name);
+            RegistryTools.DeleteSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemWizardClothingStandalone.Name);
+
+            RegistryTools.DeleteSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemDeleteLocalOrphans.Name);
         }
 
         private void OnLoad(object sender, System.EventArgs e)
@@ -202,13 +208,13 @@ namespace RepositoryWizard
             MyMruList = new MruList(RepositoryWizardApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FileSelected;
 
-            menuItemModeClothing.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothing.Name, 0) != 0);
-            menuItemModeObject.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeObject.Name, 1) != 0);
-            menuItemModeClothingStandalone.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothingStandalone.Name, 0) != 0);
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
             menuItemAutoMerge.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoMerge.Name, 1) != 0);
-            menuItemDeleteLocalOrphans.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemDeleteLocalOrphans.Name, 1) != 0);
+
+            menuItemWizardClothing.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardClothing.Name, 0) != 0);
+            menuItemWizardObject.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardObject.Name, 1) != 0);
+            menuItemWizardClothingStandalone.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardClothingStandalone.Name, 0) != 0);
 
             menuItemShowResTitle.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, 1) != 0); OnShowResTitleClicked(menuItemShowResTitle, null);
             menuItemShowResFilename.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, 1) != 0); OnShowResFilenameClicked(menuItemShowResFilename, null);
@@ -218,6 +224,8 @@ namespace RepositoryWizard
 
             menuItemVerifyShpeSubsets.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyShpeSubsets.Name, 0) != 0);
             menuItemVerifyGmdcSubsets.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyGmdcSubsets.Name, 1) != 0);
+
+            menuItemDeleteLocalOrphans.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemDeleteLocalOrphans.Name, 1) != 0);
 
             ckbDeRepoCopyMeshFiles.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoCopyMeshFiles.Name, 0) != 0);
             ckbDeRepoSplitFiles.Checked = ((int)RegistryTools.GetSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoSplitFiles.Name, 0) != 0);
@@ -270,13 +278,13 @@ namespace RepositoryWizard
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
 
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothing.Name, menuItemModeClothing.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeObject.Name, menuItemModeObject.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemModeClothingStandalone.Name, menuItemModeClothingStandalone.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoMerge.Name, menuItemAutoMerge.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemDeleteLocalOrphans.Name, menuItemDeleteLocalOrphans.Checked ? 1 : 0);
+
+            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardClothing.Name, menuItemWizardClothing.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardObject.Name, menuItemWizardObject.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardClothingStandalone.Name, menuItemWizardClothingStandalone.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
@@ -286,6 +294,8 @@ namespace RepositoryWizard
 
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyShpeSubsets.Name, menuItemVerifyShpeSubsets.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyGmdcSubsets.Name, menuItemVerifyGmdcSubsets.Checked ? 1 : 0);
+
+            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemDeleteLocalOrphans.Name, menuItemDeleteLocalOrphans.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoCopyMeshFiles.Name, ckbDeRepoCopyMeshFiles.Checked ? 1 : 0);
             RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoSplitFiles.Name, ckbDeRepoSplitFiles.Checked ? 1 : 0);
@@ -312,9 +322,9 @@ namespace RepositoryWizard
 
             string mode = "";
 
-            if (menuItemModeClothing.Checked) mode = "Clothing";
-            if (menuItemModeObject.Checked) mode = "Object";
-            if (menuItemModeClothingStandalone.Checked) mode = "Standalone Clothing";
+            if (menuItemWizardClothing.Checked) mode = "Clothing";
+            if (menuItemWizardObject.Checked) mode = "Object";
+            if (menuItemWizardClothingStandalone.Checked) mode = "Standalone Clothing";
 
             if (mode.Length > 0)
             {
@@ -347,23 +357,23 @@ namespace RepositoryWizard
             {
                 if (e.KeyCode == Keys.F4)
                 {
-                    menuItemModeClothing.Checked = true;
-                    menuItemModeObject.Checked = false;
-                    menuItemModeClothingStandalone.Checked = false;
+                    menuItemWizardClothing.Checked = true;
+                    menuItemWizardObject.Checked = false;
+                    menuItemWizardClothingStandalone.Checked = false;
                     e.Handled = true;
                 }
                 else if (e.KeyCode == Keys.F5)
                 {
-                    menuItemModeClothing.Checked = false;
-                    menuItemModeObject.Checked = true;
-                    menuItemModeClothingStandalone.Checked = false;
+                    menuItemWizardClothing.Checked = false;
+                    menuItemWizardObject.Checked = true;
+                    menuItemWizardClothingStandalone.Checked = false;
                     e.Handled = true;
                 }
-                else if (e.KeyCode == Keys.F5)
+                else if (e.KeyCode == Keys.F6)
                 {
-                    menuItemModeClothing.Checked = false;
-                    menuItemModeObject.Checked = false;
-                    menuItemModeClothingStandalone.Checked = true;
+                    menuItemWizardClothing.Checked = false;
+                    menuItemWizardObject.Checked = false;
+                    menuItemWizardClothingStandalone.Checked = true;
                     e.Handled = true;
                 }
 
@@ -531,14 +541,14 @@ namespace RepositoryWizard
                         return;
                     }
 
-                    DataRow row = dataPackageFiles.NewRow();
+                    DataRow packageRow = dataPackageFiles.NewRow();
 
-                    row["Name"] = (new FileInfo(packagePath)).Name;
+                    packageRow["Name"] = (new FileInfo(packagePath)).Name;
 
-                    row["PackagePath"] = packagePath;
-                    row["PackageIcon"] = null;
+                    packageRow["PackagePath"] = packagePath;
+                    packageRow["PackageIcon"] = null;
 
-                    sender.SetData(new WorkerGridTask(dataPackageFiles, row));
+                    sender.SetData(new WorkerGridTask(dataPackageFiles, packageRow));
                 }
             }
             else if (workPackage.UpdateResources)
@@ -547,7 +557,7 @@ namespace RepositoryWizard
                 {
                     using (CacheableDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
                     {
-                        TypeTypeID repoTypeID = menuItemModeClothing.Checked ? Binx.TYPE : Objd.TYPE;
+                        TypeTypeID repoTypeID = menuItemWizardClothing.Checked ? Binx.TYPE : Objd.TYPE;
 
                         foreach (DBPFEntry entry in package.GetEntriesByType(repoTypeID))
                         {
@@ -561,56 +571,56 @@ namespace RepositoryWizard
 
                             if (repoWizardData != null)
                             {
-                                DataRow row = dataResources.NewRow();
+                                DataRow resourceRow = dataResources.NewRow();
 
-                                row["repoWizardData"] = repoWizardData;
+                                resourceRow["repoWizardData"] = repoWizardData;
 
-                                row["Type"] = BuildTypeString(repoWizardData);
+                                resourceRow["Type"] = BuildTypeString(repoWizardData);
 
-                                row["Filename"] = package.PackageNameNoExtn;
+                                resourceRow["Filename"] = package.PackageNameNoExtn;
 
-                                row["Title"] = repoWizardData.Title;
-                                row["Tooltip"] = repoWizardData.Tooltip;
+                                resourceRow["Title"] = repoWizardData.Title;
+                                resourceRow["Tooltip"] = repoWizardData.Tooltip;
 
-                                if (menuItemModeClothing.Checked)
+                                if (menuItemWizardClothing.Checked)
                                 {
-                                    row["Shoe"] = "";
+                                    resourceRow["Shoe"] = "";
 
                                     switch (repoWizardData.Outfit)
                                     {
                                         case 0x04:
-                                            row["Visible"] = menuItemModeClothing.Checked ? "Yes" : "No";
-                                            row["Shoe"] = "N/A";
+                                            resourceRow["Visible"] = menuItemWizardClothing.Checked ? "Yes" : "No";
+                                            resourceRow["Shoe"] = "N/A";
                                             break;
                                         case 0x08:
-                                            row["Visible"] = menuItemModeClothing.Checked ? "Yes" : "No";
-                                            row["Shoe"] = BuildShoeString(repoWizardData.Shoe);
+                                            resourceRow["Visible"] = menuItemWizardClothing.Checked ? "Yes" : "No";
+                                            resourceRow["Shoe"] = BuildShoeString(repoWizardData.Shoe);
                                             break;
                                         case 0x10:
-                                            row["Visible"] = menuItemModeClothing.Checked ? "Yes" : "No";
-                                            row["Shoe"] = BuildShoeString(repoWizardData.Shoe);
+                                            resourceRow["Visible"] = menuItemWizardClothing.Checked ? "Yes" : "No";
+                                            resourceRow["Shoe"] = BuildShoeString(repoWizardData.Shoe);
                                             break;
                                         default:
                                             // Unsupported type
                                             continue;
                                     }
 
-                                    row["Gender"] = BuildGenderString(repoWizardData.Gender);
-                                    row["Age"] = BuildAgeString(repoWizardData.Age);
-                                    row["Category"] = BuildCategoryString(repoWizardData.Category);
-                                    row["Product"] = BuildProductString(repoWizardData.Product);
-                                    row["Sort"] = repoWizardData.SortIndex;
+                                    resourceRow["Gender"] = BuildGenderString(repoWizardData.Gender);
+                                    resourceRow["Age"] = BuildAgeString(repoWizardData.Age);
+                                    resourceRow["Category"] = BuildCategoryString(repoWizardData.Category);
+                                    resourceRow["Product"] = BuildProductString(repoWizardData.Product);
+                                    resourceRow["Sort"] = repoWizardData.SortIndex;
                                 }
                                 else
                                 {
-                                    row["Model"] = repoWizardData.Model;
-                                    row["ShpeSubsets"] = repoWizardData.ShpeSubsets;
-                                    row["GmdcSubsets"] = repoWizardData.GmdcSubsets;
-                                    row["DesignMode"] = repoWizardData.DesignMode;
-                                    row["MaterialsMesh"] = repoWizardData.MaterialsMesh;
+                                    resourceRow["Model"] = repoWizardData.Model;
+                                    resourceRow["ShpeSubsets"] = repoWizardData.ShpeSubsets;
+                                    resourceRow["GmdcSubsets"] = repoWizardData.GmdcSubsets;
+                                    resourceRow["DesignMode"] = repoWizardData.DesignMode;
+                                    resourceRow["MaterialsMesh"] = repoWizardData.MaterialsMesh;
                                 }
 
-                                sender.SetData(new WorkerGridTask(dataResources, row));
+                                sender.SetData(new WorkerGridTask(dataResources, resourceRow));
                             }
                         }
                     }
@@ -668,9 +678,9 @@ namespace RepositoryWizard
         #region Form State
         private bool IsAnyPackageDirty()
         {
-            foreach (DataRow row in dataPackageFiles.Rows)
+            foreach (DataRow packageRow in dataPackageFiles.Rows)
             {
-                if (packageCache.Contains(row["PackagePath"] as string))
+                if (packageCache.Contains(packageRow["PackagePath"] as string))
                 {
                     return true;
                 }
@@ -681,11 +691,14 @@ namespace RepositoryWizard
 
         private bool IsAnyHiddenResourceDirty()
         {
-            foreach (DataRow row in dataResources.Rows)
+            foreach (DataRow resourceRow in dataResources.Rows)
             {
-                if (!row["Visible"].Equals("Yes") && packageCache.Contains(row["PackagePath"] as string))
+                if (!resourceRow["Visible"].Equals("Yes"))
                 {
-                    return true;
+                    if ((resourceRow["repoWizardData"] as RepoWizardDbpfData).IsDirty)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -716,15 +729,20 @@ namespace RepositoryWizard
             gridResources.Columns["colCategory"].Visible = false;
             gridResources.Columns["colShoe"].Visible = false;
             gridResources.Columns["colProduct"].Visible = false;
-            menuItemShowResProduct.Enabled = false;
+            menuItemShowResProduct.Visible = false;
             gridResources.Columns["colSort"].Visible = false;
-            menuItemShowResSort.Enabled = false;
+            menuItemShowResSort.Visible = false;
 
             menuItemOptions.Enabled = true;
 
-            menuItemAutoMerge.Enabled = false;
-            menuItemVerifyShpeSubsets.Enabled = false;
-            menuItemVerifyGmdcSubsets.Enabled = false;
+            menuItemAutoMerge.Visible = false;
+
+            toolStripSeparator4.Visible = false;
+            menuItemVerifyShpeSubsets.Visible = false;
+            menuItemVerifyGmdcSubsets.Visible = false;
+
+            toolStripSeparator5.Visible = false;
+            menuItemDeleteLocalOrphans.Visible = false;
 
             gridResources.Columns["colModel"].Visible = false;
             gridResources.Columns["colShpeSubsets"].Visible = false;
@@ -732,22 +750,20 @@ namespace RepositoryWizard
             gridResources.Columns["colDesignMode"].Visible = false;
             gridResources.Columns["colMaterialsMesh"].Visible = false;
 
-            menuItemDeleteLocalOrphans.Enabled = false;
-
-            if (menuItemModeClothing.Checked || menuItemModeObject.Checked)
+            if (menuItemWizardClothing.Checked || menuItemWizardObject.Checked)
             {
                 lblNoModeSelected.Visible = false;
 
-                foreach (DataRow row in dataResources.Rows)
+                foreach (DataRow resourceRow in dataResources.Rows)
                 {
-                    RepoWizardDbpfData repoWizardData = row["repoWizardData"] as RepoWizardDbpfData;
+                    RepoWizardDbpfData repoWizardData = resourceRow["repoWizardData"] as RepoWizardDbpfData;
 
-                    row["Visible"] = (menuItemModeClothing.Checked && repoWizardData.IsClothing || menuItemModeObject.Checked && repoWizardData.IsObject) ? "Yes" : "No";
+                    resourceRow["Visible"] = (menuItemWizardClothing.Checked && repoWizardData.IsClothing || menuItemWizardObject.Checked && repoWizardData.IsObject) ? "Yes" : "No";
                 }
 
                 UpdateSaveAsState();
 
-                if (menuItemModeClothing.Checked)
+                if (menuItemWizardClothing.Checked)
                 {
                     btnSaveAs.Text = "&Save As";
 
@@ -765,20 +781,22 @@ namespace RepositoryWizard
                     grpShoe.Visible = gridResources.Columns["colShoe"].Visible;
 
                     gridResources.Columns["colProduct"].Visible = menuItemShowResProduct.Checked;
-                    menuItemShowResProduct.Enabled = true;
+                    menuItemShowResProduct.Visible = true;
 
                     gridResources.Columns["colSort"].Visible = menuItemShowResSort.Checked;
-                    menuItemShowResSort.Enabled = true;
+                    menuItemShowResSort.Visible = true;
 
-                    menuItemAutoMerge.Enabled = true;
-                    menuItemVerifyShpeSubsets.Enabled = true;
-                    menuItemVerifyGmdcSubsets.Enabled = true;
+                    menuItemAutoMerge.Visible = true;
+
+                    toolStripSeparator4.Visible = true;
+                    menuItemVerifyShpeSubsets.Visible = true;
+                    menuItemVerifyGmdcSubsets.Visible = true;
 
                     bool allBody = true;
 
-                    foreach (DataGridViewRow row in gridResources.SelectedRows)
+                    foreach (DataGridViewRow resourceRow in gridResources.SelectedRows)
                     {
-                        if ((row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData).Outfit != 0x08)
+                        if ((resourceRow.Cells["colRepoWizardData"].Value as RepoWizardDbpfData).Outfit != 0x08)
                         {
                             allBody = false;
                             break;
@@ -802,10 +820,11 @@ namespace RepositoryWizard
                     gridResources.Columns["colDesignMode"].Visible = true;
                     gridResources.Columns["colMaterialsMesh"].Visible = true;
 
-                    menuItemDeleteLocalOrphans.Enabled = true;
+                    toolStripSeparator5.Visible = true;
+                    menuItemDeleteLocalOrphans.Visible = true;
                 }
             }
-            else if (menuItemModeClothingStandalone.Checked)
+            else if (menuItemWizardClothingStandalone.Checked)
             {
                 UpdateSaveAsState();
 
@@ -830,13 +849,13 @@ namespace RepositoryWizard
         {
             bool saveAs = false;
 
-            if (menuItemModeClothing.Checked || menuItemModeObject.Checked)
+            if (menuItemWizardClothing.Checked || menuItemWizardObject.Checked)
             {
                 bool anySelected = false;
 
-                foreach (DataGridViewRow row in gridResources.SelectedRows)
+                foreach (DataGridViewRow resourceRow in gridResources.SelectedRows)
                 {
-                    if ((row.Cells["colVisible"].Value as string).Equals("Yes"))
+                    if ((resourceRow.Cells["colVisible"].Value as string).Equals("Yes"))
                     {
                         anySelected = true;
                         break;
@@ -845,7 +864,7 @@ namespace RepositoryWizard
 
                 if (anySelected)
                 {
-                    if (menuItemModeClothing.Checked)
+                    if (menuItemWizardClothing.Checked)
                     {
                         if (textName.Text.Length > 0)
                         {
@@ -899,7 +918,7 @@ namespace RepositoryWizard
                     }
                 }
             }
-            else if (menuItemModeClothingStandalone.Checked)
+            else if (menuItemWizardClothingStandalone.Checked)
             {
                 saveAs = (gridPackageFiles.SelectedRows.Count > 0);
             }
@@ -1163,7 +1182,14 @@ namespace RepositoryWizard
 
             if (ctss != null)
             {
-                name = ctss.LanguageItems(MetaData.Languages.Default)[0]?.Title;
+                List<StrItem> langItems = ctss.LanguageItems(MetaData.Languages.Default);
+
+                if (langItems.Count > 0)
+                {
+                    name = langItems[0].Title;
+
+                    if (string.IsNullOrWhiteSpace(name)) name = null;
+                }
             }
 
             return new ObjdNamedValue(name ?? objd.KeyName, objd);
@@ -1272,9 +1298,9 @@ namespace RepositoryWizard
 
             inModeUpdate = true;
 
-            if (sender != menuItemModeClothing && menuItemModeClothing.Checked) menuItemModeClothing.Checked = false;
-            if (sender != menuItemModeObject && menuItemModeObject.Checked) menuItemModeObject.Checked = false;
-            if (sender != menuItemModeClothingStandalone && menuItemModeClothingStandalone.Checked) menuItemModeClothingStandalone.Checked = false;
+            if (sender != menuItemWizardClothing && menuItemWizardClothing.Checked) menuItemWizardClothing.Checked = false;
+            if (sender != menuItemWizardObject && menuItemWizardObject.Checked) menuItemWizardObject.Checked = false;
+            if (sender != menuItemWizardClothingStandalone && menuItemWizardClothingStandalone.Checked) menuItemWizardClothingStandalone.Checked = false;
 
             inModeUpdate = false;
 
@@ -1341,8 +1367,8 @@ namespace RepositoryWizard
 
                 if (index < dataResources.Rows.Count)
                 {
-                    DataGridViewRow row = gridResources.Rows[index];
-                    string colName = row.Cells[e.ColumnIndex].OwningColumn.Name;
+                    DataGridViewRow resourceRow = gridResources.Rows[index];
+                    string colName = resourceRow.Cells[e.ColumnIndex].OwningColumn.Name;
 
                     if (colName.Equals("colType") || colName.Equals("colTitle") || colName.Equals("colFilename"))
                     {
@@ -1350,16 +1376,16 @@ namespace RepositoryWizard
                         {
                             if (!menuItemShowResFilename.Checked)
                             {
-                                e.ToolTipText = $"{row.Cells["colFilename"].Value as string} - {row.Cells["colTitle"].Value as string}";
+                                e.ToolTipText = $"{resourceRow.Cells["colFilename"].Value as string} - {resourceRow.Cells["colTitle"].Value as string}";
                             }
                             else
                             {
-                                e.ToolTipText = row.Cells["colTitle"].Value as string;
+                                e.ToolTipText = resourceRow.Cells["colTitle"].Value as string;
                             }
                         }
                         else if (!menuItemShowResFilename.Checked)
                         {
-                            e.ToolTipText = row.Cells["colFilename"].Value as string;
+                            e.ToolTipText = resourceRow.Cells["colFilename"].Value as string;
                         }
                     }
                 }
@@ -1412,9 +1438,9 @@ namespace RepositoryWizard
             if (gridResources.SelectedRows.Count >= 1)
             {
                 bool append = false;
-                foreach (DataGridViewRow row in gridResources.SelectedRows)
+                foreach (DataGridViewRow resourceRow in gridResources.SelectedRows)
                 {
-                    UpdateEditor(row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData, append);
+                    UpdateEditor(resourceRow.Cells["colRepoWizardData"].Value as RepoWizardDbpfData, append);
                     append = true;
                 }
             }
@@ -1445,7 +1471,7 @@ namespace RepositoryWizard
         {
             string type = "";
 
-            if (menuItemModeClothing.Checked)
+            if (menuItemWizardClothing.Checked)
             {
                 switch (repoWizardData.Outfit)
                 {
@@ -1713,9 +1739,9 @@ namespace RepositoryWizard
             return category;
         }
 
-        private string ExpandMacros(DataGridViewRow row, string codedString, bool stripSpaces)
+        private string ExpandMacros(DataGridViewRow resourceRow, string codedString, bool stripSpaces)
         {
-            RepoWizardDbpfData repoWizardData = row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
+            RepoWizardDbpfData repoWizardData = resourceRow.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
 
             // For example "{gender:1}{agecode:1}_{type}_{basename}_{id}" -> "tf_body_sundress_red"
             string str = "";
@@ -1746,9 +1772,9 @@ namespace RepositoryWizard
                 }
                 else if (macro.Equals("id"))
                 {
-                    string id = row.Cells["colId"].Value as string;
+                    string id = resourceRow.Cells["colId"].Value as string;
 
-                    if (string.IsNullOrEmpty(id)) id = (row.Index + 1).ToString();
+                    if (string.IsNullOrEmpty(id)) id = (resourceRow.Index + 1).ToString();
 
                     subst = id;
                 }
@@ -1850,7 +1876,7 @@ namespace RepositoryWizard
 
         private void UpdateEditor(RepoWizardDbpfData repoWizardData, bool append)
         {
-            if (menuItemModeClothing.Checked)
+            if (menuItemWizardClothing.Checked)
             {
                 uint newTypeValue = repoWizardData.Outfit;
                 if (append)
@@ -2002,7 +2028,7 @@ namespace RepositoryWizard
                     }
                 }
             }
-            else if (menuItemModeObject.Checked)
+            else if (menuItemWizardObject.Checked)
             {
                 foreach (string subset in repoWizardData.ShpeSubsets.Split(','))
                 {
@@ -2131,8 +2157,8 @@ namespace RepositoryWizard
             {
                 if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < grid.RowCount && e.ColumnIndex < grid.ColumnCount)
                 {
-                    DataGridViewRow row = grid.Rows[e.RowIndex];
-                    string colName = row.Cells[e.ColumnIndex].OwningColumn.Name;
+                    DataGridViewRow gridRow = grid.Rows[e.RowIndex];
+                    string colName = gridRow.Cells[e.ColumnIndex].OwningColumn.Name;
 
                     if (colName.Equals("colType") || colName.Equals("colId") || colName.Equals("colTitle") || colName.Equals("colName") || colName.Equals("colFilename") || colName.Equals("colTooltip"))
                     {
@@ -2140,17 +2166,21 @@ namespace RepositoryWizard
 
                         if (sender == gridResources)
                         {
-                            RepoWizardDbpfData repoWizardData = row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
+                            DataGridViewRow resourceRow = gridRow;
+
+                            RepoWizardDbpfData repoWizardData = resourceRow.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
                             Cpf thumbnailOwner = repoWizardData?.ThumbnailOwner;
                             thumbnail = (thumbnailOwner != null) ? GetResourceThumbnail(thumbnailOwner) : repoWizardData?.Thumbnail;
                         }
                         else if (sender == gridPackageFiles)
                         {
-                            thumbnail = row.Cells["colPackageIcon"].Value as Image;
+                            DataGridViewRow packageRow = gridRow;
+
+                            thumbnail = packageRow.Cells["colPackageIcon"].Value as Image;
 
                             if (thumbnail == null)
                             {
-                                using (CacheableDbpfFile package = packageCache.GetOrOpen(row.Cells["colPackagePath"].Value as string))
+                                using (CacheableDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
                                 {
                                     foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                     {
@@ -2183,7 +2213,7 @@ namespace RepositoryWizard
                                     package.Close();
                                 }
 
-                                row.Cells["colPackageIcon"].Value = thumbnail;
+                                packageRow.Cells["colPackageIcon"].Value = thumbnail;
                             }
                         }
 
@@ -2207,7 +2237,7 @@ namespace RepositoryWizard
         #region Save Button
         private void OnSaveAsClicked(object sender, EventArgs e)
         {
-            if (menuItemModeClothing.Checked)
+            if (menuItemWizardClothing.Checked)
             {
                 if (saveAsFileDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -2219,13 +2249,13 @@ namespace RepositoryWizard
                     UpdateFormState();
                 }
             }
-            else if (menuItemModeObject.Checked)
+            else if (menuItemWizardObject.Checked)
             {
                 SaveAs(null);
 
                 DoWork_FillResourceGrid(lastFolder);
             }
-            else if (menuItemModeClothingStandalone.Checked)
+            else if (menuItemWizardClothingStandalone.Checked)
             {
                 textDeRepoMsgs.Text = "";
 
@@ -2276,7 +2306,7 @@ namespace RepositoryWizard
                 }
             }
 
-            if (menuItemModeClothing.Checked)
+            if (menuItemWizardClothing.Checked)
             {
                 RepoWizardClothingMesh clothingMesh = clothingMeshes.Values[(comboMesh.Items.Count == 1 ? 0 : (comboMesh.SelectedIndex - 1))];
 
@@ -2286,9 +2316,9 @@ namespace RepositoryWizard
                     {
                         bool anyUpdates = false;
 
-                        foreach (DataGridViewRow row in gridResources.SelectedRows)
+                        foreach (DataGridViewRow resourceRow in gridResources.SelectedRows)
                         {
-                            int exitCode = SaveClothingRow(dbpfPackage, row, clothingMesh, menuItemVerifyShpeSubsets.Checked, menuItemVerifyGmdcSubsets.Checked);
+                            int exitCode = SaveClothingRow(dbpfPackage, resourceRow, clothingMesh, menuItemVerifyShpeSubsets.Checked, menuItemVerifyGmdcSubsets.Checked);
 
                             if (exitCode == 1)
                             {
@@ -2321,13 +2351,13 @@ namespace RepositoryWizard
                     int exitCode;
                     FileInfo packageInfo = new FileInfo(packageFile);
 
-                    foreach (DataGridViewRow row in gridResources.SelectedRows)
+                    foreach (DataGridViewRow resourceRow in gridResources.SelectedRows)
                     {
-                        string rowPackageFile = $"{packageInfo.FullName.Substring(0, packageInfo.FullName.Length - packageInfo.Extension.Length)}_{ExpandMacros(row, $"{{id}}", true)}{packageInfo.Extension}"; ;
+                        string rowPackageFile = $"{packageInfo.FullName.Substring(0, packageInfo.FullName.Length - packageInfo.Extension.Length)}_{ExpandMacros(resourceRow, $"{{id}}", true)}{packageInfo.Extension}"; ;
 
                         using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(rowPackageFile))
                         {
-                            exitCode = SaveClothingRow(dbpfPackage, row, clothingMesh, menuItemVerifyShpeSubsets.Checked, menuItemVerifyGmdcSubsets.Checked);
+                            exitCode = SaveClothingRow(dbpfPackage, resourceRow, clothingMesh, menuItemVerifyShpeSubsets.Checked, menuItemVerifyGmdcSubsets.Checked);
 
                             if (exitCode == 1)
                             {
@@ -2352,9 +2382,9 @@ namespace RepositoryWizard
             {
                 if (masterMeshName != null && masterShpes != null)
                 {
-                    foreach (DataGridViewRow row in gridResources.SelectedRows)
+                    foreach (DataGridViewRow resourceRow in gridResources.SelectedRows)
                     {
-                        RepoWizardDbpfData selectedResource = row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
+                        RepoWizardDbpfData selectedResource = resourceRow.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
 
                         using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(selectedResource.PackagePath))
                         {
@@ -2581,9 +2611,9 @@ namespace RepositoryWizard
             }
         }
 
-        private int SaveClothingRow(CacheableDbpfFile dbpfPackage, DataGridViewRow row, RepoWizardClothingMesh clothingMesh, bool verifyShpeSubsets, bool verifyGmdcSubsets)
+        private int SaveClothingRow(CacheableDbpfFile dbpfPackage, DataGridViewRow resourceRow, RepoWizardClothingMesh clothingMesh, bool verifyShpeSubsets, bool verifyGmdcSubsets)
         {
-            RepoWizardDbpfData selectedResource = row.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
+            RepoWizardDbpfData selectedResource = resourceRow.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
 
             TypeGroupID newGroupID = TypeGroupID.RandomID;
 
@@ -2613,8 +2643,8 @@ namespace RepositoryWizard
 
                 if (verifyShpeSubsets && !clothingMesh.ShpeSubsets.Contains(subset))
                 {
-                    logger.Warn($"Subset '{subset}' is missing in mesh's SHPE, skipping '{ExpandMacros(row, "{id}", false)}'");
-                    if (MsgBox.Show($"Subset '{subset}' is missing in mesh's SHPE, skipping '{ExpandMacros(row, "{id}", false)}'\n\nPress 'OK' to ignore this resource or 'Cancel' to stop.", "Mesh error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
+                    logger.Warn($"Subset '{subset}' is missing in mesh's SHPE, skipping '{ExpandMacros(resourceRow, "{id}", false)}'");
+                    if (MsgBox.Show($"Subset '{subset}' is missing in mesh's SHPE, skipping '{ExpandMacros(resourceRow, "{id}", false)}'\n\nPress 'OK' to ignore this resource or 'Cancel' to stop.", "Mesh error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
                     {
                         return -1;
                     }
@@ -2624,8 +2654,8 @@ namespace RepositoryWizard
 
                 if (verifyGmdcSubsets && !clothingMesh.GmdcSubsets.Contains(subset))
                 {
-                    logger.Warn($"Subset '{subset}' is missing in mesh's GMDC, skipping '{ExpandMacros(row, "{id}", false)}'");
-                    if (MsgBox.Show($"Subset '{subset}' is missing in mesh's GMDC, skipping '{ExpandMacros(row, "{id}", false)}'\n\nPress 'OK' to ignore this resource or 'Cancel' to stop.", "Mesh error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
+                    logger.Warn($"Subset '{subset}' is missing in mesh's GMDC, skipping '{ExpandMacros(resourceRow, "{id}", false)}'");
+                    if (MsgBox.Show($"Subset '{subset}' is missing in mesh's GMDC, skipping '{ExpandMacros(resourceRow, "{id}", false)}'\n\nPress 'OK' to ignore this resource or 'Cancel' to stop.", "Mesh error!", MessageBoxButtons.OKCancel, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2) == DialogResult.Cancel)
                     {
                         return -1;
                     }
@@ -2635,7 +2665,7 @@ namespace RepositoryWizard
             }
 
             // Update name, eg "{agecode:1}{gender:1}_{type}_{basename}_{id}" -> "tf_body_sundress_red"
-            string gzpsName = ExpandMacros(row, textGzpsName.Text, true);
+            string gzpsName = ExpandMacros(resourceRow, textGzpsName.Text, true);
             gzps.GetOrAddItem("name", MetaData.DataTypes.dtUInteger).StringValue = gzpsName.ToLower();
 
             // Update creator GUID
@@ -2674,7 +2704,7 @@ namespace RepositoryWizard
                 str = selectedResource.CloneStr(newGroupID);
 
                 // Update tooltip, eg "{basename} ({id}) by {creator}"
-                str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default)[0].Title = ExpandMacros(row, textTooltip.Text, false);
+                str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default)[0].Title = ExpandMacros(resourceRow, textTooltip.Text, false);
 
                 dbpfPackage.Commit(str);
             }
@@ -3108,6 +3138,49 @@ namespace RepositoryWizard
         private void OnMeshChanged(object sender, EventArgs e)
         {
             UpdateFormState();
+        }
+
+        private void OnTreeFolder_DragEnter(object sender, DragEventArgs e)
+        {
+            if (rootFolder == null)
+            {
+                DataObject data = e.Data as DataObject;
+
+                if (data.ContainsFileDropList())
+                {
+                    string[] folders = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                    if (folders != null && folders.Length == 1)
+                    {
+                        if (Directory.Exists(folders[0]))
+                        {
+                            e.Effect = DragDropEffects.Copy;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void OnTreeFolder_DragDrop(object sender, DragEventArgs e)
+        {
+            if (rootFolder == null)
+            {
+                DataObject data = e.Data as DataObject;
+
+                if (data.ContainsFileDropList())
+                {
+                    string[] folders = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                    if (folders != null && folders.Length == 1)
+                    {
+                        if (Directory.Exists(folders[0]))
+                        {
+                            rootFolder = folders[0];
+                            DoWork_FillTree(rootFolder, false, true);
+                        }
+                    }
+                }
+            }
         }
 
         private bool DeRepoTxtr(DBPFFile package, Txmt txmt, string propName, Dictionary<DBPFKey, string> keyToPackage)

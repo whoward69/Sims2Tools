@@ -70,16 +70,14 @@ namespace RepositoryWizard
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemModeClothing = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemModeObject = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemModeClothingStandalone = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAutoMerge = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemDeleteLocalOrphans = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemWizard = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemWizardClothing = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemWizardObject = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemWizardClothingStandalone = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowResTitle = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowResFilename = new System.Windows.Forms.ToolStripMenuItem();
@@ -89,6 +87,8 @@ namespace RepositoryWizard
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemVerifyShpeSubsets = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemVerifyGmdcSubsets = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemDeleteLocalOrphans = new System.Windows.Forms.ToolStripMenuItem();
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.splitTopBottom = new System.Windows.Forms.SplitContainer();
             this.splitTopLeftRight = new System.Windows.Forms.SplitContainer();
@@ -210,6 +210,7 @@ namespace RepositoryWizard
             this.menuFile,
             this.menuHelp,
             this.menuItemMode,
+            this.menuItemWizard,
             this.menuItemOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
@@ -313,91 +314,78 @@ namespace RepositoryWizard
             // menuItemMode
             // 
             this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemModeClothing,
-            this.menuItemModeObject,
-            this.menuItemModeClothingStandalone,
-            this.toolStripSeparator6,
             this.menuItemAdvanced,
             this.toolStripSeparator3,
             this.menuItemAutoBackup,
-            this.menuItemAutoMerge,
-            this.toolStripSeparator5,
-            this.menuItemDeleteLocalOrphans});
+            this.menuItemAutoMerge});
             this.menuItemMode.Name = "menuItemMode";
             this.menuItemMode.Size = new System.Drawing.Size(50, 20);
             this.menuItemMode.Text = "&Mode";
             this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
             // 
-            // menuItemModeClothing
-            // 
-            this.menuItemModeClothing.CheckOnClick = true;
-            this.menuItemModeClothing.Name = "menuItemModeClothing";
-            this.menuItemModeClothing.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.menuItemModeClothing.Size = new System.Drawing.Size(201, 22);
-            this.menuItemModeClothing.Text = "Clothing";
-            this.menuItemModeClothing.Click += new System.EventHandler(this.OnModeSelectedChanged);
-            // 
-            // menuItemModeObject
-            // 
-            this.menuItemModeObject.CheckOnClick = true;
-            this.menuItemModeObject.Name = "menuItemModeObject";
-            this.menuItemModeObject.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.menuItemModeObject.Size = new System.Drawing.Size(201, 22);
-            this.menuItemModeObject.Text = "&Object";
-            this.menuItemModeObject.Click += new System.EventHandler(this.OnModeSelectedChanged);
-            // 
-            // menuItemModeClothingStandalone
-            // 
-            this.menuItemModeClothingStandalone.CheckOnClick = true;
-            this.menuItemModeClothingStandalone.Name = "menuItemModeClothingStandalone";
-            this.menuItemModeClothingStandalone.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this.menuItemModeClothingStandalone.Size = new System.Drawing.Size(201, 22);
-            this.menuItemModeClothingStandalone.Text = "Standalone Clothing";
-            this.menuItemModeClothingStandalone.Click += new System.EventHandler(this.OnModeSelectedChanged);
-            // 
-            // toolStripSeparator6
-            // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(198, 6);
-            // 
             // menuItemAdvanced
             // 
             this.menuItemAdvanced.CheckOnClick = true;
             this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(201, 22);
+            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
             this.menuItemAdvanced.Text = "&Advanced";
             this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(198, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(141, 6);
             // 
             // menuItemAutoBackup
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(201, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
             this.menuItemAutoBackup.Text = "Auto-&Backup";
             // 
             // menuItemAutoMerge
             // 
             this.menuItemAutoMerge.CheckOnClick = true;
             this.menuItemAutoMerge.Name = "menuItemAutoMerge";
-            this.menuItemAutoMerge.Size = new System.Drawing.Size(201, 22);
+            this.menuItemAutoMerge.Size = new System.Drawing.Size(144, 22);
             this.menuItemAutoMerge.Text = "Auto-&Merge";
             // 
-            // toolStripSeparator5
+            // menuItemWizard
             // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(198, 6);
+            this.menuItemWizard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemWizardClothing,
+            this.menuItemWizardObject,
+            this.menuItemWizardClothingStandalone});
+            this.menuItemWizard.Name = "menuItemWizard";
+            this.menuItemWizard.Size = new System.Drawing.Size(55, 20);
+            this.menuItemWizard.Text = "&Wizard";
             // 
-            // menuItemDeleteLocalOrphans
+            // menuItemWizardClothing
             // 
-            this.menuItemDeleteLocalOrphans.CheckOnClick = true;
-            this.menuItemDeleteLocalOrphans.Name = "menuItemDeleteLocalOrphans";
-            this.menuItemDeleteLocalOrphans.Size = new System.Drawing.Size(201, 22);
-            this.menuItemDeleteLocalOrphans.Text = "&Delete Local Orphans";
+            this.menuItemWizardClothing.CheckOnClick = true;
+            this.menuItemWizardClothing.Name = "menuItemWizardClothing";
+            this.menuItemWizardClothing.ShortcutKeys = System.Windows.Forms.Keys.F4;
+            this.menuItemWizardClothing.Size = new System.Drawing.Size(201, 22);
+            this.menuItemWizardClothing.Text = "Clothing";
+            this.menuItemWizardClothing.Click += new System.EventHandler(this.OnModeSelectedChanged);
+            // 
+            // menuItemWizardObject
+            // 
+            this.menuItemWizardObject.CheckOnClick = true;
+            this.menuItemWizardObject.Name = "menuItemWizardObject";
+            this.menuItemWizardObject.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.menuItemWizardObject.Size = new System.Drawing.Size(201, 22);
+            this.menuItemWizardObject.Text = "&Object";
+            this.menuItemWizardObject.Click += new System.EventHandler(this.OnModeSelectedChanged);
+            // 
+            // menuItemWizardClothingStandalone
+            // 
+            this.menuItemWizardClothingStandalone.CheckOnClick = true;
+            this.menuItemWizardClothingStandalone.Name = "menuItemWizardClothingStandalone";
+            this.menuItemWizardClothingStandalone.ShortcutKeys = System.Windows.Forms.Keys.F6;
+            this.menuItemWizardClothingStandalone.Size = new System.Drawing.Size(201, 22);
+            this.menuItemWizardClothingStandalone.Text = "Standalone Clothing";
+            this.menuItemWizardClothingStandalone.Click += new System.EventHandler(this.OnModeSelectedChanged);
             // 
             // menuItemOptions
             // 
@@ -409,7 +397,9 @@ namespace RepositoryWizard
             this.menuItemShowResToolTip,
             this.toolStripSeparator4,
             this.menuItemVerifyShpeSubsets,
-            this.menuItemVerifyGmdcSubsets});
+            this.menuItemVerifyGmdcSubsets,
+            this.toolStripSeparator5,
+            this.menuItemDeleteLocalOrphans});
             this.menuItemOptions.Name = "menuItemOptions";
             this.menuItemOptions.Size = new System.Drawing.Size(61, 20);
             this.menuItemOptions.Text = "&Options";
@@ -419,52 +409,52 @@ namespace RepositoryWizard
             // 
             this.menuItemShowResTitle.CheckOnClick = true;
             this.menuItemShowResTitle.Name = "menuItemShowResTitle";
-            this.menuItemShowResTitle.Size = new System.Drawing.Size(205, 22);
-            this.menuItemShowResTitle.Text = "Show Resource &Title";
+            this.menuItemShowResTitle.Size = new System.Drawing.Size(186, 22);
+            this.menuItemShowResTitle.Text = "Show &Title";
             this.menuItemShowResTitle.Click += new System.EventHandler(this.OnShowResTitleClicked);
             // 
             // menuItemShowResFilename
             // 
             this.menuItemShowResFilename.CheckOnClick = true;
             this.menuItemShowResFilename.Name = "menuItemShowResFilename";
-            this.menuItemShowResFilename.Size = new System.Drawing.Size(205, 22);
-            this.menuItemShowResFilename.Text = "Show Resource &Filename";
+            this.menuItemShowResFilename.Size = new System.Drawing.Size(186, 22);
+            this.menuItemShowResFilename.Text = "Show &Filename";
             this.menuItemShowResFilename.Click += new System.EventHandler(this.OnShowResFilenameClicked);
             // 
             // menuItemShowResProduct
             // 
             this.menuItemShowResProduct.CheckOnClick = true;
             this.menuItemShowResProduct.Name = "menuItemShowResProduct";
-            this.menuItemShowResProduct.Size = new System.Drawing.Size(205, 22);
-            this.menuItemShowResProduct.Text = "Show Resource &Product";
+            this.menuItemShowResProduct.Size = new System.Drawing.Size(186, 22);
+            this.menuItemShowResProduct.Text = "Show &Product";
             this.menuItemShowResProduct.Click += new System.EventHandler(this.OnShowResProductClicked);
             // 
             // menuItemShowResSort
             // 
             this.menuItemShowResSort.CheckOnClick = true;
             this.menuItemShowResSort.Name = "menuItemShowResSort";
-            this.menuItemShowResSort.Size = new System.Drawing.Size(205, 22);
-            this.menuItemShowResSort.Text = "Show Resource &Sort";
+            this.menuItemShowResSort.Size = new System.Drawing.Size(186, 22);
+            this.menuItemShowResSort.Text = "Show &Sort";
             this.menuItemShowResSort.Click += new System.EventHandler(this.OnShowResSortClicked);
             // 
             // menuItemShowResToolTip
             // 
             this.menuItemShowResToolTip.CheckOnClick = true;
             this.menuItemShowResToolTip.Name = "menuItemShowResToolTip";
-            this.menuItemShowResToolTip.Size = new System.Drawing.Size(205, 22);
-            this.menuItemShowResToolTip.Text = "Show Resource T&ooltip";
+            this.menuItemShowResToolTip.Size = new System.Drawing.Size(186, 22);
+            this.menuItemShowResToolTip.Text = "Show T&ooltip";
             this.menuItemShowResToolTip.Click += new System.EventHandler(this.OnShowResToolTipClicked);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(202, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(183, 6);
             // 
             // menuItemVerifyShpeSubsets
             // 
             this.menuItemVerifyShpeSubsets.CheckOnClick = true;
             this.menuItemVerifyShpeSubsets.Name = "menuItemVerifyShpeSubsets";
-            this.menuItemVerifyShpeSubsets.Size = new System.Drawing.Size(205, 22);
+            this.menuItemVerifyShpeSubsets.Size = new System.Drawing.Size(186, 22);
             this.menuItemVerifyShpeSubsets.Text = "Verify SHPE Subsets";
             this.menuItemVerifyShpeSubsets.Click += new System.EventHandler(this.OnVerifyMeshSubsetsClicked);
             // 
@@ -472,9 +462,21 @@ namespace RepositoryWizard
             // 
             this.menuItemVerifyGmdcSubsets.CheckOnClick = true;
             this.menuItemVerifyGmdcSubsets.Name = "menuItemVerifyGmdcSubsets";
-            this.menuItemVerifyGmdcSubsets.Size = new System.Drawing.Size(205, 22);
+            this.menuItemVerifyGmdcSubsets.Size = new System.Drawing.Size(186, 22);
             this.menuItemVerifyGmdcSubsets.Text = "Verify GMDC Subsets";
             this.menuItemVerifyGmdcSubsets.Click += new System.EventHandler(this.OnVerifyMeshSubsetsClicked);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(183, 6);
+            // 
+            // menuItemDeleteLocalOrphans
+            // 
+            this.menuItemDeleteLocalOrphans.CheckOnClick = true;
+            this.menuItemDeleteLocalOrphans.Name = "menuItemDeleteLocalOrphans";
+            this.menuItemDeleteLocalOrphans.Size = new System.Drawing.Size(186, 22);
+            this.menuItemDeleteLocalOrphans.Text = "&Delete Local Orphans";
             // 
             // thumbBox
             // 
@@ -540,6 +542,8 @@ namespace RepositoryWizard
             this.treeFolders.Size = new System.Drawing.Size(218, 160);
             this.treeFolders.TabIndex = 0;
             this.treeFolders.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnTreeFolderClicked);
+            this.treeFolders.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnTreeFolder_DragDrop);
+            this.treeFolders.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnTreeFolder_DragEnter);
             // 
             // gridPackageFiles
             // 
@@ -1551,8 +1555,8 @@ namespace RepositoryWizard
         private System.Windows.Forms.GroupBox grpName;
         private System.Windows.Forms.TextBox textName;
         private System.Windows.Forms.ToolStripMenuItem menuItemMode;
-        private System.Windows.Forms.ToolStripMenuItem menuItemModeClothing;
-        private System.Windows.Forms.ToolStripMenuItem menuItemModeObject;
+        private System.Windows.Forms.ToolStripMenuItem menuItemWizardClothing;
+        private System.Windows.Forms.ToolStripMenuItem menuItemWizardObject;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoBackup;
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoMerge;
         private System.Windows.Forms.ToolStripMenuItem menuItemDeleteLocalOrphans;
@@ -1573,7 +1577,6 @@ namespace RepositoryWizard
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemSaveAs;
         private System.Windows.Forms.Label lblNoModeSelected;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.SaveFileDialog saveAsFileDialog;
         private System.Windows.Forms.ToolStripMenuItem menuItemCreatorDetails;
         private System.Windows.Forms.GroupBox grpDeRepoOptions;
@@ -1608,7 +1611,7 @@ namespace RepositoryWizard
         private System.Windows.Forms.ComboBox comboMasterPrimarySubset;
         private System.Windows.Forms.Label lblSecondarySubset;
         private System.Windows.Forms.Label lblPrimarySubset;
-        private System.Windows.Forms.ToolStripMenuItem menuItemModeClothingStandalone;
+        private System.Windows.Forms.ToolStripMenuItem menuItemWizardClothingStandalone;
         private System.Windows.Forms.TextBox textDeRepoMsgs;
         private System.Windows.Forms.CheckBox ckbDeRepoCopyMeshFiles;
         private System.Windows.Forms.GroupBox grpGzpsName;
@@ -1616,6 +1619,7 @@ namespace RepositoryWizard
         private System.Windows.Forms.CheckBox ckbDeRepoSplitFiles;
         private System.Windows.Forms.ComboBox comboMesh;
         private System.ComponentModel.BackgroundWorker repoWizardWorker;
+        private System.Windows.Forms.ToolStripMenuItem menuItemWizard;
     }
 }
 
