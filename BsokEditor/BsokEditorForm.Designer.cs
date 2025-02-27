@@ -50,16 +50,16 @@ namespace BsokEditor
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemExcludeUnknown = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemShowGenderAge = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowCategoryShoe = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowNakedCategory = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuMode = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewResources = new System.Windows.Forms.DataGridView();
             this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -78,7 +78,7 @@ namespace BsokEditor
             this.comboGender = new System.Windows.Forms.ComboBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.grpCategory = new System.Windows.Forms.GroupBox();
-            this.ckbCatNaked = new System.Windows.Forms.CheckBox();
+            this.ckbCatNakedOverlay = new System.Windows.Forms.CheckBox();
             this.ckbCatSwimwear = new System.Windows.Forms.CheckBox();
             this.ckbCatUnderwear = new System.Windows.Forms.CheckBox();
             this.ckbCatPJs = new System.Windows.Forms.CheckBox();
@@ -108,6 +108,7 @@ namespace BsokEditor
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
+            this.ckbCatSkintone = new System.Windows.Forms.CheckBox();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextGrid.SuspendLayout();
@@ -204,6 +205,37 @@ namespace BsokEditor
             this.menuItemAbout.Text = "&About";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
             // 
+            // menuMode
+            // 
+            this.menuMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAdvanced,
+            this.toolStripSeparator1,
+            this.menuItemAutoBackup});
+            this.menuMode.Name = "menuMode";
+            this.menuMode.Size = new System.Drawing.Size(50, 20);
+            this.menuMode.Text = "&Mode";
+            this.menuMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAdvanced.Text = "Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(141, 6);
+            // 
+            // menuItemAutoBackup
+            // 
+            this.menuItemAutoBackup.CheckOnClick = true;
+            this.menuItemAutoBackup.Name = "menuItemAutoBackup";
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoBackup.Text = "Auto-&Backup";
+            // 
             // menuOptions
             // 
             this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -220,20 +252,20 @@ namespace BsokEditor
             // 
             this.menuItemExcludeUnknown.CheckOnClick = true;
             this.menuItemExcludeUnknown.Name = "menuItemExcludeUnknown";
-            this.menuItemExcludeUnknown.Size = new System.Drawing.Size(191, 22);
+            this.menuItemExcludeUnknown.Size = new System.Drawing.Size(199, 22);
             this.menuItemExcludeUnknown.Text = "E&xclude Unknown";
             this.menuItemExcludeUnknown.Click += new System.EventHandler(this.OnExcludeUnknown);
             // 
             // menuItemSeparator4
             // 
             this.menuItemSeparator4.Name = "menuItemSeparator4";
-            this.menuItemSeparator4.Size = new System.Drawing.Size(188, 6);
+            this.menuItemSeparator4.Size = new System.Drawing.Size(196, 6);
             // 
             // menuItemShowGenderAge
             // 
             this.menuItemShowGenderAge.CheckOnClick = true;
             this.menuItemShowGenderAge.Name = "menuItemShowGenderAge";
-            this.menuItemShowGenderAge.Size = new System.Drawing.Size(191, 22);
+            this.menuItemShowGenderAge.Size = new System.Drawing.Size(199, 22);
             this.menuItemShowGenderAge.Text = "Show &Gender / Age";
             this.menuItemShowGenderAge.Click += new System.EventHandler(this.OnShowGenderAndAgeClicked);
             // 
@@ -241,7 +273,7 @@ namespace BsokEditor
             // 
             this.menuItemShowCategoryShoe.CheckOnClick = true;
             this.menuItemShowCategoryShoe.Name = "menuItemShowCategoryShoe";
-            this.menuItemShowCategoryShoe.Size = new System.Drawing.Size(191, 22);
+            this.menuItemShowCategoryShoe.Size = new System.Drawing.Size(199, 22);
             this.menuItemShowCategoryShoe.Text = "Show &Category / Shoe";
             this.menuItemShowCategoryShoe.Click += new System.EventHandler(this.OnShowCategoryAndShoeClicked);
             // 
@@ -249,40 +281,9 @@ namespace BsokEditor
             // 
             this.menuItemShowNakedCategory.CheckOnClick = true;
             this.menuItemShowNakedCategory.Name = "menuItemShowNakedCategory";
-            this.menuItemShowNakedCategory.Size = new System.Drawing.Size(191, 22);
-            this.menuItemShowNakedCategory.Text = "Show &Naked Category";
+            this.menuItemShowNakedCategory.Size = new System.Drawing.Size(199, 22);
+            this.menuItemShowNakedCategory.Text = "Show &Naked Categories";
             this.menuItemShowNakedCategory.Click += new System.EventHandler(this.OnShowNakedCategoryClicked);
-            // 
-            // menuMode
-            // 
-            this.menuMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemAdvanced,
-            this.toolStripSeparator1,
-            this.menuItemAutoBackup});
-            this.menuMode.Name = "menuMode";
-            this.menuMode.Size = new System.Drawing.Size(50, 20);
-            this.menuMode.Text = "&Mode";
-            this.menuMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
-            // 
-            // menuItemAdvanced
-            // 
-            this.menuItemAdvanced.CheckOnClick = true;
-            this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAdvanced.Text = "Advanced";
-            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
-            // 
-            // menuItemAutoBackup
-            // 
-            this.menuItemAutoBackup.CheckOnClick = true;
-            this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAutoBackup.Text = "Auto-&Backup";
             // 
             // gridViewResources
             // 
@@ -313,7 +314,7 @@ namespace BsokEditor
             this.gridViewResources.ReadOnly = true;
             this.gridViewResources.RowHeadersVisible = false;
             this.gridViewResources.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridViewResources.Size = new System.Drawing.Size(905, 314);
+            this.gridViewResources.Size = new System.Drawing.Size(905, 297);
             this.gridViewResources.TabIndex = 1;
             this.gridViewResources.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridViewResources.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -452,7 +453,7 @@ namespace BsokEditor
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(817, 145);
+            this.btnSave.Location = new System.Drawing.Point(817, 162);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(88, 26);
             this.btnSave.TabIndex = 23;
@@ -462,7 +463,8 @@ namespace BsokEditor
             // 
             // grpCategory
             // 
-            this.grpCategory.Controls.Add(this.ckbCatNaked);
+            this.grpCategory.Controls.Add(this.ckbCatSkintone);
+            this.grpCategory.Controls.Add(this.ckbCatNakedOverlay);
             this.grpCategory.Controls.Add(this.ckbCatSwimwear);
             this.grpCategory.Controls.Add(this.ckbCatUnderwear);
             this.grpCategory.Controls.Add(this.ckbCatPJs);
@@ -471,22 +473,23 @@ namespace BsokEditor
             this.grpCategory.Controls.Add(this.ckbCatGym);
             this.grpCategory.Controls.Add(this.ckbCatFormal);
             this.grpCategory.Controls.Add(this.ckbCatEveryday);
-            this.grpCategory.Location = new System.Drawing.Point(599, 0);
+            this.grpCategory.Location = new System.Drawing.Point(582, 0);
             this.grpCategory.Name = "grpCategory";
-            this.grpCategory.Size = new System.Drawing.Size(98, 171);
+            this.grpCategory.Size = new System.Drawing.Size(110, 188);
             this.grpCategory.TabIndex = 24;
             this.grpCategory.TabStop = false;
             this.grpCategory.Text = "Category:";
             // 
-            // ckbCatNaked
+            // ckbCatNakedOverlay
             // 
-            this.ckbCatNaked.AutoSize = true;
-            this.ckbCatNaked.Location = new System.Drawing.Point(10, 150);
-            this.ckbCatNaked.Name = "ckbCatNaked";
-            this.ckbCatNaked.Size = new System.Drawing.Size(62, 19);
-            this.ckbCatNaked.TabIndex = 9;
-            this.ckbCatNaked.Text = "Naked";
-            this.ckbCatNaked.UseVisualStyleBackColor = true;
+            this.ckbCatNakedOverlay.AutoSize = true;
+            this.ckbCatNakedOverlay.Location = new System.Drawing.Point(10, 150);
+            this.ckbCatNakedOverlay.Name = "ckbCatNakedOverlay";
+            this.ckbCatNakedOverlay.Size = new System.Drawing.Size(105, 19);
+            this.ckbCatNakedOverlay.TabIndex = 9;
+            this.ckbCatNakedOverlay.Text = "Naked Overlay";
+            this.ckbCatNakedOverlay.UseVisualStyleBackColor = true;
+            this.ckbCatNakedOverlay.Click += new System.EventHandler(this.OnCatNakedOverlayClicked);
             // 
             // ckbCatSwimwear
             // 
@@ -588,15 +591,15 @@ namespace BsokEditor
             this.panelEditor.Controls.Add(this.grpAge);
             this.panelEditor.Controls.Add(this.btnSave);
             this.panelEditor.Enabled = false;
-            this.panelEditor.Location = new System.Drawing.Point(4, 346);
+            this.panelEditor.Location = new System.Drawing.Point(4, 329);
             this.panelEditor.Name = "panelEditor";
-            this.panelEditor.Size = new System.Drawing.Size(905, 170);
+            this.panelEditor.Size = new System.Drawing.Size(905, 187);
             this.panelEditor.TabIndex = 25;
             // 
             // grpSearch
             // 
             this.grpSearch.Controls.Add(this.textSearch);
-            this.grpSearch.Location = new System.Drawing.Point(393, 80);
+            this.grpSearch.Location = new System.Drawing.Point(379, 80);
             this.grpSearch.Name = "grpSearch";
             this.grpSearch.Size = new System.Drawing.Size(75, 50);
             this.grpSearch.TabIndex = 8;
@@ -620,7 +623,7 @@ namespace BsokEditor
             this.grpBsok.Controls.Add(this.comboBsokGenre);
             this.grpBsok.Location = new System.Drawing.Point(0, 0);
             this.grpBsok.Name = "grpBsok";
-            this.grpBsok.Size = new System.Drawing.Size(370, 171);
+            this.grpBsok.Size = new System.Drawing.Size(370, 188);
             this.grpBsok.TabIndex = 0;
             this.grpBsok.TabStop = false;
             this.grpBsok.Text = "BSOK Product:";
@@ -629,7 +632,7 @@ namespace BsokEditor
             // 
             this.comboBsokRoles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBsokRoles.FormattingEnabled = true;
-            this.comboBsokRoles.Location = new System.Drawing.Point(8, 140);
+            this.comboBsokRoles.Location = new System.Drawing.Point(8, 156);
             this.comboBsokRoles.Name = "comboBsokRoles";
             this.comboBsokRoles.Size = new System.Drawing.Size(357, 23);
             this.comboBsokRoles.TabIndex = 9;
@@ -639,7 +642,7 @@ namespace BsokEditor
             // 
             this.comboBsokShape.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBsokShape.FormattingEnabled = true;
-            this.comboBsokShape.Location = new System.Drawing.Point(8, 110);
+            this.comboBsokShape.Location = new System.Drawing.Point(8, 122);
             this.comboBsokShape.Name = "comboBsokShape";
             this.comboBsokShape.Size = new System.Drawing.Size(357, 23);
             this.comboBsokShape.TabIndex = 8;
@@ -649,7 +652,7 @@ namespace BsokEditor
             // 
             this.comboBsokGroup.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBsokGroup.FormattingEnabled = true;
-            this.comboBsokGroup.Location = new System.Drawing.Point(8, 80);
+            this.comboBsokGroup.Location = new System.Drawing.Point(8, 88);
             this.comboBsokGroup.Name = "comboBsokGroup";
             this.comboBsokGroup.Size = new System.Drawing.Size(357, 23);
             this.comboBsokGroup.TabIndex = 7;
@@ -659,7 +662,7 @@ namespace BsokEditor
             // 
             this.comboBsokStyle.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBsokStyle.FormattingEnabled = true;
-            this.comboBsokStyle.Location = new System.Drawing.Point(8, 50);
+            this.comboBsokStyle.Location = new System.Drawing.Point(8, 54);
             this.comboBsokStyle.Name = "comboBsokStyle";
             this.comboBsokStyle.Size = new System.Drawing.Size(357, 23);
             this.comboBsokStyle.TabIndex = 6;
@@ -668,7 +671,7 @@ namespace BsokEditor
             // grpGender
             // 
             this.grpGender.Controls.Add(this.comboGender);
-            this.grpGender.Location = new System.Drawing.Point(393, 0);
+            this.grpGender.Location = new System.Drawing.Point(379, 0);
             this.grpGender.Name = "grpGender";
             this.grpGender.Size = new System.Drawing.Size(75, 50);
             this.grpGender.TabIndex = 6;
@@ -678,9 +681,9 @@ namespace BsokEditor
             // grpShoe
             // 
             this.grpShoe.Controls.Add(this.comboShoe);
-            this.grpShoe.Location = new System.Drawing.Point(702, 0);
+            this.grpShoe.Location = new System.Drawing.Point(701, 0);
             this.grpShoe.Name = "grpShoe";
-            this.grpShoe.Size = new System.Drawing.Size(110, 171);
+            this.grpShoe.Size = new System.Drawing.Size(110, 188);
             this.grpShoe.TabIndex = 1;
             this.grpShoe.TabStop = false;
             this.grpShoe.Text = "Shoe:";
@@ -704,9 +707,9 @@ namespace BsokEditor
             this.grpAge.Controls.Add(this.ckbAgeAdults);
             this.grpAge.Controls.Add(this.ckbAgeTeens);
             this.grpAge.Controls.Add(this.ckbAgeChildren);
-            this.grpAge.Location = new System.Drawing.Point(473, 0);
+            this.grpAge.Location = new System.Drawing.Point(463, 0);
             this.grpAge.Name = "grpAge";
-            this.grpAge.Size = new System.Drawing.Size(108, 171);
+            this.grpAge.Size = new System.Drawing.Size(110, 188);
             this.grpAge.TabIndex = 1;
             this.grpAge.TabStop = false;
             this.grpAge.Text = "Age:";
@@ -804,6 +807,17 @@ namespace BsokEditor
             this.thumbBox.TabStop = false;
             this.thumbBox.Visible = false;
             // 
+            // ckbCatSkintone
+            // 
+            this.ckbCatSkintone.AutoSize = true;
+            this.ckbCatSkintone.Location = new System.Drawing.Point(10, 167);
+            this.ckbCatSkintone.Name = "ckbCatSkintone";
+            this.ckbCatSkintone.Size = new System.Drawing.Size(74, 19);
+            this.ckbCatSkintone.TabIndex = 10;
+            this.ckbCatSkintone.Text = "Skintone";
+            this.ckbCatSkintone.UseVisualStyleBackColor = true;
+            this.ckbCatSkintone.Click += new System.EventHandler(this.OnCatSkintoneClicked);
+            // 
             // BsokEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -892,7 +906,7 @@ namespace BsokEditor
         private System.Windows.Forms.CheckBox ckbCatPJs;
         private System.Windows.Forms.CheckBox ckbCatSwimwear;
         private System.Windows.Forms.CheckBox ckbCatUnderwear;
-        private System.Windows.Forms.CheckBox ckbCatNaked;
+        private System.Windows.Forms.CheckBox ckbCatNakedOverlay;
         private System.Windows.Forms.ComboBox comboShoe;
         private System.Windows.Forms.ContextMenuStrip menuContextGrid;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextRowRestore;
@@ -913,5 +927,6 @@ namespace BsokEditor
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.GroupBox grpSearch;
         private System.Windows.Forms.TextBox textSearch;
+        private System.Windows.Forms.CheckBox ckbCatSkintone;
     }
 }

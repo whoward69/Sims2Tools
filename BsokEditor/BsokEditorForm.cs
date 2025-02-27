@@ -322,6 +322,11 @@ namespace BsokEditor
             dataTableResources.EndLoadData();
             dataLoading = false;
 
+            if (dataTableResources.Rows.Count > 0)
+            {
+                OnGridSelectionChanged(gridViewResources, null);
+            }
+
             menuItemRecentFolders.Enabled = true;
             menuItemSelectFolder.Enabled = true;
 
@@ -667,7 +672,7 @@ namespace BsokEditor
 
         private void OnShowNakedCategoryClicked(object sender, EventArgs e)
         {
-            ckbCatNaked.Visible = menuItemShowNakedCategory.Checked;
+            ckbCatNakedOverlay.Visible = ckbCatSkintone.Visible = menuItemShowNakedCategory.Checked;
         }
         #endregion
 
@@ -700,6 +705,14 @@ namespace BsokEditor
                     else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colBsok"))
                     {
                         e.ToolTipText = (row.Cells["colResRef"].Value as Cpf).GetItem("product")?.StringValue;
+                    }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colAge"))
+                    {
+                        e.ToolTipText = $"{(row.Cells["colResRef"].Value as Cpf).GetItem("age")?.StringValue} - {row.Cells[e.ColumnIndex].Value}";
+                    }
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colCategory"))
+                    {
+                        e.ToolTipText = $"{(row.Cells["colResRef"].Value as Cpf).GetItem("category")?.StringValue} - {row.Cells[e.ColumnIndex].Value}";
                     }
                 }
             }
@@ -838,7 +851,7 @@ namespace BsokEditor
                 if ((categoryFlags & 0x0008) == 0x0008) category += " ,Swimwear";
                 if ((categoryFlags & 0x0040) == 0x0040) category += " ,Underwear";
 
-                if ((categoryFlags & 0x0080) == 0x0080) category += " ,Naked";
+                if ((categoryFlags & 0x0080) == 0x0080) category += " ,Skintone";
                 if ((categoryFlags & 0x0400) == 0x0400) category += " ,Try On";
                 if ((categoryFlags & 0x0800) == 0x0800) category += " ,NakedOverlay";
             }
@@ -1027,6 +1040,8 @@ namespace BsokEditor
             ckbCatPJs.Checked = false;
             ckbCatSwimwear.Checked = false;
             ckbCatUnderwear.Checked = false;
+            ckbCatNakedOverlay.Checked = false;
+            ckbCatSkintone.Checked = false;
 
             comboShoe.SelectedIndex = -1;
 
@@ -1144,6 +1159,8 @@ namespace BsokEditor
                     if ((cachedCategoryFlags & 0x0010) != (newCategoryFlags & 0x0010)) ckbCatPJs.CheckState = CheckState.Indeterminate;
                     if ((cachedCategoryFlags & 0x0008) != (newCategoryFlags & 0x0008)) ckbCatSwimwear.CheckState = CheckState.Indeterminate;
                     if ((cachedCategoryFlags & 0x0040) != (newCategoryFlags & 0x0040)) ckbCatUnderwear.CheckState = CheckState.Indeterminate;
+                    if ((cachedCategoryFlags & 0x0080) != (newCategoryFlags & 0x0080)) ckbCatSkintone.CheckState = CheckState.Indeterminate;
+                    if ((cachedCategoryFlags & 0x0800) != (newCategoryFlags & 0x0800)) ckbCatNakedOverlay.CheckState = CheckState.Indeterminate;
                 }
             }
             else
@@ -1157,6 +1174,8 @@ namespace BsokEditor
                 if ((cachedCategoryFlags & 0x0010) == 0x0010) ckbCatPJs.Checked = true;
                 if ((cachedCategoryFlags & 0x0008) == 0x0008) ckbCatSwimwear.Checked = true;
                 if ((cachedCategoryFlags & 0x0040) == 0x0040) ckbCatUnderwear.Checked = true;
+                if ((cachedCategoryFlags & 0x0080) == 0x0080) ckbCatSkintone.Checked = true;
+                if ((cachedCategoryFlags & 0x0800) == 0x0800) ckbCatNakedOverlay.Checked = true;
             }
 
             cpfItem = cpf.GetItem("shoe");
@@ -1403,9 +1422,14 @@ namespace BsokEditor
             OnCatClicked(sender, 0x0010);
         }
 
-        private void OnCatNakedClicked(object sender, EventArgs e)
+        private void OnCatSkintoneClicked(object sender, EventArgs e)
         {
             OnCatClicked(sender, 0x0080);
+        }
+
+        private void OnCatNakedOverlayClicked(object sender, EventArgs e)
+        {
+            OnCatClicked(sender, 0x0800);
         }
 
         private void OnCatSwimwearClicked(object sender, EventArgs e)
@@ -1424,7 +1448,7 @@ namespace BsokEditor
             {
                 if (Form.ModifierKeys == Keys.Control)
                 {
-                    ckbCatEveryday.Checked = ckbCatFormal.Checked = ckbCatGym.Checked = ckbCatMaternity.Checked = ckbCatNaked.Checked = ckbCatOuterwear.Checked = ckbCatPJs.Checked = ckbCatSwimwear.Checked = ckbCatUnderwear.Checked = false;
+                    ckbCatEveryday.Checked = ckbCatFormal.Checked = ckbCatGym.Checked = ckbCatMaternity.Checked = ckbCatNakedOverlay.Checked = ckbCatSkintone.Checked = ckbCatOuterwear.Checked = ckbCatPJs.Checked = ckbCatSwimwear.Checked = ckbCatUnderwear.Checked = false;
                     ckbBox.Checked = true;
 
                     if (IsAutoUpdate) UpdateSelectedRows(data, "category");
