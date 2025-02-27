@@ -153,14 +153,14 @@ namespace RepositoryWizard
             this.grpMaster = new System.Windows.Forms.GroupBox();
             this.textMaster = new System.Windows.Forms.TextBox();
             this.btnMaster = new System.Windows.Forms.Button();
-            this.grpPrimarySubset = new System.Windows.Forms.GroupBox();
-            this.lblPrimarySubset = new System.Windows.Forms.Label();
-            this.comboMasterPrimarySubset = new System.Windows.Forms.ComboBox();
-            this.comboSlavePrimarySubset = new System.Windows.Forms.ComboBox();
-            this.grpSecondarySubset = new System.Windows.Forms.GroupBox();
-            this.lblSecondarySubset = new System.Windows.Forms.Label();
-            this.comboMasterSecondarySubset = new System.Windows.Forms.ComboBox();
-            this.comboSlaveSecondarySubset = new System.Windows.Forms.ComboBox();
+            this.grpPrimaryDesignableSubset = new System.Windows.Forms.GroupBox();
+            this.lblPrimaryDesignableSubset = new System.Windows.Forms.Label();
+            this.comboMasterPrimaryDesignableSubset = new System.Windows.Forms.ComboBox();
+            this.comboSlavePrimaryDesignableSubset = new System.Windows.Forms.ComboBox();
+            this.grpSecondaryDesignableSubset = new System.Windows.Forms.GroupBox();
+            this.lblSecondaryDesignableSubset = new System.Windows.Forms.Label();
+            this.comboMasterSecondaryDesignableSubset = new System.Windows.Forms.ComboBox();
+            this.comboSlaveSecondaryDesignableSubset = new System.Windows.Forms.ComboBox();
             this.textDeRepoMsgs = new System.Windows.Forms.TextBox();
             this.grpMesh = new System.Windows.Forms.GroupBox();
             this.comboMesh = new System.Windows.Forms.ComboBox();
@@ -174,6 +174,33 @@ namespace RepositoryWizard
             this.openMeshDialog = new System.Windows.Forms.OpenFileDialog();
             this.openMasterDialog = new System.Windows.Forms.OpenFileDialog();
             this.repoWizardWorker = new System.ComponentModel.BackgroundWorker();
+            this.tabControl = new System.Windows.Forms.TabControl();
+            this.tabDesignable = new System.Windows.Forms.TabPage();
+            this.tabNonDesignable = new System.Windows.Forms.TabPage();
+            this.grpNonDesignableSubset1 = new System.Windows.Forms.GroupBox();
+            this.lblNonDesignableSubset1 = new System.Windows.Forms.Label();
+            this.comboMasterNonDesignableSubset1 = new System.Windows.Forms.ComboBox();
+            this.comboSlaveNonDesignableSubset1 = new System.Windows.Forms.ComboBox();
+            this.grpNonDesignableSubset2 = new System.Windows.Forms.GroupBox();
+            this.lblNonDesignableSubset2 = new System.Windows.Forms.Label();
+            this.comboMasterNonDesignableSubset2 = new System.Windows.Forms.ComboBox();
+            this.comboSlaveNonDesignableSubset2 = new System.Windows.Forms.ComboBox();
+            this.grpNonDesignableSubset3 = new System.Windows.Forms.GroupBox();
+            this.lblNonDesignableSubset3 = new System.Windows.Forms.Label();
+            this.comboMasterNonDesignableSubset3 = new System.Windows.Forms.ComboBox();
+            this.comboSlaveNonDesignableSubset3 = new System.Windows.Forms.ComboBox();
+            this.grpNonDesignableSubset4 = new System.Windows.Forms.GroupBox();
+            this.lblNonDesignableSubset4 = new System.Windows.Forms.Label();
+            this.comboMasterNonDesignableSubset4 = new System.Windows.Forms.ComboBox();
+            this.comboSlaveNonDesignableSubset4 = new System.Windows.Forms.ComboBox();
+            this.grpNonDesignableSubset5 = new System.Windows.Forms.GroupBox();
+            this.lblNonDesignableSubset5 = new System.Windows.Forms.Label();
+            this.comboMasterNonDesignableSubset5 = new System.Windows.Forms.ComboBox();
+            this.comboSlaveNonDesignableSubset5 = new System.Windows.Forms.ComboBox();
+            this.grpNonDesignableSubset6 = new System.Windows.Forms.GroupBox();
+            this.lblNonDesignableSubset6 = new System.Windows.Forms.Label();
+            this.comboMasterNonDesignableSubset6 = new System.Windows.Forms.ComboBox();
+            this.comboSlaveNonDesignableSubset6 = new System.Windows.Forms.ComboBox();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -198,10 +225,19 @@ namespace RepositoryWizard
             this.grpTooltip.SuspendLayout();
             this.panelObjectEditor.SuspendLayout();
             this.grpMaster.SuspendLayout();
-            this.grpPrimarySubset.SuspendLayout();
-            this.grpSecondarySubset.SuspendLayout();
+            this.grpPrimaryDesignableSubset.SuspendLayout();
+            this.grpSecondaryDesignableSubset.SuspendLayout();
             this.grpMesh.SuspendLayout();
             this.grpDeRepoOptions.SuspendLayout();
+            this.tabControl.SuspendLayout();
+            this.tabDesignable.SuspendLayout();
+            this.tabNonDesignable.SuspendLayout();
+            this.grpNonDesignableSubset1.SuspendLayout();
+            this.grpNonDesignableSubset2.SuspendLayout();
+            this.grpNonDesignableSubset3.SuspendLayout();
+            this.grpNonDesignableSubset4.SuspendLayout();
+            this.grpNonDesignableSubset5.SuspendLayout();
+            this.grpNonDesignableSubset6.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -327,27 +363,27 @@ namespace RepositoryWizard
             // 
             this.menuItemAdvanced.CheckOnClick = true;
             this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
             this.menuItemAdvanced.Text = "&Advanced";
             this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(141, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemAutoBackup
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
             this.menuItemAutoBackup.Text = "Auto-&Backup";
             // 
             // menuItemAutoMerge
             // 
             this.menuItemAutoMerge.CheckOnClick = true;
             this.menuItemAutoMerge.Name = "menuItemAutoMerge";
-            this.menuItemAutoMerge.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoMerge.Size = new System.Drawing.Size(180, 22);
             this.menuItemAutoMerge.Text = "Auto-&Merge";
             // 
             // menuItemWizard
@@ -506,11 +542,11 @@ namespace RepositoryWizard
             // 
             this.splitTopBottom.Panel2.Controls.Add(this.btnSaveAs);
             this.splitTopBottom.Panel2.Controls.Add(this.gridResources);
-            this.splitTopBottom.Panel2.Controls.Add(this.panelClothingEditor);
             this.splitTopBottom.Panel2.Controls.Add(this.panelObjectEditor);
             this.splitTopBottom.Panel2.Controls.Add(this.textDeRepoMsgs);
-            this.splitTopBottom.Panel2.Controls.Add(this.grpMesh);
+            this.splitTopBottom.Panel2.Controls.Add(this.panelClothingEditor);
             this.splitTopBottom.Panel2.Controls.Add(this.grpDeRepoOptions);
+            this.splitTopBottom.Panel2.Controls.Add(this.grpMesh);
             this.splitTopBottom.Size = new System.Drawing.Size(984, 537);
             this.splitTopBottom.SplitterDistance = 160;
             this.splitTopBottom.TabIndex = 1;
@@ -537,10 +573,13 @@ namespace RepositoryWizard
             this.treeFolders.AllowDrop = true;
             this.treeFolders.BackColor = System.Drawing.SystemColors.Window;
             this.treeFolders.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeFolders.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
+            this.treeFolders.HideSelection = false;
             this.treeFolders.Location = new System.Drawing.Point(0, 0);
             this.treeFolders.Name = "treeFolders";
             this.treeFolders.Size = new System.Drawing.Size(218, 160);
             this.treeFolders.TabIndex = 0;
+            this.treeFolders.DrawNode += new System.Windows.Forms.DrawTreeNodeEventHandler(this.OnTreeFolder_DrawNode);
             this.treeFolders.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnTreeFolderClicked);
             this.treeFolders.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnTreeFolder_DragDrop);
             this.treeFolders.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnTreeFolder_DragEnter);
@@ -1178,24 +1217,24 @@ namespace RepositoryWizard
             // 
             this.panelObjectEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelObjectEditor.Controls.Add(this.tabControl);
             this.panelObjectEditor.Controls.Add(this.grpMaster);
-            this.panelObjectEditor.Controls.Add(this.grpPrimarySubset);
-            this.panelObjectEditor.Controls.Add(this.grpSecondarySubset);
             this.panelObjectEditor.Enabled = false;
             this.panelObjectEditor.Location = new System.Drawing.Point(0, 160);
+            this.panelObjectEditor.Margin = new System.Windows.Forms.Padding(0);
             this.panelObjectEditor.Name = "panelObjectEditor";
-            this.panelObjectEditor.Size = new System.Drawing.Size(984, 160);
+            this.panelObjectEditor.Size = new System.Drawing.Size(984, 176);
             this.panelObjectEditor.TabIndex = 26;
             // 
             // grpMaster
             // 
-            this.grpMaster.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.grpMaster.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.grpMaster.Controls.Add(this.textMaster);
             this.grpMaster.Controls.Add(this.btnMaster);
             this.grpMaster.Location = new System.Drawing.Point(4, 0);
             this.grpMaster.Name = "grpMaster";
-            this.grpMaster.Size = new System.Drawing.Size(870, 50);
+            this.grpMaster.Size = new System.Drawing.Size(870, 43);
             this.grpMaster.TabIndex = 26;
             this.grpMaster.TabStop = false;
             this.grpMaster.Text = "Master:";
@@ -1204,7 +1243,7 @@ namespace RepositoryWizard
             // 
             this.textMaster.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textMaster.Location = new System.Drawing.Point(6, 20);
+            this.textMaster.Location = new System.Drawing.Point(6, 16);
             this.textMaster.Name = "textMaster";
             this.textMaster.ReadOnly = true;
             this.textMaster.Size = new System.Drawing.Size(754, 21);
@@ -1214,7 +1253,7 @@ namespace RepositoryWizard
             // btnMaster
             // 
             this.btnMaster.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMaster.Location = new System.Drawing.Point(765, 17);
+            this.btnMaster.Location = new System.Drawing.Point(765, 13);
             this.btnMaster.Name = "btnMaster";
             this.btnMaster.Size = new System.Drawing.Size(100, 26);
             this.btnMaster.TabIndex = 26;
@@ -1222,87 +1261,87 @@ namespace RepositoryWizard
             this.btnMaster.UseVisualStyleBackColor = true;
             this.btnMaster.Click += new System.EventHandler(this.OnMasterButtonClicked);
             // 
-            // grpPrimarySubset
+            // grpPrimaryDesignableSubset
             // 
-            this.grpPrimarySubset.Controls.Add(this.lblPrimarySubset);
-            this.grpPrimarySubset.Controls.Add(this.comboMasterPrimarySubset);
-            this.grpPrimarySubset.Controls.Add(this.comboSlavePrimarySubset);
-            this.grpPrimarySubset.Location = new System.Drawing.Point(4, 50);
-            this.grpPrimarySubset.Name = "grpPrimarySubset";
-            this.grpPrimarySubset.Size = new System.Drawing.Size(456, 50);
-            this.grpPrimarySubset.TabIndex = 6;
-            this.grpPrimarySubset.TabStop = false;
-            this.grpPrimarySubset.Text = "Primary Subset:";
+            this.grpPrimaryDesignableSubset.Controls.Add(this.lblPrimaryDesignableSubset);
+            this.grpPrimaryDesignableSubset.Controls.Add(this.comboMasterPrimaryDesignableSubset);
+            this.grpPrimaryDesignableSubset.Controls.Add(this.comboSlavePrimaryDesignableSubset);
+            this.grpPrimaryDesignableSubset.Location = new System.Drawing.Point(0, 0);
+            this.grpPrimaryDesignableSubset.Name = "grpPrimaryDesignableSubset";
+            this.grpPrimaryDesignableSubset.Size = new System.Drawing.Size(456, 44);
+            this.grpPrimaryDesignableSubset.TabIndex = 6;
+            this.grpPrimaryDesignableSubset.TabStop = false;
+            this.grpPrimaryDesignableSubset.Text = "Primary Subset:";
             // 
-            // lblPrimarySubset
+            // lblPrimaryDesignableSubset
             // 
-            this.lblPrimarySubset.AutoSize = true;
-            this.lblPrimarySubset.Location = new System.Drawing.Point(214, 23);
-            this.lblPrimarySubset.Name = "lblPrimarySubset";
-            this.lblPrimarySubset.Size = new System.Drawing.Size(28, 15);
-            this.lblPrimarySubset.TabIndex = 9;
-            this.lblPrimarySubset.Text = "==>";
+            this.lblPrimaryDesignableSubset.AutoSize = true;
+            this.lblPrimaryDesignableSubset.Location = new System.Drawing.Point(214, 20);
+            this.lblPrimaryDesignableSubset.Name = "lblPrimaryDesignableSubset";
+            this.lblPrimaryDesignableSubset.Size = new System.Drawing.Size(28, 15);
+            this.lblPrimaryDesignableSubset.TabIndex = 9;
+            this.lblPrimaryDesignableSubset.Text = "==>";
             // 
-            // comboMasterPrimarySubset
+            // comboMasterPrimaryDesignableSubset
             // 
-            this.comboMasterPrimarySubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboMasterPrimarySubset.FormattingEnabled = true;
-            this.comboMasterPrimarySubset.Location = new System.Drawing.Point(247, 20);
-            this.comboMasterPrimarySubset.Name = "comboMasterPrimarySubset";
-            this.comboMasterPrimarySubset.Size = new System.Drawing.Size(203, 23);
-            this.comboMasterPrimarySubset.TabIndex = 8;
-            this.comboMasterPrimarySubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            this.comboMasterPrimaryDesignableSubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMasterPrimaryDesignableSubset.FormattingEnabled = true;
+            this.comboMasterPrimaryDesignableSubset.Location = new System.Drawing.Point(247, 17);
+            this.comboMasterPrimaryDesignableSubset.Name = "comboMasterPrimaryDesignableSubset";
+            this.comboMasterPrimaryDesignableSubset.Size = new System.Drawing.Size(203, 23);
+            this.comboMasterPrimaryDesignableSubset.TabIndex = 8;
+            this.comboMasterPrimaryDesignableSubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
             // 
-            // comboSlavePrimarySubset
+            // comboSlavePrimaryDesignableSubset
             // 
-            this.comboSlavePrimarySubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboSlavePrimarySubset.FormattingEnabled = true;
-            this.comboSlavePrimarySubset.Location = new System.Drawing.Point(5, 20);
-            this.comboSlavePrimarySubset.Name = "comboSlavePrimarySubset";
-            this.comboSlavePrimarySubset.Size = new System.Drawing.Size(203, 23);
-            this.comboSlavePrimarySubset.TabIndex = 7;
-            this.comboSlavePrimarySubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            this.comboSlavePrimaryDesignableSubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSlavePrimaryDesignableSubset.FormattingEnabled = true;
+            this.comboSlavePrimaryDesignableSubset.Location = new System.Drawing.Point(5, 17);
+            this.comboSlavePrimaryDesignableSubset.Name = "comboSlavePrimaryDesignableSubset";
+            this.comboSlavePrimaryDesignableSubset.Size = new System.Drawing.Size(203, 23);
+            this.comboSlavePrimaryDesignableSubset.TabIndex = 7;
+            this.comboSlavePrimaryDesignableSubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
             // 
-            // grpSecondarySubset
+            // grpSecondaryDesignableSubset
             // 
-            this.grpSecondarySubset.Controls.Add(this.lblSecondarySubset);
-            this.grpSecondarySubset.Controls.Add(this.comboMasterSecondarySubset);
-            this.grpSecondarySubset.Controls.Add(this.comboSlaveSecondarySubset);
-            this.grpSecondarySubset.Location = new System.Drawing.Point(4, 105);
-            this.grpSecondarySubset.Name = "grpSecondarySubset";
-            this.grpSecondarySubset.Size = new System.Drawing.Size(456, 50);
-            this.grpSecondarySubset.TabIndex = 6;
-            this.grpSecondarySubset.TabStop = false;
-            this.grpSecondarySubset.Text = "Secondary Subset:";
+            this.grpSecondaryDesignableSubset.Controls.Add(this.lblSecondaryDesignableSubset);
+            this.grpSecondaryDesignableSubset.Controls.Add(this.comboMasterSecondaryDesignableSubset);
+            this.grpSecondaryDesignableSubset.Controls.Add(this.comboSlaveSecondaryDesignableSubset);
+            this.grpSecondaryDesignableSubset.Location = new System.Drawing.Point(0, 50);
+            this.grpSecondaryDesignableSubset.Name = "grpSecondaryDesignableSubset";
+            this.grpSecondaryDesignableSubset.Size = new System.Drawing.Size(456, 44);
+            this.grpSecondaryDesignableSubset.TabIndex = 6;
+            this.grpSecondaryDesignableSubset.TabStop = false;
+            this.grpSecondaryDesignableSubset.Text = "Secondary Subset:";
             // 
-            // lblSecondarySubset
+            // lblSecondaryDesignableSubset
             // 
-            this.lblSecondarySubset.AutoSize = true;
-            this.lblSecondarySubset.Location = new System.Drawing.Point(214, 23);
-            this.lblSecondarySubset.Name = "lblSecondarySubset";
-            this.lblSecondarySubset.Size = new System.Drawing.Size(28, 15);
-            this.lblSecondarySubset.TabIndex = 10;
-            this.lblSecondarySubset.Text = "==>";
+            this.lblSecondaryDesignableSubset.AutoSize = true;
+            this.lblSecondaryDesignableSubset.Location = new System.Drawing.Point(214, 20);
+            this.lblSecondaryDesignableSubset.Name = "lblSecondaryDesignableSubset";
+            this.lblSecondaryDesignableSubset.Size = new System.Drawing.Size(28, 15);
+            this.lblSecondaryDesignableSubset.TabIndex = 10;
+            this.lblSecondaryDesignableSubset.Text = "==>";
             // 
-            // comboMasterSecondarySubset
+            // comboMasterSecondaryDesignableSubset
             // 
-            this.comboMasterSecondarySubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboMasterSecondarySubset.FormattingEnabled = true;
-            this.comboMasterSecondarySubset.Location = new System.Drawing.Point(247, 20);
-            this.comboMasterSecondarySubset.Name = "comboMasterSecondarySubset";
-            this.comboMasterSecondarySubset.Size = new System.Drawing.Size(203, 23);
-            this.comboMasterSecondarySubset.TabIndex = 8;
-            this.comboMasterSecondarySubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            this.comboMasterSecondaryDesignableSubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMasterSecondaryDesignableSubset.FormattingEnabled = true;
+            this.comboMasterSecondaryDesignableSubset.Location = new System.Drawing.Point(247, 17);
+            this.comboMasterSecondaryDesignableSubset.Name = "comboMasterSecondaryDesignableSubset";
+            this.comboMasterSecondaryDesignableSubset.Size = new System.Drawing.Size(203, 23);
+            this.comboMasterSecondaryDesignableSubset.TabIndex = 8;
+            this.comboMasterSecondaryDesignableSubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
             // 
-            // comboSlaveSecondarySubset
+            // comboSlaveSecondaryDesignableSubset
             // 
-            this.comboSlaveSecondarySubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboSlaveSecondarySubset.FormattingEnabled = true;
-            this.comboSlaveSecondarySubset.Location = new System.Drawing.Point(5, 20);
-            this.comboSlaveSecondarySubset.Name = "comboSlaveSecondarySubset";
-            this.comboSlaveSecondarySubset.Size = new System.Drawing.Size(203, 23);
-            this.comboSlaveSecondarySubset.TabIndex = 7;
-            this.comboSlaveSecondarySubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            this.comboSlaveSecondaryDesignableSubset.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSlaveSecondaryDesignableSubset.FormattingEnabled = true;
+            this.comboSlaveSecondaryDesignableSubset.Location = new System.Drawing.Point(5, 17);
+            this.comboSlaveSecondaryDesignableSubset.Name = "comboSlaveSecondaryDesignableSubset";
+            this.comboSlaveSecondaryDesignableSubset.Size = new System.Drawing.Size(203, 23);
+            this.comboSlaveSecondaryDesignableSubset.TabIndex = 7;
+            this.comboSlaveSecondaryDesignableSubset.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
             // 
             // textDeRepoMsgs
             // 
@@ -1436,6 +1475,293 @@ namespace RepositoryWizard
             this.repoWizardWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.RepoWizardWorker_Progress);
             this.repoWizardWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.RepoWizardWorker_Completed);
             // 
+            // tabControl
+            // 
+            this.tabControl.Alignment = System.Windows.Forms.TabAlignment.Bottom;
+            this.tabControl.Controls.Add(this.tabDesignable);
+            this.tabControl.Controls.Add(this.tabNonDesignable);
+            this.tabControl.Location = new System.Drawing.Point(4, 40);
+            this.tabControl.Margin = new System.Windows.Forms.Padding(0);
+            this.tabControl.Name = "tabControl";
+            this.tabControl.Padding = new System.Drawing.Point(0, 0);
+            this.tabControl.SelectedIndex = 0;
+            this.tabControl.Size = new System.Drawing.Size(968, 131);
+            this.tabControl.TabIndex = 27;
+            this.tabControl.Visible = false;
+            // 
+            // tabDesignable
+            // 
+            this.tabDesignable.Controls.Add(this.grpPrimaryDesignableSubset);
+            this.tabDesignable.Controls.Add(this.grpSecondaryDesignableSubset);
+            this.tabDesignable.Location = new System.Drawing.Point(4, 4);
+            this.tabDesignable.Margin = new System.Windows.Forms.Padding(0);
+            this.tabDesignable.Name = "tabDesignable";
+            this.tabDesignable.Size = new System.Drawing.Size(960, 103);
+            this.tabDesignable.TabIndex = 0;
+            this.tabDesignable.Text = "Designable";
+            // 
+            // tabNonDesignable
+            // 
+            this.tabNonDesignable.BackColor = System.Drawing.SystemColors.Control;
+            this.tabNonDesignable.Controls.Add(this.grpNonDesignableSubset6);
+            this.tabNonDesignable.Controls.Add(this.grpNonDesignableSubset5);
+            this.tabNonDesignable.Controls.Add(this.grpNonDesignableSubset3);
+            this.tabNonDesignable.Controls.Add(this.grpNonDesignableSubset4);
+            this.tabNonDesignable.Controls.Add(this.grpNonDesignableSubset1);
+            this.tabNonDesignable.Controls.Add(this.grpNonDesignableSubset2);
+            this.tabNonDesignable.Location = new System.Drawing.Point(4, 4);
+            this.tabNonDesignable.Name = "tabNonDesignable";
+            this.tabNonDesignable.Padding = new System.Windows.Forms.Padding(3);
+            this.tabNonDesignable.Size = new System.Drawing.Size(960, 103);
+            this.tabNonDesignable.TabIndex = 1;
+            this.tabNonDesignable.Text = "Non-Designable";
+            // 
+            // grpNonDesignableSubset1
+            // 
+            this.grpNonDesignableSubset1.Controls.Add(this.lblNonDesignableSubset1);
+            this.grpNonDesignableSubset1.Controls.Add(this.comboMasterNonDesignableSubset1);
+            this.grpNonDesignableSubset1.Controls.Add(this.comboSlaveNonDesignableSubset1);
+            this.grpNonDesignableSubset1.Location = new System.Drawing.Point(0, 0);
+            this.grpNonDesignableSubset1.Name = "grpNonDesignableSubset1";
+            this.grpNonDesignableSubset1.Size = new System.Drawing.Size(306, 44);
+            this.grpNonDesignableSubset1.TabIndex = 7;
+            this.grpNonDesignableSubset1.TabStop = false;
+            this.grpNonDesignableSubset1.Text = "Subset 1:";
+            // 
+            // lblNonDesignableSubset1
+            // 
+            this.lblNonDesignableSubset1.AutoSize = true;
+            this.lblNonDesignableSubset1.Location = new System.Drawing.Point(139, 20);
+            this.lblNonDesignableSubset1.Name = "lblNonDesignableSubset1";
+            this.lblNonDesignableSubset1.Size = new System.Drawing.Size(28, 15);
+            this.lblNonDesignableSubset1.TabIndex = 9;
+            this.lblNonDesignableSubset1.Text = "==>";
+            // 
+            // comboMasterNonDesignableSubset1
+            // 
+            this.comboMasterNonDesignableSubset1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMasterNonDesignableSubset1.FormattingEnabled = true;
+            this.comboMasterNonDesignableSubset1.Location = new System.Drawing.Point(172, 17);
+            this.comboMasterNonDesignableSubset1.Name = "comboMasterNonDesignableSubset1";
+            this.comboMasterNonDesignableSubset1.Size = new System.Drawing.Size(125, 23);
+            this.comboMasterNonDesignableSubset1.TabIndex = 8;
+            this.comboMasterNonDesignableSubset1.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // comboSlaveNonDesignableSubset1
+            // 
+            this.comboSlaveNonDesignableSubset1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSlaveNonDesignableSubset1.FormattingEnabled = true;
+            this.comboSlaveNonDesignableSubset1.Location = new System.Drawing.Point(5, 17);
+            this.comboSlaveNonDesignableSubset1.Name = "comboSlaveNonDesignableSubset1";
+            this.comboSlaveNonDesignableSubset1.Size = new System.Drawing.Size(125, 23);
+            this.comboSlaveNonDesignableSubset1.TabIndex = 7;
+            this.comboSlaveNonDesignableSubset1.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // grpNonDesignableSubset2
+            // 
+            this.grpNonDesignableSubset2.Controls.Add(this.lblNonDesignableSubset2);
+            this.grpNonDesignableSubset2.Controls.Add(this.comboMasterNonDesignableSubset2);
+            this.grpNonDesignableSubset2.Controls.Add(this.comboSlaveNonDesignableSubset2);
+            this.grpNonDesignableSubset2.Location = new System.Drawing.Point(0, 50);
+            this.grpNonDesignableSubset2.Name = "grpNonDesignableSubset2";
+            this.grpNonDesignableSubset2.Size = new System.Drawing.Size(306, 44);
+            this.grpNonDesignableSubset2.TabIndex = 8;
+            this.grpNonDesignableSubset2.TabStop = false;
+            this.grpNonDesignableSubset2.Text = "Subset 2:";
+            // 
+            // lblNonDesignableSubset2
+            // 
+            this.lblNonDesignableSubset2.AutoSize = true;
+            this.lblNonDesignableSubset2.Location = new System.Drawing.Point(139, 20);
+            this.lblNonDesignableSubset2.Name = "lblNonDesignableSubset2";
+            this.lblNonDesignableSubset2.Size = new System.Drawing.Size(28, 15);
+            this.lblNonDesignableSubset2.TabIndex = 10;
+            this.lblNonDesignableSubset2.Text = "==>";
+            // 
+            // comboMasterNonDesignableSubset2
+            // 
+            this.comboMasterNonDesignableSubset2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMasterNonDesignableSubset2.FormattingEnabled = true;
+            this.comboMasterNonDesignableSubset2.Location = new System.Drawing.Point(172, 17);
+            this.comboMasterNonDesignableSubset2.Name = "comboMasterNonDesignableSubset2";
+            this.comboMasterNonDesignableSubset2.Size = new System.Drawing.Size(125, 23);
+            this.comboMasterNonDesignableSubset2.TabIndex = 8;
+            this.comboMasterNonDesignableSubset2.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // comboSlaveNonDesignableSubset2
+            // 
+            this.comboSlaveNonDesignableSubset2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSlaveNonDesignableSubset2.FormattingEnabled = true;
+            this.comboSlaveNonDesignableSubset2.Location = new System.Drawing.Point(5, 17);
+            this.comboSlaveNonDesignableSubset2.Name = "comboSlaveNonDesignableSubset2";
+            this.comboSlaveNonDesignableSubset2.Size = new System.Drawing.Size(125, 23);
+            this.comboSlaveNonDesignableSubset2.TabIndex = 7;
+            this.comboSlaveNonDesignableSubset2.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // grpNonDesignableSubset3
+            // 
+            this.grpNonDesignableSubset3.Controls.Add(this.lblNonDesignableSubset3);
+            this.grpNonDesignableSubset3.Controls.Add(this.comboMasterNonDesignableSubset3);
+            this.grpNonDesignableSubset3.Controls.Add(this.comboSlaveNonDesignableSubset3);
+            this.grpNonDesignableSubset3.Location = new System.Drawing.Point(325, 0);
+            this.grpNonDesignableSubset3.Name = "grpNonDesignableSubset3";
+            this.grpNonDesignableSubset3.Size = new System.Drawing.Size(306, 44);
+            this.grpNonDesignableSubset3.TabIndex = 10;
+            this.grpNonDesignableSubset3.TabStop = false;
+            this.grpNonDesignableSubset3.Text = "Subset 3:";
+            // 
+            // lblNonDesignableSubset3
+            // 
+            this.lblNonDesignableSubset3.AutoSize = true;
+            this.lblNonDesignableSubset3.Location = new System.Drawing.Point(139, 20);
+            this.lblNonDesignableSubset3.Name = "lblNonDesignableSubset3";
+            this.lblNonDesignableSubset3.Size = new System.Drawing.Size(28, 15);
+            this.lblNonDesignableSubset3.TabIndex = 9;
+            this.lblNonDesignableSubset3.Text = "==>";
+            // 
+            // comboMasterNonDesignableSubset3
+            // 
+            this.comboMasterNonDesignableSubset3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMasterNonDesignableSubset3.FormattingEnabled = true;
+            this.comboMasterNonDesignableSubset3.Location = new System.Drawing.Point(172, 17);
+            this.comboMasterNonDesignableSubset3.Name = "comboMasterNonDesignableSubset3";
+            this.comboMasterNonDesignableSubset3.Size = new System.Drawing.Size(125, 23);
+            this.comboMasterNonDesignableSubset3.TabIndex = 8;
+            this.comboMasterNonDesignableSubset3.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // comboSlaveNonDesignableSubset3
+            // 
+            this.comboSlaveNonDesignableSubset3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSlaveNonDesignableSubset3.FormattingEnabled = true;
+            this.comboSlaveNonDesignableSubset3.Location = new System.Drawing.Point(5, 17);
+            this.comboSlaveNonDesignableSubset3.Name = "comboSlaveNonDesignableSubset3";
+            this.comboSlaveNonDesignableSubset3.Size = new System.Drawing.Size(125, 23);
+            this.comboSlaveNonDesignableSubset3.TabIndex = 7;
+            this.comboSlaveNonDesignableSubset3.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // grpNonDesignableSubset4
+            // 
+            this.grpNonDesignableSubset4.Controls.Add(this.lblNonDesignableSubset4);
+            this.grpNonDesignableSubset4.Controls.Add(this.comboMasterNonDesignableSubset4);
+            this.grpNonDesignableSubset4.Controls.Add(this.comboSlaveNonDesignableSubset4);
+            this.grpNonDesignableSubset4.Location = new System.Drawing.Point(325, 50);
+            this.grpNonDesignableSubset4.Name = "grpNonDesignableSubset4";
+            this.grpNonDesignableSubset4.Size = new System.Drawing.Size(306, 44);
+            this.grpNonDesignableSubset4.TabIndex = 11;
+            this.grpNonDesignableSubset4.TabStop = false;
+            this.grpNonDesignableSubset4.Text = "Subset 4:";
+            // 
+            // lblNonDesignableSubset4
+            // 
+            this.lblNonDesignableSubset4.AutoSize = true;
+            this.lblNonDesignableSubset4.Location = new System.Drawing.Point(139, 20);
+            this.lblNonDesignableSubset4.Name = "lblNonDesignableSubset4";
+            this.lblNonDesignableSubset4.Size = new System.Drawing.Size(28, 15);
+            this.lblNonDesignableSubset4.TabIndex = 10;
+            this.lblNonDesignableSubset4.Text = "==>";
+            // 
+            // comboMasterNonDesignableSubset4
+            // 
+            this.comboMasterNonDesignableSubset4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMasterNonDesignableSubset4.FormattingEnabled = true;
+            this.comboMasterNonDesignableSubset4.Location = new System.Drawing.Point(172, 17);
+            this.comboMasterNonDesignableSubset4.Name = "comboMasterNonDesignableSubset4";
+            this.comboMasterNonDesignableSubset4.Size = new System.Drawing.Size(125, 23);
+            this.comboMasterNonDesignableSubset4.TabIndex = 8;
+            this.comboMasterNonDesignableSubset4.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // comboSlaveNonDesignableSubset4
+            // 
+            this.comboSlaveNonDesignableSubset4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSlaveNonDesignableSubset4.FormattingEnabled = true;
+            this.comboSlaveNonDesignableSubset4.Location = new System.Drawing.Point(5, 17);
+            this.comboSlaveNonDesignableSubset4.Name = "comboSlaveNonDesignableSubset4";
+            this.comboSlaveNonDesignableSubset4.Size = new System.Drawing.Size(125, 23);
+            this.comboSlaveNonDesignableSubset4.TabIndex = 7;
+            this.comboSlaveNonDesignableSubset4.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // grpNonDesignableSubset5
+            // 
+            this.grpNonDesignableSubset5.Controls.Add(this.lblNonDesignableSubset5);
+            this.grpNonDesignableSubset5.Controls.Add(this.comboMasterNonDesignableSubset5);
+            this.grpNonDesignableSubset5.Controls.Add(this.comboSlaveNonDesignableSubset5);
+            this.grpNonDesignableSubset5.Location = new System.Drawing.Point(650, 0);
+            this.grpNonDesignableSubset5.Name = "grpNonDesignableSubset5";
+            this.grpNonDesignableSubset5.Size = new System.Drawing.Size(306, 44);
+            this.grpNonDesignableSubset5.TabIndex = 11;
+            this.grpNonDesignableSubset5.TabStop = false;
+            this.grpNonDesignableSubset5.Text = "Subset 5:";
+            // 
+            // lblNonDesignableSubset5
+            // 
+            this.lblNonDesignableSubset5.AutoSize = true;
+            this.lblNonDesignableSubset5.Location = new System.Drawing.Point(139, 20);
+            this.lblNonDesignableSubset5.Name = "lblNonDesignableSubset5";
+            this.lblNonDesignableSubset5.Size = new System.Drawing.Size(28, 15);
+            this.lblNonDesignableSubset5.TabIndex = 9;
+            this.lblNonDesignableSubset5.Text = "==>";
+            // 
+            // comboMasterNonDesignableSubset5
+            // 
+            this.comboMasterNonDesignableSubset5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMasterNonDesignableSubset5.FormattingEnabled = true;
+            this.comboMasterNonDesignableSubset5.Location = new System.Drawing.Point(172, 17);
+            this.comboMasterNonDesignableSubset5.Name = "comboMasterNonDesignableSubset5";
+            this.comboMasterNonDesignableSubset5.Size = new System.Drawing.Size(125, 23);
+            this.comboMasterNonDesignableSubset5.TabIndex = 8;
+            this.comboMasterNonDesignableSubset5.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // comboSlaveNonDesignableSubset5
+            // 
+            this.comboSlaveNonDesignableSubset5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSlaveNonDesignableSubset5.FormattingEnabled = true;
+            this.comboSlaveNonDesignableSubset5.Location = new System.Drawing.Point(5, 17);
+            this.comboSlaveNonDesignableSubset5.Name = "comboSlaveNonDesignableSubset5";
+            this.comboSlaveNonDesignableSubset5.Size = new System.Drawing.Size(125, 23);
+            this.comboSlaveNonDesignableSubset5.TabIndex = 7;
+            this.comboSlaveNonDesignableSubset5.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // grpNonDesignableSubset6
+            // 
+            this.grpNonDesignableSubset6.Controls.Add(this.lblNonDesignableSubset6);
+            this.grpNonDesignableSubset6.Controls.Add(this.comboMasterNonDesignableSubset6);
+            this.grpNonDesignableSubset6.Controls.Add(this.comboSlaveNonDesignableSubset6);
+            this.grpNonDesignableSubset6.Location = new System.Drawing.Point(650, 50);
+            this.grpNonDesignableSubset6.Name = "grpNonDesignableSubset6";
+            this.grpNonDesignableSubset6.Size = new System.Drawing.Size(306, 44);
+            this.grpNonDesignableSubset6.TabIndex = 12;
+            this.grpNonDesignableSubset6.TabStop = false;
+            this.grpNonDesignableSubset6.Text = "Subset 6:";
+            // 
+            // lblNonDesignableSubset6
+            // 
+            this.lblNonDesignableSubset6.AutoSize = true;
+            this.lblNonDesignableSubset6.Location = new System.Drawing.Point(139, 20);
+            this.lblNonDesignableSubset6.Name = "lblNonDesignableSubset6";
+            this.lblNonDesignableSubset6.Size = new System.Drawing.Size(28, 15);
+            this.lblNonDesignableSubset6.TabIndex = 9;
+            this.lblNonDesignableSubset6.Text = "==>";
+            // 
+            // comboMasterNonDesignableSubset6
+            // 
+            this.comboMasterNonDesignableSubset6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboMasterNonDesignableSubset6.FormattingEnabled = true;
+            this.comboMasterNonDesignableSubset6.Location = new System.Drawing.Point(172, 17);
+            this.comboMasterNonDesignableSubset6.Name = "comboMasterNonDesignableSubset6";
+            this.comboMasterNonDesignableSubset6.Size = new System.Drawing.Size(125, 23);
+            this.comboMasterNonDesignableSubset6.TabIndex = 8;
+            this.comboMasterNonDesignableSubset6.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
+            // comboSlaveNonDesignableSubset6
+            // 
+            this.comboSlaveNonDesignableSubset6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSlaveNonDesignableSubset6.FormattingEnabled = true;
+            this.comboSlaveNonDesignableSubset6.Location = new System.Drawing.Point(5, 17);
+            this.comboSlaveNonDesignableSubset6.Name = "comboSlaveNonDesignableSubset6";
+            this.comboSlaveNonDesignableSubset6.Size = new System.Drawing.Size(125, 23);
+            this.comboSlaveNonDesignableSubset6.TabIndex = 7;
+            this.comboSlaveNonDesignableSubset6.SelectedValueChanged += new System.EventHandler(this.OnSubsetChanged);
+            // 
             // RepositoryWizardForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1487,14 +1813,29 @@ namespace RepositoryWizard
             this.panelObjectEditor.ResumeLayout(false);
             this.grpMaster.ResumeLayout(false);
             this.grpMaster.PerformLayout();
-            this.grpPrimarySubset.ResumeLayout(false);
-            this.grpPrimarySubset.PerformLayout();
-            this.grpSecondarySubset.ResumeLayout(false);
-            this.grpSecondarySubset.PerformLayout();
+            this.grpPrimaryDesignableSubset.ResumeLayout(false);
+            this.grpPrimaryDesignableSubset.PerformLayout();
+            this.grpSecondaryDesignableSubset.ResumeLayout(false);
+            this.grpSecondaryDesignableSubset.PerformLayout();
             this.grpMesh.ResumeLayout(false);
             this.grpMesh.PerformLayout();
             this.grpDeRepoOptions.ResumeLayout(false);
             this.grpDeRepoOptions.PerformLayout();
+            this.tabControl.ResumeLayout(false);
+            this.tabDesignable.ResumeLayout(false);
+            this.tabNonDesignable.ResumeLayout(false);
+            this.grpNonDesignableSubset1.ResumeLayout(false);
+            this.grpNonDesignableSubset1.PerformLayout();
+            this.grpNonDesignableSubset2.ResumeLayout(false);
+            this.grpNonDesignableSubset2.PerformLayout();
+            this.grpNonDesignableSubset3.ResumeLayout(false);
+            this.grpNonDesignableSubset3.PerformLayout();
+            this.grpNonDesignableSubset4.ResumeLayout(false);
+            this.grpNonDesignableSubset4.PerformLayout();
+            this.grpNonDesignableSubset5.ResumeLayout(false);
+            this.grpNonDesignableSubset5.PerformLayout();
+            this.grpNonDesignableSubset6.ResumeLayout(false);
+            this.grpNonDesignableSubset6.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1529,10 +1870,10 @@ namespace RepositoryWizard
         private System.Windows.Forms.CheckBox ckbCatGym;
         private System.Windows.Forms.CheckBox ckbCatFormal;
         private System.Windows.Forms.CheckBox ckbCatEveryday;
-        private System.Windows.Forms.GroupBox grpPrimarySubset;
-        private System.Windows.Forms.ComboBox comboSlavePrimarySubset;
-        private System.Windows.Forms.GroupBox grpSecondarySubset;
-        private System.Windows.Forms.ComboBox comboSlaveSecondarySubset;
+        private System.Windows.Forms.GroupBox grpPrimaryDesignableSubset;
+        private System.Windows.Forms.ComboBox comboSlavePrimaryDesignableSubset;
+        private System.Windows.Forms.GroupBox grpSecondaryDesignableSubset;
+        private System.Windows.Forms.ComboBox comboSlaveSecondaryDesignableSubset;
         private System.Windows.Forms.GroupBox grpType;
         private System.Windows.Forms.ComboBox comboType;
         private System.Windows.Forms.GroupBox grpGender;
@@ -1607,10 +1948,10 @@ namespace RepositoryWizard
         private System.Windows.Forms.DataGridViewTextBoxColumn colMaterialsMesh;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTooltip;
         private System.Windows.Forms.DataGridViewTextBoxColumn colRepoWizardData;
-        private System.Windows.Forms.ComboBox comboMasterSecondarySubset;
-        private System.Windows.Forms.ComboBox comboMasterPrimarySubset;
-        private System.Windows.Forms.Label lblSecondarySubset;
-        private System.Windows.Forms.Label lblPrimarySubset;
+        private System.Windows.Forms.ComboBox comboMasterSecondaryDesignableSubset;
+        private System.Windows.Forms.ComboBox comboMasterPrimaryDesignableSubset;
+        private System.Windows.Forms.Label lblSecondaryDesignableSubset;
+        private System.Windows.Forms.Label lblPrimaryDesignableSubset;
         private System.Windows.Forms.ToolStripMenuItem menuItemWizardClothingStandalone;
         private System.Windows.Forms.TextBox textDeRepoMsgs;
         private System.Windows.Forms.CheckBox ckbDeRepoCopyMeshFiles;
@@ -1620,6 +1961,33 @@ namespace RepositoryWizard
         private System.Windows.Forms.ComboBox comboMesh;
         private System.ComponentModel.BackgroundWorker repoWizardWorker;
         private System.Windows.Forms.ToolStripMenuItem menuItemWizard;
+        private System.Windows.Forms.TabControl tabControl;
+        private System.Windows.Forms.TabPage tabDesignable;
+        private System.Windows.Forms.TabPage tabNonDesignable;
+        private System.Windows.Forms.GroupBox grpNonDesignableSubset3;
+        private System.Windows.Forms.Label lblNonDesignableSubset3;
+        private System.Windows.Forms.ComboBox comboMasterNonDesignableSubset3;
+        private System.Windows.Forms.ComboBox comboSlaveNonDesignableSubset3;
+        private System.Windows.Forms.GroupBox grpNonDesignableSubset4;
+        private System.Windows.Forms.Label lblNonDesignableSubset4;
+        private System.Windows.Forms.ComboBox comboMasterNonDesignableSubset4;
+        private System.Windows.Forms.ComboBox comboSlaveNonDesignableSubset4;
+        private System.Windows.Forms.GroupBox grpNonDesignableSubset1;
+        private System.Windows.Forms.Label lblNonDesignableSubset1;
+        private System.Windows.Forms.ComboBox comboMasterNonDesignableSubset1;
+        private System.Windows.Forms.ComboBox comboSlaveNonDesignableSubset1;
+        private System.Windows.Forms.GroupBox grpNonDesignableSubset2;
+        private System.Windows.Forms.Label lblNonDesignableSubset2;
+        private System.Windows.Forms.ComboBox comboMasterNonDesignableSubset2;
+        private System.Windows.Forms.ComboBox comboSlaveNonDesignableSubset2;
+        private System.Windows.Forms.GroupBox grpNonDesignableSubset5;
+        private System.Windows.Forms.Label lblNonDesignableSubset5;
+        private System.Windows.Forms.ComboBox comboMasterNonDesignableSubset5;
+        private System.Windows.Forms.ComboBox comboSlaveNonDesignableSubset5;
+        private System.Windows.Forms.GroupBox grpNonDesignableSubset6;
+        private System.Windows.Forms.Label lblNonDesignableSubset6;
+        private System.Windows.Forms.ComboBox comboMasterNonDesignableSubset6;
+        private System.Windows.Forms.ComboBox comboSlaveNonDesignableSubset6;
     }
 }
 

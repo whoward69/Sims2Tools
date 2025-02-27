@@ -428,6 +428,7 @@ namespace RepositoryWizard
 
                 panelClothingEditor.Enabled = false;
                 panelObjectEditor.Enabled = false;
+                tabControl.Visible = false;
 
                 dataResources.Clear();
 
@@ -493,6 +494,7 @@ namespace RepositoryWizard
                             {
                                 panelClothingEditor.Enabled = true;
                                 panelObjectEditor.Enabled = true;
+                                tabControl.Visible = true;
                             }
                         }
                     }
@@ -901,16 +903,30 @@ namespace RepositoryWizard
                     {
                         if (!string.IsNullOrEmpty(textMaster.Text))
                         {
-                            if (!string.IsNullOrEmpty(comboSlavePrimarySubset.SelectedItem as string))
+                            if (!string.IsNullOrEmpty(comboSlavePrimaryDesignableSubset.SelectedItem as string))
                             {
-                                if (!comboSlavePrimarySubset.SelectedItem.Equals(comboSlaveSecondarySubset.SelectedItem))
+                                if (!comboSlavePrimaryDesignableSubset.SelectedItem.Equals(comboSlaveSecondaryDesignableSubset.SelectedItem))
                                 {
-                                    if (!string.IsNullOrEmpty(comboMasterPrimarySubset.SelectedItem as string))
+                                    if (!string.IsNullOrEmpty(comboMasterPrimaryDesignableSubset.SelectedItem as string))
                                     {
-                                        if (string.IsNullOrEmpty(comboSlaveSecondarySubset.SelectedItem as string) || (!string.IsNullOrEmpty(comboSlaveSecondarySubset.SelectedItem as string) && !string.IsNullOrEmpty(comboMasterSecondarySubset.SelectedItem as string)))
+                                        if (string.IsNullOrEmpty(comboSlaveSecondaryDesignableSubset.SelectedItem as string) || (!string.IsNullOrEmpty(comboSlaveSecondaryDesignableSubset.SelectedItem as string) && !string.IsNullOrEmpty(comboMasterSecondaryDesignableSubset.SelectedItem as string)))
                                         {
                                             saveAs = true;
                                         }
+                                    }
+                                }
+                            }
+
+                            if (string.IsNullOrEmpty(comboSlavePrimaryDesignableSubset.SelectedItem as string) &&
+                               string.IsNullOrEmpty(comboMasterPrimaryDesignableSubset.SelectedItem as string) &&
+                               string.IsNullOrEmpty(comboSlaveSecondaryDesignableSubset.SelectedItem as string) &&
+                               string.IsNullOrEmpty(comboMasterSecondaryDesignableSubset.SelectedItem as string))
+                            {
+                                if (tabControl.SelectedIndex == 1)
+                                {
+                                    if (!string.IsNullOrEmpty(comboSlaveNonDesignableSubset1.SelectedItem as string))
+                                    {
+                                        saveAs = true;
                                     }
                                 }
                             }
@@ -1092,12 +1108,36 @@ namespace RepositoryWizard
             masterMeshName = null;
             masterShpes = null;
 
-            comboMasterPrimarySubset.SelectedIndex = -1;
-            comboMasterPrimarySubset.Items.Clear();
+            comboMasterPrimaryDesignableSubset.SelectedIndex = -1;
+            comboMasterPrimaryDesignableSubset.Items.Clear();
 
-            comboMasterSecondarySubset.Items.Clear();
-            comboMasterSecondarySubset.Items.Add("");
-            comboMasterSecondarySubset.SelectedIndex = 0;
+            comboMasterSecondaryDesignableSubset.Items.Clear();
+            comboMasterSecondaryDesignableSubset.Items.Add("");
+            comboMasterSecondaryDesignableSubset.SelectedIndex = 0;
+
+            comboMasterNonDesignableSubset1.Items.Clear();
+            comboMasterNonDesignableSubset1.Items.Add("");
+            comboMasterNonDesignableSubset1.SelectedIndex = 0;
+
+            comboMasterNonDesignableSubset2.Items.Clear();
+            comboMasterNonDesignableSubset2.Items.Add("");
+            comboMasterNonDesignableSubset2.SelectedIndex = 0;
+
+            comboMasterNonDesignableSubset3.Items.Clear();
+            comboMasterNonDesignableSubset3.Items.Add("");
+            comboMasterNonDesignableSubset3.SelectedIndex = 0;
+
+            comboMasterNonDesignableSubset4.Items.Clear();
+            comboMasterNonDesignableSubset4.Items.Add("");
+            comboMasterNonDesignableSubset4.SelectedIndex = 0;
+
+            comboMasterNonDesignableSubset5.Items.Clear();
+            comboMasterNonDesignableSubset5.Items.Add("");
+            comboMasterNonDesignableSubset5.SelectedIndex = 0;
+
+            comboMasterNonDesignableSubset6.Items.Clear();
+            comboMasterNonDesignableSubset6.Items.Add("");
+            comboMasterNonDesignableSubset6.SelectedIndex = 0;
 
             using (DBPFFile package = new DBPFFile(masterPackagePath))
             {
@@ -1157,10 +1197,17 @@ namespace RepositoryWizard
                 {
                     foreach (string subset in shpe.Subsets)
                     {
-                        if (!comboMasterPrimarySubset.Items.Contains(subset))
+                        if (!comboMasterPrimaryDesignableSubset.Items.Contains(subset))
                         {
-                            comboMasterPrimarySubset.Items.Add(subset);
-                            comboMasterSecondarySubset.Items.Add(subset);
+                            comboMasterPrimaryDesignableSubset.Items.Add(subset);
+                            comboMasterSecondaryDesignableSubset.Items.Add(subset);
+
+                            comboMasterNonDesignableSubset1.Items.Add(subset);
+                            comboMasterNonDesignableSubset2.Items.Add(subset);
+                            comboMasterNonDesignableSubset3.Items.Add(subset);
+                            comboMasterNonDesignableSubset4.Items.Add(subset);
+                            comboMasterNonDesignableSubset5.Items.Add(subset);
+                            comboMasterNonDesignableSubset6.Items.Add(subset);
                         }
                     }
                 }
@@ -1312,6 +1359,15 @@ namespace RepositoryWizard
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
             grpGzpsName.Visible = IsAdvancedMode;
+
+            if (menuItemAdvanced.Checked)
+            {
+                if (tabControl.TabPages.Count == 1) tabControl.TabPages.Add(tabNonDesignable);
+            }
+            else
+            {
+                if (tabControl.TabPages.Count == 2) tabControl.TabPages.RemoveAt(1);
+            }
         }
         #endregion
 
@@ -1412,6 +1468,29 @@ namespace RepositoryWizard
         #endregion
 
         #region Folder Tree Management
+        private void OnTreeFolder_DrawNode(object sender, DrawTreeNodeEventArgs e)
+        {
+            if (e.Node == null) return;
+
+            // if treeview's HideSelection property is "True", 
+            // this will always returns "False" on unfocused treeview
+            bool selected = (e.State & TreeNodeStates.Selected) == TreeNodeStates.Selected;
+            bool unfocused = !e.Node.TreeView.Focused;
+
+            // we need to do owner drawing only on a selected node
+            // and when the treeview is unfocused, else let the OS do it for us
+            if (selected && unfocused)
+            {
+                Font font = e.Node.NodeFont ?? e.Node.TreeView.Font;
+                e.Graphics.FillRectangle(SystemBrushes.Highlight, e.Bounds);
+                TextRenderer.DrawText(e.Graphics, e.Node.Text, font, e.Bounds, SystemColors.HighlightText, TextFormatFlags.GlyphOverhangPadding);
+            }
+            else
+            {
+                e.DrawDefault = true;
+            }
+        }
+
         private void OnTreeFolderClicked(object sender, TreeNodeMouseClickEventArgs e)
         {
             treeFolders.SelectedNode = e.Node;
@@ -1866,12 +1945,36 @@ namespace RepositoryWizard
 
             comboShoe.SelectedIndex = -1;
 
-            comboSlavePrimarySubset.SelectedIndex = -1;
-            comboSlavePrimarySubset.Items.Clear();
+            comboSlavePrimaryDesignableSubset.SelectedIndex = -1;
+            comboSlavePrimaryDesignableSubset.Items.Clear();
 
-            comboSlaveSecondarySubset.Items.Clear();
-            comboSlaveSecondarySubset.Items.Add("");
-            comboSlaveSecondarySubset.SelectedIndex = 0;
+            comboSlaveSecondaryDesignableSubset.Items.Clear();
+            comboSlaveSecondaryDesignableSubset.Items.Add("");
+            comboSlaveSecondaryDesignableSubset.SelectedIndex = 0;
+
+            comboSlaveNonDesignableSubset1.Items.Clear();
+            comboSlaveNonDesignableSubset1.Items.Add("");
+            comboSlaveNonDesignableSubset1.SelectedIndex = 0;
+
+            comboSlaveNonDesignableSubset2.Items.Clear();
+            comboSlaveNonDesignableSubset2.Items.Add("");
+            comboSlaveNonDesignableSubset2.SelectedIndex = 0;
+
+            comboSlaveNonDesignableSubset3.Items.Clear();
+            comboSlaveNonDesignableSubset3.Items.Add("");
+            comboSlaveNonDesignableSubset3.SelectedIndex = 0;
+
+            comboSlaveNonDesignableSubset4.Items.Clear();
+            comboSlaveNonDesignableSubset4.Items.Add("");
+            comboSlaveNonDesignableSubset4.SelectedIndex = 0;
+
+            comboSlaveNonDesignableSubset5.Items.Clear();
+            comboSlaveNonDesignableSubset5.Items.Add("");
+            comboSlaveNonDesignableSubset5.SelectedIndex = 0;
+
+            comboSlaveNonDesignableSubset6.Items.Clear();
+            comboSlaveNonDesignableSubset6.Items.Add("");
+            comboSlaveNonDesignableSubset6.SelectedIndex = 0;
         }
 
         private void UpdateEditor(RepoWizardDbpfData repoWizardData, bool append)
@@ -2034,10 +2137,17 @@ namespace RepositoryWizard
                 {
                     string s = subset.Trim();
 
-                    if (!comboSlavePrimarySubset.Items.Contains(s))
+                    if (!comboSlavePrimaryDesignableSubset.Items.Contains(s))
                     {
-                        comboSlavePrimarySubset.Items.Add(s);
-                        comboSlaveSecondarySubset.Items.Add(s);
+                        comboSlavePrimaryDesignableSubset.Items.Add(s);
+                        comboSlaveSecondaryDesignableSubset.Items.Add(s);
+
+                        comboSlaveNonDesignableSubset1.Items.Add(s);
+                        comboSlaveNonDesignableSubset2.Items.Add(s);
+                        comboSlaveNonDesignableSubset3.Items.Add(s);
+                        comboSlaveNonDesignableSubset4.Items.Add(s);
+                        comboSlaveNonDesignableSubset5.Items.Add(s);
+                        comboSlaveNonDesignableSubset6.Items.Add(s);
                     }
                 }
             }
@@ -2138,10 +2248,14 @@ namespace RepositoryWizard
         {
             if (openMasterDialog.ShowDialog() == DialogResult.OK)
             {
+                btnMaster.Enabled = false;
+
                 if (IsValidObjectMaster(openMasterDialog.FileName))
                 {
                     textMaster.Text = openMasterDialog.FileName;
                 }
+
+                btnMaster.Enabled = true;
 
                 UpdateFormState();
             }
@@ -2446,11 +2560,41 @@ namespace RepositoryWizard
 
                                                 if (gmdcs.Count > 0)
                                                 {
-                                                    ProcessSubset(dbpfPackage, slaveObjd, comboMasterPrimarySubset.SelectedItem as string, comboSlavePrimarySubset.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                    ProcessSubset(dbpfPackage, slaveObjd, true, comboMasterPrimaryDesignableSubset.SelectedItem as string, comboSlavePrimaryDesignableSubset.SelectedItem as string, shpes, gmnds, gmdcs);
 
-                                                    if (!string.IsNullOrEmpty(comboSlaveSecondarySubset.SelectedItem as string))
+                                                    if (!string.IsNullOrEmpty(comboSlaveSecondaryDesignableSubset.SelectedItem as string))
                                                     {
-                                                        ProcessSubset(dbpfPackage, slaveObjd, comboMasterSecondarySubset.SelectedItem as string, comboSlaveSecondarySubset.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                        ProcessSubset(dbpfPackage, slaveObjd, true, comboMasterSecondaryDesignableSubset.SelectedItem as string, comboSlaveSecondaryDesignableSubset.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                    }
+
+                                                    if (!string.IsNullOrEmpty(comboSlaveNonDesignableSubset1.SelectedItem as string))
+                                                    {
+                                                        ProcessSubset(dbpfPackage, slaveObjd, false, comboMasterNonDesignableSubset1.SelectedItem as string, comboSlaveNonDesignableSubset1.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                    }
+
+                                                    if (!string.IsNullOrEmpty(comboSlaveNonDesignableSubset2.SelectedItem as string))
+                                                    {
+                                                        ProcessSubset(dbpfPackage, slaveObjd, false, comboMasterNonDesignableSubset2.SelectedItem as string, comboSlaveNonDesignableSubset2.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                    }
+
+                                                    if (!string.IsNullOrEmpty(comboSlaveNonDesignableSubset3.SelectedItem as string))
+                                                    {
+                                                        ProcessSubset(dbpfPackage, slaveObjd, false, comboMasterNonDesignableSubset3.SelectedItem as string, comboSlaveNonDesignableSubset3.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                    }
+
+                                                    if (!string.IsNullOrEmpty(comboSlaveNonDesignableSubset4.SelectedItem as string))
+                                                    {
+                                                        ProcessSubset(dbpfPackage, slaveObjd, false, comboMasterNonDesignableSubset4.SelectedItem as string, comboSlaveNonDesignableSubset4.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                    }
+
+                                                    if (!string.IsNullOrEmpty(comboSlaveNonDesignableSubset5.SelectedItem as string))
+                                                    {
+                                                        ProcessSubset(dbpfPackage, slaveObjd, false, comboMasterNonDesignableSubset5.SelectedItem as string, comboSlaveNonDesignableSubset5.SelectedItem as string, shpes, gmnds, gmdcs);
+                                                    }
+
+                                                    if (!string.IsNullOrEmpty(comboSlaveNonDesignableSubset6.SelectedItem as string))
+                                                    {
+                                                        ProcessSubset(dbpfPackage, slaveObjd, false, comboMasterNonDesignableSubset6.SelectedItem as string, comboSlaveNonDesignableSubset6.SelectedItem as string, shpes, gmnds, gmdcs);
                                                     }
 
                                                     foreach (Shpe shpe in shpes)
@@ -2483,60 +2627,87 @@ namespace RepositoryWizard
             }
         }
 
-        private void ProcessSubset(CacheableDbpfFile package, Objd slaveObjd, string masterSubsetName, string slaveSubsetName, List<Shpe> shpes, List<Gmnd> gmnds, List<Gmdc> gmdcs)
+        private void ProcessSubset(CacheableDbpfFile package, Objd slaveObjd, bool designable, string masterSubsetName, string slaveSubsetName, List<Shpe> shpes, List<Gmnd> gmnds, List<Gmdc> gmdcs)
         {
-            string masterMaterialName = null;
             List<string> slaveMaterialNames = new List<string>();
 
-            foreach (Shpe masterShpe in masterShpes)
+            if (string.IsNullOrEmpty(masterSubsetName))
             {
-                masterMaterialName = masterShpe.GetSubsetMaterial(masterSubsetName);
-
-                if (masterMaterialName != null) break;
-            }
-
-            if (!masterSubsetName.Equals(slaveSubsetName))
-            {
-                foreach (Gmnd gmnd in gmnds)
+                foreach (Shpe shpe in shpes)
                 {
-                    gmnd.RemoveDesignModeEnabled(slaveSubsetName);
+                    string slaveMaterialName = shpe.GetSubsetMaterial(slaveSubsetName);
+
+                    if (slaveMaterialName != null)
+                    {
+                        slaveMaterialNames.Add(slaveMaterialName);
+
+                        // Update STR# 0x0088 "Material Names"
+                        UpdateStrings(package, slaveObjd, (TypeInstanceID)0x0088, slaveMaterialName, "");
+
+                        shpe.DeleteSubset(slaveSubsetName);
+
+                        // Update STR# 0x0087 "Mesh Names"
+                        UpdateStrings(package, slaveObjd, (TypeInstanceID)0x0087, slaveSubsetName, "");
+                    }
+                }
+            }
+            else
+            {
+                string masterMaterialName = null;
+
+                foreach (Shpe masterShpe in masterShpes)
+                {
+                    masterMaterialName = masterShpe.GetSubsetMaterial(masterSubsetName);
+
+                    if (masterMaterialName != null) break;
+                }
+
+                if (designable && !masterSubsetName.Equals(slaveSubsetName))
+                {
+                    foreach (Gmnd gmnd in gmnds)
+                    {
+                        gmnd.RemoveDesignModeEnabled(slaveSubsetName);
+                    }
+
+                    foreach (Shpe shpe in shpes)
+                    {
+                        shpe.RenameSubset(slaveSubsetName, masterSubsetName);
+                    }
+
+                    foreach (Gmdc gmdc in gmdcs)
+                    {
+                        gmdc.RenameSubset(slaveSubsetName, masterSubsetName);
+                    }
+
+                    // Update STR# 0x0087 "Mesh Names"
+                    UpdateStrings(package, slaveObjd, (TypeInstanceID)0x0087, slaveSubsetName, masterSubsetName);
                 }
 
                 foreach (Shpe shpe in shpes)
                 {
-                    shpe.RenameSubset(slaveSubsetName, masterSubsetName);
+                    string slaveMaterialName = shpe.GetSubsetMaterial(masterSubsetName);
+
+                    if (slaveMaterialName != null)
+                    {
+                        slaveMaterialNames.Add(slaveMaterialName);
+                        shpe.SetSubsetMaterial(masterSubsetName, masterMaterialName);
+
+                        // Update STR# 0x0088 "Material Names"
+                        UpdateStrings(package, slaveObjd, (TypeInstanceID)0x0088, slaveMaterialName, masterMaterialName);
+                    }
                 }
 
-                foreach (Gmdc gmdc in gmdcs)
+                if (designable)
                 {
-                    gmdc.RenameSubset(slaveSubsetName, masterSubsetName);
-                }
-
-                // Update STR# 0x0087 "Mesh Names"
-                UpdateStrings(package, slaveObjd, (TypeInstanceID)0x0087, slaveSubsetName, masterSubsetName);
-            }
-
-            foreach (Shpe shpe in shpes)
-            {
-                string slaveMaterialName = shpe.GetSubsetMaterial(masterSubsetName);
-
-                if (slaveMaterialName != null)
-                {
-                    slaveMaterialNames.Add(slaveMaterialName);
-                    shpe.SetSubsetMaterial(masterSubsetName, masterMaterialName);
-
-                    // Update STR# 0x0088 "Material Names"
-                    UpdateStrings(package, slaveObjd, (TypeInstanceID)0x0088, slaveMaterialName, masterMaterialName);
-                }
-            }
-
-            foreach (Gmnd gmnd in gmnds)
-            {
-                if (!(gmnd.AddDesignModeEnabled(masterSubsetName) &&
-                      gmnd.SetMaterialsMeshName(masterSubsetName, masterMeshName)))
-                {
-                    MsgBox.Show("Too many designable subsets!", "Repository Wizard - Object");
-                    throw new Exception("Too many designable subsets!");
+                    foreach (Gmnd gmnd in gmnds)
+                    {
+                        if (!(gmnd.AddDesignModeEnabled(masterSubsetName) &&
+                              gmnd.SetMaterialsMeshName(masterSubsetName, masterMeshName)))
+                        {
+                            MsgBox.Show("Too many designable subsets!", "Repository Wizard - Object");
+                            throw new Exception("Too many designable subsets!");
+                        }
+                    }
                 }
             }
 
