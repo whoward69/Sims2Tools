@@ -23,7 +23,7 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.CPF
 {
-    public abstract class Cpf : DBPFResource, IDisposable
+    public abstract class Cpf : DBPFResource, IDbpfScriptable, IDisposable
     {
         private static readonly byte[] SIGNATURE = { 0xE0, 0x50, 0xE7, 0xCB, 0x02, 0x00 };
 
@@ -273,6 +273,70 @@ namespace Sims2Tools.DBPF.CPF
 
             return AddItem(new CpfItem(name, datatype));
         }
+
+        #region IDBPFScriptable
+        public bool Assert(string item, string value)
+        {
+            // TODO - IDBPFScriptable - Assert
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, string value)
+        {
+            CpfItem cpfItem = GetItem(item);
+
+            if (cpfItem != null)
+            {
+                switch (cpfItem.DataType)
+                {
+                    case MetaData.DataTypes.dtString:
+                        {
+                            cpfItem.StringValue = value;
+                            return true;
+                        }
+                    case MetaData.DataTypes.dtUInteger:
+                        {
+                            uint val;
+
+                            if (value.StartsWith("0x"))
+                            {
+                                val = UInt32.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                            }
+                            else
+                            {
+                                val = UInt32.Parse(value);
+                            }
+
+                            cpfItem.UIntegerValue = val;
+                            return true;
+                        }
+                    case MetaData.DataTypes.dtInteger:
+                        {
+                            cpfItem.IntegerValue = Int32.Parse(value);
+                            return true;
+                        }
+                    case MetaData.DataTypes.dtBoolean:
+                        {
+                            // TODO - IDBPFScriptable - Assignment
+                            throw new NotImplementedException();
+                        }
+                    case MetaData.DataTypes.dtSingle:
+                        {
+                            // TODO - IDBPFScriptable - Assignment
+                            throw new NotImplementedException();
+                        }
+                }
+            }
+
+            return false;
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            // TODO - IDBPFScriptable - Indexed
+            throw new NotImplementedException();
+        }
+        #endregion
 
         protected XmlElement AddXml(XmlElement parent, string name)
         {

@@ -21,7 +21,7 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.OBJD
 {
-    public class Objd : DBPFResource, ISgResource, IDisposable
+    public class Objd : DBPFResource, IDbpfScriptable, ISgResource, IDisposable
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4F424A44;
@@ -194,6 +194,54 @@ namespace Sims2Tools.DBPF.OBJD
         public SgResourceList SgNeededResources()
         {
             return new SgResourceList();
+        }
+
+        public bool Assert(string item, string value)
+        {
+            // TODO - IDBPFScriptable - Assert
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, string value)
+        {
+            if (item.Equals("filename"))
+            {
+                SetKeyName(value);
+                return true;
+            }
+            else if (item.Equals("guid"))
+            {
+                uint guid = UInt32.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                SetRawData(ObjdIndex.Guid1, (ushort)(guid & 0x0000FFFF));
+                SetRawData(ObjdIndex.Guid2, (ushort)((guid & 0xFFFF0000) >> 16));
+                return true;
+            }
+            else
+            {
+                if (Enum.TryParse(item, out ObjdIndex objdIndex))
+                {
+                    ushort val;
+                    if (value.StartsWith("0x"))
+                    {
+                        val = UInt16.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                    }
+                    else
+                    {
+                        val = UInt16.Parse(value);
+                    }
+
+                    SetRawData(objdIndex, val);
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            // TODO - IDBPFScriptable - Indexed
+            throw new NotImplementedException();
         }
     }
 }

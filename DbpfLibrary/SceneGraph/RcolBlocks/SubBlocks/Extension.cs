@@ -85,7 +85,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             _isDirty = false;
         }
 
-        public ExtensionItem()
+        private ExtensionItem()
         {
             varname = "";
             translation = new Vector3f();
@@ -298,7 +298,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             writeEnd = writer.Position;
 
             Debug.Assert((writeEnd - writeStart) == FileSize);
-            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+            if (!IsDirty) Debug.Assert(((readEnd - readStart) == 0) || ((writeEnd - writeStart) == (readEnd - readStart)));
 #endif
         }
     }
@@ -543,7 +543,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             writeEnd = writer.Position;
 
             Debug.Assert((writeEnd - writeStart) == FileSize);
-            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+            if (!IsDirty) Debug.Assert(((readEnd - readStart) == 0) || ((writeEnd - writeStart) == (readEnd - readStart)));
 #endif
         }
 

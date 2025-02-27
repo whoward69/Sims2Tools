@@ -412,7 +412,7 @@ namespace OutfitOrganiser
             this.menuItemGeneticsSkins.CheckOnClick = true;
             this.menuItemGeneticsSkins.Name = "menuItemGeneticsSkins";
             this.menuItemGeneticsSkins.ShortcutKeys = System.Windows.Forms.Keys.F8;
-            this.menuItemGeneticsSkins.Size = new System.Drawing.Size(180, 22);
+            this.menuItemGeneticsSkins.Size = new System.Drawing.Size(120, 22);
             this.menuItemGeneticsSkins.Text = "&Skins";
             this.menuItemGeneticsSkins.Click += new System.EventHandler(this.OnGeneticsSelectedChanged);
             // 
@@ -421,7 +421,7 @@ namespace OutfitOrganiser
             this.menuItemGeneticsEyes.CheckOnClick = true;
             this.menuItemGeneticsEyes.Name = "menuItemGeneticsEyes";
             this.menuItemGeneticsEyes.ShortcutKeys = System.Windows.Forms.Keys.F9;
-            this.menuItemGeneticsEyes.Size = new System.Drawing.Size(180, 22);
+            this.menuItemGeneticsEyes.Size = new System.Drawing.Size(120, 22);
             this.menuItemGeneticsEyes.Text = "&Eyes";
             this.menuItemGeneticsEyes.Click += new System.EventHandler(this.OnGeneticsSelectedChanged);
             // 
@@ -654,10 +654,13 @@ namespace OutfitOrganiser
             this.treeFolders.AllowDrop = true;
             this.treeFolders.BackColor = System.Drawing.SystemColors.Window;
             this.treeFolders.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeFolders.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
+            this.treeFolders.HideSelection = false;
             this.treeFolders.Location = new System.Drawing.Point(0, 0);
             this.treeFolders.Name = "treeFolders";
             this.treeFolders.Size = new System.Drawing.Size(218, 221);
             this.treeFolders.TabIndex = 0;
+            this.treeFolders.DrawNode += new System.Windows.Forms.DrawTreeNodeEventHandler(this.OnTreeFolder_DrawNode);
             this.treeFolders.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.OnTreeFolder_ItemDrag);
             this.treeFolders.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnTreeFolderClicked);
             this.treeFolders.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnTreeFolder_DragDrop);

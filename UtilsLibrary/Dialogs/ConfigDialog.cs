@@ -69,6 +69,8 @@ namespace Sims2Tools
             this.textSimPePath.BackColor = simsPePathOk ? System.Drawing.SystemColors.Window : badColour;
 
             btnConfigOK.Enabled = (sims2PathOk && sims2HomePathOk && simsPePathOk);
+
+            lblUnsupportedVersion.Visible = !(string.IsNullOrEmpty(textSimPePath.Text) || !Directory.Exists(textSimPePath.Text) || File.Exists($"{textSimPePath.Text}/Data/simpe.xreg"));
         }
 
         private void OnSelectSim2PathClicked(object sender, EventArgs e)

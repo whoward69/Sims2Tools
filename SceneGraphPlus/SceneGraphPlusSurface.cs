@@ -776,15 +776,29 @@ namespace SceneGraphPlus.Surface
                         e.Cancel = false;
                     }
 
-                    if (contextBlock.IsMaxis && contextBlock.TypeId == Cres.TYPE)
+                    if (contextBlock.IsMaxis)
                     {
-                        if (GameData.GetMaxisResource(contextBlock.TypeId, contextBlock.Key) != null)
+                        if (contextBlock.TypeId == Cres.TYPE)
                         {
-                            menuItemContextExtract.Text = "Extract Maxis Mesh";
-                            menuItemContextExtract.Visible = true;
-                            menuItemContextExtract.Enabled = true;
+                            if (GameData.GetMaxisResource(contextBlock.TypeId, contextBlock.Key) != null)
+                            {
+                                menuItemContextExtract.Text = "Extract Maxis Mesh";
+                                menuItemContextExtract.Visible = true;
+                                menuItemContextExtract.Enabled = true;
 
-                            e.Cancel = false;
+                                e.Cancel = false;
+                            }
+                        }
+                        else if (contextBlock.TypeId == Gzps.TYPE)
+                        {
+                            if (GameData.GetMaxisResource(contextBlock.TypeId, contextBlock.Key) != null)
+                            {
+                                menuItemContextExtract.Text = "Extract Maxis Recolour";
+                                menuItemContextExtract.Visible = true;
+                                menuItemContextExtract.Enabled = true;
+
+                                e.Cancel = false;
+                            }
                         }
                     }
 
@@ -973,7 +987,14 @@ namespace SceneGraphPlus.Surface
 
                 if (contextBlock.IsMaxis)
                 {
-                    ExtractMaxisMesh(exporter);
+                    if (contextBlock.TypeId == Cres.TYPE)
+                    {
+                        ExtractMaxisMesh(exporter);
+                    }
+                    else if (contextBlock.TypeId == Gzps.TYPE)
+                    {
+                        ExtractMaxisRecolour(exporter);
+                    }
                 }
                 else
                 {
@@ -1011,7 +1032,6 @@ namespace SceneGraphPlus.Surface
 
         private void ExtractMaxisMesh(Exporter exporter)
         {
-            // TODO - SceneGraph Plus - 3 - extend this to include GZPS and MMAT recolours
             if (contextBlock.TypeId == Cres.TYPE)
             {
                 DBPFKey cresKey = contextBlock.Key;
@@ -1051,6 +1071,70 @@ namespace SceneGraphPlus.Surface
                                         if (maxisPath != null)
                                         {
                                             exporter.Export(maxisPath, gmdcKey);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ExtractMaxisRecolour(Exporter exporter)
+        {
+            if (contextBlock.TypeId == Gzps.TYPE)
+            {
+                DBPFKey gzpsKey = contextBlock.Key;
+
+                string maxisPath = GameData.GetMaxisPackagePath(Gzps.TYPE, gzpsKey, true);
+
+                if (maxisPath != null)
+                {
+                    Gzps gzps = (Gzps)GameData.GetMaxisResource(Gzps.TYPE, gzpsKey, true);
+
+                    DBPFKey idrKey = new DBPFKey(Idr.TYPE, gzpsKey);
+                    string idrPath = GameData.GetMaxisPackagePath(Idr.TYPE, idrKey, true);
+
+                    if (idrPath != null)
+                    {
+                        Idr idr = (Idr)GameData.GetMaxisResource(Idr.TYPE, idrKey, true);
+
+                        exporter.Export(maxisPath, gzps);
+                        exporter.Export(idrPath, idr);
+
+                        foreach (uint index in gzps.TxmtIndexes)
+                        {
+                            DBPFKey txmtKey = idr.GetItem(index);
+
+                            maxisPath = GameData.GetMaxisPackagePath(Txmt.TYPE, txmtKey, true);
+
+                            if (maxisPath != null)
+                            {
+                                Txmt txmt = (Txmt)GameData.GetMaxisResource(Txmt.TYPE, txmtKey, true);
+
+                                exporter.Export(maxisPath, txmt);
+
+                                foreach (string txtrName in txmt.TxtrKeyedNames.Values)
+                                {
+                                    Txtr txtr = (Txtr)GameData.GetMaxisResource(Txtr.TYPE, txtrName, true);
+
+                                    if (txtr != null)
+                                    {
+                                        maxisPath = GameData.GetMaxisPackagePath(Txtr.TYPE, txtr, true);
+
+                                        exporter.Export(maxisPath, txtr);
+
+                                        foreach (string lifoRef in txtr.ImageData.GetLifoRefs())
+                                        {
+                                            Lifo lifo = (Lifo)GameData.GetMaxisResource(Lifo.TYPE, lifoRef, true);
+
+                                            if (lifo != null)
+                                            {
+                                                maxisPath = GameData.GetMaxisPackagePath(Lifo.TYPE, lifo, true);
+
+                                                exporter.Export(maxisPath, lifo);
+                                            }
                                         }
                                     }
                                 }
@@ -1906,7 +1990,7 @@ namespace SceneGraphPlus.Surface
                     }
                     else if (res is Txmt txmt)
                     {
-                        UpdateMaterialName(txmt, block.SgBaseName, alwaysSetNames, alwaysClearNames, prefixNames, prefixLowerCase);
+                        UpdateMaterialName(txmt, block.SgBaseName, prefixNames, prefixLowerCase);
                     }
                 }
                 else
@@ -1946,29 +2030,24 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-        private void UpdateMaterialName(Txmt txmt, string basename, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames, bool prefixLowerCase)
+        private void UpdateMaterialName(Txmt txmt, string basename, bool prefixNames, bool prefixLowerCase)
         {
-            if (alwaysClearNames)
-            {
-                // This will cause the game to crash if the Type is SimSkin (and possibly others)
-                // txmt.MaterialDefinition.FileDescription = "";
-            }
-            else if (alwaysSetNames || !string.IsNullOrEmpty(txmt.MaterialDefinition.FileDescription))
-            {
-                if (prefixNames)
-                {
-                    if (prefixLowerCase)
-                    {
-                        basename = $"##{txmt.GroupID.ToString().ToLower()}!{basename}";
-                    }
-                    else
-                    {
-                        basename = $"##{txmt.GroupID.ToString().ToUpper()}!{basename}";
-                    }
-                }
+            // This will cause the game to crash if the Type is SimSkin (and possibly others)
+            // txmt.MaterialDefinition.FileDescription = "";
 
-                txmt.MaterialDefinition.FileDescription = basename;
+            if (prefixNames)
+            {
+                if (prefixLowerCase)
+                {
+                    basename = $"##{txmt.GroupID.ToString().ToLower()}!{basename}";
+                }
+                else
+                {
+                    basename = $"##{txmt.GroupID.ToString().ToUpper()}!{basename}";
+                }
             }
+
+            txmt.MaterialDefinition.FileDescription = basename;
         }
 
         private void UpdateRefsToChildren(CacheableDbpfFile package, DBPFResource res, AbstractGraphBlock block, bool prefixLowerCase)

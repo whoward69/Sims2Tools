@@ -128,6 +128,8 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
             }
         }
 
+        public void DeleteSubset(string subsetName) => cShape.DeleteSubset(subsetName);
+
         public void RenameSubset(string oldName, string newName) => cShape.RenameSubset(oldName, newName);
 
         public string GetSubsetMaterial(string subset) => cShape.GetSubsetMaterial(subset);

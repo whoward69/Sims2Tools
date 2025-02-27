@@ -185,7 +185,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             writeEnd = writer.Position;
 
             Debug.Assert((writeEnd - writeStart) == FileSize);
-            if (!parent.IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+            if (!parent.IsDirty) Debug.Assert(((readEnd - readStart) == 0) || ((writeEnd - writeStart) == (readEnd - readStart)));
 #endif
         }
 
@@ -301,6 +301,20 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         {
             parts[index].FileName = filename;
             _isDirty = true;
+        }
+
+        public void DeleteSubset(string subsetName)
+        {
+            foreach (ShapePart part in parts)
+            {
+                if (part.Subset.Equals(subsetName))
+                {
+                    parts.Remove(part);
+
+                    _isDirty = true;
+                    return;
+                }
+            }
         }
 
         public void RenameSubset(string oldName, string newName)
@@ -486,7 +500,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             writeEnd = writer.Position;
 
             Debug.Assert((writeEnd - writeStart) == FileSize);
-            if (!IsDirty) Debug.Assert((writeEnd - writeStart) == (readEnd - readStart));
+            if (!IsDirty) Debug.Assert(((readEnd - readStart) == 0) || ((writeEnd - writeStart) == (readEnd - readStart)));
 #endif
         }
 

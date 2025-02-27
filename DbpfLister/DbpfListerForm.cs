@@ -6,6 +6,7 @@ using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Groups;
 using Sims2Tools.DBPF.Groups.GROP;
+using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.BINX;
@@ -14,6 +15,7 @@ using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
+using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.STR;
@@ -22,14 +24,17 @@ using Sims2Tools.DBPF.TTAS;
 using Sims2Tools.DBPF.UI;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFLR;
+using Sims2Tools.DBPF.XWNT;
 using Sims2Tools.Files;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace DbpfLister
 {
@@ -60,7 +65,16 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
-            FindAgedNonLsOne("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+            FindWallmasks("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // FindHighestShpeSubsets("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // ProcessODS("C:\\Users\\whowa\\Desktop\\Saline Body Shapes\\ShapeTemplates\\template.ods");
+
+            // ProcessObjects();
+            // ProcessWants();
+
+            // FindAgedNonLsOne("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
             // FindCresNonShpeRefs("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
@@ -624,6 +638,82 @@ namespace DbpfLister
             }
         }
 
+        private void FindWallmasks(string baseFolder)
+        {
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Txmt.TYPE))
+                        {
+                            try
+                            {
+                                Txmt txmt = (Txmt)package.GetResourceByEntry(entry);
+
+                                if (txmt.SgName.ToLower().Contains("wallmask"))
+                                {
+                                    textMessages.AppendText($"{txmt.SgName}\r\n");
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                                textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+        }
+
+        private void FindHighestShpeSubsets(string baseFolder)
+        {
+            int most = 0;
+            string res = "";
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Shpe.TYPE))
+                        {
+                            try
+                            {
+                                Shpe shpe = (Shpe)package.GetResourceByEntry(entry);
+
+                                if (shpe.Shape.Parts.Count != most)
+                                {
+                                    most = shpe.Shape.Parts.Count;
+                                    res = shpe.SgName;
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                                textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+
+            textMessages.AppendText($"Most subsets is {most} in {res}\r\n");
+        }
+
         private void FindXmolNonMeshoverlay(string baseFolder)
         {
             foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
@@ -808,6 +898,235 @@ namespace DbpfLister
                 }
 
                 package.Close();
+            }
+        }
+
+        private void ProcessODS(string fullPath)
+        {
+            List<List<string>> rows = null;
+            List<string> row = null;
+
+            int rowRepeat = 0;
+
+            int cellRepeat = 0;
+            string cellText = "";
+
+            using (ZipArchive zip = ZipFile.Open(fullPath, ZipArchiveMode.Read))
+            {
+                ZipArchiveEntry content = zip.GetEntry("content.xml");
+
+                if (content != null)
+                {
+                    XmlReader reader = XmlReader.Create(content.Open());
+
+                    reader.MoveToContent();
+                    while (reader.Read())
+                    {
+                        if (reader.NodeType == XmlNodeType.Element)
+                        {
+                            if (reader.Name.Equals("table:table"))
+                            {
+                                rows = new List<List<string>>();
+                            }
+                            else if (reader.Name.Equals("table:table-row"))
+                            {
+                                // Process the previous row when we encounter the next one in the table, this stops us processing the last row (which repeats many, many times)
+                                if (row != null)
+                                {
+                                    while (rowRepeat-- > 0)
+                                    {
+                                        rows.Add(row);
+                                    }
+                                }
+
+                                string repeat = reader.GetAttribute("table:number-rows-repeated");
+                                rowRepeat = (repeat == null) ? 1 : Int32.Parse(repeat);
+
+                                row = new List<string>();
+
+                                cellRepeat = 0;
+                            }
+                            else if (reader.Name.Equals("table:table-cell"))
+                            {
+                                // Process the previous cell when we encounter the next one in the row, this stops us processing the last cell (which repeats many, many times)
+                                while (cellRepeat-- > 0)
+                                {
+                                    row.Add(cellText);
+                                }
+
+                                string repeat = reader.GetAttribute("table:number-columns-repeated");
+                                cellRepeat = (repeat == null) ? 1 : Int32.Parse(repeat);
+                                cellText = "";
+                            }
+                            else if (reader.Name.Equals("text:p"))
+                            {
+                                cellText = reader.ReadElementContentAsString();
+                            }
+                        }
+                        else if (reader.NodeType == XmlNodeType.EndElement)
+                        {
+                            if (reader.Name.Equals("table:table"))
+                            {
+                                // Only process the first table in the first spreadsheet
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ProcessObjects()
+        {
+            string csvFile = "C:\\Users\\whowa\\Desktop\\MaxisObjects.csv";
+
+            File.Delete(csvFile);
+
+            StreamWriter sw = new StreamWriter(csvFile);
+
+            DirectoryInfo installPath = new DirectoryInfo($"{Sims2ToolsLib.Sims2Path}\\..\\..");
+
+            Dictionary<TypeGUID, string> allObjects = new Dictionary<TypeGUID, string>();
+
+            // Process the main object file first
+            string mainPackagePath = $"{Sims2ToolsLib.Sims2Path}{GameData.objectsSubPath}";
+            using (DBPFFile package = new DBPFFile(mainPackagePath))
+            {
+                string relPath = mainPackagePath.Substring(installPath.FullName.Length);
+
+                foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
+                {
+                    try
+                    {
+                        Objd objd = (Objd)package.GetResourceByEntry(entry);
+
+                        if (!allObjects.ContainsKey(objd.Guid))
+                        {
+                            allObjects.Add(objd.Guid, objd.KeyName);
+
+                            sw.Write($"{objd.Guid},{CsvEscapeQuote(objd.KeyName)},{objd.GroupID},{relPath}");
+
+                            try
+                            {
+                                Ctss ctss = (Ctss)package.GetResourceByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
+                                if (ctss != null) sw.Write($",{CsvEscapeQuote(ctss.LanguageItems(MetaData.Languages.Default)[0].Title)},{CsvEscapeQuote(ctss.LanguageItems(MetaData.Languages.Default)[1].Title)}");
+                            }
+                            catch (Exception)
+                            {
+                            }
+
+                            sw.WriteLine();
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+            }
+
+            foreach (string packagePath in Directory.GetFiles(installPath.FullName, "*.package", SearchOption.AllDirectories))
+            {
+                if (!packagePath.Equals(mainPackagePath))
+                {
+                    if (!(packagePath.Contains("FaceInfo") || packagePath.Contains("effects") || packagePath.Contains("Tutorial")))
+                    {
+                        using (DBPFFile package = new DBPFFile(packagePath))
+                        {
+                            string relPath = packagePath.Substring(installPath.FullName.Length);
+
+                            foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
+                            {
+                                try
+                                {
+                                    Objd objd = (Objd)package.GetResourceByEntry(entry);
+
+                                    if (!allObjects.ContainsKey(objd.Guid))
+                                    {
+                                        allObjects.Add(objd.Guid, objd.KeyName);
+
+                                        sw.Write($"{objd.Guid},{CsvEscapeQuote(objd.KeyName)},{objd.GroupID},{relPath}");
+
+                                        try
+                                        {
+                                            Ctss ctss = (Ctss)package.GetResourceByKey(new DBPFKey(Ctss.TYPE, objd.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
+                                            if (ctss != null) sw.Write($",{CsvEscapeQuote(ctss.LanguageItems(MetaData.Languages.Default)[0].Title)},{CsvEscapeQuote(ctss.LanguageItems(MetaData.Languages.Default)[1].Title)}");
+                                        }
+                                        catch (Exception)
+                                        {
+                                        }
+
+                                        sw.WriteLine();
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            sw.Close();
+        }
+
+        private string CsvEscapeQuote(string s)
+        {
+            return $"\"{s.Replace("\"", "\"\"")}\"";
+        }
+
+        private void ProcessWants()
+        {
+            DirectoryInfo installPath = new DirectoryInfo($"{Sims2ToolsLib.Sims2Path}\\..\\..");
+
+            // Process the main wants file first
+            string mainPackagePath = $"{Sims2ToolsLib.Sims2Path}{GameData.wantsSubDir}\\Wants.package";
+            using (DBPFFile package = new DBPFFile(mainPackagePath))
+            {
+                string relPath = mainPackagePath.Substring(installPath.FullName.Length);
+
+                string textPackagePath = new DirectoryInfo($"{mainPackagePath}\\..\\..\\Text\\Wants.package").FullName;
+
+                using (DBPFFile textPackage = new DBPFFile(textPackagePath))
+                {
+                    foreach (DBPFEntry entry in package.GetEntriesByType(Xwnt.TYPE))
+                    {
+                        try
+                        {
+                            Xwnt xwnt = (Xwnt)package.GetResourceByEntry(entry);
+
+                            string title = null;
+
+                            TypeInstanceID strInst = (TypeInstanceID)xwnt.GetItem("stringSet").UIntegerValue;
+                            Str str = (Str)textPackage.GetResourceByKey(new DBPFKey(Str.TYPE, DBPFData.GROUP_LOCAL, strInst, DBPFData.RESOURCE_NULL));
+
+                            if (str != null)
+                            {
+                                title = str.LanguageItems(MetaData.Languages.Default)[2]?.Title;
+
+                                if (string.IsNullOrEmpty(title))
+                                {
+                                    title = str.LanguageItems(MetaData.Languages.Default)[0]?.Title;
+                                }
+                            }
+
+                            if (string.IsNullOrEmpty(title))
+                            {
+                                title = $"[{xwnt.GetItem("nodeText")?.StringValue}]";
+
+                                if (string.IsNullOrEmpty(title))
+                                {
+                                    title = "[unknown}";
+                                }
+                            }
+
+                            textMessages.AppendText($"{entry.InstanceID}\t{title}\t{xwnt.GetItem("folder")?.StringValue}\t{xwnt.GetItem("objectType")?.StringValue}\t{xwnt.GetItem("score")?.IntegerValue}\t{xwnt.GetItem("influence")?.IntegerValue}\r\n");
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                }
             }
         }
     }

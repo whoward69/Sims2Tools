@@ -51,6 +51,7 @@ namespace Sims2Tools
             this.btnSimsHomeSelect = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.ckbAllAdvancedMode = new System.Windows.Forms.CheckBox();
+            this.lblUnsupportedVersion = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lblSims2Path
@@ -159,15 +160,26 @@ namespace Sims2Tools
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // ckbAllAdvanceMode
+            // ckbAllAdvancedMode
             // 
             this.ckbAllAdvancedMode.AutoSize = true;
             this.ckbAllAdvancedMode.Location = new System.Drawing.Point(127, 134);
-            this.ckbAllAdvancedMode.Name = "ckbAllAdvanceMode";
+            this.ckbAllAdvancedMode.Name = "ckbAllAdvancedMode";
             this.ckbAllAdvancedMode.Size = new System.Drawing.Size(160, 19);
             this.ckbAllAdvancedMode.TabIndex = 10;
             this.ckbAllAdvancedMode.Text = "All Apps Advanced Mode";
             this.ckbAllAdvancedMode.UseVisualStyleBackColor = true;
+            // 
+            // lblUnsupportedVersion
+            // 
+            this.lblUnsupportedVersion.AutoSize = true;
+            this.lblUnsupportedVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblUnsupportedVersion.ForeColor = System.Drawing.Color.Red;
+            this.lblUnsupportedVersion.Location = new System.Drawing.Point(124, 110);
+            this.lblUnsupportedVersion.Name = "lblUnsupportedVersion";
+            this.lblUnsupportedVersion.Size = new System.Drawing.Size(428, 15);
+            this.lblUnsupportedVersion.TabIndex = 11;
+            this.lblUnsupportedVersion.Text = "See: https://www.tumblr.com/picknmixsims/745027235576152064";
             // 
             // ConfigDialog
             // 
@@ -175,6 +187,7 @@ namespace Sims2Tools
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(820, 169);
+            this.Controls.Add(this.lblUnsupportedVersion);
             this.Controls.Add(this.ckbAllAdvancedMode);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.lblSims2Path);
@@ -216,5 +229,6 @@ namespace Sims2Tools
         private System.Windows.Forms.Button btnSimsHomeSelect;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.CheckBox ckbAllAdvancedMode;
+        private System.Windows.Forms.Label lblUnsupportedVersion;
     }
 }

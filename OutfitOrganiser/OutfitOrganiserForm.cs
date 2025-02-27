@@ -1651,6 +1651,29 @@ namespace OutfitOrganiser
         #endregion
 
         #region Folder Tree Management
+        private void OnTreeFolder_DrawNode(object sender, DrawTreeNodeEventArgs e)
+        {
+            if (e.Node == null) return;
+
+            // if treeview's HideSelection property is "True", 
+            // this will always returns "False" on unfocused treeview
+            bool selected = (e.State & TreeNodeStates.Selected) == TreeNodeStates.Selected;
+            bool unfocused = !e.Node.TreeView.Focused;
+
+            // we need to do owner drawing only on a selected node
+            // and when the treeview is unfocused, else let the OS do it for us
+            if (selected && unfocused)
+            {
+                Font font = e.Node.NodeFont ?? e.Node.TreeView.Font;
+                e.Graphics.FillRectangle(SystemBrushes.Highlight, e.Bounds);
+                TextRenderer.DrawText(e.Graphics, e.Node.Text, font, e.Bounds, SystemColors.HighlightText, TextFormatFlags.GlyphOverhangPadding);
+            }
+            else
+            {
+                e.DrawDefault = true;
+            }
+        }
+
         private void OnTreeFolderClicked(object sender, TreeNodeMouseClickEventArgs e)
         {
             treeFolders.SelectedNode = e.Node;

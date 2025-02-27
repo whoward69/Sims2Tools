@@ -68,6 +68,9 @@ namespace HoodExporter
             this.menuItemSaveAsPng = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSaveAsJpg = new System.Windows.Forms.ToolStripMenuItem();
             this.menuLanguage = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuTransform = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemXsltNone = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.hoodWorker = new System.ComponentModel.BackgroundWorker();
             this.lblHoodPath = new System.Windows.Forms.Label();
             this.textHoodPath = new System.Windows.Forms.TextBox();
@@ -79,9 +82,6 @@ namespace HoodExporter
             this.btnSelectSavePath = new System.Windows.Forms.Button();
             this.textSavePath = new System.Windows.Forms.TextBox();
             this.lblSavePath = new System.Windows.Forms.Label();
-            this.menuTransform = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemXsltNone = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -201,7 +201,7 @@ namespace HoodExporter
             // 
             this.menuItemLots.CheckOnClick = true;
             this.menuItemLots.Name = "menuItemLots";
-            this.menuItemLots.Size = new System.Drawing.Size(180, 22);
+            this.menuItemLots.Size = new System.Drawing.Size(160, 22);
             this.menuItemLots.Text = "&Lots";
             this.menuItemLots.Click += new System.EventHandler(this.OnLotsClicked);
             // 
@@ -209,7 +209,7 @@ namespace HoodExporter
             // 
             this.menuItemFamilies.CheckOnClick = true;
             this.menuItemFamilies.Name = "menuItemFamilies";
-            this.menuItemFamilies.Size = new System.Drawing.Size(180, 22);
+            this.menuItemFamilies.Size = new System.Drawing.Size(160, 22);
             this.menuItemFamilies.Text = "&Families";
             this.menuItemFamilies.Click += new System.EventHandler(this.OnFamiliesClicked);
             // 
@@ -217,19 +217,19 @@ namespace HoodExporter
             // 
             this.menuItemSims.CheckOnClick = true;
             this.menuItemSims.Name = "menuItemSims";
-            this.menuItemSims.Size = new System.Drawing.Size(180, 22);
+            this.menuItemSims.Size = new System.Drawing.Size(160, 22);
             this.menuItemSims.Text = "&Sims";
             this.menuItemSims.Click += new System.EventHandler(this.OnSimsClicked);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(157, 6);
             // 
             // menuItemPrettyPrint
             // 
             this.menuItemPrettyPrint.Name = "menuItemPrettyPrint";
-            this.menuItemPrettyPrint.Size = new System.Drawing.Size(180, 22);
+            this.menuItemPrettyPrint.Size = new System.Drawing.Size(160, 22);
             this.menuItemPrettyPrint.Text = "&Pretty Print XML";
             // 
             // menuOptions
@@ -292,6 +292,31 @@ namespace HoodExporter
             this.menuLanguage.Name = "menuLanguage";
             this.menuLanguage.Size = new System.Drawing.Size(71, 20);
             this.menuLanguage.Text = "&Language";
+            // 
+            // menuTransform
+            // 
+            this.menuTransform.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemXsltNone,
+            this.toolStripSeparator5});
+            this.menuTransform.Name = "menuTransform";
+            this.menuTransform.Size = new System.Drawing.Size(72, 20);
+            this.menuTransform.Text = "&Transform";
+            // 
+            // menuItemXsltNone
+            // 
+            this.menuItemXsltNone.Checked = true;
+            this.menuItemXsltNone.CheckOnClick = true;
+            this.menuItemXsltNone.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.menuItemXsltNone.Name = "menuItemXsltNone";
+            this.menuItemXsltNone.Size = new System.Drawing.Size(180, 22);
+            this.menuItemXsltNone.Tag = "";
+            this.menuItemXsltNone.Text = "None";
+            this.menuItemXsltNone.Click += new System.EventHandler(this.OnTransformNoneClicked);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
             // 
             // hoodWorker
             // 
@@ -403,31 +428,6 @@ namespace HoodExporter
             this.lblSavePath.Size = new System.Drawing.Size(75, 15);
             this.lblSavePath.TabIndex = 8;
             this.lblSavePath.Text = "Save Folder:";
-            // 
-            // menuTransform
-            // 
-            this.menuTransform.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemXsltNone,
-            this.toolStripSeparator5});
-            this.menuTransform.Name = "menuTransform";
-            this.menuTransform.Size = new System.Drawing.Size(72, 20);
-            this.menuTransform.Text = "&Transform";
-            // 
-            // menuItemXsltNone
-            // 
-            this.menuItemXsltNone.Checked = true;
-            this.menuItemXsltNone.CheckOnClick = true;
-            this.menuItemXsltNone.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.menuItemXsltNone.Name = "menuItemXsltNone";
-            this.menuItemXsltNone.Size = new System.Drawing.Size(180, 22);
-            this.menuItemXsltNone.Text = "None";
-            this.menuItemXsltNone.Tag = "";
-            this.menuItemXsltNone.Click += new System.EventHandler(this.OnTransformClicked);
-            // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
             // 
             // HoodExporterForm
             // 

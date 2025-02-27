@@ -154,7 +154,9 @@ namespace HoodExporter
             ParseXml("Resources/XML/npcs.xml", "npc", npcsByGuid);
             ParseTokens("Resources/XML/tokens.xml", tokenDataList);
 
-            foreach (string xslt in Directory.GetFiles("Resources/XSL"))
+            bool foundRufio = false;
+
+            foreach (string xslt in Directory.GetFiles("Resources/XSL", "rufio*.xsl"))
             {
                 FileInfo fi = new FileInfo(xslt);
 
@@ -165,7 +167,39 @@ namespace HoodExporter
                     Tag = fi.FullName,
                     Checked = false,
                     CheckOnClick = true,
-                    CheckState = System.Windows.Forms.CheckState.Unchecked,
+                    CheckState = CheckState.Unchecked,
+                    Size = new System.Drawing.Size(180, 22)
+                };
+                menuItemXslt.Click += new System.EventHandler(this.OnTransformRufioClicked);
+                menuTransform.DropDownItems.Add(menuItemXslt);
+
+                if (Properties.Settings.Default.DefaultXslt.Equals(fi.Name))
+                {
+                    OnTransformRufioClicked(menuItemXslt, null);
+                }
+
+                foundRufio = true;
+            }
+
+            if (foundRufio)
+            {
+                menuTransform.DropDownItems.Add(new ToolStripSeparator());
+            }
+
+            foreach (string xslt in Directory.GetFiles("Resources/XSL", "*.xsl"))
+            {
+                if (xslt.Contains("rufio")) continue;
+
+                FileInfo fi = new FileInfo(xslt);
+
+                ToolStripMenuItem menuItemXslt = new ToolStripMenuItem
+                {
+                    Name = fi.Name,
+                    Text = fi.Name,
+                    Tag = fi.FullName,
+                    Checked = false,
+                    CheckOnClick = true,
+                    CheckState = CheckState.Unchecked,
                     Size = new System.Drawing.Size(180, 22)
                 };
                 menuItemXslt.Click += new System.EventHandler(this.OnTransformClicked);
@@ -1169,6 +1203,38 @@ namespace HoodExporter
             catch (Exception) { }
         }
 
+        private void OnTransformNoneClicked(object sender, EventArgs e)
+        {
+            foreach (ToolStripItem item in menuTransform.DropDownItems)
+            {
+                if (item is ToolStripMenuItem menu)
+                {
+                    menu.Checked = (menu == menuItemXsltNone);
+                }
+            }
+
+            xsltPath = "";
+
+            this.Text = $"{HoodExporterApp.AppTitle}";
+        }
+
+        private void OnTransformRufioClicked(object sender, EventArgs e)
+        {
+            ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
+
+            foreach (ToolStripItem item in menuTransform.DropDownItems)
+            {
+                if (item is ToolStripMenuItem menu)
+                {
+                    menu.Checked = (menu == menuItem);
+                }
+            }
+
+            xsltPath = menuItem.Tag as string;
+
+            this.Text = $"{HoodExporterApp.AppTitle} - {menuItem.Text}";
+        }
+
         private void OnTransformClicked(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItem = sender as ToolStripMenuItem;
@@ -1183,14 +1249,7 @@ namespace HoodExporter
 
             xsltPath = menuItem.Tag as string;
 
-            if (menuItem == menuItemXsltNone)
-            {
-                this.Text = $"{HoodExporterApp.AppTitle}";
-            }
-            else
-            {
-                this.Text = $"{HoodExporterApp.AppTitle} - {menuItem.Text}";
-            }
+            this.Text = $"{HoodExporterApp.AppTitle} - {menuItem.Text}";
         }
     }
 }
