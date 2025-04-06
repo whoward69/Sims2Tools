@@ -1,12 +1,13 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
 using Microsoft.Win32;
+using Sims2Tools.Cache;
 using System;
 using System.Drawing;
 using System.Linq;
@@ -231,6 +232,28 @@ namespace Sims2Tools.Utils.Persistence
             catch
             {
             }
+        }
+
+        public static string GetPath(string AppRegKey, string Key)
+        {
+            string path = GetSetting(AppRegKey, Key, "") as string;
+
+            // Better to do this here rather than in the setter as a user can edit the registry directly
+            return path.EndsWith(@"\") ? path.Substring(0, path.Length - 1) : path;
+        }
+
+        public static void SetPath(string AppRegKey, string Key, string Value, bool InvalidateCache = true)
+        {
+            if (Value == null)
+            {
+                DeleteSetting(AppRegKey, Key);
+            }
+            else
+            {
+                SaveSetting(AppRegKey, Key, Value);
+            }
+
+            if (InvalidateCache) GameDataCache.Invalidate();
         }
     }
 }

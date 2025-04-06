@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Sims2Tools.ico</ApplicationIcon>
+    <ApplicationIcon>DbpfLister.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -93,6 +93,9 @@
       <Project>{04C2A4A9-5CA5-4097-8375-8D54BEAD71EE}</Project>
       <Name>UtilsLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DbpfLister.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

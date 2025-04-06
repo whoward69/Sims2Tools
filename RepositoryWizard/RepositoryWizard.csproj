@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Sims2Tools.ico</ApplicationIcon>
+    <ApplicationIcon>RepositoryWizard.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>RepositoryWizard.RepositoryWizardApp</StartupObject>
@@ -133,7 +133,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Sims2Tools.ico" />
+    <Content Include="RepositoryWizard.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

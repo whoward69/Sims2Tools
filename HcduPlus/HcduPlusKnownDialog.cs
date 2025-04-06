@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -93,7 +93,7 @@ namespace HcduPlus
             if (mouseLocation.RowIndex != gridKnownConflicts.SelectedRows[0].Index)
             {
                 highlightRow = gridKnownConflicts.Rows[mouseLocation.RowIndex];
-                highlightRow.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.AddKnownHighlight); // MistyRose or LightPink
+                highlightRow.DefaultCellStyle.BackColor = HcduPlusForm.colourAddKnownHighlight;
             }
             else
             {

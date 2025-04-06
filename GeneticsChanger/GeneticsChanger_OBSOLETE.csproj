@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Sims2Tools.ico</ApplicationIcon>
+    <ApplicationIcon>GeneticsChanger.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>GeneticsChanger.GeneticsChangerApp</StartupObject>
@@ -157,7 +157,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Sims2Tools.ico" />
+    <Content Include="GeneticsChanger.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

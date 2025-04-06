@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("HoodExporter")]
-[assembly: AssemblyCopyright("Copyright © 2020-2024")]
+[assembly: AssemblyCopyright("Copyright © 2020-2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

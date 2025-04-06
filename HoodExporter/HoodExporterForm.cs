@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -82,6 +82,8 @@ namespace HoodExporter
         private string hoodCode;
         private string exportPath;
 
+        private bool isMainHood = false;
+
         // MUST total 100!
         private const int processSimImagesPercent = 15;
         private const int processLotImagesPercent = 5;
@@ -97,6 +99,8 @@ namespace HoodExporter
         private int startingPercent;
 
         private readonly Dictionary<TypeGUID, string> npcsByGuid = new Dictionary<TypeGUID, string>();
+        private readonly Dictionary<TypeInstanceID, string> strTitleById = new Dictionary<TypeInstanceID, string>();
+        private readonly Dictionary<TypeInstanceID, string> lotTitleById = new Dictionary<TypeInstanceID, string>();
 
         public HoodExporterForm()
         {
@@ -283,6 +287,9 @@ namespace HoodExporter
             DirectoryInfo hoodDirInfo = new DirectoryInfo(textHoodPath.Text);
             string hoodDirPath = hoodDirInfo.FullName;
 
+            strTitleById.Clear();
+            lotTitleById.Clear();
+
 #if !DEBUG
             try
 #endif
@@ -344,12 +351,12 @@ namespace HoodExporter
                     eleHood.SetAttribute("path", hoodDirPath);
 
                     if (!ProcessCharacterFiles(worker, processSimImagesPercent, hoodDirPath, exportPath) ||
-                        !ProcessLotFiles(worker, processLotImagesPercent, hoodDirPath, exportPath) ||
                         !ProcessMainHood(worker, processMainHoodPercent, hoodDirInfo, hoodPackagePath, eleHood, "main", isRufio ? rufioTypes : mainTypes) ||
                         !ProcessSubHoods(worker, processSuburbHoodsPercent, hoodDirInfo, $"{hoodCode}_Suburb*.package", eleHood, "suburb", suburbTypes) ||
                         !ProcessSubHoods(worker, processUniversityHoodsPercent, hoodDirInfo, $"{hoodCode}_University*.package", eleHood, "university", universityTypes) ||
                         !ProcessSubHoods(worker, processDowntownHoodsPercent, hoodDirInfo, $"{hoodCode}_Downtown*.package", eleHood, "downtown", downtownTypes) ||
                         !ProcessSubHoods(worker, processVactionHoodsPercent, hoodDirInfo, $"{hoodCode}_Vacation*.package", eleHood, "vacation", vacationTypes) ||
+                        !ProcessLotFiles(worker, processLotImagesPercent, hoodDirPath, exportPath) ||
                         !ProcessFamilyThumbnails(worker, processFamiyImagesPercent, hoodDirPath, exportPath)
                         )
                     {
@@ -408,15 +415,16 @@ namespace HoodExporter
 
         private bool ProcessMainHood(BackgroundWorker worker, int percent, DirectoryInfo _/*hoodDirInfo*/, string mainPackagePath, XmlElement parent, string kind, List<TypeTypeID> types)
         {
+            isMainHood = true;
+
             XmlElement eleMain = parent.OwnerDocument.CreateElement(kind);
             parent.AppendChild(eleMain);
 
-            if (!ProcessHood(worker, percent, mainPackagePath, eleMain, types))
-            {
-                return false;
-            }
+            bool ok = ProcessHood(worker, percent, mainPackagePath, eleMain, types);
 
-            return true;
+            isMainHood = false;
+
+            return ok;
         }
 
         private bool ProcessSubHoods(BackgroundWorker worker, int percent, DirectoryInfo hoodDirInfo, string subhoodPackageFilter, XmlElement parent, string kind, List<TypeTypeID> types)
@@ -484,9 +492,19 @@ namespace HoodExporter
 
                         if (resource != null)
                         {
-                            if (resource is Str)
+                            if (resource is Str str)
                             {
-                                (resource as Str).PrefLid = prefLid;
+                                str.PrefLid = prefLid;
+
+                                if (isMainHood && str.TypeID == Str.TYPE)
+                                {
+                                    strTitleById.Add(str.InstanceID, str.LanguageItems(MetaData.Languages.Default)[0].Title);
+                                }
+                            }
+
+                            if (resource is Ltxt ltxt)
+                            {
+                                lotTitleById.Add(ltxt.InstanceID, ltxt.LotName);
                             }
 
                             XmlElement element;
@@ -723,6 +741,13 @@ namespace HoodExporter
 
                                                 string imageName = $"{objd.Guid}_{suffix}";
 
+                                                if (!isRufio)
+                                                {
+                                                    imageName = $"{strs[0].Title}_{strs[2].Title}_{imageName}";
+                                                }
+
+                                                imageName = MakeSafeFileName(imageName);
+
                                                 using (Stream stream = new FileStream($"{simsPath}/{imageName}.{extn}", FileMode.OpenOrCreate, FileAccess.Write))
                                                 {
                                                     if (menuItemSaveAsPng.Checked)
@@ -830,6 +855,13 @@ namespace HoodExporter
                                         Img img = (Img)package.GetResourceByEntry(entry);
                                         string imageName = isRufio ? $"{hoodCode}_{uid}" : Helper.Hex8PrefixString(uid);
 
+                                        if (!isRufio && lotTitleById.ContainsKey((TypeInstanceID)uid))
+                                        {
+                                            imageName = $"{lotTitleById[(TypeInstanceID)uid]}_{imageName}";
+                                        }
+
+                                        imageName = MakeSafeFileName(imageName);
+
                                         using (Stream stream = new FileStream($"{lotsPath}/{imageName}.{extn}", FileMode.OpenOrCreate, FileAccess.Write))
                                         {
                                             if (menuItemSaveAsPng.Checked)
@@ -902,6 +934,13 @@ namespace HoodExporter
                             Img img = (Img)package.GetResourceByEntry(entry);
                             string imageName = isRufio ? $"{hoodCode}_{entry.InstanceID.AsUInt()}" : entry.InstanceID.ToString();
 
+                            if (!isRufio && strTitleById.ContainsKey(entry.InstanceID))
+                            {
+                                imageName = $"{strTitleById[entry.InstanceID]}_{imageName}";
+                            }
+
+                            imageName = MakeSafeFileName(imageName);
+
                             using (Stream stream = new FileStream($"{familiesPath}/{imageName}.{extn}", FileMode.OpenOrCreate, FileAccess.Write))
                             {
                                 if (menuItemSaveAsPng.Checked)
@@ -969,6 +1008,31 @@ namespace HoodExporter
             }
 
             btnGO.Text = "&EXPORT";
+        }
+
+        private string MakeSafeFileName(string fileName)
+        {
+            List<char> unsafeChars = new List<char>(Path.GetInvalidFileNameChars());
+
+            foreach (char c in Path.GetInvalidPathChars())
+            {
+                if (!unsafeChars.Contains(c))
+                {
+                    unsafeChars.Add(c);
+                }
+            }
+
+            List<char> safeName = new List<char>(fileName.Length);
+
+            foreach (char c in fileName)
+            {
+                if (!unsafeChars.Contains(c))
+                {
+                    safeName.Add(c);
+                }
+            }
+
+            return new string(safeName.ToArray());
         }
 
         private void OnGoClicked(object sender, System.EventArgs e)
@@ -1091,7 +1155,7 @@ namespace HoodExporter
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new ConfigDialog();
+            Form config = new ConfigDialog(false);
 
             if (config.ShowDialog() == DialogResult.OK)
             {

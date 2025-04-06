@@ -1,7 +1,7 @@
 ﻿/*
  * DBPF Viewer - a utility for testing the DBPF Library
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -148,39 +148,39 @@ namespace DbpfViewer
             // 
             this.menuItemReloadPackage.Name = "menuItemReloadPackage";
             this.menuItemReloadPackage.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.menuItemReloadPackage.Size = new System.Drawing.Size(235, 22);
+            this.menuItemReloadPackage.Size = new System.Drawing.Size(236, 22);
             this.menuItemReloadPackage.Text = "&Reload Package";
             this.menuItemReloadPackage.Click += new System.EventHandler(this.OnReloadClicked);
             // 
             // menuItemSeparator1
             // 
             this.menuItemSeparator1.Name = "menuItemSeparator1";
-            this.menuItemSeparator1.Size = new System.Drawing.Size(232, 6);
+            this.menuItemSeparator1.Size = new System.Drawing.Size(233, 6);
             // 
             // menuItemSelectPackage
             // 
             this.menuItemSelectPackage.Name = "menuItemSelectPackage";
             this.menuItemSelectPackage.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.menuItemSelectPackage.Size = new System.Drawing.Size(235, 22);
+            this.menuItemSelectPackage.Size = new System.Drawing.Size(236, 22);
             this.menuItemSelectPackage.Text = "&Select Package...";
             this.menuItemSelectPackage.Click += new System.EventHandler(this.OnSelectClicked);
             // 
             // menuItemRecentPackages
             // 
             this.menuItemRecentPackages.Name = "menuItemRecentPackages";
-            this.menuItemRecentPackages.Size = new System.Drawing.Size(235, 22);
+            this.menuItemRecentPackages.Size = new System.Drawing.Size(236, 22);
             this.menuItemRecentPackages.Text = "Recent Packages...";
             // 
             // menuItemSeparator2
             // 
             this.menuItemSeparator2.Name = "menuItemSeparator2";
-            this.menuItemSeparator2.Size = new System.Drawing.Size(232, 6);
+            this.menuItemSeparator2.Size = new System.Drawing.Size(233, 6);
             // 
             // menuItemSaveXmlToClipboard
             // 
             this.menuItemSaveXmlToClipboard.Name = "menuItemSaveXmlToClipboard";
             this.menuItemSaveXmlToClipboard.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.menuItemSaveXmlToClipboard.Size = new System.Drawing.Size(235, 22);
+            this.menuItemSaveXmlToClipboard.Size = new System.Drawing.Size(236, 22);
             this.menuItemSaveXmlToClipboard.Text = "Save XML To &Clipboard";
             this.menuItemSaveXmlToClipboard.Click += new System.EventHandler(this.OnSaveXmlToClipboardClicked);
             // 
@@ -189,32 +189,32 @@ namespace DbpfViewer
             this.menuItemSaveXmlAs.Name = "menuItemSaveXmlAs";
             this.menuItemSaveXmlAs.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
             | System.Windows.Forms.Keys.S)));
-            this.menuItemSaveXmlAs.Size = new System.Drawing.Size(235, 22);
+            this.menuItemSaveXmlAs.Size = new System.Drawing.Size(236, 22);
             this.menuItemSaveXmlAs.Text = "Save XML &As...";
             this.menuItemSaveXmlAs.Click += new System.EventHandler(this.OnSaveXmlAsClicked);
             // 
             // menuItemSeparator3
             // 
             this.menuItemSeparator3.Name = "menuItemSeparator3";
-            this.menuItemSeparator3.Size = new System.Drawing.Size(232, 6);
+            this.menuItemSeparator3.Size = new System.Drawing.Size(233, 6);
             // 
             // menuItemConfiguration
             // 
             this.menuItemConfiguration.Name = "menuItemConfiguration";
-            this.menuItemConfiguration.Size = new System.Drawing.Size(235, 22);
+            this.menuItemConfiguration.Size = new System.Drawing.Size(236, 22);
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigurationClicked);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(232, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(233, 6);
             // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
             this.menuItemExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.menuItemExit.Size = new System.Drawing.Size(235, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(236, 22);
             this.menuItemExit.Text = "E&xit";
             this.menuItemExit.Click += new System.EventHandler(this.OnExitClicked);
             // 
@@ -598,31 +598,31 @@ namespace DbpfViewer
             this.menuItemSaveJpeg,
             this.menuItemSavePng});
             this.menuContextImage.Name = "menuContextImage";
-            this.menuContextImage.Size = new System.Drawing.Size(209, 76);
+            this.menuContextImage.Size = new System.Drawing.Size(210, 76);
             // 
             // menuItemCopyImage
             // 
             this.menuItemCopyImage.Name = "menuItemCopyImage";
-            this.menuItemCopyImage.Size = new System.Drawing.Size(208, 22);
+            this.menuItemCopyImage.Size = new System.Drawing.Size(209, 22);
             this.menuItemCopyImage.Text = "Copy Image To Clipboard";
             this.menuItemCopyImage.Click += new System.EventHandler(this.OnCopyImageClicked);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(205, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(206, 6);
             // 
             // menuItemSaveJpeg
             // 
             this.menuItemSaveJpeg.Name = "menuItemSaveJpeg";
-            this.menuItemSaveJpeg.Size = new System.Drawing.Size(208, 22);
+            this.menuItemSaveJpeg.Size = new System.Drawing.Size(209, 22);
             this.menuItemSaveJpeg.Text = "Save As JPEG";
             this.menuItemSaveJpeg.Click += new System.EventHandler(this.OnSaveJpegClicked);
             // 
             // menuItemSavePng
             // 
             this.menuItemSavePng.Name = "menuItemSavePng";
-            this.menuItemSavePng.Size = new System.Drawing.Size(208, 22);
+            this.menuItemSavePng.Size = new System.Drawing.Size(209, 22);
             this.menuItemSavePng.Text = "Save As PNG";
             this.menuItemSavePng.Click += new System.EventHandler(this.OnSavePngClicked);
             // 

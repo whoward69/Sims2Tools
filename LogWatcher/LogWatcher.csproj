@@ -51,7 +51,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Sims2Tools.ico</ApplicationIcon>
+    <ApplicationIcon>LogWatcher.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=2.0.17.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -134,6 +134,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="LogWatcher.ico" />
     <Content Include="Resources\XML\knowntokens.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -149,7 +150,6 @@
     <Content Include="Resources\XML\persondata.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sims2Tools.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DbpfLibrary\DbpfLibrary.csproj">

@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -83,15 +83,15 @@ namespace SgChecker
             this.tabIssues = new System.Windows.Forms.TabControl();
             this.tabPageMissing = new System.Windows.Forms.TabPage();
             this.gridMissing = new System.Windows.Forms.DataGridView();
+            this.colMissingFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPageDuplicate = new System.Windows.Forms.TabPage();
             this.gridDuplicate = new System.Windows.Forms.DataGridView();
+            this.colDuplicateFileA = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDuplicateFileB = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.btnSelectScanPath = new System.Windows.Forms.Button();
             this.textScanPath = new System.Windows.Forms.TextBox();
             this.lblScanPath = new System.Windows.Forms.Label();
-            this.colDuplicateFileA = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colDuplicateFileB = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMissingFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuMain.SuspendLayout();
             this.tabIssues.SuspendLayout();
             this.tabPageMissing.SuspendLayout();
@@ -446,6 +446,14 @@ namespace SgChecker
             this.gridMissing.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridMissing.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeededMissing);
             // 
+            // colMissingFile
+            // 
+            this.colMissingFile.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colMissingFile.DataPropertyName = "File";
+            this.colMissingFile.HeaderText = "File";
+            this.colMissingFile.Name = "colMissingFile";
+            this.colMissingFile.ReadOnly = true;
+            // 
             // tabPageDuplicate
             // 
             this.tabPageDuplicate.Controls.Add(this.gridDuplicate);
@@ -498,6 +506,23 @@ namespace SgChecker
             this.gridDuplicate.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridDuplicate.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeededDuplicate);
             // 
+            // colDuplicateFileA
+            // 
+            this.colDuplicateFileA.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colDuplicateFileA.DataPropertyName = "FileA";
+            this.colDuplicateFileA.HeaderText = "File 1";
+            this.colDuplicateFileA.Name = "colDuplicateFileA";
+            this.colDuplicateFileA.ReadOnly = true;
+            this.colDuplicateFileA.Width = 62;
+            // 
+            // colDuplicateFileB
+            // 
+            this.colDuplicateFileB.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colDuplicateFileB.DataPropertyName = "FileB";
+            this.colDuplicateFileB.HeaderText = "File 2";
+            this.colDuplicateFileB.Name = "colDuplicateFileB";
+            this.colDuplicateFileB.ReadOnly = true;
+            // 
             // saveFileDialog
             // 
             this.saveFileDialog.DefaultExt = "txt";
@@ -532,31 +557,6 @@ namespace SgChecker
             this.lblScanPath.Size = new System.Drawing.Size(76, 15);
             this.lblScanPath.TabIndex = 8;
             this.lblScanPath.Text = "Scan Folder:";
-            // 
-            // colDuplicateFileA
-            // 
-            this.colDuplicateFileA.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colDuplicateFileA.DataPropertyName = "FileA";
-            this.colDuplicateFileA.HeaderText = "File 1";
-            this.colDuplicateFileA.Name = "colDuplicateFileA";
-            this.colDuplicateFileA.ReadOnly = true;
-            this.colDuplicateFileA.Width = 62;
-            // 
-            // colDuplicateFileB
-            // 
-            this.colDuplicateFileB.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colDuplicateFileB.DataPropertyName = "FileB";
-            this.colDuplicateFileB.HeaderText = "File 2";
-            this.colDuplicateFileB.Name = "colDuplicateFileB";
-            this.colDuplicateFileB.ReadOnly = true;
-            // 
-            // colMissingFile
-            // 
-            this.colMissingFile.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colMissingFile.DataPropertyName = "File";
-            this.colMissingFile.HeaderText = "File";
-            this.colMissingFile.Name = "colMissingFile";
-            this.colMissingFile.ReadOnly = true;
             // 
             // SgCheckerForm
             // 

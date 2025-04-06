@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -59,6 +59,8 @@ namespace HcduPlus
 
         private MruList MyMruList;
         private Updater MyUpdater;
+
+        internal static readonly Color colourAddKnownHighlight = Color.FromName(Properties.Settings.Default.AddKnownHighlight);
 
         private readonly SortedSet<ConflictPair> allCurrentConflicts = new SortedSet<ConflictPair>();
         private readonly KnownConflicts knownConflicts = new KnownConflicts();
@@ -800,7 +802,7 @@ namespace HcduPlus
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new ConfigDialog();
+            Form config = new ConfigDialog(false);
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -840,7 +842,7 @@ namespace HcduPlus
             if (mouseLocation.RowIndex != gridByPackage.SelectedRows[0].Index)
             {
                 highlightRow = gridByPackage.Rows[mouseLocation.RowIndex];
-                highlightRow.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.AddKnownHighlight); // MistyRose or LightPink
+                highlightRow.DefaultCellStyle.BackColor = colourAddKnownHighlight;
             }
             else
             {

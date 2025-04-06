@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Sims2Tools.ico</ApplicationIcon>
+    <ApplicationIcon>SgChecker.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomMarshalers" />
@@ -132,7 +132,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Sims2Tools.ico" />
+    <Content Include="SgChecker.ico" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\XML\" />

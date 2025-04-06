@@ -1,7 +1,7 @@
 ﻿/*
  * SceneGraph Plus - a utility for repairing scene graphs
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -17,7 +17,7 @@ namespace SceneGraphPlus
         public static string AppName = "SceneGraph PLUS";
 
         public static int AppVersionMajor = 1;
-        public static int AppVersionMinor = 9;
+        public static int AppVersionMinor = 10;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;

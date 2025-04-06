@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -249,33 +249,33 @@ namespace HoodExporter
             // 
             this.menuItemLotImages.CheckOnClick = true;
             this.menuItemLotImages.Name = "menuItemLotImages";
-            this.menuItemLotImages.Size = new System.Drawing.Size(189, 22);
+            this.menuItemLotImages.Size = new System.Drawing.Size(188, 22);
             this.menuItemLotImages.Text = "Extract &Lot Images";
             // 
             // menuItemFamilyImages
             // 
             this.menuItemFamilyImages.CheckOnClick = true;
             this.menuItemFamilyImages.Name = "menuItemFamilyImages";
-            this.menuItemFamilyImages.Size = new System.Drawing.Size(189, 22);
+            this.menuItemFamilyImages.Size = new System.Drawing.Size(188, 22);
             this.menuItemFamilyImages.Text = "Extract &Family Images";
             // 
             // menuItemSimImages
             // 
             this.menuItemSimImages.CheckOnClick = true;
             this.menuItemSimImages.Name = "menuItemSimImages";
-            this.menuItemSimImages.Size = new System.Drawing.Size(189, 22);
+            this.menuItemSimImages.Size = new System.Drawing.Size(188, 22);
             this.menuItemSimImages.Text = "Extract &Sim Images";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(186, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(185, 6);
             // 
             // menuItemSaveAsPng
             // 
             this.menuItemSaveAsPng.CheckOnClick = true;
             this.menuItemSaveAsPng.Name = "menuItemSaveAsPng";
-            this.menuItemSaveAsPng.Size = new System.Drawing.Size(189, 22);
+            this.menuItemSaveAsPng.Size = new System.Drawing.Size(188, 22);
             this.menuItemSaveAsPng.Text = "Save As &PNG";
             this.menuItemSaveAsPng.Click += new System.EventHandler(this.OnSaveAsPngClicked);
             // 
@@ -283,7 +283,7 @@ namespace HoodExporter
             // 
             this.menuItemSaveAsJpg.CheckOnClick = true;
             this.menuItemSaveAsJpg.Name = "menuItemSaveAsJpg";
-            this.menuItemSaveAsJpg.Size = new System.Drawing.Size(189, 22);
+            this.menuItemSaveAsJpg.Size = new System.Drawing.Size(188, 22);
             this.menuItemSaveAsJpg.Text = "Save As &JPG";
             this.menuItemSaveAsJpg.Click += new System.EventHandler(this.OnSaveAsJpgClicked);
             // 
@@ -299,7 +299,7 @@ namespace HoodExporter
             this.menuItemXsltNone,
             this.toolStripSeparator5});
             this.menuTransform.Name = "menuTransform";
-            this.menuTransform.Size = new System.Drawing.Size(72, 20);
+            this.menuTransform.Size = new System.Drawing.Size(73, 20);
             this.menuTransform.Text = "&Transform";
             // 
             // menuItemXsltNone
@@ -308,7 +308,7 @@ namespace HoodExporter
             this.menuItemXsltNone.CheckOnClick = true;
             this.menuItemXsltNone.CheckState = System.Windows.Forms.CheckState.Checked;
             this.menuItemXsltNone.Name = "menuItemXsltNone";
-            this.menuItemXsltNone.Size = new System.Drawing.Size(180, 22);
+            this.menuItemXsltNone.Size = new System.Drawing.Size(103, 22);
             this.menuItemXsltNone.Tag = "";
             this.menuItemXsltNone.Text = "None";
             this.menuItemXsltNone.Click += new System.EventHandler(this.OnTransformNoneClicked);
@@ -316,7 +316,7 @@ namespace HoodExporter
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(100, 6);
             // 
             // hoodWorker
             // 

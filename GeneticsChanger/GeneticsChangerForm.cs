@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -56,6 +56,9 @@ namespace GeneticsChanger
 
         private MruList MyMruList;
         private Updater MyUpdater;
+
+        private static readonly Color colourDirtyHighlight = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+        private static readonly Color colourThumbnailBackground = Color.FromName(Properties.Settings.Default.ThumbnailBackground);
 
         private readonly GeneticsChangerPackageData dataPackageFiles = new GeneticsChangerPackageData();
         private readonly GeneticsChangerResourceData dataResources = new GeneticsChangerResourceData();
@@ -122,6 +125,8 @@ namespace GeneticsChanger
 
             gridPackageFiles.DataSource = dataPackageFiles;
             gridResources.DataSource = dataResources;
+
+            thumbBox.BackColor = colourThumbnailBackground;
         }
 
         public new void Dispose()
@@ -622,7 +627,7 @@ namespace GeneticsChanger
 
                 if (packageCache.Contains(packagePath))
                 {
-                    row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+                    row.DefaultCellStyle.BackColor = colourDirtyHighlight;
                     menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
                 }
                 else
@@ -637,7 +642,7 @@ namespace GeneticsChanger
 
                 if (geneticData.IsDirty)
                 {
-                    row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+                    row.DefaultCellStyle.BackColor = colourDirtyHighlight;
                 }
                 else
                 {
@@ -690,7 +695,7 @@ namespace GeneticsChanger
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new ConfigDialog();
+            Form config = new ConfigDialog(true);
 
             if (config.ShowDialog() == DialogResult.OK)
             {

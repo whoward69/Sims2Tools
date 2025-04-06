@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Sims2Tools.ico</ApplicationIcon>
+    <ApplicationIcon>BsokEditor.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -128,6 +128,7 @@
     <None Include="Resources\Padlock_locked_gray_16.png" />
     <None Include="Resources\Padlock_unlocked_16.png" />
     <None Include="Resources\Padlock_unlocked_gray_16.png" />
+    <Content Include="BsokEditor.ico" />
     <Content Include="Resources\XML\bsok_01nu_B_Curvy.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -155,7 +156,6 @@
     <Content Include="Resources\XML\bsok_05cccasok.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sims2Tools.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DbpfLibrary\DbpfLibrary.csproj">

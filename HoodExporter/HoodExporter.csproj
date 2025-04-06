@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Sims2Tools.ico</ApplicationIcon>
+    <ApplicationIcon>HoodExporter.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>HoodExporter.HoodExporterApp</StartupObject>
@@ -160,6 +160,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="HoodExporter.ico" />
     <Content Include="Resources\XML\tokens.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -195,7 +196,6 @@
     <Content Include="Resources\XSL\rufio.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sims2Tools.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

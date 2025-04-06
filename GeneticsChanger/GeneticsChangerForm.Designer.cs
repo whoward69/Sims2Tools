@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -55,6 +55,10 @@ namespace GeneticsChanger
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGenetics = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGeneticSkins = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGeneticHair = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,10 +76,6 @@ namespace GeneticsChanger
             this.menuItemOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowResTitle = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowResFilename = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.splitTopBottom = new System.Windows.Forms.SplitContainer();
@@ -277,6 +277,37 @@ namespace GeneticsChanger
             this.menuItemAbout.Text = "About...";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
             // 
+            // menuItemMode
+            // 
+            this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAdvanced,
+            this.toolStripSeparator3,
+            this.menuItemAutoBackup});
+            this.menuItemMode.Name = "menuItemMode";
+            this.menuItemMode.Size = new System.Drawing.Size(50, 20);
+            this.menuItemMode.Text = "&Mode";
+            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAdvanced.Text = "Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(141, 6);
+            // 
+            // menuItemAutoBackup
+            // 
+            this.menuItemAutoBackup.CheckOnClick = true;
+            this.menuItemAutoBackup.Name = "menuItemAutoBackup";
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoBackup.Text = "Auto-Backup";
+            // 
             // menuItemGenetics
             // 
             this.menuItemGenetics.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -409,7 +440,7 @@ namespace GeneticsChanger
             // 
             this.menuItemShowResTitle.CheckOnClick = true;
             this.menuItemShowResTitle.Name = "menuItemShowResTitle";
-            this.menuItemShowResTitle.Size = new System.Drawing.Size(205, 22);
+            this.menuItemShowResTitle.Size = new System.Drawing.Size(154, 22);
             this.menuItemShowResTitle.Text = "Show &Title";
             this.menuItemShowResTitle.Click += new System.EventHandler(this.OnShowResTitleClicked);
             // 
@@ -417,40 +448,9 @@ namespace GeneticsChanger
             // 
             this.menuItemShowResFilename.CheckOnClick = true;
             this.menuItemShowResFilename.Name = "menuItemShowResFilename";
-            this.menuItemShowResFilename.Size = new System.Drawing.Size(205, 22);
+            this.menuItemShowResFilename.Size = new System.Drawing.Size(154, 22);
             this.menuItemShowResFilename.Text = "Show &Filename";
             this.menuItemShowResFilename.Click += new System.EventHandler(this.OnShowResFilenameClicked);
-            // 
-            // menuItemMode
-            // 
-            this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemAdvanced,
-            this.toolStripSeparator3,
-            this.menuItemAutoBackup});
-            this.menuItemMode.Name = "menuItemMode";
-            this.menuItemMode.Size = new System.Drawing.Size(50, 20);
-            this.menuItemMode.Text = "&Mode";
-            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
-            // 
-            // menuItemAdvanced
-            // 
-            this.menuItemAdvanced.CheckOnClick = true;
-            this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAdvanced.Text = "Advanced";
-            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
-            // 
-            // menuItemAutoBackup
-            // 
-            this.menuItemAutoBackup.CheckOnClick = true;
-            this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAutoBackup.Text = "Auto-Backup";
             // 
             // saveFileDialog
             // 

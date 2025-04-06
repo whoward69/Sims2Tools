@@ -1,7 +1,7 @@
 ﻿/*
  * Log Watcher - a utility for monitoring Sims 2 ObjectError logs
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -36,6 +36,7 @@ namespace LogWatcher
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogWatcherForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,7 +68,7 @@ namespace LogWatcher
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.logDirWatcher = new System.IO.FileSystemWatcher();
-            this.menuContextTab = new System.Windows.Forms.ContextMenuStrip();
+            this.menuContextTab = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.renameContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sep1ContextMenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.closeContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -120,38 +121,38 @@ namespace LogWatcher
             // 
             this.menuItemSelectLog.Name = "menuItemSelectLog";
             this.menuItemSelectLog.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.menuItemSelectLog.Size = new System.Drawing.Size(251, 22);
+            this.menuItemSelectLog.Size = new System.Drawing.Size(252, 22);
             this.menuItemSelectLog.Text = "&Select Log(s)...";
             this.menuItemSelectLog.Click += new System.EventHandler(this.OnSelectClicked);
             // 
             // menuItemRecentLogs
             // 
             this.menuItemRecentLogs.Name = "menuItemRecentLogs";
-            this.menuItemRecentLogs.Size = new System.Drawing.Size(251, 22);
+            this.menuItemRecentLogs.Size = new System.Drawing.Size(252, 22);
             this.menuItemRecentLogs.Text = "Recent Logs...";
             // 
             // menuItemSeparator2
             // 
             this.menuItemSeparator2.Name = "menuItemSeparator2";
-            this.menuItemSeparator2.Size = new System.Drawing.Size(248, 6);
+            this.menuItemSeparator2.Size = new System.Drawing.Size(249, 6);
             // 
             // menuItemConfiguration
             // 
             this.menuItemConfiguration.Name = "menuItemConfiguration";
-            this.menuItemConfiguration.Size = new System.Drawing.Size(251, 22);
+            this.menuItemConfiguration.Size = new System.Drawing.Size(252, 22);
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigurationClicked);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(248, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(249, 6);
             // 
             // menuItemCloseTab
             // 
             this.menuItemCloseTab.Name = "menuItemCloseTab";
             this.menuItemCloseTab.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
-            this.menuItemCloseTab.Size = new System.Drawing.Size(251, 22);
+            this.menuItemCloseTab.Size = new System.Drawing.Size(252, 22);
             this.menuItemCloseTab.Text = "&Close Tab";
             this.menuItemCloseTab.Click += new System.EventHandler(this.OnCloseCurrentTab);
             // 
@@ -160,39 +161,39 @@ namespace LogWatcher
             this.menuItemCloseAndDeleteTab.Name = "menuItemCloseAndDeleteTab";
             this.menuItemCloseAndDeleteTab.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.F4)));
-            this.menuItemCloseAndDeleteTab.Size = new System.Drawing.Size(251, 22);
+            this.menuItemCloseAndDeleteTab.Size = new System.Drawing.Size(252, 22);
             this.menuItemCloseAndDeleteTab.Text = "Close && &Delete Tab";
             this.menuItemCloseAndDeleteTab.Click += new System.EventHandler(this.OnCloseAndDeleteCurrentTab);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(248, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(249, 6);
             // 
             // menuItemCloseAllTabs
             // 
             this.menuItemCloseAllTabs.Name = "menuItemCloseAllTabs";
-            this.menuItemCloseAllTabs.Size = new System.Drawing.Size(251, 22);
+            this.menuItemCloseAllTabs.Size = new System.Drawing.Size(252, 22);
             this.menuItemCloseAllTabs.Text = "Close &All Tabs";
             this.menuItemCloseAllTabs.Click += new System.EventHandler(this.OnCloseAllTabs);
             // 
             // menuItemCloseAndDeleteAllTabs
             // 
             this.menuItemCloseAndDeleteAllTabs.Name = "menuItemCloseAndDeleteAllTabs";
-            this.menuItemCloseAndDeleteAllTabs.Size = new System.Drawing.Size(251, 22);
+            this.menuItemCloseAndDeleteAllTabs.Size = new System.Drawing.Size(252, 22);
             this.menuItemCloseAndDeleteAllTabs.Text = "Close && Delete All Tabs";
             this.menuItemCloseAndDeleteAllTabs.Click += new System.EventHandler(this.OnCloseAndDeleteAllTabs);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(248, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(249, 6);
             // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
             this.menuItemExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.menuItemExit.Size = new System.Drawing.Size(251, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(252, 22);
             this.menuItemExit.Text = "E&xit";
             this.menuItemExit.Click += new System.EventHandler(this.OnExitClicked);
             // 
@@ -296,7 +297,7 @@ namespace LogWatcher
             // 
             this.menuItemIncPropIndex.CheckOnClick = true;
             this.menuItemIncPropIndex.Name = "menuItemIncPropIndex";
-            this.menuItemIncPropIndex.Size = new System.Drawing.Size(234, 22);
+            this.menuItemIncPropIndex.Size = new System.Drawing.Size(235, 22);
             this.menuItemIncPropIndex.Text = "Add 1 To Token Property Index";
             this.menuItemIncPropIndex.Click += new System.EventHandler(this.OnIncPropIndexClicked);
             // 

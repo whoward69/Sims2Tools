@@ -51,7 +51,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Sims2Tools.ico</ApplicationIcon>
+    <ApplicationIcon>DbpfCompare.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=2.0.17.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -141,7 +141,7 @@
   <ItemGroup>
     <None Include="Resources\SaveIcon.png" />
     <None Include="Resources\SwitchIcon.png" />
-    <Content Include="Sims2Tools.ico" />
+    <Content Include="DbpfCompare.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DbpfLibrary\DbpfLibrary.csproj">

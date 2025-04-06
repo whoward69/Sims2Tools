@@ -1,7 +1,7 @@
 ﻿/*
  * DBPF Viewer - a utility for testing the DBPF Library
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -52,6 +52,8 @@ namespace DbpfViewer
 
         private MruList MyMruList;
         private Updater MyUpdater;
+
+        private static readonly Color colourSaveRawHighlight = Color.FromName(Properties.Settings.Default.SaveRawHighlight);
 
         private readonly HashSet<TypeTypeID> enabledResources = new HashSet<TypeTypeID>();
 
@@ -200,7 +202,7 @@ namespace DbpfViewer
 
         private void OnConfigurationClicked(object sender, EventArgs e)
         {
-            Form config = new ConfigDialog();
+            Form config = new ConfigDialog(false);
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -781,7 +783,7 @@ namespace DbpfViewer
             if (mouseLocation.RowIndex != gridResources.SelectedRows[0].Index)
             {
                 highlightRow = gridResources.Rows[mouseLocation.RowIndex];
-                highlightRow.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.SaveRawHighlight); // MistyRose or LightPink
+                highlightRow.DefaultCellStyle.BackColor = colourSaveRawHighlight;
             }
             else
             {

@@ -1,7 +1,7 @@
 ﻿/*
  * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -47,6 +47,9 @@ namespace ObjectRelocator
 
         private MruList MyMruList;
         private Updater MyUpdater;
+
+        private static readonly Color colourDirtyHighlight = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+        private static readonly Color colourThumbnailBackground = Color.FromName(Properties.Settings.Default.ThumbnailBackground);
 
         private readonly ThumbnailCache thumbCache;
 
@@ -167,6 +170,8 @@ namespace ObjectRelocator
             gridViewResources.DataSource = dataTableResources;
 
             thumbCache = new ThumbnailCache();
+
+            thumbBox.BackColor = colourThumbnailBackground;
         }
 
         public new void Dispose()
@@ -623,7 +628,7 @@ namespace ObjectRelocator
                 if (objectData.IsDirty)
                 {
                     menuItemSaveAll.Enabled = btnSave.Enabled = true;
-                    row.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+                    row.DefaultCellStyle.BackColor = colourDirtyHighlight;
                 }
                 else
                 {
@@ -668,7 +673,7 @@ namespace ObjectRelocator
 
         private void OnConfigurationClicked(object sender, EventArgs e)
         {
-            Form config = new ConfigDialog();
+            Form config = new ConfigDialog(true);
 
             if (config.ShowDialog() == DialogResult.OK)
             {

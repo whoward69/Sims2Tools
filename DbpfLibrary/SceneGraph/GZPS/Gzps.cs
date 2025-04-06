@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -43,10 +43,17 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
         {
             get
             {
-                return new uint[]
+                if (this.GetItem("resourcekeyidx") != null)
                 {
+                    return new uint[]
+                    {
                     this.GetItem("resourcekeyidx").UIntegerValue,
-                };
+                    };
+                }
+                else
+                {
+                    return new uint[0];
+                }
             }
         }
 
@@ -54,10 +61,17 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
         {
             get
             {
-                return new uint[]
+                if (this.GetItem("shapekeyidx") != null)
                 {
+                    return new uint[]
+                    {
                     this.GetItem("shapekeyidx").UIntegerValue,
-                };
+                    };
+                }
+                else
+                {
+                    return new uint[0];
+                }
             }
         }
 
@@ -71,7 +85,14 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
 
                 for (int i = 0; i < entries; ++i)
                 {
-                    indexes[i] = this.GetItem($"override{i}resourcekeyidx").UIntegerValue;
+                    if (this.GetItem($"override{i}resourcekeyidx") != null)
+                    {
+                        indexes[i] = this.GetItem($"override{i}resourcekeyidx").UIntegerValue;
+                    }
+                    else
+                    {
+                        indexes[i] = uint.MaxValue;
+                    }
                 }
 
                 return indexes;

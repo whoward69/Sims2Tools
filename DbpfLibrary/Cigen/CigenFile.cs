@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Parts of this code derived from the SimPE project - https://sourceforge.net/projects/simpe/
  * Parts of this code derived from the SimUnity2 project - https://github.com/LazyDuchess/SimUnity2 
@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 
 namespace Sims2Tools.DBPF.Cigen
 {
@@ -80,30 +79,7 @@ namespace Sims2Tools.DBPF.Cigen
 
                     if (img != null)
                     {
-                        int srcDimension = Math.Min(thumbnail.Width, thumbnail.Height);
-                        int dstDimension = srcDimension;
-                        if (dstDimension != 64 && dstDimension != 128 && dstDimension != 256 && dstDimension != 512) dstDimension = 256;
-
-                        if (thumbnail.Width != dstDimension || thumbnail.Height != dstDimension)
-                        {
-                            Bitmap _bitmap = new Bitmap(dstDimension, dstDimension);
-                            _bitmap.SetResolution(thumbnail.HorizontalResolution, thumbnail.VerticalResolution);
-                            using (Graphics _graphic = Graphics.FromImage(_bitmap))
-                            {
-                                _graphic.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                                _graphic.SmoothingMode = SmoothingMode.HighQuality;
-                                _graphic.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                                _graphic.CompositingQuality = CompositingQuality.HighQuality;
-
-                                _graphic.DrawImage(thumbnail, new Rectangle(0, 0, dstDimension, dstDimension), new Rectangle((thumbnail.Width - srcDimension) / 2, (thumbnail.Height - srcDimension) / 2, srcDimension, srcDimension), GraphicsUnit.Pixel);
-                            }
-
-                            img.Image = _bitmap;
-                        }
-                        else
-                        {
-                            img.Image = thumbnail;
-                        }
+                        img.Image = Img.MakeThumbnail(thumbnail);
 
                         cigenPackage.Commit(img);
 

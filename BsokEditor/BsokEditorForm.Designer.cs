@@ -1,7 +1,7 @@
 ﻿/*
  * BSOK Editor - a utility for adding BSOK data to clothing and accessory packages
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -78,6 +78,7 @@ namespace BsokEditor
             this.comboGender = new System.Windows.Forms.ComboBox();
             this.btnSave = new System.Windows.Forms.Button();
             this.grpCategory = new System.Windows.Forms.GroupBox();
+            this.ckbCatSkintone = new System.Windows.Forms.CheckBox();
             this.ckbCatNakedOverlay = new System.Windows.Forms.CheckBox();
             this.ckbCatSwimwear = new System.Windows.Forms.CheckBox();
             this.ckbCatUnderwear = new System.Windows.Forms.CheckBox();
@@ -108,7 +109,6 @@ namespace BsokEditor
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
-            this.ckbCatSkintone = new System.Windows.Forms.CheckBox();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextGrid.SuspendLayout();
@@ -480,6 +480,17 @@ namespace BsokEditor
             this.grpCategory.TabStop = false;
             this.grpCategory.Text = "Category:";
             // 
+            // ckbCatSkintone
+            // 
+            this.ckbCatSkintone.AutoSize = true;
+            this.ckbCatSkintone.Location = new System.Drawing.Point(10, 167);
+            this.ckbCatSkintone.Name = "ckbCatSkintone";
+            this.ckbCatSkintone.Size = new System.Drawing.Size(74, 19);
+            this.ckbCatSkintone.TabIndex = 10;
+            this.ckbCatSkintone.Text = "Skintone";
+            this.ckbCatSkintone.UseVisualStyleBackColor = true;
+            this.ckbCatSkintone.Click += new System.EventHandler(this.OnCatSkintoneClicked);
+            // 
             // ckbCatNakedOverlay
             // 
             this.ckbCatNakedOverlay.AutoSize = true;
@@ -806,17 +817,6 @@ namespace BsokEditor
             this.thumbBox.TabIndex = 25;
             this.thumbBox.TabStop = false;
             this.thumbBox.Visible = false;
-            // 
-            // ckbCatSkintone
-            // 
-            this.ckbCatSkintone.AutoSize = true;
-            this.ckbCatSkintone.Location = new System.Drawing.Point(10, 167);
-            this.ckbCatSkintone.Name = "ckbCatSkintone";
-            this.ckbCatSkintone.Size = new System.Drawing.Size(74, 19);
-            this.ckbCatSkintone.TabIndex = 10;
-            this.ckbCatSkintone.Text = "Skintone";
-            this.ckbCatSkintone.UseVisualStyleBackColor = true;
-            this.ckbCatSkintone.Click += new System.EventHandler(this.OnCatSkintoneClicked);
             // 
             // BsokEditorForm
             // 

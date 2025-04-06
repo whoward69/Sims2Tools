@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -602,6 +602,7 @@ namespace OutfitOrganiser
             // 
             // thumbBox
             // 
+            this.thumbBox.BackColor = System.Drawing.Color.LightSteelBlue;
             this.thumbBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.thumbBox.Location = new System.Drawing.Point(10, 40);
             this.thumbBox.Name = "thumbBox";

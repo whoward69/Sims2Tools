@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -16,7 +16,7 @@ namespace Sims2Tools
 {
     public partial class ConfigDialog : Form
     {
-        public ConfigDialog()
+        public ConfigDialog(bool requiresInstallPath)
         {
             InitializeComponent();
 
@@ -24,11 +24,13 @@ namespace Sims2Tools
             {
                 IsFolderPicker = true
             };
+
+            lblSims2InstallPath.Visible = lblHelpInstallPath.Visible = textSims2InstallPath.Visible = btnSims2InstallSelect.Visible = btnSims2EpSpSelect.Visible = requiresInstallPath;
         }
 
         private void OnConfigLoad(object sender, EventArgs e)
         {
-            textSims2Path.Text = Sims2ToolsLib.Sims2Path;
+            textSims2ExePath.Text = Sims2ToolsLib.Sims2Path;
 
             if (Sims2ToolsLib.IsSims2HomePathSet)
             {
@@ -48,7 +50,33 @@ namespace Sims2Tools
                 }
             }
 
-            textSimPePath.Text = Sims2ToolsLib.SimPePath;
+            if (Sims2ToolsLib.IsSims2InstallPathSet)
+            {
+                textSims2InstallPath.Text = Sims2ToolsLib.Sims2InstallPath;
+            }
+            else
+            {
+#pragma warning disable CS0612
+                string basePath = SimpeData.PathSetting("Sims2Path");
+
+                if (!string.IsNullOrEmpty(basePath))
+                {
+                    if (basePath.EndsWith("Ultimate Collection\\Double Deluxe\\Base"))
+                    {
+                        textSims2InstallPath.Text = basePath.Substring(0, basePath.Length - 19);
+                    }
+                    else if (basePath.EndsWith("Legacy Collection\\Base"))
+                    {
+                        textSims2InstallPath.Text = basePath.Substring(0, basePath.Length - 5);
+                    }
+                    else if (basePath.Contains("\\EA GAMES\\"))
+                    {
+                        int pos = basePath.IndexOf("\\EA GAMES\\");
+                        textSims2InstallPath.Text = basePath.Substring(0, pos + 9);
+                    }
+                }
+#pragma warning restore CS0612
+            }
 
             ckbAllAdvancedMode.Checked = Sims2ToolsLib.AllAdvancedMode;
 
@@ -59,31 +87,31 @@ namespace Sims2Tools
         {
             Color badColour = Color.LightCoral;
 
-            bool sims2PathOk = Directory.Exists(textSims2Path.Text);
-            this.textSims2Path.BackColor = sims2PathOk ? System.Drawing.SystemColors.Window : badColour;
+            bool sims2ExePathOk = File.Exists($"{textSims2ExePath.Text}\\TSData\\Res\\Objects\\objects.package");
+            this.textSims2ExePath.BackColor = sims2ExePathOk ? System.Drawing.SystemColors.Window : badColour;
 
-            bool sims2HomePathOk = Directory.Exists(textSims2HomePath.Text);
+            bool sims2HomePathOk = Directory.Exists($"{textSims2HomePath.Text}\\Neighborhoods");
             this.textSims2HomePath.BackColor = sims2HomePathOk ? System.Drawing.SystemColors.Window : badColour;
 
-            bool simsPePathOk = string.IsNullOrEmpty(textSimPePath.Text) || (Directory.Exists(textSimPePath.Text) && File.Exists($"{textSimPePath.Text}/Data/simpe.xreg"));
-            this.textSimPePath.BackColor = simsPePathOk ? System.Drawing.SystemColors.Window : badColour;
+            bool sims2InstallPathOk = !textSims2InstallPath.Visible || (string.IsNullOrEmpty(textSims2InstallPath.Text) || Directory.Exists(textSims2InstallPath.Text));
+            this.textSims2InstallPath.BackColor = sims2InstallPathOk ? System.Drawing.SystemColors.Window : badColour;
 
-            btnConfigOK.Enabled = (sims2PathOk && sims2HomePathOk && simsPePathOk);
+            btnSims2EpSpSelect.Enabled = Directory.Exists(textSims2InstallPath.Text);
 
-            lblUnsupportedVersion.Visible = !(string.IsNullOrEmpty(textSimPePath.Text) || !Directory.Exists(textSimPePath.Text) || File.Exists($"{textSimPePath.Text}/Data/simpe.xreg"));
+            btnConfigOK.Enabled = (sims2ExePathOk && sims2HomePathOk && sims2InstallPathOk);
         }
 
-        private void OnSelectSim2PathClicked(object sender, EventArgs e)
+        private void OnSelectSims2ExePathClicked(object sender, EventArgs e)
         {
-            selectPathDialog.InitialDirectory = textSims2Path.Text;
+            selectPathDialog.InitialDirectory = textSims2ExePath.Text;
 
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                textSims2Path.Text = selectPathDialog.FileName;
+                textSims2ExePath.Text = selectPathDialog.FileName;
             }
         }
 
-        private void OnSelectSim2HomePathClicked(object sender, EventArgs e)
+        private void OnSelectSims2HomePathClicked(object sender, EventArgs e)
         {
             selectPathDialog.InitialDirectory = textSims2HomePath.Text;
 
@@ -93,13 +121,22 @@ namespace Sims2Tools
             }
         }
 
-        private void OnSelectSimPEPathClicked(object sender, EventArgs e)
+        private void OnSelectSims2InstallPathClicked(object sender, EventArgs e)
         {
-            selectPathDialog.InitialDirectory = textSimPePath.Text;
+            selectPathDialog.InitialDirectory = textSims2InstallPath.Text;
 
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                textSimPePath.Text = selectPathDialog.FileName;
+                textSims2InstallPath.Text = selectPathDialog.FileName;
+            }
+        }
+
+        private void OnSelectSims2EpSpPathClicked(object sender, EventArgs e)
+        {
+            Form epSpConfig = new EpSpConfigDialog(textSims2InstallPath.Text);
+
+            if (epSpConfig.ShowDialog() == DialogResult.OK)
+            {
             }
         }
 
@@ -112,20 +149,24 @@ namespace Sims2Tools
         {
             string oldSims2Path = Sims2ToolsLib.Sims2Path;
             string oldSims2HomePath = Sims2ToolsLib.Sims2HomePath;
-            string oldSimPePath = Sims2ToolsLib.SimPePath;
+            string oldSims2BasePath = Sims2ToolsLib.Sims2InstallPath;
 
-            Sims2ToolsLib.Sims2Path = textSims2Path.Text;
+            Sims2ToolsLib.Sims2Path = textSims2ExePath.Text;
             Sims2ToolsLib.Sims2HomePath = textSims2HomePath.Text;
-            Sims2ToolsLib.SimPePath = textSimPePath.Text;
+            Sims2ToolsLib.Sims2InstallPath = textSims2InstallPath.Text;
 
             Sims2ToolsLib.AllAdvancedMode = ckbAllAdvancedMode.Checked;
 
             // As updating the global objects is a long process, it's worth checking that one of these actually changed
-            if (!(textSims2Path.Text.Equals(oldSims2Path) && textSims2HomePath.Text.Equals(oldSims2HomePath) && textSimPePath.Text.Equals(oldSimPePath)))
+            if (!(textSims2ExePath.Text.Equals(oldSims2Path) && textSims2HomePath.Text.Equals(oldSims2HomePath) && textSims2InstallPath.Text.Equals(oldSims2BasePath)))
             {
                 btnConfigOK.Enabled = false;
                 GameData.UpdateGlobalObjects();
             }
+
+#pragma warning disable CS0612
+            // Sims2ToolsLib.SimPePath = null;
+#pragma warning restore CS0612
 
             this.Close();
         }

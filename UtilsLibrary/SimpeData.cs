@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -24,7 +24,9 @@ namespace Sims2Tools
             {
                 logger.Debug("SimpeData loading from .xreg");
 
+#pragma warning disable CS0612
                 ParseXreg($"{Sims2ToolsLib.SimPePath}/Data/simpe.xreg", "Settings", pathSettings);
+#pragma warning restore CS0612
 
                 logger.Info("SimpeData loaded from .xreg");
             }
@@ -54,6 +56,7 @@ namespace Sims2Tools
             }
         }
 
+        [Obsolete]
         public static string PathSetting(string key)
         {
             pathSettings.TryGetValue(key, out string value);

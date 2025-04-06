@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -244,10 +244,10 @@ namespace Sims2Tools
 
             try
             {
-                logger.Info($"Loading SimpeData: Start");
+                logger.Info($"Loading Data Folders: Start");
 
                 // Base game folder
-                string baseFolder = SimpeData.PathSetting("Sims2Path");
+                string baseFolder = Sims2ToolsLib.Sims2BasePath;
                 if (!string.IsNullOrEmpty(baseFolder))
                 {
                     gameFolders.Insert(0, baseFolder);
@@ -257,7 +257,7 @@ namespace Sims2Tools
                 // Expansion Pack (EP) folders
                 for (int i = 1; i <= 9; i++)
                 {
-                    string epPath = SimpeData.PathSetting($"Sims2EP{i}Path");
+                    string epPath = Sims2ToolsLib.Sims2EpPath(i);
                     if (!string.IsNullOrEmpty(epPath))
                     {
                         gameFolders.Insert(0, epPath);
@@ -266,29 +266,21 @@ namespace Sims2Tools
                 }
 
                 // Stuff Pack (SP) folders
-                // Note: SimPe ignores Sims2SP4Path, places SP4 in Sims2SP5Path, places SP5 in Sims2SP6Path and uses Sims2SCPath for SP6 ... go figure!
                 for (int i = 1; i <= 8; i++)
                 {
-                    string spPath = SimpeData.PathSetting($"Sims2SP{i}Path");
+                    string spPath = Sims2ToolsLib.Sims2SpPath(i);
                     if (!string.IsNullOrEmpty(spPath))
                     {
                         gameFolders.Insert(0, spPath);
                         game3dFolders.Insert(0, $"{spPath}{GameData.subFolder3d}");
                     }
                 }
-                string scPath = SimpeData.PathSetting($"Sims2SCPath");
-                if (!string.IsNullOrEmpty(scPath))
-                {
-                    gameFolders.Insert(0, scPath);
-                    game3dFolders.Insert(0, $"{scPath}{GameData.subFolder3d}");
-                }
 
-
-                logger.Info($"Loading SimpeData: End");
+                logger.Info($"Loading Data Folders: End");
             }
             catch (Exception ex)
             {
-                logger.Warn($"Loading SimpeData threw {ex.Message}");
+                logger.Warn($"Loading Data Folders threw {ex.Message}");
                 logger.Info(ex.StackTrace);
             }
 

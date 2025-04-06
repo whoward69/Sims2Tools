@@ -1,7 +1,7 @@
 ﻿/*
  * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -11,6 +11,7 @@ using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
+using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.THUB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
@@ -26,7 +27,6 @@ using Sims2Tools.DbpfCache;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 
 namespace ObjectRelocator
@@ -113,6 +113,19 @@ namespace ObjectRelocator
                 }
 
                 return "";
+            }
+        }
+
+        public ObjdType ObjdType
+        {
+            get
+            {
+                if (res is Objd objd)
+                {
+                    return (ObjdType)objd.GetRawData(ObjdIndex.Type);
+                }
+
+                return ObjdType.Unknown;
             }
         }
 
@@ -788,30 +801,7 @@ namespace ObjectRelocator
 
                 if (thub != null)
                 {
-                    int srcDimension = Math.Min(newThumbnail.Width, newThumbnail.Height);
-                    int dstDimension = srcDimension;
-                    if (dstDimension != 64 && dstDimension != 128 && dstDimension != 256 && dstDimension != 512) dstDimension = 256;
-
-                    if (newThumbnail.Width != dstDimension || newThumbnail.Height != dstDimension)
-                    {
-                        Bitmap _bitmap = new Bitmap(dstDimension, dstDimension);
-                        _bitmap.SetResolution(newThumbnail.HorizontalResolution, newThumbnail.VerticalResolution);
-                        using (Graphics _graphic = Graphics.FromImage(_bitmap))
-                        {
-                            _graphic.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                            _graphic.SmoothingMode = SmoothingMode.HighQuality;
-                            _graphic.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                            _graphic.CompositingQuality = CompositingQuality.HighQuality;
-
-                            _graphic.DrawImage(newThumbnail, new Rectangle(0, 0, dstDimension, dstDimension), new Rectangle((newThumbnail.Width - srcDimension) / 2, (newThumbnail.Height - srcDimension) / 2, srcDimension, srcDimension), GraphicsUnit.Pixel);
-                        }
-
-                        thub.Image = _bitmap;
-                    }
-                    else
-                    {
-                        thub.Image = newThumbnail;
-                    }
+                    thub.Image = Img.MakeThumbnail(newThumbnail);
 
                     thumbCache.Commit(thub);
 

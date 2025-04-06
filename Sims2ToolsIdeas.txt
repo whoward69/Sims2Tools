@@ -1,37 +1,3 @@
-Genetics Changer V0.1
-=====================
-http://www.insimenator.org/index.php?topic=48812.0
-
-Skins
- BINX/3IDR/XSTN
-   BINX sortindex
-   XSTN genetic
-   Townify (family/creator/flags)
- 
-Eyes
-  BINX/3IDR/XTOL
-   BINX sortindex
-   XTOL genetic
-   Townify (family/creator/flags)
-   
-Hairs
-  Thumbnails are in cigen
-  
-  XHTN
-    proxy (https://modthesims.info/showthread.php?t=150742 step 5)
-	Black: 00000001-0000-0000-0000-000000000000
-    Brown: 00000002-0000-0000-0000-000000000000
-    Blonde: 00000003-0000-0000-0000-000000000000
-    Red: 00000004-0000-0000-0000-000000000000
-    genetic (as eyes)
-
-  GZPS (probably in the same group as the hairtone
-    hairtone (as above)
-
-Eyebrows?
-	
-
-
 SG Checker
 ==========
   Saved Sims sub-dir

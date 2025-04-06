@@ -1,7 +1,7 @@
 ﻿/*
  * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -140,8 +140,6 @@ namespace ObjectRelocator
             this.panelBuyModeEditor = new System.Windows.Forms.Panel();
             this.grpBuyPlacement = new System.Windows.Forms.GroupBox();
             this.ckbBuyQuarterTile = new System.Windows.Forms.CheckBox();
-            this.grpFunction = new System.Windows.Forms.GroupBox();
-            this.grpSubfunction = new System.Windows.Forms.GroupBox();
             this.grpCommunity = new System.Windows.Forms.GroupBox();
             this.ckbCommStreet = new System.Windows.Forms.CheckBox();
             this.ckbCommShopping = new System.Windows.Forms.CheckBox();
@@ -159,6 +157,8 @@ namespace ObjectRelocator
             this.lblLinkDepreciation = new System.Windows.Forms.Label();
             this.ckbLinkDep = new System.Windows.Forms.CheckBox();
             this.grpDepreciation = new System.Windows.Forms.GroupBox();
+            this.grpFunction = new System.Windows.Forms.GroupBox();
+            this.grpSubfunction = new System.Windows.Forms.GroupBox();
             this.grpBuildPlacement = new System.Windows.Forms.GroupBox();
             this.ckbBuildQuarterTile = new System.Windows.Forms.CheckBox();
             this.grpBuild = new System.Windows.Forms.GroupBox();
@@ -176,12 +176,12 @@ namespace ObjectRelocator
             this.grpRooms.SuspendLayout();
             this.panelBuyModeEditor.SuspendLayout();
             this.grpBuyPlacement.SuspendLayout();
-            this.grpFunction.SuspendLayout();
-            this.grpSubfunction.SuspendLayout();
             this.grpCommunity.SuspendLayout();
             this.grpUse.SuspendLayout();
             this.grpBuyPrice.SuspendLayout();
             this.grpDepreciation.SuspendLayout();
+            this.grpFunction.SuspendLayout();
+            this.grpSubfunction.SuspendLayout();
             this.grpBuildPlacement.SuspendLayout();
             this.grpBuild.SuspendLayout();
             this.grpSubbuild.SuspendLayout();
@@ -694,7 +694,7 @@ namespace ObjectRelocator
             this.toolStripSeparator6,
             this.menuItemContextMoveFiles});
             this.menuContextObjects.Name = "menuContextGrid";
-            this.menuContextObjects.Size = new System.Drawing.Size(227, 254);
+            this.menuContextObjects.Size = new System.Drawing.Size(228, 254);
             this.menuContextObjects.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextObjects.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             this.menuContextObjects.Opened += new System.EventHandler(this.OnContextMenuOpened);
@@ -702,95 +702,95 @@ namespace ObjectRelocator
             // menuItemContextEditTitleDesc
             // 
             this.menuItemContextEditTitleDesc.Name = "menuItemContextEditTitleDesc";
-            this.menuItemContextEditTitleDesc.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextEditTitleDesc.Size = new System.Drawing.Size(227, 22);
             this.menuItemContextEditTitleDesc.Text = "&Change Title and Description";
             this.menuItemContextEditTitleDesc.Click += new System.EventHandler(this.OnEditTitleDescClicked);
             // 
             // menuItemContextStripCTSSCrap
             // 
             this.menuItemContextStripCTSSCrap.Name = "menuItemContextStripCTSSCrap";
-            this.menuItemContextStripCTSSCrap.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextStripCTSSCrap.Size = new System.Drawing.Size(227, 22);
             this.menuItemContextStripCTSSCrap.Text = "&Tidy Catalog Entries";
             this.menuItemContextStripCTSSCrap.Click += new System.EventHandler(this.OnStripCTSSCrapClicked);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(223, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(224, 6);
             // 
             // menuItemContextRowRestore
             // 
             this.menuItemContextRowRestore.Name = "menuItemContextRowRestore";
-            this.menuItemContextRowRestore.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextRowRestore.Size = new System.Drawing.Size(227, 22);
             this.menuItemContextRowRestore.Text = "&Restore Original Values";
             this.menuItemContextRowRestore.Click += new System.EventHandler(this.OnRowRevertClicked);
             // 
             // menuItemSeparator6
             // 
             this.menuItemSeparator6.Name = "menuItemSeparator6";
-            this.menuItemSeparator6.Size = new System.Drawing.Size(223, 6);
+            this.menuItemSeparator6.Size = new System.Drawing.Size(224, 6);
             // 
             // menuContextSaveThumb
             // 
             this.menuContextSaveThumb.Name = "menuContextSaveThumb";
-            this.menuContextSaveThumb.Size = new System.Drawing.Size(226, 22);
+            this.menuContextSaveThumb.Size = new System.Drawing.Size(227, 22);
             this.menuContextSaveThumb.Text = "Save Thumbnail...";
             this.menuContextSaveThumb.Click += new System.EventHandler(this.OnSaveThumbClicked);
             // 
             // menuContextReplaceThumb
             // 
             this.menuContextReplaceThumb.Name = "menuContextReplaceThumb";
-            this.menuContextReplaceThumb.Size = new System.Drawing.Size(226, 22);
+            this.menuContextReplaceThumb.Size = new System.Drawing.Size(227, 22);
             this.menuContextReplaceThumb.Text = "Replace Thumbnail...";
             this.menuContextReplaceThumb.Click += new System.EventHandler(this.OnReplaceThumbClicked);
             // 
             // menuContextDeleteThumb
             // 
             this.menuContextDeleteThumb.Name = "menuContextDeleteThumb";
-            this.menuContextDeleteThumb.Size = new System.Drawing.Size(226, 22);
+            this.menuContextDeleteThumb.Size = new System.Drawing.Size(227, 22);
             this.menuContextDeleteThumb.Text = "Delete Thumbnail";
             this.menuContextDeleteThumb.Click += new System.EventHandler(this.OnDeleteThumbClicked);
             // 
             // toolStripSeparatorHood
             // 
             this.toolStripSeparatorHood.Name = "toolStripSeparatorHood";
-            this.toolStripSeparatorHood.Size = new System.Drawing.Size(223, 6);
+            this.toolStripSeparatorHood.Size = new System.Drawing.Size(224, 6);
             // 
             // menuItemContextHoodVisible
             // 
             this.menuItemContextHoodVisible.Name = "menuItemContextHoodVisible";
-            this.menuItemContextHoodVisible.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextHoodVisible.Size = new System.Drawing.Size(227, 22);
             this.menuItemContextHoodVisible.Text = "Make &Visible In Hood";
             this.menuItemContextHoodVisible.Click += new System.EventHandler(this.OnMakeHoodVisibleClicked);
             // 
             // menuItemContextHoodInvisible
             // 
             this.menuItemContextHoodInvisible.Name = "menuItemContextHoodInvisible";
-            this.menuItemContextHoodInvisible.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextHoodInvisible.Size = new System.Drawing.Size(227, 22);
             this.menuItemContextHoodInvisible.Text = "Remove Visible In Hood";
             this.menuItemContextHoodInvisible.Click += new System.EventHandler(this.OnMakeHoodVisibleClicked);
             // 
             // toolStripSeparatorCamera
             // 
             this.toolStripSeparatorCamera.Name = "toolStripSeparatorCamera";
-            this.toolStripSeparatorCamera.Size = new System.Drawing.Size(223, 6);
+            this.toolStripSeparatorCamera.Size = new System.Drawing.Size(224, 6);
             // 
             // menuItemContextRemoveThumbCamera
             // 
             this.menuItemContextRemoveThumbCamera.Name = "menuItemContextRemoveThumbCamera";
-            this.menuItemContextRemoveThumbCamera.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextRemoveThumbCamera.Size = new System.Drawing.Size(227, 22);
             this.menuItemContextRemoveThumbCamera.Text = "Remove Thumbnail Camera";
             this.menuItemContextRemoveThumbCamera.Click += new System.EventHandler(this.OnMakeRemoveThumbCameraClicked);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(223, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(224, 6);
             // 
             // menuItemContextMoveFiles
             // 
             this.menuItemContextMoveFiles.Name = "menuItemContextMoveFiles";
-            this.menuItemContextMoveFiles.Size = new System.Drawing.Size(226, 22);
+            this.menuItemContextMoveFiles.Size = new System.Drawing.Size(227, 22);
             this.menuItemContextMoveFiles.Text = "&Move Package Files";
             this.menuItemContextMoveFiles.Click += new System.EventHandler(this.OnMoveFilesClicked);
             // 
@@ -1069,12 +1069,12 @@ namespace ObjectRelocator
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelBuyModeEditor.Controls.Add(this.grpBuyPlacement);
             this.panelBuyModeEditor.Controls.Add(this.grpRooms);
-            this.panelBuyModeEditor.Controls.Add(this.grpFunction);
-            this.panelBuyModeEditor.Controls.Add(this.grpSubfunction);
             this.panelBuyModeEditor.Controls.Add(this.grpCommunity);
             this.panelBuyModeEditor.Controls.Add(this.grpUse);
             this.panelBuyModeEditor.Controls.Add(this.grpBuyPrice);
             this.panelBuyModeEditor.Controls.Add(this.grpDepreciation);
+            this.panelBuyModeEditor.Controls.Add(this.grpFunction);
+            this.panelBuyModeEditor.Controls.Add(this.grpSubfunction);
             this.panelBuyModeEditor.Enabled = false;
             this.panelBuyModeEditor.Location = new System.Drawing.Point(4, 347);
             this.panelBuyModeEditor.Name = "panelBuyModeEditor";
@@ -1101,26 +1101,6 @@ namespace ObjectRelocator
             this.ckbBuyQuarterTile.Text = "Quarter Tile";
             this.ckbBuyQuarterTile.UseVisualStyleBackColor = true;
             this.ckbBuyQuarterTile.Click += new System.EventHandler(this.OnBuyQuarterTileClicked);
-            // 
-            // grpFunction
-            // 
-            this.grpFunction.Controls.Add(this.comboFunction);
-            this.grpFunction.Location = new System.Drawing.Point(120, 0);
-            this.grpFunction.Name = "grpFunction";
-            this.grpFunction.Size = new System.Drawing.Size(140, 170);
-            this.grpFunction.TabIndex = 0;
-            this.grpFunction.TabStop = false;
-            this.grpFunction.Text = "Function Sort:";
-            // 
-            // grpSubfunction
-            // 
-            this.grpSubfunction.Controls.Add(this.comboSubfunction);
-            this.grpSubfunction.Location = new System.Drawing.Point(265, 0);
-            this.grpSubfunction.Name = "grpSubfunction";
-            this.grpSubfunction.Size = new System.Drawing.Size(120, 170);
-            this.grpSubfunction.TabIndex = 6;
-            this.grpSubfunction.TabStop = false;
-            this.grpSubfunction.Text = "Function Subsort:";
             // 
             // grpCommunity
             // 
@@ -1319,6 +1299,26 @@ namespace ObjectRelocator
             this.grpDepreciation.TabStop = false;
             this.grpDepreciation.Text = "Depreciation:";
             // 
+            // grpFunction
+            // 
+            this.grpFunction.Controls.Add(this.comboFunction);
+            this.grpFunction.Location = new System.Drawing.Point(120, 0);
+            this.grpFunction.Name = "grpFunction";
+            this.grpFunction.Size = new System.Drawing.Size(140, 170);
+            this.grpFunction.TabIndex = 0;
+            this.grpFunction.TabStop = false;
+            this.grpFunction.Text = "Function Sort:";
+            // 
+            // grpSubfunction
+            // 
+            this.grpSubfunction.Controls.Add(this.comboSubfunction);
+            this.grpSubfunction.Location = new System.Drawing.Point(265, 0);
+            this.grpSubfunction.Name = "grpSubfunction";
+            this.grpSubfunction.Size = new System.Drawing.Size(120, 170);
+            this.grpSubfunction.TabIndex = 6;
+            this.grpSubfunction.TabStop = false;
+            this.grpSubfunction.Text = "Function Subsort:";
+            // 
             // grpBuildPlacement
             // 
             this.grpBuildPlacement.Controls.Add(this.ckbBuildQuarterTile);
@@ -1403,6 +1403,7 @@ namespace ObjectRelocator
             // 
             // thumbBox
             // 
+            this.thumbBox.BackColor = System.Drawing.Color.WhiteSmoke;
             this.thumbBox.Location = new System.Drawing.Point(10, 60);
             this.thumbBox.Name = "thumbBox";
             this.thumbBox.Size = new System.Drawing.Size(96, 96);
@@ -1431,8 +1432,8 @@ namespace ObjectRelocator
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.thumbBox);
             this.Controls.Add(this.gridViewResources);
-            this.Controls.Add(this.panelBuyModeEditor);
             this.Controls.Add(this.panelBuildModeEditor);
+            this.Controls.Add(this.panelBuyModeEditor);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
@@ -1451,8 +1452,6 @@ namespace ObjectRelocator
             this.panelBuyModeEditor.ResumeLayout(false);
             this.grpBuyPlacement.ResumeLayout(false);
             this.grpBuyPlacement.PerformLayout();
-            this.grpFunction.ResumeLayout(false);
-            this.grpSubfunction.ResumeLayout(false);
             this.grpCommunity.ResumeLayout(false);
             this.grpCommunity.PerformLayout();
             this.grpUse.ResumeLayout(false);
@@ -1461,6 +1460,8 @@ namespace ObjectRelocator
             this.grpBuyPrice.PerformLayout();
             this.grpDepreciation.ResumeLayout(false);
             this.grpDepreciation.PerformLayout();
+            this.grpFunction.ResumeLayout(false);
+            this.grpSubfunction.ResumeLayout(false);
             this.grpBuildPlacement.ResumeLayout(false);
             this.grpBuildPlacement.PerformLayout();
             this.grpBuild.ResumeLayout(false);

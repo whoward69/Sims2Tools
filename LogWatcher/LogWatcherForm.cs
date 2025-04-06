@@ -1,7 +1,7 @@
 ﻿/*
  * Log Watcher - a utility for monitoring Sims 2 ObjectError logs
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -109,7 +109,7 @@ namespace LogWatcher
 
         private void OnConfigurationClicked(object sender, EventArgs e)
         {
-            Form config = new ConfigDialog();
+            Form config = new ConfigDialog(false);
 
             if (config.ShowDialog() == DialogResult.OK)
             {

@@ -95,6 +95,12 @@
     <Compile Include="Dialogs\CreatorConfigDialog.Designer.cs">
       <DependentUpon>CreatorConfigDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\EpSPConfigDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\EpSPConfigDialog.Designer.cs">
+      <DependentUpon>EpSPConfigDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\TreePickerDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -160,6 +166,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\CreatorConfigDialog.resx">
       <DependentUpon>CreatorConfigDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\EpSPConfigDialog.resx">
+      <DependentUpon>EpSPConfigDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TreePickerDialog.resx">
       <DependentUpon>TreePickerDialog.cs</DependentUpon>

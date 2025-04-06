@@ -1,7 +1,7 @@
 ﻿/*
  * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */

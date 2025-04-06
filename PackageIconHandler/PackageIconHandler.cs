@@ -5,7 +5,7 @@
  * 
  * Based on the SharpShell extensions - see https://www.codeproject.com/Articles/522665/NET-Shell-Extensions-Shell-Icon-Handlers
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */

@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Sims2Tools.ico</ApplicationIcon>
+    <ApplicationIcon>SceneGraphPlus.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomMarshalers" />
@@ -140,7 +140,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Sims2Tools.ico" />
+    <Content Include="SceneGraphPlus.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DbpfLibrary\DbpfLibrary.csproj">

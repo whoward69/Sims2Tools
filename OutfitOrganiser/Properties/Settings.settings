@@ -17,5 +17,8 @@
     <Setting Name="AccessoryBin" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">15</Value>
     </Setting>
+    <Setting Name="ThumbnailBackground" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LightSteelBlue</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

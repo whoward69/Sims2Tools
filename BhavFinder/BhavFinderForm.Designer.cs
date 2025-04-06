@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -132,12 +132,12 @@ namespace BhavFinder
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemRestoreFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.saveResultsDialog = new System.Windows.Forms.SaveFileDialog();
             this.bhavFinderWorker = new System.ComponentModel.BackgroundWorker();
             this.lblUsingIgnoreCase = new System.Windows.Forms.Label();
             this.checkUsingIgnoreCase = new System.Windows.Forms.CheckBox();
-            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemRestoreFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextOperands.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridFoundBhavs)).BeginInit();
             this.menuContextFoundBhavs.SuspendLayout();
@@ -1000,13 +1000,13 @@ namespace BhavFinder
             this.menuContextFoundBhavs.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemExtract});
             this.menuContextFoundBhavs.Name = "menuContextOperands";
-            this.menuContextFoundBhavs.Size = new System.Drawing.Size(156, 26);
+            this.menuContextFoundBhavs.Size = new System.Drawing.Size(155, 26);
             this.menuContextFoundBhavs.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextFoundBhavsOpening);
             // 
             // menuItemExtract
             // 
             this.menuItemExtract.Name = "menuItemExtract";
-            this.menuItemExtract.Size = new System.Drawing.Size(155, 22);
+            this.menuItemExtract.Size = new System.Drawing.Size(154, 22);
             this.menuItemExtract.Text = "SimPE Extract...";
             this.menuItemExtract.Click += new System.EventHandler(this.OnExtractBhavsClicked);
             // 
@@ -1055,33 +1055,33 @@ namespace BhavFinder
             // 
             this.menuItemSelectPackage.Name = "menuItemSelectPackage";
             this.menuItemSelectPackage.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.menuItemSelectPackage.Size = new System.Drawing.Size(248, 22);
+            this.menuItemSelectPackage.Size = new System.Drawing.Size(249, 22);
             this.menuItemSelectPackage.Text = "&Select Package...";
             this.menuItemSelectPackage.Click += new System.EventHandler(this.OnSelectClicked);
             // 
             // menuItemSelectFolder
             // 
             this.menuItemSelectFolder.Name = "menuItemSelectFolder";
-            this.menuItemSelectFolder.Size = new System.Drawing.Size(248, 22);
+            this.menuItemSelectFolder.Size = new System.Drawing.Size(249, 22);
             this.menuItemSelectFolder.Text = "Select Package Folder...";
             this.menuItemSelectFolder.Click += new System.EventHandler(this.OnSelectFolderClicked);
             // 
             // menuItemRecentPackages
             // 
             this.menuItemRecentPackages.Name = "menuItemRecentPackages";
-            this.menuItemRecentPackages.Size = new System.Drawing.Size(248, 22);
+            this.menuItemRecentPackages.Size = new System.Drawing.Size(249, 22);
             this.menuItemRecentPackages.Text = "Recent Packages...";
             // 
             // menuItemSeparator3
             // 
             this.menuItemSeparator3.Name = "menuItemSeparator3";
-            this.menuItemSeparator3.Size = new System.Drawing.Size(245, 6);
+            this.menuItemSeparator3.Size = new System.Drawing.Size(246, 6);
             // 
             // menuItemSaveResultsToClipboard
             // 
             this.menuItemSaveResultsToClipboard.Name = "menuItemSaveResultsToClipboard";
             this.menuItemSaveResultsToClipboard.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.menuItemSaveResultsToClipboard.Size = new System.Drawing.Size(248, 22);
+            this.menuItemSaveResultsToClipboard.Size = new System.Drawing.Size(249, 22);
             this.menuItemSaveResultsToClipboard.Text = "Save Results To &Clipboard";
             this.menuItemSaveResultsToClipboard.Click += new System.EventHandler(this.OnSaveResultsToClipboardClicked);
             // 
@@ -1090,32 +1090,32 @@ namespace BhavFinder
             this.menuItemSaveResultsAs.Name = "menuItemSaveResultsAs";
             this.menuItemSaveResultsAs.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
             | System.Windows.Forms.Keys.S)));
-            this.menuItemSaveResultsAs.Size = new System.Drawing.Size(248, 22);
+            this.menuItemSaveResultsAs.Size = new System.Drawing.Size(249, 22);
             this.menuItemSaveResultsAs.Text = "Save Results &As...";
             this.menuItemSaveResultsAs.Click += new System.EventHandler(this.OnSaveResultsAsClicked);
             // 
             // menuItemSeparator1
             // 
             this.menuItemSeparator1.Name = "menuItemSeparator1";
-            this.menuItemSeparator1.Size = new System.Drawing.Size(245, 6);
+            this.menuItemSeparator1.Size = new System.Drawing.Size(246, 6);
             // 
             // menuItemConfiguration
             // 
             this.menuItemConfiguration.Name = "menuItemConfiguration";
-            this.menuItemConfiguration.Size = new System.Drawing.Size(248, 22);
+            this.menuItemConfiguration.Size = new System.Drawing.Size(249, 22);
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigClicked);
             // 
             // menuItemSeparator2
             // 
             this.menuItemSeparator2.Name = "menuItemSeparator2";
-            this.menuItemSeparator2.Size = new System.Drawing.Size(245, 6);
+            this.menuItemSeparator2.Size = new System.Drawing.Size(246, 6);
             // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
             this.menuItemExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.menuItemExit.Size = new System.Drawing.Size(248, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(249, 22);
             this.menuItemExit.Text = "E&xit";
             this.menuItemExit.Click += new System.EventHandler(this.OnExitClicked);
             // 
@@ -1136,6 +1136,21 @@ namespace BhavFinder
             this.menuItemAbout.Size = new System.Drawing.Size(135, 22);
             this.menuItemAbout.Text = "About...";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
+            // 
+            // menuOptions
+            // 
+            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemRestoreFilters});
+            this.menuOptions.Name = "menuOptions";
+            this.menuOptions.Size = new System.Drawing.Size(61, 20);
+            this.menuOptions.Text = "&Options";
+            // 
+            // menuItemRestoreFilters
+            // 
+            this.menuItemRestoreFilters.CheckOnClick = true;
+            this.menuItemRestoreFilters.Name = "menuItemRestoreFilters";
+            this.menuItemRestoreFilters.Size = new System.Drawing.Size(200, 22);
+            this.menuItemRestoreFilters.Text = "Restore Last Used &Filters";
             // 
             // saveResultsDialog
             // 
@@ -1169,21 +1184,6 @@ namespace BhavFinder
             this.checkUsingIgnoreCase.TabIndex = 50;
             this.checkUsingIgnoreCase.UseVisualStyleBackColor = true;
             this.checkUsingIgnoreCase.CheckedChanged += new System.EventHandler(this.OnUsingIgnoreCaseChanged);
-            // 
-            // menuOptions
-            // 
-            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemRestoreFilters});
-            this.menuOptions.Name = "menuOptions";
-            this.menuOptions.Size = new System.Drawing.Size(61, 20);
-            this.menuOptions.Text = "&Options";
-            // 
-            // menuItemRestoreFilters
-            // 
-            this.menuItemRestoreFilters.CheckOnClick = true;
-            this.menuItemRestoreFilters.Name = "menuItemRestoreFilters";
-            this.menuItemRestoreFilters.Size = new System.Drawing.Size(200, 22);
-            this.menuItemRestoreFilters.Text = "Restore Last Used &Filters";
             // 
             // BhavFinderForm
             // 

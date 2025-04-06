@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -396,7 +396,7 @@ namespace WhatCausedThis
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new ConfigDialog();
+            Form config = new ConfigDialog(false);
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -574,7 +574,7 @@ namespace WhatCausedThis
 
                 string msg = "This error is usually caused by a missing global support file.\n\nTypically one of\n" +
                              "  *Smarter EP Check (http://cyjon.net/node/323)\n" +
-                             "  *InTeen Check (https://www.picknmixmods.com/Sims2/Downloads/InTeenCheck/InTeenCheck.html)\n" +
+                             "  *InTeen Check 2 (https://www.picknmixmods.com/Sims2/Downloads/InTeenCheck2/InTeenCheck2.html)\n" +
                              "  *Money Globals (https://www.picknmixmods.com/Sims2/Downloads/MoneyGlobals/MoneyGlobals.html)\n" +
                              "  *Easy Inventory Check (https://hexagonal-bipyramid.tumblr.com/post/182541679666/mod-easy-inventory-check)\n" +
                              "  *Easy Lot Check (https://fireflowersims.tumblr.com/post/624808683142053888/easy-lot-check)\n" +

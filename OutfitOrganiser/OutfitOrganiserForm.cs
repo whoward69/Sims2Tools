@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -62,6 +62,9 @@ namespace OutfitOrganiser
 
         private MruList MyMruList;
         private Updater MyUpdater;
+
+        private static readonly Color colourDirtyHighlight = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+        internal static readonly Color colourThumbnailBackground = Color.FromName(Properties.Settings.Default.ThumbnailBackground);
 
         private readonly OutfitOrganiserPackageData dataPackageFiles = new OutfitOrganiserPackageData();
         private readonly OutfitOrganiserResourceData dataResources = new OutfitOrganiserResourceData();
@@ -235,6 +238,8 @@ namespace OutfitOrganiser
 
             gridPackageFiles.DataSource = dataPackageFiles;
             gridResources.DataSource = dataResources;
+
+            thumbBox.BackColor = colourThumbnailBackground;
         }
 
         public new void Dispose()
@@ -973,7 +978,7 @@ namespace OutfitOrganiser
 
                 if (packageCache.Contains(packagePath))
                 {
-                    packageRow.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+                    packageRow.DefaultCellStyle.BackColor = colourDirtyHighlight;
                     menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
                 }
                 else
@@ -988,7 +993,7 @@ namespace OutfitOrganiser
 
                 if (outfitData.IsDirty)
                 {
-                    resourceRow.DefaultCellStyle.BackColor = Color.FromName(Properties.Settings.Default.DirtyHighlight);
+                    resourceRow.DefaultCellStyle.BackColor = colourDirtyHighlight;
 
                     menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
                 }
@@ -1065,7 +1070,7 @@ namespace OutfitOrganiser
 
         private void OnConfigClicked(object sender, EventArgs e)
         {
-            Form config = new ConfigDialog();
+            Form config = new ConfigDialog(true);
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -1831,7 +1836,7 @@ namespace OutfitOrganiser
 
         private string BuildGenderString(uint value)
         {
-            string gender = "";
+            string gender;
 
             switch (value)
             {

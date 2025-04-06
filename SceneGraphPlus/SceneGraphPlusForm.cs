@@ -1,7 +1,7 @@
 ﻿/*
  * SceneGraph Plus - a utility for repairing scene graphs
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -271,7 +271,7 @@ namespace SceneGraphPlus
 
         private void OnConfigurationClicked(object sender, EventArgs e)
         {
-            Form config = new ConfigDialog();
+            Form config = new ConfigDialog(true);
 
             if (config.ShowDialog() == DialogResult.OK)
             {
@@ -881,7 +881,7 @@ namespace SceneGraphPlus
                     startBlock.ConnectTo(0, "model", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("modelName").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
                     freeCol += DrawingSurface.ColumnGap;
 
-                    startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("name").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                    startBlock.ConnectTo(1, mmat.GetItem("subsetName").StringValue, AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("name").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
                 }
                 else if (res is Aged aged)
                 {

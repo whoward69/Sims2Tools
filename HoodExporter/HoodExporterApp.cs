@@ -4,7 +4,7 @@
  *
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2024
+ * William Howard - 2020-2025
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -19,10 +19,10 @@ namespace HoodExporter
         public static string AppName = "Hood Exporter";
 
         public static int AppVersionMajor = 2;
-        public static int AppVersionMinor = 2;
+        public static int AppVersionMinor = 3;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 0;
+        private static readonly int AppVersionDebug = 1;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release

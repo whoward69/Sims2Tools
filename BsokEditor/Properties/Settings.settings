@@ -11,5 +11,8 @@
     <Setting Name="SelectedRowHighlight" Type="System.String" Scope="User">
       <Value Profile="(Default)">LightSteelBlue</Value>
     </Setting>
+    <Setting Name="ThumbnailBackground" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LightSteelBlue</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
