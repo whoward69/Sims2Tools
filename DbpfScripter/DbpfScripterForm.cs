@@ -16,6 +16,7 @@ using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -29,6 +30,9 @@ namespace DbpfScripter
         private Updater MyUpdater;
 
         DbpfScripterWorker dbpfScripterWorker;
+
+        public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
+        public bool IsDevelopmentMode => IsAdvancedMode && menuItemDeveloper.Checked;
 
         public DbpfScripterForm()
         {
@@ -45,8 +49,6 @@ namespace DbpfScripter
 
         private void ScriptWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs args)
         {
-            textMessages.Text = "";
-
             dbpfScripterWorker.ProcessScript();
         }
 
@@ -58,9 +60,26 @@ namespace DbpfScripter
             }
             else
             {
-                // TODO - Scripter - display the message
-                textMessages.AppendText(e.UserState.ToString());
+                string msg = e.UserState.ToString();
+
+                Color textColour = textMessages.SelectionColor;
+
+                if (msg.StartsWith("!!"))
+                {
+                    msg = msg.Substring(2);
+                    textMessages.SelectionColor = Color.Red;
+                }
+                else if (msg.StartsWith("--"))
+                {
+                    msg = msg.Substring(2);
+                    textMessages.SelectionColor = Color.Gray;
+                }
+
+                textMessages.AppendText(msg);
+
+                textMessages.SelectionColor = textColour;
                 textMessages.AppendText("\r\n");
+                textMessages.ScrollToCaret();
             }
         }
 
@@ -85,7 +104,7 @@ namespace DbpfScripter
                 }
             }
 
-            btnGO.Text = "&Execute";
+            btnGO.Text = "&GO";
         }
 
         private void OnGoClicked(object sender, System.EventArgs e)
@@ -103,7 +122,9 @@ namespace DbpfScripter
                 // This is the Export action
                 btnGO.Text = "Cancel";
 
-                dbpfScripterWorker = new DbpfScripterWorker(scriptWorker, textTemplatePath.Text, textSavePath.Text, "output"); // TODO - Scripter - get basename from the UI
+                textMessages.Text = "";
+
+                dbpfScripterWorker = new DbpfScripterWorker(scriptWorker, textTemplatePath.Text, textSavePath.Text, textSaveName.Text, IsDevelopmentMode);
 
                 scriptWorker.RunWorkerAsync();
             }
@@ -118,11 +139,16 @@ namespace DbpfScripter
         {
             RegistryTools.LoadAppSettings(DbpfScripterApp.RegistryKey, DbpfScripterApp.AppVersionMajor, DbpfScripterApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(DbpfScripterApp.RegistryKey, this);
-            textTemplatePath.Text = RegistryTools.GetSetting(DbpfScripterApp.RegistryKey, textTemplatePath.Name, "") as string;
-            textSavePath.Text = RegistryTools.GetSetting(DbpfScripterApp.RegistryKey, textSavePath.Name, "") as string;
 
             MyMruList = new MruList(DbpfScripterApp.RegistryKey, menuItemRecentTemplates, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FileSelected;
+
+            menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(DbpfScripterApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
+            menuItemDeveloper.Checked = ((int)RegistryTools.GetSetting(DbpfScripterApp.RegistryKey + @"\Mode", menuItemDeveloper.Name, 1) != 0);
+
+            textTemplatePath.Text = RegistryTools.GetSetting(DbpfScripterApp.RegistryKey, textTemplatePath.Name, "") as string;
+            textSavePath.Text = RegistryTools.GetSetting(DbpfScripterApp.RegistryKey, textSavePath.Name, "") as string;
+            if (IsDevelopmentMode) textSaveName.Text = RegistryTools.GetSetting(DbpfScripterApp.RegistryKey, textSaveName.Name, "") as string;
 
             MyUpdater = new Updater(DbpfScripterApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
@@ -137,8 +163,25 @@ namespace DbpfScripter
         {
             RegistryTools.SaveAppSettings(DbpfScripterApp.RegistryKey, DbpfScripterApp.AppVersionMajor, DbpfScripterApp.AppVersionMinor);
             RegistryTools.SaveFormSettings(DbpfScripterApp.RegistryKey, this);
+
+            RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
+            RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey + @"\Mode", menuItemDeveloper.Name, menuItemDeveloper.Checked ? 1 : 0);
+
             RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textTemplatePath.Name, textTemplatePath.Text);
             RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textSavePath.Name, textSavePath.Text);
+            if (IsDevelopmentMode) RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textSaveName.Name, textSaveName.Text);
+        }
+
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+
+            toolStripSeparator3.Visible = IsAdvancedMode;
+            menuItemDeveloper.Visible = IsAdvancedMode;
+        }
+
+        private void OnAdvancedModeChanged(object sender, EventArgs e)
+        {
         }
 
         private void OnSelectTemplatePathClicked(object sender, EventArgs e)
@@ -170,11 +213,14 @@ namespace DbpfScripter
         {
             btnGO.Enabled = false;
 
-            if (textSavePath.Text.Length > 0)
+            if (textSaveName.Text.Length > 0)
             {
-                if (textTemplatePath.Text.Length > 0 && Directory.Exists(textTemplatePath.Text))
+                if (textSavePath.Text.Length > 0)
                 {
-                    btnGO.Enabled = File.Exists($"{textTemplatePath.Text}\\dbpfscript.txt");
+                    if (textTemplatePath.Text.Length > 0 && Directory.Exists(textTemplatePath.Text))
+                    {
+                        btnGO.Enabled = File.Exists($"{textTemplatePath.Text}\\dbpfscript.txt");
+                    }
                 }
             }
         }

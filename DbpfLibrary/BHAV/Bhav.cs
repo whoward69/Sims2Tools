@@ -13,13 +13,15 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.BHAV
 {
-    public class Bhav : DBPFResource
+    public class Bhav : DBPFResource, IDbpfScriptable
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x42484156;
@@ -50,6 +52,55 @@ namespace Sims2Tools.DBPF.BHAV
             while (this.instructions.Count < Header.InstructionCount)
                 this.instructions.Add(new Instruction(reader, header.Format, index++));
         }
+
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 0x40 + header.FileSize;
+
+                foreach (Instruction inst in Instructions)
+                {
+                    size += inst.FileSize;
+                }
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteBytes(Encoding.ASCII.GetBytes(KeyName), 0x40);
+
+            header.Serialize(writer);
+
+            foreach (Instruction inst in Instructions)
+            {
+                inst.Serialize(writer);
+            }
+        }
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            if (item.Equals("filename"))
+            {
+                return KeyName.Equals(sv.ToString());
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            return instructions[index];
+        }
+        #endregion
 
         public override XmlElement AddXml(XmlElement parent)
         {

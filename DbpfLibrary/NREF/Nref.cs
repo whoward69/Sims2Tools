@@ -13,11 +13,13 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
+using System;
+using System.Diagnostics;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.NREF
 {
-    public class Nref : DBPFResource
+    public class Nref : DBPFResource, IDbpfScriptable
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4E524546;
@@ -25,8 +27,52 @@ namespace Sims2Tools.DBPF.NREF
 
         public Nref(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
-            this._keyName = Helper.ToString(reader.ReadBytes((int)entry.FileSize));
+            Unserialize(reader, (int)entry.FileSize);
         }
+
+        protected void Unserialize(DbpfReader reader, int len)
+        {
+            this._keyName = Helper.ToString(reader.ReadBytes(len));
+        }
+
+        public override uint FileSize => (uint)Helper.ToBytes(KeyName, 0).Length;
+
+        public override void Serialize(DbpfWriter writer)
+        {
+#if DEBUG
+            long writeStart = writer.Position;
+#endif
+
+            writer.WriteBytes(Helper.ToBytes(KeyName, 0));
+
+#if DEBUG
+            Debug.Assert((writer.Position - writeStart) == FileSize);
+#endif
+        }
+
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("filename"))
+            {
+                this._keyName = sv;
+                return true;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
 
         public override XmlElement AddXml(XmlElement parent)
         {

@@ -67,17 +67,31 @@ namespace Sims2Tools.DBPF.BHAV
 
         public void Unserialize(DbpfReader reader)
         {
-            this.format = reader.ReadUInt16();
-            this.count = reader.ReadUInt16();
-            this.type = reader.ReadByte();
-            this.argc = reader.ReadByte();
-            this.locals = reader.ReadByte();
-            this.headerflag = reader.ReadByte();
-            this.treeversion = reader.ReadUInt32();
-            if (this.format > 0x8008)
-                this.cacheflags = reader.ReadByte();
+            format = reader.ReadUInt16();
+            count = reader.ReadUInt16();
+            type = reader.ReadByte();
+            argc = reader.ReadByte();
+            locals = reader.ReadByte();
+            headerflag = reader.ReadByte();
+            treeversion = reader.ReadUInt32();
+            if (format > 0x8008)
+                cacheflags = reader.ReadByte();
             else
-                this.cacheflags = 0;
+                cacheflags = 0;
+        }
+
+        public uint FileSize => (uint)(2 + 2 + 1 + 1 + 1 + 1 + 4 + (format > 0x8008 ? 1 : 0));
+
+        public void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt16(format);
+            writer.WriteUInt16(count);
+            writer.WriteByte(type);
+            writer.WriteByte(argc);
+            writer.WriteByte(locals);
+            writer.WriteByte(headerflag);
+            writer.WriteUInt32(treeversion);
+            if (format > 0x8008) writer.WriteByte(cacheflags);
         }
     }
 }

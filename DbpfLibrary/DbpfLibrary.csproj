@@ -72,6 +72,7 @@
     <Compile Include="BHAV\Bhav.cs" />
     <Compile Include="BHAV\BhavHeader.cs" />
     <Compile Include="BHAV\Instruction.cs" />
+    <Compile Include="BHAV\Operand.cs" />
     <Compile Include="Cigen\CGN1\Cgn1.cs" />
     <Compile Include="Cigen\CGN1\Cgn1Item.cs" />
     <Compile Include="Cigen\CigenFile.cs" />
@@ -241,7 +242,6 @@
     <Compile Include="Utils\Helper.cs" />
     <Compile Include="Utils\Win32Processes.cs" />
     <Compile Include="Utils\MetaData.cs" />
-    <Compile Include="Utils\WrappedByteArray.cs" />
     <Compile Include="Utils\XmlHelper.cs" />
     <Compile Include="VERS\Vers.cs" />
     <Compile Include="XFLR\Xflr.cs" />

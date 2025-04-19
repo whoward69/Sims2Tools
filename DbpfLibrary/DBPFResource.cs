@@ -35,6 +35,13 @@ namespace Sims2Tools.DBPF
             _isDirty = true;
         }
 
+        public new void ChangeIR(TypeInstanceID instanceID, TypeResourceID resourceID)
+        {
+            base.ChangeIR(instanceID, resourceID);
+
+            _isDirty = true;
+        }
+
         protected DBPFResource(DBPFEntry entry) : base(entry, "")
         {
         }

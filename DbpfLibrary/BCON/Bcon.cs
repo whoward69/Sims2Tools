@@ -13,12 +13,14 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
+using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.BCON
 {
-    public class Bcon : DBPFResource
+    public class Bcon : DBPFResource, IDbpfScriptable
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x42434F4E;
@@ -27,6 +29,31 @@ namespace Sims2Tools.DBPF.BCON
         private bool flag;
 
         private List<BconItem> items;
+
+        public override bool IsDirty
+        {
+            get
+            {
+                if (base.IsDirty) return true;
+
+                foreach (BconItem item in items)
+                {
+                    if (item.IsDirty) return true;
+                }
+
+                return false;
+            }
+        }
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            foreach (BconItem item in items)
+            {
+                item.SetClean();
+            }
+        }
 
         public Bcon(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
@@ -51,15 +78,52 @@ namespace Sims2Tools.DBPF.BCON
         {
             this._keyName = Helper.ToString(reader.ReadBytes(0x40));
 
-            ushort num1 = reader.ReadUInt16();
-            this.flag = (num1 & 0x8000) != 0;
-            int num2 = num1 & short.MaxValue;
-            this.items = new List<BconItem>();
-            while (this.items.Count < num2)
+            ushort val = reader.ReadUInt16();
+            this.flag = (val & 0x8000) != 0;
+
+            int entries = val & short.MaxValue;
+            this.items = new List<BconItem>(entries);
+            while (this.items.Count < entries)
             {
                 this.items.Add(reader.ReadInt16());
             }
         }
+
+        public override uint FileSize => (uint)(0x40 + 2 + 2 * items.Count);
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteBytes(Encoding.ASCII.GetBytes(KeyName), 0x40);
+
+            writer.WriteUInt16((ushort)((flag ? 0x8000 : 0) | items.Count));
+
+            foreach (BconItem bconItem in items)
+            {
+                writer.WriteInt16(bconItem);
+            }
+        }
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            if (item.Equals("filename"))
+            {
+                return KeyName.Equals(sv);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            return items[index];
+        }
+        #endregion
 
         public override XmlElement AddXml(XmlElement parent)
         {

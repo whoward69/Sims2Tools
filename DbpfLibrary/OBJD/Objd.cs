@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.Utils;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -147,10 +148,22 @@ namespace Sims2Tools.DBPF.OBJD
 
             reader.Seek(SeekOrigin.Begin, startPos + 0x40);
 
-            data = reader.ReadUInt16s((int)((length - 0x40)) / 2);
+            if (length > (0x40 + 2 * 108))
+            {
+                data = reader.ReadUInt16s(108);
+
+                int nameLen = reader.ReadInt32();
+                string name = Helper.ToString(reader.ReadBytes(nameLen));
+
+                Debug.Assert(name.Equals(KeyName));
+            }
+            else
+            {
+                data = reader.ReadUInt16s((int)((length - 0x40)) / 2);
+            }
         }
 
-        public override uint FileSize => (uint)(0x40 + 2 * data.Length);
+        public override uint FileSize => (uint)(0x40 + 2 * 108 + 4 + Encoding.ASCII.GetBytes(KeyName).Length);
 
         public override void Serialize(DbpfWriter writer)
         {
@@ -160,6 +173,18 @@ namespace Sims2Tools.DBPF.OBJD
             {
                 writer.WriteUInt16(x);
             }
+
+            if (data.Length < 108)
+            {
+                for (int i = data.Length; i < 108; ++i)
+                {
+                    writer.WriteUInt16(0x0000);
+                }
+            }
+
+            byte[] name = Encoding.ASCII.GetBytes(KeyName);
+            writer.WriteInt32(name.Length);
+            writer.WriteBytes(name);
         }
 
         public void Dispose()
@@ -196,41 +221,31 @@ namespace Sims2Tools.DBPF.OBJD
             return new SgResourceList();
         }
 
-        public bool Assert(string item, string value)
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
         {
-            // TODO - IDBPFScriptable - Assert
             throw new NotImplementedException();
         }
 
-        public bool Assignment(string item, string value)
+        public bool Assignment(string item, ScriptValue sv)
         {
             if (item.Equals("filename"))
             {
-                SetKeyName(value);
+                SetKeyName(sv);
                 return true;
             }
             else if (item.Equals("guid"))
             {
-                uint guid = UInt32.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
-                SetRawData(ObjdIndex.Guid1, (ushort)(guid & 0x0000FFFF));
-                SetRawData(ObjdIndex.Guid2, (ushort)((guid & 0xFFFF0000) >> 16));
+                guid = sv;
+                SetRawData(ObjdIndex.Guid1, sv.LoWord());
+                SetRawData(ObjdIndex.Guid2, sv.HiWord());
                 return true;
             }
             else
             {
                 if (Enum.TryParse(item, out ObjdIndex objdIndex))
                 {
-                    ushort val;
-                    if (value.StartsWith("0x"))
-                    {
-                        val = UInt16.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
-                    }
-                    else
-                    {
-                        val = UInt16.Parse(value);
-                    }
-
-                    SetRawData(objdIndex, val);
+                    SetRawData(objdIndex, sv);
                     return true;
                 }
 
@@ -240,8 +255,8 @@ namespace Sims2Tools.DBPF.OBJD
 
         public IDbpfScriptable Indexed(int index)
         {
-            // TODO - IDBPFScriptable - Indexed
             throw new NotImplementedException();
         }
+        #endregion
     }
 }

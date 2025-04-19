@@ -195,11 +195,13 @@ namespace Sims2Tools.DBPF.Package
 
         public bool Remove(DBPFKey key) => resourceIndex.Remove(key);
 
-        public string Update(string subFolder) => Update(false, subFolder);
+        public string SaveAs(string newFilePath) => Update(false, null, newFilePath);
 
-        public string Update(bool autoBackup) => Update(autoBackup, null);
+        public string Update(string subFolder) => Update(false, subFolder, null);
 
-        private string Update(bool autoBackup, string subFolder)
+        public string Update(bool autoBackup) => Update(autoBackup, null, null);
+
+        private string Update(bool autoBackup, string subFolder, string newFilePath)
         {
             string originalName = packagePath;
             string updateName;
@@ -213,7 +215,14 @@ namespace Sims2Tools.DBPF.Package
             }
             else
             {
-                updateName = $"{packagePath}.temp";
+                if (newFilePath != null)
+                {
+                    updateName = newFilePath;
+                }
+                else
+                {
+                    updateName = $"{packagePath}.temp";
+                }
             }
 
             using (Stream stream = File.OpenWrite(updateName))
@@ -229,7 +238,7 @@ namespace Sims2Tools.DBPF.Package
                     File.Copy(originalName, backupName, true);
                 }
 
-                if (subFolder == null)
+                if (subFolder == null && newFilePath == null)
                 {
                     try
                     {

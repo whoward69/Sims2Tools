@@ -21,7 +21,7 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.IDR
 {
-    public class Idr : SgResource
+    public class Idr : SgResource, IDbpfScriptable
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xAC506764;
@@ -36,9 +36,9 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
             get => "3D ID Referencing File";
         }
 
-        private List<DBPFKey> items;
+        private List<DBPFScriptableKey> items;
 
-        public ReadOnlyCollection<DBPFKey> Items => items.AsReadOnly();
+        public ReadOnlyCollection<DBPFKey> Items => (new List<DBPFKey>(items)).AsReadOnly();
 
         public int ItemCount => items.Count;
 
@@ -75,7 +75,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
 
         public void SetItem(uint idx, DBPFKey value)
         {
-            items[(int)idx] = value;
+            items[(int)idx] = new DBPFScriptableKey(value.TypeID, value.GroupID, value.InstanceID, value.ResourceID);
             _isDirty = true;
         }
 
@@ -83,7 +83,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
         {
             while (items.Count <= idx)
             {
-                items.Add(new DBPFKey(DBPFData.TYPE_NULL, DBPFData.GROUP_LOCAL, DBPFData.INSTANCE_NULL, DBPFData.RESOURCE_NULL));
+                items.Add(new DBPFScriptableKey(DBPFData.TYPE_NULL, DBPFData.GROUP_LOCAL, DBPFData.INSTANCE_NULL, DBPFData.RESOURCE_NULL));
             }
 
             SetItem(idx, value);
@@ -91,7 +91,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
 
         public Idr(DBPFEntry entry, int expectedItems = 0) : base(entry)
         {
-            items = new List<DBPFKey>(expectedItems);
+            items = new List<DBPFScriptableKey>(expectedItems);
         }
 
         public Idr(DBPFEntry entry, DbpfReader reader) : base(entry)
@@ -109,7 +109,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
             uint type = reader.ReadUInt32();
             uint entries = reader.ReadUInt32();
 
-            items = new List<DBPFKey>((int)entries);
+            items = new List<DBPFScriptableKey>((int)entries);
 
             for (int i = 0; i < entries; i++)
             {
@@ -118,7 +118,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
                 TypeInstanceID instanceID = reader.ReadInstanceId();
                 TypeResourceID resourceID = (type == 0x02) ? reader.ReadResourceId() : (TypeResourceID)0x00000000;
 
-                items.Add(new DBPFKey(typeID, groupID, instanceID, resourceID));
+                items.Add(new DBPFScriptableKey(typeID, groupID, instanceID, resourceID));
             }
 
 #if DEBUG
@@ -160,6 +160,40 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
         {
             return new SgResourceList();
         }
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("group"))
+            {
+                ChangeGroupID(sv);
+                return true;
+            }
+            else if (item.Equals("instance"))
+            {
+                ChangeIR(sv, ResourceID);
+                return true;
+            }
+            else if (item.Equals("resource"))
+            {
+                ChangeIR(InstanceID, sv);
+                return true;
+            }
+
+            return false;
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            _isDirty = true;
+            return items[index];
+        }
+        #endregion
 
         public override XmlElement AddXml(XmlElement parent)
         {

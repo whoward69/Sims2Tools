@@ -64,7 +64,13 @@ namespace DbpfScripter
             this.btnSelectSavePath = new System.Windows.Forms.Button();
             this.textSavePath = new System.Windows.Forms.TextBox();
             this.lblSavePath = new System.Windows.Forms.Label();
-            this.textMessages = new System.Windows.Forms.TextBox();
+            this.textMessages = new System.Windows.Forms.RichTextBox();
+            this.textSaveName = new System.Windows.Forms.TextBox();
+            this.lblSaveName = new System.Windows.Forms.Label();
+            this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemDeveloper = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -72,11 +78,12 @@ namespace DbpfScripter
             // 
             this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
-            this.menuHelp});
+            this.menuHelp,
+            this.menuItemMode});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
-            this.menuMain.Size = new System.Drawing.Size(933, 24);
+            this.menuMain.Size = new System.Drawing.Size(784, 24);
             this.menuMain.TabIndex = 0;
             this.menuMain.Text = "menuStrip";
             // 
@@ -99,51 +106,51 @@ namespace DbpfScripter
             // 
             this.menuItemTemplatePath.Name = "menuItemTemplatePath";
             this.menuItemTemplatePath.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
-            this.menuItemTemplatePath.Size = new System.Drawing.Size(200, 22);
-            this.menuItemTemplatePath.Text = "&Template Path...";
+            this.menuItemTemplatePath.Size = new System.Drawing.Size(183, 22);
+            this.menuItemTemplatePath.Text = "&Template...";
             this.menuItemTemplatePath.Click += new System.EventHandler(this.OnSelectTemplatePathClicked);
             // 
             // menuItemRecentTemplates
             // 
             this.menuItemRecentTemplates.Name = "menuItemRecentTemplates";
-            this.menuItemRecentTemplates.Size = new System.Drawing.Size(200, 22);
+            this.menuItemRecentTemplates.Size = new System.Drawing.Size(183, 22);
             this.menuItemRecentTemplates.Text = "&Recent Templates";
             // 
             // menuItemSeparator2
             // 
             this.menuItemSeparator2.Name = "menuItemSeparator2";
-            this.menuItemSeparator2.Size = new System.Drawing.Size(197, 6);
+            this.menuItemSeparator2.Size = new System.Drawing.Size(180, 6);
             // 
             // menuItemSavePath
             // 
             this.menuItemSavePath.Name = "menuItemSavePath";
             this.menuItemSavePath.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.menuItemSavePath.Size = new System.Drawing.Size(200, 22);
-            this.menuItemSavePath.Text = "&Save Path...";
+            this.menuItemSavePath.Size = new System.Drawing.Size(183, 22);
+            this.menuItemSavePath.Text = "&Save Folder...";
             this.menuItemSavePath.Click += new System.EventHandler(this.OnSelectSavePathClicked);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(197, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(180, 6);
             // 
             // menuItemConfiguration
             // 
             this.menuItemConfiguration.Name = "menuItemConfiguration";
-            this.menuItemConfiguration.Size = new System.Drawing.Size(200, 22);
+            this.menuItemConfiguration.Size = new System.Drawing.Size(183, 22);
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigClicked);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(197, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(180, 6);
             // 
             // menuItemExit
             // 
             this.menuItemExit.Name = "menuItemExit";
             this.menuItemExit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.menuItemExit.Size = new System.Drawing.Size(200, 22);
+            this.menuItemExit.Size = new System.Drawing.Size(183, 22);
             this.menuItemExit.Text = "E&xit";
             this.menuItemExit.Click += new System.EventHandler(this.OnExitClicked);
             // 
@@ -177,17 +184,17 @@ namespace DbpfScripter
             this.lblTemplatePath.AutoSize = true;
             this.lblTemplatePath.Location = new System.Drawing.Point(10, 41);
             this.lblTemplatePath.Name = "lblTemplatePath";
-            this.lblTemplatePath.Size = new System.Drawing.Size(62, 15);
+            this.lblTemplatePath.Size = new System.Drawing.Size(100, 15);
             this.lblTemplatePath.TabIndex = 1;
-            this.lblTemplatePath.Text = "Template:";
+            this.lblTemplatePath.Text = "Template Folder:";
             // 
             // textTemplatePath
             // 
             this.textTemplatePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textTemplatePath.Location = new System.Drawing.Point(91, 38);
+            this.textTemplatePath.Location = new System.Drawing.Point(121, 38);
             this.textTemplatePath.Name = "textTemplatePath";
-            this.textTemplatePath.Size = new System.Drawing.Size(678, 21);
+            this.textTemplatePath.Size = new System.Drawing.Size(499, 21);
             this.textTemplatePath.TabIndex = 2;
             this.textTemplatePath.TabStop = false;
             this.textTemplatePath.WordWrap = false;
@@ -196,7 +203,7 @@ namespace DbpfScripter
             // btnSelectTemplatePath
             // 
             this.btnSelectTemplatePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectTemplatePath.Location = new System.Drawing.Point(775, 33);
+            this.btnSelectTemplatePath.Location = new System.Drawing.Point(626, 33);
             this.btnSelectTemplatePath.Name = "btnSelectTemplatePath";
             this.btnSelectTemplatePath.Size = new System.Drawing.Size(143, 30);
             this.btnSelectTemplatePath.TabIndex = 3;
@@ -207,7 +214,7 @@ namespace DbpfScripter
             // lblProgress
             // 
             this.lblProgress.AutoSize = true;
-            this.lblProgress.Location = new System.Drawing.Point(10, 121);
+            this.lblProgress.Location = new System.Drawing.Point(10, 146);
             this.lblProgress.Name = "lblProgress";
             this.lblProgress.Size = new System.Drawing.Size(59, 15);
             this.lblProgress.TabIndex = 4;
@@ -216,14 +223,14 @@ namespace DbpfScripter
             // 
             // btnGO
             // 
-            this.btnGO.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnGO.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnGO.Enabled = false;
             this.btnGO.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnGO.Location = new System.Drawing.Point(775, 407);
+            this.btnGO.Location = new System.Drawing.Point(626, 103);
             this.btnGO.Name = "btnGO";
             this.btnGO.Size = new System.Drawing.Size(143, 30);
             this.btnGO.TabIndex = 6;
-            this.btnGO.Text = "&Execute";
+            this.btnGO.Text = "&GO";
             this.btnGO.UseVisualStyleBackColor = true;
             this.btnGO.Click += new System.EventHandler(this.OnGoClicked);
             // 
@@ -236,7 +243,7 @@ namespace DbpfScripter
             // btnSelectSavePath
             // 
             this.btnSelectSavePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectSavePath.Location = new System.Drawing.Point(775, 68);
+            this.btnSelectSavePath.Location = new System.Drawing.Point(626, 68);
             this.btnSelectSavePath.Name = "btnSelectSavePath";
             this.btnSelectSavePath.Size = new System.Drawing.Size(143, 30);
             this.btnSelectSavePath.TabIndex = 10;
@@ -248,9 +255,9 @@ namespace DbpfScripter
             // 
             this.textSavePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textSavePath.Location = new System.Drawing.Point(91, 73);
+            this.textSavePath.Location = new System.Drawing.Point(121, 73);
             this.textSavePath.Name = "textSavePath";
-            this.textSavePath.Size = new System.Drawing.Size(678, 21);
+            this.textSavePath.Size = new System.Drawing.Size(499, 21);
             this.textSavePath.TabIndex = 9;
             this.textSavePath.TabStop = false;
             this.textSavePath.WordWrap = false;
@@ -267,20 +274,75 @@ namespace DbpfScripter
             // 
             // textMessages
             // 
-            this.textMessages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.textMessages.Location = new System.Drawing.Point(91, 117);
-            this.textMessages.Multiline = true;
+            this.textMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textMessages.Location = new System.Drawing.Point(121, 146);
             this.textMessages.Name = "textMessages";
-            this.textMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textMessages.Size = new System.Drawing.Size(678, 320);
+            this.textMessages.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.textMessages.Size = new System.Drawing.Size(648, 153);
             this.textMessages.TabIndex = 11;
+            this.textMessages.Text = "";
+            // 
+            // textSaveName
+            // 
+            this.textSaveName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textSaveName.Location = new System.Drawing.Point(121, 108);
+            this.textSaveName.Name = "textSaveName";
+            this.textSaveName.Size = new System.Drawing.Size(499, 21);
+            this.textSaveName.TabIndex = 13;
+            this.textSaveName.TabStop = false;
+            this.textSaveName.WordWrap = false;
+            this.textSaveName.TextChanged += new System.EventHandler(this.OnPathsChanged);
+            // 
+            // lblSaveName
+            // 
+            this.lblSaveName.AutoSize = true;
+            this.lblSaveName.Location = new System.Drawing.Point(10, 111);
+            this.lblSaveName.Name = "lblSaveName";
+            this.lblSaveName.Size = new System.Drawing.Size(105, 15);
+            this.lblSaveName.TabIndex = 12;
+            this.lblSaveName.Text = "Save Base Name:";
+            // 
+            // menuItemMode
+            // 
+            this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAdvanced,
+            this.toolStripSeparator3,
+            this.menuItemDeveloper});
+            this.menuItemMode.Name = "menuItemMode";
+            this.menuItemMode.Size = new System.Drawing.Size(50, 20);
+            this.menuItemMode.Text = "&Mode";
+            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAdvanced.Text = "&Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
+            // 
+            // menuItemDeveloper
+            // 
+            this.menuItemDeveloper.CheckOnClick = true;
+            this.menuItemDeveloper.Name = "menuItemDeveloper";
+            this.menuItemDeveloper.Size = new System.Drawing.Size(180, 22);
+            this.menuItemDeveloper.Text = "&Developer";
             // 
             // DbpfScripterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(933, 449);
+            this.ClientSize = new System.Drawing.Size(784, 311);
+            this.Controls.Add(this.textSaveName);
+            this.Controls.Add(this.lblSaveName);
             this.Controls.Add(this.textMessages);
             this.Controls.Add(this.btnSelectSavePath);
             this.Controls.Add(this.textSavePath);
@@ -295,7 +357,7 @@ namespace DbpfScripter
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(800, 195);
+            this.MinimumSize = new System.Drawing.Size(800, 350);
             this.Name = "DbpfScripterForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
             this.Load += new System.EventHandler(this.OnLoad);
@@ -331,7 +393,13 @@ namespace DbpfScripter
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemRecentTemplates;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.TextBox textMessages;
+        private System.Windows.Forms.RichTextBox textMessages;
+        private System.Windows.Forms.TextBox textSaveName;
+        private System.Windows.Forms.Label lblSaveName;
+        private System.Windows.Forms.ToolStripMenuItem menuItemMode;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDeveloper;
     }
 }
 

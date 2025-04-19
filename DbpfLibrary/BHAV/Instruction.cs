@@ -12,11 +12,12 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
+using System;
 using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF.BHAV
 {
-    public class Instruction
+    public class Instruction : IDbpfScriptable
     {
         public const ushort TARGET_ERROR = 0xFFFC;
         public const ushort TARGET_TRUE = 0xFFFD;
@@ -29,26 +30,8 @@ namespace Sims2Tools.DBPF.BHAV
         private ushort addr1;
         private ushort addr2;
         private byte nodeversion;
-        private WrappedByteArray operands;
-        private static readonly byte[] nooperands = new byte[16]
-        {
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue,
-            byte.MaxValue
-        };
+
+        private readonly List<Operand> operands = new List<Operand>();
 
         public ushort OpCode
         {
@@ -70,22 +53,43 @@ namespace Sims2Tools.DBPF.BHAV
             get => this.addr2;
         }
 
-        public WrappedByteArray Operands => this.operands;
+        public List<Operand> Operands => this.operands;
 
         public Instruction(DbpfReader reader, ushort format, int index)
         {
             this.format = format;
             this.index = index;
 
-            this.operands = new WrappedByteArray((byte[])Instruction.nooperands.Clone());
+            this.operands = new List<Operand>(16);
+            for (int i = 0; i < 16; ++i)
+            {
+                this.operands.Add(new Operand(Byte.MaxValue));
+            }
 
             this.Unserialize(reader);
         }
 
+        private ushort FormatSpecificGetAddr(ushort target)
+        {
+            if (format >= 0x8007) return target;
+
+            switch (target)
+            {
+                case 0xFFFC:
+                    return 253;
+                case 0xFFFD:
+                    return 254;
+                case 0xFFFE:
+                    return byte.MaxValue;
+                default:
+                    return (ushort)(target & byte.MaxValue);
+            }
+        }
+
         private ushort FormatSpecificSetAddr(ushort addr)
         {
-            if (format >= 0x8007)
-                return addr;
+            if (format >= 0x8007) return addr;
+
             switch (addr)
             {
                 case 253:
@@ -101,32 +105,97 @@ namespace Sims2Tools.DBPF.BHAV
 
         private void Unserialize(DbpfReader reader)
         {
-            this.opcode = reader.ReadUInt16();
+            opcode = reader.ReadUInt16();
+
             if (format < 0x8007)
             {
-                this.addr1 = this.FormatSpecificSetAddr(reader.ReadByte());
-                this.addr2 = this.FormatSpecificSetAddr(reader.ReadByte());
+                addr1 = FormatSpecificSetAddr(reader.ReadByte());
+                addr2 = FormatSpecificSetAddr(reader.ReadByte());
             }
             else
             {
-                this.addr1 = this.FormatSpecificSetAddr(reader.ReadUInt16());
-                this.addr2 = this.FormatSpecificSetAddr(reader.ReadUInt16());
+                addr1 = FormatSpecificSetAddr(reader.ReadUInt16());
+                addr2 = FormatSpecificSetAddr(reader.ReadUInt16());
+            }
+
+            int opCount = 16;
+
+            if (format < 0x8003)
+            {
+                nodeversion = 0;
+                opCount = 8;
+            }
+            else if (format < 0x8005)
+            {
+                nodeversion = 0;
+            }
+            else
+            {
+                nodeversion = reader.ReadByte();
+            }
+
+            int i = 0;
+
+            while (i < opCount)
+            {
+                operands[i++] = new Operand(reader.ReadByte());
+            }
+
+            while (i < 16)
+            {
+                operands[i++] = new Operand(byte.MaxValue);
+            }
+        }
+
+        public uint FileSize
+        {
+            get
+            {
+                long size = 2;
+
+                size += ((format < 0x8007) ? 2 : 4);
+
+                size += ((format < 0x8005) ? 0 : 1);
+
+                size += ((format < 0x8003) ? 8 : 16);
+
+                return (uint)size;
+            }
+        }
+
+        public void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt16(opcode);
+
+            if (format < 0x8007)
+            {
+                writer.WriteByte((byte)FormatSpecificGetAddr(addr1));
+                writer.WriteByte((byte)FormatSpecificGetAddr(addr2));
+            }
+            else
+            {
+                writer.WriteUInt16(FormatSpecificGetAddr(addr1));
+                writer.WriteUInt16(FormatSpecificGetAddr(addr2));
+            }
+
+            if (format >= 0x8005)
+            {
+                writer.WriteByte(nodeversion);
             }
 
             if (format < 0x8003)
             {
-                this.nodeversion = 0;
-                this.operands = new WrappedByteArray(reader, 8);
-            }
-            else if (format < 0x8005)
-            {
-                this.nodeversion = 0;
-                this.operands = new WrappedByteArray(reader, 16);
+                for (int i = 0; i < 8; ++i)
+                {
+                    writer.WriteByte(operands[i]);
+                }
             }
             else
             {
-                this.nodeversion = reader.ReadByte();
-                this.operands = new WrappedByteArray(reader, 16);
+                for (int i = 0; i < 16; ++i)
+                {
+                    writer.WriteByte(operands[i]);
+                }
             }
         }
 
@@ -162,6 +231,28 @@ namespace Sims2Tools.DBPF.BHAV
                     return $"{delta:+#;-#;0}";
             }
         }
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            if (item.Equals("opcode"))
+            {
+                return OpCode == sv;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            return operands[index];
+        }
+        #endregion
 
         public string DiffString()
         {

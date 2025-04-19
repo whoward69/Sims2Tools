@@ -22,7 +22,7 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.STR
 {
-    public class Str : DBPFResource
+    public class Str : DBPFResource, IDbpfScriptable
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x53545223;
@@ -245,6 +245,45 @@ namespace Sims2Tools.DBPF.STR
                     strItem.Serialize(writer);
                 }
             }
+        }
+        #endregion
+
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            if (item.Equals("filename"))
+            {
+                return KeyName.Equals(sv);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("group"))
+            {
+                ChangeGroupID(sv);
+                return true;
+            }
+            else if (item.Equals("instance"))
+            {
+                ChangeIR(sv, ResourceID);
+                return true;
+            }
+            else if (item.Equals("resource"))
+            {
+                ChangeIR(InstanceID, sv);
+                return true;
+            }
+
+            return false;
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            return languages[MetaData.Languages.Default][index];
         }
         #endregion
 

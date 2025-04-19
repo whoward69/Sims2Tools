@@ -145,6 +145,63 @@ namespace Sims2Tools.DBPF
         public override string ToString() => $"{DBPFData.TypeName(TypeID)}-{GroupID}-{ResourceID}-{InstanceID}";
     }
 
+    public class DBPFScriptableKey : DBPFKey, IDbpfScriptable
+    {
+        public DBPFScriptableKey(TypeTypeID typeID, TypeGroupID groupID, TypeInstanceID instanceID, TypeResourceID resourceID) : base(typeID, groupID, instanceID, resourceID)
+        {
+        }
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            if (item.Equals("type"))
+            {
+                return DBPFData.TypeName(TypeID).Equals(sv.ToUpper());
+            }
+            else if (item.Equals("group"))
+            {
+                return GroupID.Hex8String().Equals(sv.ToUpper());
+            }
+            else if (item.Equals("instance"))
+            {
+                return InstanceID.Hex8String().Equals(sv.ToUpper());
+            }
+            else if (item.Equals("resource"))
+            {
+                return ResourceID.Hex8String().Equals(sv.ToUpper());
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("group"))
+            {
+                ChangeGroupID(sv);
+                return true;
+            }
+            else if (item.Equals("instance"))
+            {
+                ChangeIR(sv, ResourceID);
+                return true;
+            }
+            else if (item.Equals("resource"))
+            {
+                ChangeIR(InstanceID, sv);
+                return true;
+            }
+
+            return false;
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+    }
+
     public interface IDBPFNamedKey : IDBPFKey
     {
         string KeyName

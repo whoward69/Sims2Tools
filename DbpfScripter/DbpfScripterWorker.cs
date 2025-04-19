@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,7 +35,13 @@ namespace DbpfScripter
         private readonly string savePath;
         private readonly string baseName;
 
+        private readonly bool isDevMode;
+
+        private int countAssignments = 0;
+        private int countResources = 0;
+
         private TextReader scriptReader;
+        private int scriptLineIndex = 0;
         private string scriptLine = null;
         private string nextToken = null;
 
@@ -48,13 +55,15 @@ namespace DbpfScripter
 
         private readonly Dictionary<string, string> variables = new Dictionary<string, string>();
 
-        public DbpfScripterWorker(BackgroundWorker scriptWorker, string templatePath, string savePath, string baseName)
+        public DbpfScripterWorker(BackgroundWorker scriptWorker, string templatePath, string savePath, string baseName, bool isDevMode)
         {
             this.scriptWorker = scriptWorker;
 
             this.templatePath = templatePath;
             this.savePath = savePath;
             this.baseName = baseName;
+
+            this.isDevMode = isDevMode;
         }
 
         public void ProcessScript()
@@ -63,7 +72,7 @@ namespace DbpfScripter
 
             if (File.Exists(scriptPath))
             {
-                ReportProgress($"Processing {scriptPath}");
+                ReportProgress($"Executing {scriptPath}");
 
                 bool result = false;
 
@@ -74,40 +83,36 @@ namespace DbpfScripter
 
                 if (result)
                 {
-                    ReportProgress("Script complete");
+                    ReportProgress($"Edits completed ({countAssignments} changes made to {countResources} resources)");
 
                     foreach (string templateFileFullPath in Directory.GetFiles(templatePath, "*.package", SearchOption.AllDirectories))
                     {
                         string templateName = templateFileFullPath.Substring(templatePath.Length + 1);
 
-                        string packageName = templateName.Replace("template", baseName);
+                        string packageName = templateName.Replace("template", baseName).Replace("Template", baseName).Replace("TEMPLATE", baseName);
 
                         FileInfo fi = new FileInfo($"{savePath}/{packageName}");
 
                         ReportProgress($"Saving {templateName} into {packageName}");
 
-                        /* TODO - Scripter
-                            Directory.CreateDirectory(fi.DirectoryName);
+                        Directory.CreateDirectory(fi.DirectoryName);
 
-                            if (allEditedPackages.ContainsKey(templateName))
-                            {
-                                DBPFFile package = allEditedPackages[templateName];
+                        if (allEditedPackages.ContainsKey(templateName))
+                        {
+                            DBPFFile package = allEditedPackages[templateName];
 
-                                // TODO - Scripter - implement DBPFFile.SaveAs()
-                                // package.SaveAs(fi.FullName);
+                            package.SaveAs(fi.FullName);
+                            package.Close();
 
-                                package.Close();
-
-                                allEditedPackages.Remove(templateName);
-                            }
-                            else
-                            {
-                                File.Copy(templateFileFullPath, fi.FullName);
-                            }
-                        */
+                            allEditedPackages.Remove(templateName);
+                        }
+                        else
+                        {
+                            File.Copy(templateFileFullPath, fi.FullName);
+                        }
                     }
 
-                    ReportProgress("Finished!");
+                    ReportProgress("Finished :)");
                 }
             }
         }
@@ -124,15 +129,16 @@ namespace DbpfScripter
         {
             if (TestEndOfScript()) return false;
 
-            string filename = ReadFilename();
+            string filename = ReadInitOrFilename();
 
             if (filename != null && SkipOpenSquareBracket())
             {
-                ReportProgress($"Processing BLOCK {filename}");
+                ReportProgress("");
+                ReportProgress($"Processing {filename}");
 
                 bool processed;
 
-                if (filename.EndsWith(".ods"))
+                if (filename.Equals("INIT") || filename.EndsWith(".ods"))
                 {
                     processed = ProcessInitialisers(filename);
                 }
@@ -142,18 +148,21 @@ namespace DbpfScripter
                 }
                 else
                 {
-                    return ReportError($"Unknown file extension {filename}");
+                    return ReportErrorFalse($"Unknown file extension {filename}");
                 }
 
                 return processed && SkipCloseSquareBracket();
             }
 
-            return ReportError("Invalid BLOCK");
+            return ReportErrorFalse("Invalid BLOCK");
         }
 
         private bool ProcessInitialisers(string filename)
         {
-            ParseODS($"{templatePath}\\{filename}");
+            if (!filename.Equals("INIT"))
+            {
+                if (!ParseODS($"{templatePath}\\{filename}")) return false;
+            }
 
             while (ProcessInitialiser()) ;
 
@@ -165,93 +174,68 @@ namespace DbpfScripter
             if (TestEndOfBlock()) return false;
 
             string varDefn = ReadVarDefn();
+            string value = null;
 
             if (varDefn != null && SkipEqualsSign())
             {
-                string funct = ReadFunction();
-
-                if (funct != null)
+                string nextToken = PeekNextToken();
+                if (nextToken.ToLower().StartsWith("0x"))
                 {
-                    string value = null;
+                    value = ReadNextToken();
+                }
+                else if (nextToken[0] == '"' || nextToken[0] == '\'')
+                {
+                    value = ReadNextToken();
 
-                    if (funct.Equals("guid"))
+                    value = EvaluateString(value.Substring(1, value.Length - 2));
+                }
+                else
+                {
+                    string funct = ReadFunctionOrCellRef();
+
+                    if (funct != null)
                     {
-                        if (SkipOpenBracket() && SkipCloseBracket()) value = NewGuid();
-                    }
-                    else if (funct.Equals("group"))
-                    {
-                        if (SkipOpenBracket() && SkipCloseBracket()) value = NewGroup();
-                    }
-                    else if (funct.Equals("family"))
-                    {
-                        if (SkipOpenBracket() && SkipCloseBracket()) value = NewFamily();
-                    }
-                    else if (funct.Equals("loword"))
-                    {
-                        if (SkipOpenBracket())
+                        if (IsFunctionName(funct))
                         {
-                            string param = ReadVarDefn();
+                            value = EvaluateFunction(funct);
+                        }
+                        else
+                        {
+                            Match m = reCellRef.Match(funct);
 
-                            if (param != null && SkipCloseBracket())
+                            if (m.Success)
                             {
-                                if (variables.TryGetValue(param, out value))
+                                int col = m.Groups[1].Value.ToCharArray()[0] - 'a';
+                                int row = Int16.Parse(m.Groups[2].Value) - 1;
+
+                                if (odsRows.Count > row)
                                 {
-                                    value = $"0x{value.Substring(value.Length - 4)}";
+                                    List<string> odsRow = odsRows[row];
+
+                                    if (odsRow.Count > col)
+                                    {
+                                        value = odsRow[col];
+
+                                        // ReportDebug($"Cell {funct} is {value}");
+                                    }
                                 }
                             }
                         }
                     }
-                    else if (funct.Equals("hiword"))
-                    {
-                        if (SkipOpenBracket())
-                        {
-                            string param = ReadVarDefn();
+                }
 
-                            if (param != null && SkipCloseBracket())
-                            {
-                                if (variables.TryGetValue(param, out value))
-                                {
-                                    value = value.Substring(0, 6);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Match m = reCellRef.Match(funct);
+                if (value != null)
+                {
+                    variables.Remove(varDefn);
+                    variables.Add(varDefn, value);
 
-                        if (m.Success)
-                        {
-                            int col = m.Groups[1].Value.ToCharArray()[0] - 'a';
-                            int row = Int16.Parse(m.Groups[2].Value) - 1;
+                    ReportDevMode($"  ${varDefn} = {value}");
 
-                            if (odsRows.Count > row)
-                            {
-                                List<string> odsRow = odsRows[row];
-
-                                if (odsRow.Count > col)
-                                {
-                                    value = odsRow[col];
-
-                                    // ReportProgress($"Cell {funct} is {value}");
-                                }
-                            }
-                        }
-                    }
-
-                    if (value != null)
-                    {
-                        variables.Remove(varDefn);
-                        variables.Add(varDefn, value);
-
-                        ReportProgress($"${varDefn} = {value}");
-
-                        return true;
-                    }
+                    return true;
                 }
             }
 
-            return ReportError("Invalid variable definition");
+            return ReportErrorFalse($"Invalid variable definition");
         }
 
         private bool ProcessActions(string filename)
@@ -272,7 +256,7 @@ namespace DbpfScripter
 
             if (tgir != null && SkipOpenSquareBracket())
             {
-                ReportProgress($"ACTION {tgir}");
+                ReportProgress($"Editing {tgir}");
 
                 Match m = reTGIR.Match(tgir);
 
@@ -283,10 +267,13 @@ namespace DbpfScripter
                     TypeResourceID resourceId = (TypeResourceID)(uint)Int32.Parse(m.Groups[3].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
                     TypeInstanceID instanceId = (TypeInstanceID)(uint)Int32.Parse(m.Groups[4].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
 
-                    DBPFResource res = activePackage.GetResourceByKey(new DBPFKey(typeId, groupId, instanceId, resourceId));
+                    DBPFKey resKey = new DBPFKey(typeId, groupId, instanceId, resourceId);
+                    DBPFResource res = activePackage.GetResourceByKey(resKey);
 
                     if (res is IDbpfScriptable scriptable)
                     {
+                        ++countResources;
+
                         currentScriptableObject = scriptable;
                         scriptableObjects.Push(currentScriptableObject);
 
@@ -294,7 +281,8 @@ namespace DbpfScripter
 
                         if (result)
                         {
-                            activePackage.Commit(res);
+                            activePackage.Remove(resKey);
+                            activePackage.Commit(res, true);
                         }
 
                         scriptableObjects.Pop();
@@ -303,12 +291,19 @@ namespace DbpfScripter
                     }
                     else
                     {
-                        return ReportError($"{tgir} is not scriptable");
+                        if (res == null)
+                        {
+                            return ReportErrorFalse($"{tgir} not found");
+                        }
+                        else
+                        {
+                            return ReportErrorFalse($"{tgir} is not scriptable");
+                        }
                     }
                 }
             }
 
-            return ReportError("Invalid ACTION");
+            return ReportErrorFalse("Invalid ACTION");
         }
 
         private bool ProcessSubactions()
@@ -348,20 +343,26 @@ namespace DbpfScripter
 
                 if (assertItem != null && SkipColon())
                 {
-                    string assertValue = ReadNextToken();
+                    ScriptValue assertValue = new ScriptValue(ReadNextToken());
 
                     if (assertValue != null && SkipCloseBracket())
                     {
                         assertItem = assertItem.ToLower();
 
-                        ReportProgress($"ASSERT: {assertItem} is {assertValue}");
-                        return true;
-                        // TODO - Scripter - Scripter - return currentScriptableObject.Assert(assertItem, assertValue);
+                        bool ok = currentScriptableObject.Assert(assertItem, assertValue);
+
+                        if (!ok)
+                        {
+                            return ReportErrorFalse($"Assert failed, {assertItem} is NOT {assertValue}");
+                        }
+
+                        ReportDebug($"  Asserted {assertItem} is {assertValue}");
+                        return ok;
                     }
                 }
             }
 
-            return ReportError("Invalid ASSERT");
+            return ReportErrorFalse("Invalid ASSERT");
         }
 
         private bool ProcessAssignment()
@@ -376,66 +377,49 @@ namespace DbpfScripter
                 {
                     if (value[0] == '"' || value[0] == '\'')
                     {
-                        string codedString = value.Substring(1, value.Length - 2);
+                        value = EvaluateString(value.Substring(1, value.Length - 2));
 
-                        // For example "{gender:1}{agecode:1}_{type}_{basename}_{id}" -> "tf_body_sundress_red"
-                        value = "";
-
-                        int braPos = codedString.IndexOf('{');
-
-                        while (braPos != -1)
-                        {
-                            value = $"{value}{codedString.Substring(0, braPos)}";
-                            codedString = codedString.Substring(braPos + 1);
-
-                            int ketPos = codedString.IndexOf('}');
-                            string macro = codedString.Substring(0, ketPos);
-                            int macroLen = -1;
-
-                            int colonPos = macro.IndexOf(':');
-                            if (colonPos != -1)
-                            {
-                                int.TryParse(macro.Substring(colonPos + 1), out macroLen);
-                                macro = macro.Substring(0, colonPos);
-                            }
-
-                            if (!variables.TryGetValue(macro, out string subst))
-                            {
-                                return ReportError($"Unknown variable {macro}");
-                            }
-
-                            if (macroLen > 0)
-                            {
-                                subst = subst.Substring(0, macroLen);
-                            }
-
-                            value = $"{value}{subst}";
-
-                            codedString = codedString.Substring(ketPos + 1);
-                            braPos = codedString.IndexOf('{');
-                        }
-
-                        value = $"{value}{codedString}";
+                        if (value == null) return false;
                     }
                     else if (value[0] == '$')
                     {
-                        if (!variables.TryGetValue(value.Substring(1), out value))
+                        if (!variables.TryGetValue(value.Substring(1), out string varValue))
                         {
-                            return ReportError($"Unknown variable {value}");
+                            return ReportErrorFalse($"Unknown variable {value}");
                         }
+
+                        value = varValue;
+                    }
+                    else if (value.StartsWith("0x"))
+                    {
+
+                    }
+                    else if (IsFunctionName(value))
+                    {
+                        value = EvaluateFunction(value);
+
+                        if (value == null) return ReportErrorFalse("Invalid function");
                     }
                     else
                     {
-                        return ReportError("Unknown assignment (expected string or variable");
+                        return ReportErrorFalse("Unknown assignment (expected string or variable)");
                     }
 
-                    ReportProgress($"ASSIGNMENT: {item} = {value}");
-                    return true;
-                    // TODO - Scripter - return currentScriptableObject.Assignment(item, value);
+                    bool ok = currentScriptableObject.Assignment(item, new ScriptValue(value));
+                    if (ok)
+                    {
+                        ++countAssignments;
+                        ReportDevMode($"  {item} = {value}");
+                    }
+                    else
+                    {
+                        ReportErrorFalse($"Invalid ASSIGNMENT {item} = {value}");
+                    }
+                    return ok;
                 }
             }
 
-            return ReportError("Invalid ASSIGNMENT");
+            return ReportErrorFalse("Invalid ASSIGNMENT");
         }
 
         private bool ProcessIndexing()
@@ -444,21 +428,28 @@ namespace DbpfScripter
 
             if (index != null && reIndex.IsMatch(index) && SkipOpenSquareBracket())
             {
-                ReportProgress($"INDEX {index}");
+                ReportDevMode($"Index [{index}]");
 
-                // TODO - Scripter - IDbpfScriptable indexer = currentScriptableObject.Indexed(Int32.Parse(index));
-
-                // TODO - Scripter - if (indexer != null)
+                try
                 {
-                    // TODO - Scripter - currentScriptableObject = indexer;
-                    // TODO - Scripter - scriptableObjects.Push(currentScriptableObject);
+                    IDbpfScriptable indexer = currentScriptableObject.Indexed(Int32.Parse(index));
 
-                    bool result = ProcessSubactions() && SkipCloseSquareBracket();
+                    if (indexer != null)
+                    {
+                        currentScriptableObject = indexer;
+                        scriptableObjects.Push(currentScriptableObject);
 
-                    // TODO - Scripter - scriptableObjects.Pop();
-                    // TODO - Scripter - currentScriptableObject = scriptableObjects.Peek();
+                        bool result = ProcessSubactions() && SkipCloseSquareBracket();
 
-                    return result;
+                        scriptableObjects.Pop();
+                        currentScriptableObject = scriptableObjects.Peek();
+
+                        return result;
+                    }
+                }
+                catch (Exception)
+                {
+                    return ReportErrorFalse($"Invalid index {index}");
                 }
             }
 
@@ -466,8 +457,151 @@ namespace DbpfScripter
         }
         #endregion
 
+        #region Evaluation
+        private string EvaluateFunction(string function)
+        {
+            string value = "";
+
+            if (function.Equals("guid"))
+            {
+                if (SkipOpenBracket() && SkipCloseBracket()) return NewGuid();
+            }
+            else if (function.Equals("group"))
+            {
+                if (SkipOpenBracket() && SkipCloseBracket()) return NewGroup();
+            }
+            else if (function.Equals("family"))
+            {
+                if (SkipOpenBracket() && SkipCloseBracket()) return NewFamily();
+            }
+            else if (function.Equals("loword"))
+            {
+                if (SkipOpenBracket())
+                {
+                    string param = ReadVarDefn();
+
+                    if (param != null && SkipCloseBracket())
+                    {
+                        if (variables.TryGetValue(param, out value))
+                        {
+                            return Helper.Hex4PrefixString((new ScriptValue(value)).LoWord());
+                        }
+                    }
+                }
+            }
+            else if (function.Equals("hiword"))
+            {
+                if (SkipOpenBracket())
+                {
+                    string param = ReadVarDefn();
+
+                    if (param != null && SkipCloseBracket())
+                    {
+                        if (variables.TryGetValue(param, out value))
+                        {
+                            return Helper.Hex4PrefixString((new ScriptValue(value)).HiWord());
+                        }
+                    }
+                }
+            }
+            else if (function.Equals("lobyte"))
+            {
+                if (SkipOpenBracket())
+                {
+                    string param = ReadVarDefn();
+
+                    if (param != null && SkipCloseBracket())
+                    {
+                        if (variables.TryGetValue(param, out value))
+                        {
+                            return Helper.Hex2PrefixString((new ScriptValue(value)).LoByte());
+                        }
+                    }
+                }
+            }
+            else if (function.Equals("hibyte"))
+            {
+                if (SkipOpenBracket())
+                {
+                    string param = ReadVarDefn();
+
+                    if (param != null && SkipCloseBracket())
+                    {
+                        if (variables.TryGetValue(param, out value))
+                        {
+                            return Helper.Hex2PrefixString((new ScriptValue(value)).HiByte());
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private string EvaluateString(string codedString)
+        {
+            // For example "{gender:1}{agecode:1}_{type}_{basename}_{id}" -> "tf_body_sundress_red"
+            string value = "";
+
+            int braPos = codedString.IndexOf('{');
+
+            while (braPos != -1)
+            {
+                bool lower = false;
+                bool upper = false;
+
+                value = $"{value}{codedString.Substring(0, braPos)}";
+                codedString = codedString.Substring(braPos + 1);
+
+                int ketPos = codedString.IndexOf('}');
+                string macro = codedString.Substring(0, ketPos);
+                int macroLen = -1;
+
+                int colonPos = macro.IndexOf(':');
+                if (colonPos != -1)
+                {
+                    string format = macro.Substring(colonPos + 1);
+                    if (format.EndsWith("l") || format.EndsWith("U"))
+                    {
+                        lower = format.EndsWith("l");
+                        upper = format.EndsWith("U");
+
+                        format = format.Substring(0, format.Length - 1);
+                    }
+
+                    if (format.Length > 0)
+                    {
+                        int.TryParse(format, out macroLen);
+                    }
+
+                    macro = macro.Substring(0, colonPos);
+                }
+
+                if (!variables.TryGetValue(macro, out string subst))
+                {
+                    return ReportErrorNull($"Unknown variable {macro}");
+                }
+
+                if (macroLen > 0)
+                {
+                    subst = subst.Substring(0, macroLen);
+                }
+
+                if (lower) subst = subst.ToLower();
+                if (upper) subst = subst.ToUpper();
+
+                value = $"{value}{subst}";
+
+                codedString = codedString.Substring(ketPos + 1);
+                braPos = codedString.IndexOf('{');
+            }
+
+            return $"{value}{codedString}";
+        }
+        #endregion
+
         #region ODS Parsing
-        private void ParseODS(string fullPath)
+        private bool ParseODS(string fullPath)
         {
             odsRows = new List<List<string>>();
             List<string> row = null;
@@ -477,92 +611,102 @@ namespace DbpfScripter
             int cellRepeat = 0;
             string cellText = "";
 
-            using (ZipArchive zip = ZipFile.Open(fullPath, ZipArchiveMode.Read))
+            try
             {
-                ZipArchiveEntry content = zip.GetEntry("content.xml");
-
-                if (content != null)
+                using (ZipArchive zip = ZipFile.Open(fullPath, ZipArchiveMode.Read))
                 {
-                    ReportProgress($"Reading ODS {fullPath}");
+                    ZipArchiveEntry content = zip.GetEntry("content.xml");
 
-                    XmlReader reader = XmlReader.Create(content.Open());
-
-                    reader.MoveToContent();
-                    while (reader.Read())
+                    if (content != null)
                     {
-                        if (reader.NodeType == XmlNodeType.Element)
+                        ReportDebug($"Reading {fullPath}");
+
+                        XmlReader reader = XmlReader.Create(content.Open());
+
+                        reader.MoveToContent();
+                        while (reader.Read())
                         {
-                            if (reader.Name.Equals("table:table"))
+                            if (reader.NodeType == XmlNodeType.Element)
                             {
-                                odsRows = new List<List<string>>();
-                            }
-                            else if (reader.Name.Equals("table:table-row"))
-                            {
-                                // Process the previous row when we encounter the next one in the table, this stops us processing the last row (which repeats many, many times)
-                                if (row != null)
+                                if (reader.Name.Equals("table:table"))
                                 {
-                                    while (rowRepeat-- > 0)
+                                    odsRows = new List<List<string>>();
+                                }
+                                else if (reader.Name.Equals("table:table-row"))
+                                {
+                                    // Process the previous row when we encounter the next one in the table, this stops us processing the last row (which repeats many, many times)
+                                    if (row != null)
                                     {
-                                        odsRows.Add(row);
+                                        while (rowRepeat-- > 0)
+                                        {
+                                            odsRows.Add(row);
+                                        }
                                     }
+
+                                    string repeat = reader.GetAttribute("table:number-rows-repeated");
+                                    rowRepeat = (repeat == null) ? 1 : Int32.Parse(repeat);
+
+                                    row = new List<string>();
+
+                                    cellRepeat = 0;
                                 }
-
-                                string repeat = reader.GetAttribute("table:number-rows-repeated");
-                                rowRepeat = (repeat == null) ? 1 : Int32.Parse(repeat);
-
-                                row = new List<string>();
-
-                                cellRepeat = 0;
-                            }
-                            else if (reader.Name.Equals("table:table-cell"))
-                            {
-                                // Process the previous cell when we encounter the next one in the row, this stops us processing the last cell (which repeats many, many times)
-                                while (cellRepeat-- > 0)
+                                else if (reader.Name.Equals("table:table-cell"))
                                 {
-                                    row.Add(cellText);
-                                }
+                                    // Process the previous cell when we encounter the next one in the row, this stops us processing the last cell (which repeats many, many times)
+                                    while (cellRepeat-- > 0)
+                                    {
+                                        row.Add(cellText);
+                                    }
 
-                                string repeat = reader.GetAttribute("table:number-columns-repeated");
-                                cellRepeat = (repeat == null) ? 1 : Int32.Parse(repeat);
-                                cellText = "";
+                                    string repeat = reader.GetAttribute("table:number-columns-repeated");
+                                    cellRepeat = (repeat == null) ? 1 : Int32.Parse(repeat);
+                                    cellText = "";
+                                }
+                                else if (reader.Name.Equals("text:p"))
+                                {
+                                    cellText = reader.ReadElementContentAsString();
+                                }
                             }
-                            else if (reader.Name.Equals("text:p"))
+                            else if (reader.NodeType == XmlNodeType.EndElement)
                             {
-                                cellText = reader.ReadElementContentAsString();
-                            }
-                        }
-                        else if (reader.NodeType == XmlNodeType.EndElement)
-                        {
-                            if (reader.Name.Equals("table:table"))
-                            {
-                                // Only process the first table in the first spreadsheet
-                                return;
+                                if (reader.Name.Equals("table:table"))
+                                {
+                                    // Only process the first table in the first spreadsheet
+                                    return true;
+                                }
                             }
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                ReportDebug(ex.Message);
+                return ReportErrorFalse($"Unable to open/read {fullPath}");
+            }
+
+            return ReportErrorFalse($"Unable to parse {fullPath}");
         }
         #endregion
 
         #region New (Random) generators
         private string NewGuid()
         {
-            ReportProgress($"Generating GUID");
+            ReportDebug($"GENERATING Guid");
 
             return $"0x{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
         }
 
         private string NewGroup()
         {
-            ReportProgress($"Generating Group");
+            ReportDebug($"GENERATING Group");
 
             return $"0x{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
         }
 
         private string NewFamily()
         {
-            ReportProgress($"Generating FAMILY");
+            ReportDebug($"GENERATING Family");
 
             return Guid.NewGuid().ToString();
         }
@@ -601,23 +745,25 @@ namespace DbpfScripter
                 return true;
             }
 
-            return ReportError($"Expected {exectedToken}");
+            return ReportErrorFalse($"Expected {exectedToken}");
         }
         #endregion
 
         #region Reads and Peeks
-        private string ReadFilename()
+        private string ReadInitOrFilename()
         {
             string filename = ReadNextToken();
 
+            if (filename.Equals("INIT")) return filename;
+
             if (filename != null && filename.StartsWith("\""))
             {
-                if (filename.Length <= 2) return ReportNull($"Invalid file name ({filename})");
+                if (filename.Length <= 2) return ReportErrorNull($"Invalid file name ({filename})");
 
                 filename = filename.Substring(1, filename.Length - 2);
             }
 
-            if (!File.Exists($"{templatePath}/{filename}")) return ReportNull($"File ({filename}) doesn't exist");
+            if (!File.Exists($"{templatePath}/{filename}")) return ReportErrorNull($"File ({filename}) doesn't exist");
 
             return filename;
         }
@@ -628,7 +774,7 @@ namespace DbpfScripter
 
             if (tgir != null && reTGIR.IsMatch(tgir)) return tgir;
 
-            return ReportNull("TGIR expected");
+            return ReportErrorNull($"TGIR expected");
         }
 
         private string ReadVarDefn()
@@ -637,16 +783,16 @@ namespace DbpfScripter
 
             if (varDefn != null && varDefn.StartsWith("$")) return varDefn.Substring(1);
 
-            return ReportNull("Variable definition expected");
+            return ReportErrorNull($"Variable definition expected");
         }
 
-        private string ReadFunction()
+        private string ReadFunctionOrCellRef()
         {
             string function = ReadNextToken();
 
             if (function != null) return function.ToLower();
 
-            return ReportNull("Function or cell reference expected");
+            return ReportErrorNull($"Function or cell reference expected");
         }
 
         private string ReadNextToken()
@@ -680,7 +826,7 @@ namespace DbpfScripter
                             ++pos;
                         }
 
-                        if (pos >= scriptLine.Length) return ReportNull($"Missing closing {scriptLine[0]}");
+                        if (pos >= scriptLine.Length) return ReportErrorNull($"Missing closing {scriptLine[0]}");
 
                         token = scriptLine.Substring(0, pos + 1);
                     }
@@ -709,12 +855,15 @@ namespace DbpfScripter
                 }
             }
 
+            if (token != null && token.Equals(";")) token = ReadNextToken();
+
             return token;
         }
 
         private string ReadNextLine()
         {
             string line = scriptReader.ReadLine();
+            ++scriptLineIndex;
 
             if (line != null)
             {
@@ -741,28 +890,49 @@ namespace DbpfScripter
 
         private bool IsSpecialChar(char c)
         {
-            return (c == '[' || c == ']' || c == '(' || c == ')' || c == ':' || c == '=');
+            return (c == '[' || c == ']' || c == '(' || c == ')' || c == ':' || c == '=' || c == ';');
         }
 
         private bool IsSpaceOrSpecialChar(char c)
         {
             return (c == ' ' || IsSpecialChar(c));
         }
+
+        private bool IsFunctionName(string s)
+        {
+            return s.Equals("loword") || s.Equals("hiword") || s.Equals("lobyte") || s.Equals("hibyte") || s.Equals("guid") || s.Equals("group") || s.Equals("family");
+        }
         #endregion
 
         #region Error Reporting
-        private string ReportNull(string msg)
+        private string ReportErrorNull(string msg)
         {
-            ReportError(msg);
+            ReportErrorFalse(msg);
 
             return null;
         }
 
-        private bool ReportError(string msg)
+        private bool ReportErrorFalse(string msg)
         {
-            ReportProgress(msg);
+            ReportProgress($"!!{msg} at line {scriptLineIndex}");
 
             return false;
+        }
+
+        private void ReportDevMode(string msg)
+        {
+#if DEBUG
+            ReportProgress($"--{msg}");
+#else
+            if (isDevMode) ReportProgress($"--{msg}");
+#endif
+        }
+
+        private void ReportDebug(string msg)
+        {
+#if DEBUG
+            ReportProgress($"--{msg}");
+#endif
         }
 
         private void ReportProgress(string msg)

@@ -275,13 +275,12 @@ namespace Sims2Tools.DBPF.CPF
         }
 
         #region IDBPFScriptable
-        public bool Assert(string item, string value)
+        public bool Assert(string item, ScriptValue sv)
         {
-            // TODO - IDBPFScriptable - Assert
             throw new NotImplementedException();
         }
 
-        public bool Assignment(string item, string value)
+        public bool Assignment(string item, ScriptValue sv)
         {
             CpfItem cpfItem = GetItem(item);
 
@@ -291,40 +290,47 @@ namespace Sims2Tools.DBPF.CPF
                 {
                     case MetaData.DataTypes.dtString:
                         {
-                            cpfItem.StringValue = value;
+                            cpfItem.StringValue = sv;
                             return true;
                         }
                     case MetaData.DataTypes.dtUInteger:
                         {
-                            uint val;
-
-                            if (value.StartsWith("0x"))
-                            {
-                                val = UInt32.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
-                            }
-                            else
-                            {
-                                val = UInt32.Parse(value);
-                            }
-
-                            cpfItem.UIntegerValue = val;
+                            cpfItem.UIntegerValue = sv;
                             return true;
                         }
                     case MetaData.DataTypes.dtInteger:
                         {
-                            cpfItem.IntegerValue = Int32.Parse(value);
+                            cpfItem.IntegerValue = sv;
                             return true;
                         }
                     case MetaData.DataTypes.dtBoolean:
                         {
-                            // TODO - IDBPFScriptable - Assignment
-                            throw new NotImplementedException();
+                            cpfItem.BooleanValue = sv;
+                            return true;
                         }
                     case MetaData.DataTypes.dtSingle:
                         {
-                            // TODO - IDBPFScriptable - Assignment
-                            throw new NotImplementedException();
+                            cpfItem.SingleValue = sv;
+                            return true;
                         }
+                }
+            }
+            else
+            {
+                if (item.Equals("group"))
+                {
+                    ChangeGroupID(sv);
+                    return true;
+                }
+                else if (item.Equals("instance"))
+                {
+                    ChangeIR((TypeInstanceID)sv, ResourceID);
+                    return true;
+                }
+                else if (item.Equals("resource"))
+                {
+                    ChangeIR(InstanceID, (TypeResourceID)sv);
+                    return true;
                 }
             }
 
@@ -333,7 +339,6 @@ namespace Sims2Tools.DBPF.CPF
 
         public IDbpfScriptable Indexed(int index)
         {
-            // TODO - IDBPFScriptable - Indexed
             throw new NotImplementedException();
         }
         #endregion

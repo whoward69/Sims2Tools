@@ -12,23 +12,20 @@
 
 using System;
 
-namespace Sims2Tools.DBPF.BCON
+namespace Sims2Tools.DBPF.BHAV
 {
-    public class BconItem : IDbpfScriptable
+    public class Operand : IDbpfScriptable
     {
-        private short value;
+        private byte value;
 
-        private bool _isDirty = false;
+        public static implicit operator byte(Operand op) => op.value;
+        public static implicit operator int(Operand op) => op.value;
+        public static implicit operator uint(Operand op) => op.value;
 
-        public bool IsDirty => _isDirty;
-        public void SetClean() => _isDirty = false;
-
-        public BconItem(short value) => this.value = value;
-
-        public static implicit operator BconItem(short i) => new BconItem(i);
-
-        public static implicit operator uint(BconItem i) => (uint)i.value;
-        public static implicit operator short(BconItem i) => (short)i.value;
+        public Operand(byte value)
+        {
+            this.value = value;
+        }
 
         #region IDBPFScriptable
         public bool Assert(string item, ScriptValue sv)
@@ -38,10 +35,9 @@ namespace Sims2Tools.DBPF.BCON
 
         public bool Assignment(string item, ScriptValue sv)
         {
-            if (item.Equals("value"))
+            if (item.Equals("operand"))
             {
                 this.value = sv;
-                _isDirty = true;
                 return true;
             }
 

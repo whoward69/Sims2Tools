@@ -85,7 +85,7 @@ namespace Sims2Tools.DBPF.STR
         }
     }
 
-    public class StrItem : IEquatable<StrItem>
+    public class StrItem : IDbpfScriptable, IEquatable<StrItem>
     {
         private readonly StrLanguage lang;
         private string title;
@@ -148,6 +148,34 @@ namespace Sims2Tools.DBPF.STR
             writer.WritePChar(title);
             writer.WritePChar(desc);
         }
+
+        #region IDbpfScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("text") || item.Equals("title"))
+            {
+                Title = sv;
+                return true;
+            }
+            else if (item.Equals("desc"))
+            {
+                Description = sv;
+                return true;
+            }
+
+            return false;
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
 
         internal StrItem Clone()
         {
