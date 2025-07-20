@@ -46,7 +46,10 @@ namespace SceneGraphPlus
             this.menuItemRecentPackages = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemSaveAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCreatorDetails = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemDdsUtilsPath = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,8 +85,9 @@ namespace SceneGraphPlus
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.textGuid = new System.Windows.Forms.TextBox();
+            this.lblGuid = new System.Windows.Forms.Label();
             this.btnSaveAll = new System.Windows.Forms.Button();
-            this.btnFixTgi = new System.Windows.Forms.Button();
             this.textBlockName = new System.Windows.Forms.TextBox();
             this.lblBlockName = new System.Windows.Forms.Label();
             this.textBlockSgName = new System.Windows.Forms.TextBox();
@@ -95,6 +99,7 @@ namespace SceneGraphPlus
             this.lblBlockPackagePath = new System.Windows.Forms.Label();
             this.textBlockPackagePath = new System.Windows.Forms.TextBox();
             this.btnFixIssues = new System.Windows.Forms.Button();
+            this.btnFixTgi = new System.Windows.Forms.Button();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel2.SuspendLayout();
@@ -127,7 +132,10 @@ namespace SceneGraphPlus
             this.menuItemRecentPackages,
             this.menuItemSeparator2,
             this.menuItemSaveAll,
+            this.toolStripSeparator9,
             this.menuItemConfiguration,
+            this.menuItemCreatorDetails,
+            this.menuItemDdsUtilsPath,
             this.toolStripSeparator1,
             this.menuItemExit});
             this.menuFile.Name = "menuFile";
@@ -180,8 +188,13 @@ namespace SceneGraphPlus
             this.menuItemSaveAll.Name = "menuItemSaveAll";
             this.menuItemSaveAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.menuItemSaveAll.Size = new System.Drawing.Size(204, 22);
-            this.menuItemSaveAll.Text = "&Save All";
+            this.menuItemSaveAll.Text = "Save &All";
             this.menuItemSaveAll.Click += new System.EventHandler(this.OnSaveAll);
+            // 
+            // toolStripSeparator9
+            // 
+            this.toolStripSeparator9.Name = "toolStripSeparator9";
+            this.toolStripSeparator9.Size = new System.Drawing.Size(201, 6);
             // 
             // menuItemConfiguration
             // 
@@ -189,6 +202,20 @@ namespace SceneGraphPlus
             this.menuItemConfiguration.Size = new System.Drawing.Size(204, 22);
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigurationClicked);
+            // 
+            // menuItemCreatorDetails
+            // 
+            this.menuItemCreatorDetails.Name = "menuItemCreatorDetails";
+            this.menuItemCreatorDetails.Size = new System.Drawing.Size(204, 22);
+            this.menuItemCreatorDetails.Text = "Creator Details...";
+            this.menuItemCreatorDetails.Click += new System.EventHandler(this.OnCreatorClicked);
+            // 
+            // menuItemDdsUtilsPath
+            // 
+            this.menuItemDdsUtilsPath.Name = "menuItemDdsUtilsPath";
+            this.menuItemDdsUtilsPath.Size = new System.Drawing.Size(204, 22);
+            this.menuItemDdsUtilsPath.Text = "DDS Utils Path...";
+            this.menuItemDdsUtilsPath.Click += new System.EventHandler(this.OnDdsUtilsPathClicked);
             // 
             // toolStripSeparator1
             // 
@@ -235,20 +262,20 @@ namespace SceneGraphPlus
             // 
             this.menuItemAdvanced.CheckOnClick = true;
             this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
             this.menuItemAdvanced.Text = "Advanced";
             this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(141, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemAutoBackup
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
             this.menuItemAutoBackup.Text = "Auto-Backup";
             // 
             // menuOptions
@@ -474,8 +501,9 @@ namespace SceneGraphPlus
             // 
             // splitContainer.Panel2
             // 
+            this.splitContainer.Panel2.Controls.Add(this.textGuid);
+            this.splitContainer.Panel2.Controls.Add(this.lblGuid);
             this.splitContainer.Panel2.Controls.Add(this.btnSaveAll);
-            this.splitContainer.Panel2.Controls.Add(this.btnFixTgi);
             this.splitContainer.Panel2.Controls.Add(this.textBlockName);
             this.splitContainer.Panel2.Controls.Add(this.lblBlockName);
             this.splitContainer.Panel2.Controls.Add(this.textBlockSgName);
@@ -487,10 +515,33 @@ namespace SceneGraphPlus
             this.splitContainer.Panel2.Controls.Add(this.lblBlockPackagePath);
             this.splitContainer.Panel2.Controls.Add(this.textBlockPackagePath);
             this.splitContainer.Panel2.Controls.Add(this.btnFixIssues);
+            this.splitContainer.Panel2.Controls.Add(this.btnFixTgi);
             this.splitContainer.Panel2MinSize = 100;
             this.splitContainer.Size = new System.Drawing.Size(878, 604);
             this.splitContainer.SplitterDistance = 500;
             this.splitContainer.TabIndex = 2;
+            // 
+            // textGuid
+            // 
+            this.textGuid.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textGuid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textGuid.Location = new System.Drawing.Point(101, 60);
+            this.textGuid.MinimumSize = new System.Drawing.Size(100, 21);
+            this.textGuid.Name = "textGuid";
+            this.textGuid.ReadOnly = true;
+            this.textGuid.Size = new System.Drawing.Size(270, 21);
+            this.textGuid.TabIndex = 16;
+            // 
+            // lblGuid
+            // 
+            this.lblGuid.AutoSize = true;
+            this.lblGuid.Location = new System.Drawing.Point(55, 63);
+            this.lblGuid.Name = "lblGuid";
+            this.lblGuid.Size = new System.Drawing.Size(40, 15);
+            this.lblGuid.TabIndex = 15;
+            this.lblGuid.Text = "GUID:";
+            this.lblGuid.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // btnSaveAll
             // 
@@ -502,17 +553,6 @@ namespace SceneGraphPlus
             this.btnSaveAll.Text = "Save All";
             this.btnSaveAll.UseVisualStyleBackColor = true;
             this.btnSaveAll.Click += new System.EventHandler(this.OnSaveAll);
-            // 
-            // btnFixTgi
-            // 
-            this.btnFixTgi.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFixTgi.Location = new System.Drawing.Point(377, 31);
-            this.btnFixTgi.Name = "btnFixTgi";
-            this.btnFixTgi.Size = new System.Drawing.Size(71, 23);
-            this.btnFixTgi.TabIndex = 8;
-            this.btnFixTgi.Text = "Fix TGI";
-            this.btnFixTgi.UseVisualStyleBackColor = true;
-            this.btnFixTgi.Click += new System.EventHandler(this.OnFixTgiClicked);
             // 
             // textBlockName
             // 
@@ -633,6 +673,17 @@ namespace SceneGraphPlus
             this.btnFixIssues.UseVisualStyleBackColor = true;
             this.btnFixIssues.Click += new System.EventHandler(this.OnFixIssuesClicked);
             // 
+            // btnFixTgi
+            // 
+            this.btnFixTgi.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFixTgi.Location = new System.Drawing.Point(377, 31);
+            this.btnFixTgi.Name = "btnFixTgi";
+            this.btnFixTgi.Size = new System.Drawing.Size(71, 23);
+            this.btnFixTgi.TabIndex = 8;
+            this.btnFixTgi.Text = "Fix TGI";
+            this.btnFixTgi.UseVisualStyleBackColor = true;
+            this.btnFixTgi.Click += new System.EventHandler(this.OnFixTgiClicked);
+            // 
             // SceneGraphPlusForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -721,5 +772,10 @@ namespace SceneGraphPlus
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
         private System.Windows.Forms.ToolStripMenuItem menuItemLoadMeshesNow;
         private System.Windows.Forms.ToolStripMenuItem menuItemPreloadMeshes;
+        private System.Windows.Forms.TextBox textGuid;
+        private System.Windows.Forms.Label lblGuid;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDdsUtilsPath;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCreatorDetails;
     }
 }

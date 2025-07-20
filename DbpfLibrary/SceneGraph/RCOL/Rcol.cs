@@ -190,7 +190,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
         public Rcol(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
-            Unserialize(reader, entry.DataSize);
+            if (reader != null) Unserialize(reader, entry.DataSize);
         }
 
         public void AddBlock(IRcolBlock block)
@@ -399,6 +399,32 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             Debug.Assert((writeEnd - writeStart) == FileSize);
             if (!IsDirty) Debug.Assert(((readEnd - readStart) == 0) || ((writeEnd - writeStart) == (readEnd - readStart)));
 #endif
+        }
+
+        public void Duplicate(Rcol into, string newName)
+        {
+            into.duff = this.duff;
+            if (duff) return;
+
+            into.count = this.count;
+
+            foreach (DBPFKey refKey in this.reffiles)
+            {
+                into.reffiles.Add(new DBPFKey(refKey));
+            }
+
+            into.index = new uint[this.index.Length];
+            for (int i = 0; i < this.index.Length; i++) into.index[i] = this.index[i];
+
+            foreach (IRcolBlock blk in this.blocks)
+            {
+                into.blocks.Add(blk.Duplicate(into));
+            }
+
+            into.oversize = new byte[this.oversize.Length];
+            for (int i = 0; i < this.oversize.Length; i++) into.oversize[i] = this.oversize[i];
+
+            into.SetKeyName(newName);
         }
 
         protected XmlElement AddXml(XmlElement parent, string name)

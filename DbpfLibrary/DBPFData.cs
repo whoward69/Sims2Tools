@@ -100,6 +100,14 @@ namespace Sims2Tools.DBPF
         public static TypeInstanceID INSTANCE_NULL = (TypeInstanceID)0x00000000;
         public static TypeInstanceID INSTANCE_COLLECTIONS = (TypeInstanceID)0x0FFE0010;
 
+        public static TypeInstanceID STR_MODELS = (TypeInstanceID)0x00000085;
+        public static TypeInstanceID STR_MATERIALS = (TypeInstanceID)0x00000088;
+        public static TypeInstanceID STR_BONES = (TypeInstanceID)0x00000090;
+        public static TypeInstanceID STR_DIALOG = (TypeInstanceID)0x0000012D;
+        public static TypeInstanceID STR_ACTIONS = (TypeInstanceID)0x0000012E;
+        public static TypeInstanceID STR_CALL_TREE = (TypeInstanceID)0x0000012F;
+        public static TypeInstanceID STR_SOUNDS = (TypeInstanceID)0x00004132;
+
         public static TypeResourceID RESOURCE_NULL = (TypeResourceID)0x00000000;
 
         public static TypeGUID GUID_NULL = (TypeGUID)0x00000000;

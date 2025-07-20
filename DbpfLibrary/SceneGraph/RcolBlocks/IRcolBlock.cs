@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System.Xml;
 
@@ -47,6 +48,8 @@ namespace Sims2Tools.DBPF.SceneGraph
         uint FileSize { get; }
 
         void Serialize(DbpfWriter writer);
+
+        IRcolBlock Duplicate(Rcol parent);
 
         XmlElement AddXml(XmlElement parent);
     }

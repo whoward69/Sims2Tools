@@ -105,17 +105,34 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
             }
         }
 
-        public string GetDesignModeEnabledSubsets()
+        public List<string> GetDesignModeEnabledSubsets()
         {
+            List<string> subsets = new List<string>();
+
             CDataListExtension tsDesignModeEnabled = GetDataListExtension("tsDesignModeEnabled");
 
-            if (tsDesignModeEnabled == null) return "";
+            if (tsDesignModeEnabled != null)
+            {
+                foreach (ExtensionItem item in tsDesignModeEnabled.Extension.Items)
+                {
+                    subsets.Add(item.Name);
+                }
+            }
+
+            return subsets;
+        }
+
+        public string GetDesignModeEnabledSubsetsAsString()
+        {
+            List<string> subsets = GetDesignModeEnabledSubsets();
+
+            if (subsets.Count == 0) return "";
 
             string designModeSubsets = "";
 
-            foreach (ExtensionItem item in tsDesignModeEnabled.Extension.Items)
+            foreach (string subset in subsets)
             {
-                designModeSubsets = $"{designModeSubsets}, {item.Name}";
+                designModeSubsets = $"{designModeSubsets}, {subset}";
             }
 
             if (designModeSubsets.Length > 2) designModeSubsets = designModeSubsets.Substring(2);
@@ -141,7 +158,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
             tsDesignModeEnabled?.Extension.RemoveItem(subset);
         }
 
-        public string GetMaterialsMeshNameSubsets()
+        public string GetMaterialsMeshNameSubsetsAsString()
         {
             CDataListExtension tsMaterialsMeshName = GetDataListExtension("tsMaterialsMeshName");
 

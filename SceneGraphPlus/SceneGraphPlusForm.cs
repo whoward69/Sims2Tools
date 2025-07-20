@@ -43,6 +43,7 @@ using Sims2Tools.DBPF.XFLR;
 using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DBPF.XROF;
+using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Helpers;
 using Sims2Tools.Updates;
@@ -59,7 +60,7 @@ using System.Windows.Forms;
 
 namespace SceneGraphPlus
 {
-    // TODO - SceneGraph Plus - 2 - right-click on a missing/maxis block to manually enter new G-R-I values
+    // IDEA - SceneGraph Plus - right-click on a missing block to manually select a Maxis one
 
     public partial class SceneGraphPlusForm : Form
     {
@@ -67,9 +68,18 @@ namespace SceneGraphPlus
 
         // When adding to this List, search for "UnderstoodTypes" (both this file and the Surface file)
         // UnderstoodTypes - also need to add TypeBlockColour and TypeRow to the Settings.settings file (see https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors?view=windowsdesktop-8.0 for colour names)
-        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() { Str.TYPE, Mmat.TYPE, Aged.TYPE, Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE, Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE, Txmt.TYPE, Txtr.TYPE, Lifo.TYPE, Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE, Hls.TYPE, Trks.TYPE, Audio.TYPE };
+        public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() {
+            Mmat.TYPE,
+            Objd.TYPE, Str.TYPE,    // OBJDs MUST be processed before STRs
+            Aged.TYPE,
+            Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE,
+            Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE,
+            Txmt.TYPE, Txtr.TYPE, Lifo.TYPE,
+            Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE,
+            Hls.TYPE, Trks.TYPE, Audio.TYPE };
 
         private CigenFile cigenCache = null;
+        private static readonly DbpfFileCache packageCache = new DbpfFileCache();
 
         private readonly DrawingSurface surface;
         private FiltersDialog filtersDialog = null;
@@ -77,7 +87,7 @@ namespace SceneGraphPlus
         private readonly List<string> packageFiles = new List<string>();
         private readonly BlockCache blockCache = new BlockCache();
 
-        private TextureDialog textureDialog = new TextureDialog();
+        private TextureDialog textureDialog = new TextureDialog(packageCache);
 
         private MruList MyMruList;
         private Updater MyUpdater;
@@ -93,7 +103,7 @@ namespace SceneGraphPlus
         {
             logger.Info(SceneGraphPlusApp.AppProduct);
 
-            surface = new DrawingSurface(this);
+            surface = new DrawingSurface(this, packageCache);
 
             InitializeComponent();
             this.Text = SceneGraphPlusApp.AppTitle;
@@ -278,6 +288,15 @@ namespace SceneGraphPlus
             }
         }
 
+        private void OnDdsUtilsPathClicked(object sender, EventArgs e)
+        {
+            Form config = new DdsConfigDialog();
+
+            if (config.ShowDialog() == DialogResult.OK)
+            {
+            }
+        }
+
         private void MyMruList_FileSelected(string package)
         {
             AddPackages(new string[] { package });
@@ -375,7 +394,7 @@ namespace SceneGraphPlus
             return available;
         }
 
-        public void UpdateEditor(AbstractGraphBlock block)
+        public void UpdateEditor(GraphBlock block)
         {
             lblBlockName.Visible = false;
             textBlockName.Visible = false;
@@ -384,6 +403,9 @@ namespace SceneGraphPlus
             textBlockFullSgName.Visible = false;
             lblBlockSgName.Visible = false;
             textBlockSgName.Visible = false;
+
+            lblGuid.Visible = false;
+            textGuid.Visible = false;
 
             btnFixTgi.Visible = false;
             btnFixIssues.Visible = false;
@@ -395,7 +417,23 @@ namespace SceneGraphPlus
 
             ignoreUpdates = true;
 
-            if (block.BlockName != null || (block.TypeId == Hls.TYPE || block.TypeId == Trks.TYPE || block.TypeId == Audio.TYPE))
+            if (block.TypeId == Objd.TYPE)
+            {
+                lblGuid.Visible = true;
+                textGuid.Visible = true;
+                textGuid.Text = block.GUID.ToString();
+
+                if (block.BlockName != null)
+                {
+                    lblBlockName.Visible = true;
+                    textBlockName.Visible = true;
+                    textBlockName.Text = block.BlockName;
+
+                    textBlockName.ReadOnly = false;
+                    textBlockName.BorderStyle = BorderStyle.Fixed3D;
+                }
+            }
+            else if (block.BlockName != null || (block.TypeId == Hls.TYPE || block.TypeId == Trks.TYPE || block.TypeId == Audio.TYPE))
             {
                 lblBlockName.Visible = true;
                 textBlockName.Visible = true;
@@ -524,21 +562,26 @@ namespace SceneGraphPlus
                 }
             }
 
-            if (textureDialog != null && !textureDialog.IsDisposed && textureDialog.Visible)
-            {
-                DisplayTexture(block);
-            }
+            UpdateTexture(block);
 
             ignoreUpdates = false;
         }
 
-        public void DisplayTexture(AbstractGraphBlock block)
+        public void UpdateTexture(GraphBlock block)
+        {
+            if (textureDialog != null && !textureDialog.IsDisposed && textureDialog.Visible)
+            {
+                DisplayTexture(block);
+            }
+        }
+
+        public void DisplayTexture(GraphBlock block)
         {
             if (block.TypeId == Txmt.TYPE)
             {
-                AbstractGraphBlock txtrBlock = null;
+                GraphBlock txtrBlock = null;
 
-                foreach (AbstractGraphConnector connector in block.OutConnectors)
+                foreach (GraphConnector connector in block.OutConnectors)
                 {
                     if (connector.Label.Equals("stdMatBaseTextureName"))
                     {
@@ -555,11 +598,11 @@ namespace SceneGraphPlus
             }
         }
 
-        private void ShowTexture(AbstractGraphBlock block)
+        private void ShowTexture(GraphBlock block)
         {
             if (textureDialog == null || textureDialog.IsDisposed)
             {
-                textureDialog = new TextureDialog();
+                textureDialog = new TextureDialog(packageCache);
             }
 
             if (block != null)
@@ -690,7 +733,7 @@ namespace SceneGraphPlus
             surface.ApplyFilters(blockFilters);
         }
 
-        private void AddPackage(string packageFile, bool reloading = false)
+        internal void AddPackage(string packageFile, bool reloading = false)
         {
             if (!reloading)
             {
@@ -710,16 +753,16 @@ namespace SceneGraphPlus
                     {
                         foreach (DBPFEntry entry in package.GetEntriesByType(typeId))
                         {
-                            ProcessEntry(package, entry);
+                            ProcessKey(package, entry);
                         }
                     }
                     else
                     {
                         foreach (DBPFEntry entry in package.GetEntriesByType(typeId))
                         {
-                            if (entry.InstanceID == (TypeInstanceID)0x0085 || entry.InstanceID == (TypeInstanceID)0x0088 || entry.InstanceID == (TypeInstanceID)0x4132)
+                            if (entry.InstanceID == DBPFData.STR_MODELS || entry.InstanceID == DBPFData.STR_MATERIALS || entry.InstanceID == DBPFData.STR_SOUNDS)
                             {
-                                ProcessEntry(package, entry);
+                                ProcessKey(package, entry);
                             }
                         }
                     }
@@ -731,13 +774,26 @@ namespace SceneGraphPlus
             surface.Invalidate();
         }
 
-        private void ProcessEntry(DBPFFile package, DBPFEntry entry)
+        public GraphBlock AddResource(IDBPFFile package, DBPFResource res, bool invalidateSurface = false)
         {
+            GraphBlock newBlock = ProcessKey(package, res);
+
+            if (newBlock != null && res.IsDirty) newBlock.SetDirty();
+
+            if (invalidateSurface) surface.Invalidate();
+
+            return newBlock;
+        }
+
+        private GraphBlock ProcessKey(IDBPFFile package, DBPFKey key)
+        {
+            GraphBlock newBlock = null;
+
             int freeCol = surface.NextFreeCol;
 
-            BlockRef blockRefByKey = new BlockRef(package, entry.TypeID, new DBPFKey(entry));
+            BlockRef blockRefByKey = new BlockRef(package, key.TypeID, new DBPFKey(key));
 
-            if (blockCache.TryGetValue(blockRefByKey, out AbstractGraphBlock block))
+            if (blockCache.TryGetValue(blockRefByKey, out GraphBlock block))
             {
                 if (block.IsMissing)
                 {
@@ -746,29 +802,51 @@ namespace SceneGraphPlus
             }
             else
             {
-                DBPFResource res = package.GetResourceByEntry(entry);
+                DBPFResource res = package.GetResourceByKey(key);
 
-                BlockRef blockRefBySgName = new BlockRef(package, entry.TypeID, new DBPFKey(entry));
-
-                blockRefBySgName.SetSgFullName(res.KeyName, menuItemPrefixLowerCase.Checked);
-
-                if (blockRefBySgName.IsTgirValid && blockCache.TryGetValue(blockRefBySgName, out block))
+                if (res is Objd objd)
                 {
-                    if (block.IsMissing)
+                    blockRefByKey.SetGuid(objd.Guid);
+
+                    if (blockCache.TryGetValue(blockRefByKey, out block))
                     {
-                        UpdateBlockByKey(block, package, blockRefByKey, ref freeCol);
+                        if (block.IsMissing)
+                        {
+                            UpdateBlockByKey(block, package, blockRefByKey, ref freeCol);
+                        }
+                    }
+                    else
+                    {
+                        newBlock = AddBlockByKey(package, new BlockRef(package, key.TypeID, new DBPFKey(key)), ref freeCol);
+                        newBlock.SetGuid(objd.Guid);
                     }
                 }
                 else
                 {
-                    AddBlockByKey(package, new BlockRef(package, entry.TypeID, entry), ref freeCol);
+                    BlockRef blockRefBySgName = new BlockRef(package, key.TypeID, new DBPFKey(key));
+
+                    blockRefBySgName.SetSgFullName(res.KeyName, menuItemPrefixLowerCase.Checked);
+
+                    if (blockRefBySgName.IsTgirValid && blockCache.TryGetValue(blockRefBySgName, out block))
+                    {
+                        if (block.IsMissing)
+                        {
+                            UpdateBlockByKey(block, package, blockRefByKey, ref freeCol);
+                        }
+                    }
+                    else
+                    {
+                        newBlock = AddBlockByKey(package, new BlockRef(package, key.TypeID, new DBPFKey(key)), ref freeCol);
+                    }
                 }
             }
+
+            return newBlock;
         }
 
-        private AbstractGraphBlock AddBlockByName(DBPFFile package, BlockRef blockRef, ref int freeCol, AbstractGraphBlock parentBlock = null)
+        private GraphBlock AddBlockByName(IDBPFFile package, BlockRef blockRef, ref int freeCol, GraphBlock parentBlock = null)
         {
-            if (blockCache.TryGetValue(blockRef, out AbstractGraphBlock block))
+            if (blockCache.TryGetValue(blockRef, out GraphBlock block))
             {
                 freeCol -= DrawingSurface.ColumnGap;
                 return block;
@@ -788,9 +866,9 @@ namespace SceneGraphPlus
             return block;
         }
 
-        private AbstractGraphBlock AddBlockByKey(DBPFFile package, BlockRef blockRef, ref int freeCol, AbstractGraphBlock parentBlock = null)
+        private GraphBlock AddBlockByKey(IDBPFFile package, BlockRef blockRef, ref int freeCol, GraphBlock parentBlock = null)
         {
-            if (blockRef.Key != null && blockCache.TryGetValue(blockRef, out AbstractGraphBlock block))
+            if (blockRef.Key != null && blockCache.TryGetValue(blockRef, out GraphBlock block))
             {
                 freeCol -= DrawingSurface.ColumnGap;
                 return block;
@@ -805,16 +883,16 @@ namespace SceneGraphPlus
             return block;
         }
 
-        private AbstractGraphBlock AddBlockByEntry(DBPFFile package, BlockRef blockRef, DBPFEntry entry, ref int freeCol, AbstractGraphBlock parentBlock = null)
+        private GraphBlock AddBlockByEntry(IDBPFFile package, BlockRef blockRef, DBPFEntry entry, ref int freeCol, GraphBlock parentBlock = null)
         {
-            AbstractGraphBlock startBlock = new RoundedBlock(surface, blockRef) { Text = DBPFData.TypeName(blockRef.TypeId), Centre = new Point(freeCol, RowForType(blockRef.TypeId)), FillColour = ColourForType(blockRef.TypeId) };
+            GraphBlock startBlock = new RoundedBlock(surface, blockRef) { Text = DBPFData.TypeName(blockRef.TypeId), Centre = new Point(freeCol, RowForType(blockRef.TypeId)), FillColour = ColourForType(blockRef.TypeId) };
 
             ProcessBlock(startBlock, package, entry, ref freeCol, parentBlock);
 
             return startBlock;
         }
 
-        private void UpdateBlockByKey(AbstractGraphBlock startBlock, DBPFFile package, BlockRef blockRef, ref int freeCol, AbstractGraphBlock parentBlock = null)
+        private void UpdateBlockByKey(GraphBlock startBlock, IDBPFFile package, BlockRef blockRef, ref int freeCol, GraphBlock parentBlock = null)
         {
             DBPFEntry entry = package.GetEntryByKey(blockRef.Key);
 
@@ -823,10 +901,20 @@ namespace SceneGraphPlus
 
             ProcessBlock(startBlock, package, entry, ref freeCol, parentBlock);
 
-            if (blockRef.Key != null && !blockCache.ContainsKey(blockRef)) blockCache.Add(blockRef, startBlock);
+            if (blockRef.Key != null)
+            {
+                if (entry.TypeID == Objd.TYPE)
+                {
+                    blockCache.UpdateOrAdd(blockRef, startBlock);
+                }
+                else
+                {
+                    if (!blockCache.ContainsKey(blockRef)) blockCache.Add(blockRef, startBlock);
+                }
+            }
         }
 
-        private void ProcessBlock(AbstractGraphBlock startBlock, DBPFFile package, DBPFEntry entry, ref int freeCol, AbstractGraphBlock parentBlock)
+        private void ProcessBlock(GraphBlock startBlock, IDBPFFile package, DBPFEntry entry, ref int freeCol, GraphBlock parentBlock)
         {
             DBPFResource res = package.GetResourceByEntry(entry);
 
@@ -838,6 +926,8 @@ namespace SceneGraphPlus
             }
             else
             {
+                int startingFreeCol = freeCol;
+
                 string blockName = GetResourceName(res);
                 if (blockName != null) startBlock.BlockName = blockName;
 
@@ -848,12 +938,38 @@ namespace SceneGraphPlus
                 if (res is Str str)
                 {
                     TypeTypeID connectionTypeId = DBPFData.TYPE_NULL;
-                    if (entry.InstanceID == (TypeInstanceID)0x0085) connectionTypeId = Cres.TYPE;
-                    else if (entry.InstanceID == (TypeInstanceID)0x0088) connectionTypeId = Txmt.TYPE;
-                    else if (entry.InstanceID == (TypeInstanceID)0x4132) connectionTypeId = Hls.TYPE;
+                    if (entry.InstanceID == DBPFData.STR_MODELS) connectionTypeId = Cres.TYPE;
+                    else if (entry.InstanceID == DBPFData.STR_MATERIALS) connectionTypeId = Txmt.TYPE;
+                    else if (entry.InstanceID == DBPFData.STR_SOUNDS) connectionTypeId = Hls.TYPE;
 
                     if (connectionTypeId != DBPFData.TYPE_NULL)
                     {
+                        if (connectionTypeId != Cres.TYPE)
+                        {
+                            foreach (DBPFEntry objdEntry in package.GetEntriesByType(Objd.TYPE))
+                            {
+                                if (objdEntry.GroupID == entry.GroupID)
+                                {
+                                    BlockRef blockRefByKey = new BlockRef(package, Objd.TYPE, objdEntry);
+
+                                    if (blockCache.TryGetValue(blockRefByKey, out GraphBlock objdBlock))
+                                    {
+                                        if (!objdBlock.IsMissing)
+                                        {
+                                            if (connectionTypeId == Txmt.TYPE)
+                                            {
+                                                objdBlock.ConnectTo(1, "Material Names", startBlock);
+                                            }
+                                            else if (connectionTypeId == Hls.TYPE)
+                                            {
+                                                objdBlock.ConnectTo(2, "Sound ID Names", startBlock);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         List<StrItem> items = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default);
 
                         for (int index = 0; index < items.Count; ++index)
@@ -876,12 +992,31 @@ namespace SceneGraphPlus
                         }
                     }
                 }
+                else if (res is Objd objd)
+                {
+                    startBlock.ConnectTo(0, "Model Names", AddBlockByKey(package, new BlockRef(package, Str.TYPE, new DBPFKey(Str.TYPE, objd.GroupID, DBPFData.STR_MODELS, DBPFData.RESOURCE_NULL)), ref freeCol));
+
+                    // See code in the "if (res is Str)" block above
+
+                    // Adding this block makes it look like the OBJD is broken when this STR# is not required by the object
+                    // freeCol += DrawingSurface.ColumnGap;
+                    // startBlock.ConnectTo(1, "Material Names", AddBlockByKey(package, new BlockRef(package, Str.TYPE, new DBPFKey(Str.TYPE, objd.GroupID, DBPFData.STR_MATERIALS, DBPFData.RESOURCE_NULL)), ref freeCol));
+
+                    // Adding this block makes it look like the OBJD is broken when this STR# is not required by the object
+                    // freeCol += DrawingSurface.ColumnGap;
+                    // startBlock.ConnectTo(2, "Sound ID Names", AddBlockByKey(package, new BlockRef(package, Str.TYPE, new DBPFKey(Str.TYPE, objd.GroupID, DBPFData.STR_SOUNDS, DBPFData.RESOURCE_NULL)), ref freeCol));
+                }
                 else if (res is Mmat mmat)
                 {
+                    if (mmat.DefaultMaterial) startBlock.Text = $"{startBlock.Text} (Def)";
+
                     startBlock.ConnectTo(0, "model", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("modelName").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
                     freeCol += DrawingSurface.ColumnGap;
 
                     startBlock.ConnectTo(1, mmat.GetItem("subsetName").StringValue, AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("name").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                    freeCol += DrawingSurface.ColumnGap;
+
+                    startBlock.ConnectTo(2, "guid", AddBlockByName(package, new BlockRef(package, Objd.TYPE, (TypeGUID)mmat.GetItem("objectGUID").StringValue), ref freeCol));
                 }
                 else if (res is Aged aged)
                 {
@@ -925,12 +1060,12 @@ namespace SceneGraphPlus
                                         {
                                             string label = DecodeLkValue(aged.GetItem($"lk{index}").StringValue);
 
-                                            AbstractGraphConnector connector = startBlock.ConnectTo((int)itemIndex, label, AddBlockByKey(package, new BlockRef(package, itemKey.TypeID, itemKey), ref freeCol));
+                                            GraphConnector connector = startBlock.ConnectTo((int)itemIndex, label, AddBlockByKey(package, new BlockRef(package, itemKey.TypeID, itemKey), ref freeCol));
 
-                                            if (connector.EndBlock.TypeId == Gzps.TYPE && connector.EndBlock.SoleParent != null)
+                                            /* if (connector.EndBlock.TypeId == Gzps.TYPE && connector.EndBlock.SoleParent != null)
                                             {
                                                 connector.EndBlock.Centre = new Point(connector.EndBlock.Centre.X, connector.EndBlock.Centre.Y + DrawingSurface.RowGap / 2);
-                                            }
+                                            } */
 
                                             freeCol += DrawingSurface.ColumnGap;
                                         }
@@ -1081,7 +1216,7 @@ namespace SceneGraphPlus
                     {
                         startBlock.ConnectTo(0, "texturetname", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xflr.GetItem("texturetname").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
                         freeCol += DrawingSurface.ColumnGap;
-                        AbstractGraphConnector detailConnector = startBlock.ConnectTo(1, "texturetname_detail", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, $"{xflr.GetItem("texturetname").StringValue}_detail", menuItemPrefixLowerCase.Checked), ref freeCol));
+                        GraphConnector detailConnector = startBlock.ConnectTo(1, "texturetname_detail", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, $"{xflr.GetItem("texturetname").StringValue}_detail", menuItemPrefixLowerCase.Checked), ref freeCol));
 
                         detailConnector.EndBlock.IsEditable = false;
 
@@ -1105,7 +1240,7 @@ namespace SceneGraphPlus
                     index = 0;
                     foreach (DBPFKey lghtKey in cres.LghtKeys)
                     {
-                        AbstractGraphBlock lightBlock = AddBlockByKey(package, new BlockRef(package, lghtKey.TypeID, lghtKey), ref freeCol, startBlock);
+                        GraphBlock lightBlock = AddBlockByKey(package, new BlockRef(package, lghtKey.TypeID, lghtKey), ref freeCol, startBlock);
 
                         startBlock.ConnectTo(index++, lightBlock.strData, lightBlock);
 
@@ -1163,7 +1298,7 @@ namespace SceneGraphPlus
                         freeCol += DrawingSurface.ColumnGap;
                     }
 
-                    if (txtrKeyedNames.Count > 0) freeCol -= DrawingSurface.ColumnGap;
+                    if (freeCol > startingFreeCol && txtrKeyedNames.Count > 0) freeCol -= DrawingSurface.ColumnGap;
 
                     startBlock.IsFileListValid = txmt.IsFileListValid;
                 }
@@ -1239,6 +1374,10 @@ namespace SceneGraphPlus
             if (res is Str str)
             {
                 return str.KeyName;
+            }
+            else if (res is Objd objd)
+            {
+                return objd.KeyName;
             }
             else if (res is Mmat mmat)
             {
@@ -1367,11 +1506,14 @@ namespace SceneGraphPlus
             return null;
         }
 
-
         private string GetResourceSgName(DBPFResource res)
         {
             // "UnderstoodTypes" - when adding a new resource type, need to update this block
             if (res is Str)
+            {
+                return null;
+            }
+            else if (res is Objd)
             {
                 return null;
             }
@@ -1669,12 +1811,12 @@ namespace SceneGraphPlus
 
         private void OnFixIssuesClicked(object sender, EventArgs e)
         {
-            surface.FixEditingIssues();
+            surface.FixEditingIssues((Control.ModifierKeys & Keys.Shift) == Keys.Shift);
         }
 
         private void OnFixTgiClicked(object sender, EventArgs e)
         {
-            surface.FixEditingTgir();
+            surface.FixEditingTgir((Control.ModifierKeys & Keys.Shift) == Keys.Shift);
         }
 
         private void OnClearAllOptionalNames(object sender, EventArgs e)
@@ -1792,6 +1934,15 @@ namespace SceneGraphPlus
         private void OnOptionsMenuOpening(object sender, EventArgs e)
         {
             menuItemLoadMeshesNow.Enabled = !(meshCachesLoaded || meshCachesLoading);
+        }
+
+        private void OnCreatorClicked(object sender, EventArgs e)
+        {
+            Form config = new CreatorConfigDialog();
+
+            if (config.ShowDialog() == DialogResult.OK)
+            {
+            }
         }
     }
 }

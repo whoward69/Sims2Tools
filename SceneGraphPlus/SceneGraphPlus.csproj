@@ -77,11 +77,35 @@
     <Compile Include="Dialogs\FiltersDialog.Designer.cs">
       <DependentUpon>FiltersDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="OptionsDialogs\GmndDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsDialogs\GmndDialog.Designer.cs">
+      <DependentUpon>GmndDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsDialogs\MmatDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsDialogs\MmatDialog.Designer.cs">
+      <DependentUpon>MmatDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsDialogs\ObjdDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsDialogs\ObjdDialog.Designer.cs">
+      <DependentUpon>ObjdDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\TextureDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\TextureDialog.Designer.cs">
       <DependentUpon>TextureDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsDialogs\TxtrDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsDialogs\TxtrDialog.Designer.cs">
+      <DependentUpon>TxtrDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="SceneGraphPlusApp.cs" />
     <Compile Include="SceneGraphPlusForm.cs">
@@ -96,11 +120,29 @@
     <Compile Include="SceneGraphPlusSurface.cs" />
     <Compile Include="SceneGraphPlusShapes.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="OptionsDialogs\TxmtDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsDialogs\TxmtDialog.Designer.cs">
+      <DependentUpon>TxmtDialog.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Dialogs\FiltersDialog.resx">
       <DependentUpon>FiltersDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="OptionsDialogs\GmndDialog.resx">
+      <DependentUpon>GmndDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsDialogs\MmatDialog.resx">
+      <DependentUpon>MmatDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsDialogs\ObjdDialog.resx">
+      <DependentUpon>ObjdDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TextureDialog.resx">
       <DependentUpon>TextureDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsDialogs\TxtrDialog.resx">
+      <DependentUpon>TxtrDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SceneGraphPlusForm.resx">
       <DependentUpon>SceneGraphPlusForm.cs</DependentUpon>
@@ -115,6 +157,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="OptionsDialogs\TxmtDialog.resx">
+      <DependentUpon>TxmtDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="App.Debug.config">
       <DependentUpon>App.config</DependentUpon>
       <IsTransformFile>true</IsTransformFile>

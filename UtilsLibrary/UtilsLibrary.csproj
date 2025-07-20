@@ -87,6 +87,12 @@
     <Compile Include="Controls\TextProgressBar.Designer.cs">
       <DependentUpon>TextProgressBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\DdsConfigDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\DdsConfigDialog.Designer.cs">
+      <DependentUpon>DdsConfigDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="DbpfCache\DbpfFileCache.cs" />
     <Compile Include="Dialogs\MsgBox.cs" />
     <Compile Include="Dialogs\CreatorConfigDialog.cs">
@@ -126,6 +132,8 @@
       <DependentUpon>TextEntryDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Exporter\Exporter.cs" />
+    <Compile Include="Exporter\IExporter.cs" />
+    <Compile Include="Exporter\Extractor.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helpers\CpfHelper.cs" />
     <Compile Include="IO\PjseStringFileReader.cs" />
@@ -161,6 +169,9 @@
     <Compile Include="Win32\Win32API.cs" />
     <Compile Include="Win32\WindowsHook.cs" />
     <Compile Include="Win32\WndProcRetHook.cs" />
+    <EmbeddedResource Include="Dialogs\DdsConfigDialog.resx">
+      <DependentUpon>DdsConfigDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\AboutDialog.resx">
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </EmbeddedResource>

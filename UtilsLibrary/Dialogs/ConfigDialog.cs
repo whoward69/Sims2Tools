@@ -164,9 +164,7 @@ namespace Sims2Tools
                 GameData.UpdateGlobalObjects();
             }
 
-#pragma warning disable CS0612
             // Sims2ToolsLib.SimPePath = null;
-#pragma warning restore CS0612
 
             this.Close();
         }

@@ -23,6 +23,30 @@ namespace Sims2Tools.DBPF
         IDbpfScriptable Indexed(int index);
     }
 
+    public class DbpfScriptable
+    {
+        public static bool IsTGIRAssignment(DBPFResource res, string item, ScriptValue value)
+        {
+            if (item.Equals("group"))
+            {
+                res.ChangeGroupID(value);
+                return true;
+            }
+            else if (item.Equals("instance"))
+            {
+                res.ChangeIR((TypeInstanceID)value, res.ResourceID);
+                return true;
+            }
+            else if (item.Equals("resource"))
+            {
+                res.ChangeIR(res.InstanceID, (TypeResourceID)value);
+                return true;
+            }
+
+            return false;
+        }
+    }
+
     public class ScriptValue
     {
         private readonly string sVal;

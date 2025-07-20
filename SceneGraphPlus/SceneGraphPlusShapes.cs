@@ -22,7 +22,7 @@ using System.Windows.Forms;
 namespace SceneGraphPlus.Shapes
 {
     // See - https://stackoverflow.com/questions/38747027/how-to-drag-and-move-shapes-in-c-sharp
-    public abstract class AbstractGraphShape
+    public abstract class GraphShape
     {
         protected DrawingSurface surface;
         private bool _dirty = false;
@@ -43,7 +43,7 @@ namespace SceneGraphPlus.Shapes
 
         public string strData; // Any old shit that needs to be stored for later use.
 
-        protected AbstractGraphShape(DrawingSurface surface)
+        protected GraphShape(DrawingSurface surface)
         {
             this.surface = surface;
 
@@ -73,7 +73,7 @@ namespace SceneGraphPlus.Shapes
         public abstract void Move(Point delta);
     }
 
-    public abstract class AbstractGraphConnector : AbstractGraphShape, IEquatable<AbstractGraphConnector>
+    public abstract class GraphConnector : GraphShape, IEquatable<GraphConnector>
     {
         public static readonly Color ConnectorColour = Color.FromName(Properties.Settings.Default.ConnectorColour);
         public static readonly Color ConnectorHighlightColour = Color.FromName(Properties.Settings.Default.ConnectorHighlightColour);
@@ -89,10 +89,10 @@ namespace SceneGraphPlus.Shapes
         private int index;
         private string label;
 
-        protected AbstractGraphBlock startBlock = null;
-        protected AbstractGraphBlock endBlock = null;
+        protected GraphBlock startBlock = null;
+        protected GraphBlock endBlock = null;
 
-        protected AbstractGraphConnector(DrawingSurface surface, AbstractGraphBlock startBlock, AbstractGraphBlock endBlock) : base(surface)
+        protected GraphConnector(DrawingSurface surface, GraphBlock startBlock, GraphBlock endBlock) : base(surface)
         {
             this.startBlock = startBlock;
             this.endBlock = endBlock;
@@ -128,11 +128,11 @@ namespace SceneGraphPlus.Shapes
             set => label = value;
         }
 
-        public AbstractGraphBlock StartBlock => startBlock;
+        public GraphBlock StartBlock => startBlock;
 
-        public AbstractGraphBlock EndBlock => endBlock;
+        public GraphBlock EndBlock => endBlock;
 
-        public void SetEndBlock(AbstractGraphBlock block, bool makesDirty)
+        public void SetEndBlock(GraphBlock block, bool makesDirty)
         {
             endBlock?.DisconnectFrom(this);
 
@@ -147,7 +147,7 @@ namespace SceneGraphPlus.Shapes
 
         public abstract void Draw(Graphics g, bool hideMissingBlocks, int count);
 
-        public bool Equals(AbstractGraphConnector that)
+        public bool Equals(GraphConnector that)
         {
             return (this.StartBlock.Equals(that.StartBlock) && this.EndBlock.Equals(that.EndBlock));
         }
@@ -163,10 +163,10 @@ namespace SceneGraphPlus.Shapes
         }
     }
 
-    public class BezierConnector : AbstractGraphConnector
+    public class BezierConnector : GraphConnector
     {
         // See - https://learn.microsoft.com/en-us/dotnet/api/system.drawing.graphics.drawbezier?view=net-8.0&viewFallbackFrom=dotnet-plat-ext-7.0
-        public BezierConnector(DrawingSurface surface, AbstractGraphBlock startBlock, AbstractGraphBlock endBlock) : base(surface, startBlock, endBlock) { }
+        public BezierConnector(DrawingSurface surface, GraphBlock startBlock, GraphBlock endBlock) : base(surface, startBlock, endBlock) { }
 
         public override GraphicsPath GetPath()
         {
@@ -341,7 +341,7 @@ namespace SceneGraphPlus.Shapes
         }
     }
 
-    public abstract class AbstractGraphBlock : AbstractGraphShape, IEquatable<AbstractGraphBlock>, IComparable<AbstractGraphBlock>, IDisposable
+    public abstract class GraphBlock : GraphShape, IEquatable<GraphBlock>, IComparable<GraphBlock>, IDisposable
     {
         public static readonly Color BadTgirColour = Color.FromName(Properties.Settings.Default.BadTgirColour);
         public static readonly Color MaxisBlockColour = Color.FromName(Properties.Settings.Default.MaxisBlockColour);
@@ -368,7 +368,7 @@ namespace SceneGraphPlus.Shapes
         private bool fileListValid = true;
         private bool lightValid = true;
 
-        protected AbstractGraphBlock clonedFrom = null;
+        protected GraphBlock clonedFrom = null;
 
         public override bool IsDirty => (IsClone ? clonedFrom.IsDirty : (base.IsDirty || deleteMe));
 
@@ -448,17 +448,17 @@ namespace SceneGraphPlus.Shapes
         private Color fillColour = Color.HotPink;
         private readonly Color textColour = Color.Black;
 
-        private readonly List<AbstractGraphConnector> outConnectors = new List<AbstractGraphConnector>(); // Connectors this is the StartBlock of
-        private readonly List<AbstractGraphConnector> inConnectors = new List<AbstractGraphConnector>(); // Connectors this is the EndBlock of
+        private readonly List<GraphConnector> outConnectors = new List<GraphConnector>(); // Connectors this is the StartBlock of
+        private readonly List<GraphConnector> inConnectors = new List<GraphConnector>(); // Connectors this is the EndBlock of
 
-        public AbstractGraphBlock SoleParent => (inConnectors.Count == 1) ? inConnectors[0].StartBlock : null;
-        public AbstractGraphBlock SoleRcolParent
+        public GraphBlock SoleParent => (inConnectors.Count == 1) ? inConnectors[0].StartBlock : null;
+        public GraphBlock SoleRcolParent
         {
             get
             {
-                AbstractGraphBlock rcolBlock = null;
+                GraphBlock rcolBlock = null;
 
-                foreach (AbstractGraphConnector connector in inConnectors)
+                foreach (GraphConnector connector in inConnectors)
                 {
                     if (DBPFData.IsKnownRcolType(connector.StartBlock.TypeId))
                     {
@@ -472,26 +472,28 @@ namespace SceneGraphPlus.Shapes
             }
         }
 
-        protected AbstractGraphBlock(DrawingSurface surface) : base(surface)
+        protected GraphBlock(DrawingSurface surface) : base(surface)
         {
         }
 
-        protected AbstractGraphBlock(DrawingSurface surface, BlockRef blockRef) : base(surface)
+        protected GraphBlock(DrawingSurface surface, BlockRef blockRef) : base(surface)
         {
             this.blockRef = blockRef;
         }
 
-        public abstract AbstractGraphBlock MakeClone(Point delta);
+        public abstract GraphBlock MakeClone(Point delta);
 
         public void ReplaceBlockRef(BlockRef blockRef)
         {
             Trace.Assert(!IsClone, "Cannot replace a clone's BlockRef");
 
-            // Use this.blockRef here and not BlockRef as we want the non-clone redirected value
-
-            if (!(this.blockRef.Key != null && this.blockRef.Key.Equals(blockRef.Key)))
+            if (blockRef.GUID == DBPFData.GUID_NULL)
             {
-                Trace.Assert((this.blockRef.Key == null && blockRef.SgFullName != null) || (this.blockRef.SgFullName == null && this.blockRef.Key != null), "Bad BlockRef replacement");
+                // Use this.blockRef here and not BlockRef as we want the non-clone redirected value
+                if (!(this.blockRef.Key != null && this.blockRef.Key.Equals(blockRef.Key)))
+                {
+                    Trace.Assert((this.blockRef.Key == null && blockRef.SgFullName != null) || (this.blockRef.SgFullName == null && this.blockRef.Key != null), "Bad BlockRef replacement");
+                }
             }
 
             this.blockRef = blockRef;
@@ -555,10 +557,7 @@ namespace SceneGraphPlus.Shapes
         public string PackagePath => BlockRef.PackagePath;
         public string KeyName => BlockRef.Key?.ToString();
         public string SgOriginalName => BlockRef.SgOriginalName;
-        public string SgFullName
-        {
-            get => BlockRef.SgFullName;
-        }
+        public string SgFullName => BlockRef.SgFullName;
         public void SetSgFullName(string value, bool prefixLowerCase)
         {
             BlockRef.SetSgFullName(value, prefixLowerCase);
@@ -567,6 +566,9 @@ namespace SceneGraphPlus.Shapes
         }
 
         public string SgBaseName => BlockRef.MinimiseSgName(SgFullName);
+
+        public TypeGUID GUID => BlockRef.GUID;
+        public void SetGuid(TypeGUID guid) => BlockRef.SetGuid(guid);
 
         public bool HasIssues => !IsDirty && !(IsFileListValid && IsLightValid);
 
@@ -584,7 +586,7 @@ namespace SceneGraphPlus.Shapes
             FixFileListIssues();
             SetDirty();
 
-            foreach (AbstractGraphConnector inConnector in inConnectors)
+            foreach (GraphConnector inConnector in inConnectors)
             {
                 inConnector.StartBlock.SetDirty();
             }
@@ -600,7 +602,7 @@ namespace SceneGraphPlus.Shapes
 
         public bool IsMaxis
         {
-            get => (BlockRef.Key.GroupID == DBPFData.GROUP_SG_MAXIS || (BlockRef.Key.TypeID == Gzps.TYPE && BlockRef.Key.GroupID == DBPFData.GROUP_GZPS_MAXIS));
+            get => (BlockRef.Key != null) && (BlockRef.Key.GroupID == DBPFData.GROUP_SG_MAXIS || (BlockRef.Key.TypeID == Gzps.TYPE && BlockRef.Key.GroupID == DBPFData.GROUP_GZPS_MAXIS));
         }
 
         public bool IsClone
@@ -671,11 +673,11 @@ namespace SceneGraphPlus.Shapes
             get => (BlockRef.IsTgirValid ? textColour : Color.White);
         }
 
-        public List<AbstractGraphConnector> GetInConnectors()
+        public List<GraphConnector> GetInConnectors()
         {
-            List<AbstractGraphConnector> connectors = new List<AbstractGraphConnector>();
+            List<GraphConnector> connectors = new List<GraphConnector>();
 
-            foreach (AbstractGraphConnector connector in inConnectors)
+            foreach (GraphConnector connector in inConnectors)
             {
                 connectors.Add(connector);
             }
@@ -683,13 +685,13 @@ namespace SceneGraphPlus.Shapes
             return connectors;
         }
 
-        public List<AbstractGraphConnector> OutConnectors => outConnectors;
+        public List<GraphConnector> OutConnectors => outConnectors;
 
-        public List<AbstractGraphConnector> GetOutConnectors()
+        public List<GraphConnector> GetOutConnectors()
         {
-            List<AbstractGraphConnector> connectors = new List<AbstractGraphConnector>();
+            List<GraphConnector> connectors = new List<GraphConnector>();
 
-            foreach (AbstractGraphConnector connector in outConnectors)
+            foreach (GraphConnector connector in outConnectors)
             {
                 connectors.Add(connector);
             }
@@ -697,9 +699,9 @@ namespace SceneGraphPlus.Shapes
             return connectors;
         }
 
-        public AbstractGraphConnector OutConnectorByLabel(string label)
+        public GraphConnector OutConnectorByLabel(string label)
         {
-            foreach (AbstractGraphConnector connector in outConnectors)
+            foreach (GraphConnector connector in outConnectors)
             {
                 if (connector.Label.Equals(label))
                 {
@@ -710,9 +712,22 @@ namespace SceneGraphPlus.Shapes
             return null;
         }
 
-        public AbstractGraphConnector ConnectTo(int index, string label, AbstractGraphBlock endBlock)
+        public GraphConnector OutConnectorByIndex(int index)
         {
-            AbstractGraphConnector connector = new BezierConnector(surface, this, endBlock) { Index = index, Label = label };
+            foreach (GraphConnector connector in outConnectors)
+            {
+                if (connector.Index == index)
+                {
+                    return connector;
+                }
+            }
+
+            return null;
+        }
+
+        public GraphConnector ConnectTo(int index, string label, GraphBlock endBlock)
+        {
+            GraphConnector connector = new BezierConnector(surface, this, endBlock) { Index = index, Label = label };
             outConnectors.Add(connector);
 
             endBlock.ConnectedFrom(connector);
@@ -720,12 +735,12 @@ namespace SceneGraphPlus.Shapes
             return connector;
         }
 
-        public void ConnectedFrom(AbstractGraphConnector connector)
+        public void ConnectedFrom(GraphConnector connector)
         {
             inConnectors.Add(connector);
         }
 
-        public void DisconnectFrom(AbstractGraphConnector connector)
+        public void DisconnectFrom(GraphConnector connector)
         {
             inConnectors.Remove(connector);
         }
@@ -740,47 +755,47 @@ namespace SceneGraphPlus.Shapes
         public bool IsLeftConnectionPoint(Point that) => (LeftConnectionPoint == that);
         public bool IsRightConnectionPoint(Point that) => (RightConnectionPoint == that);
 
-        public bool IsAbove(AbstractGraphBlock that)
+        public bool IsAbove(GraphBlock that)
         {
             return DistanceAbove(that) >= 0;
         }
 
-        public bool IsBelow(AbstractGraphBlock that)
+        public bool IsBelow(GraphBlock that)
         {
             return !IsAbove(that);
         }
 
-        public bool IsLeft(AbstractGraphBlock that)
+        public bool IsLeft(GraphBlock that)
         {
             return DistanceLeft(that) >= 0;
         }
 
-        public bool IsRight(AbstractGraphBlock that)
+        public bool IsRight(GraphBlock that)
         {
             return !IsLeft(that);
         }
 
-        public int DistanceAbove(AbstractGraphBlock that)
+        public int DistanceAbove(GraphBlock that)
         {
             return (that.Centre.Y - this.Centre.Y);
         }
 
-        public int DistanceBelow(AbstractGraphBlock that)
+        public int DistanceBelow(GraphBlock that)
         {
             return (this.Centre.Y - that.Centre.Y);
         }
 
-        public int DistanceLeft(AbstractGraphBlock that)
+        public int DistanceLeft(GraphBlock that)
         {
             return (that.Centre.X - this.Centre.X);
         }
 
-        public int DistanceRight(AbstractGraphBlock that)
+        public int DistanceRight(GraphBlock that)
         {
             return (this.Centre.X - that.Centre.X);
         }
 
-        public Point BestStartPoint(AbstractGraphBlock that)
+        public Point BestStartPoint(GraphBlock that)
         {
             if (IsAbove(that))
             {
@@ -804,7 +819,7 @@ namespace SceneGraphPlus.Shapes
             }
         }
 
-        public Point BestEndPoint(AbstractGraphBlock that)
+        public Point BestEndPoint(GraphBlock that)
         {
             if (IsLeft(that))
             {
@@ -903,7 +918,7 @@ namespace SceneGraphPlus.Shapes
             }
         }
 
-        public bool Equals(AbstractGraphBlock that)
+        public bool Equals(GraphBlock that)
         {
             if (that == null) return false;
 
@@ -917,7 +932,7 @@ namespace SceneGraphPlus.Shapes
             }
         }
 
-        public int CompareTo(AbstractGraphBlock that)
+        public int CompareTo(GraphBlock that)
         {
             if (this.IsClone) return 1;
             if (that.IsClone) return -1;
@@ -934,7 +949,7 @@ namespace SceneGraphPlus.Shapes
         {
             while (outConnectors.Count > 0)
             {
-                AbstractGraphConnector outConnector = outConnectors[0];
+                GraphConnector outConnector = outConnectors[0];
                 outConnectors.RemoveAt(0);
 
                 outConnector.EndBlock.DisconnectFrom(outConnector);
@@ -943,7 +958,7 @@ namespace SceneGraphPlus.Shapes
 
             while (inConnectors.Count > 0)
             {
-                AbstractGraphConnector inConnector = inConnectors[0];
+                GraphConnector inConnector = inConnectors[0];
                 inConnectors.RemoveAt(0);
 
                 DisconnectFrom(inConnector);
@@ -969,7 +984,7 @@ namespace SceneGraphPlus.Shapes
         }
     }
 
-    public class RoundedBlock : AbstractGraphBlock
+    public class RoundedBlock : GraphBlock
     {
         private int radius = 10;
 
@@ -979,7 +994,7 @@ namespace SceneGraphPlus.Shapes
             set => radius = value;
         }
 
-        private RoundedBlock(DrawingSurface surface, AbstractGraphBlock clonedFrom) : base(surface)
+        private RoundedBlock(DrawingSurface surface, GraphBlock clonedFrom) : base(surface)
         {
             this.clonedFrom = clonedFrom;
             this.Text = clonedFrom.Text;
@@ -988,11 +1003,11 @@ namespace SceneGraphPlus.Shapes
         public RoundedBlock(DrawingSurface surface, BlockRef blockRef) : base(surface, blockRef) { }
 
 
-        public override AbstractGraphBlock MakeClone(Point delta)
+        public override GraphBlock MakeClone(Point delta)
         {
-            AbstractGraphBlock clone = new RoundedBlock(surface, this);
+            GraphBlock clone = new RoundedBlock(surface, this);
 
-            foreach (AbstractGraphConnector connector in OutConnectors)
+            foreach (GraphConnector connector in OutConnectors)
             {
                 clone.ConnectTo(connector.Index, connector.Label, connector.EndBlock);
             }

@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
+using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,7 +35,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 
         internal static readonly string[] txtrPropKeys = { "stdMatBaseTextureName", "stdMatNormalMapTextureName", "stdMatEnvCubeTextureName" };
 
-        private readonly CMaterialDefinition cMaterialDefinition = null;
+        private CMaterialDefinition cMaterialDefinition = null;
         public CMaterialDefinition MaterialDefinition => cMaterialDefinition;
 
         public override bool IsDirty => base.IsDirty || (cMaterialDefinition != null && cMaterialDefinition.IsDirty);
@@ -47,6 +48,35 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
         }
 
         public Txmt(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
+        {
+            FindMaterialDataBlock();
+
+            if (reader != null)
+            {
+                if (cMaterialDefinition == null)
+                {
+#if DEBUG
+                    throw new Exception($"cMaterialDefinition not found in {this}");
+#else
+                    logger.Warn($"cMaterialDefinition not found in {this}");
+#endif
+                }
+            }
+        }
+
+        public Txmt Duplicate(string newName)
+        {
+            string name = Hashes.StripHashFromName(newName);
+            if (!name.EndsWith("_txmt")) name = $"{name}_txmt";
+            Txmt newTxmt = new Txmt(new DBPFEntry(new DBPFKey(Txmt.TYPE, this.GroupID, Hashes.InstanceIDHash(name), Hashes.ResourceIDHash(name))), null);
+            base.Duplicate(newTxmt, newName);
+
+            newTxmt.FindMaterialDataBlock();
+
+            return newTxmt;
+        }
+
+        private void FindMaterialDataBlock()
         {
             foreach (IRcolBlock block in Blocks)
             {
@@ -65,15 +95,6 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 #endif
                     }
                 }
-            }
-
-            if (cMaterialDefinition == null)
-            {
-#if DEBUG
-                throw new Exception($"cMaterialDefinition not found in {this}");
-#else
-                logger.Warn($"cMaterialDefinition not found in {this}");
-#endif
             }
         }
 

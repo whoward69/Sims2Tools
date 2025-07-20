@@ -19,6 +19,7 @@ namespace Sims2Tools
         private static readonly string Sims2PathKey = "Sims2Path"; // This is the path to the directory containing the TSBin sub-directory that contains the executable used to start the game.
         private static readonly string Sims2HomePathKey = "Sims2HomePath";
         private static readonly string Sims2InstallPathKey = "Sims2InstallPath";
+        private static readonly string Sims2DdsUtilsPathKey = "Sims2DdsUtilsPath";
 
 #pragma warning disable CS0414
         private static readonly string Sims2BasePathKey = "Sims2BasePath";
@@ -186,6 +187,12 @@ namespace Sims2Tools
                     RegistryTools.SaveSetting(RegistryKey, CreatorGuidKey, value);
                 }
             }
+        }
+
+        public static string Sims2DdsUtilsPath
+        {
+            get => RegistryTools.GetPath(RegistryKey, Sims2DdsUtilsPathKey);
+            set => RegistryTools.SetPath(RegistryKey, Sims2DdsUtilsPathKey, value);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace SceneGraphPlus.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.12.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -241,7 +241,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
         public int OverflowRow {
             get {
                 return ((int)(this["OverflowRow"]));
@@ -289,7 +289,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public int CresRow {
             get {
                 return ((int)(this["CresRow"]));
@@ -313,7 +313,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int ShpeRow {
             get {
                 return ((int)(this["ShpeRow"]));
@@ -337,7 +337,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
         public int GmndRow {
             get {
                 return ((int)(this["GmndRow"]));
@@ -361,7 +361,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
         public int GmdcRow {
             get {
                 return ((int)(this["GmdcRow"]));
@@ -385,7 +385,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
         public int TxmtRow {
             get {
                 return ((int)(this["TxmtRow"]));
@@ -409,7 +409,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
         public int TxtrRow {
             get {
                 return ((int)(this["TxtrRow"]));
@@ -433,7 +433,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public int GzpsRow {
             get {
                 return ((int)(this["GzpsRow"]));
@@ -457,7 +457,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public int XobjRow {
             get {
                 return ((int)(this["XobjRow"]));
@@ -481,7 +481,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public int XmolRow {
             get {
                 return ((int)(this["XmolRow"]));
@@ -505,7 +505,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public int XtolRow {
             get {
                 return ((int)(this["XtolRow"]));
@@ -529,7 +529,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public int XfncRow {
             get {
                 return ((int)(this["XfncRow"]));
@@ -553,7 +553,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public int XrofRow {
             get {
                 return ((int)(this["XrofRow"]));
@@ -577,7 +577,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public int StrRow {
             get {
                 return ((int)(this["StrRow"]));
@@ -601,7 +601,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
         public int XflrRow {
             get {
                 return ((int)(this["XflrRow"]));
@@ -625,7 +625,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
         public int LifoRow {
             get {
                 return ((int)(this["LifoRow"]));
@@ -649,7 +649,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
         public int LambRow {
             get {
                 return ((int)(this["LambRow"]));
@@ -673,7 +673,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
         public int LdirRow {
             get {
                 return ((int)(this["LdirRow"]));
@@ -697,7 +697,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
         public int LpntRow {
             get {
                 return ((int)(this["LpntRow"]));
@@ -721,7 +721,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
         public int LsptRow {
             get {
                 return ((int)(this["LsptRow"]));
@@ -745,7 +745,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public int AgedRow {
             get {
                 return ((int)(this["AgedRow"]));
@@ -781,7 +781,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
         public int HlsRow {
             get {
                 return ((int)(this["HlsRow"]));
@@ -805,7 +805,7 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int TrksRow {
             get {
                 return ((int)(this["TrksRow"]));
@@ -829,13 +829,37 @@ namespace SceneGraphPlus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("6")]
         public int AudioRow {
             get {
                 return ((int)(this["AudioRow"]));
             }
             set {
                 this["AudioRow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DeepSkyBlue")]
+        public string ObjdBlockColour {
+            get {
+                return ((string)(this["ObjdBlockColour"]));
+            }
+            set {
+                this["ObjdBlockColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int ObjdRow {
+            get {
+                return ((int)(this["ObjdRow"]));
+            }
+            set {
+                this["ObjdRow"] = value;
             }
         }
     }

@@ -285,6 +285,35 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 #endif
         }
 
+        public override IRcolBlock Duplicate(Rcol parent)
+        {
+            CMaterialDefinition newMaterialDef = new CMaterialDefinition(parent)
+            {
+                Version = this.Version
+            };
+
+            newMaterialDef.NameResource.SetVersion(this.NameResource.Version);
+            newMaterialDef.NameResource.BlockName = this.NameResource.BlockName;
+            newMaterialDef.NameResource.FileName = this.NameResource.FileName;
+
+            newMaterialDef.fldsc = this.fldsc;
+            newMaterialDef.mattype = this.mattype;
+
+            for (int i = 0; i < this.properties.Count; i++)
+            {
+                newMaterialDef.properties.Add(new MaterialDefinitionProperty(this.properties[i].Name, this.properties[i].Value));
+            }
+
+            for (int i = 0; i < this.fileList.Count; i++)
+            {
+                newMaterialDef.fileList.Add(this.fileList[i]);
+            }
+
+            newMaterialDef.fileListValid = this.fileListValid;
+
+            return newMaterialDef;
+        }
+
         public override void Dispose()
         {
         }

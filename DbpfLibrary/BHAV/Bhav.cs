@@ -31,6 +31,9 @@ namespace Sims2Tools.DBPF.BHAV
 
         private readonly List<Instruction> instructions = new List<Instruction>();
 
+        private Instruction startInstruction = null;
+        private readonly List<Instruction> unreachableInstructions = new List<Instruction>();
+
         public Bhav(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             this.header = new BhavHeader();
@@ -79,6 +82,68 @@ namespace Sims2Tools.DBPF.BHAV
                 inst.Serialize(writer);
             }
         }
+
+        #region Reordering
+        public void ReorderInstructionTree()
+        {
+            int nextNumber = 0;
+            unreachableInstructions.Clear();
+
+            if (startInstruction == null) BuildInstructionTree();
+
+            nextNumber = RenumberInstruction(startInstruction, nextNumber);
+
+            foreach (Instruction inst in instructions)
+            {
+                if (inst.NewNumber == -1)
+                {
+                    nextNumber = RenumberInstruction(inst, nextNumber);
+
+                    unreachableInstructions.Add(inst);
+                    inst.NewNumber *= -1; // TODO - DBPF Viewer - test stuff
+                }
+
+                Console.Out.WriteLine($"{inst.OldNumber} -> {inst.NewNumber}"); // TODO - DBPF Viewer - test stuff
+            }
+        }
+
+        private void BuildInstructionTree()
+        {
+            int oldNumber = 0;
+
+            startInstruction = instructions[0];
+            startInstruction.IsReachable = true;
+
+            foreach (Instruction inst in instructions)
+            {
+                inst.OldNumber = oldNumber++;
+                inst.NewNumber = -1;
+
+                Instruction trueInst = inst.IsTrueLinked ? instructions[inst.TrueTarget] : null;
+                Instruction falseInst = inst.IsFalseLinked ? instructions[inst.FalseTarget] : null;
+
+                inst.TrueInstuction = trueInst; if (trueInst != null) trueInst.IsReachable = true;
+                inst.FalseInstuction = falseInst; if (falseInst != null) falseInst.IsReachable = true;
+            }
+        }
+
+        private int RenumberInstruction(Instruction currentInstruction, int nextNumber)
+        {
+            currentInstruction.NewNumber = nextNumber++;
+
+            if (currentInstruction.IsTrueLinked && currentInstruction.TrueInstuction.NewNumber == -1)
+            {
+                nextNumber = RenumberInstruction(currentInstruction.TrueInstuction, nextNumber);
+            }
+
+            if (currentInstruction.IsFalseLinked && currentInstruction.FalseInstuction.NewNumber == -1)
+            {
+                nextNumber = RenumberInstruction(currentInstruction.FalseInstuction, nextNumber);
+            }
+
+            return nextNumber;
+        }
+        #endregion
 
         #region IDBPFScriptable
         public bool Assert(string item, ScriptValue sv)

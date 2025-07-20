@@ -73,7 +73,7 @@ namespace Sims2Tools.DBPF.CPF
         {
             items = new List<CpfItem>();
 
-            Unserialize(reader, (int)entry.DataSize);
+            if (reader != null) Unserialize(reader, (int)entry.DataSize);
         }
 
         internal void Unserialize(DbpfReader reader, int len)
@@ -315,26 +315,8 @@ namespace Sims2Tools.DBPF.CPF
                         }
                 }
             }
-            else
-            {
-                if (item.Equals("group"))
-                {
-                    ChangeGroupID(sv);
-                    return true;
-                }
-                else if (item.Equals("instance"))
-                {
-                    ChangeIR((TypeInstanceID)sv, ResourceID);
-                    return true;
-                }
-                else if (item.Equals("resource"))
-                {
-                    ChangeIR(InstanceID, (TypeResourceID)sv);
-                    return true;
-                }
-            }
 
-            return false;
+            return DbpfScriptable.IsTGIRAssignment(this, item, sv);
         }
 
         public IDbpfScriptable Indexed(int index)

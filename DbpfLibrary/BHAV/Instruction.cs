@@ -27,33 +27,53 @@ namespace Sims2Tools.DBPF.BHAV
         private readonly int index;
 
         private ushort opcode;
-        private ushort addr1;
-        private ushort addr2;
+        private ushort addrTrue;
+        private ushort addrFalse;
         private byte nodeversion;
 
         private readonly List<Operand> operands = new List<Operand>();
 
-        public ushort OpCode
-        {
-            get => this.opcode;
-        }
+        private Instruction trueInstruction = null;
+        private Instruction falseInstruction = null;
+        private bool isReachable = false;
+        private int oldNumber = -1;
+        private int newNumber = -1;
 
-        public byte NodeVersion
-        {
-            get => this.nodeversion;
-        }
+        public ushort OpCode => opcode;
+        public byte NodeVersion => nodeversion;
+        public ushort TrueTarget => addrTrue;
+        public ushort FalseTarget => addrFalse;
 
-        public ushort TrueTarget
-        {
-            get => this.addr1;
-        }
-
-        public ushort FalseTarget
-        {
-            get => this.addr2;
-        }
+        public bool IsTrueLinked => (addrTrue != TARGET_ERROR && addrTrue != TARGET_TRUE && addrTrue != TARGET_FALSE);
+        public bool IsFalseLinked => (addrFalse != TARGET_ERROR && addrFalse != TARGET_TRUE && addrFalse != TARGET_FALSE);
 
         public List<Operand> Operands => this.operands;
+
+        public Instruction TrueInstuction
+        {
+            get => trueInstruction;
+            set => trueInstruction = value;
+        }
+        public Instruction FalseInstuction
+        {
+            get => falseInstruction;
+            set => falseInstruction = value;
+        }
+        public bool IsReachable
+        {
+            get => isReachable;
+            set => isReachable = value;
+        }
+        public int NewNumber
+        {
+            get => newNumber;
+            set => newNumber = value;
+        }
+        public int OldNumber
+        {
+            get => oldNumber;
+            set => oldNumber = value;
+        }
 
         public Instruction(DbpfReader reader, ushort format, int index)
         {
@@ -75,11 +95,11 @@ namespace Sims2Tools.DBPF.BHAV
 
             switch (target)
             {
-                case 0xFFFC:
+                case TARGET_ERROR:
                     return 253;
-                case 0xFFFD:
+                case TARGET_TRUE:
                     return 254;
-                case 0xFFFE:
+                case TARGET_FALSE:
                     return byte.MaxValue;
                 default:
                     return (ushort)(target & byte.MaxValue);
@@ -93,11 +113,11 @@ namespace Sims2Tools.DBPF.BHAV
             switch (addr)
             {
                 case 253:
-                    return 0xFFFC;
+                    return TARGET_ERROR;
                 case 254:
-                    return 0xFFFD;
+                    return TARGET_TRUE;
                 case byte.MaxValue:
-                    return 0xFFFE;
+                    return TARGET_FALSE;
                 default:
                     return addr;
             }
@@ -109,13 +129,13 @@ namespace Sims2Tools.DBPF.BHAV
 
             if (format < 0x8007)
             {
-                addr1 = FormatSpecificSetAddr(reader.ReadByte());
-                addr2 = FormatSpecificSetAddr(reader.ReadByte());
+                addrTrue = FormatSpecificSetAddr(reader.ReadByte());
+                addrFalse = FormatSpecificSetAddr(reader.ReadByte());
             }
             else
             {
-                addr1 = FormatSpecificSetAddr(reader.ReadUInt16());
-                addr2 = FormatSpecificSetAddr(reader.ReadUInt16());
+                addrTrue = FormatSpecificSetAddr(reader.ReadUInt16());
+                addrFalse = FormatSpecificSetAddr(reader.ReadUInt16());
             }
 
             int opCount = 16;
@@ -169,13 +189,13 @@ namespace Sims2Tools.DBPF.BHAV
 
             if (format < 0x8007)
             {
-                writer.WriteByte((byte)FormatSpecificGetAddr(addr1));
-                writer.WriteByte((byte)FormatSpecificGetAddr(addr2));
+                writer.WriteByte((byte)FormatSpecificGetAddr(addrTrue));
+                writer.WriteByte((byte)FormatSpecificGetAddr(addrFalse));
             }
             else
             {
-                writer.WriteUInt16(FormatSpecificGetAddr(addr1));
-                writer.WriteUInt16(FormatSpecificGetAddr(addr2));
+                writer.WriteUInt16(FormatSpecificGetAddr(addrTrue));
+                writer.WriteUInt16(FormatSpecificGetAddr(addrFalse));
             }
 
             if (format >= 0x8005)

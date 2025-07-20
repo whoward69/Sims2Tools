@@ -15,7 +15,6 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.Utils;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -27,6 +26,8 @@ namespace Sims2Tools.DBPF.OBJD
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4F424A44;
         public const string NAME = "OBJD";
+
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private ObjdType type;
 
@@ -60,6 +61,13 @@ namespace Sims2Tools.DBPF.OBJD
         public TypeGUID DiagonalGuid => diagonalGuid;
 
         public TypeGUID GridGuid => gridGuid;
+
+        public void SetGuid(TypeGUID newGuid)
+        {
+            guid = newGuid;
+            SetRawData(ObjdIndex.Guid1, (ushort)(((uint)newGuid) & 0x0000FFFF));
+            SetRawData(ObjdIndex.Guid2, (ushort)((((uint)newGuid) & 0xFFFF0000) >> 16));
+        }
 
         public bool IsRawDataValid(int index)
         {
@@ -155,7 +163,10 @@ namespace Sims2Tools.DBPF.OBJD
                 int nameLen = reader.ReadInt32();
                 string name = Helper.ToString(reader.ReadBytes(nameLen));
 
-                Debug.Assert(name.Equals(KeyName));
+                if (!name.Substring(0, Math.Min(KeyName.Length, name.Length)).Equals(KeyName))
+                {
+                    logger.Debug($"{name} differs from {KeyName}");
+                }
             }
             else
             {

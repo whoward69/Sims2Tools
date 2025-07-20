@@ -169,23 +169,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
 
         public bool Assignment(string item, ScriptValue sv)
         {
-            if (item.Equals("group"))
-            {
-                ChangeGroupID(sv);
-                return true;
-            }
-            else if (item.Equals("instance"))
-            {
-                ChangeIR(sv, ResourceID);
-                return true;
-            }
-            else if (item.Equals("resource"))
-            {
-                ChangeIR(InstanceID, sv);
-                return true;
-            }
-
-            return false;
+            return DbpfScriptable.IsTGIRAssignment(this, item, sv);
         }
 
         public IDbpfScriptable Indexed(int index)

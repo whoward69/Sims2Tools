@@ -83,8 +83,28 @@ using System.Text;
 
 namespace Sims2Tools.DBPF.Package
 {
+    public interface IDBPFFile
+    {
+        string PackagePath { get; }
+        string PackageDir { get; }
+        string PackageName { get; }
+        string PackageNameNoExtn { get; }
+
+        List<DBPFEntry> GetEntriesByType(TypeTypeID type);
+
+        DBPFEntry GetEntryByKey(DBPFKey key);
+        DBPFEntry GetEntryByName(TypeTypeID typeId, string sgName);
+
+        DBPFResource GetResourceByTGIR(int tgir);
+        DBPFResource GetResourceByKey(DBPFKey key);
+        DBPFResource GetResourceByEntry(DBPFEntry entry);
+        DBPFResource GetResourceByName(TypeTypeID typeId, string sgName);
+
+        string GetFilenameByEntry(DBPFEntry entry);
+    }
+
     // See also - https://modthesims.info/wiki.php?title=DBPF/Source_Code and https://modthesims.info/wiki.php?title=DBPF
-    public class DBPFFile : IDisposable
+    public class DBPFFile : IDBPFFile, IDisposable
     {
         private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -265,6 +285,35 @@ namespace Sims2Tools.DBPF.Package
             }
 
             return (subFolder != null) ? updateName : backupName;
+        }
+
+        public bool RetryUpdateFromTemp()
+        {
+            bool ok = true;
+
+            string originalName = packagePath;
+            string updateName = $"{packagePath}.temp";
+
+            if (File.Exists(updateName))
+            {
+                try
+                {
+                    this.Close();
+
+                    File.Delete(originalName);
+
+                    File.Copy(updateName, originalName, true);
+                    File.Delete(updateName);
+                }
+                catch (Exception)
+                {
+                    ok = false;
+                }
+
+                Read(File.OpenRead(originalName));
+            }
+
+            return ok;
         }
 
         private string NextBackupName()

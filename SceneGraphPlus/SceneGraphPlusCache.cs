@@ -8,6 +8,7 @@
 
 using SceneGraphPlus.Shapes;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LAMB;
 using Sims2Tools.DBPF.SceneGraph.LDIR;
@@ -21,7 +22,7 @@ namespace SceneGraphPlus.Cache
 {
     public class BlockCache
     {
-        private readonly Dictionary<BlockRef, AbstractGraphBlock> processedBlocks = new Dictionary<BlockRef, AbstractGraphBlock>();
+        private readonly Dictionary<BlockRef, GraphBlock> processedBlocks = new Dictionary<BlockRef, GraphBlock>();
 
         public BlockCache()
         {
@@ -38,17 +39,44 @@ namespace SceneGraphPlus.Cache
             return processedBlocks.ContainsKey(blockRef);
         }
 
-        public bool TryGetValue(BlockRef blockRef, out AbstractGraphBlock block)
+        public bool TryGetValue(BlockRef blockRef, out GraphBlock block)
         {
-            return processedBlocks.TryGetValue(blockRef, out block);
+            if (blockRef.TypeId == Objd.TYPE)
+            {
+                foreach (KeyValuePair<BlockRef, GraphBlock> entries in processedBlocks)
+                {
+                    if (entries.Key.Equals(blockRef))
+                    {
+                        block = entries.Value;
+                        return true;
+                    }
+                }
+
+                block = null;
+                return false;
+            }
+            else
+            {
+                return processedBlocks.TryGetValue(blockRef, out block);
+            }
         }
 
-        public void Add(BlockRef blockRef, AbstractGraphBlock block)
+        public void Add(BlockRef blockRef, GraphBlock block)
         {
             if (!processedBlocks.ContainsKey(blockRef))
             {
                 processedBlocks.Add(blockRef, block);
             }
+        }
+
+        public void UpdateOrAdd(BlockRef blockRef, GraphBlock block)
+        {
+            if (processedBlocks.ContainsKey(blockRef))
+            {
+                processedBlocks.Remove(blockRef);
+            }
+
+            processedBlocks.Add(blockRef, block);
         }
     }
 
@@ -61,8 +89,9 @@ namespace SceneGraphPlus.Cache
         private DBPFKey key;
         private string sgOriginalName;
         private string sgName;
+        private TypeGUID guid;
 
-        private BlockRef(DBPFFile package, TypeTypeID typeId)
+        private BlockRef(IDBPFFile package, TypeTypeID typeId)
         {
             this.packagePath = package.PackagePath;
             this.packageName = package.PackageName;
@@ -70,17 +99,28 @@ namespace SceneGraphPlus.Cache
 
             this.originalKey = null;
             this.sgOriginalName = null;
+
+            this.guid = DBPFData.GUID_NULL;
         }
 
-        internal BlockRef(DBPFFile package, TypeTypeID typeId, DBPFKey key) : this(package, typeId)
+        internal BlockRef(IDBPFFile package, TypeTypeID typeId, DBPFKey key) : this(package, typeId)
         {
-            this.originalKey = key;
             this.key = key;
+            this.originalKey = this.key;
             this.sgName = null;
             this.sgOriginalName = this.sgName;
         }
 
-        internal BlockRef(DBPFFile package, TypeTypeID typeId, TypeGroupID groupId, string sgName, bool prefixLowerCase) : this(package, typeId)
+        internal BlockRef(IDBPFFile package, TypeTypeID typeId, TypeGUID guid) : this(package, typeId)
+        {
+            this.key = null;
+            this.originalKey = this.key;
+            this.sgName = null;
+            this.sgOriginalName = this.sgName;
+            this.guid = guid;
+        }
+
+        internal BlockRef(IDBPFFile package, TypeTypeID typeId, TypeGroupID groupId, string sgName, bool prefixLowerCase) : this(package, typeId)
         {
             TypeGroupID sgGroupId = groupId;
 
@@ -126,6 +166,11 @@ namespace SceneGraphPlus.Cache
         {
             key = new DBPFKey(key.TypeID, key.GroupID, Hashes.InstanceIDHash(name), Hashes.ResourceIDHash(name));
         }
+
+        public TypeGUID GUID => guid;
+        public void SetGuid(string guid) => this.guid = (TypeGUID)guid;
+        public void SetGuid(TypeGUID guid) => this.guid = guid;
+
         public DBPFKey OriginalKey => originalKey;
         public DBPFKey Key => key;
         public string PackagePath => packagePath;
@@ -215,12 +260,16 @@ namespace SceneGraphPlus.Cache
 
         public override int GetHashCode()
         {
-            return (key != null) ? key.GetHashCode() : sgName.ToLower().GetHashCode();
+            return (guid != DBPFData.GUID_NULL) ? guid.AsInt() : ((key != null) ? key.GetHashCode() : sgName.ToLower().GetHashCode());
         }
 
         public bool Equals(BlockRef that)
         {
-            if (key != null)
+            if (this.guid != DBPFData.GUID_NULL && that.guid != DBPFData.GUID_NULL)
+            {
+                return this.guid == that.guid;
+            }
+            else if (this.key != null)
             {
                 if (this.key.Equals(that.key))
                 {
@@ -242,7 +291,14 @@ namespace SceneGraphPlus.Cache
             {
                 if (this.typeId == that.typeId)
                 {
-                    return this.sgName.ToLower().Equals(that.sgName.ToLower());
+                    if (this.sgName != null)
+                    {
+                        return this.sgName.ToLower().Equals(that.sgName.ToLower());
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 else
                 {
@@ -257,7 +313,11 @@ namespace SceneGraphPlus.Cache
 
             if (this.typeId != that.typeId) return this.typeId.CompareTo(that.typeId);
 
-            if (key != null)
+            if (this.guid != DBPFData.GUID_NULL && that.guid != DBPFData.GUID_NULL)
+            {
+                return this.guid.CompareTo(that.guid);
+            }
+            else if (this.key != null)
             {
                 return this.key.CompareTo(that.key);
             }
@@ -269,7 +329,7 @@ namespace SceneGraphPlus.Cache
 
         public override string ToString()
         {
-            return $"{((key != null) ? key.ToString() : sgName)} in {packageName}"; ;
+            return $"{((key != null) ? key.ToString() : ((guid != DBPFData.GUID_NULL) ? guid.ToString() : sgName))} in {packageName}"; ;
         }
     }
 }

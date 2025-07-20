@@ -54,6 +54,12 @@ namespace Sims2Tools.DBPF.SceneGraph
             protected set { version = value; }
         }
 
+        public void SetVersion(uint value)
+        {
+            version = value;
+            _isDirty = true;
+        }
+
         public Rcol Parent
         {
             get { return parent; }
@@ -116,6 +122,11 @@ namespace Sims2Tools.DBPF.SceneGraph
         public virtual void Serialize(DbpfWriter writer)
         {
             throw new NotImplementedException($"{BlockID} does not implement Serialize");
+        }
+
+        public virtual IRcolBlock Duplicate(Rcol parent)
+        {
+            throw new NotImplementedException($"{BlockID} does not implement Duplicate");
         }
 
         public virtual XmlElement AddXml(XmlElement parent)

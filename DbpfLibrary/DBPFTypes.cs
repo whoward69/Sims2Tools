@@ -33,6 +33,9 @@ namespace Sims2Tools.DBPF
         }
 
         public static explicit operator TypeGUID(uint guid) => new TypeGUID(guid);
+        public static explicit operator TypeGUID(string guid) => new TypeGUID(new ScriptValue(guid));
+
+        public static explicit operator uint(TypeGUID guid) => guid.guid;
 
         public static uint operator %(TypeGUID lhs, int rhs) => (uint)(lhs.guid % rhs);
         public static TypeGUID operator /(TypeGUID lhs, int rhs) => new TypeGUID((uint)(lhs.guid / rhs));
@@ -47,7 +50,10 @@ namespace Sims2Tools.DBPF
 
         public override string ToString() => Helper.Hex8PrefixString(guid);
 
+        public uint AsUInt() => guid;
         public int AsInt() => (int)guid;
+
+        public static TypeGUID RandomID => (TypeGUID)((((uint)(TypeRng.RNG.Next() & 0xFFFF)) << 16) | ((uint)(TypeRng.RNG.Next() & 0xFFFF)));
     }
 
     /*

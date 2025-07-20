@@ -16,8 +16,6 @@
 using System;
 using System.Drawing;
 
-
-
 #if UNSERIALIZE_MIPMAPS
 using Sims2Tools.DBPF.Images;
 using Sims2Tools.DBPF.IO;
@@ -62,7 +60,15 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
 
 #if UNSERIALIZE_MIPMAPS
-        private byte[] Data => data;
+        internal byte[] Data
+        {
+            get => data;
+            set
+            {
+                data = value;
+                img = null;
+            }
+        }
 
         public string LifoFile
         {
@@ -218,6 +224,20 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
 #endif
 
+        public void Duplicate(MipMap into)
+        {
+            into.index = this.index;
+            into.mapcount = this.mapcount;
+            into.datatype = this.datatype;
+
+            into.data = new byte[this.data.Length];
+            for (int i = 0; i < this.data.Length; ++i) into.data[i] = this.data[i];
+
+            into.img = this.img;
+
+            into.lifofile = this.lifofile;
+        }
+
 #if UNSERIALIZE_MIPMAPS
         public override string ToString()
         {
@@ -266,6 +286,17 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             mipmaps = new MipMap[0];
             creator = 0xffffffff;
             unknown_1 = 0x41200000;
+        }
+
+        public void UpdateFromDDSData(DDSData[] ddsData)
+        {
+            mipmaps = new MipMap[ddsData.Length];
+
+            int mipmapIndex = 0;
+            for (int i = ddsData.Length - 1; i >= 0; i--)
+            {
+                mipmaps[mipmapIndex++] = new MipMap(this.parent, ddsData[i]);
+            }
         }
 
         public MipMap LargestTexture
@@ -365,6 +396,20 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             if ((parent.Version == 0x08) || (parent.Version == 0x09)) writer.WriteUInt32(unknown_1);
         }
 #endif
+
+        public void Duplicate(MipMapBlock into)
+        {
+            into.mipmaps = new MipMap[this.mipmaps.Length];
+
+            for (int i = 0; i < this.mipmaps.Length; i++)
+            {
+                into.mipmaps[i] = new MipMap(into.parent);
+                this.mipmaps[i].Duplicate(into.mipmaps[i]);
+            }
+
+            into.creator = this.creator;
+            into.unknown_1 = this.unknown_1;
+        }
 
 #if UNSERIALIZE_MIPMAPS
         public override string ToString()

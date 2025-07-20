@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Drawing;
+using System.IO;
 
 namespace Sims2Tools.DBPF.Images
 {
@@ -50,6 +51,7 @@ namespace Sims2Tools.DBPF.Images
         }
 
         private readonly int count;
+        private readonly int level;
 
         private Image img;
         public Image Texture
@@ -58,19 +60,20 @@ namespace Sims2Tools.DBPF.Images
             {
                 if (img == null)
                 {
-                    img = DdsLoader.Load(size, format, new System.IO.BinaryReader(new System.IO.MemoryStream(data)), -1, count);
+                    img = DdsLoader.Load(size, format, new BinaryReader(new MemoryStream(data)), -1, count);
                 }
 
                 return img;
             }
         }
 
-        public DDSData(byte[] data, Size sz, DdsFormats format, int count)
+        public DDSData(byte[] data, Size sz, DdsFormats format, int level, int count)
         {
             this.format = format;
             this.size = sz;
             this.data = data;
-            img = null;
+            this.img = null;
+            this.level = level;
             this.count = count;
         }
     }
@@ -78,23 +81,17 @@ namespace Sims2Tools.DBPF.Images
 
     public class DdsLoader
     {
-        /// <summary>
-        /// Lodas the MipMap Data from a DDS File
-        /// </summary>
-        /// <param name="flname">The Filename</param>
-        /// <returns>all Datablocks (Biggest Map first)</returns>
-        /// <exception cref="Exception">Thrown if the Signature is unknown</exception>
         public static DDSData[] ParseDDS(string flname)
         {
-            if (!System.IO.File.Exists(flname)) return new DDSData[0];
+            if (!File.Exists(flname)) return new DDSData[0];
 
             DDSData[] maps = new DDSData[0];
-            //open the File
-            System.IO.FileStream fs = System.IO.File.OpenRead(flname);
+
+            FileStream fs = File.OpenRead(flname);
             try
             {
-                System.IO.BinaryReader reader = new System.IO.BinaryReader(fs);
-                fs.Seek(0x0c, System.IO.SeekOrigin.Begin);
+                BinaryReader reader = new BinaryReader(fs);
+                fs.Seek(0x0c, SeekOrigin.Begin);
                 int hg = reader.ReadInt32();
                 int wd = reader.ReadInt32();
                 Size sz = new Size(wd, hg);
@@ -102,21 +99,23 @@ namespace Sims2Tools.DBPF.Images
                 int unknown = reader.ReadInt32();
                 maps = new DDSData[reader.ReadInt32()];
 
-                fs.Seek(0x54, System.IO.SeekOrigin.Begin);
+                fs.Seek(0x54, SeekOrigin.Begin);
                 string sig = Helper.ToString(reader.ReadBytes(0x04));
+
+                // TODO - DDS Formats - what about (Ext)Raw 8/24/34 Bit formats?
                 DdsFormats format;
                 if (sig == "DXT1") format = DdsFormats.DXT1Format;
                 else if (sig == "DXT3") format = DdsFormats.DXT3Format;
                 else if (sig == "DXT5") format = DdsFormats.DXT5Format;
                 else throw new Exception("Unknown DXT Format " + sig);
 
-                fs.Seek(0x80, System.IO.SeekOrigin.Begin);
+                fs.Seek(0x80, SeekOrigin.Begin);
                 int blocksize = 0x10;
                 if (format == DdsFormats.DXT1Format) blocksize = 0x8;
                 for (int i = 0; i < maps.Length; i++)
                 {
                     byte[] d = reader.ReadBytes(firstsize);
-                    maps[i] = new DDSData(d, sz, format, maps.Length);
+                    maps[i] = new DDSData(d, sz, format, (maps.Length - (i + 1)), maps.Length);
 
                     sz = new Size(Math.Max(1, sz.Width / 2), Math.Max(1, sz.Height / 2));
                     firstsize = Math.Max(1, sz.Width / 4) * Math.Max(1, sz.Height / 4) * blocksize;
@@ -131,16 +130,7 @@ namespace Sims2Tools.DBPF.Images
             return maps;
         }
 
-        /// <summary>
-        /// Tries to load an Image from the datasource
-        /// </summary>
-        /// <param name="imgDimension">Maximum Dimensions of the Image (used to determin the aspect ration</param>
-        /// <param name="format">FOrmat of the Image</param>
-        /// <param name="reader">A Binary Reader. Position must be the start of the Image Data</param>
-        /// <param name="level">The index of the Texture in the current MipMap use -1 if you don't want to specify an Level</param>
-        /// <param name="levelcount">Number of Levels stored in the MipMap</param>
-        /// <returns>null or a valid Image</returns>
-        public static Image Load(Size imgDimension, DdsFormats format, System.IO.BinaryReader reader, int level, int levelcount)
+        internal static Image Load(Size imgDimension, DdsFormats format, BinaryReader reader, int level, int levelcount)
         {
             Image img = null;
 
@@ -174,12 +164,6 @@ namespace Sims2Tools.DBPF.Images
             return img;
         }
 
-        /// <summary>
-        /// Creates a Byte array for the passed Image
-        /// </summary>
-        /// <param name="format">The Format you want to store the Image in</param>
-        /// <param name="img">The Image</param>
-        /// <returns>A Byte array containing the Image Data</returns>
         public static byte[] Save(DdsFormats format, Image img)
         {
             byte[] data = new byte[0];
@@ -199,9 +183,7 @@ namespace Sims2Tools.DBPF.Images
             return data;
         }
 
-
-
-        public static Image RAWParser(DdsFormats format, System.IO.BinaryReader reader, int w, int h)
+        protected static Image RAWParser(DdsFormats format, BinaryReader reader, int w, int h)
         {
             w = Math.Max(1, w);
             h = Math.Max(1, h);
@@ -235,11 +217,11 @@ namespace Sims2Tools.DBPF.Images
             return bmp;
         }
 
-        public static byte[] RAWWriter(Image img, DdsFormats format)
+        protected static byte[] RAWWriter(Image img, DdsFormats format)
         {
             if (img == null) return new byte[0];
 
-            System.IO.BinaryWriter writer = new System.IO.BinaryWriter(new System.IO.MemoryStream());
+            BinaryWriter writer = new BinaryWriter(new MemoryStream());
 
             Bitmap bmp = (Bitmap)img;
             for (int y = 0; y < bmp.Height; y++)
@@ -258,15 +240,12 @@ namespace Sims2Tools.DBPF.Images
                 }
             }
 
-            System.IO.BinaryReader reader = new System.IO.BinaryReader(writer.BaseStream);
-            reader.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+            BinaryReader reader = new BinaryReader(writer.BaseStream);
+            reader.BaseStream.Seek(0, SeekOrigin.Begin);
             return reader.ReadBytes((int)reader.BaseStream.Length);
         }
 
-        //
-        // DXT1 RGB, DXT3, DXT5 Parser
-        //
-        public static Image DXTParser(Size parentsize, DdsFormats format, System.IO.BinaryReader reader, int wd, int hg)
+        protected static Image DXTParser(Size parentsize, DdsFormats format, BinaryReader reader, int wd, int hg)
         {
             Bitmap bm;
 
@@ -414,7 +393,7 @@ namespace Sims2Tools.DBPF.Images
             return bm;
         }
 
-        protected static void DXT3WriteTransparencyBlock(System.IO.BinaryWriter writer, Color[] alphas)
+        protected static void DXT3WriteTransparencyBlock(BinaryWriter writer, Color[] alphas)
         {
             ushort col = 0;
             for (int i = alphas.Length - 1; i >= 0; i--)
@@ -427,7 +406,7 @@ namespace Sims2Tools.DBPF.Images
             writer.Write(col);
         }
 
-        protected static void DXT5WriteTransparencyBlock(System.IO.BinaryWriter writer, Color[] alphas)
+        protected static void DXT5WriteTransparencyBlock(BinaryWriter writer, Color[] alphas)
         {
             byte[] table = new byte[8];
             table[0] = 0x00;
@@ -476,12 +455,6 @@ namespace Sims2Tools.DBPF.Images
             writer.Write(abits1);
         }
 
-        /// <summary>
-        /// Calculates the §D Distance of two Colors
-        /// </summary>
-        /// <param name="table">First Color</param>
-        /// <param name="test">Second Color</param>
-        /// <returns>Distanc Value</returns>
         protected static double DXT3ColorDist(Color table, Color test)
         {
             return Math.Pow(table.R - test.R, 2) + Math.Pow(table.G - test.G, 2) + Math.Pow(table.B - test.B, 2);
@@ -513,8 +486,6 @@ namespace Sims2Tools.DBPF.Images
             if (table.ToArgb() > test.ToArgb()) table = test;
         }
 
-
-
         protected static void DXT3MaxColor(ref Color table, Color test)
         {
             if (table.ToArgb() < test.ToArgb()) table = test;
@@ -542,7 +513,7 @@ namespace Sims2Tools.DBPF.Images
             return (short)res;
         }
 
-        protected static void DXT3WriteTexel(System.IO.BinaryWriter writer, Color[,] colors)
+        protected static void DXT3WriteTexel(BinaryWriter writer, Color[,] colors)
         {
             Color[] table = new Color[4];
             table[0] = Color.White;
@@ -562,7 +533,6 @@ namespace Sims2Tools.DBPF.Images
             }
 
             //invert the Color Order
-            //if ((format==TxtrFormats.DXT1Format) && (table[0].ToArgb()<=table[1].ToArgb()) )
             if ((table[0].ToArgb() <= table[1].ToArgb()))
             {
                 table[2] = DXT3MixColors(table[0], table[1], 1.0 / 2, 1.0 / 2);
@@ -591,10 +561,10 @@ namespace Sims2Tools.DBPF.Images
             }
         }
 
-        public static byte[] DXT3Writer(Image img, DdsFormats format)
+        protected static byte[] DXT3Writer(Image img, DdsFormats format)
         {
             if (img == null) return new byte[0];
-            System.IO.BinaryWriter writer = new System.IO.BinaryWriter(new System.IO.MemoryStream());
+            BinaryWriter writer = new BinaryWriter(new MemoryStream());
 
             Bitmap bmp = (Bitmap)img;
 
@@ -675,18 +645,12 @@ namespace Sims2Tools.DBPF.Images
                 }
             }
 
-            System.IO.BinaryReader reader = new System.IO.BinaryReader(writer.BaseStream);
-            reader.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
+            BinaryReader reader = new BinaryReader(writer.BaseStream);
+            reader.BaseStream.Seek(0, SeekOrigin.Begin);
             return reader.ReadBytes((int)reader.BaseStream.Length);
         }
 
-        /// <summary>
-        /// Creates a Preview with the correct Aspect Ration
-        /// </summary>
-        /// <param name="img">The Image you want to preview</param>
-        /// <param name="sz">Size of te Preview Image</param>
-        /// <returns>The Preview image</returns>
-        public static Image Preview(Image img, Size sz)
+        internal static Image Preview(Image img, Size sz)
         {
             Image prev = new Bitmap(sz.Width, sz.Height);
 
@@ -709,7 +673,7 @@ namespace Sims2Tools.DBPF.Images
             return prev;
         }
 
-        public static System.Drawing.Imaging.ImageFormat GetImageFormat(string name)
+        internal static System.Drawing.Imaging.ImageFormat GetImageFormat(string name)
         {
             name = name.Trim().ToLower();
 

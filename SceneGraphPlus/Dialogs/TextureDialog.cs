@@ -7,9 +7,9 @@
  */
 
 using Sims2Tools.DBPF;
-using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
+using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -34,11 +34,15 @@ namespace SceneGraphPlus.Dialogs
         private DBPFKey currentTextureKey;
         private string currentTextureTitle;
 
-        public TextureDialog()
+        private readonly DbpfFileCache packageCache;
+
+        public TextureDialog(DbpfFileCache packageCache)
         {
             InitializeComponent();
 
             pictHover.Visible = false;
+
+            this.packageCache = packageCache;
         }
 
         private void OnLoad(object sender, EventArgs e)
@@ -325,35 +329,32 @@ namespace SceneGraphPlus.Dialogs
 
             if (currentTexturePath != null)
             {
-                using (DBPFFile package = new DBPFFile(currentTexturePath))
+                CacheableDbpfFile package = packageCache.GetOrAdd(currentTexturePath);
+
+                if (currentTextureKey.TypeID == Txtr.TYPE)
                 {
-                    DBPFKey key = currentTextureKey;
+                    Txtr txtr = (Txtr)package.GetResourceByKey(currentTextureKey);
 
-                    if (key.TypeID == Txtr.TYPE)
+                    if (!worker.CancellationPending)
                     {
-                        Txtr txtr = (Txtr)package.GetResourceByKey(key);
+                        worker.ReportProgress(50);
 
-                        if (!worker.CancellationPending)
-                        {
-                            worker.ReportProgress(50);
-
-                            texture = txtr?.ImageData?.LargestTexture?.Texture;
-                        }
+                        texture = txtr?.ImageData?.LargestTexture?.Texture;
                     }
-                    else
-                    {
-                        Lifo lifo = (Lifo)package.GetResourceByKey(key);
-
-                        if (!worker.CancellationPending)
-                        {
-                            worker.ReportProgress(50);
-
-                            texture = lifo?.LevelInfo?.Texture;
-                        }
-                    }
-
-                    package.Close();
                 }
+                else
+                {
+                    Lifo lifo = (Lifo)package.GetResourceByKey(currentTextureKey);
+
+                    if (!worker.CancellationPending)
+                    {
+                        worker.ReportProgress(50);
+
+                        texture = lifo?.LevelInfo?.Texture;
+                    }
+                }
+
+                package.Close();
             }
 
             e.Result = texture;

@@ -14,14 +14,10 @@ using System.Collections.Generic;
 
 namespace Sims2Tools.DbpfCache
 {
-    public class CacheableDbpfFile : IDisposable
+    public class CacheableDbpfFile : IDBPFFile, IDisposable
     {
         private readonly DBPFFile package;
         private bool isCached;
-
-        public string PackagePath => package.PackagePath;
-        public string PackageName => package.PackageName;
-        public string PackageNameNoExtn => package.PackageNameNoExtn;
 
         public bool IsDirty => package.IsDirty;
 
@@ -33,12 +29,25 @@ namespace Sims2Tools.DbpfCache
             this.isCached = isCached;
         }
 
+        #region IDBPFFile
+        public string PackagePath => package.PackagePath;
+        public string PackageName => package.PackageName;
+        public string PackageNameNoExtn => package.PackageNameNoExtn;
+        public string PackageDir => throw new NotImplementedException();
+
         public List<DBPFEntry> GetEntriesByType(TypeTypeID type) => package.GetEntriesByType(type);
+
         public DBPFEntry GetEntryByKey(DBPFKey key) => package.GetEntryByKey(key);
+        public DBPFEntry GetEntryByName(TypeTypeID typeId, string sgName) => package.GetEntryByName(typeId, sgName);
+
         public DBPFResource GetResourceByTGIR(int tgir) => package.GetResourceByTGIR(tgir);
         public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
-        public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName) => package.GetResourceByName(typeId, sgName);
         public DBPFResource GetResourceByEntry(DBPFEntry entry) => package.GetResourceByEntry(entry);
+        public DBPFResource GetResourceByName(TypeTypeID typeId, string sgName) => package.GetResourceByName(typeId, sgName);
+
+        public string GetFilenameByEntry(DBPFEntry entry) => package.GetFilenameByEntry(entry);
+        #endregion
+
 
         public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
         public void UnCommit(DBPFKey key) => package.UnCommit(key);
@@ -46,6 +55,7 @@ namespace Sims2Tools.DbpfCache
         public void Remove(DBPFKey key) => package.Remove(key);
 
         public string Update(bool autoBackup) => package.Update(autoBackup);
+        public bool RetryUpdateFromTemp() => package.RetryUpdateFromTemp();
 
         internal void DeCache()
         {

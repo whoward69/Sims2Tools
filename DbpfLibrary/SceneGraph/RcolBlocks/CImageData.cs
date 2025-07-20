@@ -19,9 +19,14 @@ using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+
 #if UNSERIALIZE_MIPMAPS
 using Sims2Tools.DBPF.Images;
 using System.Drawing;
+#endif
+
+#if !SERIALIZE_MIPMAPS
+using System.IO;
 #endif
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
@@ -73,6 +78,17 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             unknown_0 = (float)1.0;
             format = DdsFormats.ExtRaw24Bit;
 #endif
+        }
+
+        public void UpdateFromDDSData(DDSData[] ddsData)
+        {
+            texturesize = ddsData[0].ParentSize;
+            format = ddsData[0].Format;
+            mipmaplevels = (uint)ddsData.Length;
+
+            mipmapblocks[0].UpdateFromDDSData(ddsData);
+
+            _isDirty = true;
         }
 
         public override void Unserialize(DbpfReader reader)
@@ -201,6 +217,43 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             Debug.Assert((writeEnd - writeStart) == FileSize);
             if (!IsDirty) Debug.Assert(((readEnd - readStart) == 0) || ((writeEnd - writeStart) == (readEnd - readStart)));
 #endif
+        }
+
+        public override IRcolBlock Duplicate(Rcol parent)
+        {
+            CImageData newImageData = new CImageData(parent)
+            {
+                Version = this.Version
+            };
+
+            newImageData.NameResource.SetVersion(this.NameResource.Version);
+            newImageData.NameResource.BlockName = this.NameResource.BlockName;
+            newImageData.NameResource.FileName = this.NameResource.FileName;
+
+#if !SERIALIZE_MIPMAPS
+            newImageData.imageData = new byte[this.imageData.Length];
+            for (int i = 0; i < this.imageData.Length; ++i) newImageData.imageData[i] = this.imageData[i];
+#endif
+
+#if UNSERIALIZE_MIPMAPS
+            newImageData.texturesize = new Size(this.texturesize.Width, this.texturesize.Height);
+
+            newImageData.format = this.format;
+            newImageData.mipmaplevels = this.mipmaplevels;
+            newImageData.unknown_0 = this.unknown_0;
+            newImageData.mipmapblocks = new MipMapBlock[this.mipmapblocks.Length];
+            newImageData.unknown_1 = this.unknown_1;
+
+            newImageData.filenamerep = this.filenamerep;
+
+            for (int i = 0; i < this.mipmapblocks.Length; i++)
+            {
+                newImageData.mipmapblocks[i] = new MipMapBlock(newImageData);
+                this.mipmapblocks[i].Duplicate(newImageData.mipmapblocks[i]);
+            }
+#endif
+
+            return newImageData;
         }
 
         public MipMap LargestTexture
