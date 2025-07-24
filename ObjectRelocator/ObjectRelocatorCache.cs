@@ -148,7 +148,7 @@ namespace ObjectRelocator
             {
                 if (res is Objd objd)
                 {
-                    return !(objd.DiagonalGuid.AsInt() == 0x00000000 || objd.DiagonalGuid.AsInt() == 0x00010000);
+                    return !(objd.DiagonalGuid.AsUInt() == 0x00000000 || objd.DiagonalGuid.AsUInt() == 0x00010000);
                 }
 
                 return false;

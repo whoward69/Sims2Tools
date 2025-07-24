@@ -2570,6 +2570,8 @@ namespace ObjectRelocator
 
         private void OnEditTitleDescClicked(object sender, EventArgs e)
         {
+            if (gridViewResources.SelectedRows.Count > 1) return;
+
             DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
             ObjectDbpfData selectedObject = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
@@ -2928,7 +2930,7 @@ namespace ObjectRelocator
                     }
                     catch (Exception)
                     {
-                        MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
+                        MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}, file is probably open in SimPe!", "Package Update Error!");
                     }
 
                     foreach (ObjectDbpfData editedObject in dirtyObjectsByPackage[packageFile])
