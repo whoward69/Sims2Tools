@@ -1215,6 +1215,16 @@ namespace RepositoryWizard
                         }
                     }
                 }
+
+                ControlHelper.SetDropDownWidth(comboMasterPrimaryDesignableSubset);
+                ControlHelper.SetDropDownWidth(comboMasterSecondaryDesignableSubset);
+
+                ControlHelper.SetDropDownWidth(comboMasterNonDesignableSubset1);
+                ControlHelper.SetDropDownWidth(comboMasterNonDesignableSubset2);
+                ControlHelper.SetDropDownWidth(comboMasterNonDesignableSubset3);
+                ControlHelper.SetDropDownWidth(comboMasterNonDesignableSubset4);
+                ControlHelper.SetDropDownWidth(comboMasterNonDesignableSubset5);
+                ControlHelper.SetDropDownWidth(comboMasterNonDesignableSubset6);
             }
             else
             {
@@ -2154,6 +2164,16 @@ namespace RepositoryWizard
                         comboSlaveNonDesignableSubset6.Items.Add(s);
                     }
                 }
+
+                ControlHelper.SetDropDownWidth(comboSlavePrimaryDesignableSubset);
+                ControlHelper.SetDropDownWidth(comboSlaveSecondaryDesignableSubset);
+
+                ControlHelper.SetDropDownWidth(comboSlaveNonDesignableSubset1);
+                ControlHelper.SetDropDownWidth(comboSlaveNonDesignableSubset2);
+                ControlHelper.SetDropDownWidth(comboSlaveNonDesignableSubset3);
+                ControlHelper.SetDropDownWidth(comboSlaveNonDesignableSubset4);
+                ControlHelper.SetDropDownWidth(comboSlaveNonDesignableSubset5);
+                ControlHelper.SetDropDownWidth(comboSlaveNonDesignableSubset6);
             }
         }
         #endregion

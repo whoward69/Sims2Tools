@@ -204,8 +204,8 @@ namespace RepositoryWizard
 
                     if (gmnd != null && gmnd.GmdcKeys.Count == 1)
                     {
-                        designMode = gmnd.GetDesignModeEnabledSubsets();
-                        materialsMesh = gmnd.GetMaterialsMeshNameSubsets();
+                        designMode = gmnd.GetDesignModeEnabledSubsetsAsString();
+                        materialsMesh = gmnd.GetMaterialsMeshNameSubsetsAsString();
 
                         Gmdc gmdc = (Gmdc)package.GetResourceByKey(gmnd.GmdcKeys[0]);
 

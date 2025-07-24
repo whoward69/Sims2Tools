@@ -314,7 +314,7 @@ namespace RepositoryWizard
             // 
             this.menuItemCreatorDetails.Name = "menuItemCreatorDetails";
             this.menuItemCreatorDetails.Size = new System.Drawing.Size(184, 22);
-            this.menuItemCreatorDetails.Text = "Creator &Details...";
+            this.menuItemCreatorDetails.Text = "Creator Details...";
             this.menuItemCreatorDetails.Click += new System.EventHandler(this.OnCreatorClicked);
             // 
             // toolStripSeparator2
