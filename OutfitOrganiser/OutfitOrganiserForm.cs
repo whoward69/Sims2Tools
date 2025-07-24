@@ -1336,6 +1336,12 @@ namespace OutfitOrganiser
 
         private void OnPkgMergeClicked(object sender, EventArgs e)
         {
+            // TODO - Outfit Organiser - changes to the way Merge works
+            // Ask for new name
+            // Create empty .package file with new name
+            // Merge selected .package files into new package
+            // Commit & close new .package file
+            // Delete all selected .package files
             int selPackages = gridPackageFiles.SelectedRows.Count;
 
             if (selPackages < 2)
@@ -3973,19 +3979,26 @@ namespace OutfitOrganiser
             {
                 OutfitDbpfData outfitData = selectedResourceRow.Cells["colOutfitData"].Value as OutfitDbpfData;
 
-                outfitData.Flags = (uint)(outfitData.Flags & (~0x00000008));
-
-                if (!(menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked))
+                if (IsAdvancedMode && Form.ModifierKeys == Keys.Shift)
                 {
-                    outfitData.Creator = "00000000-0000-0000-0000-000000000000";
-                    outfitData.Family = "00000000-0000-0000-0000-000000000000";
+                    outfitData.Flags = (uint)(outfitData.Flags | 0x00000008);
+                }
+                else
+                {
+                    outfitData.Flags = (uint)(outfitData.Flags & (~0x00000008));
 
-                    if ((outfitData.Age & 0x0040) == 0x0040)
+                    if (!(menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked))
                     {
-                        if (outfitData.Product == 0x000000000) outfitData.Product = 0x00000000; // Do not remove - as this will add the value if it's missing!!!
-                        if (outfitData.Version <= 0x000000001) outfitData.Version = 0x00000000;
-                    }
+                        outfitData.Creator = "00000000-0000-0000-0000-000000000000";
+                        outfitData.Family = "00000000-0000-0000-0000-000000000000";
 
+                        if ((outfitData.Age & 0x0040) == 0x0040)
+                        {
+                            if (outfitData.Product == 0x000000000) outfitData.Product = 0x00000000; // Do not remove - as this will add the value if it's missing!!!
+                            if (outfitData.Version <= 0x000000001) outfitData.Version = 0x00000000;
+                        }
+
+                    }
                 }
 
                 UpdateGridRow(outfitData);
