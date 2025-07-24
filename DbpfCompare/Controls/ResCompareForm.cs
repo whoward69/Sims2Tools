@@ -529,6 +529,15 @@ namespace DbpfCompare.Controls
 
             DataRow row;
 
+            if (!leftObjd.KeyName.Equals(rightObjd.KeyName))
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Filename";
+                row["LeftValue1"] = leftObjd.KeyName;
+                row["RightValue1"] = rightObjd.KeyName;
+                dataResCompare.Append(row);
+            }
+
             if (leftObjd.Guid != rightObjd.Guid)
             {
                 row = dataResCompare.NewRow();
