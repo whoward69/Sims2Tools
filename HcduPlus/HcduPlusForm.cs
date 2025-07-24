@@ -71,6 +71,9 @@ namespace HcduPlus
 
         private bool formUpdates = true;
 
+        private long countPackages = 0;
+        private readonly Dictionary<TypeTypeID, long> countTypes = new Dictionary<TypeTypeID, long>();
+
         public HcduPlusForm()
         {
             logger.Info(HcduPlusApp.AppProduct);
@@ -91,6 +94,9 @@ namespace HcduPlus
         {
             BackgroundWorker worker = sender as BackgroundWorker;
             allCurrentConflicts.Clear();
+
+            countPackages = 0;
+            countTypes.Clear();
 
             IDataStore modsDataStore;
             IDataStore scanDataStore;
@@ -382,22 +388,25 @@ namespace HcduPlus
                         }
                         else
                         {
-                            if (GameData.GlobalObjectsByGUID.ContainsKey(guid))
+                            if (menuItemMaxisGuidConflicts.Checked)
                             {
-                                ConflictPair cpNew = new ConflictPair(GameData.GlobalObjectsByGUID[guid], scanPackages[0].Substring(24));
-
-                                if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
+                                if (GameData.GlobalObjectsByGUID.ContainsKey(guid))
                                 {
-                                    allCurrentConflicts.Add(cpNew);
-                                    cpData = cpNew;
+                                    ConflictPair cpNew = new ConflictPair(GameData.GlobalObjectsByGUID[guid], scanPackages[0].Substring(24));
 
-                                    worker.ReportProgress((int)((done / total) * 100.0), cpNew);
+                                    if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
+                                    {
+                                        allCurrentConflicts.Add(cpNew);
+                                        cpData = cpNew;
+
+                                        worker.ReportProgress((int)((done / total) * 100.0), cpNew);
+                                    }
+
+                                    TypeGroupID group = (TypeGroupID)Convert.ToUInt32(scanPackages[0].Substring(4, 8), 16);
+                                    TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(scanPackages[0].Substring(15, 8), 16);
+
+                                    cpData.AddTGI(Objd.TYPE, group, instance, scanDataStore.NamesByTgiGet(Hash.TGIHash(instance, Objd.TYPE, group)));
                                 }
-
-                                TypeGroupID group = (TypeGroupID)Convert.ToUInt32(scanPackages[0].Substring(4, 8), 16);
-                                TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(scanPackages[0].Substring(15, 8), 16);
-
-                                cpData.AddTGI(Objd.TYPE, group, instance, scanDataStore.NamesByTgiGet(Hash.TGIHash(instance, Objd.TYPE, group)));
                             }
                         }
                     }
@@ -504,6 +513,8 @@ namespace HcduPlus
 
         private void ProcessPackage(DBPFFile package, int fileIndex, IDataStore dataStore)
         {
+            ++countPackages;
+
             foreach (TypeTypeID type in enabledResources)
             {
                 foreach (DBPFEntry entry in package.GetEntriesByType(type))
@@ -511,6 +522,13 @@ namespace HcduPlus
 #if DEBUG
                     if (Debugger.IsAttached) logger.Debug($"  Entry: {entry}");
 #endif
+
+                    if (!countTypes.ContainsKey(type))
+                    {
+                        countTypes.Add(type, 0);
+                    }
+
+                    ++countTypes[type];
 
                     if (type == Objd.TYPE && menuItemGuidConflicts.Checked)
                     {
@@ -602,6 +620,14 @@ namespace HcduPlus
             MyUpdater.Enabled = true;
             textModsPath.Enabled = checkModsSavedSims.Enabled = btnSelectModsPath.Enabled = true;
             textScanPath.Enabled = checkScanSavedSims.Enabled = btnSelectScanPath.Enabled = true;
+
+            textInfo.Text = $"Total packages: {countPackages}\r\n\r\n";
+
+            foreach (TypeTypeID type in enabledResources)
+            {
+                countTypes.TryGetValue(type, out long count);
+                textInfo.AppendText($"  {DBPFData.TypeName(type)}: {count}\r\n");
+            }
         }
 
         private void OnGoClicked(object sender, System.EventArgs e)
@@ -624,6 +650,8 @@ namespace HcduPlus
                 MyUpdater.Enabled = false;
                 textModsPath.Enabled = checkModsSavedSims.Enabled = btnSelectModsPath.Enabled = false;
                 textScanPath.Enabled = checkScanSavedSims.Enabled = btnSelectScanPath.Enabled = false;
+
+                textInfo.Clear();
 
                 lblProgress.Text = "Progress:";
                 lblProgress.Visible = true;
@@ -689,6 +717,7 @@ namespace HcduPlus
                 menuItemVers.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Vers.NAME, 0) != 0); OnVersClicked(menuItemVers, null);
 
                 menuItemGuidConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, 1) != 0);
+                menuItemMaxisGuidConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemMaxisGuidConflicts.Name, 1) != 0);
                 menuItemInternalConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, 1) != 0);
                 menuItemHomeCrafterConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, 1) != 0);
                 menuItemStoreVersionConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, 1) != 0);
@@ -736,6 +765,7 @@ namespace HcduPlus
             knownConflicts.SaveRegexs();
 
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, menuItemGuidConflicts.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemMaxisGuidConflicts.Name, menuItemMaxisGuidConflicts.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, menuItemInternalConflicts.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, menuItemHomeCrafterConflicts.Checked ? 1 : 0);
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, menuItemStoreVersionConflicts.Checked ? 1 : 0);
@@ -940,6 +970,12 @@ namespace HcduPlus
 
                 writer.Close();
             }
+        }
+
+        private void OnConflictsDropDown(object sender, EventArgs e)
+        {
+            menuItemGuidConflicts.Enabled = menuItemObjd.Checked;
+            menuItemMaxisGuidConflicts.Enabled = menuItemObjd.Checked;
         }
 
         private void OnAllClicked(object sender, EventArgs e)

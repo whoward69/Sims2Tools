@@ -123,12 +123,15 @@ namespace HcduPlus
             this.colHcduInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHcduName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHcduPackages = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tabInfo = new System.Windows.Forms.TabPage();
+            this.textInfo = new System.Windows.Forms.TextBox();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.btnSelectScanPath = new System.Windows.Forms.Button();
             this.textScanPath = new System.Windows.Forms.TextBox();
             this.lblScanPath = new System.Windows.Forms.Label();
             this.checkModsSavedSims = new System.Windows.Forms.CheckBox();
             this.checkScanSavedSims = new System.Windows.Forms.CheckBox();
+            this.menuItemMaxisGuidConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             this.tabConflicts.SuspendLayout();
             this.tabByPackage.SuspendLayout();
@@ -136,6 +139,7 @@ namespace HcduPlus
             this.menuContextGrid.SuspendLayout();
             this.tabByResource.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridByResource)).BeginInit();
+            this.tabInfo.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -467,6 +471,7 @@ namespace HcduPlus
             // 
             this.menuConflicts.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemGuidConflicts,
+            this.menuItemMaxisGuidConflicts,
             this.toolStripSeparator2,
             this.menuItemInternalConflicts,
             this.menuItemHomeCrafterConflicts,
@@ -478,6 +483,7 @@ namespace HcduPlus
             this.menuConflicts.Name = "menuConflicts";
             this.menuConflicts.Size = new System.Drawing.Size(66, 20);
             this.menuConflicts.Text = "&Conflicts";
+            this.menuConflicts.DropDownOpened += new System.EventHandler(this.OnConflictsDropDown);
             // 
             // menuItemGuidConflicts
             // 
@@ -677,6 +683,7 @@ namespace HcduPlus
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabConflicts.Controls.Add(this.tabByPackage);
             this.tabConflicts.Controls.Add(this.tabByResource);
+            this.tabConflicts.Controls.Add(this.tabInfo);
             this.tabConflicts.Location = new System.Drawing.Point(12, 149);
             this.tabConflicts.Name = "tabConflicts";
             this.tabConflicts.SelectedIndex = 0;
@@ -857,6 +864,26 @@ namespace HcduPlus
             this.colHcduPackages.Name = "colHcduPackages";
             this.colHcduPackages.ReadOnly = true;
             // 
+            // tabInfo
+            // 
+            this.tabInfo.Controls.Add(this.textInfo);
+            this.tabInfo.Location = new System.Drawing.Point(4, 4);
+            this.tabInfo.Name = "tabInfo";
+            this.tabInfo.Padding = new System.Windows.Forms.Padding(3);
+            this.tabInfo.Size = new System.Drawing.Size(902, 383);
+            this.tabInfo.TabIndex = 2;
+            this.tabInfo.Text = "Info";
+            this.tabInfo.UseVisualStyleBackColor = true;
+            // 
+            // textInfo
+            // 
+            this.textInfo.Location = new System.Drawing.Point(0, 0);
+            this.textInfo.Multiline = true;
+            this.textInfo.Name = "textInfo";
+            this.textInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textInfo.Size = new System.Drawing.Size(902, 383);
+            this.textInfo.TabIndex = 0;
+            // 
             // saveFileDialog
             // 
             this.saveFileDialog.DefaultExt = "txt";
@@ -919,6 +946,15 @@ namespace HcduPlus
             this.checkScanSavedSims.UseVisualStyleBackColor = true;
             this.checkScanSavedSims.Click += new System.EventHandler(this.OnSavedSimsScan);
             // 
+            // menuItemMaxisGuidConflicts
+            // 
+            this.menuItemMaxisGuidConflicts.Checked = true;
+            this.menuItemMaxisGuidConflicts.CheckOnClick = true;
+            this.menuItemMaxisGuidConflicts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.menuItemMaxisGuidConflicts.Name = "menuItemMaxisGuidConflicts";
+            this.menuItemMaxisGuidConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemMaxisGuidConflicts.Text = "Ignore Maxis GUID Conflicts";
+            // 
             // HcduPlusForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -953,6 +989,8 @@ namespace HcduPlus
             this.menuContextGrid.ResumeLayout(false);
             this.tabByResource.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridByResource)).EndInit();
+            this.tabInfo.ResumeLayout(false);
+            this.tabInfo.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1043,6 +1081,9 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.TabPage tabInfo;
+        private System.Windows.Forms.TextBox textInfo;
+        private System.Windows.Forms.ToolStripMenuItem menuItemMaxisGuidConflicts;
     }
 }
 
