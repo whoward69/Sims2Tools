@@ -36,13 +36,17 @@ namespace WhatCausedThis
         private readonly WhatCausedThisData dataByPackage = new WhatCausedThisData();
 
         private readonly Regex reError = new Regex("^Error: (.+)$");
+        private readonly Regex reFrame = new Regex("^  Frame ([0-9]+):$");
         private readonly Regex reNode = new Regex("^    Node: ([0-9]+)$");
         private readonly Regex reBhav = new Regex("^    Tree: id ([0-9]+) name '([^']+)'");
         private readonly Regex reGroup = new Regex("^    from (.*)$");
 
         private readonly Regex reSemiGlobalsSuffix = new Regex("(_?[Gg]lobals?)$");
 
+        private string logPath;
+
         private string errorMsg = "";
+        private int maxFrame;
 
         private TypeGroupID secGroupID;
         private string secGroupName;
@@ -50,7 +54,11 @@ namespace WhatCausedThis
         private string secBhavName;
         private int secNode;
 
+        private bool dataLoading = false;
+
         private Updater MyUpdater;
+
+        public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
         public WhatCausedThisForm()
         {
@@ -325,10 +333,15 @@ namespace WhatCausedThis
             RegistryTools.LoadAppSettings(WhatCausedThisApp.RegistryKey, WhatCausedThisApp.AppVersionMajor, WhatCausedThisApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(WhatCausedThisApp.RegistryKey, this);
             textModsPath.Text = RegistryTools.GetSetting(WhatCausedThisApp.RegistryKey, textModsPath.Name, "") as string;
+
+            menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(WhatCausedThisApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
+
             menuItemSecondaryErrors.Checked = ((int)RegistryTools.GetSetting(WhatCausedThisApp.RegistryKey + @"\Options", menuItemSecondaryErrors.Name, 1) != 0);
 
             MyUpdater = new Updater(WhatCausedThisApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
+
+            UpdateForm();
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -341,7 +354,27 @@ namespace WhatCausedThis
             RegistryTools.SaveAppSettings(WhatCausedThisApp.RegistryKey, WhatCausedThisApp.AppVersionMajor, WhatCausedThisApp.AppVersionMinor);
             RegistryTools.SaveFormSettings(WhatCausedThisApp.RegistryKey, this);
             RegistryTools.SaveSetting(WhatCausedThisApp.RegistryKey, textModsPath.Name, textModsPath.Text);
+
+            RegistryTools.SaveSetting(WhatCausedThisApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
+
             RegistryTools.SaveSetting(WhatCausedThisApp.RegistryKey + @"\Options", menuItemSecondaryErrors.Name, menuItemSecondaryErrors.Checked ? 1 : 0);
+        }
+
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+        }
+
+        private void OnAdvancedModeChanged(object sender, EventArgs e)
+        {
+            if (IsAdvancedMode)
+            {
+                comboFrame.Visible = true;
+            }
+            else
+            {
+                comboFrame.Visible = false;
+            }
         }
 
         private void OnSelectModsClicked(object sender, EventArgs e)
@@ -370,6 +403,9 @@ namespace WhatCausedThis
                 {
                     MsgBox.Show("This error has been caused by shift-clicking on an object and selecting '*Force Error' and not by badly behaving code.", "Unsuitable Error Log", MessageBoxButtons.OK, MessageBoxIcon.Stop);
 
+                    comboFrame.SelectedIndex = -1;
+                    comboFrame.Items.Clear();
+                    comboFrame.Enabled = false;
                     textBhavGroup.Text = "";
                     textBhavInstance.Text = "";
                     textBhavName.Text = "";
@@ -380,10 +416,20 @@ namespace WhatCausedThis
                 else
                 {
                     btnGO.Enabled = (textModsPath.Text.Length > 0 && textBhavGroup.Text.Length > 0 && textBhavInstance.Text.Length > 0 && textBhavName.Text.Length > 0 && textBhavNode.Text.Length > 0);
+                    comboFrame.Enabled = btnGO.Enabled;
                 }
 
                 dataByPackage.Clear();
                 lblProgress.Visible = false;
+
+                if (string.IsNullOrWhiteSpace(textBhavName.Text))
+                {
+                    this.Text = $"{WhatCausedThisApp.AppTitle}";
+                }
+                else
+                {
+                    this.Text = $"{WhatCausedThisApp.AppTitle} - {(new FileInfo(logPath)).Name}";
+                }
 
                 inUpdateForm = false;
             }
@@ -431,7 +477,8 @@ namespace WhatCausedThis
 
                 if (rawFiles != null)
                 {
-                    LoadErrorLog(rawFiles[0]);
+                    logPath = rawFiles[0];
+                    LoadErrorLog(-1);
                 }
             }
         }
@@ -441,17 +488,23 @@ namespace WhatCausedThis
             selectFileDialog.FileName = "ObjectError_*";
             if (selectFileDialog.ShowDialog() == DialogResult.OK)
             {
-                LoadErrorLog(selectFileDialog.FileName);
+                logPath = selectFileDialog.FileName;
+                LoadErrorLog(-1);
             }
         }
 
-        private void LoadErrorLog(string logPath)
+        private void LoadErrorLog(int startFrame)
         {
             if (!Path.GetFileName(logPath).StartsWith("ObjectError_")) return;
+
+            dataLoading = true;
 
             textErrorText.Lines = File.ReadAllLines(logPath);
 
             bool primary = true;
+
+            bool inFrame = (startFrame == -1);
+            maxFrame = -1;
 
             foreach (string line in textErrorText.Lines)
             {
@@ -459,6 +512,24 @@ namespace WhatCausedThis
                 if (m.Success)
                 {
                     errorMsg = m.Groups[1].Value;
+                    continue;
+                }
+
+                m = reFrame.Match(line);
+                if (m.Success)
+                {
+                    int thisFrame = Convert.ToInt16(m.Groups[1].Value);
+
+                    if (maxFrame == -1)
+                    {
+                        maxFrame = thisFrame;
+                    }
+
+                    inFrame = inFrame || thisFrame == startFrame;
+                }
+                else
+                {
+                    if (!inFrame) continue;
                 }
 
                 m = reNode.Match(line);
@@ -568,6 +639,8 @@ namespace WhatCausedThis
                 }
             }
 
+            if (startFrame == -1) comboFrame.Items.Clear();
+
             if (errorMsg.Equals("Bad gosub tree number."))
             {
                 errorMsg = "";
@@ -596,6 +669,26 @@ namespace WhatCausedThis
                 }
             }
 
+            if (startFrame == -1 && !string.IsNullOrEmpty(textBhavName.Text))
+            {
+                for (int i = maxFrame; i >= 0; --i)
+                {
+                    comboFrame.Items.Add($"Fr {i}");
+                }
+
+                comboFrame.SelectedIndex = 0;
+            }
+
+            dataLoading = false;
+
+            UpdateForm();
+        }
+
+        private void OnFrameChanged(object sender, EventArgs e)
+        {
+            if (dataLoading || inUpdateForm) return;
+
+            LoadErrorLog(maxFrame - comboFrame.SelectedIndex);
         }
     }
 }

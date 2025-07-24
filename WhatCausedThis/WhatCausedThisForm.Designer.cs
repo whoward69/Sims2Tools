@@ -50,7 +50,6 @@ namespace WhatCausedThis
             this.menuItemSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemDownloadsFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemSecondaryErrors = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,6 +77,11 @@ namespace WhatCausedThis
             this.lblBhavNode = new System.Windows.Forms.Label();
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.btnSelectLog = new System.Windows.Forms.Button();
+            this.comboFrame = new System.Windows.Forms.ComboBox();
+            this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSecondaryErrors = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridByPackage)).BeginInit();
             this.SuspendLayout();
@@ -86,7 +90,9 @@ namespace WhatCausedThis
             // 
             this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
-            this.menuHelp});
+            this.menuHelp,
+            this.menuItemMode,
+            this.menuOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -101,7 +107,6 @@ namespace WhatCausedThis
             this.menuItemSeparator1,
             this.menuItemDownloadsFolder,
             this.menuItemSeparator2,
-            this.menuItemSecondaryErrors,
             this.menuItemConfiguration,
             this.toolStripSeparator2,
             this.menuItemExit});
@@ -134,13 +139,6 @@ namespace WhatCausedThis
             // 
             this.menuItemSeparator2.Name = "menuItemSeparator2";
             this.menuItemSeparator2.Size = new System.Drawing.Size(227, 6);
-            // 
-            // menuItemSecondaryErrors
-            // 
-            this.menuItemSecondaryErrors.CheckOnClick = true;
-            this.menuItemSecondaryErrors.Name = "menuItemSecondaryErrors";
-            this.menuItemSecondaryErrors.Size = new System.Drawing.Size(230, 22);
-            this.menuItemSecondaryErrors.Text = "Use Secondary Error Frame";
             // 
             // menuItemConfiguration
             // 
@@ -232,9 +230,9 @@ namespace WhatCausedThis
             // 
             this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(75, 336);
+            this.progressBar.Location = new System.Drawing.Point(13, 336);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(693, 24);
+            this.progressBar.Size = new System.Drawing.Size(755, 24);
             this.progressBar.TabIndex = 5;
             this.progressBar.Visible = false;
             // 
@@ -417,14 +415,54 @@ namespace WhatCausedThis
             this.btnSelectLog.UseVisualStyleBackColor = true;
             this.btnSelectLog.Click += new System.EventHandler(this.OnSelectLogClicked);
             // 
+            // comboFrame
+            // 
+            this.comboFrame.FormattingEnabled = true;
+            this.comboFrame.Location = new System.Drawing.Point(12, 337);
+            this.comboFrame.Name = "comboFrame";
+            this.comboFrame.Size = new System.Drawing.Size(56, 23);
+            this.comboFrame.TabIndex = 21;
+            this.comboFrame.SelectedIndexChanged += new System.EventHandler(this.OnFrameChanged);
+            // 
+            // menuItemMode
+            // 
+            this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAdvanced});
+            this.menuItemMode.Name = "menuItemMode";
+            this.menuItemMode.Size = new System.Drawing.Size(50, 20);
+            this.menuItemMode.Text = "&Mode";
+            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAdvanced.Text = "Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
+            // menuOptions
+            // 
+            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemSecondaryErrors});
+            this.menuOptions.Name = "menuOptions";
+            this.menuOptions.Size = new System.Drawing.Size(61, 20);
+            this.menuOptions.Text = "&Options";
+            // 
+            // menuItemSecondaryErrors
+            // 
+            this.menuItemSecondaryErrors.CheckOnClick = true;
+            this.menuItemSecondaryErrors.Name = "menuItemSecondaryErrors";
+            this.menuItemSecondaryErrors.Size = new System.Drawing.Size(215, 22);
+            this.menuItemSecondaryErrors.Text = "Use Secondary Error Frame";
+            // 
             // WhatCausedThisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(933, 561);
-            this.Controls.Add(this.progressBar);
+            this.Controls.Add(this.comboFrame);
             this.Controls.Add(this.btnSelectLog);
-            this.Controls.Add(this.lblProgress);
             this.Controls.Add(this.gridByPackage);
             this.Controls.Add(this.textBhavNode);
             this.Controls.Add(this.lblBhavNode);
@@ -441,6 +479,8 @@ namespace WhatCausedThis
             this.Controls.Add(this.textModsPath);
             this.Controls.Add(this.lblModsPath);
             this.Controls.Add(this.menuMain);
+            this.Controls.Add(this.lblProgress);
+            this.Controls.Add(this.progressBar);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
@@ -491,9 +531,13 @@ namespace WhatCausedThis
         private System.Windows.Forms.Button btnSelectLog;
         private System.Windows.Forms.ToolStripMenuItem selectLogToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripMenuItem menuItemSecondaryErrors;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPackage;
         private System.Windows.Forms.DataGridViewTextBoxColumn colScore;
+        private System.Windows.Forms.ComboBox comboFrame;
+        private System.Windows.Forms.ToolStripMenuItem menuItemMode;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
+        private System.Windows.Forms.ToolStripMenuItem menuOptions;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSecondaryErrors;
     }
 }
 
