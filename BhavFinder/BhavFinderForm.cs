@@ -1001,7 +1001,7 @@ namespace BhavFinder
         {
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                Exporter exporter = new Exporter();
+                Extractor exporter = new Extractor();
 
                 exporter.Open(selectPathDialog.FileName);
 
@@ -1010,7 +1010,7 @@ namespace BhavFinder
                     string packagePath = foundRow.Cells["colBhavDbpfPath"].Value as string;
                     DBPFEntry entry = foundRow.Cells["colBhavDbpfEntry"].Value as DBPFEntry;
 
-                    exporter.Export(packagePath, entry);
+                    exporter.Extract(packagePath, entry);
                 }
 
                 exporter.Close();

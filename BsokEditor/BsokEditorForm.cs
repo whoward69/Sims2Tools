@@ -1688,7 +1688,7 @@ namespace BsokEditor
                     }
                     catch (Exception)
                     {
-                        MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
+                        MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}, file is probably open in SimPe!", "Package Update Error!");
                     }
 
                     foreach (Cpf editedCpf in editedCpfs)

@@ -21,6 +21,60 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Xml;
 
+/*
+ * General notes on the dbpfscript.txt file
+ * 
+ * Ignore leading spaces
+ * Ignore everything after // to the end of the line
+ * Ignore blank lines
+ * Ignore spaces outside of quote delimited strings
+ * Semi-colon (;) is "syntatic sugar"
+ * 
+ * The initial development was heavily influenced by automating https://hypersaline.tumblr.com/post/770353073301422080/tutorial-adding-new-shapes-to-bodyshapes-mod
+ *
+ * The parser is based on the following Backus–Naur form
+ *
+ * blocks ::= <block> | <block> | <blocks>
+ * block ::= INIT [ <initialisers> ] | filename.ods [ <initialisers> ] | filename.package [ <actions> ]
+ * 
+ * initialisers ::= <initialiser> | <initialiser> <initialisers>
+ * initialiser ::= <var_defn> = <function> | <cell_ref> | <string> | <constant>
+ * 
+ * var_defn ::= $<var_name>
+ * 
+ * function ::= <function_name>(<var_defn>)
+ * function_name ::= guid | group | family | loword | hiword | lobyte | hibyte
+ * 
+ * cell_ref ::= <col_ref><row_ref>
+ * col_ref ::= [A-Z]
+ * row_ref ::= 1 ..
+ * 
+ * actions ::= <action> | <action> <actions>
+ * action ::= TGIR [ <subactions> ]
+ * 
+ * subactions ::= <subaction> | <subaction> <subactions>
+ * subaction ::= <assert> | <assignment> | <index> [ <subactions> ]
+ * 
+ * assert ::= assert(<assert_item>:<res_name>)
+ * assert_item ::= type
+ * res_name ::= CRES | GZPS | 3IDR | ...
+ * 
+ * index ::= 0 ..
+ * 
+ * assignment ::= <item> = <value>
+ * 
+ * item ::= group | resource | instance | guid | <item_name>
+ * 
+ * value ::= <var_ref> | <string> | <constant>
+ * 
+ * var_ref ::= $<var_name>
+ * var_name ::= text
+ * 
+ * string ::= "text with possible substitutions"
+ * constant ::= 0x <hexdigits>
+ * 
+ */
+
 namespace DbpfScripter
 {
     public class DbpfScripterWorker
@@ -460,7 +514,7 @@ namespace DbpfScripter
         #region Evaluation
         private string EvaluateFunction(string function)
         {
-            string value = "";
+            string value;
 
             if (function.Equals("guid"))
             {
@@ -694,14 +748,14 @@ namespace DbpfScripter
         {
             ReportDebug($"GENERATING Guid");
 
-            return $"0x{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
+            return TypeGUID.RandomID.ToString().ToUpper();
         }
 
         private string NewGroup()
         {
             ReportDebug($"GENERATING Group");
 
-            return $"0x{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
+            return TypeGroupID.RandomID.ToString().ToUpper();
         }
 
         private string NewFamily()

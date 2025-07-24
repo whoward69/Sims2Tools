@@ -93,7 +93,7 @@ namespace LogWatcher
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
-            this.menuMain.Size = new System.Drawing.Size(933, 24);
+            this.menuMain.Size = new System.Drawing.Size(933, 27);
             this.menuMain.TabIndex = 0;
             this.menuMain.Text = "menuStrip";
             // 
@@ -102,8 +102,6 @@ namespace LogWatcher
             this.menuFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemSelectLog,
             this.menuItemRecentLogs,
-            this.menuItemSeparator2,
-            this.menuItemConfiguration,
             this.toolStripSeparator1,
             this.menuItemCloseTab,
             this.menuItemCloseAndDeleteTab,
@@ -111,9 +109,11 @@ namespace LogWatcher
             this.menuItemCloseAllTabs,
             this.menuItemCloseAndDeleteAllTabs,
             this.toolStripSeparator3,
+            this.menuItemConfiguration,
+            this.menuItemSeparator2,
             this.menuItemExit});
             this.menuFile.Name = "menuFile";
-            this.menuFile.Size = new System.Drawing.Size(37, 20);
+            this.menuFile.Size = new System.Drawing.Size(37, 23);
             this.menuFile.Text = "&File";
             this.menuFile.DropDownOpening += new System.EventHandler(this.OnFileOpening);
             // 
@@ -203,7 +203,7 @@ namespace LogWatcher
             this.menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemAbout});
             this.menuHelp.Name = "menuHelp";
-            this.menuHelp.Size = new System.Drawing.Size(44, 20);
+            this.menuHelp.Size = new System.Drawing.Size(44, 23);
             this.menuHelp.Text = "&Help";
             // 
             // menuItemAbout
@@ -224,7 +224,7 @@ namespace LogWatcher
             this.menuItemAutoClose,
             this.menuItemAutoUpdate});
             this.menuOptions.Name = "menuOptions";
-            this.menuOptions.Size = new System.Drawing.Size(61, 20);
+            this.menuOptions.Size = new System.Drawing.Size(61, 23);
             this.menuOptions.Text = "&Options";
             // 
             // menuItemOpenAll
@@ -290,7 +290,7 @@ namespace LogWatcher
             this.menuSettings.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemIncPropIndex});
             this.menuSettings.Name = "menuSettings";
-            this.menuSettings.Size = new System.Drawing.Size(61, 20);
+            this.menuSettings.Size = new System.Drawing.Size(61, 23);
             this.menuSettings.Text = "&Settings";
             // 
             // menuItemIncPropIndex
@@ -314,10 +314,10 @@ namespace LogWatcher
             // 
             this.tabControl.AllowDrop = true;
             this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl.Location = new System.Drawing.Point(0, 24);
+            this.tabControl.Location = new System.Drawing.Point(0, 27);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(933, 495);
+            this.tabControl.Size = new System.Drawing.Size(933, 492);
             this.tabControl.TabIndex = 1;
             this.tabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.OnTabChanged);
             this.tabControl.DragDrop += new System.Windows.Forms.DragEventHandler(this.LogWatcher_DragDrop);
