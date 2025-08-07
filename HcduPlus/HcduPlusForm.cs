@@ -388,7 +388,7 @@ namespace HcduPlus
                         }
                         else
                         {
-                            if (menuItemMaxisGuidConflicts.Checked)
+                            if (!menuItemMaxisGuidConflicts.Checked)
                             {
                                 if (GameData.GlobalObjectsByGUID.ContainsKey(guid))
                                 {

@@ -87,6 +87,7 @@ namespace HcduPlus
             this.menuItemVers = new System.Windows.Forms.ToolStripMenuItem();
             this.menuConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGuidConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemMaxisGuidConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemInternalConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemHomeCrafterConflicts = new System.Windows.Forms.ToolStripMenuItem();
@@ -131,7 +132,6 @@ namespace HcduPlus
             this.lblScanPath = new System.Windows.Forms.Label();
             this.checkModsSavedSims = new System.Windows.Forms.CheckBox();
             this.checkScanSavedSims = new System.Windows.Forms.CheckBox();
-            this.menuItemMaxisGuidConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             this.tabConflicts.SuspendLayout();
             this.tabByPackage.SuspendLayout();
@@ -493,6 +493,15 @@ namespace HcduPlus
             this.menuItemGuidConflicts.Name = "menuItemGuidConflicts";
             this.menuItemGuidConflicts.Size = new System.Drawing.Size(230, 22);
             this.menuItemGuidConflicts.Text = "Check For GUID Conflicts";
+            // 
+            // menuItemMaxisGuidConflicts
+            // 
+            this.menuItemMaxisGuidConflicts.Checked = true;
+            this.menuItemMaxisGuidConflicts.CheckOnClick = true;
+            this.menuItemMaxisGuidConflicts.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.menuItemMaxisGuidConflicts.Name = "menuItemMaxisGuidConflicts";
+            this.menuItemMaxisGuidConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemMaxisGuidConflicts.Text = "Ignore Maxis GUID Conflicts";
             // 
             // toolStripSeparator2
             // 
@@ -945,15 +954,6 @@ namespace HcduPlus
             this.checkScanSavedSims.Text = "Inc SavedSims";
             this.checkScanSavedSims.UseVisualStyleBackColor = true;
             this.checkScanSavedSims.Click += new System.EventHandler(this.OnSavedSimsScan);
-            // 
-            // menuItemMaxisGuidConflicts
-            // 
-            this.menuItemMaxisGuidConflicts.Checked = true;
-            this.menuItemMaxisGuidConflicts.CheckOnClick = true;
-            this.menuItemMaxisGuidConflicts.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.menuItemMaxisGuidConflicts.Name = "menuItemMaxisGuidConflicts";
-            this.menuItemMaxisGuidConflicts.Size = new System.Drawing.Size(230, 22);
-            this.menuItemMaxisGuidConflicts.Text = "Ignore Maxis GUID Conflicts";
             // 
             // HcduPlusForm
             // 
