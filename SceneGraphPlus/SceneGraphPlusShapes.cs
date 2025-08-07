@@ -344,6 +344,7 @@ namespace SceneGraphPlus.Shapes
     public abstract class GraphBlock : GraphShape, IEquatable<GraphBlock>, IComparable<GraphBlock>, IDisposable
     {
         public static readonly Color BadTgirColour = Color.FromName(Properties.Settings.Default.BadTgirColour);
+        public static readonly Color NonFixableIssueColour = Color.FromName(Properties.Settings.Default.NonFixableIssueColour);
         public static readonly Color MaxisBlockColour = Color.FromName(Properties.Settings.Default.MaxisBlockColour);
         public static readonly Color MissingBlockColour = Color.FromName(Properties.Settings.Default.MissingBlockColour);
         public static readonly Color CloneBlockColour = Color.FromName(Properties.Settings.Default.CloneBlockColour);
@@ -367,6 +368,13 @@ namespace SceneGraphPlus.Shapes
 
         private bool fileListValid = true;
         private bool lightValid = true;
+        private bool subsetMmatValid = true;
+        private bool subsetShpeValid = true;
+        private bool subsetStrValid = true;
+        private bool subsetGmndMeshValid = true;
+        private bool subsetGmndDesignableValid = true;
+        private bool subsetGmndSlavedValid = true;
+        private bool defaultLangValid = true;
 
         protected GraphBlock clonedFrom = null;
 
@@ -551,6 +559,118 @@ namespace SceneGraphPlus.Shapes
             }
         }
 
+        public bool IsSubsetMmatValid
+        {
+            get => (IsClone ? clonedFrom.IsSubsetMmatValid : subsetMmatValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsSubsetMmatValid = value;
+                }
+                else
+                {
+                    subsetMmatValid = value;
+                }
+            }
+        }
+
+        public bool IsSubsetShpeValid
+        {
+            get => (IsClone ? clonedFrom.IsSubsetShpeValid : subsetShpeValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsSubsetShpeValid = value;
+                }
+                else
+                {
+                    subsetShpeValid = value;
+                }
+            }
+        }
+
+        public bool IsSubsetStrValid
+        {
+            get => (IsClone ? clonedFrom.IsSubsetStrValid : subsetStrValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsSubsetStrValid = value;
+                }
+                else
+                {
+                    subsetStrValid = value;
+                }
+            }
+        }
+
+        public bool IsSubsetGmndMeshValid
+        {
+            get => (IsClone ? clonedFrom.IsSubsetGmndMeshValid : subsetGmndMeshValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsSubsetGmndMeshValid = value;
+                }
+                else
+                {
+                    subsetGmndMeshValid = value;
+                }
+            }
+        }
+
+        public bool IsSubsetGmndDesignableValid
+        {
+            get => (IsClone ? clonedFrom.IsSubsetGmndDesignableValid : subsetGmndDesignableValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsSubsetGmndDesignableValid = value;
+                }
+                else
+                {
+                    subsetGmndDesignableValid = value;
+                }
+            }
+        }
+
+        public bool IsSubsetGmndSlavedValid
+        {
+            get => (IsClone ? clonedFrom.IsSubsetGmndSlavedValid : subsetGmndSlavedValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsSubsetGmndSlavedValid = value;
+                }
+                else
+                {
+                    subsetGmndSlavedValid = value;
+                }
+            }
+        }
+
+        public bool IsDefaultLangValid
+        {
+            get => (IsClone ? clonedFrom.IsDefaultLangValid : defaultLangValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsDefaultLangValid = value;
+                }
+                else
+                {
+                    defaultLangValid = value;
+                }
+            }
+        }
+
         public DBPFKey OriginalKey => BlockRef.OriginalKey;
         public DBPFKey Key => BlockRef.Key;
 
@@ -570,15 +690,48 @@ namespace SceneGraphPlus.Shapes
         public TypeGUID GUID => BlockRef.GUID;
         public void SetGuid(TypeGUID guid) => BlockRef.SetGuid(guid);
 
-        public bool HasIssues => !IsDirty && !(IsFileListValid && IsLightValid);
+        public bool HasIssues => HasNonFixableIssues || !(IsFileListValid && IsLightValid && IsDefaultLangValid);
+        public bool HasFixableIssues => !IsDirty && !(IsFileListValid && IsLightValid && IsDefaultLangValid);
+        public bool HasNonFixableIssues => !(IsSubsetMmatValid && IsSubsetShpeValid && IsSubsetStrValid && IsSubsetGmndMeshValid && IsSubsetGmndDesignableValid && IsSubsetGmndSlavedValid);
+
+        public string IssuesToolTip
+        {
+            get
+            {
+                string issues = "\r\n";
+
+                if (!IsTgirValid) issues = $"{issues}Invalid TGIR\r\n";
+
+                if (!IsFileListValid) issues = $"{issues}Invalid File List\r\n";
+
+                if (!IsLightValid) issues = $"{issues}Invalid Light Name\r\n";
+
+                if (!IsSubsetMmatValid) issues = $"{issues}Invalid Subset\r\n";
+                if (!IsSubsetShpeValid) issues = $"{issues}Invalid Subset(s)\r\n";
+                if (!IsSubsetStrValid) issues = $"{issues}Invalid Subset(s)\r\n";
+                if (!IsSubsetGmndMeshValid) issues = $"{issues}Invalid Subset(s) in tsMaterialsMeshName\r\n";
+                if (!IsSubsetGmndDesignableValid) issues = $"{issues}Invalid Subset(s) in tsDesignModeEnabled\r\n";
+                if (!IsSubsetGmndSlavedValid) issues = $"{issues}Invalid Subset(s) in tsDesignModeSlaveSubsets\r\n";
+
+                if (!IsDefaultLangValid) issues = $"{issues}Additional Langauages\r\n";
+
+                return (issues.Length > 2) ? issues : "";
+            }
+        }
 
         public void FixFileListIssues()
         {
             IsFileListValid = true;
 
-            SetDirty();
+            SetDirty(); // We fix them on save
         }
 
+        public void FixLanguageIssues()
+        {
+            IsDefaultLangValid = true;
+
+            SetDirty(); // We fix them on save
+        }
 
         public void FixTgir()
         {
@@ -593,6 +746,7 @@ namespace SceneGraphPlus.Shapes
         }
 
         public TypeTypeID TypeId => BlockRef.TypeId;
+        public TypeInstanceID InstanceId => BlockRef.InstanceId;
 
         public bool IsMissing
         {
@@ -626,7 +780,7 @@ namespace SceneGraphPlus.Shapes
 
         public string Text
         {
-            get => $"{(IsClone ? clonedFrom.Text : text)}{(HasIssues ? "!" : "")}";
+            get => (IsClone ? clonedFrom.Text : text);
             set
             {
                 if (IsClone)
@@ -670,7 +824,7 @@ namespace SceneGraphPlus.Shapes
 
         public Color TextColor
         {
-            get => (BlockRef.IsTgirValid ? textColour : Color.White);
+            get => (HasNonFixableIssues ? NonFixableIssueColour : (BlockRef.IsTgirValid ? textColour : BadTgirColour));
         }
 
         public List<GraphConnector> GetInConnectors()
@@ -892,8 +1046,9 @@ namespace SceneGraphPlus.Shapes
             {
                 textFont = new Font(textFont, FontStyle.Bold);
             }
-            else if (!(fileListValid && lightValid))
+            else if (!(fileListValid && lightValid && defaultLangValid))
             {
+                // Fixable issues
                 textFont = new Font(textFont, FontStyle.Underline);
             }
 

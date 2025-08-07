@@ -55,6 +55,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.lblGuid = new System.Windows.Forms.Label();
             this.btnDetailsChange = new System.Windows.Forms.Button();
             this.grpNewMmat = new System.Windows.Forms.GroupBox();
+            this.btnMaterials = new System.Windows.Forms.Button();
             this.grpRecolourable.SuspendLayout();
             this.grpDetails.SuspendLayout();
             this.grpNewMmat.SuspendLayout();
@@ -256,10 +257,24 @@ namespace SceneGraphPlus.Dialogs.Options
             this.grpNewMmat.TabStop = false;
             this.grpNewMmat.Text = "New MMAT:";
             // 
+            // btnMaterials
+            // 
+            this.btnMaterials.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMaterials.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnMaterials.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnMaterials.Location = new System.Drawing.Point(302, 248);
+            this.btnMaterials.Name = "btnMaterials";
+            this.btnMaterials.Size = new System.Drawing.Size(113, 26);
+            this.btnMaterials.TabIndex = 36;
+            this.btnMaterials.Text = "Add Materials";
+            this.btnMaterials.UseVisualStyleBackColor = true;
+            this.btnMaterials.Click += new System.EventHandler(this.OnAddMaterialsClicked);
+            // 
             // ObjdDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-            this.ClientSize = new System.Drawing.Size(434, 251);
+            this.ClientSize = new System.Drawing.Size(434, 281);
+            this.Controls.Add(this.btnMaterials);
             this.Controls.Add(this.grpNewMmat);
             this.Controls.Add(this.grpDetails);
             this.Controls.Add(this.grpRecolourable);
@@ -301,5 +316,6 @@ namespace SceneGraphPlus.Dialogs.Options
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.TextBox textTitle;
         private System.Windows.Forms.Label lblGuid;
+        private System.Windows.Forms.Button btnMaterials;
     }
 }

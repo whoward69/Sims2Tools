@@ -10,8 +10,8 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.Utils;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 
@@ -53,7 +53,7 @@ namespace Sims2Tools.DBPF.Images
         private readonly int count;
         private readonly int level;
 
-        private Image img;
+        private Image img = null;
         public Image Texture
         {
             get
@@ -67,58 +67,194 @@ namespace Sims2Tools.DBPF.Images
             }
         }
 
-        public DDSData(byte[] data, Size sz, DdsFormats format, int level, int count)
+        public DDSData(byte[] data, Size size, DdsFormats format, int level, int count)
         {
             this.format = format;
-            this.size = sz;
+            this.size = size;
             this.data = data;
-            this.img = null;
             this.level = level;
             this.count = count;
+
+            this.img = null;
         }
+    }
+
+
+    // See https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-pixelformat
+    public class DdsPixelFormat
+    {
+#pragma warning disable CS0414
+        private static readonly uint DDPF_ALPHAPIXELS = 0x00000001;
+        private static readonly uint DDPF_ALPHA = 0x00000002;
+        private static readonly uint DDPF_FOURCC = 0x00000004;
+        private static readonly uint DDPF_RGB = 0x00000040;
+        private static readonly uint DDPF_YUV = 0x00000200;
+        private static readonly uint DDPF_LUMINANCE = 0x00020000;
+
+        private static readonly uint SIG_DXT1 = 0x31545844;
+        private static readonly uint SIG_DXT2 = 0x32545844;
+        private static readonly uint SIG_DXT3 = 0x33545844;
+        private static readonly uint SIG_DXT4 = 0x34545844;
+        private static readonly uint SIG_DXT5 = 0x35545844;
+#pragma warning restore CS0414
+
+        private readonly uint dwSize;
+        private readonly uint dwFlags;
+        private readonly uint dwFourCC;
+        private readonly uint dwRGBBitCount;
+        private readonly uint dwRBitMask, dwGBitMask, dwBBitMask, dwABitMask;
+
+        public DdsPixelFormat(BinaryReader reader)
+        {
+            dwSize = reader.ReadUInt32();
+            Debug.Assert(dwSize == 32, "Invalid DdsPixelFormat size");
+
+            dwFlags = reader.ReadUInt32();
+            dwFourCC = reader.ReadUInt32();
+            dwRGBBitCount = reader.ReadUInt32();
+            dwRBitMask = reader.ReadUInt32();
+            dwGBitMask = reader.ReadUInt32();
+            dwBBitMask = reader.ReadUInt32();
+            dwABitMask = reader.ReadUInt32();
+        }
+
+        public bool IsDxt1 => (((dwFlags & DDPF_FOURCC) == DDPF_FOURCC) && (dwFourCC == SIG_DXT1));
+        public bool IsDxt3 => (((dwFlags & DDPF_FOURCC) == DDPF_FOURCC) && (dwFourCC == SIG_DXT3));
+        public bool IsDxt5 => (((dwFlags & DDPF_FOURCC) == DDPF_FOURCC) && (dwFourCC == SIG_DXT5));
+
+        public bool IsRaw8 => (((dwFlags & DDPF_ALPHA) == DDPF_ALPHA) && (dwRGBBitCount == 8));
+        public bool IsRaw24 => (((dwFlags & DDPF_RGB) == DDPF_RGB) && (dwRGBBitCount == 24));
+        public bool IsRaw32 => (((dwFlags & DDPF_RGB) == DDPF_RGB) && (dwRGBBitCount == 32));
+
+        public int RGBBitCount => (int)dwRGBBitCount;
+    }
+
+
+    // See https://learn.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
+    public class DdsHeader
+    {
+        private readonly uint dwSize;
+        private readonly uint dwFlags;
+        private readonly uint dwHeight;
+        private readonly uint dwWidth;
+        private readonly uint dwPitchOrLinearSize;
+        private readonly uint dwDepth;
+        private readonly uint dwMipMapCount;
+        private readonly uint[] dwReserved1 = new uint[11];
+
+        private readonly DdsPixelFormat pixelFormat;
+
+        private readonly uint dwCaps, dwCaps2, dwCaps3, dwCaps4;
+        private readonly uint dwReserved2;
+
+        public DdsHeader(BinaryReader reader)
+        {
+            dwSize = reader.ReadUInt32();
+            Debug.Assert(dwSize == 124, "Invalid DdsHeader size");
+
+            dwFlags = reader.ReadUInt32();
+            dwHeight = reader.ReadUInt32();
+            dwWidth = reader.ReadUInt32();
+            dwPitchOrLinearSize = reader.ReadUInt32();
+            dwDepth = reader.ReadUInt32();
+            dwMipMapCount = reader.ReadUInt32();
+
+            for (int i = 0; i < 11; ++i)
+            {
+                dwReserved1[i] = reader.ReadUInt32();
+            }
+
+            pixelFormat = new DdsPixelFormat(reader);
+
+            dwCaps = reader.ReadUInt32();
+            dwCaps2 = reader.ReadUInt32();
+            dwCaps3 = reader.ReadUInt32();
+            dwCaps4 = reader.ReadUInt32();
+            dwReserved2 = reader.ReadUInt32();
+        }
+
+        public bool IsDxt1 => pixelFormat.IsDxt1;
+        public bool IsDxt3 => pixelFormat.IsDxt1;
+        public bool IsDxt5 => pixelFormat.IsDxt1;
+
+        public bool IsRaw8 => pixelFormat.IsRaw8;
+        public bool IsRaw24 => pixelFormat.IsRaw24;
+        public bool IsRaw32 => pixelFormat.IsRaw32;
+
+        public int MaxWidth => (int)dwWidth;
+        public int MaxHeight => (int)dwHeight;
+
+        public int MipMapCount => (int)dwMipMapCount;
+        public int FirstMipMapDataLength => (int)dwPitchOrLinearSize;
+        public int RGBBitCount => pixelFormat.RGBBitCount;
     }
 
 
     public class DdsLoader
     {
-        public static DDSData[] ParseDDS(string flname)
+        public static DDSData[] ParseDDS(string fullPath)
         {
-            if (!File.Exists(flname)) return new DDSData[0];
+            if (!File.Exists(fullPath)) return new DDSData[0];
 
             DDSData[] maps = new DDSData[0];
 
-            FileStream fs = File.OpenRead(flname);
+            FileStream fs = File.OpenRead(fullPath);
             try
             {
-                BinaryReader reader = new BinaryReader(fs);
-                fs.Seek(0x0c, SeekOrigin.Begin);
-                int hg = reader.ReadInt32();
-                int wd = reader.ReadInt32();
-                Size sz = new Size(wd, hg);
-                int firstsize = reader.ReadInt32();
-                int unknown = reader.ReadInt32();
-                maps = new DDSData[reader.ReadInt32()];
+                BinaryReader ddsReader = new BinaryReader(fs);
 
-                fs.Seek(0x54, SeekOrigin.Begin);
-                string sig = Helper.ToString(reader.ReadBytes(0x04));
+                uint ddsSig = ddsReader.ReadUInt32();
+                Trace.Assert(ddsSig == 0x20534444, "Not a DDS file!"); // 0x20534444 is "DDS "
 
-                // TODO - DDS Formats - what about (Ext)Raw 8/24/34 Bit formats?
-                DdsFormats format;
-                if (sig == "DXT1") format = DdsFormats.DXT1Format;
-                else if (sig == "DXT3") format = DdsFormats.DXT3Format;
-                else if (sig == "DXT5") format = DdsFormats.DXT5Format;
-                else throw new Exception("Unknown DXT Format " + sig);
+                DdsHeader header = new DdsHeader(ddsReader);
+                Trace.Assert(ddsReader.BaseStream.Position == 128, "DDS reader at wrong position");
 
-                fs.Seek(0x80, SeekOrigin.Begin);
-                int blocksize = 0x10;
-                if (format == DdsFormats.DXT1Format) blocksize = 0x8;
-                for (int i = 0; i < maps.Length; i++)
+                maps = new DDSData[header.MipMapCount];
+
+                DdsFormats format = DdsFormats.Unknown;
+                if (header.IsDxt1) format = DdsFormats.DXT1Format;
+                else if (header.IsDxt3) format = DdsFormats.DXT3Format;
+                else if (header.IsDxt5) format = DdsFormats.DXT5Format;
+                else if (header.IsRaw8) format = DdsFormats.Raw8Bit;
+                else if (header.IsRaw24) format = DdsFormats.Raw24Bit;
+                else if (header.IsRaw32) format = DdsFormats.Raw32Bit;
+
+                if (format == DdsFormats.DXT1Format || format == DdsFormats.DXT3Format || format == DdsFormats.DXT5Format)
                 {
-                    byte[] d = reader.ReadBytes(firstsize);
-                    maps[i] = new DDSData(d, sz, format, (maps.Length - (i + 1)), maps.Length);
+                    Size nextMipMapSize = new Size(header.MaxWidth, header.MaxHeight);
+                    int nextMipMapDataLength = header.FirstMipMapDataLength;
 
-                    sz = new Size(Math.Max(1, sz.Width / 2), Math.Max(1, sz.Height / 2));
-                    firstsize = Math.Max(1, sz.Width / 4) * Math.Max(1, sz.Height / 4) * blocksize;
+                    int blocksize = (format == DdsFormats.DXT1Format) ? 0x08 : 0x10;
+
+                    for (int i = 0; i < maps.Length; i++)
+                    {
+                        byte[] d = ddsReader.ReadBytes(nextMipMapDataLength);
+                        maps[i] = new DDSData(d, nextMipMapSize, format, (maps.Length - (i + 1)), maps.Length);
+
+                        nextMipMapSize = new Size(Math.Max(1, nextMipMapSize.Width / 2), Math.Max(1, nextMipMapSize.Height / 2));
+                        nextMipMapDataLength = Math.Max(1, nextMipMapSize.Width / 4) * Math.Max(1, nextMipMapSize.Height / 4) * blocksize;
+                    }
+                }
+                else if (format == DdsFormats.Raw8Bit || format == DdsFormats.Raw24Bit || format == DdsFormats.Raw32Bit)
+                {
+                    Size nextMipMapSize = new Size(header.MaxWidth, header.MaxHeight);
+                    int bytesPerPixel = header.RGBBitCount / 8;
+                    int nextMipMapDataLength = header.FirstMipMapDataLength;
+                    Debug.Assert(nextMipMapDataLength == nextMipMapSize.Width * nextMipMapSize.Height * bytesPerPixel, "Ummm, the calculations are wrong!");
+
+                    for (int i = 0; i < maps.Length; i++)
+                    {
+                        byte[] d = ddsReader.ReadBytes(nextMipMapDataLength);
+                        maps[i] = new DDSData(d, nextMipMapSize, format, (maps.Length - (i + 1)), maps.Length);
+
+                        nextMipMapSize = new Size(Math.Max(1, nextMipMapSize.Width / 2), Math.Max(1, nextMipMapSize.Height / 2));
+                        nextMipMapDataLength = nextMipMapSize.Width * nextMipMapSize.Height * bytesPerPixel;
+                    }
+                }
+                else
+                {
+                    // The original SimPe code throws this exception.
+                    throw new Exception("Unknown DDS Format");
                 }
             }
             finally
@@ -172,7 +308,7 @@ namespace Sims2Tools.DBPF.Images
             {
                 if ((format == DdsFormats.DXT1Format) || (format == DdsFormats.DXT3Format) || (format == DdsFormats.DXT5Format))
                 {
-                    data = DdsLoader.DXT3Writer(img, format);
+                    data = DdsLoader.DXTWriter(img, format);
                 }
                 else if ((format == DdsFormats.ExtRaw8Bit) || (format == DdsFormats.Raw8Bit) || (format == DdsFormats.Raw24Bit) || (format == DdsFormats.Raw32Bit) || (format == DdsFormats.ExtRaw24Bit))
                 {
@@ -561,7 +697,7 @@ namespace Sims2Tools.DBPF.Images
             }
         }
 
-        protected static byte[] DXT3Writer(Image img, DdsFormats format)
+        protected static byte[] DXTWriter(Image img, DdsFormats format)
         {
             if (img == null) return new byte[0];
             BinaryWriter writer = new BinaryWriter(new MemoryStream());

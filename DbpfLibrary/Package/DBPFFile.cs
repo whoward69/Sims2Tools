@@ -31,6 +31,7 @@ using Sims2Tools.DBPF.Neighbourhood.SDNA;
 using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.Neighbourhood.SREL;
 using Sims2Tools.DBPF.Neighbourhood.SWAF;
+using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
@@ -694,6 +695,10 @@ namespace Sims2Tools.DBPF.Package
             else if (entry.TypeID == Swaf.TYPE)
             {
                 res = new Swaf(entry, reader);
+            }
+            else if (entry.TypeID == Xngb.TYPE)
+            {
+                res = new Xngb(entry, reader);
             }
             //
             // SceneGraph resources

@@ -105,6 +105,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
             }
         }
 
+        #region tsDesignModeEnabled
         public List<string> GetDesignModeEnabledSubsets()
         {
             List<string> subsets = new List<string>();
@@ -140,7 +141,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
             return designModeSubsets;
         }
 
-        public bool AddDesignModeEnabled(string subset)
+        public bool AddDesignModeEnabledSubset(string subset)
         {
             CDataListExtension tsDesignModeEnabled = GetOrAddDataListExtension("tsDesignModeEnabled", GeometryNode.ObjectGraphNode);
 
@@ -151,29 +152,102 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
             return true;
         }
 
-        public void RemoveDesignModeEnabled(string subset)
+        public void RemoveDesignModeEnabledSubset(string subset)
         {
             CDataListExtension tsDesignModeEnabled = GetDataListExtension("tsDesignModeEnabled");
 
             tsDesignModeEnabled?.Extension.RemoveItem(subset);
         }
+        #endregion
+
+        #region tsDesignModeSlaveSubsets
+        public List<string> GetDesignModeSlaveSubsets()
+        {
+            List<string> subsets = new List<string>();
+
+            CDataListExtension tsDesignModeSlaveSubsets = GetDataListExtension("tsDesignModeSlaveSubsets");
+
+            if (tsDesignModeSlaveSubsets != null)
+            {
+                foreach (ExtensionItem item in tsDesignModeSlaveSubsets.Extension.Items)
+                {
+                    subsets.Add(item.Name);
+                }
+            }
+
+            return subsets;
+        }
+
+        public string GetDesignModeSlaveSubsetsAsString()
+        {
+            List<string> subsets = GetDesignModeSlaveSubsets();
+
+            if (subsets.Count == 0) return "";
+
+            return ListToString(subsets);
+        }
+
+        public List<string> GetDesignModeSlaveSubsetsSubset(string subset)
+        {
+            CDataListExtension tsDesignModeSlaveSubsets = GetDataListExtension("tsDesignModeSlaveSubsets");
+
+            if (tsDesignModeSlaveSubsets != null)
+            {
+                string slaveSubsets = tsDesignModeSlaveSubsets.Extension.GetString(subset);
+
+                if (slaveSubsets != null)
+                {
+                    return StringToList(slaveSubsets);
+                }
+            }
+
+            return new List<string>();
+        }
+
+        public bool AddDesignModeSlaveSubsetsSubset(string subset, List<string> slaveSubsets)
+        {
+            CDataListExtension tsDesignModeSlaveSubsets = GetOrAddDataListExtension("tsDesignModeSlaveSubsets", GeometryNode.ObjectGraphNode);
+
+            tsDesignModeSlaveSubsets.Extension.AddOrUpdateString(subset, ListToString(slaveSubsets));
+
+            if (tsDesignModeSlaveSubsets.Extension.Count >= 3) return false;
+
+            return true;
+        }
+
+        public void RemoveDesignModeSlaveSubsetsSubset(string subset)
+        {
+            CDataListExtension tsDesignModeSlaveSubsets = GetDataListExtension("tsDesignModeSlaveSubsets");
+
+            tsDesignModeSlaveSubsets?.Extension.RemoveItem(subset);
+        }
+        #endregion
+
+        #region tsMaterialsMeshName
+        public List<string> GetMaterialsMeshNameSubsets()
+        {
+            List<string> subsets = new List<string>();
+
+            CDataListExtension tsMaterialsMeshName = GetDataListExtension("tsMaterialsMeshName");
+
+            if (tsMaterialsMeshName != null)
+            {
+                foreach (ExtensionItem item in tsMaterialsMeshName.Extension.Items)
+                {
+                    subsets.Add(item.Name);
+                }
+            }
+
+            return subsets;
+        }
 
         public string GetMaterialsMeshNameSubsetsAsString()
         {
-            CDataListExtension tsMaterialsMeshName = GetDataListExtension("tsMaterialsMeshName");
+            List<string> subsets = GetMaterialsMeshNameSubsets();
 
-            if (tsMaterialsMeshName == null) return "";
+            if (subsets.Count == 0) return "";
 
-            string materialsMeshNameSubsets = "";
-
-            foreach (ExtensionItem item in tsMaterialsMeshName.Extension.Items)
-            {
-                materialsMeshNameSubsets = $"{materialsMeshNameSubsets}, {item.Name}";
-            }
-
-            if (materialsMeshNameSubsets.Length > 2) materialsMeshNameSubsets = materialsMeshNameSubsets.Substring(2);
-
-            return materialsMeshNameSubsets;
+            return ListToString(subsets);
         }
 
         public bool SetMaterialsMeshName(string subset, string mesh)
@@ -184,6 +258,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
 
             return true;
         }
+        #endregion
 
         public override SgResourceList SgNeededResources()
         {
@@ -203,6 +278,32 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
         public override XmlElement AddXml(XmlElement parent)
         {
             return AddXml(parent, NAME);
+        }
+
+        private string ListToString(List<string> items)
+        {
+            string str = "";
+
+            foreach (string item in items)
+            {
+                str = $"{str}, {item}";
+            }
+
+            if (str.Length > 2) str = str.Substring(2);
+
+            return str;
+        }
+
+        private List<string> StringToList(string str)
+        {
+            List<string> items = new List<string>();
+
+            foreach (string s in str.Split(','))
+            {
+                items.Add(s.Trim());
+            }
+
+            return items;
         }
     }
 }

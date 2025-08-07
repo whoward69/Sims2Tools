@@ -11,6 +11,7 @@ using Sims2Tools.DBPF.Images;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DbpfCache;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -54,6 +55,18 @@ namespace SceneGraphPlus.Dialogs.Options
             else if (txtr.ImageData.Format == DdsFormats.DXT5Format)
             {
                 radioDxt5.Checked = true;
+            }
+            else if (txtr.ImageData.Format == DdsFormats.Raw8Bit || txtr.ImageData.Format == DdsFormats.ExtRaw8Bit)
+            {
+                radioRaw8.Checked = true;
+            }
+            else if (txtr.ImageData.Format == DdsFormats.Raw24Bit || txtr.ImageData.Format == DdsFormats.ExtRaw24Bit)
+            {
+                radioRaw24.Checked = true;
+            }
+            else if (txtr.ImageData.Format == DdsFormats.Raw32Bit)
+            {
+                radioRaw32.Checked = true;
             }
 
             textLevels.Text = txtr.ImageData.MipMapLevels.ToString();
@@ -139,16 +152,18 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private void UpdateTexture(Txtr txtrToUpdate)
         {
-            UpdateTextureHelper(txtrToUpdate, textNewImage.Text, GetTextureFormat(radioDxt1, radioDxt3, radioDxt5), textLevels.Text, comboSharpen, ckbFilters);
+            UpdateTextureHelper(txtrToUpdate, textNewImage.Text, GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters);
         }
 
-        public static DdsFormats GetTextureFormat(RadioButton radioDxt1, RadioButton radioDxt3, RadioButton radioDxt5)
+        public static DdsFormats GetTextureFormat(bool radioDxt1, bool radioDxt3, bool radioDxt5, bool radioRaw8, bool radioRaw24, bool radioRaw32)
         {
-            // TODO - DDS Formats - what about (Ext)Raw 8/24/34 Bit formats?
-            if (radioDxt1.Checked) return DdsFormats.DXT1Format;
-            else if (radioDxt3.Checked) return DdsFormats.DXT3Format;
-            else if (radioDxt5.Checked) return DdsFormats.DXT5Format;
-            else throw new Exception("Unknown DXT Format");
+            if (radioDxt1) return DdsFormats.DXT1Format;
+            else if (radioDxt3) return DdsFormats.DXT3Format;
+            else if (radioDxt5) return DdsFormats.DXT5Format;
+            else if (radioRaw8) return DdsFormats.Raw8Bit;
+            else if (radioRaw24) return DdsFormats.Raw24Bit;
+            else if (radioRaw32) return DdsFormats.Raw32Bit;
+            else return DdsFormats.Unknown;
         }
 
         public static void UpdateTextureHelper(Txtr txtrToUpdate, string imageName, DdsFormats format, string sLevels, ComboBox comboSharpen, CheckedListBox ckbFilters)
@@ -160,23 +175,54 @@ namespace SceneGraphPlus.Dialogs.Options
                 levels = txtrToUpdate.ImageData.MipMapLevels;
             }
 
-            string extraParameters = $"-sharpenMethod {comboSharpen.Text}";
-
-            foreach (string filter in ckbFilters.CheckedItems)
+            if (format == DdsFormats.DXT1Format || format == DdsFormats.DXT3Format || format == DdsFormats.DXT5Format)
             {
-                extraParameters += $" -{filter}";
+                if (imageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
+                {
+                    ddsData = DdsLoader.ParseDDS(imageName);
+                }
+                else
+                {
+                    string extraParameters = $"-sharpenMethod {comboSharpen.Text}";
+
+                    foreach (string filter in ckbFilters.CheckedItems)
+                    {
+                        extraParameters += $" -{filter}";
+                    }
+
+                    ddsData = (new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger)).BuildDDS(imageName, levels, format, extraParameters);
+                }
             }
-
-            if (imageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
+            else if (format == DdsFormats.Raw8Bit || format == DdsFormats.Raw24Bit || format == DdsFormats.Raw32Bit)
             {
-                ddsData = DdsLoader.ParseDDS(imageName);
+                if (imageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new Exception("Unsupported file extension");
+                }
+                else
+                {
+                    ddsData = (new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger)).BuildDDS(imageName, levels, format, "");
+                }
             }
             else
             {
-                ddsData = (new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger)).BuildDDS(imageName, levels, format, extraParameters);
+                throw new Exception("Unsupported DDS Format");
             }
 
+            Trace.Assert(txtrToUpdate.ImageData.MipMapLevels == ddsData.Length, $"Incorrect number of MipMaps! Expected {txtrToUpdate.ImageData.MipMapLevels}, got {ddsData.Length}");
             txtrToUpdate.UpdateFromDDSData(ddsData);
+        }
+
+        private void OnFormatChanged(object sender, EventArgs e)
+        {
+            if (sender == radioDxt1 || sender == radioDxt3 || sender == radioDxt5)
+            {
+                comboSharpen.Enabled = ckbFilters.Enabled = true;
+            }
+            else if (sender == radioRaw8 || sender == radioRaw24 || sender == radioRaw32)
+            {
+                comboSharpen.Enabled = ckbFilters.Enabled = false;
+            }
         }
     }
 }

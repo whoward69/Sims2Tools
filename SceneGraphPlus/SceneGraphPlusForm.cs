@@ -56,6 +56,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Sims2Tools.DBPF.Data.MetaData;
 
 
 namespace SceneGraphPlus
@@ -77,6 +78,14 @@ namespace SceneGraphPlus
             Txmt.TYPE, Txtr.TYPE, Lifo.TYPE,
             Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE,
             Hls.TYPE, Trks.TYPE, Audio.TYPE };
+
+        // When adding to this List, search for "UnderstoodStrings" (both this file and the Surface file)
+        public static List<TypeInstanceID> UnderstoodStrInstances = new List<TypeInstanceID>() {
+            DBPFData.STR_MODELS,
+            DBPFData.STR_MATERIALS,
+            DBPFData.STR_SUBSETS,
+            DBPFData.STR_SOUNDS,
+        };
 
         private CigenFile cigenCache = null;
         private static readonly DbpfFileCache packageCache = new DbpfFileCache();
@@ -168,13 +177,13 @@ namespace SceneGraphPlus
                 else
                 {
                     logger.Warn("'cigen.package' not found - thumbnails will NOT display.");
-                    MsgBox.Show("'cigen.package' not found - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) MsgBox.Show("'cigen.package' not found - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
                 }
             }
             else
             {
                 logger.Warn("'Sims2HomePath' not set - thumbnails will NOT display.");
-                MsgBox.Show("'Sims2HomePath' not set - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) MsgBox.Show("'Sims2HomePath' not set - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
             }
 
             downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2DownloadsPath}"), UnderstoodTypeIds.ToArray());
@@ -410,6 +419,9 @@ namespace SceneGraphPlus
             btnFixTgi.Visible = false;
             btnFixIssues.Visible = false;
 
+            int yOffset = (block != null && block.TypeId == Str.TYPE) ? lblBlockSgName.Location.Y : lblBlockName.Location.Y;
+            btnFixIssues.Location = new Point(btnFixIssues.Location.X, yOffset - 5);
+
             textBlockPackagePath.Text = "";
             textBlockKey.Text = "";
 
@@ -441,6 +453,8 @@ namespace SceneGraphPlus
 
                 textBlockName.ReadOnly = (!block.IsEditable || block.TypeId == Mmat.TYPE || block.TypeId == Aged.TYPE);
                 textBlockName.BorderStyle = (textBlockName.ReadOnly ? BorderStyle.FixedSingle : BorderStyle.Fixed3D);
+
+                btnFixIssues.Visible = !btnFixTgi.Visible && block.HasFixableIssues;
             }
             else
             {
@@ -456,7 +470,7 @@ namespace SceneGraphPlus
                 textBlockSgName.BorderStyle = (textBlockSgName.ReadOnly ? BorderStyle.FixedSingle : BorderStyle.Fixed3D);
 
                 btnFixTgi.Visible = !block.IsTgirValid;
-                btnFixIssues.Visible = !btnFixTgi.Visible && block.HasIssues;
+                btnFixIssues.Visible = !btnFixTgi.Visible && block.HasFixableIssues;
             }
 
             textBlockKey.Text = block.KeyName;
@@ -499,7 +513,7 @@ namespace SceneGraphPlus
                                         textBlockSgName.ReadOnly = true;
                                         textBlockSgName.BorderStyle = BorderStyle.FixedSingle;
 
-                                        textBlockFullSgName.Text = BlockRef.NormalizeSgName(res.TypeID, res.GroupID, blockSgName, menuItemPrefixLowerCase.Checked); ;
+                                        textBlockFullSgName.Text = BlockRef.NormalizeSgName(res.TypeID, res.GroupID, blockSgName, IsPrefixLowerCase); ;
                                     }
                                     else
                                     {
@@ -551,7 +565,7 @@ namespace SceneGraphPlus
                                 textBlockSgName.ReadOnly = true;
                                 textBlockSgName.BorderStyle = BorderStyle.FixedSingle;
 
-                                textBlockFullSgName.Text = BlockRef.NormalizeSgName(maxisRes.TypeID, maxisRes.GroupID, blockSgName, menuItemPrefixLowerCase.Checked); ;
+                                textBlockFullSgName.Text = BlockRef.NormalizeSgName(maxisRes.TypeID, maxisRes.GroupID, blockSgName, IsPrefixLowerCase); ;
                             }
                             else
                             {
@@ -760,7 +774,7 @@ namespace SceneGraphPlus
                     {
                         foreach (DBPFEntry entry in package.GetEntriesByType(typeId))
                         {
-                            if (entry.InstanceID == DBPFData.STR_MODELS || entry.InstanceID == DBPFData.STR_MATERIALS || entry.InstanceID == DBPFData.STR_SOUNDS)
+                            if (UnderstoodStrInstances.Contains(entry.InstanceID))
                             {
                                 ProcessKey(package, entry);
                             }
@@ -770,6 +784,8 @@ namespace SceneGraphPlus
 
                 package.Close();
             }
+
+            surface.ValidateBlocks();
 
             surface.Invalidate();
         }
@@ -783,6 +799,13 @@ namespace SceneGraphPlus
             if (invalidateSurface) surface.Invalidate();
 
             return newBlock;
+        }
+
+        public void RemoveResource(IDBPFFile package, DBPFKey key)
+        {
+            BlockRef blockRef = new BlockRef(package, key.TypeID, key);
+
+            blockCache.Remove(blockRef);
         }
 
         private GraphBlock ProcessKey(IDBPFFile package, DBPFKey key)
@@ -825,7 +848,7 @@ namespace SceneGraphPlus
                 {
                     BlockRef blockRefBySgName = new BlockRef(package, key.TypeID, new DBPFKey(key));
 
-                    blockRefBySgName.SetSgFullName(res.KeyName, menuItemPrefixLowerCase.Checked);
+                    blockRefBySgName.SetSgFullName(res.KeyName, IsPrefixLowerCase);
 
                     if (blockRefBySgName.IsTgirValid && blockCache.TryGetValue(blockRefBySgName, out block))
                     {
@@ -932,14 +955,16 @@ namespace SceneGraphPlus
                 if (blockName != null) startBlock.BlockName = blockName;
 
                 string blockSgName = GetResourceSgName(res);
-                if (blockSgName != null) startBlock.UpdateSgName(blockSgName, menuItemPrefixLowerCase.Checked);
+                if (blockSgName != null) startBlock.UpdateSgName(blockSgName, IsPrefixLowerCase);
 
                 // "UnderstoodTypes" - when adding a new resource type, need to update this block
                 if (res is Str str)
                 {
+                    // "UnderstoodStrings" - when adding a new string instance, need to update this block
                     TypeTypeID connectionTypeId = DBPFData.TYPE_NULL;
                     if (entry.InstanceID == DBPFData.STR_MODELS) connectionTypeId = Cres.TYPE;
                     else if (entry.InstanceID == DBPFData.STR_MATERIALS) connectionTypeId = Txmt.TYPE;
+                    else if (entry.InstanceID == DBPFData.STR_SUBSETS) connectionTypeId = Gmdc.TYPE; // This is a fudge!
                     else if (entry.InstanceID == DBPFData.STR_SOUNDS) connectionTypeId = Hls.TYPE;
 
                     if (connectionTypeId != DBPFData.TYPE_NULL)
@@ -964,32 +989,41 @@ namespace SceneGraphPlus
                                             {
                                                 objdBlock.ConnectTo(2, "Sound ID Names", startBlock);
                                             }
+                                            else if (connectionTypeId == Gmdc.TYPE)
+                                            {
+                                                objdBlock.ConnectTo(3, "Subsets", startBlock);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
 
-                        List<StrItem> items = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default);
-
-                        for (int index = 0; index < items.Count; ++index)
+                        if (connectionTypeId != Gmdc.TYPE)
                         {
-                            string link = items[index].Title;
+                            List<StrItem> items = str.LanguageItems(Languages.Default);
 
-                            if (!string.IsNullOrWhiteSpace(link))
+                            for (int index = 0; index < items.Count; ++index)
                             {
-                                if (connectionTypeId == Hls.TYPE)
-                                {
-                                    startBlock.ConnectTo(index, link, AddBlockByKey(package, new BlockRef(package, connectionTypeId, new DBPFKey(connectionTypeId, (TypeGroupID)0xEB8AB356, Hashes.InstanceIDHash(link), Hashes.ResourceIDHash(link))), ref freeCol));
-                                }
-                                else
-                                {
-                                    startBlock.ConnectTo(index, link, AddBlockByKey(package, new BlockRef(package, connectionTypeId, DBPFData.GROUP_SG_MAXIS, link, menuItemPrefixLowerCase.Checked), ref freeCol));
-                                }
+                                string link = items[index].Title;
 
-                                freeCol += DrawingSurface.ColumnGap;
+                                if (!string.IsNullOrWhiteSpace(link))
+                                {
+                                    if (connectionTypeId == Hls.TYPE)
+                                    {
+                                        startBlock.ConnectTo(index, link, AddBlockByKey(package, new BlockRef(package, connectionTypeId, new DBPFKey(connectionTypeId, (TypeGroupID)0xEB8AB356, Hashes.InstanceIDHash(link), Hashes.ResourceIDHash(link))), ref freeCol));
+                                    }
+                                    else
+                                    {
+                                        startBlock.ConnectTo(index, link, AddBlockByKey(package, new BlockRef(package, connectionTypeId, DBPFData.GROUP_SG_MAXIS, link, IsPrefixLowerCase), ref freeCol));
+                                    }
+
+                                    freeCol += DrawingSurface.ColumnGap;
+                                }
                             }
                         }
+
+                        startBlock.IsDefaultLangValid = (str.Languages.Count == 1);
                     }
                 }
                 else if (res is Objd objd)
@@ -1010,10 +1044,10 @@ namespace SceneGraphPlus
                 {
                     if (mmat.DefaultMaterial) startBlock.Text = $"{startBlock.Text} (Def)";
 
-                    startBlock.ConnectTo(0, "model", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("modelName").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                    startBlock.ConnectTo(0, "model", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("modelName").StringValue, IsPrefixLowerCase), ref freeCol));
                     freeCol += DrawingSurface.ColumnGap;
 
-                    startBlock.ConnectTo(1, mmat.GetItem("subsetName").StringValue, AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("name").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                    startBlock.ConnectTo(1, mmat.GetItem("subsetName").StringValue, AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("name").StringValue, IsPrefixLowerCase), ref freeCol));
                     freeCol += DrawingSurface.ColumnGap;
 
                     startBlock.ConnectTo(2, "guid", AddBlockByName(package, new BlockRef(package, Objd.TYPE, (TypeGUID)mmat.GetItem("objectGUID").StringValue), ref freeCol));
@@ -1116,11 +1150,11 @@ namespace SceneGraphPlus
 
                     if (type != null && type.Equals("fence"))
                     {
-                        startBlock.ConnectTo(0, "post", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("post").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(0, "post", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("post").StringValue, IsPrefixLowerCase), ref freeCol));
                         freeCol += DrawingSurface.ColumnGap;
-                        startBlock.ConnectTo(1, "rail", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("rail").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(1, "rail", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("rail").StringValue, IsPrefixLowerCase), ref freeCol));
                         freeCol += DrawingSurface.ColumnGap;
-                        startBlock.ConnectTo(2, "diagrail", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("diagrail").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(2, "diagrail", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xfnc.GetItem("diagrail").StringValue, IsPrefixLowerCase), ref freeCol));
 
                         freeCol += DrawingSurface.ColumnGap;
                     }
@@ -1184,7 +1218,7 @@ namespace SceneGraphPlus
 
                     if (type != null && (type.Equals("wall") || type.Equals("floor")))
                     {
-                        startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, xobj.GetItem("material").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(0, "material", AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, xobj.GetItem("material").StringValue, IsPrefixLowerCase), ref freeCol));
 
                         freeCol += DrawingSurface.ColumnGap;
                     }
@@ -1195,15 +1229,15 @@ namespace SceneGraphPlus
 
                     if (type != null && (type.Equals("roof")))
                     {
-                        startBlock.ConnectTo(0, "texturetop", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetop").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(0, "texturetop", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetop").StringValue, IsPrefixLowerCase), ref freeCol));
                         freeCol += DrawingSurface.ColumnGap;
-                        startBlock.ConnectTo(1, "texturetopbump", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetopbump").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(1, "texturetopbump", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetopbump").StringValue, IsPrefixLowerCase), ref freeCol));
                         freeCol += DrawingSurface.ColumnGap;
-                        startBlock.ConnectTo(2, "textureedges", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("textureedges").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(2, "textureedges", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("textureedges").StringValue, IsPrefixLowerCase), ref freeCol));
                         freeCol += DrawingSurface.ColumnGap;
-                        startBlock.ConnectTo(3, "texturetrim", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetrim").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(3, "texturetrim", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("texturetrim").StringValue, IsPrefixLowerCase), ref freeCol));
                         freeCol += DrawingSurface.ColumnGap;
-                        startBlock.ConnectTo(4, "textureunder", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("textureunder").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(4, "textureunder", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xrof.GetItem("textureunder").StringValue, IsPrefixLowerCase), ref freeCol));
 
                         freeCol += DrawingSurface.ColumnGap;
                     }
@@ -1214,9 +1248,9 @@ namespace SceneGraphPlus
 
                     if (type != null && (type.Equals("terrainpaint")))
                     {
-                        startBlock.ConnectTo(0, "texturetname", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xflr.GetItem("texturetname").StringValue, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(0, "texturetname", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, xflr.GetItem("texturetname").StringValue, IsPrefixLowerCase), ref freeCol));
                         freeCol += DrawingSurface.ColumnGap;
-                        GraphConnector detailConnector = startBlock.ConnectTo(1, "texturetname_detail", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, $"{xflr.GetItem("texturetname").StringValue}_detail", menuItemPrefixLowerCase.Checked), ref freeCol));
+                        GraphConnector detailConnector = startBlock.ConnectTo(1, "texturetname_detail", AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, $"{xflr.GetItem("texturetname").StringValue}_detail", IsPrefixLowerCase), ref freeCol));
 
                         detailConnector.EndBlock.IsEditable = false;
 
@@ -1254,7 +1288,7 @@ namespace SceneGraphPlus
                     int index = 0;
                     foreach (string gmndName in shpe.GmndNames)
                     {
-                        startBlock.ConnectTo(index++, null, AddBlockByName(package, new BlockRef(package, Gmnd.TYPE, DBPFData.GROUP_SG_MAXIS, gmndName, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(index++, null, AddBlockByName(package, new BlockRef(package, Gmnd.TYPE, DBPFData.GROUP_SG_MAXIS, gmndName, IsPrefixLowerCase), ref freeCol));
 
                         freeCol += DrawingSurface.ColumnGap;
                     }
@@ -1264,7 +1298,7 @@ namespace SceneGraphPlus
                     index = 0;
                     foreach (KeyValuePair<string, string> kvPair in txmtKeyedNames)
                     {
-                        startBlock.ConnectTo(index++, kvPair.Key, AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, kvPair.Value, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(index++, kvPair.Key, AddBlockByName(package, new BlockRef(package, Txmt.TYPE, DBPFData.GROUP_SG_MAXIS, kvPair.Value, IsPrefixLowerCase), ref freeCol));
 
                         freeCol += DrawingSurface.ColumnGap;
                     }
@@ -1293,7 +1327,7 @@ namespace SceneGraphPlus
                     int index = 0;
                     foreach (KeyValuePair<string, string> kvPair in txtrKeyedNames)
                     {
-                        startBlock.ConnectTo(index++, kvPair.Key, AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, kvPair.Value, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(index++, kvPair.Key, AddBlockByName(package, new BlockRef(package, Txtr.TYPE, DBPFData.GROUP_SG_MAXIS, kvPair.Value, IsPrefixLowerCase), ref freeCol));
 
                         freeCol += DrawingSurface.ColumnGap;
                     }
@@ -1307,7 +1341,7 @@ namespace SceneGraphPlus
                     int index = 0;
                     foreach (string lifoRef in txtr.ImageData.GetLifoRefs())
                     {
-                        startBlock.ConnectTo(index++, null, AddBlockByName(package, new BlockRef(package, Lifo.TYPE, DBPFData.GROUP_SG_MAXIS, lifoRef, menuItemPrefixLowerCase.Checked), ref freeCol));
+                        startBlock.ConnectTo(index++, null, AddBlockByName(package, new BlockRef(package, Lifo.TYPE, DBPFData.GROUP_SG_MAXIS, lifoRef, IsPrefixLowerCase), ref freeCol));
 
                         freeCol += DrawingSurface.ColumnGap;
                     }
@@ -1788,7 +1822,7 @@ namespace SceneGraphPlus
             int caret = textBlockSgName.SelectionStart;
             int len = textBlockSgName.SelectionLength;
 
-            surface.ChangeEditingSgName(textBlockSgName.Text, menuItemPrefixLowerCase.Checked);
+            surface.ChangeEditingSgName(textBlockSgName.Text, IsPrefixLowerCase);
 
             textBlockSgName.Focus();
             textBlockSgName.SelectionStart = caret;
@@ -1878,7 +1912,7 @@ namespace SceneGraphPlus
 
         private void OnSaveAll(object sender, EventArgs e)
         {
-            surface.SaveAll(menuItemAutoBackup.Checked, menuItemSetOptionalNames.Checked, menuItemClearOptionalNames.Checked, menuItemPrefixOptionalNames.Checked, menuItemPrefixLowerCase.Checked);
+            surface.SaveAll(menuItemAutoBackup.Checked, menuItemSetOptionalNames.Checked, menuItemClearOptionalNames.Checked, menuItemPrefixOptionalNames.Checked, IsPrefixLowerCase);
         }
 
         #region Meshes Cache

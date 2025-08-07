@@ -35,7 +35,7 @@ namespace Sims2Tools.DBPF.STR
         Dictionary<MetaData.Languages, List<StrItem>> languages;
 
         #region Constructors
-        public Str(DBPFEntry entry) : base(entry)
+        public Str(IDBPFKey entry) : base(entry)
         {
             format = MetaData.FormatCode.normal;
             languages = new Dictionary<MetaData.Languages, List<StrItem>>();
@@ -133,6 +133,19 @@ namespace Sims2Tools.DBPF.STR
             }
 
             return new List<StrItem>();
+        }
+
+        public int AppendLanguageItem(MetaData.Languages l, StrItem item)
+        {
+            if (!languages.ContainsKey(l))
+            {
+                AddLanguage(l);
+            }
+
+            languages[l].Add(item);
+            _isDirty = true;
+
+            return languages[l].Count - 1;
         }
 
         public List<StrItem> AddLanguage(MetaData.Languages l)

@@ -120,23 +120,23 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private void OnSubsetUpdate(object sender, EventArgs e)
         {
-            if (originalPrimarySubset != null) gmnd.RemoveDesignModeEnabled(originalPrimarySubset);
+            if (originalPrimarySubset != null) gmnd.RemoveDesignModeEnabledSubset(originalPrimarySubset);
 
             if (comboPrimarySubset.SelectedItem != null)
             {
                 if (comboPrimarySubset.SelectedIndex > 0)
                 {
-                    gmnd.AddDesignModeEnabled(comboPrimarySubset.SelectedItem.ToString());
+                    gmnd.AddDesignModeEnabledSubset(comboPrimarySubset.SelectedItem.ToString());
                 }
             }
 
-            if (originalSecondarySubset != null) gmnd.RemoveDesignModeEnabled(originalSecondarySubset);
+            if (originalSecondarySubset != null) gmnd.RemoveDesignModeEnabledSubset(originalSecondarySubset);
 
             if (comboSecondarySubset.SelectedItem != null)
             {
                 if (comboSecondarySubset.SelectedIndex > 0)
                 {
-                    gmnd.AddDesignModeEnabled(comboSecondarySubset.SelectedItem.ToString());
+                    gmnd.AddDesignModeEnabledSubset(comboSecondarySubset.SelectedItem.ToString());
                 }
             }
         }

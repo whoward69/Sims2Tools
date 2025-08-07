@@ -26,7 +26,6 @@ namespace SceneGraphPlus.Cache
 
         public BlockCache()
         {
-
         }
 
         public void Clear()
@@ -77,6 +76,11 @@ namespace SceneGraphPlus.Cache
             }
 
             processedBlocks.Add(blockRef, block);
+        }
+
+        public bool Remove(BlockRef blockRef)
+        {
+            return processedBlocks.Remove(blockRef);
         }
     }
 
@@ -147,6 +151,8 @@ namespace SceneGraphPlus.Cache
         }
 
         public TypeTypeID TypeId => typeId;
+        public TypeInstanceID InstanceId => key.InstanceID;
+
         public string SgOriginalName => sgOriginalName;
         public string SgFullName => sgName;
         public void SetSgFullName(string value, bool prefixLowerCase)

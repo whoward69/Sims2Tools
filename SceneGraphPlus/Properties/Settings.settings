@@ -45,7 +45,7 @@
       <Value Profile="(Default)">40</Value>
     </Setting>
     <Setting Name="BadTgirColour" Type="System.String" Scope="User">
-      <Value Profile="(Default)">White</Value>
+      <Value Profile="(Default)">DimGray</Value>
     </Setting>
     <Setting Name="MaxisBlockColour" Type="System.String" Scope="User">
       <Value Profile="(Default)">DarkGray</Value>
@@ -211,6 +211,9 @@
     </Setting>
     <Setting Name="ObjdRow" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="NonFixableIssueColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">White</Value>
     </Setting>
   </Settings>
 </SettingsFile>

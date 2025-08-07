@@ -17,10 +17,10 @@ namespace SceneGraphPlus
         public static string AppName = "SceneGraph PLUS";
 
         public static int AppVersionMajor = 2;
-        public static int AppVersionMinor = 0;
+        public static int AppVersionMinor = 1;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 5;
+        private static readonly int AppVersionDebug = 0;
 #endif
 
         private static readonly string AppVersionType = "b"; // a - alpha, b - beta, r - release

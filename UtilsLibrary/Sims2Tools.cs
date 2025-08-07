@@ -48,6 +48,7 @@ namespace Sims2Tools
         private static readonly string SimPeKey = @"Ambertation\SimPe\Settings";
 
         private static readonly string AllAdvancedModeKey = "AllAdvancedMode";
+        private static readonly string MuteThumbnailWarningsKey = "MuteThumbnailWarnings";
 
         private static readonly string CreatorNickNameKey = "CreatorNickName";
         private static readonly string CreatorGuidKey = "CreatorGUID";
@@ -148,6 +149,18 @@ namespace Sims2Tools
                 {
                     RegistryTools.SetAllAdvancedMode();
                 }
+            }
+        }
+
+        public static bool MuteThumbnailWarnings
+        {
+            get
+            {
+                return (((int)RegistryTools.GetSetting(RegistryKey, MuteThumbnailWarningsKey, 0)) != 0);
+            }
+            set
+            {
+                RegistryTools.SaveSetting(RegistryKey, MuteThumbnailWarningsKey, value ? 1 : 0);
             }
         }
 

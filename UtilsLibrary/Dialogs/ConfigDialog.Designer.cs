@@ -57,6 +57,7 @@ namespace Sims2Tools
             this.lblHelpHomePath = new System.Windows.Forms.Label();
             this.lblHelpInstallPath = new System.Windows.Forms.Label();
             this.btnSims2EpSpSelect = new System.Windows.Forms.Button();
+            this.ckbMuteThumbnailWarnings = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // lblSims2ExePath
@@ -235,12 +236,24 @@ namespace Sims2Tools
             this.btnSims2EpSpSelect.UseVisualStyleBackColor = true;
             this.btnSims2EpSpSelect.Click += new System.EventHandler(this.OnSelectSims2EpSpPathClicked);
             // 
+            // ckbMuteThumbnailWarnings
+            // 
+            this.ckbMuteThumbnailWarnings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ckbMuteThumbnailWarnings.AutoSize = true;
+            this.ckbMuteThumbnailWarnings.Location = new System.Drawing.Point(306, 178);
+            this.ckbMuteThumbnailWarnings.Name = "ckbMuteThumbnailWarnings";
+            this.ckbMuteThumbnailWarnings.Size = new System.Drawing.Size(171, 19);
+            this.ckbMuteThumbnailWarnings.TabIndex = 16;
+            this.ckbMuteThumbnailWarnings.Text = "Mute Thumbnail Warnings";
+            this.ckbMuteThumbnailWarnings.UseVisualStyleBackColor = true;
+            // 
             // ConfigDialog
             // 
             this.AcceptButton = this.btnConfigOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(820, 213);
+            this.Controls.Add(this.ckbMuteThumbnailWarnings);
             this.Controls.Add(this.btnSims2EpSpSelect);
             this.Controls.Add(this.lblHelpInstallPath);
             this.Controls.Add(this.lblHelpHomePath);
@@ -291,5 +304,6 @@ namespace Sims2Tools
         private System.Windows.Forms.Label lblHelpHomePath;
         private System.Windows.Forms.Label lblHelpInstallPath;
         private System.Windows.Forms.Button btnSims2EpSpSelect;
+        private System.Windows.Forms.CheckBox ckbMuteThumbnailWarnings;
     }
 }

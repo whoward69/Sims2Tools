@@ -142,7 +142,7 @@ namespace Sims2Tools.Exporter
             xmlWriter.WriteLine($"<package type=\"2\">");
             xmlWriter.WriteLine($"    <packedfile path=\"\" name=\"{dataFileName}\">");
             xmlWriter.WriteLine($"        <type>");
-            xmlWriter.WriteLine($"            <number>{key.TypeID.IntString()})</number>");
+            xmlWriter.WriteLine($"            <number>{key.TypeID.IntString()}</number>");
             xmlWriter.WriteLine($"        </type>");
             xmlWriter.WriteLine($"        <classid>{key.ResourceID.IntString()}</classid>");
             xmlWriter.WriteLine($"        <group>{key.GroupID.IntString()}</group>");

@@ -53,7 +53,7 @@ namespace Sims2Tools.DBPF.Images
             }
         }
 
-        public DDSData[] BuildDDS(string imageInputFullName, uint levels, DdsFormats dxtFormat, string extraParameters)
+        public DDSData[] BuildDDS(string imageInputFullName, uint levels, DdsFormats ddsFormat, string extraParameters)
         {
             string exePath = $"{ddsUtilsPath}\\nvdxt.exe";
 
@@ -66,14 +66,20 @@ namespace Sims2Tools.DBPF.Images
 
             string arguments = $"-file \"{imageInputFullName}\" -output \"{ddsOutputFullName}\"";
 
-            if (dxtFormat == DdsFormats.DXT1Format)
+            if (ddsFormat == DdsFormats.DXT1Format)
                 arguments += " -dxt1c";
-            else if (dxtFormat == DdsFormats.DXT3Format)
+            else if (ddsFormat == DdsFormats.DXT3Format)
                 arguments += " -dxt3";
-            else if (dxtFormat == DdsFormats.DXT5Format)
+            else if (ddsFormat == DdsFormats.DXT5Format)
                 arguments += " -dxt5";
+            else if (ddsFormat == DdsFormats.Raw8Bit || ddsFormat == DdsFormats.ExtRaw8Bit)
+                arguments += " -a8";
+            else if (ddsFormat == DdsFormats.Raw24Bit || ddsFormat == DdsFormats.ExtRaw24Bit)
+                arguments += " -u888";
+            else if (ddsFormat == DdsFormats.Raw32Bit)
+                arguments += " -u8888";
             else
-                throw new ArgumentException("Expected DXT1, DXT3 or DXT5 format");
+                throw new ArgumentException("Unsupported format");
 
             arguments += $" -nmips {levels}";
 

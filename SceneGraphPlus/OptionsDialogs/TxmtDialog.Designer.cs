@@ -65,9 +65,12 @@ namespace SceneGraphPlus.Dialogs.Options
             this.comboAddMmatSubset = new System.Windows.Forms.ComboBox();
             this.btnMmatCreate = new System.Windows.Forms.Button();
             this.grpNewGZPS = new System.Windows.Forms.GroupBox();
+            this.textGzpsNewName = new System.Windows.Forms.TextBox();
             this.lblGzpsName = new System.Windows.Forms.Label();
             this.btnGzpsCreate = new System.Windows.Forms.Button();
-            this.textGzpsNewName = new System.Windows.Forms.TextBox();
+            this.radioRaw32 = new System.Windows.Forms.RadioButton();
+            this.radioRaw24 = new System.Windows.Forms.RadioButton();
+            this.radioRaw8 = new System.Windows.Forms.RadioButton();
             this.grpDuplicate.SuspendLayout();
             this.grpChangeTexture.SuspendLayout();
             this.panelDdsOptions.SuspendLayout();
@@ -135,6 +138,9 @@ namespace SceneGraphPlus.Dialogs.Options
             // 
             // panelDdsOptions
             // 
+            this.panelDdsOptions.Controls.Add(this.radioRaw32);
+            this.panelDdsOptions.Controls.Add(this.radioRaw24);
+            this.panelDdsOptions.Controls.Add(this.radioRaw8);
             this.panelDdsOptions.Controls.Add(this.comboSharpen);
             this.panelDdsOptions.Controls.Add(this.lblSharpen);
             this.panelDdsOptions.Controls.Add(this.ckbFilters);
@@ -258,28 +264,31 @@ namespace SceneGraphPlus.Dialogs.Options
             this.radioDxt1.TabStop = true;
             this.radioDxt1.Text = "DXT 1";
             this.radioDxt1.UseVisualStyleBackColor = true;
+            this.radioDxt1.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
             // 
             // radioDxt5
             // 
             this.radioDxt5.AutoSize = true;
-            this.radioDxt5.Location = new System.Drawing.Point(208, 1);
+            this.radioDxt5.Location = new System.Drawing.Point(200, 1);
             this.radioDxt5.Name = "radioDxt5";
             this.radioDxt5.Size = new System.Drawing.Size(59, 19);
             this.radioDxt5.TabIndex = 41;
             this.radioDxt5.TabStop = true;
             this.radioDxt5.Text = "DXT 5";
             this.radioDxt5.UseVisualStyleBackColor = true;
+            this.radioDxt5.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
             // 
             // radioDxt3
             // 
             this.radioDxt3.AutoSize = true;
-            this.radioDxt3.Location = new System.Drawing.Point(143, 1);
+            this.radioDxt3.Location = new System.Drawing.Point(139, 1);
             this.radioDxt3.Name = "radioDxt3";
             this.radioDxt3.Size = new System.Drawing.Size(59, 19);
             this.radioDxt3.TabIndex = 40;
             this.radioDxt3.TabStop = true;
             this.radioDxt3.Text = "DXT 3";
             this.radioDxt3.UseVisualStyleBackColor = true;
+            this.radioDxt3.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
             // 
             // btnSelectImage
             // 
@@ -393,6 +402,15 @@ namespace SceneGraphPlus.Dialogs.Options
             this.grpNewGZPS.TabStop = false;
             this.grpNewGZPS.Text = "New GZPS:";
             // 
+            // textGzpsNewName
+            // 
+            this.textGzpsNewName.Location = new System.Drawing.Point(84, 15);
+            this.textGzpsNewName.Name = "textGzpsNewName";
+            this.textGzpsNewName.Size = new System.Drawing.Size(383, 21);
+            this.textGzpsNewName.TabIndex = 36;
+            this.textGzpsNewName.TextChanged += new System.EventHandler(this.OnGzpsNameChanged);
+            this.textGzpsNewName.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnGzpsNameKeyUp);
+            // 
             // lblGzpsName
             // 
             this.lblGzpsName.AutoSize = true;
@@ -415,14 +433,41 @@ namespace SceneGraphPlus.Dialogs.Options
             this.btnGzpsCreate.UseVisualStyleBackColor = true;
             this.btnGzpsCreate.Click += new System.EventHandler(this.OnAddGzpsClicked);
             // 
-            // textGzpsNewName
+            // radioRaw32
             // 
-            this.textGzpsNewName.Location = new System.Drawing.Point(84, 15);
-            this.textGzpsNewName.Name = "textGzpsNewName";
-            this.textGzpsNewName.Size = new System.Drawing.Size(383, 21);
-            this.textGzpsNewName.TabIndex = 36;
-            this.textGzpsNewName.TextChanged += new System.EventHandler(this.OnGzpsNameChanged);
-            this.textGzpsNewName.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnGzpsNameKeyUp);
+            this.radioRaw32.AutoSize = true;
+            this.radioRaw32.Location = new System.Drawing.Point(388, 1);
+            this.radioRaw32.Name = "radioRaw32";
+            this.radioRaw32.Size = new System.Drawing.Size(67, 19);
+            this.radioRaw32.TabIndex = 55;
+            this.radioRaw32.TabStop = true;
+            this.radioRaw32.Text = "Raw 32";
+            this.radioRaw32.UseVisualStyleBackColor = true;
+            this.radioRaw32.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
+            // 
+            // radioRaw24
+            // 
+            this.radioRaw24.AutoSize = true;
+            this.radioRaw24.Location = new System.Drawing.Point(323, 1);
+            this.radioRaw24.Name = "radioRaw24";
+            this.radioRaw24.Size = new System.Drawing.Size(67, 19);
+            this.radioRaw24.TabIndex = 54;
+            this.radioRaw24.TabStop = true;
+            this.radioRaw24.Text = "Raw 24";
+            this.radioRaw24.UseVisualStyleBackColor = true;
+            this.radioRaw24.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
+            // 
+            // radioRaw8
+            // 
+            this.radioRaw8.AutoSize = true;
+            this.radioRaw8.Location = new System.Drawing.Point(261, 1);
+            this.radioRaw8.Name = "radioRaw8";
+            this.radioRaw8.Size = new System.Drawing.Size(60, 19);
+            this.radioRaw8.TabIndex = 53;
+            this.radioRaw8.TabStop = true;
+            this.radioRaw8.Text = "Raw 8";
+            this.radioRaw8.UseVisualStyleBackColor = true;
+            this.radioRaw8.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
             // 
             // TxmtDialog
             // 
@@ -486,5 +531,8 @@ namespace SceneGraphPlus.Dialogs.Options
         private System.Windows.Forms.TextBox textGzpsNewName;
         private System.Windows.Forms.Label lblGzpsName;
         private System.Windows.Forms.Button btnGzpsCreate;
+        private System.Windows.Forms.RadioButton radioRaw32;
+        private System.Windows.Forms.RadioButton radioRaw24;
+        private System.Windows.Forms.RadioButton radioRaw8;
     }
 }

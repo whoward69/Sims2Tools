@@ -79,6 +79,7 @@ namespace Sims2Tools
             }
 
             ckbAllAdvancedMode.Checked = Sims2ToolsLib.AllAdvancedMode;
+            ckbMuteThumbnailWarnings.Checked = Sims2ToolsLib.MuteThumbnailWarnings;
 
             UpdateFormState();
         }
@@ -156,6 +157,7 @@ namespace Sims2Tools
             Sims2ToolsLib.Sims2InstallPath = textSims2InstallPath.Text;
 
             Sims2ToolsLib.AllAdvancedMode = ckbAllAdvancedMode.Checked;
+            Sims2ToolsLib.MuteThumbnailWarnings = ckbMuteThumbnailWarnings.Checked;
 
             // As updating the global objects is a long process, it's worth checking that one of these actually changed
             if (!(textSims2ExePath.Text.Equals(oldSims2Path) && textSims2HomePath.Text.Equals(oldSims2HomePath) && textSims2InstallPath.Text.Equals(oldSims2BasePath)))

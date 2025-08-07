@@ -90,6 +90,7 @@
     <Compile Include="Images\DdsLoader.cs" />
     <Compile Include="IO\TempFiles.cs" />
     <Compile Include="Logger\DBPFLogger.cs" />
+    <Compile Include="Neighbourhood\XNGB\Xngb.cs" />
     <Compile Include="SceneGraph\AGED\Aged.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\MipMap.cs" />
     <Compile Include="Images\THUB\Thub.cs" />

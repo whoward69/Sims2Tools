@@ -43,6 +43,16 @@ namespace SceneGraphPlus.Dialogs.Options
             this.textNewName = new System.Windows.Forms.TextBox();
             this.grpChangeTexture = new System.Windows.Forms.GroupBox();
             this.panelDdsOptions = new System.Windows.Forms.Panel();
+            this.radioRaw32 = new System.Windows.Forms.RadioButton();
+            this.radioRaw24 = new System.Windows.Forms.RadioButton();
+            this.radioRaw8 = new System.Windows.Forms.RadioButton();
+            this.comboSharpen = new System.Windows.Forms.ComboBox();
+            this.lblSharpen = new System.Windows.Forms.Label();
+            this.ckbFilters = new System.Windows.Forms.CheckedListBox();
+            this.lblFilters = new System.Windows.Forms.Label();
+            this.textLevels = new System.Windows.Forms.TextBox();
+            this.lblLevels = new System.Windows.Forms.Label();
+            this.lblFormat = new System.Windows.Forms.Label();
             this.radioDxt1 = new System.Windows.Forms.RadioButton();
             this.radioDxt5 = new System.Windows.Forms.RadioButton();
             this.radioDxt3 = new System.Windows.Forms.RadioButton();
@@ -52,14 +62,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.lblSubset = new System.Windows.Forms.Label();
             this.btnChangeTexture = new System.Windows.Forms.Button();
             this.selectImageDialog = new System.Windows.Forms.OpenFileDialog();
-            this.lblFormat = new System.Windows.Forms.Label();
-            this.lblLevels = new System.Windows.Forms.Label();
-            this.textLevels = new System.Windows.Forms.TextBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.ckbFilters = new System.Windows.Forms.CheckedListBox();
-            this.lblFilters = new System.Windows.Forms.Label();
-            this.lblSharpen = new System.Windows.Forms.Label();
-            this.comboSharpen = new System.Windows.Forms.ComboBox();
             this.grpDuplicate.SuspendLayout();
             this.grpChangeTexture.SuspendLayout();
             this.panelDdsOptions.SuspendLayout();
@@ -125,6 +128,9 @@ namespace SceneGraphPlus.Dialogs.Options
             // 
             // panelDdsOptions
             // 
+            this.panelDdsOptions.Controls.Add(this.radioRaw32);
+            this.panelDdsOptions.Controls.Add(this.radioRaw24);
+            this.panelDdsOptions.Controls.Add(this.radioRaw8);
             this.panelDdsOptions.Controls.Add(this.comboSharpen);
             this.panelDdsOptions.Controls.Add(this.lblSharpen);
             this.panelDdsOptions.Controls.Add(this.ckbFilters);
@@ -140,6 +146,140 @@ namespace SceneGraphPlus.Dialogs.Options
             this.panelDdsOptions.Size = new System.Drawing.Size(461, 95);
             this.panelDdsOptions.TabIndex = 42;
             // 
+            // radioRaw32
+            // 
+            this.radioRaw32.AutoSize = true;
+            this.radioRaw32.Location = new System.Drawing.Point(388, 1);
+            this.radioRaw32.Name = "radioRaw32";
+            this.radioRaw32.Size = new System.Drawing.Size(67, 19);
+            this.radioRaw32.TabIndex = 52;
+            this.radioRaw32.TabStop = true;
+            this.radioRaw32.Text = "Raw 32";
+            this.radioRaw32.UseVisualStyleBackColor = true;
+            this.radioRaw32.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
+            // 
+            // radioRaw24
+            // 
+            this.radioRaw24.AutoSize = true;
+            this.radioRaw24.Location = new System.Drawing.Point(323, 1);
+            this.radioRaw24.Name = "radioRaw24";
+            this.radioRaw24.Size = new System.Drawing.Size(67, 19);
+            this.radioRaw24.TabIndex = 51;
+            this.radioRaw24.TabStop = true;
+            this.radioRaw24.Text = "Raw 24";
+            this.radioRaw24.UseVisualStyleBackColor = true;
+            this.radioRaw24.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
+            // 
+            // radioRaw8
+            // 
+            this.radioRaw8.AutoSize = true;
+            this.radioRaw8.Location = new System.Drawing.Point(261, 1);
+            this.radioRaw8.Name = "radioRaw8";
+            this.radioRaw8.Size = new System.Drawing.Size(60, 19);
+            this.radioRaw8.TabIndex = 50;
+            this.radioRaw8.TabStop = true;
+            this.radioRaw8.Text = "Raw 8";
+            this.radioRaw8.UseVisualStyleBackColor = true;
+            this.radioRaw8.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
+            // 
+            // comboSharpen
+            // 
+            this.comboSharpen.FormattingEnabled = true;
+            this.comboSharpen.Items.AddRange(new object[] {
+            "None",
+            "Negative",
+            "Lighter",
+            "Darker",
+            "ContrastMore",
+            "ContrastLess",
+            "Smoothen",
+            "SharpenSoft",
+            "SharpenMedium",
+            "SharpenStrong",
+            "FindEdges",
+            "Contour",
+            "EdgeDetect",
+            "EdgeDetectSoft",
+            "Emboss",
+            "MeanRemoval"});
+            this.comboSharpen.Location = new System.Drawing.Point(78, 54);
+            this.comboSharpen.Name = "comboSharpen";
+            this.comboSharpen.Size = new System.Drawing.Size(153, 23);
+            this.comboSharpen.TabIndex = 49;
+            this.comboSharpen.Text = "None";
+            // 
+            // lblSharpen
+            // 
+            this.lblSharpen.AutoSize = true;
+            this.lblSharpen.Location = new System.Drawing.Point(15, 57);
+            this.lblSharpen.Name = "lblSharpen";
+            this.lblSharpen.Size = new System.Drawing.Size(57, 15);
+            this.lblSharpen.TabIndex = 48;
+            this.lblSharpen.Text = "Sharpen:";
+            // 
+            // ckbFilters
+            // 
+            this.ckbFilters.CheckOnClick = true;
+            this.ckbFilters.FormattingEnabled = true;
+            this.ckbFilters.IntegralHeight = false;
+            this.ckbFilters.Items.AddRange(new object[] {
+            "dither",
+            "Point",
+            "Box",
+            "Triangle",
+            "Quadratic",
+            "Cubic",
+            "Catrom",
+            "Mitchell",
+            "Gaussian",
+            "Sinc",
+            "Bessel",
+            "Hanning",
+            "Hamming",
+            "Blackman",
+            "Kaiser"});
+            this.ckbFilters.Location = new System.Drawing.Point(281, 27);
+            this.ckbFilters.Name = "ckbFilters";
+            this.ckbFilters.ScrollAlwaysVisible = true;
+            this.ckbFilters.Size = new System.Drawing.Size(177, 62);
+            this.ckbFilters.TabIndex = 46;
+            // 
+            // lblFilters
+            // 
+            this.lblFilters.AutoSize = true;
+            this.lblFilters.Location = new System.Drawing.Point(232, 30);
+            this.lblFilters.Name = "lblFilters";
+            this.lblFilters.Size = new System.Drawing.Size(43, 15);
+            this.lblFilters.TabIndex = 47;
+            this.lblFilters.Text = "Filters:";
+            // 
+            // textLevels
+            // 
+            this.textLevels.Location = new System.Drawing.Point(78, 27);
+            this.textLevels.Name = "textLevels";
+            this.textLevels.Size = new System.Drawing.Size(59, 21);
+            this.textLevels.TabIndex = 45;
+            this.textLevels.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnLevelsKeyPress);
+            // 
+            // lblLevels
+            // 
+            this.lblLevels.AutoSize = true;
+            this.lblLevels.Location = new System.Drawing.Point(27, 30);
+            this.lblLevels.Name = "lblLevels";
+            this.lblLevels.Size = new System.Drawing.Size(45, 15);
+            this.lblLevels.TabIndex = 44;
+            this.lblLevels.Text = "Levels:";
+            this.toolTip.SetToolTip(this.lblLevels, resources.GetString("lblLevels.ToolTip"));
+            // 
+            // lblFormat
+            // 
+            this.lblFormat.AutoSize = true;
+            this.lblFormat.Location = new System.Drawing.Point(23, 3);
+            this.lblFormat.Name = "lblFormat";
+            this.lblFormat.Size = new System.Drawing.Size(49, 15);
+            this.lblFormat.TabIndex = 43;
+            this.lblFormat.Text = "Format:";
+            // 
             // radioDxt1
             // 
             this.radioDxt1.AutoSize = true;
@@ -150,28 +290,31 @@ namespace SceneGraphPlus.Dialogs.Options
             this.radioDxt1.TabStop = true;
             this.radioDxt1.Text = "DXT 1";
             this.radioDxt1.UseVisualStyleBackColor = true;
+            this.radioDxt1.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
             // 
             // radioDxt5
             // 
             this.radioDxt5.AutoSize = true;
-            this.radioDxt5.Location = new System.Drawing.Point(208, 1);
+            this.radioDxt5.Location = new System.Drawing.Point(200, 1);
             this.radioDxt5.Name = "radioDxt5";
             this.radioDxt5.Size = new System.Drawing.Size(59, 19);
             this.radioDxt5.TabIndex = 41;
             this.radioDxt5.TabStop = true;
             this.radioDxt5.Text = "DXT 5";
             this.radioDxt5.UseVisualStyleBackColor = true;
+            this.radioDxt5.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
             // 
             // radioDxt3
             // 
             this.radioDxt3.AutoSize = true;
-            this.radioDxt3.Location = new System.Drawing.Point(143, 1);
+            this.radioDxt3.Location = new System.Drawing.Point(139, 1);
             this.radioDxt3.Name = "radioDxt3";
             this.radioDxt3.Size = new System.Drawing.Size(59, 19);
             this.radioDxt3.TabIndex = 40;
             this.radioDxt3.TabStop = true;
             this.radioDxt3.Text = "DXT 3";
             this.radioDxt3.UseVisualStyleBackColor = true;
+            this.radioDxt3.CheckedChanged += new System.EventHandler(this.OnFormatChanged);
             // 
             // btnSelectImage
             // 
@@ -230,104 +373,6 @@ namespace SceneGraphPlus.Dialogs.Options
     ".jpeg|BMP files|*.bmp|GIF files|*.gif|DDS files|*.dds|All files|*.*";
             this.selectImageDialog.Title = "Select Image";
             // 
-            // lblFormat
-            // 
-            this.lblFormat.AutoSize = true;
-            this.lblFormat.Location = new System.Drawing.Point(23, 3);
-            this.lblFormat.Name = "lblFormat";
-            this.lblFormat.Size = new System.Drawing.Size(49, 15);
-            this.lblFormat.TabIndex = 43;
-            this.lblFormat.Text = "Format:";
-            // 
-            // lblLevels
-            // 
-            this.lblLevels.AutoSize = true;
-            this.lblLevels.Location = new System.Drawing.Point(27, 30);
-            this.lblLevels.Name = "lblLevels";
-            this.lblLevels.Size = new System.Drawing.Size(45, 15);
-            this.lblLevels.TabIndex = 44;
-            this.lblLevels.Text = "Levels:";
-            this.toolTip.SetToolTip(this.lblLevels, resources.GetString("lblLevels.ToolTip"));
-            // 
-            // textLevels
-            // 
-            this.textLevels.Location = new System.Drawing.Point(78, 27);
-            this.textLevels.Name = "textLevels";
-            this.textLevels.Size = new System.Drawing.Size(59, 21);
-            this.textLevels.TabIndex = 45;
-            this.textLevels.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnLevelsKeyPress);
-            // 
-            // ckbFilters
-            // 
-            this.ckbFilters.CheckOnClick = true;
-            this.ckbFilters.FormattingEnabled = true;
-            this.ckbFilters.IntegralHeight = false;
-            this.ckbFilters.Items.AddRange(new object[] {
-            "dither",
-            "Point",
-            "Box",
-            "Triangle",
-            "Quadratic",
-            "Cubic",
-            "Catrom",
-            "Mitchell",
-            "Gaussian",
-            "Sinc",
-            "Bessel",
-            "Hanning",
-            "Hamming",
-            "Blackman",
-            "Kaiser"});
-            this.ckbFilters.Location = new System.Drawing.Point(281, 27);
-            this.ckbFilters.Name = "ckbFilters";
-            this.ckbFilters.ScrollAlwaysVisible = true;
-            this.ckbFilters.Size = new System.Drawing.Size(177, 62);
-            this.ckbFilters.TabIndex = 46;
-            // 
-            // lblFilters
-            // 
-            this.lblFilters.AutoSize = true;
-            this.lblFilters.Location = new System.Drawing.Point(232, 30);
-            this.lblFilters.Name = "lblFilters";
-            this.lblFilters.Size = new System.Drawing.Size(43, 15);
-            this.lblFilters.TabIndex = 47;
-            this.lblFilters.Text = "Filters:";
-            // 
-            // lblSharpen
-            // 
-            this.lblSharpen.AutoSize = true;
-            this.lblSharpen.Location = new System.Drawing.Point(15, 57);
-            this.lblSharpen.Name = "lblSharpen";
-            this.lblSharpen.Size = new System.Drawing.Size(57, 15);
-            this.lblSharpen.TabIndex = 48;
-            this.lblSharpen.Text = "Sharpen:";
-            // 
-            // comboSharpen
-            // 
-            this.comboSharpen.FormattingEnabled = true;
-            this.comboSharpen.Items.AddRange(new object[] {
-            "None",
-            "Negative",
-            "Lighter",
-            "Darker",
-            "ContrastMore",
-            "ContrastLess",
-            "Smoothen",
-            "SharpenSoft",
-            "SharpenMedium",
-            "SharpenStrong",
-            "FindEdges",
-            "Contour",
-            "EdgeDetect",
-            "EdgeDetectSoft",
-            "Emboss",
-            "MeanRemoval"});
-            this.comboSharpen.Location = new System.Drawing.Point(78, 54);
-            this.comboSharpen.Name = "comboSharpen";
-            this.comboSharpen.Size = new System.Drawing.Size(153, 23);
-            this.comboSharpen.TabIndex = 49;
-            this.comboSharpen.Text = "None";
-            // 
             // TxtrDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -376,5 +421,8 @@ namespace SceneGraphPlus.Dialogs.Options
         private System.Windows.Forms.CheckedListBox ckbFilters;
         private System.Windows.Forms.ComboBox comboSharpen;
         private System.Windows.Forms.Label lblSharpen;
+        private System.Windows.Forms.RadioButton radioRaw32;
+        private System.Windows.Forms.RadioButton radioRaw24;
+        private System.Windows.Forms.RadioButton radioRaw8;
     }
 }

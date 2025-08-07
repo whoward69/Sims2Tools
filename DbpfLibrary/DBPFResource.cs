@@ -11,7 +11,6 @@
  */
 
 using Sims2Tools.DBPF.IO;
-using Sims2Tools.DBPF.Package;
 using System;
 using System.Xml;
 
@@ -42,7 +41,7 @@ namespace Sims2Tools.DBPF
             _isDirty = true;
         }
 
-        protected DBPFResource(DBPFEntry entry) : base(entry, "")
+        protected DBPFResource(IDBPFKey key) : base(key, "")
         {
         }
 

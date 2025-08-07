@@ -30,6 +30,7 @@ using Sims2Tools.DBPF.Neighbourhood.SDNA;
 using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.Neighbourhood.SREL;
 using Sims2Tools.DBPF.Neighbourhood.SWAF;
+using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
@@ -101,8 +102,10 @@ namespace Sims2Tools.DBPF
         public static TypeInstanceID INSTANCE_COLLECTIONS = (TypeInstanceID)0x0FFE0010;
 
         public static TypeInstanceID STR_MODELS = (TypeInstanceID)0x00000085;
+        public static TypeInstanceID STR_SUBSETS = (TypeInstanceID)0x00000087;
         public static TypeInstanceID STR_MATERIALS = (TypeInstanceID)0x00000088;
         public static TypeInstanceID STR_BONES = (TypeInstanceID)0x00000090;
+        public static TypeInstanceID STR_ATTRIBUTES = (TypeInstanceID)0x00000100;
         public static TypeInstanceID STR_DIALOG = (TypeInstanceID)0x0000012D;
         public static TypeInstanceID STR_ACTIONS = (TypeInstanceID)0x0000012E;
         public static TypeInstanceID STR_CALL_TREE = (TypeInstanceID)0x0000012F;
@@ -180,6 +183,7 @@ namespace Sims2Tools.DBPF
             OtherTypeNames.Add(Swaf.TYPE, Swaf.NAME);
             OtherTypeNames.Add(Xflr.TYPE, Xflr.NAME);
             OtherTypeNames.Add(Xfnc.TYPE, Xfnc.NAME);
+            OtherTypeNames.Add(Xngb.TYPE, Xngb.NAME);
             OtherTypeNames.Add(Xobj.TYPE, Xobj.NAME);
             OtherTypeNames.Add(Xrof.TYPE, Xrof.NAME);
             OtherTypeNames.Add(Xwnt.TYPE, Xwnt.NAME);

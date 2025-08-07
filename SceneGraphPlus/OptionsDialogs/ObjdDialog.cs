@@ -9,7 +9,6 @@
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CTSS;
-using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.CRES;
@@ -24,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using static Sims2Tools.DBPF.Data.MetaData;
 
 namespace SceneGraphPlus.Dialogs.Options
 {
@@ -50,7 +50,7 @@ namespace SceneGraphPlus.Dialogs.Options
             InitializeComponent();
         }
 
-        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile package, Objd objd, Ctss ctss, Cres cres, Shpe shpe, Gmnd gmnd, Gmdc gmdc)
+        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile package, Objd objd, Ctss ctss, Cres cres, Shpe shpe, Gmnd gmnd, Gmdc gmdc, bool hasMaterials)
         {
             this.form = form;
             this.package = package;
@@ -68,7 +68,7 @@ namespace SceneGraphPlus.Dialogs.Options
             textTitle.Enabled = textDesc.Enabled = false;
             if (ctss != null)
             {
-                List<StrItem> defStrings = ctss.LanguageItems(MetaData.Languages.Default);
+                List<StrItem> defStrings = ctss.LanguageItems(Languages.Default);
                 if (defStrings != null)
                 {
                     if (defStrings.Count > 0)
@@ -142,6 +142,7 @@ namespace SceneGraphPlus.Dialogs.Options
             btnDetailsChange.Enabled = false;
             btnSubsetsUpdate.Enabled = false;
             btnMmatCreate.Enabled = false;
+            btnMaterials.Enabled = !hasMaterials;
 
             return base.ShowDialog();
         }
@@ -184,7 +185,7 @@ namespace SceneGraphPlus.Dialogs.Options
 
             if (ctss != null)
             {
-                List<StrItem> defStrings = ctss.LanguageItems(MetaData.Languages.Default);
+                List<StrItem> defStrings = ctss.LanguageItems(Languages.Default);
 
                 if (textTitle.Enabled && !originalTitle.Equals(textTitle.Text))
                 {
@@ -193,7 +194,7 @@ namespace SceneGraphPlus.Dialogs.Options
 
                 if (textDesc.Enabled && !originalDesc.Equals(textDesc.Text))
                 {
-                    ctss.LanguageItems(MetaData.Languages.Default)[1].Title = textDesc.Text;
+                    ctss.LanguageItems(Languages.Default)[1].Title = textDesc.Text;
                 }
             }
         }
@@ -225,18 +226,18 @@ namespace SceneGraphPlus.Dialogs.Options
                     DBPFEntry mmatEntry = new DBPFEntry(Mmat.TYPE, objd.GroupID, (TypeInstanceID)nextInstance, DBPFData.RESOURCE_NULL);
                     Mmat mmat = new Mmat(mmatEntry, null);
 
-                    mmat.GetOrAddItem("flags", MetaData.DataTypes.dtUInteger).UIntegerValue = 0x00000000;
-                    mmat.GetOrAddItem("creator", MetaData.DataTypes.dtString).StringValue = "00000000-0000-0000-0000-000000000000";
-                    mmat.GetOrAddItem("type", MetaData.DataTypes.dtString).StringValue = "modelMaterial";
-                    mmat.GetOrAddItem("materialStateFlags", MetaData.DataTypes.dtUInteger).UIntegerValue = 0x00000000;
-                    mmat.GetOrAddItem("objectStateIndex", MetaData.DataTypes.dtUInteger).UIntegerValue = 0xFFFFFFFF;
-                    mmat.GetOrAddItem("family", MetaData.DataTypes.dtString).StringValue = Guid.NewGuid().ToString();
-                    mmat.GetOrAddItem("defaultMaterial", MetaData.DataTypes.dtBoolean).BooleanValue = false;
+                    mmat.GetOrAddItem("flags", DataTypes.dtUInteger).UIntegerValue = 0x00000000;
+                    mmat.GetOrAddItem("creator", DataTypes.dtString).StringValue = "00000000-0000-0000-0000-000000000000";
+                    mmat.GetOrAddItem("type", DataTypes.dtString).StringValue = "modelMaterial";
+                    mmat.GetOrAddItem("materialStateFlags", DataTypes.dtUInteger).UIntegerValue = 0x00000000;
+                    mmat.GetOrAddItem("objectStateIndex", DataTypes.dtUInteger).UIntegerValue = 0xFFFFFFFF;
+                    mmat.GetOrAddItem("family", DataTypes.dtString).StringValue = Guid.NewGuid().ToString();
+                    mmat.GetOrAddItem("defaultMaterial", DataTypes.dtBoolean).BooleanValue = false;
 
-                    mmat.GetOrAddItem("objectGUID", MetaData.DataTypes.dtUInteger).UIntegerValue = objd.Guid.AsUInt();
-                    mmat.GetOrAddItem("modelName", MetaData.DataTypes.dtString).StringValue = cres.SgName;
-                    mmat.GetOrAddItem("subsetName", MetaData.DataTypes.dtString).StringValue = comboAddMmatSubset.Text; ;
-                    mmat.GetOrAddItem("name", MetaData.DataTypes.dtString).StringValue = subsetMaterial;
+                    mmat.GetOrAddItem("objectGUID", DataTypes.dtUInteger).UIntegerValue = objd.Guid.AsUInt();
+                    mmat.GetOrAddItem("modelName", DataTypes.dtString).StringValue = cres.SgName;
+                    mmat.GetOrAddItem("subsetName", DataTypes.dtString).StringValue = comboAddMmatSubset.Text; ;
+                    mmat.GetOrAddItem("name", DataTypes.dtString).StringValue = subsetMaterial;
 
                     package.Commit(mmat);
 
@@ -291,25 +292,35 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private void OnUpdateSubsetsClicked(object sender, EventArgs e)
         {
-            if (originalPrimarySubset != null) gmnd.RemoveDesignModeEnabled(originalPrimarySubset);
+            if (originalPrimarySubset != null) gmnd.RemoveDesignModeEnabledSubset(originalPrimarySubset);
 
             if (comboPrimarySubset.SelectedItem != null)
             {
                 if (comboPrimarySubset.SelectedIndex > 0)
                 {
-                    gmnd.AddDesignModeEnabled(comboPrimarySubset.SelectedItem.ToString());
+                    gmnd.AddDesignModeEnabledSubset(comboPrimarySubset.SelectedItem.ToString());
                 }
             }
 
-            if (originalSecondarySubset != null) gmnd.RemoveDesignModeEnabled(originalSecondarySubset);
+            if (originalSecondarySubset != null) gmnd.RemoveDesignModeEnabledSubset(originalSecondarySubset);
 
             if (comboSecondarySubset.SelectedItem != null)
             {
                 if (comboSecondarySubset.SelectedIndex > 0)
                 {
-                    gmnd.AddDesignModeEnabled(comboSecondarySubset.SelectedItem.ToString());
+                    gmnd.AddDesignModeEnabledSubset(comboSecondarySubset.SelectedItem.ToString());
                 }
             }
+        }
+
+        private void OnAddMaterialsClicked(object sender, EventArgs e)
+        {
+            Str materials = new Str(new DBPFKey(Str.TYPE, objd.GroupID, DBPFData.STR_MATERIALS, DBPFData.RESOURCE_NULL));
+            materials.SetKeyName("Materials");
+
+            materials.AppendLanguageItem(Languages.Default, new StrItem(Languages.Default, "", ""));
+
+            package.Commit(materials);
         }
     }
 }

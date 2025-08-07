@@ -69,7 +69,7 @@ namespace SceneGraphPlus.Dialogs.Options
             grpNewGZPS.Visible = (gzps != null);
             grpNewMmat.Visible = !grpNewGZPS.Visible;
 
-            // TODO - SceneGraph Plus - remove this when Create GZPS/3IDR/BINX/STR# is working!
+            // TODO - SceneGraph Plus - gzps - remove this when Create GZPS/3IDR/BINX/STR# is working!
             grpNewGZPS.Visible = false;
 
             originalTxmtName = txmtBlock.SgBaseName;
@@ -92,6 +92,18 @@ namespace SceneGraphPlus.Dialogs.Options
                 else if (txtr.ImageData.Format == DdsFormats.DXT5Format)
                 {
                     radioDxt5.Checked = true;
+                }
+                else if (txtr.ImageData.Format == DdsFormats.Raw8Bit || txtr.ImageData.Format == DdsFormats.ExtRaw8Bit)
+                {
+                    radioRaw8.Checked = true;
+                }
+                else if (txtr.ImageData.Format == DdsFormats.Raw24Bit || txtr.ImageData.Format == DdsFormats.ExtRaw24Bit)
+                {
+                    radioRaw24.Checked = true;
+                }
+                else if (txtr.ImageData.Format == DdsFormats.Raw32Bit)
+                {
+                    radioRaw32.Checked = true;
                 }
 
                 textLevels.Text = txtr.ImageData.MipMapLevels.ToString();
@@ -138,7 +150,7 @@ namespace SceneGraphPlus.Dialogs.Options
             txmtPackage.Commit(newTxmt, true);
             GraphBlock newTxmtBlock = form.AddResource(txmtPackage, newTxmt, true);
 
-            if (!(Form.ModifierKeys == Keys.Shift) && txtr != null)
+            if (!(Form.ModifierKeys == Keys.Control) && txtr != null)
             {
                 Txtr newTxtr = txtr.Duplicate(textTxmtNewName.Text);
 
@@ -271,7 +283,7 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private void UpdateTexture(Txtr txtrToUpdate)
         {
-            TxtrDialog.UpdateTextureHelper(txtrToUpdate, textNewImage.Text, TxtrDialog.GetTextureFormat(radioDxt1, radioDxt3, radioDxt5), textLevels.Text, comboSharpen, ckbFilters);
+            TxtrDialog.UpdateTextureHelper(txtrToUpdate, textNewImage.Text, TxtrDialog.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters);
         }
 
         private void OnGzpsNameKeyUp(object sender, KeyEventArgs e)
@@ -345,7 +357,7 @@ namespace SceneGraphPlus.Dialogs.Options
                         }
                     }
 
-                    // TODO - SceneGraph Plus - create a new GZPS resource linked to this TXMT
+                    // TODO - SceneGraph Plus - gzps - create a new GZPS resource linked to this TXMT
 
                     // Clone the GZPS as newGzps
                     //   Change instance to nextInstance
@@ -368,6 +380,18 @@ namespace SceneGraphPlus.Dialogs.Options
             }
 
             return newGzps;
+        }
+
+        private void OnFormatChanged(object sender, EventArgs e)
+        {
+            if (sender == radioDxt1 || sender == radioDxt3 || sender == radioDxt5)
+            {
+                comboSharpen.Enabled = ckbFilters.Enabled = true;
+            }
+            else if (sender == radioRaw8 || sender == radioRaw24 || sender == radioRaw32)
+            {
+                comboSharpen.Enabled = ckbFilters.Enabled = false;
+            }
         }
     }
 }
