@@ -10,7 +10,6 @@ using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.CTSS;
-using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.THUB;
 using Sims2Tools.DBPF.OBJD;
@@ -28,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using static Sims2Tools.DBPF.Data.MetaData;
 
 namespace ObjectRelocator
 {
@@ -82,7 +82,7 @@ namespace ObjectRelocator
             {
                 if (HasTitleAndDescription)
                 {
-                    List<StrItem> strs = strings?.LanguageItems(MetaData.Languages.Default);
+                    List<StrItem> strs = strings?.LanguageItems(Languages.Default);
 
                     if (strs != null && strs.Count > 0)
                     {
@@ -104,7 +104,7 @@ namespace ObjectRelocator
             {
                 if (HasTitleAndDescription)
                 {
-                    List<StrItem> strs = strings.LanguageItems(MetaData.Languages.Default);
+                    List<StrItem> strs = strings.LanguageItems(Languages.Default);
 
                     if (strs != null && strs.Count > 1)
                     {
@@ -331,8 +331,11 @@ namespace ObjectRelocator
                 {
                     leadtile?.SetRawData(objdIndex, data);
                 }
-
-                if (objdIndex == ObjdIndex.Price)
+                else if (objdIndex == ObjdIndex.NoDuplicateOnPlacement)
+                {
+                    leadtile?.SetRawData(objdIndex, data);
+                }
+                else if (objdIndex == ObjdIndex.Price)
                 {
                     diagonaltile?.SetRawData(objdIndex, data);
                 }
@@ -362,12 +365,12 @@ namespace ObjectRelocator
                 {
                     if (strings != null)
                     {
-                        List<StrItem> defLangStrings = strings.LanguageItems(MetaData.Languages.Default);
+                        List<StrItem> defLangStrings = strings.LanguageItems(Languages.Default);
 
                         // Add any missing strings, [0]=name, [1]=author, [2]=cost
                         while (defLangStrings.Count < 3)
                         {
-                            defLangStrings.Add(new StrItem(MetaData.Languages.Default, "", ""));
+                            defLangStrings.Add(new StrItem(Languages.Default, "", ""));
                         }
 
                         defLangStrings[2].Title = value.ToString();
@@ -399,7 +402,7 @@ namespace ObjectRelocator
             {
                 if (HasTitleAndDescription)
                 {
-                    List<StrItem> strs = strings?.LanguageItems(MetaData.Languages.Default);
+                    List<StrItem> strs = strings?.LanguageItems(Languages.Default);
 
                     if (strs?[0] != null)
                     {
@@ -420,7 +423,7 @@ namespace ObjectRelocator
             {
                 if (HasTitleAndDescription)
                 {
-                    List<StrItem> strs = strings.LanguageItems(MetaData.Languages.Default);
+                    List<StrItem> strs = strings.LanguageItems(Languages.Default);
 
                     if (strs?[1] != null)
                     {
@@ -493,7 +496,7 @@ namespace ObjectRelocator
                                 if (str != null)
                                 {
                                     int modelIndex = objd.GetRawData(ObjdIndex.DefaultGraphic);
-                                    string cresName = str.LanguageItems(MetaData.Languages.Default)[modelIndex]?.Title;
+                                    string cresName = str.LanguageItems(Languages.Default)[modelIndex]?.Title;
 
                                     Cres localCres = (Cres)package.GetResourceByName(Cres.TYPE, cresName);
 
@@ -684,7 +687,7 @@ namespace ObjectRelocator
                         if (str != null)
                         {
                             int modelIndex = objd.GetRawData(ObjdIndex.DefaultGraphic);
-                            string cresname = str.LanguageItems(MetaData.Languages.Default)[modelIndex].Title;
+                            string cresname = str.LanguageItems(Languages.Default)[modelIndex].Title;
                             TypeGroupID groupId = objd.GroupID;
 
                             if (groupId == DBPFData.GROUP_LOCAL)
@@ -793,6 +796,7 @@ namespace ObjectRelocator
 
         public bool ReplaceThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode, Image newThumbnail)
         {
+            // TODO - Object Relocator - some build mode objects have their thumbnails in the buy mode cache!
             ThumbnailDbpfCache thumbCache = (buyMode ? thumbCacheBuyMode : thumbCacheBuildMode);
 
             if (thumbCache != null)
@@ -814,6 +818,7 @@ namespace ObjectRelocator
 
         public bool DeleteThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode)
         {
+            // TODO - Object Relocator - some build mode objects have their thumbnails in the buy mode cache!
             ThumbnailDbpfCache thumbCache = (buyMode ? thumbCacheBuyMode : thumbCacheBuildMode);
 
             if (objectData.IsObjd && thumbCache != null)

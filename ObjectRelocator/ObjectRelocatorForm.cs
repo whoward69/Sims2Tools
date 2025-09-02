@@ -43,6 +43,12 @@ namespace ObjectRelocator
         private static readonly ushort QuarterTileOn = 0x0023;
         private static readonly ushort QuarterTileOff = 0x0001;
 
+        private static readonly ushort NoDuplicateOnPlacementOn = 0x0001;
+        private static readonly ushort NoDuplicateOnPlacementOff = 0x0000;
+
+        private static readonly ushort ShowInCatalogOn = 0x0001;
+        private static readonly ushort ShowInCatalogOff = 0x0000;
+
         private readonly DbpfFileCache packageCache = new DbpfFileCache();
 
         private MruList MyMruList;
@@ -200,6 +206,8 @@ namespace ObjectRelocator
             menuItemShowGuids.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowGuids.Name, 0) != 0); OnShowHideGuids(menuItemShowGuids, null);
             menuItemShowDepreciation.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowDepreciation.Name, 0) != 0); OnShowHideDepreciation(menuItemShowDepreciation, null);
             menuItemShowHoodView.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowHoodView.Name, 0) != 0); OnShowHideHoodView(menuItemShowHoodView, null);
+            menuItemShowShowInCatalog.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowShowInCatalog.Name, 0) != 0); OnShowHideShowInCatalog(menuItemShowShowInCatalog, null);
+            menuItemShowNoDuplicate.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowNoDuplicate.Name, 0) != 0); OnShowHideNoDuplicate(menuItemShowNoDuplicate, null);
 
             menuItemRecurse.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, 1) != 0);
 
@@ -248,6 +256,8 @@ namespace ObjectRelocator
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowGuids.Name, menuItemShowGuids.Checked ? 1 : 0);
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowDepreciation.Name, menuItemShowDepreciation.Checked ? 1 : 0);
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowHoodView.Name, menuItemShowHoodView.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowShowInCatalog.Name, menuItemShowShowInCatalog.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowNoDuplicate.Name, menuItemShowNoDuplicate.Checked ? 1 : 0);
 
             RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, menuItemRecurse.Checked ? 1 : 0);
 
@@ -709,6 +719,16 @@ namespace ObjectRelocator
             gridViewResources.Columns["colHoodView"].Visible = menuItemShowHoodView.Checked;
         }
 
+        private void OnShowHideShowInCatalog(object sender, EventArgs e)
+        {
+            gridViewResources.Columns["colShowInCatalog"].Visible = (IsBuildMode && menuItemShowShowInCatalog.Checked);
+        }
+
+        private void OnShowHideNoDuplicate(object sender, EventArgs e)
+        {
+            gridViewResources.Columns["colNoDuplicate"].Visible = menuItemShowNoDuplicate.Checked;
+        }
+
         private void OnExcludeHidden(object sender, EventArgs e)
         {
             UpdateFormState();
@@ -812,6 +832,8 @@ namespace ObjectRelocator
             gridViewResources.Columns["colUse"].Visible = IsBuyMode;
             gridViewResources.Columns["colDepreciation"].Visible = IsBuyMode;
             gridViewResources.Columns["colFunction"].HeaderText = IsBuyMode ? "Function" : "Build";
+            gridViewResources.Columns["colShowInCatalog"].Visible = (IsBuildMode && menuItemShowShowInCatalog.Checked);
+            gridViewResources.Columns["colNoDuplicate"].Visible = menuItemShowNoDuplicate.Checked;
 
             DoWork_FillGrid(folder, true);
         }
@@ -825,6 +847,8 @@ namespace ObjectRelocator
         {
             // Option menu entries
             menuItemShowHoodView.Visible = IsAdvancedMode;
+            menuItemShowShowInCatalog.Visible = IsAdvancedMode;
+            menuItemShowNoDuplicate.Visible = IsAdvancedMode;
             menuItemSeparatorModels.Visible = IsAdvancedMode;
             menuItemModifyAllModels.Visible = IsAdvancedMode;
             menuItemSeparatorFilters.Visible = IsAdvancedMode;
@@ -842,10 +866,14 @@ namespace ObjectRelocator
             if (IsAdvancedMode)
             {
                 gridViewResources.Columns["colHoodView"].Visible = menuItemShowHoodView.Checked;
+                gridViewResources.Columns["colShowInCatalog"].Visible = (IsBuildMode && menuItemShowShowInCatalog.Checked);
+                gridViewResources.Columns["colNoDuplicate"].Visible = menuItemShowNoDuplicate.Checked;
             }
             else
             {
                 gridViewResources.Columns["colHoodView"].Visible = false;
+                gridViewResources.Columns["colShowInCatalog"].Visible = false;
+                gridViewResources.Columns["colNoDuplicate"].Visible = false;
             }
         }
         #endregion
@@ -1003,6 +1031,7 @@ namespace ObjectRelocator
             row["Use"] = BuildUseString(objectData);
 
             row["QuarterTile"] = BuildQuarterTileString(objectData);
+            row["NoDuplicate"] = BuildNoDuplicateString(objectData);
 
             row["Price"] = objectData.GetRawData(ObjdIndex.Price);
             row["Depreciation"] = BuildDepreciationString(objectData);
@@ -1030,12 +1059,15 @@ namespace ObjectRelocator
                 row["Function"] = BuildBuildString(objectData);
 
                 row["QuarterTile"] = BuildQuarterTileString(objectData);
+                row["NoDuplicate"] = BuildNoDuplicateString(objectData);
 
                 row["Price"] = objectData.GetRawData(ObjdIndex.Price);
             }
             else if (objectData.IsCpf)
             {
                 row["Function"] = BuildBuildString(objectData);
+
+                row["ShowInCatalog"] = BuildShowInCatalogString(objectData);
 
                 row["Price"] = objectData.GetUIntItem("cost");
             }
@@ -1321,6 +1353,41 @@ namespace ObjectRelocator
             return "";
         }
 
+        private string BuildNoDuplicateString(ObjectDbpfData objectData)
+        {
+            if (objectData.IsObjd)
+            {
+                ushort noDuplicate = objectData.GetRawData(ObjdIndex.NoDuplicateOnPlacement);
+
+                return (noDuplicate == NoDuplicateOnPlacementOff) ? "No" : "Yes";
+            }
+
+            return "";
+        }
+
+        private string BuildShowInCatalogString(ObjectDbpfData objectData)
+        {
+            if (objectData.IsCpf)
+            {
+                ushort showInCatalog = (ushort)objectData.GetUIntItem("showincatalog");
+
+                if (showInCatalog == ShowInCatalogOff)
+                {
+                    return "No";
+                }
+                else if (showInCatalog == ShowInCatalogOn)
+                {
+                    return "Yes";
+                }
+                else
+                {
+                    return $"Unknown ({Helper.Hex4PrefixString(showInCatalog)})";
+                }
+            }
+
+            return "n/a";
+        }
+
         private string BuildDepreciationString(ObjectDbpfData objectData)
         {
             if (objectData.IsObjd)
@@ -1380,6 +1447,7 @@ namespace ObjectRelocator
                     row.Cells["colCommunity"].Value = BuildCommunityString(selectedObject);
                     row.Cells["colUse"].Value = BuildUseString(selectedObject);
                     row.Cells["colQuarterTile"].Value = BuildQuarterTileString(selectedObject);
+                    row.Cells["colNoDuplicate"].Value = BuildNoDuplicateString(selectedObject);
                     row.Cells["colPrice"].Value = selectedObject.GetRawData(ObjdIndex.Price);
                     row.Cells["colDepreciation"].Value = BuildDepreciationString(selectedObject);
                     row.Cells["colHoodView"].Value = BuildHoodViewString(selectedObject, menuItemShowHoodView.Checked);
@@ -1406,6 +1474,7 @@ namespace ObjectRelocator
 
                     row.Cells["colFunction"].Value = BuildBuildString(selectedObject);
                     row.Cells["colQuarterTile"].Value = BuildQuarterTileString(selectedObject);
+                    row.Cells["colNoDuplicate"].Value = BuildNoDuplicateString(selectedObject);
 
                     if (selectedObject.IsObjd)
                     {
@@ -1413,6 +1482,8 @@ namespace ObjectRelocator
                     }
                     else
                     {
+                        row.Cells["colShowInCatalog"].Value = BuildShowInCatalogString(selectedObject);
+
                         row.Cells["colPrice"].Value = selectedObject.GetUIntItem("cost");
                     }
 
@@ -1564,7 +1635,7 @@ namespace ObjectRelocator
         #endregion
 
         #region Editor
-        ushort cachedRoomFlags, cachedFunctionFlags, cachedSubfunctionFlags, cachedUseFlags, cachedCommunityFlags, cachedQuarterTile, cachedBuildFlags, cachedSubbuildFlags, cachedSurfacetype;
+        ushort cachedRoomFlags, cachedFunctionFlags, cachedSubfunctionFlags, cachedUseFlags, cachedCommunityFlags, cachedQuarterTile, cachedNoDuplicate, cachedShowInCatalog, cachedBuildFlags, cachedSubbuildFlags, cachedSurfacetype;
 
         private void ClearEditor()
         {
@@ -1607,6 +1678,7 @@ namespace ObjectRelocator
             ckbUseGroupActivity.Checked = false;
 
             ckbBuyQuarterTile.Checked = false;
+            ckbBuyNoDuplicate.Checked = false;
 
             textBuyPrice.Text = "";
 
@@ -1619,6 +1691,8 @@ namespace ObjectRelocator
         private void ClearBuildModeEditor()
         {
             ckbBuildQuarterTile.Checked = false;
+            ckbBuildNoDuplicate.Checked = false;
+            ckbBuildShowInCatalog.Checked = false;
 
             textBuildPrice.Text = "";
         }
@@ -1754,6 +1828,20 @@ namespace ObjectRelocator
                 ckbBuyQuarterTile.Checked = (cachedQuarterTile != QuarterTileOff);
             }
 
+            ushort newNoDuplicate = objectData.GetRawData(ObjdIndex.NoDuplicateOnPlacement);
+            if (append)
+            {
+                if ((cachedNoDuplicate == NoDuplicateOnPlacementOff && newNoDuplicate != NoDuplicateOnPlacementOff) || (cachedNoDuplicate != NoDuplicateOnPlacementOff && newNoDuplicate == NoDuplicateOnPlacementOff))
+                {
+                    ckbBuyNoDuplicate.CheckState = CheckState.Indeterminate;
+                }
+            }
+            else
+            {
+                cachedNoDuplicate = newNoDuplicate;
+                ckbBuyNoDuplicate.Checked = (cachedNoDuplicate != NoDuplicateOnPlacementOff);
+            }
+
             if (append)
             {
                 if (!textBuyPrice.Text.Equals(objectData.GetRawData(ObjdIndex.Price).ToString()))
@@ -1830,6 +1918,18 @@ namespace ObjectRelocator
 
                 comboSurfacetype.SelectedIndex = -1;
 
+                if (append)
+                {
+                    if (!textBuildPrice.Text.Equals(objectData.GetRawData(ObjdIndex.Price).ToString()))
+                    {
+                        textBuildPrice.Text = "";
+                    }
+                }
+                else
+                {
+                    textBuildPrice.Text = objectData.GetRawData(ObjdIndex.Price).ToString();
+                }
+
                 ushort newQuarterTile = objectData.GetRawData(ObjdIndex.IgnoreQuarterTilePlacement);
                 if (append)
                 {
@@ -1844,17 +1944,21 @@ namespace ObjectRelocator
                     ckbBuildQuarterTile.Checked = (cachedQuarterTile != QuarterTileOff);
                 }
 
+                ushort newNoDuplicate = objectData.GetRawData(ObjdIndex.NoDuplicateOnPlacement);
                 if (append)
                 {
-                    if (!textBuildPrice.Text.Equals(objectData.GetRawData(ObjdIndex.Price).ToString()))
+                    if ((cachedNoDuplicate == NoDuplicateOnPlacementOff && newNoDuplicate != NoDuplicateOnPlacementOff) || (cachedNoDuplicate != NoDuplicateOnPlacementOff && newNoDuplicate == NoDuplicateOnPlacementOff))
                     {
-                        textBuildPrice.Text = "";
+                        ckbBuildNoDuplicate.CheckState = CheckState.Indeterminate;
                     }
                 }
                 else
                 {
-                    textBuildPrice.Text = objectData.GetRawData(ObjdIndex.Price).ToString();
+                    cachedNoDuplicate = newNoDuplicate;
+                    ckbBuildNoDuplicate.Checked = (cachedNoDuplicate != NoDuplicateOnPlacementOff);
                 }
+
+                ckbBuildShowInCatalog.CheckState = CheckState.Indeterminate;
             }
             else
             {
@@ -1899,6 +2003,20 @@ namespace ObjectRelocator
                             break;
                         }
                     }
+                }
+
+                ushort newShowInCatalog = (ushort)objectData.GetUIntItem("showincatalog");
+                if (append)
+                {
+                    if ((cachedShowInCatalog == ShowInCatalogOff && newShowInCatalog != ShowInCatalogOff) || (cachedShowInCatalog != ShowInCatalogOff && newShowInCatalog == ShowInCatalogOff))
+                    {
+                        ckbBuildShowInCatalog.CheckState = CheckState.Indeterminate;
+                    }
+                }
+                else
+                {
+                    cachedShowInCatalog = newShowInCatalog;
+                    ckbBuildShowInCatalog.CheckState = (cachedShowInCatalog == ShowInCatalogOff) ? CheckState.Unchecked : ((cachedShowInCatalog == ShowInCatalogOn) ? CheckState.Checked : CheckState.Indeterminate);
                 }
 
                 if (append)
@@ -1949,6 +2067,7 @@ namespace ObjectRelocator
                 }
 
                 ckbBuildQuarterTile.CheckState = CheckState.Indeterminate;
+                ckbBuildNoDuplicate.CheckState = CheckState.Indeterminate;
 
                 if (append)
                 {
@@ -2326,6 +2445,21 @@ namespace ObjectRelocator
         private void OnBuildQuarterTileClicked(object sender, EventArgs e)
         {
             if (IsAutoUpdate) UpdateSelectedRows(ckbBuildQuarterTile.Checked ? QuarterTileOn : QuarterTileOff, ObjdIndex.IgnoreQuarterTilePlacement);
+        }
+
+        private void OnBuyNoDuplicateClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbBuyNoDuplicate.Checked ? NoDuplicateOnPlacementOn : NoDuplicateOnPlacementOff, ObjdIndex.NoDuplicateOnPlacement);
+        }
+
+        private void OnBuildNoDuplicateClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbBuildNoDuplicate.Checked ? NoDuplicateOnPlacementOn : NoDuplicateOnPlacementOff, ObjdIndex.NoDuplicateOnPlacement);
+        }
+
+        private void OnBuildShowInCatalogClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows(ckbBuildShowInCatalog.Checked ? ShowInCatalogOn : ShowInCatalogOff, ObjdIndex.NONE, "showincatalog");
         }
 
         private void OnDepreciationSelfClicked(object sender, EventArgs e)

@@ -69,6 +69,8 @@ namespace ObjectRelocator
             this.menuItemShowGuids = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowDepreciation = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowHoodView = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemShowShowInCatalog = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemShowNoDuplicate = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExcludeHidden = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -91,12 +93,15 @@ namespace ObjectRelocator
             this.colCommunity = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colUse = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colQuarterTile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colNoDuplicate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDepreciation = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHoodView = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colShowInCatalog = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colObjectData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextObjects = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemContextEditTitleDesc = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemContextStripCTSSCrap = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemContextRowRestore = new System.Windows.Forms.ToolStripMenuItem();
@@ -140,6 +145,7 @@ namespace ObjectRelocator
             this.panelBuyModeEditor = new System.Windows.Forms.Panel();
             this.grpBuyPlacement = new System.Windows.Forms.GroupBox();
             this.ckbBuyQuarterTile = new System.Windows.Forms.CheckBox();
+            this.ckbBuyNoDuplicate = new System.Windows.Forms.CheckBox();
             this.grpCommunity = new System.Windows.Forms.GroupBox();
             this.ckbCommStreet = new System.Windows.Forms.CheckBox();
             this.ckbCommShopping = new System.Windows.Forms.CheckBox();
@@ -161,6 +167,9 @@ namespace ObjectRelocator
             this.grpSubfunction = new System.Windows.Forms.GroupBox();
             this.grpBuildPlacement = new System.Windows.Forms.GroupBox();
             this.ckbBuildQuarterTile = new System.Windows.Forms.CheckBox();
+            this.ckbBuildNoDuplicate = new System.Windows.Forms.CheckBox();
+            this.grpBuildShowInCatalog = new System.Windows.Forms.GroupBox();
+            this.ckbBuildShowInCatalog = new System.Windows.Forms.CheckBox();
             this.grpBuild = new System.Windows.Forms.GroupBox();
             this.grpSubbuild = new System.Windows.Forms.GroupBox();
             this.grpBuildSurfaceType = new System.Windows.Forms.GroupBox();
@@ -170,7 +179,6 @@ namespace ObjectRelocator
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextObjects.SuspendLayout();
@@ -184,6 +192,7 @@ namespace ObjectRelocator
             this.grpFunction.SuspendLayout();
             this.grpSubfunction.SuspendLayout();
             this.grpBuildPlacement.SuspendLayout();
+            this.grpBuildShowInCatalog.SuspendLayout();
             this.grpBuild.SuspendLayout();
             this.grpSubbuild.SuspendLayout();
             this.grpBuildSurfaceType.SuspendLayout();
@@ -378,6 +387,8 @@ namespace ObjectRelocator
             this.menuItemShowGuids,
             this.menuItemShowDepreciation,
             this.menuItemShowHoodView,
+            this.menuItemShowShowInCatalog,
+            this.menuItemShowNoDuplicate,
             this.menuItemSeparator3,
             this.menuItemExcludeHidden,
             this.menuItemSeparator4,
@@ -430,6 +441,22 @@ namespace ObjectRelocator
             this.menuItemShowHoodView.Size = new System.Drawing.Size(243, 22);
             this.menuItemShowHoodView.Text = "Show &Hood View";
             this.menuItemShowHoodView.Click += new System.EventHandler(this.OnShowHideHoodView);
+            // 
+            // menuItemShowShowInCatalog
+            // 
+            this.menuItemShowShowInCatalog.CheckOnClick = true;
+            this.menuItemShowShowInCatalog.Name = "menuItemShowShowInCatalog";
+            this.menuItemShowShowInCatalog.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowShowInCatalog.Text = "Show In &Catalog";
+            this.menuItemShowShowInCatalog.Click += new System.EventHandler(this.OnShowHideShowInCatalog);
+            // 
+            // menuItemShowNoDuplicate
+            // 
+            this.menuItemShowNoDuplicate.CheckOnClick = true;
+            this.menuItemShowNoDuplicate.Name = "menuItemShowNoDuplicate";
+            this.menuItemShowNoDuplicate.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowNoDuplicate.Text = "Show No D&uplicate";
+            this.menuItemShowNoDuplicate.Click += new System.EventHandler(this.OnShowHideNoDuplicate);
             // 
             // menuItemSeparator3
             // 
@@ -523,9 +550,11 @@ namespace ObjectRelocator
             this.colCommunity,
             this.colUse,
             this.colQuarterTile,
+            this.colNoDuplicate,
             this.colPrice,
             this.colDepreciation,
             this.colHoodView,
+            this.colShowInCatalog,
             this.colObjectData});
             this.gridViewResources.ContextMenuStrip = this.menuContextObjects;
             this.gridViewResources.Location = new System.Drawing.Point(4, 27);
@@ -641,6 +670,15 @@ namespace ObjectRelocator
             this.colQuarterTile.ReadOnly = true;
             this.colQuarterTile.Width = 65;
             // 
+            // colNoDuplicate
+            // 
+            this.colNoDuplicate.DataPropertyName = "NoDuplicate";
+            this.colNoDuplicate.HeaderText = "No Dup";
+            this.colNoDuplicate.MinimumWidth = 65;
+            this.colNoDuplicate.Name = "colNoDuplicate";
+            this.colNoDuplicate.ReadOnly = true;
+            this.colNoDuplicate.Width = 65;
+            // 
             // colPrice
             // 
             this.colPrice.DataPropertyName = "Price";
@@ -667,6 +705,15 @@ namespace ObjectRelocator
             this.colHoodView.Name = "colHoodView";
             this.colHoodView.ReadOnly = true;
             this.colHoodView.Width = 85;
+            // 
+            // colShowInCatalog
+            // 
+            this.colShowInCatalog.DataPropertyName = "ShowInCatalog";
+            this.colShowInCatalog.HeaderText = "Show In Catalog";
+            this.colShowInCatalog.MinimumWidth = 85;
+            this.colShowInCatalog.Name = "colShowInCatalog";
+            this.colShowInCatalog.ReadOnly = true;
+            this.colShowInCatalog.Width = 85;
             // 
             // colObjectData
             // 
@@ -696,7 +743,7 @@ namespace ObjectRelocator
             this.toolStripSeparator6,
             this.menuItemContextMoveFiles});
             this.menuContextObjects.Name = "menuContextGrid";
-            this.menuContextObjects.Size = new System.Drawing.Size(301, 282);
+            this.menuContextObjects.Size = new System.Drawing.Size(301, 260);
             this.menuContextObjects.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextObjects.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             this.menuContextObjects.Opened += new System.EventHandler(this.OnContextMenuOpened);
@@ -709,6 +756,11 @@ namespace ObjectRelocator
             this.menuItemContextEditTitleDesc.Size = new System.Drawing.Size(300, 22);
             this.menuItemContextEditTitleDesc.Text = "&Change Title and Description";
             this.menuItemContextEditTitleDesc.Click += new System.EventHandler(this.OnEditTitleDescClicked);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(297, 6);
             // 
             // menuItemContextStripCTSSCrap
             // 
@@ -1094,6 +1146,7 @@ namespace ObjectRelocator
             // grpBuyPlacement
             // 
             this.grpBuyPlacement.Controls.Add(this.ckbBuyQuarterTile);
+            this.grpBuyPlacement.Controls.Add(this.ckbBuyNoDuplicate);
             this.grpBuyPlacement.Location = new System.Drawing.Point(390, 105);
             this.grpBuyPlacement.Name = "grpBuyPlacement";
             this.grpBuyPlacement.Size = new System.Drawing.Size(115, 64);
@@ -1111,6 +1164,16 @@ namespace ObjectRelocator
             this.ckbBuyQuarterTile.Text = "Quarter Tile";
             this.ckbBuyQuarterTile.UseVisualStyleBackColor = true;
             this.ckbBuyQuarterTile.Click += new System.EventHandler(this.OnBuyQuarterTileClicked);
+            // 
+            // ckbBuyNoDuplicate
+            // 
+            this.ckbBuyNoDuplicate.AutoSize = true;
+            this.ckbBuyNoDuplicate.Location = new System.Drawing.Point(10, 32);
+            this.ckbBuyNoDuplicate.Name = "ckbBuyNoDuplicate";
+            this.ckbBuyNoDuplicate.Size = new System.Drawing.Size(97, 19);
+            this.ckbBuyNoDuplicate.TabIndex = 5;
+            this.ckbBuyNoDuplicate.Text = "No Duplicate";
+            this.ckbBuyNoDuplicate.UseVisualStyleBackColor = true;
             // 
             // grpCommunity
             // 
@@ -1332,6 +1395,7 @@ namespace ObjectRelocator
             // grpBuildPlacement
             // 
             this.grpBuildPlacement.Controls.Add(this.ckbBuildQuarterTile);
+            this.grpBuildPlacement.Controls.Add(this.ckbBuildNoDuplicate);
             this.grpBuildPlacement.Location = new System.Drawing.Point(390, 105);
             this.grpBuildPlacement.Name = "grpBuildPlacement";
             this.grpBuildPlacement.Size = new System.Drawing.Size(115, 64);
@@ -1349,6 +1413,38 @@ namespace ObjectRelocator
             this.ckbBuildQuarterTile.Text = "Quarter Tile";
             this.ckbBuildQuarterTile.UseVisualStyleBackColor = true;
             this.ckbBuildQuarterTile.Click += new System.EventHandler(this.OnBuildQuarterTileClicked);
+            // 
+            // ckbBuildNoDuplicate
+            // 
+            this.ckbBuildNoDuplicate.AutoSize = true;
+            this.ckbBuildNoDuplicate.Location = new System.Drawing.Point(10, 32);
+            this.ckbBuildNoDuplicate.Name = "ckbBuildNoDuplicate";
+            this.ckbBuildNoDuplicate.Size = new System.Drawing.Size(97, 19);
+            this.ckbBuildNoDuplicate.TabIndex = 4;
+            this.ckbBuildNoDuplicate.Text = "No Duplicate";
+            this.ckbBuildNoDuplicate.UseVisualStyleBackColor = true;
+            this.ckbBuildNoDuplicate.Click += new System.EventHandler(this.OnBuildNoDuplicateClicked);
+            // 
+            // grpBuildShowInCatalog
+            // 
+            this.grpBuildShowInCatalog.Controls.Add(this.ckbBuildShowInCatalog);
+            this.grpBuildShowInCatalog.Location = new System.Drawing.Point(511, 0);
+            this.grpBuildShowInCatalog.Name = "grpBuildShowInCatalog";
+            this.grpBuildShowInCatalog.Size = new System.Drawing.Size(148, 100);
+            this.grpBuildShowInCatalog.TabIndex = 6;
+            this.grpBuildShowInCatalog.TabStop = false;
+            this.grpBuildShowInCatalog.Text = "Catalog:";
+            // 
+            // ckbBuildShowInCatalog
+            // 
+            this.ckbBuildShowInCatalog.AutoSize = true;
+            this.ckbBuildShowInCatalog.Location = new System.Drawing.Point(10, 15);
+            this.ckbBuildShowInCatalog.Name = "ckbBuildShowInCatalog";
+            this.ckbBuildShowInCatalog.Size = new System.Drawing.Size(57, 19);
+            this.ckbBuildShowInCatalog.TabIndex = 4;
+            this.ckbBuildShowInCatalog.Text = "Show";
+            this.ckbBuildShowInCatalog.UseVisualStyleBackColor = true;
+            this.ckbBuildShowInCatalog.Click += new System.EventHandler(this.OnBuildShowInCatalogClicked);
             // 
             // grpBuild
             // 
@@ -1398,6 +1494,7 @@ namespace ObjectRelocator
             this.panelBuildModeEditor.Controls.Add(this.grpSubbuild);
             this.panelBuildModeEditor.Controls.Add(this.grpBuildSurfaceType);
             this.panelBuildModeEditor.Controls.Add(this.grpBuildPlacement);
+            this.panelBuildModeEditor.Controls.Add(this.grpBuildShowInCatalog);
             this.panelBuildModeEditor.Controls.Add(this.grpBuildPrice);
             this.panelBuildModeEditor.Enabled = false;
             this.panelBuildModeEditor.Location = new System.Drawing.Point(4, 347);
@@ -1432,11 +1529,6 @@ namespace ObjectRelocator
             this.openThumbnailDialog.Filter = "JPG file|*.jpg|PNG file|*.png|BMP file|*.bmp|All files|*.*";
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(297, 6);
             // 
             // ObjectRelocatorForm
             // 
@@ -1479,6 +1571,8 @@ namespace ObjectRelocator
             this.grpSubfunction.ResumeLayout(false);
             this.grpBuildPlacement.ResumeLayout(false);
             this.grpBuildPlacement.PerformLayout();
+            this.grpBuildShowInCatalog.ResumeLayout(false);
+            this.grpBuildShowInCatalog.PerformLayout();
             this.grpBuild.ResumeLayout(false);
             this.grpSubbuild.ResumeLayout(false);
             this.grpBuildSurfaceType.ResumeLayout(false);
@@ -1507,6 +1601,8 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuItemShowGuids;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowDepreciation;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowHoodView;
+        private System.Windows.Forms.ToolStripMenuItem menuItemShowShowInCatalog;
+        private System.Windows.Forms.ToolStripMenuItem menuItemShowNoDuplicate;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuItemExcludeHidden;
         private System.Windows.Forms.ToolStripMenuItem menuMode;
@@ -1576,8 +1672,10 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator5;
         private System.Windows.Forms.GroupBox grpBuyPlacement;
         private System.Windows.Forms.CheckBox ckbBuyQuarterTile;
+        private System.Windows.Forms.CheckBox ckbBuyNoDuplicate;
         private System.Windows.Forms.GroupBox grpBuildPlacement;
         private System.Windows.Forms.CheckBox ckbBuildQuarterTile;
+        private System.Windows.Forms.CheckBox ckbBuildNoDuplicate;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator6;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextMoveFiles;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowName;
@@ -1616,13 +1714,17 @@ namespace ObjectRelocator
         private System.Windows.Forms.DataGridViewTextBoxColumn colCommunity;
         private System.Windows.Forms.DataGridViewTextBoxColumn colUse;
         private System.Windows.Forms.DataGridViewTextBoxColumn colQuarterTile;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colNoDuplicate;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPrice;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDepreciation;
         private System.Windows.Forms.DataGridViewTextBoxColumn colHoodView;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colShowInCatalog;
         private System.Windows.Forms.DataGridViewTextBoxColumn colObjectData;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.GroupBox grpBuildShowInCatalog;
+        private System.Windows.Forms.CheckBox ckbBuildShowInCatalog;
     }
 }
