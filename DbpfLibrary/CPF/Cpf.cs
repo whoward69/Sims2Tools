@@ -284,6 +284,30 @@ namespace Sims2Tools.DBPF.CPF
         {
             CpfItem cpfItem = GetItem(item);
 
+            if (cpfItem == null)
+            {
+                if (sv.IsBool)
+                {
+                    cpfItem = AddItem(new CpfItem(item, MetaData.DataTypes.dtBoolean));
+                }
+                else if (sv.IsInt)
+                {
+                    cpfItem = AddItem(new CpfItem(item, MetaData.DataTypes.dtInteger));
+                }
+                else if (sv.IsUInt)
+                {
+                    cpfItem = AddItem(new CpfItem(item, MetaData.DataTypes.dtUInteger));
+                }
+                else if (sv.IsFloat)
+                {
+                    cpfItem = AddItem(new CpfItem(item, MetaData.DataTypes.dtSingle));
+                }
+                else
+                {
+                    cpfItem = AddItem(new CpfItem(item, MetaData.DataTypes.dtString));
+                }
+            }
+
             if (cpfItem != null)
             {
                 switch (cpfItem.DataType)

@@ -9,6 +9,7 @@
 using Sims2Tools.Dialogs;
 using Sims2Tools.Utils.Persistence;
 using System;
+using System.Net;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -138,9 +139,13 @@ namespace Sims2Tools.Updates
         {
             try
             {
-                DateTime now = DateTime.Now;
+                WebClient client = new WebClient();
+                client.Headers.Add("user-agent", "Sims2Tools/1.0");
 
-                XmlTextReader reader = new XmlTextReader($"https://www.picknmixmods.com/Sims2/Notes/Sims2Tools.html?now={now.Ticks}");
+                DateTime now = DateTime.Now;
+                string url = $"https://www.picknmixmods.com/Sims2/Notes/Sims2Tools.html?now={now.Ticks}";
+
+                XmlTextReader reader = new XmlTextReader(client.OpenRead(url));
 
                 string eleName = AppRegKey.Substring(AppRegKey.LastIndexOf(@"\") + 1);
 

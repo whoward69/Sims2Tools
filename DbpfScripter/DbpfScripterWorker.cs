@@ -93,6 +93,7 @@ namespace DbpfScripter
 
         private int countAssignments = 0;
         private int countResources = 0;
+        private int countErrors = 0;
 
         private TextReader scriptReader;
         private int scriptLineIndex = 0;
@@ -162,11 +163,18 @@ namespace DbpfScripter
                         }
                         else
                         {
-                            File.Copy(templateFileFullPath, fi.FullName);
+                            File.Copy(templateFileFullPath, fi.FullName, true);
                         }
                     }
 
-                    ReportProgress("Finished :)");
+                    if (countErrors > 0)
+                    {
+                        ReportProgress($"!!Finished with {countErrors} error{(countErrors == 1 ? "" : "s")} :(");
+                    }
+                    else
+                    {
+                        ReportProgress("Finished :)");
+                    }
                 }
             }
         }
@@ -294,6 +302,14 @@ namespace DbpfScripter
 
         private bool ProcessActions(string filename)
         {
+            if (isDevMode)
+            {
+                if (!(filename.Contains("template") || filename.Contains("Template") || filename.Contains("TEMPLATE")))
+                {
+                    ReportErrorNull($"File ({filename}) doesn't conform to required naming convention");
+                }
+            }
+
             activePackage = new DBPFFile($"{templatePath}/{filename}");
             allEditedPackages.Add(filename, activePackage);
 
@@ -655,6 +671,9 @@ namespace DbpfScripter
         #endregion
 
         #region ODS Parsing
+        private const int MAX_ROW_REPEAT = 25;
+        private const int MAX_CELL_REPEAT = 25;
+
         private bool ParseODS(string fullPath)
         {
             odsRows = new List<List<string>>();
@@ -723,8 +742,26 @@ namespace DbpfScripter
                             }
                             else if (reader.NodeType == XmlNodeType.EndElement)
                             {
-                                if (reader.Name.Equals("table:table"))
+                                if (reader.Name.Equals("table:table-row"))
                                 {
+                                    if (cellRepeat > 0 && cellRepeat < MAX_CELL_REPEAT)
+                                    {
+                                        while (cellRepeat-- > 0)
+                                        {
+                                            row.Add(cellText);
+                                        }
+                                    }
+                                }
+                                else if (reader.Name.Equals("table:table"))
+                                {
+                                    if (row != null && rowRepeat < MAX_ROW_REPEAT)
+                                    {
+                                        while (rowRepeat-- > 0)
+                                        {
+                                            odsRows.Add(row);
+                                        }
+                                    }
+
                                     // Only process the first table in the first spreadsheet
                                     return true;
                                 }
@@ -969,6 +1006,8 @@ namespace DbpfScripter
         private bool ReportErrorFalse(string msg)
         {
             ReportProgress($"!!{msg} at line {scriptLineIndex}");
+
+            ++countErrors;
 
             return false;
         }

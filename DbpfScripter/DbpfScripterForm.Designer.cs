@@ -41,6 +41,7 @@ namespace DbpfScripter
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DbpfScripterForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,6 +55,10 @@ namespace DbpfScripter
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemDeveloper = new System.Windows.Forms.ToolStripMenuItem();
             this.scriptWorker = new System.ComponentModel.BackgroundWorker();
             this.lblTemplatePath = new System.Windows.Forms.Label();
             this.textTemplatePath = new System.Windows.Forms.TextBox();
@@ -67,10 +72,7 @@ namespace DbpfScripter
             this.textMessages = new System.Windows.Forms.RichTextBox();
             this.textSaveName = new System.Windows.Forms.TextBox();
             this.lblSaveName = new System.Windows.Forms.Label();
-            this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemDeveloper = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.menuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -171,6 +173,37 @@ namespace DbpfScripter
             this.menuItemAbout.Text = "About...";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
             // 
+            // menuItemMode
+            // 
+            this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAdvanced,
+            this.toolStripSeparator3,
+            this.menuItemDeveloper});
+            this.menuItemMode.Name = "menuItemMode";
+            this.menuItemMode.Size = new System.Drawing.Size(50, 20);
+            this.menuItemMode.Text = "&Mode";
+            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(127, 22);
+            this.menuItemAdvanced.Text = "&Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(124, 6);
+            // 
+            // menuItemDeveloper
+            // 
+            this.menuItemDeveloper.CheckOnClick = true;
+            this.menuItemDeveloper.Name = "menuItemDeveloper";
+            this.menuItemDeveloper.Size = new System.Drawing.Size(127, 22);
+            this.menuItemDeveloper.Text = "&Developer";
+            // 
             // scriptWorker
             // 
             this.scriptWorker.WorkerReportsProgress = true;
@@ -187,6 +220,7 @@ namespace DbpfScripter
             this.lblTemplatePath.Size = new System.Drawing.Size(100, 15);
             this.lblTemplatePath.TabIndex = 1;
             this.lblTemplatePath.Text = "Template Folder:";
+            this.toolTip.SetToolTip(this.lblTemplatePath, "Folder containing the dbpfscript.txt file");
             // 
             // textTemplatePath
             // 
@@ -271,6 +305,8 @@ namespace DbpfScripter
             this.lblSavePath.Size = new System.Drawing.Size(75, 15);
             this.lblSavePath.TabIndex = 8;
             this.lblSavePath.Text = "Save Folder:";
+            this.toolTip.SetToolTip(this.lblSavePath, "Folder to receive the updated .package files.  Cannot be a sub-folder of the Temp" +
+        "late folder.");
             // 
             // textMessages
             // 
@@ -304,37 +340,8 @@ namespace DbpfScripter
             this.lblSaveName.Size = new System.Drawing.Size(105, 15);
             this.lblSaveName.TabIndex = 12;
             this.lblSaveName.Text = "Save Base Name:";
-            // 
-            // menuItemMode
-            // 
-            this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemAdvanced,
-            this.toolStripSeparator3,
-            this.menuItemDeveloper});
-            this.menuItemMode.Name = "menuItemMode";
-            this.menuItemMode.Size = new System.Drawing.Size(50, 20);
-            this.menuItemMode.Text = "&Mode";
-            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
-            // 
-            // menuItemAdvanced
-            // 
-            this.menuItemAdvanced.CheckOnClick = true;
-            this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAdvanced.Text = "&Advanced";
-            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
-            // 
-            // menuItemDeveloper
-            // 
-            this.menuItemDeveloper.CheckOnClick = true;
-            this.menuItemDeveloper.Name = "menuItemDeveloper";
-            this.menuItemDeveloper.Size = new System.Drawing.Size(180, 22);
-            this.menuItemDeveloper.Text = "&Developer";
+            this.toolTip.SetToolTip(this.lblSaveName, "File name part used to replace any occurance of \"template\" in the input .package " +
+        "file name(s)");
             // 
             // DbpfScripterForm
             // 
@@ -400,6 +407,7 @@ namespace DbpfScripter
         private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuItemDeveloper;
+        private System.Windows.Forms.ToolTip toolTip;
     }
 }
 

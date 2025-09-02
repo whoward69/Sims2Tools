@@ -82,6 +82,8 @@ namespace Sims2Tools.DBPF
     {
         public static TypeTypeID TYPE_NULL = (TypeTypeID)0x00000000; // Technically this is type UI
 
+        public static TypeGroupID GROUP_NULL = (TypeGroupID)0x00000000;
+
         public static TypeGroupID GROUP_GLOBALS = (TypeGroupID)0x7FD46CD0;
         public static string NAME_GLOBALS = "Globals";
 
@@ -264,7 +266,7 @@ namespace Sims2Tools.DBPF
                 }
             }
 
-            return (TypeTypeID)0x00000000;
+            return TYPE_NULL;
         }
     }
 }

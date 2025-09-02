@@ -7,6 +7,7 @@
  */
 
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.Package;
 
 namespace Sims2Tools.Exporter
 {
@@ -16,6 +17,7 @@ namespace Sims2Tools.Exporter
         void Close();
 
         void Extract(string packagePath, DBPFKey key);
+        void Extract(DBPFFile package, DBPFKey key);
         void Extract(DBPFResource resource);
     }
 }

@@ -80,13 +80,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 #endif
         }
 
-        public void UpdateFromDDSData(DDSData[] ddsData)
+        public void UpdateFromDDSData(DDSData[] ddsData, bool removeLifos)
         {
             texturesize = ddsData[0].ParentSize;
             format = ddsData[0].Format;
             mipmaplevels = (uint)ddsData.Length;
 
-            mipmapblocks[0].UpdateFromDDSData(ddsData);
+            mipmapblocks[0].UpdateFromDDSData(ddsData, removeLifos);
 
             _isDirty = true;
         }

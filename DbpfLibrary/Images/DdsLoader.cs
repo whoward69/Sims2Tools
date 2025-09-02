@@ -174,8 +174,8 @@ namespace Sims2Tools.DBPF.Images
         }
 
         public bool IsDxt1 => pixelFormat.IsDxt1;
-        public bool IsDxt3 => pixelFormat.IsDxt1;
-        public bool IsDxt5 => pixelFormat.IsDxt1;
+        public bool IsDxt3 => pixelFormat.IsDxt3;
+        public bool IsDxt5 => pixelFormat.IsDxt5;
 
         public bool IsRaw8 => pixelFormat.IsRaw8;
         public bool IsRaw24 => pixelFormat.IsRaw24;

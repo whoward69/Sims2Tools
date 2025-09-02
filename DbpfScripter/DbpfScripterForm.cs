@@ -41,6 +41,10 @@ namespace DbpfScripter
             InitializeComponent();
             this.Text = DbpfScripterApp.AppTitle;
 
+            this.toolTip.SetToolTip(textTemplatePath, toolTip.GetToolTip(lblTemplatePath));
+            this.toolTip.SetToolTip(textSavePath, toolTip.GetToolTip(lblSavePath));
+            this.toolTip.SetToolTip(textSaveName, toolTip.GetToolTip(lblSaveName));
+
             selectPathDialog = new CommonOpenFileDialog
             {
                 IsFolderPicker = true
@@ -219,7 +223,10 @@ namespace DbpfScripter
                 {
                     if (textTemplatePath.Text.Length > 0 && Directory.Exists(textTemplatePath.Text))
                     {
-                        btnGO.Enabled = File.Exists($"{textTemplatePath.Text}\\dbpfscript.txt");
+                        if (!textSavePath.Text.StartsWith(textTemplatePath.Text))
+                        {
+                            btnGO.Enabled = File.Exists($"{textTemplatePath.Text}\\dbpfscript.txt");
+                        }
                     }
                 }
             }

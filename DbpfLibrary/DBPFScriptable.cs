@@ -54,6 +54,12 @@ namespace Sims2Tools.DBPF
         private readonly long lVal = 0;
         private readonly double dVal = 0;
 
+        private readonly bool isBool = false;
+        private readonly bool isInt = false;
+        private readonly bool isUInt = false;
+        private readonly bool isFloat = false;
+        private readonly bool isString = false;
+
         public ScriptValue(string value)
         {
             if (value.StartsWith("\"") && value.EndsWith("\""))
@@ -67,14 +73,31 @@ namespace Sims2Tools.DBPF
             {
                 lVal = Int32.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
                 dVal = lVal;
-            }
-            else if (double.TryParse(value, out dVal))
-            {
-                lVal = (long)dVal;
+
+                isUInt = true;
             }
             else if (long.TryParse(value, out lVal))
             {
                 dVal = lVal;
+
+                if (lVal == 0 || lVal == 1)
+                {
+                    isBool = true;
+                }
+                else
+                {
+                    isInt = true;
+                }
+            }
+            else if (double.TryParse(value, out dVal))
+            {
+                lVal = (long)dVal;
+
+                isFloat = true;
+            }
+            else
+            {
+                isString = true;
             }
 
             uVal = (uint)lVal;
@@ -96,9 +119,17 @@ namespace Sims2Tools.DBPF
 
         public static implicit operator TypeGUID(ScriptValue sv) => (TypeGUID)sv.uVal;
 
+        public static implicit operator TypeTypeID(ScriptValue sv) => (sv.IsString ? DBPFData.TypeID(sv.sVal) : (TypeTypeID)sv.uVal);
         public static implicit operator TypeGroupID(ScriptValue sv) => (TypeGroupID)sv.uVal;
         public static implicit operator TypeResourceID(ScriptValue sv) => (TypeResourceID)sv.uVal;
         public static implicit operator TypeInstanceID(ScriptValue sv) => (TypeInstanceID)sv.uVal;
+
+        public bool IsBool => isBool;
+        public bool IsInt => isInt;
+        public bool IsUInt => isUInt;
+        public bool IsFloat => isFloat;
+        public bool IsString => isString;
+
 
         public string ToLower() => sVal.ToLower();
         public string ToUpper() => sVal.ToUpper();

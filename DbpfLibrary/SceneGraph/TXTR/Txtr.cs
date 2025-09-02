@@ -81,9 +81,9 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
             }
         }
 
-        public void UpdateFromDDSData(DDSData[] ddsData)
+        public void UpdateFromDDSData(DDSData[] ddsData, bool removeLifos)
         {
-            cImageData.UpdateFromDDSData(ddsData);
+            cImageData.UpdateFromDDSData(ddsData, removeLifos);
         }
 
         public override SgResourceList SgNeededResources()

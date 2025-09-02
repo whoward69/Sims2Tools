@@ -29,7 +29,7 @@ namespace Sims2Tools.DBPF
 
     public class DBPFKey : IDBPFKey, IEquatable<DBPFKey>, IComparable<DBPFKey>
     {
-        private readonly TypeTypeID typeID;
+        private TypeTypeID typeID;
         private TypeGroupID groupID;
         private TypeResourceID resourceID;
         private TypeInstanceID instanceID;
@@ -121,6 +121,11 @@ namespace Sims2Tools.DBPF
         {
         }
 
+        protected void ChangeTypeID(TypeTypeID typeID)
+        {
+            this.typeID = typeID;
+        }
+
         protected void ChangeGroupID(TypeGroupID groupID)
         {
             this.groupID = groupID;
@@ -176,7 +181,12 @@ namespace Sims2Tools.DBPF
 
         public bool Assignment(string item, ScriptValue sv)
         {
-            if (item.Equals("group"))
+            if (item.Equals("type"))
+            {
+                ChangeTypeID(sv);
+                return true;
+            }
+            else if (item.Equals("group"))
             {
                 ChangeGroupID(sv);
                 return true;

@@ -21,36 +21,6 @@ namespace Sims2Tools.DBPF.Utils
         public const byte HEADER_SIGNATURE_HI = 0xFB;
         public const byte HEADER_SIGNATURE_LO = 0x10;
 
-        private static void ArrayCopy2(byte[] Src, int SrcPos, ref byte[] Dest, int DestPos, long Length)
-        {
-            if (Dest.Length < DestPos + Length)
-            {
-                byte[] DestExt = new byte[(int)(DestPos + Length)];
-                Array.Copy(Dest, 0, DestExt, 0, Dest.Length);
-                Dest = DestExt;
-            }
-
-            for (int i = 0; i < Length/* - 1*/; i++)
-                Dest[DestPos + i] = Src[SrcPos + i];
-        }
-
-        private static void OffsetCopy(ref byte[] array, int offset, int destPos, long length)
-        {
-            int srcPos = destPos - offset;
-
-            if (array.Length < destPos + length)
-            {
-                byte[] NewArray = new byte[(int)(destPos + length)];
-                Array.Copy(array, 0, NewArray, 0, array.Length);
-                array = NewArray;
-            }
-
-            for (int i = 0; i < length /*- 1*/; i++)
-            {
-                array[destPos + i] = array[srcPos + i];
-            }
-        }
-
         // See also https://modthesims.info/wiki.php?title=DBPF/Compression
         public static byte[] Decompress(byte[] Data, uint UncompressedFileSize)
         {
@@ -167,5 +137,36 @@ namespace Sims2Tools.DBPF.Utils
 
             return Data;
         }
+
+        private static void ArrayCopy2(byte[] Src, int SrcPos, ref byte[] Dest, int DestPos, long Length)
+        {
+            if (Dest.Length < DestPos + Length)
+            {
+                byte[] DestExt = new byte[(int)(DestPos + Length)];
+                Array.Copy(Dest, 0, DestExt, 0, Dest.Length);
+                Dest = DestExt;
+            }
+
+            for (int i = 0; i < Length/* - 1*/; i++)
+                Dest[DestPos + i] = Src[SrcPos + i];
+        }
+
+        private static void OffsetCopy(ref byte[] array, int offset, int destPos, long length)
+        {
+            int srcPos = destPos - offset;
+
+            if (array.Length < destPos + length)
+            {
+                byte[] NewArray = new byte[(int)(destPos + length)];
+                Array.Copy(array, 0, NewArray, 0, array.Length);
+                array = NewArray;
+            }
+
+            for (int i = 0; i < length /*- 1*/; i++)
+            {
+                array[destPos + i] = array[srcPos + i];
+            }
+        }
+
     }
 }

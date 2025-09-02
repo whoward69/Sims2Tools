@@ -42,6 +42,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         private string lifofile;
 
         public MipMapType DataType => datatype;
+        public bool IsLifoRef => (datatype == MipMapType.LifoReference);
 #endif
 
         public Image Texture
@@ -74,6 +75,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         {
             get => lifofile;
             internal set => lifofile = value;
+        }
+
+        public void SetLifoFile(string value)
+        {
+            lifofile = value;
+            parent.SetDirty();
         }
 
         private readonly CImageData parent;
@@ -230,8 +237,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             into.mapcount = this.mapcount;
             into.datatype = this.datatype;
 
-            into.data = new byte[this.data.Length];
-            for (int i = 0; i < this.data.Length; ++i) into.data[i] = this.data[i];
+            if (this.data != null)
+            {
+                into.data = new byte[this.data.Length];
+                for (int i = 0; i < this.data.Length; ++i) into.data[i] = this.data[i];
+            }
 
             into.img = this.img;
 
@@ -288,15 +298,26 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             unknown_1 = 0x41200000;
         }
 
-        public void UpdateFromDDSData(DDSData[] ddsData)
+        public void UpdateFromDDSData(DDSData[] ddsData, bool removeLifos)
         {
-            mipmaps = new MipMap[ddsData.Length];
+            MipMap[] newMipMaps = new MipMap[ddsData.Length];
 
             int mipmapIndex = 0;
             for (int i = ddsData.Length - 1; i >= 0; i--)
             {
-                mipmaps[mipmapIndex++] = new MipMap(this.parent, ddsData[i]);
+                if (mipmaps[mipmapIndex].IsLifoRef && !removeLifos)
+                {
+                    newMipMaps[mipmapIndex] = mipmaps[mipmapIndex];
+                }
+                else
+                {
+                    newMipMaps[mipmapIndex] = new MipMap(this.parent, ddsData[i]);
+                }
+
+                ++mipmapIndex;
             }
+
+            mipmaps = newMipMaps;
         }
 
         public MipMap LargestTexture

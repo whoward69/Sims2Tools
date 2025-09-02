@@ -135,6 +135,7 @@
     <Compile Include="Exporter\IExporter.cs" />
     <Compile Include="Exporter\Extractor.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Helpers\ColourHelper.cs" />
     <Compile Include="Helpers\CpfHelper.cs" />
     <Compile Include="IO\PjseStringFileReader.cs" />
     <Compile Include="IO\Sims2Directory.cs" />
@@ -148,6 +149,12 @@
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Sims2Tools.cs" />
+    <Compile Include="Dialogs\ThumbnailWarningDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ThumbnailWarningDialog.Designer.cs">
+      <DependentUpon>ThumbnailWarningDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ConfigDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -192,6 +199,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TextEntryDialog.resx">
       <DependentUpon>TextEntryDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ThumbnailWarningDialog.resx">
+      <DependentUpon>ThumbnailWarningDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\ConfigDialog.resx">
       <DependentUpon>ConfigDialog.cs</DependentUpon>

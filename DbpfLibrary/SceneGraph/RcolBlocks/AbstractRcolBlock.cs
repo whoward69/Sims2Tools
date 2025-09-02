@@ -35,6 +35,10 @@ namespace Sims2Tools.DBPF.SceneGraph
         protected bool _isDirty = false;
 
         public virtual bool IsDirty => _isDirty || (sgres != null && sgres.IsDirty);
+        public virtual void SetDirty()
+        {
+            _isDirty = true;
+        }
 
         public virtual void SetClean()
         {

@@ -80,6 +80,19 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 #endif
         }
 
+        public void UpdateFromDDSData(DDSData ddsData)
+        {
+            texturesize = ddsData.ParentSize;
+            // this.zlevel = this.zlevel;
+
+            format = ddsData.Format;
+            datatype = MipMapType.SimPE_PlainData;
+            data = ddsData.Data;
+            img = null;
+
+            _isDirty = true;
+        }
+
         public override void Unserialize(DbpfReader reader)
         {
 #if DEBUG
@@ -222,6 +235,38 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             Debug.Assert((writeEnd - writeStart) == FileSize);
             if (!IsDirty) Debug.Assert(((readEnd - readStart) == 0) || ((writeEnd - writeStart) == (readEnd - readStart)));
 #endif
+        }
+
+        public override IRcolBlock Duplicate(Rcol parent)
+        {
+            CLevelInfo newLevelInfo = new CLevelInfo(parent)
+            {
+                Version = this.Version
+            };
+
+            newLevelInfo.NameResource.SetVersion(this.NameResource.Version);
+            newLevelInfo.NameResource.BlockName = this.NameResource.BlockName;
+            newLevelInfo.NameResource.FileName = this.NameResource.FileName;
+
+#if !SERIALIZE_MIPMAPS
+            newLevelInfo.imageData = new byte[this.imageData.Length];
+            for (int i = 0; i < this.imageData.Length; ++i) newLevelInfo.imageData[i] = this.imageData[i];
+#endif
+
+            img = null;
+
+#if UNSERIALIZE_MIPMAPS
+            newLevelInfo.texturesize = new Size(this.texturesize.Width, this.texturesize.Height);
+            newLevelInfo.zlevel = this.zlevel;
+
+            newLevelInfo.format = this.format;
+            newLevelInfo.datatype = this.datatype;
+
+            newLevelInfo.data = new byte[this.data.Length];
+            for (int i = 0; i < this.data.Length; ++i) newLevelInfo.data[i] = this.data[i];
+#endif
+
+            return newLevelInfo;
         }
 
         public override void Dispose()

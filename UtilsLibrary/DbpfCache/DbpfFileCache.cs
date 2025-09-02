@@ -101,6 +101,17 @@ namespace Sims2Tools.DbpfCache
             return cache.Remove(packagePath);
         }
 
+        public void Clear()
+        {
+            foreach (CacheableDbpfFile package in cache.Values)
+            {
+                package.DeCache();
+                package.Close();
+            }
+
+            cache.Clear();
+        }
+
         public CacheableDbpfFile GetOrOpen(string packagePath)
         {
             if (cache.ContainsKey(packagePath))
