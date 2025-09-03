@@ -7,9 +7,9 @@
  */
 
 using Sims2Tools.Controls;
-using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -27,7 +27,7 @@ namespace SceneGraphPlus.Dialogs.Options
             InitializeComponent();
         }
 
-        public DialogResult ShowDialog(Point location, Mmat mmat, Gmnd gmnd)
+        public DialogResult ShowDialog(Point location, Mmat mmat, List<string> subsets)
         {
             this.mmat = mmat;
 
@@ -38,12 +38,12 @@ namespace SceneGraphPlus.Dialogs.Options
             btnDefMaterial.Enabled = false;
 
             originalSubset = mmat.SubsetName;
-            grpSubset.Enabled = (gmnd != null);
+            grpSubset.Enabled = (subsets.Count > 0);
 
             if (grpSubset.Enabled)
             {
                 comboSubset.Items.Clear();
-                foreach (string subset in gmnd.GetDesignModeEnabledSubsets())
+                foreach (string subset in subsets)
                 {
                     comboSubset.Items.Add(subset);
                 }

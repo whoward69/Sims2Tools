@@ -57,7 +57,7 @@ namespace SceneGraphPlus.Dialogs
             this.pictTexture.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictTexture.BackColor = System.Drawing.Color.White;
+            this.pictTexture.BackColor = System.Drawing.Color.Transparent;
             this.pictTexture.ContextMenuStrip = this.menuContextTexture;
             this.pictTexture.Location = new System.Drawing.Point(0, 0);
             this.pictTexture.Name = "pictTexture";
@@ -79,26 +79,26 @@ namespace SceneGraphPlus.Dialogs
             this.menuItemContext256,
             this.menuItemContext512});
             this.menuContextTexture.Name = "menuContextTexture";
-            this.menuContextTexture.Size = new System.Drawing.Size(157, 120);
+            this.menuContextTexture.Size = new System.Drawing.Size(155, 120);
             this.menuContextTexture.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             // 
             // menuItemContextAutoZoom
             // 
             this.menuItemContextAutoZoom.CheckOnClick = true;
             this.menuItemContextAutoZoom.Name = "menuItemContextAutoZoom";
-            this.menuItemContextAutoZoom.Size = new System.Drawing.Size(156, 22);
+            this.menuItemContextAutoZoom.Size = new System.Drawing.Size(154, 22);
             this.menuItemContextAutoZoom.Text = "Auto-&Zoom";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(153, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(151, 6);
             // 
             // menuItemContextAutoSize
             // 
             this.menuItemContextAutoSize.CheckOnClick = true;
             this.menuItemContextAutoSize.Name = "menuItemContextAutoSize";
-            this.menuItemContextAutoSize.Size = new System.Drawing.Size(156, 22);
+            this.menuItemContextAutoSize.Size = new System.Drawing.Size(154, 22);
             this.menuItemContextAutoSize.Text = "Auto-&Size";
             this.menuItemContextAutoSize.Click += new System.EventHandler(this.OnTextureSizeClicked);
             // 
@@ -106,7 +106,7 @@ namespace SceneGraphPlus.Dialogs
             // 
             this.menuItemContext128.CheckOnClick = true;
             this.menuItemContext128.Name = "menuItemContext128";
-            this.menuItemContext128.Size = new System.Drawing.Size(156, 22);
+            this.menuItemContext128.Size = new System.Drawing.Size(154, 22);
             this.menuItemContext128.Text = "&128 x 128 (max)";
             this.menuItemContext128.Click += new System.EventHandler(this.OnTextureSizeClicked);
             // 
@@ -114,7 +114,7 @@ namespace SceneGraphPlus.Dialogs
             // 
             this.menuItemContext256.CheckOnClick = true;
             this.menuItemContext256.Name = "menuItemContext256";
-            this.menuItemContext256.Size = new System.Drawing.Size(156, 22);
+            this.menuItemContext256.Size = new System.Drawing.Size(154, 22);
             this.menuItemContext256.Text = "&256 x 256 (max)";
             this.menuItemContext256.Click += new System.EventHandler(this.OnTextureSizeClicked);
             // 
@@ -122,7 +122,7 @@ namespace SceneGraphPlus.Dialogs
             // 
             this.menuItemContext512.CheckOnClick = true;
             this.menuItemContext512.Name = "menuItemContext512";
-            this.menuItemContext512.Size = new System.Drawing.Size(156, 22);
+            this.menuItemContext512.Size = new System.Drawing.Size(154, 22);
             this.menuItemContext512.Text = "&512 x 512 (max)";
             this.menuItemContext512.Click += new System.EventHandler(this.OnTextureSizeClicked);
             // 

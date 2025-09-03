@@ -140,6 +140,7 @@ namespace SceneGraphPlus
         {
             RegistryTools.LoadAppSettings(SceneGraphPlusApp.RegistryKey, SceneGraphPlusApp.AppVersionMajor, SceneGraphPlusApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(SceneGraphPlusApp.RegistryKey, this);
+            splitContainer.SplitterDistance = (int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey, "splitter", splitContainer.SplitterDistance);
 
             MyMruList = new MruList(SceneGraphPlusApp.RegistryKey, menuItemRecentPackages, Properties.Settings.Default.MruSize, true, false);
             MyMruList.FileSelected += MyMruList_FileSelected;
@@ -177,13 +178,13 @@ namespace SceneGraphPlus
                 else
                 {
                     logger.Warn("'cigen.package' not found - thumbnails will NOT display.");
-                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) MsgBox.Show("'cigen.package' not found - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'cigen.package' not found - thumbnails will NOT display.")).ShowDialog();
                 }
             }
             else
             {
                 logger.Warn("'Sims2HomePath' not set - thumbnails will NOT display.");
-                if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) MsgBox.Show("'Sims2HomePath' not set - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'Sims2HomePath' not set - thumbnails will NOT display.")).ShowDialog();
             }
 
             downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2DownloadsPath}"), UnderstoodTypeIds.ToArray());
@@ -591,7 +592,25 @@ namespace SceneGraphPlus
 
         public void DisplayTexture(GraphBlock block)
         {
-            if (block.TypeId == Txmt.TYPE)
+            if (block.TypeId == Mmat.TYPE)
+            {
+                GraphBlock txmtBlock = null;
+
+                foreach (GraphConnector connector in block.OutConnectors)
+                {
+                    if (!(connector.Label.Equals("guid") || connector.Label.Equals("model")))
+                    {
+                        txmtBlock = connector.EndBlock;
+                        break;
+                    }
+                }
+
+                if (txmtBlock != null)
+                {
+                    DisplayTexture(txmtBlock);
+                }
+            }
+            else if (block.TypeId == Txmt.TYPE)
             {
                 GraphBlock txtrBlock = null;
 
@@ -604,7 +623,19 @@ namespace SceneGraphPlus
                     }
                 }
 
-                ShowTexture(txtrBlock);
+                if (txtrBlock != null)
+                {
+                    ShowTexture(txtrBlock);
+                }
+                else
+                {
+                    Txmt txmt = (Txmt)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
+
+                    if (txmt != null)
+                    {
+                        ShowTexture(ColourHelper.ColourFromTxmtProperty(txmt, "stdMatDiffCoef"));
+                    }
+                }
             }
             else if (block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE)
             {
@@ -612,7 +643,17 @@ namespace SceneGraphPlus
             }
         }
 
+        private void ShowTexture(Color colour)
+        {
+            ShowTexture(null, colour);
+        }
+
         private void ShowTexture(GraphBlock block)
+        {
+            ShowTexture(block, Color.Transparent);
+        }
+
+        private void ShowTexture(GraphBlock block, Color colour)
         {
             if (textureDialog == null || textureDialog.IsDisposed)
             {
@@ -622,12 +663,13 @@ namespace SceneGraphPlus
             if (block != null)
             {
                 textureDialog.SetTextureFromKey(block.PackagePath, block.OriginalKey, block.SgFullName);
-                textureDialog.Focus();
             }
             else
             {
-                textureDialog.ClearTexture();
+                textureDialog.ClearTexture(colour);
             }
+
+            textureDialog.Focus();
         }
 
         public Image GetThumbnail(DBPFKey key)
@@ -690,6 +732,7 @@ namespace SceneGraphPlus
 
             Reset();
 
+            packageCache.Clear();
             packageFiles.Clear();
 
             UpdateForm();
@@ -1066,6 +1109,7 @@ namespace SceneGraphPlus
                     }
 
                     Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+                    startBlock.IsIdrValid = (idr != null);
 
                     if (idr != null)
                     {
@@ -1125,6 +1169,7 @@ namespace SceneGraphPlus
                     }
 
                     Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+                    startBlock.IsIdrValid = (idr != null);
 
                     if (idr != null)
                     {
@@ -1168,6 +1213,7 @@ namespace SceneGraphPlus
                         startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(xmol.Age)}{CpfHelper.GenderCode(xmol.Gender)}";
 
                         Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+                        startBlock.IsIdrValid = (idr != null);
 
                         if (idr != null)
                         {
@@ -1203,6 +1249,7 @@ namespace SceneGraphPlus
                         startBlock.Text = $"{startBlock.Text} {CpfHelper.AgeCode(xtol.Age)}{CpfHelper.GenderCode(xtol.Gender)}";
 
                         Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+                        startBlock.IsIdrValid = (idr != null);
 
                         if (idr != null)
                         {

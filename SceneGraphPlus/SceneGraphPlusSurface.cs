@@ -6,7 +6,9 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+#region Usings
 using Microsoft.WindowsAPICodePack.Dialogs;
+using SceneGraphPlus.Data;
 using SceneGraphPlus.Dialogs.Options;
 using SceneGraphPlus.Shapes;
 using Sims2Tools;
@@ -56,6 +58,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Windows.Forms;
 using static Sims2Tools.DBPF.Data.MetaData;
+#endregion
 
 namespace SceneGraphPlus.Surface
 {
@@ -69,10 +72,7 @@ namespace SceneGraphPlus.Surface
         public static readonly int ColumnGap = Properties.Settings.Default.ColumnGap;
         public static readonly int RowGap = Properties.Settings.Default.RowGap;
 
-        private readonly DbpfFileCache packageCache;
-
-        private readonly SceneGraphPlusForm owningForm;
-
+        #region Surface Dynamic Controls (context menus, dialogs, tooltip and thumbnail)
         private readonly Label lblTooltip = new Label();
         private readonly PictureBox picThumbnail = new PictureBox();
 
@@ -99,10 +99,60 @@ namespace SceneGraphPlus.Surface
         private readonly ContextMenuStrip menuContextConnector;
         private readonly ToolStripMenuItem menuItemContextSplitMulti;
         private readonly ToolStripMenuItem menuItemContextUnlink;
+        #endregion
 
-        private readonly List<GraphBlock> allBlocks = new List<GraphBlock>();
-        private readonly List<GraphConnector> allConnectors = new List<GraphConnector>();
+        #region Surface Options and Mode Tracking
+        private bool advancedMode = false;
+        private bool hideMissingBlocks = false;
+        private bool connectorsOver = true;
 
+        private bool dropToGrid = false;
+        private float gridScale = 1.0f;
+
+        public bool HideMissingBlocks
+        {
+            set
+            {
+                hideMissingBlocks = value;
+
+                Invalidate();
+            }
+        }
+
+        public bool AdvancedMode
+        {
+            set
+            {
+                advancedMode = value;
+
+                Invalidate();
+            }
+        }
+
+        public bool ConnectorsOver
+        {
+            set
+            {
+                connectorsOver = value;
+
+                Invalidate();
+            }
+        }
+
+        public bool DropToGrid
+        {
+            get => dropToGrid;
+            set => dropToGrid = value;
+        }
+
+        public float GridScale
+        {
+            get => gridScale;
+            set => gridScale = value;
+        }
+        #endregion
+
+        #region Surface Selected Shape Tracking
         private GraphBlock selectedBlock = null;
         private HashSet<GraphBlock> selectedBlockChain = null;
         private GraphBlock hoverBlock = null;
@@ -113,29 +163,32 @@ namespace SceneGraphPlus.Surface
         private GraphConnector hoverConnector = null;
         private GraphConnector dropOntoConnector = null;
         private GraphConnector contextConnector = null;
+        #endregion
 
+        #region Surface Mouse Tracking
         private bool moving;
         private Point previousPoint = Point.Empty;
-
-        private bool dropToGrid = false;
-        private float gridScale = 1.0f;
-
-        private bool advancedMode = false;
-        private bool hideMissingBlocks = false;
-        private bool connectorsOver = true;
 
         private DateTime mouseLastClick;
         private bool inDoubleClick = false;
         private Rectangle doubleClickArea;
         private TimeSpan doubleClickMaxTime;
         private readonly Timer mouseClickTimer;
+        #endregion
 
+        private readonly SceneGraphPlusForm owningForm;
+        private readonly DbpfFileCache packageCache;
 
+        private readonly List<GraphBlock> allBlocks = new List<GraphBlock>();
+        private readonly List<GraphConnector> allConnectors = new List<GraphConnector>();
+
+        #region Surface Constructor and Reset
         public DrawingSurface(SceneGraphPlusForm owningForm, DbpfFileCache packageCache)
         {
             this.owningForm = owningForm;
             this.packageCache = packageCache;
 
+            #region Block Context Menu Initialisation
             {
                 menuContextBlock = new ContextMenuStrip();
                 menuItemContextTexture = new ToolStripMenuItem();
@@ -249,7 +302,9 @@ namespace SceneGraphPlus.Surface
 
                 menuContextBlock.ResumeLayout(false);
             }
+            #endregion
 
+            #region Connector Context Menu Initialisation
             {
                 menuContextConnector = new ContextMenuStrip();
                 menuItemContextSplitMulti = new ToolStripMenuItem();
@@ -273,7 +328,9 @@ namespace SceneGraphPlus.Surface
 
                 menuContextConnector.ResumeLayout(false);
             }
+            #endregion
 
+            #region Tooltip Initialisation
             {
                 lblTooltip.Visible = false;
                 lblTooltip.AutoSize = true;
@@ -289,7 +346,9 @@ namespace SceneGraphPlus.Surface
                 picThumbnail.Visible = false;
                 this.Controls.Add(picThumbnail);
             }
+            #endregion
 
+            #region Dialog Initialisation
             selectPathDialog = new CommonOpenFileDialog
             {
                 IsFolderPicker = true
@@ -301,7 +360,9 @@ namespace SceneGraphPlus.Surface
                 DefaultExt = "package",
                 Filter = "DBPF Package|*.package"
             };
+            #endregion
 
+            #region Mouse Tracking Initialisation
             doubleClickMaxTime = TimeSpan.FromMilliseconds(SystemInformation.DoubleClickTime);
 
             mouseClickTimer = new Timer
@@ -309,12 +370,41 @@ namespace SceneGraphPlus.Surface
                 Interval = SystemInformation.DoubleClickTime
             };
             mouseClickTimer.Tick += MouseClickTimer_Tick;
+            #endregion
 
             DoubleBuffered = true;
 
             Reset(false);
         }
 
+        public void Reset(bool flushEditor = true)
+        {
+            hideMissingBlocks = false;
+
+            editBlock = null;
+            selectedBlock = null;
+            selectedBlockChain = null;
+            hoverBlock = null;
+            dropOntoBlocks.Clear();
+            contextBlock = null;
+
+            hoverConnector = null;
+            dropOntoConnector = null;
+            contextConnector = null;
+
+            allBlocks.Clear();
+            allConnectors.Clear();
+
+            Invalidate();
+
+            if (flushEditor)
+            {
+                owningForm.UpdateEditor(editBlock);
+            }
+        }
+        #endregion
+
+        #region Surface State Tracking
         public bool IsDirty
         {
             get
@@ -345,54 +435,62 @@ namespace SceneGraphPlus.Surface
 
             return false;
         }
+        #endregion
 
-        public bool HideMissingBlocks
-        {
-            set
-            {
-                hideMissingBlocks = value;
+        #region Surface Layout of Shapes
+        public int MinWidth => NextFreeCol - ColumnGap / 2;
 
-                Invalidate();
-            }
-        }
-
-        public bool AdvancedMode
-        {
-            set
-            {
-                advancedMode = value;
-
-                Invalidate();
-            }
-        }
-
-        public bool ConnectorsOver
-        {
-            set
-            {
-                connectorsOver = value;
-
-                Invalidate();
-            }
-        }
-
-        public bool DropToGrid
-        {
-            get => dropToGrid;
-            set => dropToGrid = value;
-        }
-
-        public float GridScale
-        {
-            get => gridScale;
-            set => gridScale = value;
-        }
+        public int MinHeight => NextFreeRow - RowGap / 2;
 
         public void ResizeToFit()
         {
             if (MinWidth > this.Width || MinHeight > this.Height)
             {
                 this.Size = new Size(Math.Max(MinWidth, this.Width), Math.Max(MinHeight, this.Height));
+            }
+        }
+
+        public int NextFreeCol
+        {
+            get
+            {
+                int highestX = 0;
+
+                if (allBlocks.Count > 0)
+                {
+                    foreach (GraphBlock block in allBlocks)
+                    {
+                        if (hideMissingBlocks && block.IsMissing) continue;
+
+                        if (block.Centre.X > highestX) highestX = block.Centre.X;
+                    }
+
+                    highestX = ((highestX + ColumnGap - 1) / ColumnGap) * ColumnGap;
+                }
+
+                return highestX + (ColumnGap / 2);
+            }
+        }
+
+        public int NextFreeRow
+        {
+            get
+            {
+                int highestY = 0;
+
+                if (allBlocks.Count > 0)
+                {
+                    foreach (GraphBlock block in allBlocks)
+                    {
+                        if (hideMissingBlocks && block.IsMissing) continue;
+
+                        if (block.Centre.Y > highestY) highestY = block.Centre.Y;
+                    }
+
+                    highestY = ((highestY + RowGap - 1) / RowGap) * RowGap;
+                }
+
+                return highestY + (RowGap / 2);
             }
         }
 
@@ -464,8 +562,14 @@ namespace SceneGraphPlus.Surface
 
             if (freeCol > startCol) freeCol -= ColumnGap;
         }
+        #endregion
 
-        public void Add(GraphShape shape)
+        #region Shape Arrays Manipulation
+        /// <summary>
+        /// Adds the block or connector to the surface,
+        /// allowing it to be drawn and detected.
+        /// </summary>
+        public void AddShape(GraphShape shape)
         {
             if (shape is GraphBlock block)
             {
@@ -481,7 +585,12 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-        public void Remove(GraphShape shape)
+        /// <summary>
+        /// Removes the block or connector from the surface.
+        /// Does NOT disconnect a block from its associated connectors and
+        /// does NOT disconnect a connector from its start and end blocks.
+        /// </summary>
+        public void RemoveShape(GraphShape shape)
         {
             if (shape is GraphBlock block)
             {
@@ -504,80 +613,82 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-        public void Reset(bool flushEditor = true)
+        /// <summary>
+        /// Mark this unattached block for deletion.
+        /// Disconnect block from children and discard associated connectors.
+        /// </summary>
+        private void MarkBlockForDeletion(GraphBlock block)
         {
-            hideMissingBlocks = false;
+            Trace.Assert(block.GetInConnectors().Count == 0, "Cannot delete block with in connectors");
+            Trace.Assert(block.IsEditable, "Cannot delete a 'read-only' block");
 
-            editBlock = null;
-            selectedBlock = null;
-            selectedBlockChain = null;
-            hoverBlock = null;
-            dropOntoBlocks.Clear();
-            contextBlock = null;
-
-            hoverConnector = null;
-            dropOntoConnector = null;
-            contextConnector = null;
-
-            allBlocks.Clear();
-            allConnectors.Clear();
-
-            Invalidate();
-
-            if (flushEditor)
+            foreach (GraphConnector connector in block.GetOutConnectors())
             {
+                connector.EndBlock.UnlinkFrom(connector);
+                RemoveShape(connector);
+            }
+
+            block.MarkForDeletion();
+
+            if (block.Equals(editBlock))
+            {
+                editBlock = null;
                 owningForm.UpdateEditor(editBlock);
             }
         }
 
-        public int MinWidth => NextFreeCol - ColumnGap / 2;
-
-        public int MinHeight => NextFreeRow - RowGap / 2;
-
-        public int NextFreeCol
+        /// <summary>
+        /// Deletes an unattached chain of blocks from the bottom to the top
+        /// by repeatedly calling MarkBlockForDeletion.
+        /// </summary>
+        private void MarkChainForDeletion(GraphBlock startBlock)
         {
-            get
+            Trace.Assert(contextBlock.GetInConnectors().Count == 0, "Cannot delete chain with in connectors");
+            Trace.Assert(contextBlock.IsEditable, "Cannot delete a 'read-only' block");
+
+            foreach (GraphConnector connector in startBlock.GetOutConnectors()) // GetOutConnectors() allows us to use DisconnectFrom() below
             {
-                int highestX = 0;
-
-                if (allBlocks.Count > 0)
+                if (connector.EndBlock.GetInConnectors().Count == 1)
                 {
-                    foreach (GraphBlock block in allBlocks)
-                    {
-                        if (hideMissingBlocks && block.IsMissing) continue;
+                    MarkChainForDeletion(connector.EndBlock);
 
-                        if (block.Centre.X > highestX) highestX = block.Centre.X;
-                    }
-
-                    highestX = ((highestX + ColumnGap - 1) / ColumnGap) * ColumnGap;
+                    connector.EndBlock.UnlinkFrom(connector);
                 }
-
-                return highestX + (ColumnGap / 2);
             }
+
+            MarkBlockForDeletion(startBlock);
         }
 
-        public int NextFreeRow
+        private bool SeenIdenticalConnector(int i)
         {
-            get
+            for (int j = i - 1; j > 0; --j)
             {
-                int highestY = 0;
-
-                if (allBlocks.Count > 0)
+                if (allConnectors[i].Equals(allConnectors[j]))
                 {
-                    foreach (GraphBlock block in allBlocks)
-                    {
-                        if (hideMissingBlocks && block.IsMissing) continue;
-
-                        if (block.Centre.Y > highestY) highestY = block.Centre.Y;
-                    }
-
-                    highestY = ((highestY + RowGap - 1) / RowGap) * RowGap;
+                    return true;
                 }
-
-                return highestY + (RowGap / 2);
             }
+
+            return false;
         }
 
+        private int CountIdenticalConnectors(int i)
+        {
+            int count = 1;
+
+            for (int j = i + 1; j < allConnectors.Count; ++j)
+            {
+                if (allConnectors[i].Equals(allConnectors[j]))
+                {
+                    ++count;
+                }
+            }
+
+            return count;
+        }
+        #endregion
+
+        #region Block Chain Retrieval and Manipulation
         private HashSet<GraphBlock> GetBlockChain(GraphBlock startBlock, bool meshOnly, bool materialsOnly, bool rightOnly)
         {
             HashSet<GraphBlock> chain = GetOutBlockChain(startBlock, meshOnly, materialsOnly);
@@ -634,6 +745,37 @@ namespace SceneGraphPlus.Surface
             return chain;
         }
 
+        private void HideBlockChain(GraphBlock startBlock)
+        {
+            startBlock.Hide();
+
+            foreach (GraphConnector outConnector in startBlock.OutConnectors)
+            {
+                List<GraphConnector> visibleInConnectors = new List<GraphConnector>();
+
+                foreach (GraphConnector inConnector in outConnector.EndBlock.GetInConnectors())
+                {
+                    if (!inConnector.StartBlock.IsHidden)
+                    {
+                        visibleInConnectors.Add(inConnector);
+                    }
+                }
+
+                if (visibleInConnectors.Count == 0)
+                {
+                    HideBlockChain(outConnector.EndBlock);
+                }
+            }
+
+            if (startBlock.Equals(editBlock))
+            {
+                editBlock = null;
+                owningForm.UpdateEditor(editBlock);
+            }
+        }
+        #endregion
+
+        #region Editor Based Updates
         public void ChangeEditingSgName(string sgName, bool prefixLowerCase)
         {
             if (editBlock != null)
@@ -832,7 +974,7 @@ namespace SceneGraphPlus.Surface
                 foreach (GraphConnector connector in inConnectors)
                 {
                     connector.SetEndBlock(fixBlock, false);
-                    block.DisconnectFrom(connector);
+                    block.UnlinkFrom(connector);
                 }
 
                 block.Discard();
@@ -840,15 +982,16 @@ namespace SceneGraphPlus.Surface
 
             Invalidate();
         }
+        #endregion
 
-        #region Context Menu
+        #region Block Context Menu Events
         private void OnContextBlockOpening(object sender, CancelEventArgs e)
         {
             if (contextBlock != null)
             {
                 if (!contextBlock.IsMissingOrClone)
                 {
-                    menuItemContextTexture.Visible = (contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE);
+                    menuItemContextTexture.Visible = (contextBlock.TypeId == Mmat.TYPE || contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE);
 
                     menuItemContextDelete.Visible = advancedMode;
                     menuItemContextDelete.Enabled = (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0);
@@ -976,7 +1119,7 @@ namespace SceneGraphPlus.Surface
 
         private void OnContextBlockTexture(object sender, EventArgs e)
         {
-            Trace.Assert(contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE, "Expected TXMT, TXTR or LIFO");
+            Trace.Assert(contextBlock.TypeId == Mmat.TYPE || contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE, "Expected MMAT, TXMT, TXTR or LIFO");
 
             owningForm.DisplayTexture(contextBlock);
         }
@@ -984,54 +1127,16 @@ namespace SceneGraphPlus.Surface
         private void OnContextBlockDelete(object sender, EventArgs e)
         {
             Trace.Assert(contextBlock.OutConnectors.Count == 0, "Cannot delete block with out connectors");
-            DeleteBlock(contextBlock);
+            MarkBlockForDeletion(contextBlock);
 
             Invalidate();
-        }
-
-        private void DeleteBlock(GraphBlock block)
-        {
-            Trace.Assert(block.GetInConnectors().Count == 0, "Cannot delete block with in connectors");
-            Trace.Assert(block.IsEditable, "Cannot delete a 'read-only' block");
-
-            foreach (GraphConnector connector in block.GetOutConnectors())
-            {
-                connector.EndBlock.DisconnectFrom(connector);
-                Remove(connector);
-            }
-
-            block.Delete();
-
-            if (block.Equals(editBlock))
-            {
-                editBlock = null;
-                owningForm.UpdateEditor(editBlock);
-            }
         }
 
         private void OnContextBlockDeleteChain(object sender, EventArgs e)
         {
-            DeleteChain(contextBlock);
+            MarkChainForDeletion(contextBlock);
 
             Invalidate();
-        }
-
-        private void DeleteChain(GraphBlock startBlock)
-        {
-            Trace.Assert(contextBlock.GetInConnectors().Count == 0, "Cannot delete chain with in connectors");
-            Trace.Assert(contextBlock.IsEditable, "Cannot delete a 'read-only' block");
-
-            foreach (GraphConnector connector in startBlock.GetOutConnectors()) // GetOutConnectors() allows us to use DisconnectFrom() below
-            {
-                if (connector.EndBlock.GetInConnectors().Count == 1)
-                {
-                    DeleteChain(connector.EndBlock);
-
-                    connector.EndBlock.DisconnectFrom(connector);
-                }
-            }
-
-            DeleteBlock(startBlock);
         }
 
         private void OnContextBlockHide(object sender, EventArgs e)
@@ -1053,92 +1158,9 @@ namespace SceneGraphPlus.Surface
         {
             Trace.Assert(contextBlock.GetInConnectors().Count == 0, "Cannot hide chain with in connectors");
 
-            HideChain(contextBlock);
+            HideBlockChain(contextBlock);
 
             Invalidate();
-        }
-
-        private void HideChain(GraphBlock startBlock)
-        {
-            startBlock.Hide();
-
-            foreach (GraphConnector outConnector in startBlock.OutConnectors)
-            {
-                List<GraphConnector> visibleInConnectors = new List<GraphConnector>();
-
-                foreach (GraphConnector inConnector in outConnector.EndBlock.GetInConnectors())
-                {
-                    if (!inConnector.StartBlock.IsHidden)
-                    {
-                        visibleInConnectors.Add(inConnector);
-                    }
-                }
-
-                if (visibleInConnectors.Count == 0)
-                {
-                    HideChain(outConnector.EndBlock);
-                }
-            }
-
-            if (startBlock.Equals(editBlock))
-            {
-                editBlock = null;
-                owningForm.UpdateEditor(editBlock);
-            }
-        }
-
-        public void CloseFilters()
-        {
-            owningForm.CloseFilters();
-        }
-
-        public void ApplyFilters(BlockFilters filters)
-        {
-            // Do NOT merge these two loops!!!
-            foreach (GraphBlock block in allBlocks)
-            {
-                block.Filter(false);
-            }
-
-            foreach (GraphBlock block in allBlocks)
-            {
-                if (block.TypeId == Gzps.TYPE || block.TypeId == Aged.TYPE || block.TypeId == Xmol.TYPE || block.TypeId == Xtol.TYPE)
-                {
-                    if (filters.Exclude(block.Text))
-                    {
-                        FilterChain(block);
-                    }
-                }
-            }
-        }
-
-        private void FilterChain(GraphBlock startBlock)
-        {
-            startBlock.Filter(true);
-
-            foreach (GraphConnector outConnector in startBlock.OutConnectors)
-            {
-                List<GraphConnector> visibleInConnectors = new List<GraphConnector>();
-
-                foreach (GraphConnector inConnector in outConnector.EndBlock.GetInConnectors())
-                {
-                    if (!inConnector.StartBlock.IsHidden)
-                    {
-                        visibleInConnectors.Add(inConnector);
-                    }
-                }
-
-                if (visibleInConnectors.Count == 0)
-                {
-                    FilterChain(outConnector.EndBlock);
-                }
-            }
-
-            if (startBlock.Equals(editBlock))
-            {
-                editBlock = null;
-                owningForm.UpdateEditor(editBlock);
-            }
         }
 
         private void OnContextBlockExport(object sender, EventArgs e)
@@ -1218,6 +1240,190 @@ namespace SceneGraphPlus.Surface
             }
         }
 
+        private void OnContextBlockFixTgir(object sender, EventArgs e)
+        {
+            FixTgir(contextBlock);
+        }
+
+        private void OnContextBlockFixFileList(object sender, EventArgs e)
+        {
+            FixIssues(contextBlock);
+        }
+
+        private void OnContextBlockFixLight(object sender, EventArgs e)
+        {
+            FixIssues(contextBlock);
+        }
+
+        private void OnContextBlockFixLanguages(object sender, EventArgs e)
+        {
+            FixIssues(contextBlock);
+        }
+
+        private void OnContextBlockCopySgName(object sender, EventArgs e)
+        {
+            string sgName = contextBlock.SoleRcolParent?.SgBaseName;
+
+            if (sgName != null)
+            {
+                contextBlock.SetSgFullName(sgName, owningForm.IsPrefixLowerCase);
+                contextBlock.SetDirty();
+
+                Invalidate();
+
+                if (contextBlock.Equals(editBlock))
+                {
+                    owningForm.UpdateEditor(editBlock);
+                }
+            }
+        }
+
+        private void OnContextBlockSplitBlock(object sender, EventArgs e)
+        {
+            int shiftMultiplier = 0;
+
+            foreach (GraphConnector connector in contextBlock.GetInConnectors())
+            {
+                if (shiftMultiplier > 0)
+                {
+                    connector.SetEndBlock(connector.EndBlock.MakeClone(new Point((ColumnGap / 8) * shiftMultiplier, (RowGap / 8) * shiftMultiplier)), false);
+                }
+
+                ++shiftMultiplier;
+            }
+        }
+
+        private void OnContextBlockOpenPackage(object sender, EventArgs e)
+        {
+            owningForm.OpenPackage(contextBlock.Key);
+        }
+
+        private void OnContextBlockClosePackage(object sender, EventArgs e)
+        {
+            owningForm.ClosePackage(contextBlock.PackagePath);
+        }
+        #endregion
+
+        #region Connector Context Menu Events
+        private void OnContextConnectorOpening(object sender, CancelEventArgs e)
+        {
+            if (contextConnector != null)
+            {
+                if (CountIdenticalConnectors(allConnectors.IndexOf(contextConnector)) > 1)
+                {
+                    menuItemContextSplitMulti.Visible = true;
+                    menuItemContextUnlink.Visible = false;
+                }
+                else if (contextConnector.StartBlock.TypeId == Str.TYPE && (contextConnector.EndBlock.TypeId == Cres.TYPE || contextConnector.EndBlock.TypeId == Txmt.TYPE))
+                {
+                    menuItemContextUnlink.Visible = true;
+                    menuItemContextSplitMulti.Visible = false;
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        private void OnContextConnectorSplitMulti(object sender, EventArgs e)
+        {
+            int shiftMultiplier = 1;
+
+            foreach (GraphConnector connector in new List<GraphConnector>(allConnectors)) // Make a copy, as we're changing the connectors list
+            {
+                if (connector == contextConnector) continue;
+
+                if (connector.Equals(contextConnector))
+                {
+                    connector.SetEndBlock(connector.EndBlock.MakeClone(new Point((ColumnGap / 8) * shiftMultiplier, (RowGap / 8) * shiftMultiplier)), false);
+
+                    ++shiftMultiplier;
+                }
+            }
+        }
+
+        private void OnContextConnectorUnlink(object sender, EventArgs e)
+        {
+            Trace.Assert(contextConnector.StartBlock.TypeId == Str.TYPE, "Expected start block to be a STR#");
+            Trace.Assert(contextConnector.EndBlock.TypeId == Cres.TYPE || contextConnector.EndBlock.TypeId == Txmt.TYPE, "Expected end block to be a CRES or TXMT");
+
+            GraphBlock startBlock = contextConnector.StartBlock;
+            GraphBlock disconnectedEndBlock = contextConnector.EndBlock;
+
+            disconnectedEndBlock.UnlinkFrom(contextConnector);
+
+            startBlock.UnconnectTo(contextConnector);
+            startBlock.SetDirty();
+
+            contextConnector.Discard();
+
+            if (disconnectedEndBlock.IsMissingOrClone)
+            {
+                if (disconnectedEndBlock.GetInConnectors().Count == 0) disconnectedEndBlock.Discard();
+            }
+
+            Invalidate();
+        }
+        #endregion
+
+        #region Filters
+        public void CloseFilters()
+        {
+            owningForm.CloseFilters();
+        }
+
+        public void ApplyFilters(BlockFilters filters)
+        {
+            // Do NOT merge these two loops!!!
+            foreach (GraphBlock block in allBlocks)
+            {
+                block.Filter(false);
+            }
+
+            foreach (GraphBlock block in allBlocks)
+            {
+                if (block.TypeId == Gzps.TYPE || block.TypeId == Aged.TYPE || block.TypeId == Xmol.TYPE || block.TypeId == Xtol.TYPE)
+                {
+                    if (filters.Exclude(block.Text))
+                    {
+                        FilterChain(block);
+                    }
+                }
+            }
+        }
+
+        private void FilterChain(GraphBlock startBlock)
+        {
+            startBlock.Filter(true);
+
+            foreach (GraphConnector outConnector in startBlock.OutConnectors)
+            {
+                List<GraphConnector> visibleInConnectors = new List<GraphConnector>();
+
+                foreach (GraphConnector inConnector in outConnector.EndBlock.GetInConnectors())
+                {
+                    if (!inConnector.StartBlock.IsHidden)
+                    {
+                        visibleInConnectors.Add(inConnector);
+                    }
+                }
+
+                if (visibleInConnectors.Count == 0)
+                {
+                    FilterChain(outConnector.EndBlock);
+                }
+            }
+
+            if (startBlock.Equals(editBlock))
+            {
+                editBlock = null;
+                owningForm.UpdateEditor(editBlock);
+            }
+        }
+        #endregion
+
+        #region Extraction
         private void ExtractCustomMesh(IExporter exporter)
         {
             ExtractCustomMeshOrRecolour(exporter, true);
@@ -1298,7 +1504,7 @@ namespace SceneGraphPlus.Surface
                         if (deletableBlock.GetInConnectors().Count == 1)
                         {
                             GraphConnector connector = deletableBlock.GetInConnectors()[0];
-                            connector.EndBlock.DisconnectFrom(connector);
+                            connector.EndBlock.UnlinkFrom(connector);
                         }
 
                         // TODO - SceneGraph Plus - exporting - and for GZPS et al, delete the associated BINX/3IDR resources
@@ -1308,8 +1514,8 @@ namespace SceneGraphPlus.Surface
 
                         exportedBlocks.Remove(deletableBlock);
 
-                        DeleteBlock(deletableBlock);
-                        Remove(deletableBlock);
+                        MarkBlockForDeletion(deletableBlock);
+                        deletableBlock.Discard();
                     }
                 } while (exportedBlocks.Count > 0 && deletableBlock != null);
             }
@@ -1429,159 +1635,9 @@ namespace SceneGraphPlus.Surface
                 }
             }
         }
-
-        private void OnContextBlockFixTgir(object sender, EventArgs e)
-        {
-            FixTgir(contextBlock);
-        }
-
-        private void OnContextBlockFixFileList(object sender, EventArgs e)
-        {
-            FixIssues(contextBlock);
-        }
-
-        private void OnContextBlockFixLight(object sender, EventArgs e)
-        {
-            FixIssues(contextBlock);
-        }
-
-        private void OnContextBlockFixLanguages(object sender, EventArgs e)
-        {
-            FixIssues(contextBlock);
-        }
-
-        private void OnContextBlockCopySgName(object sender, EventArgs e)
-        {
-            string sgName = contextBlock.SoleRcolParent?.SgBaseName;
-
-            if (sgName != null)
-            {
-                contextBlock.SetSgFullName(sgName, owningForm.IsPrefixLowerCase);
-                contextBlock.SetDirty();
-
-                Invalidate();
-
-                if (contextBlock.Equals(editBlock))
-                {
-                    owningForm.UpdateEditor(editBlock);
-                }
-            }
-        }
-
-        private void OnContextBlockSplitBlock(object sender, EventArgs e)
-        {
-            int shiftMultiplier = 0;
-
-            foreach (GraphConnector connector in contextBlock.GetInConnectors())
-            {
-                if (shiftMultiplier > 0)
-                {
-                    connector.SetEndBlock(connector.EndBlock.MakeClone(new Point((ColumnGap / 8) * shiftMultiplier, (RowGap / 8) * shiftMultiplier)), false);
-                }
-
-                ++shiftMultiplier;
-            }
-        }
-
-        private void OnContextBlockOpenPackage(object sender, EventArgs e)
-        {
-            owningForm.OpenPackage(contextBlock.Key);
-        }
-
-        public void UpdateAvailableBlocks()
-        {
-            foreach (GraphBlock block in allBlocks)
-            {
-                block.IsAvailable = owningForm.IsAvailable(block.Key);
-            }
-
-            Invalidate();
-        }
-
-        private void OnContextBlockClosePackage(object sender, EventArgs e)
-        {
-            owningForm.ClosePackage(contextBlock.PackagePath);
-        }
-
-        public bool ClosePackage(string packagePathToClose)
-        {
-            foreach (GraphBlock block in allBlocks)
-            {
-                if (block.PackagePath.Equals(packagePathToClose))
-                {
-                    block.Close();
-                }
-            }
-
-            Invalidate();
-
-            return true;
-        }
-
-
-        private void OnContextConnectorOpening(object sender, CancelEventArgs e)
-        {
-            if (contextConnector != null)
-            {
-                if (CountIdenticalConnectors(allConnectors.IndexOf(contextConnector)) > 1)
-                {
-                    menuItemContextSplitMulti.Visible = true;
-                    menuItemContextUnlink.Visible = false;
-                }
-                else if (contextConnector.StartBlock.TypeId == Str.TYPE && (contextConnector.EndBlock.TypeId == Cres.TYPE || contextConnector.EndBlock.TypeId == Txmt.TYPE))
-                {
-                    menuItemContextUnlink.Visible = true;
-                    menuItemContextSplitMulti.Visible = false;
-                }
-                else
-                {
-                    e.Cancel = true;
-                }
-            }
-        }
-
-        private void OnContextConnectorSplitMulti(object sender, EventArgs e)
-        {
-            int shiftMultiplier = 1;
-
-            foreach (GraphConnector connector in new List<GraphConnector>(allConnectors)) // Make a copy, as we're changing the connectors list
-            {
-                if (connector == contextConnector) continue;
-
-                if (connector.Equals(contextConnector))
-                {
-                    connector.SetEndBlock(connector.EndBlock.MakeClone(new Point((ColumnGap / 8) * shiftMultiplier, (RowGap / 8) * shiftMultiplier)), false);
-
-                    ++shiftMultiplier;
-                }
-            }
-        }
-
-        private void OnContextConnectorUnlink(object sender, EventArgs e)
-        {
-            Trace.Assert(contextConnector.StartBlock.TypeId == Str.TYPE, "Expected start block to be a STR#");
-            Trace.Assert(contextConnector.EndBlock.TypeId == Cres.TYPE || contextConnector.EndBlock.TypeId == Txmt.TYPE, "Expected end block to be a CRES or TXMT");
-
-            GraphBlock startBlock = contextConnector.StartBlock;
-            GraphBlock disconnectedEndBlock = contextConnector.EndBlock;
-
-            disconnectedEndBlock.DisconnectFrom(contextConnector);
-
-            startBlock.OutConnectors.Remove(contextConnector);
-            startBlock.SetDirty();
-
-            contextConnector.Discard();
-
-            if (disconnectedEndBlock.IsMissingOrClone)
-            {
-                if (disconnectedEndBlock.GetInConnectors().Count == 0) disconnectedEndBlock.Discard();
-            }
-
-            Invalidate();
-        }
         #endregion
 
-        #region Keys
+        #region Key Tracking
         protected override void OnKeyUp(KeyEventArgs e)
         {
             if (e.KeyCode == Keys.ShiftKey || e.KeyCode == Keys.LShiftKey || e.KeyCode == Keys.RShiftKey)
@@ -1632,7 +1688,7 @@ namespace SceneGraphPlus.Surface
         }
         #endregion
 
-        #region Mouse
+        #region Mouse Tracking
         private void MouseClickTimer_Tick(object sender, EventArgs e)
         {
             // Clear double click watcher and timer
@@ -1760,7 +1816,7 @@ namespace SceneGraphPlus.Surface
                                 foreach (GraphConnector connector in inConnectors)
                                 {
                                     connector.SetEndBlock(selectedBlock, true);
-                                    dropOntoBlock.DisconnectFrom(connector);
+                                    dropOntoBlock.UnlinkFrom(connector);
 
                                     connector.StartBlock.SetDirty();
                                 }
@@ -1785,6 +1841,10 @@ namespace SceneGraphPlus.Surface
                             GraphBlock disconnectedEndBlock = dropOntoConnector.EndBlock;
 
                             dropOntoConnector.SetEndBlock(selectedBlock, true);
+                            if (selectedBlock.TypeId == Txmt.TYPE && dropOntoConnector.StartBlock.TypeId == Mmat.TYPE)
+                            {
+                                dropOntoConnector.StartBlock.BlockName = selectedBlock.SgFullName;
+                            }
 
                             dropOntoConnector.StartBlock.SetDirty();
 
@@ -2194,7 +2254,7 @@ namespace SceneGraphPlus.Surface
         }
         #endregion
 
-        #region DoubleClick
+        #region Double Click Tracking
         private void OnBlockDoubleClick(Point mouseScreenLocation)
         {
             if (hoverBlock != null)
@@ -2210,16 +2270,18 @@ namespace SceneGraphPlus.Surface
 
                     string originalSubsetName = mmat.SubsetName;
 
-                    GraphBlock gmndBlock = GetGmndBlock(hoverBlock);
-                    Gmnd gmnd = null;
+                    List<GraphBlock> gmndBlocks = GetGmndBlocks(hoverBlock);
+                    List<string> subsets = new List<string>();
 
-                    if (gmndBlock != null)
+                    if (gmndBlocks.Count > 0)
                     {
-                        CacheableDbpfFile gmndPackage = packageCache.GetOrAdd(gmndBlock.PackagePath);
-                        gmnd = (Gmnd)gmndPackage.GetResourceByKey(gmndBlock.OriginalKey);
+                        foreach (GraphBlock gmndBlock in gmndBlocks)
+                        {
+                            subsets.AddRange(((Gmnd)packageCache.GetOrAdd(gmndBlock.PackagePath).GetResourceByKey(gmndBlock.OriginalKey)).GetDesignModeEnabledSubsets());
+                        }
                     }
 
-                    if ((new MmatDialog().ShowDialog(mouseScreenLocation, mmat, gmnd)) == DialogResult.OK)
+                    if ((new MmatDialog().ShowDialog(mouseScreenLocation, mmat, subsets)) == DialogResult.OK)
                     {
                         if (mmat.IsDirty)
                         {
@@ -2244,7 +2306,6 @@ namespace SceneGraphPlus.Surface
                 else if (hoverBlock.TypeId == Objd.TYPE)
                 {
                     CacheableDbpfFile objdPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
-                    CacheableDbpfFile gmndPackage = null;
 
                     Objd objd = (Objd)objdPackage.GetResourceByKey(hoverBlock.OriginalKey);
                     Trace.Assert(objd != null, $"Double-Click: Missing resource for {hoverBlock.OriginalKey}");
@@ -2253,27 +2314,37 @@ namespace SceneGraphPlus.Surface
 
                     TypeGUID originalGuid = objd.Guid;
                     int defaultGraphic = objd.GetRawData(ObjdIndex.DefaultGraphic);
-                    GraphBlock gmndBlock = GetGmndBlock(hoverBlock, defaultGraphic);
-                    GraphBlock gmdcBlock = GetGmdcBlock(gmndBlock);
+                    List<GraphBlock> gmndBlocks = GetGmndBlocks(hoverBlock, defaultGraphic);
 
-                    DBPFResource cres = null, shpe = null, gmnd = null, gmdc = null;
+                    string cresSgName = null;
+                    Dictionary<string, SubsetData> subsets = new Dictionary<string, SubsetData>();
 
-                    if (gmdcBlock != null)
+                    if (gmndBlocks.Count > 0)
                     {
                         GraphBlock cresBlock = hoverBlock.OutConnectorByLabel("Model Names").EndBlock.OutConnectorByIndex(defaultGraphic).EndBlock;
-                        cres = packageCache.GetOrAdd(cresBlock.PackagePath).GetResourceByKey(cresBlock.OriginalKey);
+                        cresSgName = ((Cres)packageCache.GetOrAdd(cresBlock.PackagePath).GetResourceByKey(cresBlock.OriginalKey)).SgName;
 
-                        GraphBlock shpeBlock = cresBlock.OutConnectorByIndex(0).EndBlock;
-                        shpe = packageCache.GetOrAdd(shpeBlock.PackagePath).GetResourceByKey(shpeBlock.OriginalKey);
+                        foreach (GraphBlock gmndBlock in gmndBlocks)
+                        {
+                            GraphBlock shpeBlock = GetShpeBlock(gmndBlock);
+                            Shpe shpe = (Shpe)packageCache.GetOrAdd(shpeBlock.PackagePath).GetResourceByKey(shpeBlock.OriginalKey);
 
-                        gmndPackage = packageCache.GetOrAdd(gmndBlock.PackagePath);
-                        gmnd = gmndPackage.GetResourceByKey(gmndBlock.OriginalKey);
-                        gmdc = packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.OriginalKey);
+                            GraphBlock gmdcBlock = GetGmdcBlock(gmndBlock);
+                            Gmnd gmnd = (Gmnd)packageCache.GetOrAdd(gmndBlock.PackagePath).GetResourceByKey(gmndBlock.OriginalKey);
+
+                            if (gmdcBlock != null)
+                            {
+                                foreach (string subset in ((Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.OriginalKey)).Subsets)
+                                {
+                                    subsets.Add(subset, new SubsetData(subset, shpe.GetSubsetMaterial(subset), gmndBlock, gmnd));
+                                }
+                            }
+                        }
                     }
 
                     bool hasMaterials = (hoverBlock.OutConnectorByIndex(1) != null);
 
-                    if ((new ObjdDialog().ShowDialog(owningForm, mouseScreenLocation, objdPackage, objd, ctss, (Cres)cres, (Shpe)shpe, (Gmnd)gmnd, (Gmdc)gmdc, hasMaterials)) == DialogResult.OK)
+                    if ((new ObjdDialog().ShowDialog(owningForm, mouseScreenLocation, objdPackage, objd, ctss, cresSgName, subsets, hasMaterials)) == DialogResult.OK)
                     {
                         if (objd.IsDirty)
                         {
@@ -2302,13 +2373,20 @@ namespace SceneGraphPlus.Surface
                             hoverBlock.SetDirty(); // Only way we can get the Save All button enabled
                         }
 
-                        if (gmnd != null && gmnd.IsDirty)
+                        bool dirtyGmnds = false;
+
+                        foreach (SubsetData subsetData in subsets.Values)
                         {
-                            gmndPackage.Commit(gmnd);
-                            gmndBlock.SetDirty();
+                            if (subsetData.OwningGmnd.IsDirty)
+                            {
+                                packageCache.GetOrAdd(subsetData.OwningGmndBlock.PackagePath).Commit(subsetData.OwningGmnd);
+                                subsetData.OwningGmndBlock.SetDirty();
+
+                                dirtyGmnds = true;
+                            }
                         }
 
-                        if (objd.IsDirty || (ctss != null && ctss.IsDirty) || (gmnd != null && gmnd.IsDirty))
+                        if (objd.IsDirty || (ctss != null && ctss.IsDirty) || dirtyGmnds)
                         {
                             Invalidate();
                         }
@@ -2365,8 +2443,10 @@ namespace SceneGraphPlus.Surface
                     GraphBlock shpeBlock = null;
                     GraphBlock objdBlock = null;
 
-                    TypeGUID guid = DBPFData.GUID_NULL;
-                    TypeGroupID mmatGroup = DBPFData.GROUP_LOCAL;
+                    GraphConnector shpeConnector = null;
+
+                    TypeGUID guid;
+                    TypeGroupID mmatGroup;
                     string cresSgName = null;
                     List<string> subsets = new List<string>();
                     CacheableDbpfFile gzpsPackage = null;
@@ -2374,9 +2454,19 @@ namespace SceneGraphPlus.Surface
 
                     foreach (GraphConnector inConnector in hoverBlock.GetInConnectors())
                     {
-                        if (inConnector.StartBlock.TypeId == Mmat.TYPE) mmatBlock = inConnector.StartBlock;
-                        else if (inConnector.StartBlock.TypeId == Gzps.TYPE) gzpsBlock = inConnector.StartBlock;
-                        else if (inConnector.StartBlock.TypeId == Shpe.TYPE) shpeBlock = inConnector.StartBlock;
+                        if (inConnector.StartBlock.TypeId == Mmat.TYPE)
+                        {
+                            mmatBlock = inConnector.StartBlock;
+                        }
+                        else if (inConnector.StartBlock.TypeId == Gzps.TYPE)
+                        {
+                            gzpsBlock = inConnector.StartBlock;
+                        }
+                        else if (inConnector.StartBlock.TypeId == Shpe.TYPE)
+                        {
+                            shpeBlock = inConnector.StartBlock;
+                            shpeConnector = inConnector;
+                        }
                     }
 
                     if (gzpsBlock != null)
@@ -2444,11 +2534,12 @@ namespace SceneGraphPlus.Surface
                     if (objd != null)
                     {
                         int defaultGraphic = objd.GetRawData(ObjdIndex.DefaultGraphic);
-                        GraphBlock gmndBlock = GetGmndBlock(objdBlock, defaultGraphic);
+                        List<GraphBlock> gmndBlocks = GetGmndBlocks(shpeBlock);
 
                         guid = objd.Guid;
+                        mmatGroup = objd.GroupID;
 
-                        if (gmndBlock != null)
+                        if (gmndBlocks != null)
                         {
                             GraphBlock cresBlock = objdBlock.OutConnectorByLabel("Model Names").EndBlock.OutConnectorByIndex(defaultGraphic).EndBlock;
 
@@ -2457,32 +2548,109 @@ namespace SceneGraphPlus.Surface
                                 cresSgName = cresBlock.SgFullName;
                             }
 
-                            CacheableDbpfFile gmndPackage = packageCache.GetOrAdd(gmndBlock.PackagePath);
-                            Gmnd gmnd = (Gmnd)gmndPackage.GetResourceByKey(gmndBlock.OriginalKey);
-
-                            if (gmnd != null)
+                            foreach (GraphBlock gmndBlock in gmndBlocks)
                             {
-                                subsets = gmnd.GetDesignModeEnabledSubsets();
+                                CacheableDbpfFile gmndPackage = packageCache.GetOrAdd(gmndBlock.PackagePath);
+                                Gmnd gmnd = (Gmnd)gmndPackage.GetResourceByKey(gmndBlock.OriginalKey);
+
+                                if (gmnd != null)
+                                {
+                                    foreach (string subset in gmnd.GetDesignModeEnabledSubsets())
+                                    {
+                                        if (shpeConnector.Label.Equals(subset))
+                                        {
+                                            if (!subsets.Contains(subset)) subsets.Add(subset);
+                                        }
+                                    }
+                                }
                             }
                         }
+                    }
+                    else
+                    {
+                        guid = DBPFData.GUID_NULL;
+                        mmatGroup = DBPFData.GROUP_NULL;
                     }
 
                     GraphBlock txtrBlock = hoverBlock.OutConnectorByLabel("stdMatBaseTextureName")?.EndBlock;
                     CacheableDbpfFile txtrPackage = null;
                     Txtr txtr = null;
 
+                    List<GraphConnector> lifoConectors = new List<GraphConnector>();
+                    List<Lifo> lifos = new List<Lifo>();
+
                     if (txtrBlock != null)
                     {
                         txtrPackage = packageCache.GetOrAdd(txtrBlock.PackagePath);
                         txtr = (Txtr)txtrPackage.GetResourceByKey(txtrBlock.OriginalKey);
+
+
+                        foreach (GraphConnector outConnector in txtrBlock.OutConnectors)
+                        {
+                            if (outConnector.EndBlock.TypeId == Lifo.TYPE)
+                            {
+                                lifoConectors.Add(outConnector);
+
+                                GraphBlock lifoBlock = outConnector.EndBlock;
+                                Lifo lifo = null;
+
+                                CacheableDbpfFile lifoPackage = packageCache.GetOrAdd(lifoBlock.PackagePath);
+
+                                if (lifoPackage != null)
+                                {
+                                    lifo = (Lifo)lifoPackage.GetResourceByKey(lifoBlock.Key);
+                                }
+
+                                lifos.Add(lifo);
+                            }
+                        }
                     }
 
-                    if ((new TxmtDialog().ShowDialog(owningForm, mouseScreenLocation, txmtPackage, hoverBlock, txmt, guid, mmatGroup, cresSgName, subsets, gzpsPackage, gzps, txtr)) == DialogResult.OK)
+                    bool removeLifos = false;
+                    if ((new TxmtDialog().ShowDialog(owningForm, mouseScreenLocation, txmtPackage, hoverBlock, txmt, guid, mmatGroup, cresSgName, subsets, gzpsPackage, gzps, txtr, lifos, out removeLifos)) == DialogResult.OK)
                     {
                         if (txtr != null && txtr.IsDirty)
                         {
                             txtrPackage.Commit(txtr);
                             txtrBlock.SetDirty();
+
+                            if (removeLifos)
+                            {
+                                foreach (GraphConnector lifoConnector in lifoConectors)
+                                {
+                                    GraphBlock lifoBlock = lifoConnector.EndBlock;
+
+                                    lifoBlock.UnlinkFrom(lifoConnector);
+
+                                    if (lifoBlock.GetInConnectors().Count == 0)
+                                    {
+                                        CacheableDbpfFile package = packageCache.GetOrOpen(lifoBlock.PackagePath);
+                                        package.Remove(lifoBlock.OriginalKey);
+                                        owningForm.RemoveResource(package, lifoBlock.OriginalKey);
+
+                                        MarkBlockForDeletion(lifoBlock);
+                                    }
+
+                                    lifoConnector.StartBlock.UnconnectTo(lifoConnector);
+                                    lifoConnector.Discard();
+                                }
+                            }
+                            else
+                            {
+                                // The LIFOs were updated, so mark the blocks as dirty
+                                for (int index = 0; index < lifoConectors.Count; ++index)
+                                {
+                                    GraphConnector lifoConnector = lifoConectors[index];
+                                    Lifo lifo = lifos[index];
+
+                                    if (lifo != null && lifo.IsDirty)
+                                    {
+                                        packageCache.GetOrAdd(lifoConnector.EndBlock.PackagePath).Commit(lifo);
+
+                                        lifoConnector.EndBlock.SetDirty();
+                                    }
+                                }
+                            }
                         }
 
                         if (txmt.IsDirty)
@@ -2506,7 +2674,31 @@ namespace SceneGraphPlus.Surface
                     Txtr txtr = (Txtr)txtrPackage.GetResourceByKey(hoverBlock.OriginalKey);
                     Trace.Assert(txtr != null, $"Double-Click: Missing resource for {hoverBlock.OriginalKey}");
 
-                    if ((new TxtrDialog().ShowDialog(owningForm, mouseScreenLocation, txtrPackage, txtr, hoverBlock.SgBaseName)) == DialogResult.OK)
+                    List<GraphConnector> lifoConectors = new List<GraphConnector>();
+                    List<Lifo> lifos = new List<Lifo>();
+
+                    foreach (GraphConnector outConnector in hoverBlock.OutConnectors)
+                    {
+                        if (outConnector.EndBlock.TypeId == Lifo.TYPE)
+                        {
+                            lifoConectors.Add(outConnector);
+
+                            GraphBlock lifoBlock = outConnector.EndBlock;
+                            Lifo lifo = null;
+
+                            CacheableDbpfFile lifoPackage = packageCache.GetOrAdd(lifoBlock.PackagePath);
+
+                            if (lifoPackage != null)
+                            {
+                                lifo = (Lifo)lifoPackage.GetResourceByKey(lifoBlock.Key);
+                            }
+
+                            lifos.Add(lifo);
+                        }
+                    }
+
+                    bool removeLifos = false;
+                    if ((new TxtrDialog().ShowDialog(owningForm, mouseScreenLocation, txtrPackage, txtr, hoverBlock.SgBaseName, lifos, out removeLifos)) == DialogResult.OK)
                     {
                         if (txtr.IsDirty)
                         {
@@ -2516,6 +2708,44 @@ namespace SceneGraphPlus.Surface
                             Invalidate();
 
                             owningForm.UpdateTexture(hoverBlock);
+                        }
+
+                        if (removeLifos)
+                        {
+                            foreach (GraphConnector lifoConnector in lifoConectors)
+                            {
+                                GraphBlock lifoBlock = lifoConnector.EndBlock;
+
+                                lifoBlock.UnlinkFrom(lifoConnector);
+
+                                if (lifoBlock.GetInConnectors().Count == 0)
+                                {
+                                    CacheableDbpfFile package = packageCache.GetOrOpen(lifoBlock.PackagePath);
+                                    package.Remove(lifoBlock.OriginalKey);
+                                    owningForm.RemoveResource(package, lifoBlock.OriginalKey);
+
+                                    MarkBlockForDeletion(lifoBlock);
+                                }
+
+                                lifoConnector.StartBlock.UnconnectTo(lifoConnector);
+                                lifoConnector.Discard();
+                            }
+                        }
+                        else
+                        {
+                            // The LIFOs were updated, so mark the blocks as dirty
+                            for (int index = 0; index < lifoConectors.Count; ++index)
+                            {
+                                GraphConnector lifoConnector = lifoConectors[index];
+                                Lifo lifo = lifos[index];
+
+                                if (lifo != null && lifo.IsDirty)
+                                {
+                                    packageCache.GetOrAdd(lifoConnector.EndBlock.PackagePath).Commit(lifo);
+
+                                    lifoConnector.EndBlock.SetDirty();
+                                }
+                            }
                         }
                     }
                 }
@@ -2529,13 +2759,16 @@ namespace SceneGraphPlus.Surface
                 // Must have been over the background
             }
         }
+        #endregion
 
-        private GraphBlock GetGmndBlock(GraphBlock objdBlock, int defaultGraphic)
+        #region Block Finding (chain traversal)
+        [Obsolete("Use GetGmndBlocks instead")]
+        private GraphBlock GetGmndBlock(GraphBlock startBlock)
         {
-            return GetGmndBlock(objdBlock.OutConnectorByLabel("Model Names")?.EndBlock?.OutConnectorByIndex(defaultGraphic)?.EndBlock);
+            return _GetGmndBlock(startBlock);
         }
 
-        private GraphBlock GetGmndBlock(GraphBlock startBlock)
+        private GraphBlock _GetGmndBlock(GraphBlock startBlock)
         {
             if (startBlock == null) return null;
 
@@ -2569,11 +2802,11 @@ namespace SceneGraphPlus.Surface
                     return null;
                 }
 
-                return GetGmndBlock(endBlock);
+                return _GetGmndBlock(endBlock);
             }
             else if (startBlock.TypeId == Mmat.TYPE)
             {
-                return GetGmndBlock(startBlock.OutConnectorByLabel("model")?.EndBlock);
+                return _GetGmndBlock(startBlock.OutConnectorByLabel("model")?.EndBlock);
             }
             else if (startBlock.TypeId == Str.TYPE)
             {
@@ -2585,7 +2818,72 @@ namespace SceneGraphPlus.Surface
 
                     if (objd != null)
                     {
-                        return GetGmndBlock(startBlock.SoleParent, objd.GetRawData(ObjdIndex.DefaultGraphic));
+                        return _GetGmndBlock(startBlock.SoleParent?.OutConnectorByLabel("Model Names")?.EndBlock?.OutConnectorByIndex(objd.GetRawData(ObjdIndex.DefaultGraphic))?.EndBlock);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private List<GraphBlock> GetGmndBlocks(GraphBlock objdBlock, int defaultGraphic)
+        {
+            return GetGmndBlocks(objdBlock.OutConnectorByLabel("Model Names")?.EndBlock?.OutConnectorByIndex(defaultGraphic)?.EndBlock);
+        }
+
+        private List<GraphBlock> GetGmndBlocks(GraphBlock startBlock)
+        {
+            List<GraphBlock> gmndBlocks = new List<GraphBlock>();
+
+            if (startBlock == null) return null;
+
+            if (startBlock.TypeId == Shpe.TYPE)
+            {
+                foreach (GraphConnector connector in startBlock.OutConnectors)
+                {
+                    GraphBlock endBlock = connector.EndBlock;
+
+                    if (endBlock == null) return null;
+
+                    if (endBlock.TypeId == Gmnd.TYPE)
+                    {
+                        gmndBlocks.Add(endBlock);
+                    }
+                }
+
+                return gmndBlocks;
+            }
+            else if (startBlock.TypeId == Cres.TYPE)
+            {
+                foreach (GraphConnector connector in startBlock.OutConnectors)
+                {
+                    GraphBlock endBlock = connector.EndBlock;
+
+                    if (endBlock == null) return null;
+
+                    if (endBlock.TypeId == Shpe.TYPE)
+                    {
+                        gmndBlocks.AddRange(GetGmndBlocks(endBlock));
+                    }
+                }
+
+                return gmndBlocks;
+            }
+            else if (startBlock.TypeId == Mmat.TYPE)
+            {
+                return GetGmndBlocks(startBlock.OutConnectorByLabel("model")?.EndBlock);
+            }
+            else if (startBlock.TypeId == Str.TYPE)
+            {
+                GraphBlock objdBlock = startBlock.SoleParent;
+
+                if (objdBlock != null && !objdBlock.IsMissing)
+                {
+                    Objd objd = (Objd)packageCache.GetOrAdd(objdBlock.PackagePath).GetResourceByKey(objdBlock.OriginalKey);
+
+                    if (objd != null)
+                    {
+                        return GetGmndBlocks(startBlock.SoleParent, objd.GetRawData(ObjdIndex.DefaultGraphic));
                     }
                 }
             }
@@ -2614,11 +2912,30 @@ namespace SceneGraphPlus.Surface
                 return endBlock;
             }
 
+            // TODO - SceneGraph Plus - multiple GMNDs - use GetGmndBlocks instead
             return GetGmdcBlock(GetGmndBlock(startBlock));
+        }
+
+        private GraphBlock GetShpeBlock(GraphBlock startBlock)
+        {
+            if (startBlock == null) return null;
+
+            if (startBlock.TypeId == Gmnd.TYPE)
+            {
+                GraphBlock shpeBlock = startBlock.SoleParent;
+
+                if (shpeBlock == null) return null;
+
+                Trace.Assert(shpeBlock.TypeId == Shpe.TYPE, "Expected SHPE as sole parent of GMND");
+
+                return shpeBlock;
+            }
+
+            throw new NotImplementedException($"GetShpeBlock not implemented for starting from {DBPFData.TypeName(startBlock.TypeId)}");
         }
         #endregion
 
-        #region Paint
+        #region Surface Painting
         public new void Invalidate()
         {
             base.Invalidate();
@@ -2664,33 +2981,178 @@ namespace SceneGraphPlus.Surface
                 allConnectors[i].Draw(g, hideMissingBlocks, CountIdenticalConnectors(i));
             }
         }
+        #endregion
 
-        private bool SeenIdenticalConnector(int i)
+        #region Block Validation and Updating (post loading of all blocks)
+        public void ValidateBlocks()
         {
-            for (int j = i - 1; j > 0; --j)
+            // Validate any blocks with special conditions
+            foreach (GraphBlock block in allBlocks)
             {
-                if (allConnectors[i].Equals(allConnectors[j]))
-                {
-                    return true;
-                }
+                ValidateBlock(block);
             }
-
-            return false;
         }
 
-        private int CountIdenticalConnectors(int i)
+        private void ValidateBlock(GraphBlock block)
         {
-            int count = 1;
-
-            for (int j = i + 1; j < allConnectors.Count; ++j)
+            // "UnderstoodTypes" - when adding a new resource type, need to update this block
+            if (block.TypeId == Mmat.TYPE)
             {
-                if (allConnectors[i].Equals(allConnectors[j]))
+                List<GraphBlock> gmndBlocks = GetGmndBlocks(block);
+
+                if (gmndBlocks.Count > 0)
                 {
-                    ++count;
+                    Mmat mmat = (Mmat)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
+
+                    if (mmat != null)
+                    {
+                        block.IsSubsetMmatValid = false;
+
+                        foreach (GraphBlock gmndBlock in gmndBlocks)
+                        {
+                            Gmnd gmnd = (Gmnd)packageCache.GetOrAdd(gmndBlock.PackagePath).GetResourceByKey(gmndBlock.Key);
+
+                            if (gmnd != null)
+                            {
+                                if (gmnd.GetDesignModeEnabledSubsets().Contains(mmat.SubsetName))
+                                {
+                                    block.IsSubsetMmatValid = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
+            else if (block.TypeId == Shpe.TYPE)
+            {
+                GraphBlock gmdcBlock = GetGmdcBlock(block);
 
-            return count;
+                if (gmdcBlock != null)
+                {
+                    Shpe shpe = (Shpe)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
+                    Gmdc gmdc = (Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
+
+                    if (shpe != null && gmdc != null)
+                    {
+                        block.IsSubsetShpeValid = true;
+
+                        ReadOnlyCollection<string> gmdcSubsets = gmdc.Subsets;
+
+                        foreach (string subset in shpe.Subsets)
+                        {
+                            if (!gmdcSubsets.Contains(subset))
+                            {
+                                block.IsSubsetShpeValid = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (block.TypeId == Gmnd.TYPE)
+            {
+                GraphBlock gmdcBlock = GetGmdcBlock(block);
+
+                if (gmdcBlock != null)
+                {
+                    Gmnd gmnd = (Gmnd)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
+                    Gmdc gmdc = (Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
+
+                    if (gmnd != null && gmdc != null)
+                    {
+                        block.IsSubsetGmndDesignableValid = true;
+                        block.IsSubsetGmndMeshValid = true;
+                        block.IsSubsetGmndSlavedValid = true;
+
+                        ReadOnlyCollection<string> gmdcSubsets = gmdc.Subsets;
+
+                        foreach (string subset in gmnd.GetDesignModeEnabledSubsets())
+                        {
+                            if (!gmdcSubsets.Contains(subset))
+                            {
+                                block.IsSubsetGmndDesignableValid = false;
+                                break;
+                            }
+                        }
+
+                        foreach (string subset in gmnd.GetMaterialsMeshNameSubsets())
+                        {
+                            if (!gmdcSubsets.Contains(subset))
+                            {
+                                block.IsSubsetGmndMeshValid = false;
+                                break;
+                            }
+                        }
+
+                        foreach (string subset in gmnd.GetDesignModeSlaveSubsets())
+                        {
+                            if (!gmdcSubsets.Contains(subset))
+                            {
+                                block.IsSubsetGmndSlavedValid = false;
+                                break;
+                            }
+                            else
+                            {
+                                List<string> slaveSubsets = gmnd.GetDesignModeSlaveSubsetsSubset(subset);
+
+                                foreach (string slaveSubset in slaveSubsets)
+                                {
+                                    if (!gmdcSubsets.Contains(slaveSubset))
+                                    {
+                                        block.IsSubsetGmndSlavedValid = false;
+                                        break;
+                                    }
+                                }
+
+                                if (!block.IsSubsetGmndSlavedValid) break;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (block.TypeId == Str.TYPE)
+            {
+                if (block.InstanceId == DBPFData.STR_SUBSETS)
+                {
+                    GraphBlock gmdcBlock = GetGmdcBlock(block);
+
+                    if (gmdcBlock != null)
+                    {
+                        Str str = (Str)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
+                        Gmdc gmdc = (Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
+
+                        if (str != null && gmdc != null)
+                        {
+                            block.IsSubsetStrValid = true;
+
+                            ReadOnlyCollection<string> gmdcSubsets = gmdc.Subsets;
+
+                            foreach (StrItem item in str.LanguageItems(Languages.Default))
+                            {
+                                string subset = item.Title;
+
+                                if (!(string.IsNullOrWhiteSpace(subset) || gmdcSubsets.Contains(subset)))
+                                {
+                                    block.IsSubsetStrValid = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void UpdateAvailableBlocks()
+        {
+            foreach (GraphBlock block in allBlocks)
+            {
+                block.IsAvailable = owningForm.IsAvailable(block.Key);
+            }
+
+            Invalidate();
         }
         #endregion
 
@@ -2834,154 +3296,9 @@ namespace SceneGraphPlus.Surface
 
             Invalidate();
         }
+        #endregion
 
-        public void ValidateBlocks()
-        {
-            // Validate any blocks with special conditions
-            foreach (GraphBlock block in allBlocks)
-            {
-                ValidateBlock(block);
-            }
-        }
-
-        private void ValidateBlock(GraphBlock block)
-        {
-            // "UnderstoodTypes" - when adding a new resource type, need to update this block
-            if (block.TypeId == Mmat.TYPE)
-            {
-                GraphBlock gmndBlock = GetGmndBlock(block);
-
-                if (gmndBlock != null)
-                {
-                    Mmat mmat = (Mmat)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
-                    Gmnd gmnd = (Gmnd)packageCache.GetOrAdd(gmndBlock.PackagePath).GetResourceByKey(gmndBlock.Key);
-
-                    if (mmat != null && gmnd != null)
-                    {
-                        block.IsSubsetMmatValid = gmnd.GetDesignModeEnabledSubsets().Contains(mmat.SubsetName);
-                    }
-                }
-            }
-            else if (block.TypeId == Shpe.TYPE)
-            {
-                GraphBlock gmdcBlock = GetGmdcBlock(block);
-
-                if (gmdcBlock != null)
-                {
-                    Shpe shpe = (Shpe)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
-                    Gmdc gmdc = (Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
-
-                    if (shpe != null && gmdc != null)
-                    {
-                        block.IsSubsetShpeValid = true;
-
-                        ReadOnlyCollection<string> gmdcSubsets = gmdc.Subsets;
-
-                        foreach (string subset in shpe.Subsets)
-                        {
-                            if (!gmdcSubsets.Contains(subset))
-                            {
-                                block.IsSubsetShpeValid = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            else if (block.TypeId == Gmnd.TYPE)
-            {
-                GraphBlock gmdcBlock = GetGmdcBlock(block);
-
-                if (gmdcBlock != null)
-                {
-                    Gmnd gmnd = (Gmnd)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
-                    Gmdc gmdc = (Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
-
-                    if (gmnd != null && gmdc != null)
-                    {
-                        block.IsSubsetGmndDesignableValid = true;
-                        block.IsSubsetGmndMeshValid = true;
-                        block.IsSubsetGmndSlavedValid = true;
-
-                        ReadOnlyCollection<string> gmdcSubsets = gmdc.Subsets;
-
-                        foreach (string subset in gmnd.GetDesignModeEnabledSubsets())
-                        {
-                            if (!gmdcSubsets.Contains(subset))
-                            {
-                                block.IsSubsetGmndDesignableValid = false;
-                                break;
-                            }
-                        }
-
-                        foreach (string subset in gmnd.GetMaterialsMeshNameSubsets())
-                        {
-                            if (!gmdcSubsets.Contains(subset))
-                            {
-                                block.IsSubsetGmndMeshValid = false;
-                                break;
-                            }
-                        }
-
-                        foreach (string subset in gmnd.GetDesignModeSlaveSubsets())
-                        {
-                            if (!gmdcSubsets.Contains(subset))
-                            {
-                                block.IsSubsetGmndSlavedValid = false;
-                                break;
-                            }
-                            else
-                            {
-                                List<string> slaveSubsets = gmnd.GetDesignModeSlaveSubsetsSubset(subset);
-
-                                foreach (string slaveSubset in slaveSubsets)
-                                {
-                                    if (!gmdcSubsets.Contains(slaveSubset))
-                                    {
-                                        block.IsSubsetGmndSlavedValid = false;
-                                        break;
-                                    }
-                                }
-
-                                if (!block.IsSubsetGmndSlavedValid) break;
-                            }
-                        }
-                    }
-                }
-            }
-            else if (block.TypeId == Str.TYPE)
-            {
-                if (block.InstanceId == DBPFData.STR_SUBSETS)
-                {
-                    GraphBlock gmdcBlock = GetGmdcBlock(block);
-
-                    if (gmdcBlock != null)
-                    {
-                        Str str = (Str)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
-                        Gmdc gmdc = (Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
-
-                        if (str != null && gmdc != null)
-                        {
-                            block.IsSubsetStrValid = true;
-
-                            ReadOnlyCollection<string> gmdcSubsets = gmdc.Subsets;
-
-                            foreach (StrItem item in str.LanguageItems(Languages.Default))
-                            {
-                                string subset = item.Title;
-
-                                if (!(string.IsNullOrWhiteSpace(subset) || gmdcSubsets.Contains(subset)))
-                                {
-                                    block.IsSubsetStrValid = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+        #region Block Updating (as part of save)
         private void UpdateName(DBPFResource res, GraphBlock block, bool alwaysSetNames, bool alwaysClearNames, bool prefixNames, bool prefixLowerCase)
         {
             // "UnderstoodTypes" - when adding a new resource type, need to update this block
@@ -3428,30 +3745,6 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-        private string MakeSgName(TypeGroupID groupId, string name, bool prefixLowerCase)
-        {
-            if (groupId == DBPFData.GROUP_SG_MAXIS)
-            {
-                return name;
-            }
-            else
-            {
-                if (prefixLowerCase)
-                {
-                    return $"##{groupId.ToString().ToLower()}!{name}";
-                }
-                else
-                {
-                    return $"##{groupId.ToString().ToUpper()}!{name}";
-                }
-            }
-        }
-
-        private string MakeSgName(TypeGroupID groupId, string name, TypeTypeID typeId, bool prefixLowerCase)
-        {
-            return $"{MakeSgName(groupId, name, prefixLowerCase)}_{DBPFData.TypeName(typeId).ToLower()}";
-        }
-
         private void UpdateRefsFromParents(DbpfFileCache packageCache, GraphBlock block, bool prefixLowerCase)
         {
             foreach (GraphConnector connector in block.GetInConnectors())
@@ -3470,6 +3763,47 @@ namespace SceneGraphPlus.Surface
                     package.Commit(parentRes);
                 }
             }
+        }
+
+        private string MakeSgName(TypeGroupID groupId, string name, TypeTypeID typeId, bool prefixLowerCase)
+        {
+            return $"{MakeSgName(groupId, name, prefixLowerCase)}_{DBPFData.TypeName(typeId).ToLower()}";
+        }
+
+        private string MakeSgName(TypeGroupID groupId, string name, bool prefixLowerCase)
+        {
+            if (groupId == DBPFData.GROUP_SG_MAXIS)
+            {
+                return name;
+            }
+            else
+            {
+                if (prefixLowerCase)
+                {
+                    return $"##{groupId.ToString().ToLower()}!{name}";
+                }
+                else
+                {
+                    return $"##{groupId.ToString().ToUpper()}!{name}";
+                }
+            }
+        }
+        #endregion
+
+        #region Close
+        public bool ClosePackage(string packagePathToClose)
+        {
+            foreach (GraphBlock block in allBlocks)
+            {
+                if (block.PackagePath.Equals(packagePathToClose))
+                {
+                    block.Close();
+                }
+            }
+
+            Invalidate();
+
+            return true;
         }
         #endregion
     }

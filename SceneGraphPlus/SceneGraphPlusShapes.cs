@@ -47,7 +47,7 @@ namespace SceneGraphPlus.Shapes
         {
             this.surface = surface;
 
-            surface.Add(this);
+            surface.AddShape(this);
         }
 
         public bool BorderVisible
@@ -56,14 +56,12 @@ namespace SceneGraphPlus.Shapes
             set => borderVisible = value;
         }
 
-        public abstract string ToolTip
-        {
-            get;
-        }
+        public abstract string ToolTip { get; }
 
         public void Discard()
         {
-            surface.Remove(this);
+            surface.RemoveShape(this);
+            surface = null;
         }
 
 
@@ -134,10 +132,10 @@ namespace SceneGraphPlus.Shapes
 
         public void SetEndBlock(GraphBlock block, bool makesDirty)
         {
-            endBlock?.DisconnectFrom(this);
+            endBlock?.UnlinkFrom(this);
 
             endBlock = block;
-            endBlock.ConnectedFrom(this);
+            endBlock.LinkFrom(this);
 
             if (makesDirty) SetDirty();
         }
@@ -375,6 +373,7 @@ namespace SceneGraphPlus.Shapes
         private bool subsetGmndDesignableValid = true;
         private bool subsetGmndSlavedValid = true;
         private bool defaultLangValid = true;
+        private bool idrValid = true;
 
         protected GraphBlock clonedFrom = null;
 
@@ -412,7 +411,7 @@ namespace SceneGraphPlus.Shapes
         public bool IsDeleteMe => deleteMe;
         public bool IsDeleted => deleted;
 
-        public void Delete()
+        public void MarkForDeletion()
         {
             deleteMe = true;
             deleted = true;
@@ -456,8 +455,14 @@ namespace SceneGraphPlus.Shapes
         private Color fillColour = Color.HotPink;
         private readonly Color textColour = Color.Black;
 
-        private readonly List<GraphConnector> outConnectors = new List<GraphConnector>(); // Connectors this is the StartBlock of
-        private readonly List<GraphConnector> inConnectors = new List<GraphConnector>(); // Connectors this is the EndBlock of
+        /// <summary>
+        /// Connectors this is the StartBlock of, ie links to my child(ren)
+        /// </summary>
+        private readonly List<GraphConnector> outConnectors = new List<GraphConnector>();
+        /// <summary>
+        /// Connectors this is the EndBlock of, ie links to my parent(s)
+        /// </summary>
+        private readonly List<GraphConnector> inConnectors = new List<GraphConnector>();
 
         public GraphBlock SoleParent => (inConnectors.Count == 1) ? inConnectors[0].StartBlock : null;
         public GraphBlock SoleRcolParent
@@ -671,6 +676,22 @@ namespace SceneGraphPlus.Shapes
             }
         }
 
+        public bool IsIdrValid
+        {
+            get => (IsClone ? clonedFrom.IsIdrValid : idrValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsIdrValid = value;
+                }
+                else
+                {
+                    idrValid = value;
+                }
+            }
+        }
+
         public DBPFKey OriginalKey => BlockRef.OriginalKey;
         public DBPFKey Key => BlockRef.Key;
 
@@ -692,7 +713,7 @@ namespace SceneGraphPlus.Shapes
 
         public bool HasIssues => HasNonFixableIssues || !(IsFileListValid && IsLightValid && IsDefaultLangValid);
         public bool HasFixableIssues => !IsDirty && !(IsFileListValid && IsLightValid && IsDefaultLangValid);
-        public bool HasNonFixableIssues => !(IsSubsetMmatValid && IsSubsetShpeValid && IsSubsetStrValid && IsSubsetGmndMeshValid && IsSubsetGmndDesignableValid && IsSubsetGmndSlavedValid);
+        public bool HasNonFixableIssues => !(IsSubsetMmatValid && IsSubsetShpeValid && IsSubsetStrValid && IsSubsetGmndMeshValid && IsSubsetGmndDesignableValid && IsSubsetGmndSlavedValid && IsIdrValid);
 
         public string IssuesToolTip
         {
@@ -714,6 +735,8 @@ namespace SceneGraphPlus.Shapes
                 if (!IsSubsetGmndSlavedValid) issues = $"{issues}Invalid Subset(s) in tsDesignModeSlaveSubsets\r\n";
 
                 if (!IsDefaultLangValid) issues = $"{issues}Additional Langauages\r\n";
+
+                if (!IsIdrValid) issues = $"{issues}Missing 3IDR\r\n";
 
                 return (issues.Length > 2) ? issues : "";
             }
@@ -879,22 +902,41 @@ namespace SceneGraphPlus.Shapes
             return null;
         }
 
+        /// <summary>
+        /// Create a connector to the endBlock and 
+        /// add the new connector to the list of outConnectors, ie links to my child(ren)
+        /// </summary>
+        /// <returns></returns>
         public GraphConnector ConnectTo(int index, string label, GraphBlock endBlock)
         {
             GraphConnector connector = new BezierConnector(surface, this, endBlock) { Index = index, Label = label };
             outConnectors.Add(connector);
 
-            endBlock.ConnectedFrom(connector);
+            endBlock.LinkFrom(connector);
 
             return connector;
         }
 
-        public void ConnectedFrom(GraphConnector connector)
+        /// <summary>
+        /// Remove the connector from the list of outConnectors, ie links to my child(ren)
+        /// </summary>
+        public void UnconnectTo(GraphConnector connector)
+        {
+            outConnectors.Remove(connector);
+        }
+
+        /// <summary>
+        /// Add the connector to the list of inConnectors, ie links to my parent(s)
+        /// </summary>
+        public void LinkFrom(GraphConnector connector)
         {
             inConnectors.Add(connector);
         }
 
-        public void DisconnectFrom(GraphConnector connector)
+        /// <summary>
+        /// Remove the connector from the list of inConnectors, ie links to my parent(s)
+        /// </summary>
+        public void UnlinkFrom(GraphConnector connector)
         {
             inConnectors.Remove(connector);
         }
@@ -1107,7 +1149,7 @@ namespace SceneGraphPlus.Shapes
                 GraphConnector outConnector = outConnectors[0];
                 outConnectors.RemoveAt(0);
 
-                outConnector.EndBlock.DisconnectFrom(outConnector);
+                outConnector.EndBlock.UnlinkFrom(outConnector);
                 outConnector.Discard();
             }
 
@@ -1116,7 +1158,7 @@ namespace SceneGraphPlus.Shapes
                 GraphConnector inConnector = inConnectors[0];
                 inConnectors.RemoveAt(0);
 
-                DisconnectFrom(inConnector);
+                UnlinkFrom(inConnector);
                 inConnector.Discard();
             }
 

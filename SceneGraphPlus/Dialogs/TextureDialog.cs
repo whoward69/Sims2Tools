@@ -82,11 +82,13 @@ namespace SceneGraphPlus.Dialogs
             return base.ProcessDialogKey(keyData);
         }
 
-        public void ClearTexture()
+        public void ClearTexture(Color colour)
         {
             nextTexturePath = null;
             nextTextureKey = new DBPFKey(Txtr.TYPE, DBPFData.GROUP_LOCAL, DBPFData.INSTANCE_NULL, DBPFData.RESOURCE_NULL);
             nextTextureTitle = "";
+
+            pictTexture.BackColor = colour;
 
             DisplayNextTexture();
         }
@@ -137,10 +139,10 @@ namespace SceneGraphPlus.Dialogs
 
             pictTexture.Image = texture;
 
-            SetWindowSize();
-
             if (texture != null)
             {
+                pictTexture.BackColor = Color.Transparent;
+
                 if (menuItemContextAutoSize.Checked)
                 {
                     SetWindowSize(texture.Width, texture.Height);
@@ -149,6 +151,14 @@ namespace SceneGraphPlus.Dialogs
                 {
                     AdjustWindowSize();
                 }
+            }
+            else if (pictTexture.BackColor != Color.Transparent)
+            {
+                SetWindowSize(128, 128);
+            }
+            else
+            {
+                SetWindowSize();
             }
         }
 
@@ -212,7 +222,7 @@ namespace SceneGraphPlus.Dialogs
                 }
                 else
                 {
-                    width = height = 512;
+                    width = height = 128;
                 }
             }
 

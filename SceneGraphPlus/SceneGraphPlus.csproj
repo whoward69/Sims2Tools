@@ -108,6 +108,7 @@
       <DependentUpon>TxtrDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="SceneGraphPlusApp.cs" />
+    <Compile Include="SceneGraphPlusData.cs" />
     <Compile Include="SceneGraphPlusForm.cs">
       <SubType>Form</SubType>
     </Compile>

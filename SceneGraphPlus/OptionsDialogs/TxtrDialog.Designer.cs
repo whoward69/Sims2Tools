@@ -43,6 +43,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.textNewName = new System.Windows.Forms.TextBox();
             this.grpChangeTexture = new System.Windows.Forms.GroupBox();
             this.panelDdsOptions = new System.Windows.Forms.Panel();
+            this.ckbRemoveLifos = new System.Windows.Forms.CheckBox();
             this.radioRaw32 = new System.Windows.Forms.RadioButton();
             this.radioRaw24 = new System.Windows.Forms.RadioButton();
             this.radioRaw8 = new System.Windows.Forms.RadioButton();
@@ -121,13 +122,14 @@ namespace SceneGraphPlus.Dialogs.Options
             this.grpChangeTexture.Controls.Add(this.btnChangeTexture);
             this.grpChangeTexture.Location = new System.Drawing.Point(10, 63);
             this.grpChangeTexture.Name = "grpChangeTexture";
-            this.grpChangeTexture.Size = new System.Drawing.Size(562, 145);
+            this.grpChangeTexture.Size = new System.Drawing.Size(562, 180);
             this.grpChangeTexture.TabIndex = 38;
             this.grpChangeTexture.TabStop = false;
             this.grpChangeTexture.Text = "Change Texture:";
             // 
             // panelDdsOptions
             // 
+            this.panelDdsOptions.Controls.Add(this.ckbRemoveLifos);
             this.panelDdsOptions.Controls.Add(this.radioRaw32);
             this.panelDdsOptions.Controls.Add(this.radioRaw24);
             this.panelDdsOptions.Controls.Add(this.radioRaw8);
@@ -143,8 +145,18 @@ namespace SceneGraphPlus.Dialogs.Options
             this.panelDdsOptions.Controls.Add(this.radioDxt3);
             this.panelDdsOptions.Location = new System.Drawing.Point(6, 45);
             this.panelDdsOptions.Name = "panelDdsOptions";
-            this.panelDdsOptions.Size = new System.Drawing.Size(461, 95);
+            this.panelDdsOptions.Size = new System.Drawing.Size(461, 129);
             this.panelDdsOptions.TabIndex = 42;
+            // 
+            // ckbRemoveLifos
+            // 
+            this.ckbRemoveLifos.AutoSize = true;
+            this.ckbRemoveLifos.Location = new System.Drawing.Point(139, 29);
+            this.ckbRemoveLifos.Name = "ckbRemoveLifos";
+            this.ckbRemoveLifos.Size = new System.Drawing.Size(107, 19);
+            this.ckbRemoveLifos.TabIndex = 53;
+            this.ckbRemoveLifos.Text = "Remove LIFOs";
+            this.ckbRemoveLifos.UseVisualStyleBackColor = true;
             // 
             // radioRaw32
             // 
@@ -202,16 +214,16 @@ namespace SceneGraphPlus.Dialogs.Options
             "EdgeDetectSoft",
             "Emboss",
             "MeanRemoval"});
-            this.comboSharpen.Location = new System.Drawing.Point(78, 54);
+            this.comboSharpen.Location = new System.Drawing.Point(307, 103);
             this.comboSharpen.Name = "comboSharpen";
-            this.comboSharpen.Size = new System.Drawing.Size(153, 23);
+            this.comboSharpen.Size = new System.Drawing.Size(151, 23);
             this.comboSharpen.TabIndex = 49;
             this.comboSharpen.Text = "None";
             // 
             // lblSharpen
             // 
             this.lblSharpen.AutoSize = true;
-            this.lblSharpen.Location = new System.Drawing.Point(15, 57);
+            this.lblSharpen.Location = new System.Drawing.Point(244, 109);
             this.lblSharpen.Name = "lblSharpen";
             this.lblSharpen.Size = new System.Drawing.Size(57, 15);
             this.lblSharpen.TabIndex = 48;
@@ -223,7 +235,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.ckbFilters.FormattingEnabled = true;
             this.ckbFilters.IntegralHeight = false;
             this.ckbFilters.Items.AddRange(new object[] {
-            "dither",
+            "Dither",
             "Point",
             "Box",
             "Triangle",
@@ -238,16 +250,16 @@ namespace SceneGraphPlus.Dialogs.Options
             "Hamming",
             "Blackman",
             "Kaiser"});
-            this.ckbFilters.Location = new System.Drawing.Point(281, 27);
+            this.ckbFilters.Location = new System.Drawing.Point(307, 27);
             this.ckbFilters.Name = "ckbFilters";
             this.ckbFilters.ScrollAlwaysVisible = true;
-            this.ckbFilters.Size = new System.Drawing.Size(177, 62);
+            this.ckbFilters.Size = new System.Drawing.Size(151, 73);
             this.ckbFilters.TabIndex = 46;
             // 
             // lblFilters
             // 
             this.lblFilters.AutoSize = true;
-            this.lblFilters.Location = new System.Drawing.Point(232, 30);
+            this.lblFilters.Location = new System.Drawing.Point(258, 30);
             this.lblFilters.Name = "lblFilters";
             this.lblFilters.Size = new System.Drawing.Size(43, 15);
             this.lblFilters.TabIndex = 47;
@@ -257,7 +269,7 @@ namespace SceneGraphPlus.Dialogs.Options
             // 
             this.textLevels.Location = new System.Drawing.Point(78, 27);
             this.textLevels.Name = "textLevels";
-            this.textLevels.Size = new System.Drawing.Size(59, 21);
+            this.textLevels.Size = new System.Drawing.Size(55, 21);
             this.textLevels.TabIndex = 45;
             this.textLevels.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnLevelsKeyPress);
             // 
@@ -358,7 +370,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.btnChangeTexture.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnChangeTexture.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnChangeTexture.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnChangeTexture.Location = new System.Drawing.Point(473, 113);
+            this.btnChangeTexture.Location = new System.Drawing.Point(473, 148);
             this.btnChangeTexture.Name = "btnChangeTexture";
             this.btnChangeTexture.Size = new System.Drawing.Size(82, 26);
             this.btnChangeTexture.TabIndex = 33;
@@ -376,7 +388,7 @@ namespace SceneGraphPlus.Dialogs.Options
             // TxtrDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-            this.ClientSize = new System.Drawing.Size(584, 211);
+            this.ClientSize = new System.Drawing.Size(584, 251);
             this.Controls.Add(this.grpChangeTexture);
             this.Controls.Add(this.grpDuplicate);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -424,5 +436,6 @@ namespace SceneGraphPlus.Dialogs.Options
         private System.Windows.Forms.RadioButton radioRaw32;
         private System.Windows.Forms.RadioButton radioRaw24;
         private System.Windows.Forms.RadioButton radioRaw8;
+        private System.Windows.Forms.CheckBox ckbRemoveLifos;
     }
 }

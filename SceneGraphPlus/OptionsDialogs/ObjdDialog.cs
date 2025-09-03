@@ -6,16 +6,13 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using SceneGraphPlus.Data;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
-using Sims2Tools.DBPF.SceneGraph.CRES;
-using Sims2Tools.DBPF.SceneGraph.GMDC;
-using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
-using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
@@ -33,9 +30,8 @@ namespace SceneGraphPlus.Dialogs.Options
         private CacheableDbpfFile package;
         private Objd objd;
         private Ctss ctss;
-        private Cres cres;
-        private Shpe shpe;
-        private Gmnd gmnd;
+        private string cresSgName;
+        private Dictionary<string, SubsetData> subsets;
 
         private string originalGuid;
 
@@ -50,15 +46,14 @@ namespace SceneGraphPlus.Dialogs.Options
             InitializeComponent();
         }
 
-        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile package, Objd objd, Ctss ctss, Cres cres, Shpe shpe, Gmnd gmnd, Gmdc gmdc, bool hasMaterials)
+        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile package, Objd objd, Ctss ctss, string cresSgName, Dictionary<string, SubsetData> subsets, bool hasMaterials)
         {
             this.form = form;
             this.package = package;
             this.objd = objd;
             this.ctss = ctss;
-            this.cres = cres;
-            this.shpe = shpe;
-            this.gmnd = gmnd;
+            this.cresSgName = cresSgName;
+            this.subsets = subsets;
 
             this.Location = new Point(location.X + 5, location.Y + 5);
 
@@ -87,7 +82,13 @@ namespace SceneGraphPlus.Dialogs.Options
                 }
             }
 
-            grpRecolourable.Enabled = (gmdc != null);
+            List<string> enabledSubsets = new List<string>();
+            foreach (SubsetData subsetData in subsets.Values)
+            {
+                enabledSubsets.AddRange(subsetData.OwningGmnd.GetDesignModeEnabledSubsets());
+            }
+
+            grpRecolourable.Enabled = (subsets != null);
             if (grpRecolourable.Enabled)
             {
                 comboPrimarySubset.Items.Clear();
@@ -95,7 +96,7 @@ namespace SceneGraphPlus.Dialogs.Options
                 comboSecondarySubset.Items.Clear();
                 comboSecondarySubset.Items.Add("");
 
-                foreach (string subset in gmdc.Subsets)
+                foreach (string subset in subsets.Keys)
                 {
                     comboPrimarySubset.Items.Add(subset);
                     comboSecondarySubset.Items.Add(subset);
@@ -103,8 +104,6 @@ namespace SceneGraphPlus.Dialogs.Options
 
                 ControlHelper.SetDropDownWidth(comboPrimarySubset);
                 ControlHelper.SetDropDownWidth(comboSecondarySubset);
-
-                List<string> enabledSubsets = gmnd.GetDesignModeEnabledSubsets();
 
                 if (enabledSubsets.Count == 1)
                 {
@@ -127,15 +126,15 @@ namespace SceneGraphPlus.Dialogs.Options
                 }
             }
 
-            grpNewMmat.Enabled = (gmnd != null);
+            grpNewMmat.Enabled = (enabledSubsets.Count > 0);
             if (grpNewMmat.Enabled)
             {
                 comboAddMmatSubset.Items.Clear();
                 comboAddMmatSubset.Items.Add("");
 
-                foreach (string subset in gmnd.GetDesignModeEnabledSubsets())
+                foreach (string subset in enabledSubsets)
                 {
-                    comboAddMmatSubset.Items.Add(subset);
+                    if (!comboAddMmatSubset.Items.Contains(subset)) comboAddMmatSubset.Items.Add(subset);
                 }
             }
 
@@ -209,7 +208,7 @@ namespace SceneGraphPlus.Dialogs.Options
         {
             if (comboAddMmatSubset.SelectedIndex != 0)
             {
-                string subsetMaterial = shpe.GetSubsetMaterial(comboAddMmatSubset.Text);
+                string subsetMaterial = GetSubsetMaterial(comboAddMmatSubset.Text);
 
                 if (subsetMaterial != null)
                 {
@@ -235,7 +234,7 @@ namespace SceneGraphPlus.Dialogs.Options
                     mmat.GetOrAddItem("defaultMaterial", DataTypes.dtBoolean).BooleanValue = false;
 
                     mmat.GetOrAddItem("objectGUID", DataTypes.dtUInteger).UIntegerValue = objd.Guid.AsUInt();
-                    mmat.GetOrAddItem("modelName", DataTypes.dtString).StringValue = cres.SgName;
+                    mmat.GetOrAddItem("modelName", DataTypes.dtString).StringValue = cresSgName;
                     mmat.GetOrAddItem("subsetName", DataTypes.dtString).StringValue = comboAddMmatSubset.Text; ;
                     mmat.GetOrAddItem("name", DataTypes.dtString).StringValue = subsetMaterial;
 
@@ -292,25 +291,40 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private void OnUpdateSubsetsClicked(object sender, EventArgs e)
         {
-            if (originalPrimarySubset != null) gmnd.RemoveDesignModeEnabledSubset(originalPrimarySubset);
+            if (originalPrimarySubset != null) RemoveSubset(originalPrimarySubset);
 
             if (comboPrimarySubset.SelectedItem != null)
             {
                 if (comboPrimarySubset.SelectedIndex > 0)
                 {
-                    gmnd.AddDesignModeEnabledSubset(comboPrimarySubset.SelectedItem.ToString());
+                    AddSubset(comboPrimarySubset.SelectedItem.ToString());
                 }
             }
 
-            if (originalSecondarySubset != null) gmnd.RemoveDesignModeEnabledSubset(originalSecondarySubset);
+            if (originalSecondarySubset != null) RemoveSubset(originalSecondarySubset);
 
             if (comboSecondarySubset.SelectedItem != null)
             {
                 if (comboSecondarySubset.SelectedIndex > 0)
                 {
-                    gmnd.AddDesignModeEnabledSubset(comboSecondarySubset.SelectedItem.ToString());
+                    AddSubset(comboSecondarySubset.SelectedItem.ToString());
                 }
             }
+        }
+
+        private void RemoveSubset(string subset)
+        {
+            subsets[subset].OwningGmnd.RemoveDesignModeEnabledSubset(subset);
+        }
+
+        private void AddSubset(string subset)
+        {
+            subsets[subset].OwningGmnd.AddDesignModeEnabledSubset(subset);
+        }
+
+        private string GetSubsetMaterial(string subset)
+        {
+            return subsets[subset].Material;
         }
 
         private void OnAddMaterialsClicked(object sender, EventArgs e)

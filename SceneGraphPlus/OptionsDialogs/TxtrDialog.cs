@@ -8,9 +8,12 @@
 
 using Sims2Tools;
 using Sims2Tools.DBPF.Images;
+using Sims2Tools.DBPF.SceneGraph.LIFO;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DbpfCache;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -25,6 +28,8 @@ namespace SceneGraphPlus.Dialogs.Options
         private SceneGraphPlusForm form;
         private CacheableDbpfFile package;
         private Txtr txtr;
+        private List<Lifo> lifos;
+        private bool removeLifos;
 
         private string originalTxtrName = null;
 
@@ -33,13 +38,17 @@ namespace SceneGraphPlus.Dialogs.Options
             InitializeComponent();
         }
 
-        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile package, Txtr txtr, string txtrname)
+        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile package, Txtr txtr, string txtrname, List<Lifo> lifos, out bool removeLifos)
         {
             this.form = form;
             this.package = package;
             this.txtr = txtr;
+            this.lifos = lifos;
 
             this.Location = new Point(location.X + 5, location.Y + 5);
+
+            ckbRemoveLifos.Checked = this.removeLifos = false;
+            ckbRemoveLifos.Visible = (lifos.Count > 0);
 
             originalTxtrName = txtrname;
             textNewName.Text = originalTxtrName;
@@ -74,7 +83,10 @@ namespace SceneGraphPlus.Dialogs.Options
             btnDuplicate.Enabled = false;
             btnChangeTexture.Enabled = false;
 
-            return base.ShowDialog();
+            DialogResult result = base.ShowDialog();
+
+            removeLifos = this.removeLifos;
+            return result;
         }
 
         private void OnTxtrNameChanged(object sender, EventArgs e)
@@ -96,9 +108,35 @@ namespace SceneGraphPlus.Dialogs.Options
         {
             Txtr newTxtr = txtr.Duplicate(textNewName.Text);
 
+            List<Lifo> newLifos = new List<Lifo>(lifos.Count);
+            for (int index = 0; index < lifos.Count; ++index)
+            {
+                newLifos.Add(lifos[index].Duplicate(textNewName.Text, lifos.Count - 1 - index));
+            }
+
+            if (newLifos.Count > 0)
+            {
+                int index = 0;
+
+                foreach (MipMap mipmap in newTxtr.ImageData.MipMapBlocks[0].MipMaps)
+                {
+                    if (mipmap.IsLifoRef)
+                    {
+                        mipmap.SetLifoFile(newLifos[index++].SgName);
+                    }
+                }
+            }
+
             if (btnChangeTexture.Enabled)
             {
-                UpdateTexture(newTxtr);
+                UpdateTexture(newTxtr, newLifos);
+            }
+
+            // Do the LIFOs first, as that way the TXTR will link to them and not create "missing" LIFO blocks first
+            foreach (Lifo newLifo in newLifos)
+            {
+                package.Commit(newLifo);
+                form.AddResource(package, newLifo, true);
             }
 
             package.Commit(newTxtr);
@@ -146,13 +184,15 @@ namespace SceneGraphPlus.Dialogs.Options
             }
             else
             {
-                UpdateTexture(txtr);
+                UpdateTexture(txtr, lifos);
             }
         }
 
-        private void UpdateTexture(Txtr txtrToUpdate)
+        private void UpdateTexture(Txtr txtrToUpdate, List<Lifo> lifosToUpdate)
         {
-            UpdateTextureHelper(txtrToUpdate, textNewImage.Text, GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters);
+            UpdateTextureHelper(txtrToUpdate, (ckbRemoveLifos.Checked ? null : lifosToUpdate), textNewImage.Text, GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters);
+
+            this.removeLifos = ckbRemoveLifos.Checked;
         }
 
         public static DdsFormats GetTextureFormat(bool radioDxt1, bool radioDxt3, bool radioDxt5, bool radioRaw8, bool radioRaw24, bool radioRaw32)
@@ -166,7 +206,7 @@ namespace SceneGraphPlus.Dialogs.Options
             else return DdsFormats.Unknown;
         }
 
-        public static void UpdateTextureHelper(Txtr txtrToUpdate, string imageName, DdsFormats format, string sLevels, ComboBox comboSharpen, CheckedListBox ckbFilters)
+        public static void UpdateTextureHelper(Txtr txtrToUpdate, List<Lifo> lifosToUpdate, string imageName, DdsFormats format, string sLevels, ComboBox comboSharpen, CheckedListBox ckbFilters)
         {
             DDSData[] ddsData;
 
@@ -187,7 +227,14 @@ namespace SceneGraphPlus.Dialogs.Options
 
                     foreach (string filter in ckbFilters.CheckedItems)
                     {
-                        extraParameters += $" -{filter}";
+                        if (filter.Equals("Dither"))
+                        {
+                            extraParameters += $" -dither";
+                        }
+                        else
+                        {
+                            extraParameters += $" -{filter}";
+                        }
                     }
 
                     ddsData = (new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger)).BuildDDS(imageName, levels, format, extraParameters);
@@ -210,7 +257,28 @@ namespace SceneGraphPlus.Dialogs.Options
             }
 
             Trace.Assert(txtrToUpdate.ImageData.MipMapLevels == ddsData.Length, $"Incorrect number of MipMaps! Expected {txtrToUpdate.ImageData.MipMapLevels}, got {ddsData.Length}");
-            txtrToUpdate.UpdateFromDDSData(ddsData);
+            txtrToUpdate.UpdateFromDDSData(ddsData, (lifosToUpdate == null));
+
+            if (lifosToUpdate != null)
+            {
+                int lifoIndex = 0;
+
+                MipMap[] mipmaps = txtrToUpdate.ImageData.MipMapBlocks[0].MipMaps;
+
+                for (int mipMapIndex = 0; mipMapIndex < mipmaps.Length; ++mipMapIndex)
+                {
+                    if (mipmaps[mipMapIndex].IsLifoRef)
+                    {
+                        if (lifosToUpdate[lifoIndex] != null)
+                        {
+                            Lifo lifo = lifosToUpdate[lifoIndex];
+                            lifo.UpdateFromDDSData(ddsData[mipmaps.Length - 1 - mipMapIndex]);
+                        }
+
+                        ++lifoIndex;
+                    }
+                }
+            }
         }
 
         private void OnFormatChanged(object sender, EventArgs e)

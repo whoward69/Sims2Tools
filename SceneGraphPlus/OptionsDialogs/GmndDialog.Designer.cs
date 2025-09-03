@@ -53,7 +53,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.btnChangeSubsets.Location = new System.Drawing.Point(323, 49);
             this.btnChangeSubsets.Name = "btnChangeSubsets";
             this.btnChangeSubsets.Size = new System.Drawing.Size(82, 26);
-            this.btnChangeSubsets.TabIndex = 28;
+            this.btnChangeSubsets.TabIndex = 5;
             this.btnChangeSubsets.Text = "Update";
             this.btnChangeSubsets.UseVisualStyleBackColor = true;
             this.btnChangeSubsets.Click += new System.EventHandler(this.OnSubsetUpdate);
@@ -68,7 +68,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.grpRecolourable.Location = new System.Drawing.Point(10, 4);
             this.grpRecolourable.Name = "grpRecolourable";
             this.grpRecolourable.Size = new System.Drawing.Size(412, 85);
-            this.grpRecolourable.TabIndex = 29;
+            this.grpRecolourable.TabIndex = 0;
             this.grpRecolourable.TabStop = false;
             this.grpRecolourable.Text = "Recolours:";
             // 
@@ -78,7 +78,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.comboPrimarySubset.Location = new System.Drawing.Point(76, 17);
             this.comboPrimarySubset.Name = "comboPrimarySubset";
             this.comboPrimarySubset.Size = new System.Drawing.Size(241, 23);
-            this.comboPrimarySubset.TabIndex = 3;
+            this.comboPrimarySubset.TabIndex = 2;
             this.comboPrimarySubset.SelectedIndexChanged += new System.EventHandler(this.OnSubsetChanged);
             // 
             // comboSecondarySubset
@@ -87,7 +87,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.comboSecondarySubset.Location = new System.Drawing.Point(76, 51);
             this.comboSecondarySubset.Name = "comboSecondarySubset";
             this.comboSecondarySubset.Size = new System.Drawing.Size(241, 23);
-            this.comboSecondarySubset.TabIndex = 2;
+            this.comboSecondarySubset.TabIndex = 4;
             this.comboSecondarySubset.SelectedIndexChanged += new System.EventHandler(this.OnSubsetChanged);
             // 
             // lblSecondarySubset
@@ -96,7 +96,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.lblSecondarySubset.Location = new System.Drawing.Point(12, 54);
             this.lblSecondarySubset.Name = "lblSecondarySubset";
             this.lblSecondarySubset.Size = new System.Drawing.Size(58, 15);
-            this.lblSecondarySubset.TabIndex = 1;
+            this.lblSecondarySubset.TabIndex = 3;
             this.lblSecondarySubset.Text = "Subset 2:";
             // 
             // lblPrimarySubset
@@ -105,7 +105,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.lblPrimarySubset.Location = new System.Drawing.Point(12, 20);
             this.lblPrimarySubset.Name = "lblPrimarySubset";
             this.lblPrimarySubset.Size = new System.Drawing.Size(58, 15);
-            this.lblPrimarySubset.TabIndex = 0;
+            this.lblPrimarySubset.TabIndex = 1;
             this.lblPrimarySubset.Text = "Subset 1:";
             // 
             // GmndDialog

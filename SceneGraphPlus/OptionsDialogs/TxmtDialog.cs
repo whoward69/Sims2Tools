@@ -13,10 +13,13 @@ using Sims2Tools.DBPF.Images;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DbpfCache;
+using Sims2Tools.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -40,20 +43,30 @@ namespace SceneGraphPlus.Dialogs.Options
         private TypeGroupID mmatGroup;
         private string cresSgName;
         private Txtr txtr;
+        private List<Lifo> lifos;
+        private bool removeLifos;
+
+        private Color initialDiffCoefs;
+        private int initialDiffAlpha;
+        private bool initialLightingEnabled;
+        private string initialBlendMode;
 
         private string originalTxmtName = null;
         private string originalGzpsName = null;
+
+        private bool dataLoading = true;
 
         public TxmtDialog()
         {
             InitializeComponent();
         }
 
-        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile txmtPackage, GraphBlock txmtBlock, Txmt txmt, TypeGUID guid, TypeGroupID mmatGroup, string cresSgName, List<string> subsets, CacheableDbpfFile gzpsPackage, Gzps gzps, Txtr txtr)
+        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile txmtPackage, GraphBlock txmtBlock, Txmt txmt, TypeGUID guid, TypeGroupID mmatGroup, string cresSgName, List<string> subsets, CacheableDbpfFile gzpsPackage, Gzps gzps, Txtr txtr, List<Lifo> lifos, out bool removeLifos)
         {
             this.form = form;
             this.txmtPackage = txmtPackage;
             this.txmt = txmt;
+            this.lifos = lifos;
 
             this.gzpsPackage = gzpsPackage;
             this.gzps = gzps;
@@ -72,14 +85,22 @@ namespace SceneGraphPlus.Dialogs.Options
             // TODO - SceneGraph Plus - gzps - remove this when Create GZPS/3IDR/BINX/STR# is working!
             grpNewGZPS.Visible = false;
 
-            originalTxmtName = txmtBlock.SgBaseName;
-            textTxmtNewName.Text = originalTxmtName;
-
             originalGzpsName = gzps?.Name;
             textGzpsNewName.Text = originalGzpsName;
 
-            grpChangeTexture.Enabled = (txtr != null);
-            if (grpChangeTexture.Enabled)
+            ckbRemoveLifos.Checked = this.removeLifos = false;
+            ckbRemoveLifos.Visible = (lifos.Count > 0);
+
+            originalTxmtName = txmtBlock.SgBaseName;
+            textTxmtNewName.Text = originalTxmtName;
+
+            string textureEnabled = txmt.MaterialDefinition.GetProperty("stdMatBaseTextureEnabled");
+            bool hasTxtr = (txtr != null) && ((textureEnabled != null) && textureEnabled.Equals("true", StringComparison.OrdinalIgnoreCase));
+
+            lblNewImage.Visible = textNewImage.Visible = btnSelectImage.Visible = panelDdsOptions.Visible = hasTxtr;
+            grpStdMat.Visible = !hasTxtr;
+
+            if (hasTxtr)
             {
                 if (txtr.ImageData.Format == DdsFormats.DXT1Format)
                 {
@@ -108,6 +129,20 @@ namespace SceneGraphPlus.Dialogs.Options
 
                 textLevels.Text = txtr.ImageData.MipMapLevels.ToString();
             }
+            else
+            {
+                btnDiffCoefs.BackColor = initialDiffCoefs = ColourHelper.ColourFromTxmtProperty(txmt, "stdMatDiffCoef");
+
+                initialDiffAlpha = (int)(float.Parse(txmt.MaterialDefinition.GetProperty("stdMatUntexturedDiffAlpha")) * 100);
+                textDiffAlpha.Text = (initialDiffAlpha / 100).ToString("0.00");
+                trackDiffAlpha.Value = initialDiffAlpha;
+
+                ckbLightingEnabled.Checked = initialLightingEnabled = txmt.MaterialDefinition.GetProperty("stdMatLightingEnabled").Equals("1");
+
+                initialBlendMode = txmt.MaterialDefinition.GetProperty("stdMatAlphaBlendMode").ToLower();
+                initialBlendMode = $"{initialBlendMode.Substring(0, 1).ToUpper()}{initialBlendMode.Substring(1)}";
+                comboAlphaBlendMode.SelectedItem = initialBlendMode;
+            }
 
             grpNewMmat.Enabled = (subsets.Count > 0);
             if (grpNewMmat.Enabled)
@@ -125,7 +160,12 @@ namespace SceneGraphPlus.Dialogs.Options
             btnChangeTexture.Enabled = false;
             btnMmatCreate.Enabled = false;
 
-            return base.ShowDialog();
+            dataLoading = false;
+
+            DialogResult result = base.ShowDialog();
+
+            removeLifos = this.removeLifos;
+            return result;
         }
 
         private void OnTxmtNameChanged(object sender, EventArgs e)
@@ -147,21 +187,61 @@ namespace SceneGraphPlus.Dialogs.Options
         {
             Txmt newTxmt = txmt.Duplicate(textTxmtNewName.Text);
 
-            txmtPackage.Commit(newTxmt, true);
-            GraphBlock newTxmtBlock = form.AddResource(txmtPackage, newTxmt, true);
+            GraphBlock newTxtrBlock = null;
 
-            if (!(Form.ModifierKeys == Keys.Control) && txtr != null)
+            if (!(Form.ModifierKeys == Keys.Control))
             {
-                Txtr newTxtr = txtr.Duplicate(textTxmtNewName.Text);
+                Txtr newTxtr = null;
+                List<Lifo> newLifos = new List<Lifo>(lifos.Count);
+
+                if (txtr != null)
+                {
+                    newTxtr = txtr.Duplicate(textTxmtNewName.Text);
+
+                    for (int index = 0; index < lifos.Count; ++index)
+                    {
+                        newLifos.Add(lifos[index].Duplicate(newTxtr.SgName, lifos.Count - 1 - index));
+                    }
+
+                    if (newLifos.Count > 0)
+                    {
+                        int index = 0;
+
+                        foreach (MipMap mipmap in newTxtr.ImageData.MipMapBlocks[0].MipMaps)
+                        {
+                            if (mipmap.IsLifoRef)
+                            {
+                                mipmap.SetLifoFile(newLifos[index++].SgName);
+                            }
+                        }
+                    }
+                }
 
                 if (btnChangeTexture.Enabled)
                 {
-                    UpdateTexture(newTxtr);
+                    UpdateTexture(newTxmt, newTxtr, newLifos);
                 }
 
-                txmtPackage.Commit(newTxtr, true);
-                GraphBlock newTxtrBlock = form.AddResource(txmtPackage, newTxtr, true);
+                if (newTxtr != null)
+                {
+                    // Do the LIFOs first, as that way the TXTR will link to them and not create "missing" LIFO blocks first
+                    foreach (Lifo newLifo in newLifos)
+                    {
+                        txmtPackage.Commit(newLifo, true);
+                        form.AddResource(txmtPackage, newLifo, true);
+                    }
 
+                    txmtPackage.Commit(newTxtr, true);
+                    newTxtrBlock = form.AddResource(txmtPackage, newTxtr, true);
+                }
+            }
+
+            // Do the TXTR (and any LIFOs) first, as that way the TXMT will link to the new TXTR and not create "missing" TXTR block first
+            txmtPackage.Commit(newTxmt, true);
+            GraphBlock newTxmtBlock = form.AddResource(txmtPackage, newTxmt, true);
+
+            if (newTxtrBlock != null)
+            {
                 newTxmtBlock.OutConnectorByLabel("stdMatBaseTextureName").SetEndBlock(newTxtrBlock, true);
             }
 
@@ -218,7 +298,7 @@ namespace SceneGraphPlus.Dialogs.Options
             }
             else
             {
-                UpdateTexture(txtr);
+                UpdateTexture(txmt, txtr, lifos);
             }
         }
 
@@ -281,9 +361,21 @@ namespace SceneGraphPlus.Dialogs.Options
             return null;
         }
 
-        private void UpdateTexture(Txtr txtrToUpdate)
+        private void UpdateTexture(Txmt txmtToUpdate, Txtr txtrToUpdate, List<Lifo> lifosToUpdate)
         {
-            TxtrDialog.UpdateTextureHelper(txtrToUpdate, textNewImage.Text, TxtrDialog.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters);
+            if (txtrToUpdate == null)
+            {
+                ColourHelper.SetTxmtPropertyFromColour(txmtToUpdate, "stdMatDiffCoef", btnDiffCoefs.BackColor);
+                txmtToUpdate.MaterialDefinition.SetProperty("stdMatAlphaBlendMode", comboAlphaBlendMode.SelectedItem.ToString().ToLower());
+                txmtToUpdate.MaterialDefinition.SetProperty("stdMatLightingEnabled", (ckbLightingEnabled.Checked ? "1" : "0"));
+                txmtToUpdate.MaterialDefinition.SetProperty("stdMatUntexturedDiffAlpha", (trackDiffAlpha.Value / 100.0).ToString("0.00"));
+            }
+            else
+            {
+                TxtrDialog.UpdateTextureHelper(txtrToUpdate, (ckbRemoveLifos.Checked ? null : lifosToUpdate), textNewImage.Text, TxtrDialog.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters);
+
+                this.removeLifos = ckbRemoveLifos.Checked;
+            }
         }
 
         private void OnGzpsNameKeyUp(object sender, KeyEventArgs e)
@@ -391,6 +483,88 @@ namespace SceneGraphPlus.Dialogs.Options
             else if (sender == radioRaw8 || sender == radioRaw24 || sender == radioRaw32)
             {
                 comboSharpen.Enabled = ckbFilters.Enabled = false;
+            }
+        }
+
+        private void OnSelectColourClicked(object sender, EventArgs e)
+        {
+            if (sender is Button button)
+            {
+                dlgColourPicker.Color = button.BackColor;
+
+                if (dlgColourPicker.ShowDialog() == DialogResult.OK)
+                {
+                    button.BackColor = dlgColourPicker.Color;
+
+                    UpdateChangeTextureButton();
+                }
+            }
+        }
+
+        bool changingDiffAlpha = false;
+
+        private void OnDiffAlphaScrolled(object sender, EventArgs e)
+        {
+            if (changingDiffAlpha) return;
+
+            changingDiffAlpha = true;
+            textDiffAlpha.Text = (trackDiffAlpha.Value / 100.0).ToString("0.00");
+            changingDiffAlpha = false;
+
+            UpdateChangeTextureButton();
+        }
+
+        private void OnDiffAplhaEdited(object sender, EventArgs e)
+        {
+            if (changingDiffAlpha) return;
+
+            changingDiffAlpha = true;
+            try
+            {
+                trackDiffAlpha.Value = (int)(float.Parse(textDiffAlpha.Text) * 100);
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                changingDiffAlpha = false;
+            }
+
+            UpdateChangeTextureButton();
+        }
+
+        private void OnLightingChanged(object sender, EventArgs e)
+        {
+            UpdateChangeTextureButton();
+        }
+
+        private void OnBlendModeChanged(object sender, EventArgs e)
+        {
+            UpdateChangeTextureButton();
+        }
+
+        private void UpdateChangeTextureButton()
+        {
+            if (dataLoading) return;
+
+            btnChangeTexture.Enabled = false;
+
+            if (btnDiffCoefs.BackColor != initialDiffCoefs)
+            {
+                btnChangeTexture.Enabled = true;
+            }
+            else if (!initialBlendMode.Equals(comboAlphaBlendMode.SelectedItem))
+            {
+                btnChangeTexture.Enabled = true;
+            }
+            else if (initialLightingEnabled != ckbLightingEnabled.Checked)
+            {
+                btnChangeTexture.Enabled = true;
+            }
+            else if (initialDiffAlpha != trackDiffAlpha.Value)
+            {
+                btnChangeTexture.Enabled = true;
             }
         }
     }
