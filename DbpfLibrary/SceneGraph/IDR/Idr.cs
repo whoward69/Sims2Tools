@@ -174,6 +174,11 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
 
         public IDbpfScriptable Indexed(int index)
         {
+            if (index == -1)
+            {
+                index = items.Count;
+            }
+
             while (index > (items.Count - 1))
             {
                 items.Add(new DBPFScriptableKey(DBPFData.TYPE_NULL, DBPFData.GROUP_NULL, DBPFData.INSTANCE_NULL, DBPFData.RESOURCE_NULL));

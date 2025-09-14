@@ -48,6 +48,7 @@ namespace Sims2Tools.DBPF.TTAB
         }
 
         // See - https://modthesims.info/wiki.php?title=54544142
+        // TODO - DBPF Library - Ttab unserialize - check this
         protected void Unserialize(DbpfReader reader)
         {
             this._keyName = Helper.ToString(reader.ReadBytes(0x40));
@@ -67,6 +68,10 @@ namespace Sims2Tools.DBPF.TTAB
 
             // this.footer = reader.ReadBytes((int)(reader.Length - reader.Position));
         }
+
+        // TODO - DBPF Library - TtabItem serialize - add FileSize
+
+        // TODO - DBPF Library - TtabItem serialize - add Serialize
 
         public override XmlElement AddXml(XmlElement parent)
         {

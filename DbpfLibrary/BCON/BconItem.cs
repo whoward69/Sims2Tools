@@ -21,6 +21,8 @@ namespace Sims2Tools.DBPF.BCON
         private bool _isDirty = false;
 
         public bool IsDirty => _isDirty;
+        public void SetDirty() => _isDirty = true;
+
         public void SetClean() => _isDirty = false;
 
         public BconItem(short value) => this.value = value;

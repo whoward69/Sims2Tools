@@ -19,6 +19,7 @@ using Sims2Tools.DBPF.SceneGraph.TXMT;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.SHPE
@@ -132,6 +133,8 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
 
         public void RenameSubset(string oldName, string newName) => cShape.RenameSubset(oldName, newName);
 
+        public bool HasSubset(string subset) => cShape.HasSubset(subset);
+
         public string GetSubsetMaterial(string subset) => cShape.GetSubsetMaterial(subset);
 
         public void SetSubsetMaterial(string subset, string material) => cShape.SetSubsetMaterial(subset, material);
@@ -167,6 +170,27 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
 
             return needed;
         }
+
+        #region IDBPFScriptable
+        public override bool Assignment(string item, ScriptValue sv)
+        {
+            if (HasSubset(item))
+            {
+                SetSubsetMaterial(item, sv);
+
+                return true;
+            }
+
+            return base.Assignment(item, sv);
+        }
+
+        public override IDbpfScriptable Indexed(int index)
+        {
+            Trace.Assert(index >= 0 && index < cShape.Items.Count, $"Item index {index} out of range");
+
+            return cShape.GetItem(index);
+        }
+        #endregion
 
         public override XmlElement AddXml(XmlElement parent)
         {

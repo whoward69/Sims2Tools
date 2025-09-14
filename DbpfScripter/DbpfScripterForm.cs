@@ -245,5 +245,14 @@ namespace DbpfScripter
             {
             }
         }
+
+        private void OnDdsUtilsPathClicked(object sender, EventArgs e)
+        {
+            Form config = new DdsConfigDialog();
+
+            if (config.ShowDialog() == DialogResult.OK)
+            {
+            }
+        }
     }
 }

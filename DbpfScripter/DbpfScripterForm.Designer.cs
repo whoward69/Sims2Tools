@@ -73,6 +73,7 @@ namespace DbpfScripter
             this.textSaveName = new System.Windows.Forms.TextBox();
             this.lblSaveName = new System.Windows.Forms.Label();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.menuItemDdsUtilsPath = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -98,6 +99,7 @@ namespace DbpfScripter
             this.menuItemSavePath,
             this.toolStripSeparator1,
             this.menuItemConfiguration,
+            this.menuItemDdsUtilsPath,
             this.toolStripSeparator2,
             this.menuItemExit});
             this.menuFile.Name = "menuFile";
@@ -343,6 +345,13 @@ namespace DbpfScripter
             this.toolTip.SetToolTip(this.lblSaveName, "File name part used to replace any occurance of \"template\" in the input .package " +
         "file name(s)");
             // 
+            // menuItemDdsUtilsPath
+            // 
+            this.menuItemDdsUtilsPath.Name = "menuItemDdsUtilsPath";
+            this.menuItemDdsUtilsPath.Size = new System.Drawing.Size(183, 22);
+            this.menuItemDdsUtilsPath.Text = "DDS Utils Path...";
+            this.menuItemDdsUtilsPath.Click += new System.EventHandler(this.OnDdsUtilsPathClicked);
+            // 
             // DbpfScripterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -408,6 +417,7 @@ namespace DbpfScripter
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuItemDeveloper;
         private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDdsUtilsPath;
     }
 }
 

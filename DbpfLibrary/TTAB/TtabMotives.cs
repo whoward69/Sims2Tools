@@ -47,6 +47,7 @@ namespace Sims2Tools.DBPF.TTAB
             if (reader != null) this.Unserialize(reader, format);
         }
 
+        // TODO - DBPF Library - TtabMotives unserialize - check this
         private void Unserialize(DbpfReader reader, uint format)
         {
             int length = this.counts == null ? reader.ReadInt32() : this.counts.Length;
@@ -54,6 +55,10 @@ namespace Sims2Tools.DBPF.TTAB
             for (int index = 0; index < length; ++index)
                 items.Set(index, new TtabItemMotiveGroup(this, format, this.counts != null ? this.counts[index] : 0, this.type, reader));
         }
+
+        // TODO - DBPF Library - TtabMotives serialize - add FileSize
+
+        // TODO - DBPF Library - TtabMotives serialize - add Serialize
 
         public void AddXml(XmlElement parent)
         {
@@ -106,6 +111,7 @@ namespace Sims2Tools.DBPF.TTAB
             if (reader != null) this.Unserialize(reader, format);
         }
 
+        // TODO - DBPF Library - TtabMotives unserialize - check this
         private void Unserialize(DbpfReader reader, uint format)
         {
             int num = format < 84U ? this.count : reader.ReadInt32();
@@ -125,6 +131,10 @@ namespace Sims2Tools.DBPF.TTAB
                     items.Set(index, new TtabItemAnimalMotiveItem(this, null));
             }
         }
+
+        // TODO - DBPF Library - TtabMotives serialize - add FileSize
+
+        // TODO - DBPF Library - TtabMotives serialize - add Serialize
 
         internal void AddXml(XmlElement parent, int index)
         {
@@ -200,11 +210,16 @@ namespace Sims2Tools.DBPF.TTAB
         {
         }
 
+        // TODO - DBPF Library - TtabMotives unserialize - check this
         protected override void Unserialize(DbpfReader reader)
         {
             for (int index = 0; index < this.items.Length; ++index)
                 this.items[index] = reader.ReadInt16();
         }
+
+        // TODO - DBPF Library - TtabMotives serialize - add FileSize
+
+        // TODO - DBPF Library - TtabMotives serialize - add Serialize
 
         internal override void AddXml(XmlElement parent, int index)
         {
@@ -226,6 +241,7 @@ namespace Sims2Tools.DBPF.TTAB
         {
         }
 
+        // TODO - DBPF Library - TtabMotives unserialize - check this
         protected override void Unserialize(DbpfReader reader)
         {
             int length = reader.ReadInt32();
@@ -235,6 +251,10 @@ namespace Sims2Tools.DBPF.TTAB
             for (int index = 0; index < length; ++index)
                 items.Add(new TtabItemSingleMotiveItem(this.parent, reader));
         }
+
+        // TODO - DBPF Library - TtabMotives serialize - add FileSize
+
+        // TODO - DBPF Library - TtabMotives serialize - add Serialize
 
         internal override void AddXml(XmlElement parent, int index)
         {

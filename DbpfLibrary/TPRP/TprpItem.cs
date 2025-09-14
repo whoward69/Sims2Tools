@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
+using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.TPRP
 {
@@ -26,7 +27,27 @@ namespace Sims2Tools.DBPF.TPRP
 
         public TprpItem(DbpfReader reader) => this.Unserialize(reader);
 
+        // TODO - DBPF Library - _TEST - Unserialize TprpItem, check this
         protected void Unserialize(DbpfReader reader) => this.label = Helper.ToString(reader.ReadBytes(reader.ReadByte()));
+
+        // TODO - DBPF Library - _TEST - Serialize TprpItem
+        public uint FileSize => (uint)(1 + Helper.ToBytes(label, 0).Length);
+
+        // TODO - DBPF Library - _TEST - Serialize TprpItem
+        public void Serialize(DbpfWriter writer)
+        {
+#if DEBUG
+            long writeStart = writer.Position;
+#endif
+
+            byte[] b = Helper.ToBytes(label, 0);
+            writer.WriteByte((byte)b.Length);
+            writer.WriteBytes(b);
+
+#if DEBUG
+            Debug.Assert((writer.Position - writeStart) == FileSize);
+#endif
+        }
 
         public override string ToString() => this.label;
 

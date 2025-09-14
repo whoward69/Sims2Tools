@@ -19,6 +19,7 @@ using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.GMND
@@ -87,6 +88,18 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
         }
 
         public void SetGmdcKey(int index, DBPFKey key)
+        {
+            if (key is DBPFScriptableKey)
+            {
+                SetGmdcKey(index, key as DBPFScriptableKey);
+            }
+            else
+            {
+                SetGmdcKey(index, new DBPFScriptableKey(key));
+            }
+        }
+
+        public void SetGmdcKey(int index, DBPFScriptableKey key)
         {
             int idxGmdc = 0;
 
@@ -275,11 +288,6 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
             return needed;
         }
 
-        public override XmlElement AddXml(XmlElement parent)
-        {
-            return AddXml(parent, NAME);
-        }
-
         private string ListToString(List<string> items)
         {
             string str = "";
@@ -304,6 +312,20 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
             }
 
             return items;
+        }
+
+        #region IDBPFScriptable
+        public override IDbpfScriptable Indexed(int index)
+        {
+            Trace.Assert(index >= 0 && index < ReferencedFiles.Count, $"Reference index {index} out of range");
+
+            return ReferencedFiles[index];
+        }
+        #endregion
+
+        public override XmlElement AddXml(XmlElement parent)
+        {
+            return AddXml(parent, NAME);
         }
     }
 }

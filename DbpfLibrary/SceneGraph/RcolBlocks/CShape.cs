@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -25,6 +26,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         private string subset;
         private string filename;
         private byte[] data = new byte[9] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+        private bool _isDirty = false;
+
+        public bool IsDirty => _isDirty;
+
+        public void SetClean() => _isDirty = false;
 
         public string Subset
         {
@@ -73,7 +80,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public override string ToString() => $"{subset}: {filename}";
     }
 
-    public class ShapeItem
+    public class ShapeItem : IDbpfScriptable
     {
 #if DEBUG
         protected long readStart, readEnd, writeStart, writeEnd;
@@ -87,6 +94,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         private byte unknown4;
 
         private string filename;
+
+        private bool _isDirty = false;
+
+        public bool IsDirty => _isDirty;
+
+        public void SetClean() => _isDirty = false;
 
         public string FileName
         {
@@ -189,6 +202,31 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 #endif
         }
 
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("item"))
+            {
+                filename = sv;
+                _isDirty = true;
+
+                return true;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
         public override string ToString()
         {
             string name = Helper.Hex4PrefixString((uint)lod) + " - " + Helper.Hex4PrefixString(unknown2);
@@ -215,7 +253,42 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         private uint[] lodData;
         private readonly ReferentNode refnode = new ReferentNode();
 
+        public override bool IsDirty
+        {
+            get
+            {
+                foreach (ShapeItem item in items)
+                {
+                    if (item.IsDirty) return true;
+                }
+
+                foreach (ShapePart part in parts)
+                {
+                    if (part.IsDirty) return true;
+                }
+
+                return base.IsDirty;
+            }
+        }
+
+        public override void SetClean()
+        {
+            foreach (ShapeItem item in items)
+            {
+                item.SetClean();
+            }
+
+            foreach (ShapePart part in parts)
+            {
+                part.SetClean();
+            }
+
+            base.SetClean();
+        }
+
         public ReadOnlyCollection<ShapeItem> Items => items.AsReadOnly();
+
+        public ShapeItem GetItem(int index) => items[index];
 
         public ReadOnlyCollection<ShapePart> Parts => parts.AsReadOnly();
 
@@ -328,6 +401,19 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             }
 
             _isDirty = true;
+        }
+
+        public bool HasSubset(string subset)
+        {
+            foreach (ShapePart part in parts)
+            {
+                if (part.Subset.Equals(subset))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public string GetSubsetMaterial(string subset)

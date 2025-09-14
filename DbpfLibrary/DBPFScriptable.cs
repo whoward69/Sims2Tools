@@ -11,6 +11,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Sims2Tools.DBPF
 {
@@ -60,8 +61,26 @@ namespace Sims2Tools.DBPF
         private readonly bool isFloat = false;
         private readonly bool isString = false;
 
-        public ScriptValue(string value)
+        private readonly Dictionary<string, ScriptValue> scriptConstants = null;
+
+        public ScriptValue ScriptConstant(string name)
         {
+            if (scriptConstants != null && scriptConstants.ContainsKey(name))
+            {
+                return scriptConstants[name];
+            }
+
+            return null;
+        }
+
+        public ScriptValue(string value) : this(value, null)
+        {
+        }
+
+        public ScriptValue(string value, Dictionary<string, ScriptValue> scriptConstants)
+        {
+            this.scriptConstants = scriptConstants;
+
             if (value.StartsWith("\"") && value.EndsWith("\""))
             {
                 value = value.Substring(1, value.Length - 2);
@@ -130,6 +149,8 @@ namespace Sims2Tools.DBPF
         public bool IsFloat => isFloat;
         public bool IsString => isString;
 
+        public bool IsTrue => (isFloat && dVal != 0.0) || (isInt && lVal != 0) || (isString && !string.IsNullOrWhiteSpace(sVal));
+        public bool IsFale => !IsTrue;
 
         public string ToLower() => sVal.ToLower();
         public string ToUpper() => sVal.ToUpper();

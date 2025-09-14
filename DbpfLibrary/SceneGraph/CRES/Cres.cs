@@ -22,6 +22,7 @@ using Sims2Tools.DBPF.SceneGraph.SHPE;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.CRES
@@ -95,6 +96,18 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
 
         public void SetShpeKey(int index, DBPFKey key)
         {
+            if (key is DBPFScriptableKey)
+            {
+                SetShpeKey(index, key as DBPFScriptableKey);
+            }
+            else
+            {
+                SetShpeKey(index, new DBPFScriptableKey(key));
+            }
+        }
+
+        public void SetShpeKey(int index, DBPFScriptableKey key)
+        {
             int idxShpe = 0;
 
             for (int i = 0; i < ReferencedFiles.Count; ++i)
@@ -132,6 +145,18 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
 
         public void SetLghtKey(int index, DBPFKey key)
         {
+            if (key is DBPFScriptableKey)
+            {
+                SetLghtKey(index, key as DBPFScriptableKey);
+            }
+            else
+            {
+                SetLghtKey(index, new DBPFScriptableKey(key));
+            }
+        }
+
+        public void SetLghtKey(int index, DBPFScriptableKey key)
+        {
             int idxLght = 0;
 
             for (int i = 0; i < ReferencedFiles.Count; ++i)
@@ -164,6 +189,15 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
 
             return needed;
         }
+
+        #region IDBPFScriptable
+        public override IDbpfScriptable Indexed(int index)
+        {
+            Trace.Assert(index >= 0 && index < ReferencedFiles.Count, $"Reference index {index} out of range");
+
+            return ReferencedFiles[index];
+        }
+        #endregion
 
         public override XmlElement AddXml(XmlElement parent)
         {

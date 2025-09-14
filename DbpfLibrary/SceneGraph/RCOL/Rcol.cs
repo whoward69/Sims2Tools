@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
+using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.RCOL
 {
-    public abstract class Rcol : SgResource, IDisposable
+    public abstract class Rcol : SgResource, IDisposable, IDbpfScriptable
     {
         private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -55,7 +56,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 #endif
 
         private uint[] index;
-        private readonly List<DBPFKey> reffiles = new List<DBPFKey>();
+        private readonly List<DBPFScriptableKey> reffiles = new List<DBPFScriptableKey>();
         private readonly List<IRcolBlock> blocks = new List<IRcolBlock>();
         private uint count;
         private byte[] oversize;
@@ -138,9 +139,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             }
         }
 
-        public ReadOnlyCollection<DBPFKey> ReferencedFiles => reffiles.AsReadOnly();
+        public ReadOnlyCollection<DBPFScriptableKey> ReferencedFiles => reffiles.AsReadOnly();
 
-        protected void SetReferencedFile(int index, DBPFKey key)
+        protected void SetReferencedFile(int index, DBPFScriptableKey key)
         {
             Trace.Assert(!duff, "RCOL is duff!");
             Debug.Assert(index >= 0 && index < reffiles.Count, "reffiles[index] is invalid!");
@@ -312,7 +313,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                     TypeResourceID resourceId = (count == 0xffff0001) ? reader.ReadResourceId() : DBPFData.RESOURCE_NULL;
                     TypeTypeID typeId = reader.ReadTypeId();
 
-                    reffiles.Add(new DBPFKey(typeId, groupId, instanceId, resourceId));
+                    reffiles.Add(new DBPFScriptableKey(typeId, groupId, instanceId, resourceId));
                 }
 
                 index = new uint[reader.ReadUInt32()];
@@ -401,6 +402,46 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 #endif
         }
 
+        #region IDBPFScriptable
+        public virtual bool Assert(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("filename"))
+            {
+                SetKeyName(sv);
+
+                FixTGIR();
+
+                OgnName = sv;
+
+                if (this is Txmt txmt)
+                {
+                    string matDefDesc = sv.ToString();
+
+                    if (matDefDesc.ToLower().EndsWith("_txmt"))
+                    {
+                        matDefDesc = matDefDesc.Substring(0, matDefDesc.Length - 5);
+                    }
+
+                    txmt.MaterialDefinition.FileDescription = matDefDesc;
+                }
+
+                return true;
+            }
+
+            return DbpfScriptable.IsTGIRAssignment(this, item, sv);
+        }
+
+        public virtual IDbpfScriptable Indexed(int index)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
         public void Duplicate(Rcol into, string newName)
         {
             into.duff = this.duff;
@@ -410,7 +451,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
             foreach (DBPFKey refKey in this.reffiles)
             {
-                into.reffiles.Add(new DBPFKey(refKey));
+                into.reffiles.Add(new DBPFScriptableKey(refKey));
             }
 
             into.index = new uint[this.index.Length];

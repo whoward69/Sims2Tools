@@ -282,6 +282,8 @@ namespace Sims2Tools.DBPF.CPF
 
         public bool Assignment(string item, ScriptValue sv)
         {
+            if (DbpfScriptable.IsTGIRAssignment(this, item, sv)) return true;
+
             CpfItem cpfItem = GetItem(item);
 
             if (cpfItem == null)
@@ -340,7 +342,7 @@ namespace Sims2Tools.DBPF.CPF
                 }
             }
 
-            return DbpfScriptable.IsTGIRAssignment(this, item, sv);
+            return false;
         }
 
         public IDbpfScriptable Indexed(int index)

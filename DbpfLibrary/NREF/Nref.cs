@@ -50,7 +50,6 @@ namespace Sims2Tools.DBPF.NREF
 #endif
         }
 
-
         #region IDBPFScriptable
         public bool Assert(string item, ScriptValue sv)
         {

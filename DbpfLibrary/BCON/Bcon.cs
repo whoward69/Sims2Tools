@@ -121,6 +121,19 @@ namespace Sims2Tools.DBPF.BCON
 
         public IDbpfScriptable Indexed(int index)
         {
+            if (index == -1)
+            {
+                index = items.Count;
+            }
+
+            while (index > (items.Count - 1))
+            {
+                BconItem item = new BconItem(0);
+                item.SetDirty();
+
+                items.Add(item);
+            }
+
             return items[index];
         }
         #endregion

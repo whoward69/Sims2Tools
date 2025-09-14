@@ -17,6 +17,8 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.TTAB
 {
+    // TODO - DBPF Library - it would be nice to be able to script these values, eg, to enable/disable life stages
+
     public class TtabItem : IComparable<TtabItem>
     {
         private readonly uint format; // Owning TTAB format
@@ -78,6 +80,7 @@ namespace Sims2Tools.DBPF.TTAB
             this.Unserialize(reader);
         }
 
+        // TODO - DBPF Library - TtabItem unserialize - check this
         private void Unserialize(DbpfReader reader)
         {
             this.action = reader.ReadUInt16();
@@ -127,6 +130,10 @@ namespace Sims2Tools.DBPF.TTAB
                 this.animalGroups = new TtabItemMotiveTable(format, null, TtabItemMotiveTableType.Animal, reader);
             }
         }
+
+        // TODO - DBPF Library - TtabItem serialize - add FileSize
+
+        // TODO - DBPF Library - TtabItem serialize - add Serialize
 
         public int CompareTo(TtabItem that)
         {

@@ -88,7 +88,7 @@ namespace Sims2Tools.DBPF.Images
                 arguments += $" {extraParameters.Trim()}";
             }
 
-            logger.Info($"nvdxt {arguments}");
+            if (logger != null) logger.Info($"nvdxt {arguments}");
 
             try
             {

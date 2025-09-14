@@ -13,12 +13,15 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.TRCN
 {
-    public class Trcn : DBPFResource
+    public class Trcn : DBPFResource, IDbpfScriptable
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x5452434E;
@@ -64,8 +67,10 @@ namespace Sims2Tools.DBPF.TRCN
             this.header[0] = reader.ReadUInt32();
             this.header[1] = reader.ReadUInt32();
             this.header[2] = reader.ReadUInt32();
+
             if (this.TextOnly)
                 return;
+
             uint num = reader.ReadUInt32();
             if (num >= 0x8000)
             {
@@ -84,6 +89,92 @@ namespace Sims2Tools.DBPF.TRCN
                 }
             }
         }
+
+        public override uint FileSize
+        {
+            get
+            {
+                Trace.Assert(duff == false, "Cannot serialize a bad resource");
+
+                uint size = 0x40;
+
+                size += 4 + 4 + 4;
+
+                if (!this.TextOnly)
+                {
+                    size += 4;
+
+                    for (int index = 0; index < items.Count; ++index)
+                    {
+                        size += items[index].FileSize;
+                    }
+                }
+
+                return size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            Trace.Assert(duff == false, "Cannot serialize a bad resource");
+
+#if DEBUG
+            long writeStart = writer.Position;
+#endif
+
+            writer.WriteBytes(Encoding.ASCII.GetBytes(KeyName), 0x40);
+
+            writer.WriteUInt32(header[0]);
+            writer.WriteUInt32(header[1]);
+            writer.WriteUInt32(header[2]);
+
+            if (this.TextOnly)
+                return;
+
+            writer.WriteUInt32((uint)items.Count);
+
+            for (int index = 0; index < items.Count; ++index)
+            {
+                items[index].Serialize(writer);
+            }
+
+#if DEBUG
+            Debug.Assert((writer.Position - writeStart) == FileSize);
+#endif
+        }
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            if (item.Equals("filename"))
+            {
+                return KeyName.Equals(sv);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDbpfScriptable Indexed(int index)
+        {
+            if (index == -1)
+            {
+                index = items.Count;
+            }
+
+            while (index > (items.Count - 1))
+            {
+                items.Add(new TrcnItem("", true));
+                _isDirty = true;
+            }
+
+            return items[index];
+        }
+        #endregion
 
         public override XmlElement AddXml(XmlElement parent)
         {

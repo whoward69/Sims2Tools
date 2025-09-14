@@ -16,6 +16,7 @@ using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Text;
 using System.Xml;
 
@@ -163,6 +164,8 @@ namespace Sims2Tools.DBPF.BHAV
 
         public IDbpfScriptable Indexed(int index)
         {
+            Trace.Assert(index >= 0 && index < instructions.Count, $"Instruction index {index} out of range");
+
             return instructions[index];
         }
         #endregion

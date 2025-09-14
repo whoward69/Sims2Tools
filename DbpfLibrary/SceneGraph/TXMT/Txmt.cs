@@ -120,6 +120,23 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 
         public bool IsFileListValid => cMaterialDefinition.IsFileListValid;
 
+        public void FixFiles()
+        {
+            MaterialDefinition.ClearFiles();
+
+            foreach (string txtrProp in txtrPropKeys)
+            {
+                string txtrValue = GetProperty(txtrProp);
+
+                if (txtrValue != null)
+                {
+                    MaterialDefinition.AddFile(txtrValue);
+                }
+            }
+        }
+
+        public bool HasProperty(string name) => MaterialDefinition.HasProperty(name);
+
         public string GetProperty(string name) => MaterialDefinition.GetProperty(name);
 
         public void SetProperty(string name, string value) => MaterialDefinition.SetProperty(name, value);
@@ -179,6 +196,28 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 
             return needed;
         }
+
+        #region IDBPFScriptable
+        public override bool Assignment(string item, ScriptValue sv)
+        {
+            if (HasProperty(item))
+            {
+                SetProperty(item, sv);
+
+                foreach (string txtrProp in txtrPropKeys)
+                {
+                    if (txtrProp.Equals(item, StringComparison.OrdinalIgnoreCase))
+                    {
+                        FixFiles();
+                    }
+                }
+
+                return true;
+            }
+
+            return base.Assignment(item, sv);
+        }
+        #endregion
 
         public override XmlElement AddXml(XmlElement parent)
         {

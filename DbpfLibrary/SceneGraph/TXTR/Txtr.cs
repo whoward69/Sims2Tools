@@ -17,6 +17,7 @@ using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.Utils;
 using System;
+using System.Diagnostics;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.TXTR
@@ -90,6 +91,57 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
         {
             return new SgResourceList();
         }
+
+        #region IDBPFScriptable
+        public override bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("image"))
+            {
+                string imageName = sv.ToString();
+
+                DDSData[] ddsData;
+
+                uint levels = ImageData.MipMapLevels;
+                DdsFormats format = ImageData.Format;
+
+                if (format == DdsFormats.DXT1Format || format == DdsFormats.DXT3Format || format == DdsFormats.DXT5Format)
+                {
+                    if (imageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ddsData = DdsLoader.ParseDDS(imageName);
+                    }
+                    else
+                    {
+                        string extraParameters = $"-sharpenMethod None";
+
+                        ddsData = (new NvidiaDdsBuilder(sv.ScriptConstant("ddsutils"), null)).BuildDDS(imageName, levels, format, extraParameters);
+                    }
+                }
+                else if (format == DdsFormats.Raw8Bit || format == DdsFormats.ExtRaw8Bit || format == DdsFormats.Raw24Bit || format == DdsFormats.ExtRaw24Bit || format == DdsFormats.Raw32Bit)
+                {
+                    if (imageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new Exception("Unsupported file extension");
+                    }
+                    else
+                    {
+                        ddsData = (new NvidiaDdsBuilder(sv.ScriptConstant("ddsutils"), null)).BuildDDS(imageName, levels, format, "");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Unsupported DDS Format");
+                }
+
+                Trace.Assert(ImageData.MipMapLevels == ddsData.Length, $"Incorrect number of MipMaps! Expected {ImageData.MipMapLevels}, got {ddsData.Length}");
+                UpdateFromDDSData(ddsData, true);
+
+                return true;
+            }
+
+            return base.Assignment(item, sv);
+        }
+        #endregion
 
         public override XmlElement AddXml(XmlElement parent)
         {

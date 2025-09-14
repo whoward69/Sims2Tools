@@ -280,7 +280,24 @@ namespace Sims2Tools.DBPF.STR
 
         public IDbpfScriptable Indexed(int index)
         {
-            return languages[MetaData.Languages.Default][index];
+            if (!languages.ContainsKey(MetaData.Languages.Default))
+            {
+                AddLanguage(MetaData.Languages.Default);
+            }
+
+            List<StrItem> defLang = languages[MetaData.Languages.Default];
+
+            if (index == -1)
+            {
+                index = defLang.Count;
+            }
+
+            while (index > (defLang.Count - 1))
+            {
+                AppendLanguageItem(MetaData.Languages.Default, new StrItem(MetaData.Languages.Default, "", "", true));
+            }
+
+            return defLang[index];
         }
         #endregion
 

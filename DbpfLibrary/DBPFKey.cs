@@ -156,6 +156,10 @@ namespace Sims2Tools.DBPF
         {
         }
 
+        public DBPFScriptableKey(DBPFKey key) : this(key.TypeID, key.GroupID, key.InstanceID, key.ResourceID)
+        {
+        }
+
         #region IDBPFScriptable
         public bool Assert(string item, ScriptValue sv)
         {

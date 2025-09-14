@@ -19,13 +19,13 @@ namespace DbpfScripter
         public static string AppName = "DBPF Scripter";
 
         public static int AppVersionMajor = 1;
-        public static int AppVersionMinor = 1;
+        public static int AppVersionMinor = 2;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 1;
+        private static readonly int AppVersionDebug = 2;
 #endif
 
-        private static readonly string AppVersionType = "a"; // a - alpha, b - beta, r - release
+        private static readonly string AppVersionType = "b"; // a - alpha, b - beta, r - release
 
 #if DEBUG
         public static readonly string AppTitle = $"{AppName} V{AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType}";
