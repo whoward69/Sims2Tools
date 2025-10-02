@@ -116,10 +116,10 @@ namespace Sims2Tools.DBPF.BCON
 
         public bool Assignment(string item, ScriptValue sv)
         {
-            throw new NotImplementedException();
+            return DbpfScriptable.IsTGIRAssignment(this, item, sv);
         }
 
-        public IDbpfScriptable Indexed(int index)
+        public IDbpfScriptable Indexed(int index, bool clone)
         {
             if (index == -1)
             {

@@ -26,54 +26,162 @@ using System.Xml;
 /*
  * General notes on the dbpfscript.txt file
  * 
- * Ignore leading spaces
- * Ignore everything after // to the end of the line
- * Ignore blank lines
- * Ignore spaces outside of quote delimited strings
- * Semi-colon (;) is "syntatic sugar"
+ * The parser is based on the following Backus–Naur form, with the additional meanings
+ *   (x | y) - either x or y, more than two options are permitted
+ *   (x)+ - one or more occurances of x (or y)
+ *   (x)? - x (or y) is optional (zero or one occurance of x (or y))
+ *   (x)N - x occurs exactly N times
  * 
- * The initial development was heavily influenced by automating https://hypersaline.tumblr.com/post/770353073301422080/tutorial-adding-new-shapes-to-bodyshapes-mod
- *
- * The parser is based on the following Backus–Naur form
- *
- * blocks ::= <block> | <block> <blocks>
- * block ::= INIT [ <initialisers> ] | filename.ods [ <initialisers> ] | filename.package (<var_defn>) [ <actions> ] | REPEAT <count> [ <blocks> ]
+ * The parser
+ *   ignores leading white space
+ *   ignores everything after // to the end of the line
+ *   ignore blank lines
+ *   ignores white space outside of quote delimited strings
+ *   treats a semi-colon (;) as "syntatic sugar"
  * 
- * initialisers ::= <initialiser> | <initialiser> <initialisers>
- * initialiser ::= <assert> | <var_defn> = <function> | <cell_ref> | <string> | <constant>
+ * -- A script is one or more init, ods, repeat, template or end blocks
+ * script ::= <blocks>
+ * blocks ::= (<block> | <block> <blocks>)
+ * block  ::= (<initBlock> | <odsBlock> | <templateBlock> | <repeatBlock> | <endBlock>)
  * 
- * var_defn ::= $<var_name>
+ * -- A REPEAT block causes the enclosed blocks to be executed multiple times
+ * repeatBlock ::= REPEAT (<varRef> | <hexConstant>) [ (<initBlock> | <odsBlock> | <templateBlock>)+ ]
  * 
- * function ::= <function_name>(<var_defn>)
- * function_name ::= guid | group | family | loword | hiword | lobyte | hibyte | ihash | rhash | fullpath | if
+ * -- The END block marks the end of the script before the end of the file
+ * endBlock ::= END
  * 
- * cell_ref ::= <col_ref><row_ref>
- * col_ref ::= [A-Z]
- * row_ref ::= 1 ..
+ * -- Init blocks set values to be used later in the script
+ * initBlock ::= INIT [ (<initContents>)+ ]
+ * odsBlock ::= <odsName> [ (<initContents>)+ ]
+ * odsName ::= "<fileName>.ods"
+ * initContents ::= (<assert> | <message> | <initialiser>)
  * 
- * actions ::= <action> | <action> <actions>
- * action ::= TGIR [ <subactions> ]
+ * -- For assert, see subactions below
  * 
- * subactions ::= <subaction> | <subaction> <subactions>
- * subaction ::= <assert> | <assignment> | <index> [ <subactions> ]
+ * -- Messages display a text string to the user at the end of the script's execution
+ * message ::= message BRA <string> KET
  * 
- * assert ::= assert(<assert_item>:<res_name>)
- * assert_item ::= type
- * res_name ::= CRES | GZPS | 3IDR | ...
+ * -- Initialisers define a named variable and its initial value
+ * initialiser ::= <varDefn> = <varValue>
+ * varDefn ::= $<varName>
+ * varValue ::= (<cellRef> | <varRef> | <string> | <hexConstant> | <function>)
  * 
- * index ::= 0 ..
+ * -- A cell referenced in the current spreadsheet (not valid in INIT blocks).
+ * -- Within an enclosing REPEAT block, the format C10+ will reference the cell C10 on the first iteration, 
+ * -- C11 on the second, C12 on the third, etc
+ * cellRef ::= <colRef> (PLUS)? <rowRef> (PLUS)?
+ * colRef ::= <colChar> (<colChar>)?
+ * rowRef ::= <rowNumFirst> (<rowNumFollowing>)+
+ * colChar ::= (A | B | ... | Y | Z)
+ * rowNumFirst ::= (1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
+ * rowNumFollowing ::= (0 | <rowNumFirst>)
  * 
+ * -- Template blocks define which resources are to be edited within the specified template (.package) file
+ * templateBlock ::= <templateDefn> [ <actions> ]
+ * templateDefn ::= <templateName> (<saveRef>)? (<conditional>)?
+ * templateName ::= "<fileName>.package"
+ * saveRef :: <varRef>
+ * 
+ * -- Conditionals apply to template blocks (see above), delete actions and TGRI actions (see below)
+ * conditional ::= IF (NOT)? <condition>
+ * condition ::= <varRef>
+ * 
+ * -- Actions are the workers of the script, making changes to resources
+ * actions ::= (<action> | <action> <actions>)
+ * action ::= (<initBlock> | <deleteAction> | <cloneAction> | <tgriAction>)
+ * 
+ * -- Delete actions delete the given resource (if the condition is true) from the template (.package) file
+ * deleteAction ::= DELETE (<conditional>)? <tgri>
+ * 
+ * -- Clone actions copy the given resource before applying the changes, 
+ * -- one of the changes should alter (at least one of) the G, R or I values
+ * cloneAction ::= CLONE <tgriAction>
+ * 
+ * -- TGRI actions edit the specified resource
+ * tgriAction ::= <tgri> (<conditional>)? [ <subactions> ]
+ * 
+ * -- TGRI (TypeName-GroupId-ResourceId-InstanceId) uniquely references a resource in the template (.package) file
+ * tgri ::= <typeNameScriptable> - <groupId> - <resourceId> - <instanceId>
+ * typeNameAll ::= (<typeNameScriptable> | <typeNameOther>)
+ * typeNameScriptable ::= (BCON | BHAV | AGED | BINX | COLL | GZPS | MMAT | SDNA | VERS | XFCH | XFLR | XFNC | XHTN | XMOL | XOBJ | XROF | XSTN | XTOL | XWNT | 3IDR | NREF | OBJD | ANIM | CINE | CRES | GMDC | GMND | LAMB | LDIR | LPNT | LSPT | LIFO | SHPE | TXMT | TXTR | STR | CTSS | TTAS | TRCN | TTAB)
+ * typeNameOther ::= {any other resource type name supported by the DBPF Library}
+ * groupId ::= <hexConstant8>
+ * resourceId ::= <hexConstant8>
+ * instanceId ::= <hexConstant8>
+ * 
+ * -- Subactions are either asserts, assignments or indexing
+ * subactions ::= (<subaction> | <subaction> <subactions>)
+ * subaction ::= <assert> | <assignment> | <indexing>
+ * 
+ * -- Asserts confirm that the item has the given value, if not, the script is aborted
+ * assert ::= assert BRA <assertItem> : <assertValue> KET
+ * assertItem ::= (tools | version | type | group | resource | instance | filename | opcode)
+ * assertValue ::= (ddsutils | <typeNameAll> | <hexConstant> | (<char>)+)
+ * 
+ * -- Assignments change the value of a property or item within the current resource being edited
+ * -- Possible properties/items are dependant on the current resource being edited
  * assignment ::= <item> = <value>
+ * item ::= (<string> | <name>)		// Where <string> must evaluate to a <name>
+ * name ::= (type | group | instance | resource | filename | <objdName> | <cpfName> | <strName> | <bconName> | <trcnName> | <bhavName> | <ttabName> | <txtrName> | <txmtName> | <shpeName>)
+ * objdName ::= (guid | {any objd index name - see ObjdIndex.cs})
+ * cpfName ::= {any valid cpf property name; if the property does not exist, it will be created}
+ * strName ::= (text | title | desc)
+ * bconName ::= value
+ * trcnName ::= label
+ * bhavName ::= operand
+ * ttabName ::= (stringid | action | guardian | flags | flags2)
+ * txtrName ::= image
+ * txmtName ::= {any valid txmt property name}
+ * shpeName ::= (item | {any current subset name})
+ * value ::= <varRef> | <string> | <hexConstant> | <function>
  * 
- * item ::= group | resource | instance | guid | <item_name>
+ * -- TODO
+ * indexing ::= <index> (CLONE)? [ (<subaction>)+ ]
+ * index ::= (<varRef> | <indexKey>)	// Where <varRef> must evaluate to an <indexKey>
+ * indexKey ::= (PLUS | (<digit>)+)
  * 
- * value ::= <var_ref> | <string> | <constant>
+ * -- Functions for performing specific operations
+ * function ::= <fnWord> | <fnByte> | <fnGuid> | <fnGroup> | <fnFamily> | <fnHash> | <fnPath> | <fnIf> | <fnInc>
+ * fnWord ::= (loword | hiword) BRA <param> KET
+ * fnByte ::= (lobyte | hibyte) BRA <param> KET
+ * fnGuid ::= guid BRA (<param> (, <tag>)?)? KET
+ * fngroup ::= group BRA (<param> (, <tag>)?)? KET
+ * fnFamily ::= family BRA KET
+ * fnHash ::= (ghash | rhash | ihash) BRA <param> KET
+ * fnPath ::= fullpath BRA <param> KET
+ * fnIf ::= if BRA <condition> , <varValue> , <varValue> KET
+ * fnInc ::= (preinc | postinc) BRA <param> KET
+ * param ::= <varRef>
+ * tag ::= <varRef>
  * 
- * var_ref ::= $<var_name>
- * var_name ::= text
+ * -- Filename without an extension
+ * fileName ::= ({any valid filename character})+
  * 
- * string ::= "text with possible substitutions"
- * constant ::= 0x <hexdigits>
+ * -- Variable references start with a $ sign
+ * varRef ::= $<varName>
+ * varName ::= (<normalChar>)+
+ * 
+ * -- Double quote delimited text string; macro replacement is supported by {var:format}
+ * string ::= "<text>"
+ * text ::= (<char> | <macro>)+
+ * macro ::= { ({ | <varName> (:<format>)?) }		// To get a { in a string, use {{}
+ * format ::= (<digit>)+ (<caseSpecifier>)?
+ * caseSpecifier ::= (l | U)
+ * 
+ * -- Hex constants start 0x; with the exception of TGRI identifiers, hex constants can have between 1 and 8 hex digits
+ * hexConstant8 ::= <hexPrefix>(<hexDigit>)8
+ * hexConstant ::= <hexPrefix>(<hexDigit>)+
+ * hexPrefix ::= 0x
+ * hexDigit ::= (<digit> | A | B | C | D | E | F | a | b | c | d | e | f)
+ * 
+ * -- Terminals
+ * BRA ::= (
+ * KET ::= )
+ * PLUS ::= +
+ * digit ::= (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
+ * char ::= {any valid character for the current context}
+ * specialChar ::= ( BRA | KET | [ | ] | : | = | ; | ,)
+ * normalChar ::= {any valid character other than the <specialChar>s or space}
  * 
  */
 
@@ -81,8 +189,10 @@ namespace DbpfScripter
 {
     public class DbpfScripterWorker
     {
+        private static readonly Regex reVersion = new Regex("^([0-9]+)\\.([0-9]+)$");
+
         private static readonly Regex reTGIR = new Regex("^([0-9A-Z]+)-(0x[0-9A-Fa-f]{8})-(0x[0-9A-Fa-f]{8})-(0x[0-9A-Fa-f]{8})$");
-        private static readonly Regex reCellRef = new Regex("^([a-z][+]?)([1-9][0-9]*[+]?)$");
+        private static readonly Regex reCellRef = new Regex("^([a]?[a-z][+]?)([1-9][0-9]*[+]?)$");
         private static readonly Regex reIndex = new Regex("^([+]|[0-9]+)$");
 
         private readonly BackgroundWorker scriptWorker;
@@ -102,13 +212,15 @@ namespace DbpfScripter
         private readonly Stack<IDbpfScriptable> scriptableObjects = new Stack<IDbpfScriptable>();
         private IDbpfScriptable currentScriptableObject = null;
 
+        private readonly HashSet<string> allOpenedTemplates = new HashSet<string>();
         private readonly Dictionary<string, DBPFFile> allEditedPackages = new Dictionary<string, DBPFFile>();
         private readonly HashSet<string> allSavedPackages = new HashSet<string>();
         private DBPFFile activePackage = null;
 
-        private List<List<string>> odsRows = new List<List<string>>();
+        private readonly Dictionary<string, List<List<string>>> odsCache = new Dictionary<string, List<List<string>>>();
+        private List<List<string>> odsRows = null;
 
-        private readonly Dictionary<string, string> variables = new Dictionary<string, string>();
+        private readonly Dictionary<string, ScriptValue> variables = new Dictionary<string, ScriptValue>();
         private readonly List<string> messages = new List<string>();
 
         private readonly Dictionary<string, string> generatedGuids = new Dictionary<string, string>();
@@ -140,10 +252,16 @@ namespace DbpfScripter
 
                 bool result = false;
 
+                odsCache.Clear();
+                variables.Clear();
                 messages.Clear();
 
                 generatedGuids.Clear();
                 generatedGroups.Clear();
+
+                allOpenedTemplates.Clear();
+                allEditedPackages.Clear();
+                allSavedPackages.Clear();
 
                 using (StreamReader scriptStream = new StreamReader(scriptPath))
                 {
@@ -151,9 +269,10 @@ namespace DbpfScripter
                     result = ProcessBlocks(0);
                 }
 
+                stopwatch.Stop();
+
                 if (result)
                 {
-                    stopwatch.Stop();
                     ReportProgress($"Edits completed ({countAssignments} changes made to {countResources} resources in {stopwatch.ElapsedMilliseconds / 1000}.{stopwatch.ElapsedMilliseconds % 1000} seconds)");
 
                     foreach (string templateFileFullPath in Directory.GetFiles(templatePath, "*.package", SearchOption.AllDirectories))
@@ -178,7 +297,7 @@ namespace DbpfScripter
                         }
                         else
                         {
-                            if (!allSavedPackages.Contains(templateName))
+                            if (!allOpenedTemplates.Contains(templateName))
                             {
                                 ReportProgress($"Copying {templateName} into {packageName}");
 
@@ -200,6 +319,10 @@ namespace DbpfScripter
                     {
                         ReportProgress("Finished :)");
                     }
+                }
+                else
+                {
+                    // ReportErrorNull("Ummmm ....");
                 }
             }
         }
@@ -239,7 +362,7 @@ namespace DbpfScripter
 
                             if (varValue == null)
                             {
-                                return ReportErrorFalse($"Unknown variable {value}");
+                                return ReportErrorFalse($"Unknown variable {value} in REPEAT");
                             }
 
                             value = varValue;
@@ -258,7 +381,14 @@ namespace DbpfScripter
                             ReportProgress("");
                             ReportProgress($"Processing REPEAT");
 
-                            int count = (int)(new ScriptValue(value));
+                            ScriptValue sv = new ScriptValue(value);
+
+                            if (!sv.IsNumber)
+                            {
+                                return ReportErrorFalse($"Unknown count (expected variable or constant got {value})");
+                            }
+
+                            int count = (int)sv;
 
                             bool processed = false;
 
@@ -273,7 +403,7 @@ namespace DbpfScripter
                                 if (iter < (count - 1)) parserState.NextRepeat();
                             }
 
-                            parserState.EndRepeat();
+                            if (!scriptWorker.CancellationPending) parserState.EndRepeat();
 
                             return processed && SkipCloseSquareBracket();
                         }
@@ -282,13 +412,48 @@ namespace DbpfScripter
                 else
                 {
                     string saveVar = null;
+                    bool conditionValue = true;
+                    bool negateCondition = false;
 
+                    // template.package ($saveNameVar) (IF (NOT) $conditionVar) [ ... ]
                     if (filename.EndsWith(".package"))
                     {
-                        if (parserState.PeekNextToken()[0] == '$')
+                        if (PeekNextToken()[0] == '$')
                         {
                             saveVar = parserState.ReadNextToken();
                         }
+
+                        if ("IF".Equals(PeekNextToken()))
+                        {
+                            parserState.ReadNextToken();
+
+                            if ("NOT".Equals(PeekNextToken()))
+                            {
+                                parserState.ReadNextToken();
+                                negateCondition = true;
+                            }
+
+                            if (PeekNextToken()[0] == '$')
+                            {
+                                conditionValue = (new ScriptValue(EvaluateVariable(parserState.ReadNextToken()))).IsTrue;
+
+                                if (negateCondition) conditionValue = !conditionValue;
+                            }
+                            else
+                            {
+                                return ReportErrorFalse($"Expected condition variable for IF, got {PeekNextToken()}");
+                            }
+                        }
+                    }
+
+                    if (!conditionValue)
+                    {
+                        if (SkipOpenSquareBracket())
+                        {
+                            return SkipBlock();
+                        }
+
+                        return ReportErrorFalse("Can't find block opening square bracket");
                     }
 
                     if (SkipOpenSquareBracket())
@@ -319,11 +484,43 @@ namespace DbpfScripter
             return ReportErrorFalse("Invalid BLOCK");
         }
 
+        private bool SkipBlock()
+        {
+            string token = parserState.ReadNextToken();
+
+            while (!"]".Equals(token))
+            {
+                if (token == null)
+                {
+                    return ReportErrorFalse("Can't find block closing square bracket");
+                }
+
+                if ("[".Equals(token))
+                {
+                    if (!SkipBlock()) return false;
+                }
+
+                token = parserState.ReadNextToken();
+            }
+
+            return true;
+        }
+
         private bool ProcessInitialisers(string filename, int iteration)
         {
             if (!filename.Equals("INIT"))
             {
-                if (!ParseODS($"{templatePath}\\{filename}")) return false;
+                if (!odsCache.TryGetValue(filename, out odsRows))
+                {
+                    odsRows = ParseODS($"{templatePath}\\{filename}");
+                    odsCache.Add(filename, odsRows);
+                }
+                else
+                {
+                    ReportProgress("Reading from cache");
+                }
+
+                if (odsRows == null) return false;
             }
 
             while (ProcessInitialiser(iteration)) ;
@@ -335,13 +532,13 @@ namespace DbpfScripter
         {
             if (TestEndOfBlock()) return false;
 
-            string nextToken = parserState.PeekNextToken();
+            string nextToken = PeekNextToken();
 
-            if (nextToken.Equals("assert"))
+            if (nextToken.Equals("assert", StringComparison.OrdinalIgnoreCase))
             {
                 return ProcessAssert();
             }
-            else if (nextToken.Equals("message"))
+            else if (nextToken.Equals("message", StringComparison.OrdinalIgnoreCase))
             {
                 return ProcessMessage();
             }
@@ -356,7 +553,7 @@ namespace DbpfScripter
                     if (value != null)
                     {
                         variables.Remove(varDefn);
-                        variables.Add(varDefn, value);
+                        variables.Add(varDefn, new ScriptValue(value));
 
                         ReportDevMode($"  ${varDefn} = {value}");
 
@@ -385,6 +582,7 @@ namespace DbpfScripter
             else
             {
                 activePackage = new DBPFFile($"{templatePath}/{filename}");
+                allOpenedTemplates.Add(filename);
                 allEditedPackages.Add(filename, activePackage);
             }
 
@@ -418,52 +616,174 @@ namespace DbpfScripter
         {
             if (TestEndOfBlock()) return false;
 
-            string tgir = ReadTGIR();
+            bool isClone = false;
 
-            if (tgir != null && SkipOpenSquareBracket())
+            string nextToken = PeekNextToken();
+            string tgir = null;
+
+            if ("INIT".Equals(nextToken))
             {
-                ReportProgress($"Editing {tgir}");
+                parserState.ReadNextToken();
 
-                Match m = reTGIR.Match(tgir);
-
-                if (m.Success)
+                if (SkipOpenSquareBracket())
                 {
-                    TypeTypeID typeId = DBPFData.TypeID(m.Groups[1].Value);
-                    TypeGroupID groupId = (TypeGroupID)(uint)Int32.Parse(m.Groups[2].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
-                    TypeResourceID resourceId = (TypeResourceID)(uint)Int32.Parse(m.Groups[3].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
-                    TypeInstanceID instanceId = (TypeInstanceID)(uint)Int32.Parse(m.Groups[4].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                    return ProcessInitialisers(nextToken, iteration) && SkipCloseSquareBracket();
+                }
 
-                    DBPFKey resKey = new DBPFKey(typeId, groupId, instanceId, resourceId);
-                    DBPFResource res = activePackage.GetResourceByKey(resKey);
+                return ReportErrorFalse("Missing open square bracket after INIT");
+            }
+            else if ("DELETE".Equals(nextToken))
+            {
+                parserState.ReadNextToken();
 
-                    if (res is IDbpfScriptable scriptable)
+                bool conditionValue = true;
+                bool negateCondition = false;
+
+                if ("IF".Equals(PeekNextToken()))
+                {
+                    parserState.ReadNextToken();
+
+                    if ("NOT".Equals(PeekNextToken()))
                     {
-                        ++countResources;
+                        parserState.ReadNextToken();
+                        negateCondition = true;
+                    }
 
-                        currentScriptableObject = scriptable;
-                        scriptableObjects.Push(currentScriptableObject);
+                    if (PeekNextToken()[0] == '$')
+                    {
+                        conditionValue = (new ScriptValue(EvaluateVariable(parserState.ReadNextToken()))).IsTrue;
 
-                        bool result = ProcessSubactions(iteration) && SkipCloseSquareBracket();
-
-                        if (result)
-                        {
-                            activePackage.Remove(resKey);
-                            activePackage.Commit(res, true);
-                        }
-
-                        scriptableObjects.Pop();
-
-                        return result;
+                        if (negateCondition) conditionValue = !conditionValue;
                     }
                     else
                     {
-                        if (res == null)
+                        return ReportErrorFalse($"Expected condition variable for IF, got {PeekNextToken()}");
+                    }
+                }
+
+                tgir = ReadTGIR();
+
+                if (tgir != null)
+                {
+                    if (!conditionValue)
+                    {
+                        return true;
+                    }
+
+                    ReportProgress($"Deleting {tgir}");
+
+                    Match m = reTGIR.Match(tgir);
+
+                    if (m.Success)
+                    {
+                        TypeTypeID typeId = DBPFData.TypeID(m.Groups[1].Value);
+                        TypeGroupID groupId = (TypeGroupID)(uint)Int32.Parse(m.Groups[2].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                        TypeResourceID resourceId = (TypeResourceID)(uint)Int32.Parse(m.Groups[3].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                        TypeInstanceID instanceId = (TypeInstanceID)(uint)Int32.Parse(m.Groups[4].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+
+                        DBPFKey resKey = new DBPFKey(typeId, groupId, instanceId, resourceId);
+
+                        activePackage.Remove(resKey);
+
+                        return true;
+                    }
+                }
+
+                return ReportErrorFalse("Expected TGRI after DELETE");
+            }
+            else if ("CLONE".Equals(nextToken))
+            {
+                parserState.ReadNextToken();
+
+                isClone = true;
+
+                // Drop through into TGIR parsing
+            }
+
+            tgir = ReadTGIR();
+
+            if (tgir != null)
+            {
+                bool conditionValue = true;
+                bool negateCondition = false;
+
+                if ("IF".Equals(PeekNextToken()))
+                {
+                    parserState.ReadNextToken();
+
+                    if ("NOT".Equals(PeekNextToken()))
+                    {
+                        parserState.ReadNextToken();
+                        negateCondition = true;
+                    }
+
+                    if (PeekNextToken()[0] == '$')
+                    {
+                        conditionValue = (new ScriptValue(EvaluateVariable(parserState.ReadNextToken()))).IsTrue;
+
+                        if (negateCondition) conditionValue = !conditionValue;
+                    }
+                    else
+                    {
+                        return ReportErrorFalse($"Expected condition variable for IF, got {PeekNextToken()}");
+                    }
+                }
+
+                if (!conditionValue)
+                {
+                    if (SkipOpenSquareBracket())
+                    {
+                        return SkipBlock();
+                    }
+
+                    return ReportErrorFalse("Can't find TGRI action opening square bracket");
+                }
+
+                if (SkipOpenSquareBracket())
+                {
+                    ReportProgress($"Editing {tgir}");
+
+                    Match m = reTGIR.Match(tgir);
+
+                    if (m.Success)
+                    {
+                        TypeTypeID typeId = DBPFData.TypeID(m.Groups[1].Value);
+                        TypeGroupID groupId = (TypeGroupID)(uint)Int32.Parse(m.Groups[2].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                        TypeResourceID resourceId = (TypeResourceID)(uint)Int32.Parse(m.Groups[3].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                        TypeInstanceID instanceId = (TypeInstanceID)(uint)Int32.Parse(m.Groups[4].Value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+
+                        DBPFKey resKey = new DBPFKey(typeId, groupId, instanceId, resourceId);
+                        DBPFResource res = activePackage.GetResourceByKey(resKey);
+
+                        if (res is IDbpfScriptable scriptable)
                         {
-                            return ReportErrorFalse($"{tgir} not found");
+                            ++countResources;
+
+                            currentScriptableObject = scriptable;
+                            scriptableObjects.Push(currentScriptableObject);
+
+                            bool result = ProcessSubactions(iteration) && SkipCloseSquareBracket();
+
+                            if (result)
+                            {
+                                if (!isClone) activePackage.Remove(resKey);
+                                activePackage.Commit(res, true);
+                            }
+
+                            scriptableObjects.Pop();
+
+                            return result;
                         }
                         else
                         {
-                            return ReportErrorFalse($"{tgir} is not scriptable");
+                            if (res == null)
+                            {
+                                return ReportErrorFalse($"{tgir} not found");
+                            }
+                            else
+                            {
+                                return ReportErrorFalse($"{tgir} is not scriptable");
+                            }
                         }
                     }
                 }
@@ -483,7 +803,7 @@ namespace DbpfScripter
         {
             if (TestEndOfBlock()) return false;
 
-            string token = parserState.PeekNextToken();
+            string token = PeekNextToken();
 
             if (token.Equals("assert", StringComparison.OrdinalIgnoreCase))
             {
@@ -559,6 +879,49 @@ namespace DbpfScripter
                                 return ReportErrorFalse($"Assert failed, {assertItem} is NOT {assertValue}");
                             }
                         }
+                        else if (assertItem.Equals("version"))
+                        {
+                            Match m = reVersion.Match(assertValue);
+
+                            if (m.Success)
+                            {
+                                try
+                                {
+                                    int major = int.Parse(m.Groups[1].Value);
+                                    int minor = int.Parse(m.Groups[2].Value);
+
+                                    bool ok = false;
+
+                                    if (DbpfScripterApp.AppVersionMajor > major)
+                                    {
+                                        ok = true;
+                                    }
+                                    else if (DbpfScripterApp.AppVersionMajor == major)
+                                    {
+                                        if (DbpfScripterApp.AppVersionMinor >= minor)
+                                        {
+                                            ok = true;
+                                        }
+                                    }
+
+                                    if (!ok)
+                                    {
+                                        return ReportErrorFalse($"Assert failed, {assertItem}:{assertValue}");
+                                    }
+
+                                    ReportDebug($"  Asserted {assertItem}:{assertValue}");
+                                    return ok;
+                                }
+                                catch (Exception)
+                                {
+                                    return ReportErrorFalse($"Assert failed, {assertItem}:{assertValue}");
+                                }
+                            }
+                            else
+                            {
+                                return ReportErrorFalse($"Assert failed, {assertItem} is NOT {assertValue}");
+                            }
+                        }
                         else
                         {
                             bool ok = currentScriptableObject.Assert(assertItem, assertValue);
@@ -613,11 +976,17 @@ namespace DbpfScripter
                     {
                         value = EvaluateFunction(value, iteration);
 
-                        if (value == null) return ReportErrorFalse("Invalid function");
+                        if (value == null) return false;
                     }
                     else
                     {
                         return ReportErrorFalse("Unknown assignment (expected string or variable)");
+                    }
+
+                    // Can't test for a variable here, as that was used up by $var [ ... ] for indexing
+                    if (item.StartsWith("\""))
+                    {
+                        item = EvaluateString(item);
                     }
 
                     bool ok = currentScriptableObject.Assignment(item, new ScriptValue(value, scriptConstants));
@@ -640,6 +1009,13 @@ namespace DbpfScripter
         private bool ProcessIndexing(int iteration)
         {
             string index = parserState.ReadNextToken();
+            bool clone = false;
+
+            if ("CLONE".Equals(PeekNextToken()))
+            {
+                clone = true;
+                parserState.ReadNextToken();
+            }
 
             if (index != null && SkipOpenSquareBracket())
             {
@@ -647,6 +1023,11 @@ namespace DbpfScripter
                 {
                     ReportDevMode($"Indexing from ${index}");
                     index = EvaluateVariable(index);
+
+                    if (index.ToLower().StartsWith("0x"))
+                    {
+                        index = Int32.Parse(index.Substring(2), System.Globalization.NumberStyles.HexNumber).ToString();
+                    }
                 }
 
                 ReportDevMode($"Index [{index}]");
@@ -660,11 +1041,12 @@ namespace DbpfScripter
 
                     try
                     {
-                        IDbpfScriptable indexer = currentScriptableObject.Indexed(Int32.Parse(index));
+                        IDbpfScriptable indexer = currentScriptableObject.Indexed(Int32.Parse(index), clone);
 
                         if (indexer != null)
                         {
                             currentScriptableObject = indexer;
+
                             scriptableObjects.Push(currentScriptableObject);
 
                             bool result = ProcessSubactions(iteration) && SkipCloseSquareBracket();
@@ -680,6 +1062,10 @@ namespace DbpfScripter
                         return ReportErrorFalse($"Invalid index {index}");
                     }
                 }
+                else
+                {
+                    ReportErrorFalse($"{index} is not a valid index");
+                }
             }
 
             return false;
@@ -689,7 +1075,7 @@ namespace DbpfScripter
         #region Evaluation
         private string EvaluateVariable(string var)
         {
-            string value = null;
+            ScriptValue value = null;
 
             if (var.StartsWith("$")) var = var.Substring(1);
 
@@ -699,11 +1085,11 @@ namespace DbpfScripter
             {
                 if (var.Equals("SaveBaseName"))
                 {
-                    value = baseName;
+                    value = new ScriptValue(baseName);
                 }
             }
 
-            return value;
+            return value?.ToString();
         }
 
         private string EvaluateFunction(string function, int iteration)
@@ -718,11 +1104,11 @@ namespace DbpfScripter
                     value = null;
                     string tag = null;
 
-                    if (!parserState.PeekNextToken().Equals(")"))
+                    if (!PeekNextIsCloseBracket())
                     {
                         value = EvaluateVariable(ReadVarDefn());
 
-                        if (parserState.PeekNextToken().Equals(","))
+                        if (PeekNextIsComma())
                         {
                             SkipComma();
 
@@ -740,11 +1126,11 @@ namespace DbpfScripter
                     value = null;
                     string tag = null;
 
-                    if (!parserState.PeekNextToken().Equals(")"))
+                    if (!PeekNextIsCloseBracket())
                     {
                         value = EvaluateVariable(ReadVarDefn());
 
-                        if (parserState.PeekNextToken().Equals(","))
+                        if (PeekNextIsComma())
                         {
                             SkipComma();
 
@@ -827,6 +1213,23 @@ namespace DbpfScripter
                     }
                 }
             }
+            else if (function.Equals("ghash"))
+            {
+                if (SkipOpenBracket())
+                {
+                    string param = ReadVarDefn();
+
+                    if (param != null && SkipCloseBracket())
+                    {
+                        value = EvaluateVariable(param);
+
+                        if (value != null)
+                        {
+                            return Hashes.GroupIDHash(value).ToString();
+                        }
+                    }
+                }
+            }
             else if (function.Equals("ihash"))
             {
                 if (SkipOpenBracket())
@@ -881,7 +1284,7 @@ namespace DbpfScripter
 
                                 if (!File.Exists(fullpath))
                                 {
-                                    return ReportErrorNull($"{value} cannot be found");
+                                    return ReportErrorNull($"File '{value}' cannot be found");
                                 }
                             }
 
@@ -921,9 +1324,41 @@ namespace DbpfScripter
                     }
                 }
             }
-            // NOTE: If adding to the function list, must also update IsFunctionName in ParserState
+            else if (function.Equals("preinc"))
+            {
+                if (SkipOpenBracket())
+                {
+                    string param = ReadVarDefn();
 
-            return null;
+                    if (param != null && SkipCloseBracket())
+                    {
+                        variables[param]?.Inc();
+
+                        value = EvaluateVariable(param);
+
+                        return value;
+                    }
+                }
+            }
+            else if (function.Equals("postinc"))
+            {
+                if (SkipOpenBracket())
+                {
+                    string param = ReadVarDefn();
+
+                    if (param != null && SkipCloseBracket())
+                    {
+                        value = EvaluateVariable(param);
+
+                        variables[param]?.Inc();
+
+                        return value;
+                    }
+                }
+            }
+            // NOTE: If adding to the function list, must also update IsFunctionName below
+
+            return ReportErrorNull($"Unknown function {function}"); ;
         }
 
         private string EvaluateString(string codedString)
@@ -965,22 +1400,29 @@ namespace DbpfScripter
                     macro = macro.Substring(0, colonPos);
                 }
 
-                string subst = EvaluateVariable(macro);
-
-                if (subst == null)
+                if (macro.Equals("{"))
                 {
-                    return ReportErrorNull($"Unknown variable {macro}");
+                    value = $"{value}{macro}";
                 }
-
-                if (macroLen > 0)
+                else
                 {
-                    subst = subst.Substring(0, macroLen);
+                    string subst = EvaluateVariable(macro);
+
+                    if (subst == null)
+                    {
+                        return ReportErrorNull($"Unknown variable {macro} in macro");
+                    }
+
+                    if (macroLen > 0)
+                    {
+                        subst = subst.Substring(0, macroLen);
+                    }
+
+                    if (lower) subst = subst.ToLower();
+                    if (upper) subst = subst.ToUpper();
+
+                    value = $"{value}{subst}";
                 }
-
-                if (lower) subst = subst.ToLower();
-                if (upper) subst = subst.ToUpper();
-
-                value = $"{value}{subst}";
 
                 codedString = codedString.Substring(ketPos + 1);
                 braPos = codedString.IndexOf('{');
@@ -993,14 +1435,20 @@ namespace DbpfScripter
         #region Tests for "end of ..."
         private bool TestEndOfScript()
         {
-            string token = parserState.PeekNextToken();
+            if (scriptWorker.CancellationPending) return true;
+
+            string token = PeekNextToken();
+
+            if ("END".Equals(token)) return true;
 
             return (token == null);
         }
 
         private bool TestEndOfBlock()
         {
-            string token = parserState.PeekNextToken();
+            if (scriptWorker.CancellationPending) return true;
+
+            string token = PeekNextToken();
 
             return (token != null && token.Equals("]"));
         }
@@ -1012,15 +1460,31 @@ namespace DbpfScripter
             return s.Equals("loword") || s.Equals("hiword") ||
                    s.Equals("lobyte") || s.Equals("hibyte") ||
                    s.Equals("guid") || s.Equals("group") || s.Equals("family") ||
-                   s.Equals("rhash") || s.Equals("ihash") ||
+                   s.Equals("ghash") || s.Equals("rhash") || s.Equals("ihash") ||
                    s.Equals("fullpath") ||
-                   s.Equals("if");
+                   s.Equals("if") ||
+                   s.Equals("preinc") || s.Equals("postinc");
         }
 
         private bool IsVariableDefn(string s)
         {
             return s != null && s.StartsWith("$");
         }
+        #endregion
+
+        #region Peek tokens
+        private string PeekNextToken()
+        {
+            return parserState.PeekNextToken();
+        }
+
+        private bool PeekNextToken(string expected)
+        {
+            return expected.Equals(parserState.PeekNextToken(), StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool PeekNextIsComma() => PeekNextToken(",");
+        private bool PeekNextIsCloseBracket() => PeekNextToken(")");
         #endregion
 
         #region Skip expected tokens
@@ -1088,16 +1552,22 @@ namespace DbpfScripter
         {
             string value = null;
 
-            string nextToken = parserState.PeekNextToken();
+            string nextToken = PeekNextToken();
             if (nextToken.ToLower().StartsWith("0x"))
             {
                 value = parserState.ReadNextToken();
             }
             else if (nextToken[0] == '"' || nextToken[0] == '\'')
             {
-                value = parserState.ReadNextToken();
+                string str = parserState.ReadNextToken();
 
-                value = EvaluateString(value.Substring(1, value.Length - 2));
+                value = EvaluateString(str.Substring(1, str.Length - 2));
+            }
+            else if (nextToken[0] == '$')
+            {
+                string var = parserState.ReadNextToken();
+
+                value = EvaluateVariable(var);
             }
             else
             {
@@ -1118,8 +1588,26 @@ namespace DbpfScripter
                             string colCode = m.Groups[1].Value;
                             string rowCode = m.Groups[2].Value;
 
-                            int col = colCode.ToCharArray()[0] - 'a';
+                            bool addIteration = false;
+
                             if (colCode.EndsWith("+"))
+                            {
+                                addIteration = true;
+                                colCode = colCode.Substring(0, colCode.Length - 1);
+                            }
+
+                            int col = 0;
+
+                            if (colCode.Length == 2)
+                            {
+                                col = 26 * (colCode.ToCharArray()[0] - 'a' + 1);
+
+                                colCode = colCode.Substring(1);
+                            }
+
+                            col += colCode.ToCharArray()[0] - 'a';
+
+                            if (addIteration)
                             {
                                 col += iteration;
                             }
@@ -1164,9 +1652,9 @@ namespace DbpfScripter
         private const int MAX_ROW_REPEAT = 25;
         private const int MAX_CELL_REPEAT = 25;
 
-        private bool ParseODS(string fullPath)
+        private List<List<string>> ParseODS(string fullPath)
         {
-            odsRows = new List<List<string>>();
+            List<List<string>> rows = null;
             List<string> row = null;
 
             int rowRepeat = 0;
@@ -1194,7 +1682,7 @@ namespace DbpfScripter
                             {
                                 if (reader.Name.Equals("table:table"))
                                 {
-                                    odsRows = new List<List<string>>();
+                                    rows = new List<List<string>>();
                                 }
                                 else if (reader.Name.Equals("table:table-row"))
                                 {
@@ -1203,7 +1691,7 @@ namespace DbpfScripter
                                     {
                                         while (rowRepeat-- > 0)
                                         {
-                                            odsRows.Add(row);
+                                            rows.Add(row);
                                         }
                                     }
 
@@ -1224,8 +1712,11 @@ namespace DbpfScripter
                                         row.Add(cellText);
                                     }
 
+                                    string span = reader.GetAttribute("table:number-columns-spanned");
+                                    int cellSpan = (span == null) ? 1 : Int32.Parse(span);
+
                                     string repeat = reader.GetAttribute("table:number-columns-repeated");
-                                    cellRepeat = (repeat == null) ? 1 : Int32.Parse(repeat);
+                                    cellRepeat = (repeat == null) ? cellSpan : Int32.Parse(repeat);
                                     cellText = "";
                                     wantText = !reader.IsEmptyElement;
                                 }
@@ -1282,12 +1773,12 @@ namespace DbpfScripter
                                     {
                                         while (rowRepeat-- > 0)
                                         {
-                                            odsRows.Add(row);
+                                            rows.Add(row);
                                         }
                                     }
 
                                     // Only process the first table in the first spreadsheet
-                                    return true;
+                                    return rows;
                                 }
                             }
                         }
@@ -1297,10 +1788,12 @@ namespace DbpfScripter
             catch (Exception ex)
             {
                 ReportDebug(ex.Message);
-                return ReportErrorFalse($"Unable to open/read {fullPath}");
+                ReportErrorNull($"Unable to open/read {fullPath}");
+                return null;
             }
 
-            return ReportErrorFalse($"Unable to parse {fullPath}");
+            ReportErrorNull($"Unable to parse {fullPath}");
+            return null;
         }
         #endregion
 
@@ -1321,7 +1814,7 @@ namespace DbpfScripter
                 }
 
                 ReportDebug($"GENERATING Guid");
-                newGuid = TypeGUID.RandomID.ToString().ToUpper();
+                newGuid = $"0x{Helper.Hex8String(TypeGUID.RandomID.AsUInt()).ToUpper()}";
 
                 if (tag != null)
                 {
@@ -1348,7 +1841,7 @@ namespace DbpfScripter
                 }
 
                 ReportDebug($"GENERATING Group");
-                newGroup = TypeGroupID.RandomID.ToString().ToUpper();
+                newGroup = $"0x{Helper.Hex8String(TypeGroupID.RandomID.AsUInt()).ToUpper()}";
 
                 if (tag != null)
                 {
@@ -1377,9 +1870,12 @@ namespace DbpfScripter
 
         internal bool ReportErrorFalse(string msg)
         {
-            ReportProgress($"!!{msg} at line {parserState.ScriptLineIndex}");
+            if (!scriptWorker.CancellationPending)
+            {
+                ReportProgress($"!!{msg} at line {parserState.ScriptLineIndex}");
 
-            ++countErrors;
+                ++countErrors;
+            }
 
             return false;
         }

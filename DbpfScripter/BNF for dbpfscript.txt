@@ -1,0 +1,158 @@
+Last updated for V1.3
+
+ * The parser is based on the following Backus–Naur form, with the additional meanings
+ *   (x | y) - either x or y, more than two options are permitted
+ *   (x)+ - one or more occurances of x (or y)
+ *   (x)? - x (or y) is optional (zero or one occurance of x (or y))
+ *   (x)N - x occurs exactly N times
+ * 
+ * The parser
+ *   ignores leading white space
+ *   ignores everything after // to the end of the line
+ *   ignore blank lines
+ *   ignores white space outside of quote delimited strings
+ *   treats a semi-colon (;) as "syntatic sugar"
+ * 
+ * -- A script is one or more init, ods, repeat, template or end blocks
+ * script ::= <blocks>
+ * blocks ::= (<block> | <block> <blocks>)
+ * block  ::= (<initBlock> | <odsBlock> | <templateBlock> | <repeatBlock> | <endBlock>)
+ * 
+ * -- A REPEAT block causes the enclosed blocks to be executed multiple times
+ * repeatBlock ::= REPEAT (<varRef> | <hexConstant>) [ (<initBlock> | <odsBlock> | <templateBlock>)+ ]
+ * 
+ * -- The END block marks the end of the script before the end of the file
+ * endBlock ::= END
+ * 
+ * -- Init blocks set values to be used later in the script
+ * initBlock ::= INIT [ (<initContents>)+ ]
+ * odsBlock ::= <odsName> [ (<initContents>)+ ]
+ * odsName ::= "<fileName>.ods"
+ * initContents ::= (<assert> | <message> | <initialiser>)
+ * 
+ * -- For assert, see subactions below
+ * 
+ * -- Messages display a text string to the user at the end of the script's execution
+ * message ::= message BRA <string> KET
+ * 
+ * -- Initialisers define a named variable and its initial value
+ * initialiser ::= <varDefn> = <varValue>
+ * varDefn ::= $<varName>
+ * varValue ::= (<cellRef> | <varRef> | <string> | <hexConstant> | <function>)
+ * 
+ * -- A cell referenced in the current spreadsheet (not valid in INIT blocks).
+ * -- Within an enclosing REPEAT block, the format C10+ will reference the cell C10 on the first iteration, 
+ * -- C11 on the second, C12 on the third, etc
+ * cellRef ::= <colRef> (PLUS)? <rowRef> (PLUS)?
+ * colRef ::= <colChar> (<colChar>)?
+ * rowRef ::= <rowNumFirst> (<rowNumFollowing>)+
+ * colChar ::= (A | B | ... | Y | Z)
+ * rowNumFirst ::= (1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
+ * rowNumFollowing ::= (0 | <rowNumFirst>)
+ * 
+ * -- Template blocks define which resources are to be edited within the specified template (.package) file
+ * templateBlock ::= <templateDefn> [ <actions> ]
+ * templateDefn ::= <templateName> (<saveRef>)? (<conditional>)?
+ * templateName ::= "<fileName>.package"
+ * saveRef :: <varRef>
+ * 
+ * -- Conditionals apply to template blocks (see above), delete actions and TGRI actions (see below)
+ * conditional ::= IF (NOT)? <condition>
+ * condition ::= <varRef>
+ * 
+ * -- Actions are the workers of the script, making changes to resources
+ * actions ::= (<action> | <action> <actions>)
+ * action ::= (<initBlock> | <deleteAction> | <cloneAction> | <tgriAction>)
+ * 
+ * -- Delete actions delete the given resource (if the condition is true) from the template (.package) file
+ * deleteAction ::= DELETE (<conditional>)? <tgri>
+ * 
+ * -- Clone actions copy the given resource before applying the changes, 
+ * -- one of the changes should alter (at least one of) the G, R or I values
+ * cloneAction ::= CLONE <tgriAction>
+ * 
+ * -- TGRI actions edit the specified resource
+ * tgriAction ::= <tgri> (<conditional>)? [ <subactions> ]
+ * 
+ * -- TGRI (TypeName-GroupId-ResourceId-InstanceId) uniquely references a resource in the template (.package) file
+ * tgri ::= <typeNameScriptable> - <groupId> - <resourceId> - <instanceId>
+ * typeNameAll ::= (<typeNameScriptable> | <typeNameOther>)
+ * typeNameScriptable ::= (BCON | BHAV | AGED | BINX | COLL | GZPS | MMAT | SDNA | VERS | XFCH | XFLR | XFNC | XHTN | XMOL | XOBJ | XROF | XSTN | XTOL | XWNT | 3IDR | NREF | OBJD | ANIM | CINE | CRES | GMDC | GMND | LAMB | LDIR | LPNT | LSPT | LIFO | SHPE | TXMT | TXTR | STR | CTSS | TTAS | TRCN | TTAB)
+ * typeNameOther ::= {any other resource type name supported by the DBPF Library}
+ * groupId ::= <hexConstant8>
+ * resourceId ::= <hexConstant8>
+ * instanceId ::= <hexConstant8>
+ * 
+ * -- Subactions are either asserts, assignments or indexing
+ * subactions ::= (<subaction> | <subaction> <subactions>)
+ * subaction ::= <assert> | <assignment> | <indexing>
+ * 
+ * -- Asserts confirm that the item has the given value, if not, the script is aborted
+ * assert ::= assert BRA <assertItem> : <assertValue> KET
+ * assertItem ::= (tools | type | group | resource | instance | filename | opcode)
+ * assertValue ::= (ddsutils | <typeNameAll> | <hexConstant> | (<char>)+)
+ * 
+ * -- Assignments change the value of a property or item within the current resource being edited
+ * -- Possible properties/items are dependant on the current resource being edited
+ * assignment ::= <item> = <value>
+ * item ::= (<string> | <name>)		// Where <string> must evaluate to a <name>
+ * name ::= (type | group | instance | resource | filename | <objdName> | <cpfName> | <strName> | <bconName> | <trcnName> | <bhavName> | <ttabName> | <txtrName> | <txmtName> | <shpeName>)
+ * objdName ::= (guid | {any objd index name - see ObjdIndex.cs})
+ * cpfName ::= {any valid cpf property name; if the property does not exist, it will be created}
+ * strName ::= (text | title | desc)
+ * bconName ::= value
+ * trcnName ::= label
+ * bhavName ::= operand
+ * ttabName ::= (stringid | action | guardian | flags | flags2)
+ * txtrName ::= image
+ * txmtName ::= {any valid txmt property name}
+ * shpeName ::= (item | {any current subset name})
+ * value ::= <varRef> | <string> | <hexConstant> | <function>
+ * 
+ * -- Indexing into sub-items pf the current resource
+ * indexing ::= <index> (CLONE)? [ (<subaction>)+ ]
+ * index ::= (<varRef> | <indexKey>)	// Where <varRef> must evaluate to an <indexKey>
+ * indexKey ::= (PLUS | (<digit>)+)
+ * 
+ * -- Functions for performing specific operations
+ * function ::= <fnWord> | <fnByte> | <fnGuid> | <fnGroup> | <fnFamily> | <fnHash> | <fnPath> | <fnIf> | <fnInc>
+ * fnWord ::= (loword | hiword) BRA <param> KET
+ * fnByte ::= (lobyte | hibyte) BRA <param> KET
+ * fnGuid ::= guid BRA (<param> (, <tag>)?)? KET
+ * fngroup ::= group BRA (<param> (, <tag>)?)? KET
+ * fnFamily ::= family BRA KET
+ * fnHash ::= (ghash | rhash | ihash) BRA <param> KET
+ * fnPath ::= fullpath BRA <param> KET
+ * fnIf ::= if BRA <condition> , <varValue> , <varValue> KET
+ * fnInc ::= (preinc | postinc) BRA <param> KET
+ * param ::= <varRef>
+ * tag ::= <varRef>
+ * 
+ * -- Filename without an extension
+ * fileName ::= ({any valid filename character})+
+ * 
+ * -- Variable references start with a $ sign
+ * varRef ::= $<varName>
+ * varName ::= (<normalChar>)+
+ * 
+ * -- Double quote delimited text string; macro replacement is supported by {var:format}
+ * string ::= "<text>"
+ * text ::= (<char> | <macro>)+
+ * macro ::= { ({ | <varName> (:<format>)?) }		// To get a { in a string, use {{}
+ * format ::= (<digit>)+ (<caseSpecifier>)?
+ * caseSpecifier ::= (l | U)
+ * 
+ * -- Hex constants start 0x; with the exception of TGRI identifiers, hex constants can have between 1 and 8 hex digits
+ * hexConstant8 ::= <hexPrefix>(<hexDigit>)8
+ * hexConstant ::= <hexPrefix>(<hexDigit>)+
+ * hexPrefix ::= 0x
+ * hexDigit ::= (<digit> | A | B | C | D | E | F | a | b | c | d | e | f)
+ * 
+ * -- Terminals
+ * BRA ::= (
+ * KET ::= )
+ * PLUS ::= +
+ * digit ::= (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
+ * char ::= {any valid character for the current context}
+ * specialChar ::= ( BRA | KET | [ | ] | : | = | ; | ,)
+ * normalChar ::= {any valid character other than the <specialChar>s or space}

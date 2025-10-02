@@ -64,10 +64,10 @@ namespace Sims2Tools.DBPF.NREF
                 return true;
             }
 
-            throw new NotImplementedException();
+            return DbpfScriptable.IsTGIRAssignment(this, item, sv);
         }
 
-        public IDbpfScriptable Indexed(int index)
+        public IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();
         }

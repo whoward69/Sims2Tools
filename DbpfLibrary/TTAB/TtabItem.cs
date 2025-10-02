@@ -13,14 +13,17 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
 using System;
+using System.Diagnostics;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.TTAB
 {
-    // TODO - DBPF Library - it would be nice to be able to script these values, eg, to enable/disable life stages
-
-    public class TtabItem : IComparable<TtabItem>
+    public class TtabItem : IDbpfScriptable, IComparable<TtabItem>
     {
+#if DEBUG
+        protected long readStart, readEnd, writeStart, writeEnd;
+#endif
+
         private readonly uint format; // Owning TTAB format
 
         private ushort action;
@@ -63,6 +66,16 @@ namespace Sims2Tools.DBPF.TTAB
         public TtabItemMotiveTable HumanMotives => humanGroups;
         public TtabItemMotiveTable AnimalMotives => animalGroups;
 
+        private bool _isDirty = false;
+        public bool IsDirty => _isDirty || humanGroups.IsDirty || animalGroups.IsDirty;
+        public void SetClean()
+        {
+            humanGroups.SetClean();
+            animalGroups.SetClean();
+
+            _isDirty = false;
+        }
+
         public TtabItem(uint format, DbpfReader reader)
         {
             this.format = format;
@@ -80,9 +93,63 @@ namespace Sims2Tools.DBPF.TTAB
             this.Unserialize(reader);
         }
 
-        // TODO - DBPF Library - TtabItem unserialize - check this
+        private TtabItem(TtabItem from, bool makeDirty)
+        {
+#if DEBUG
+            this.readStart = from.readStart;
+            this.readEnd = from.readEnd;
+            this.writeStart = from.writeStart;
+            this.writeEnd = from.writeEnd;
+#endif
+
+            this.format = from.format;
+
+            this.action = from.action;
+            this.guard = from.guard;
+            this.flags = from.flags;
+            this.flags2 = from.flags2;
+            this.strindex = from.strindex;
+
+            this.attenuationcode = from.attenuationcode;
+            this.attenuationvalue = from.attenuationvalue;
+            this.autonomy = from.autonomy;
+            this.joinindex = from.joinindex;
+            this.uidisplaytype = from.uidisplaytype;
+            this.facialanimation = from.facialanimation;
+            this.memoryitermult = from.memoryitermult;
+            this.objecttype = from.objecttype;
+            this.modeltableid = from.modeltableid;
+
+            if (from.counts != null)
+            {
+                this.counts = new int[from.counts.Length];
+                for (int index = 0; index < this.counts.Length; ++index)
+                {
+                    this.counts[index] = from.counts[index];
+                }
+            }
+            else
+            {
+                this.counts = null;
+            }
+
+            this.humanGroups = from.humanGroups.Duplicate(makeDirty);
+            this.animalGroups = from.animalGroups.Duplicate(makeDirty);
+
+            _isDirty = makeDirty;
+        }
+
+        public TtabItem Duplicate()
+        {
+            return new TtabItem(this, true);
+        }
+
         private void Unserialize(DbpfReader reader)
         {
+#if DEBUG
+            readStart = reader.Position;
+#endif
+
             this.action = reader.ReadUInt16();
             this.guard = reader.ReadUInt16();
 
@@ -108,17 +175,20 @@ namespace Sims2Tools.DBPF.TTAB
             if (this.format >= 69U)
             {
                 this.uidisplaytype = reader.ReadUInt16();
+
                 if (this.format >= 70U)
                 {
                     if (this.format >= 74U)
                     {
                         this.facialanimation = reader.ReadUInt32();
+
                         if (this.format >= 76U)
                         {
                             this.memoryitermult = reader.ReadSingle();
                             this.objecttype = reader.ReadUInt32();
                         }
                     }
+
                     this.modeltableid = reader.ReadUInt32();
                 }
             }
@@ -129,11 +199,156 @@ namespace Sims2Tools.DBPF.TTAB
             {
                 this.animalGroups = new TtabItemMotiveTable(format, null, TtabItemMotiveTableType.Animal, reader);
             }
+
+#if DEBUG
+            readEnd = reader.Position;
+#endif
         }
 
-        // TODO - DBPF Library - TtabItem serialize - add FileSize
+        public uint FileSize
+        {
+            get
+            {
+                uint size = 2 + 2;
 
-        // TODO - DBPF Library - TtabItem serialize - add Serialize
+                if (this.counts != null)
+                {
+                    size += (uint)(4 * counts.Length);
+                }
+
+                size += 2 + 2 + 4 + 4 + 4 + 4 + 4;
+
+                if (format > 68U)
+                {
+                    size += 2;
+
+                    if (format >= 70U)
+                    {
+                        if (format >= 74U)
+                        {
+                            size += 4;
+
+                            if (format >= 76U)
+                            {
+                                size += 4 + 4;
+                            }
+                        }
+
+                        size += 4;
+                    }
+                }
+
+                size += humanGroups.FileSize;
+
+                if (format >= 84U) size += animalGroups.FileSize;
+
+                return size;
+            }
+        }
+
+        internal void Serialize(DbpfWriter writer)
+        {
+#if DEBUG
+            writeStart = writer.Position;
+#endif
+
+            writer.WriteUInt16(this.action);
+            writer.WriteUInt16(this.guard);
+
+            if (this.counts != null)
+            {
+                for (int index = 0; index < this.counts.Length; ++index)
+                    writer.WriteInt32(counts[index]);
+            }
+
+            writer.WriteUInt16(this.flags);
+            writer.WriteUInt16(this.flags2);
+            writer.WriteUInt32(this.strindex);
+            writer.WriteUInt32(this.attenuationcode);
+            writer.WriteSingle(this.attenuationvalue);
+            writer.WriteUInt32(this.autonomy);
+            writer.WriteUInt32(this.joinindex);
+
+            if (format > 68U)
+            {
+                writer.WriteUInt16(this.uidisplaytype);
+
+                if (format >= 70U)
+                {
+                    if (format >= 74U)
+                    {
+                        writer.WriteUInt32(this.facialanimation);
+
+                        if (format >= 76U)
+                        {
+                            writer.WriteSingle(this.memoryitermult);
+                            writer.WriteUInt32(this.objecttype);
+                        }
+                    }
+
+                    writer.WriteUInt32(this.modeltableid);
+                }
+            }
+
+            humanGroups.Serialize(writer);
+
+            if (format >= 84U) animalGroups.Serialize(writer);
+
+#if DEBUG
+            writeEnd = writer.Position;
+
+            Debug.Assert((writeEnd - writeStart) == FileSize);
+            if (!IsDirty) Debug.Assert(((readEnd - readStart) == 0) || ((writeEnd - writeStart) == (readEnd - readStart)));
+#endif
+        }
+
+        #region IDbpfScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("stringid"))
+            {
+                strindex = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("action"))
+            {
+                action = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("guardian"))
+            {
+                guard = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("flags"))
+            {
+                flags = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("flags2"))
+            {
+                flags2 = sv;
+                _isDirty = true;
+                return true;
+            }
+
+            return false;
+        }
+
+        public IDbpfScriptable Indexed(int index, bool clone)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
 
         public int CompareTo(TtabItem that)
         {

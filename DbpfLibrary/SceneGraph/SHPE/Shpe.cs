@@ -184,7 +184,7 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
             return base.Assignment(item, sv);
         }
 
-        public override IDbpfScriptable Indexed(int index)
+        public override IDbpfScriptable Indexed(int index, bool clone)
         {
             Trace.Assert(index >= 0 && index < cShape.Items.Count, $"Item index {index} out of range");
 

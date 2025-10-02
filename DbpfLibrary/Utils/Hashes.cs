@@ -19,7 +19,7 @@ namespace Sims2Tools.DBPF.Utils
     public class Hashes
     {
         static private readonly CRC crc24 = new CRC(CRCParameters.GetParameters(CRCStandard.CRC24));
-        static private readonly CRC crc32 = new CRC(new Classless.Hasher.CRCParameters(32, 0x04C11DB7, 0xffffffff, 0, false));
+        static private readonly CRC crc32 = new CRC(new CRCParameters(32, 0x04C11DB7, 0xffffffff, 0, false));
 
         public static uint ToUInt(byte[] input)
         {

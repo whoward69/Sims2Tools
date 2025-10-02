@@ -345,7 +345,7 @@ namespace Sims2Tools.DBPF.CPF
             return false;
         }
 
-        public IDbpfScriptable Indexed(int index)
+        public IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();
         }

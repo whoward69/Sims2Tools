@@ -221,7 +221,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             throw new NotImplementedException();
         }
 
-        public IDbpfScriptable Indexed(int index)
+        public IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();
         }

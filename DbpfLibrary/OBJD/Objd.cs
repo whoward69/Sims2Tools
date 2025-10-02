@@ -240,6 +240,8 @@ namespace Sims2Tools.DBPF.OBJD
 
         public bool Assignment(string item, ScriptValue sv)
         {
+            if (DbpfScriptable.IsTGIRAssignment(this, item, sv)) return true;
+
             if (item.Equals("filename"))
             {
                 SetKeyName(sv);
@@ -264,7 +266,7 @@ namespace Sims2Tools.DBPF.OBJD
             }
         }
 
-        public IDbpfScriptable Indexed(int index)
+        public IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();
         }

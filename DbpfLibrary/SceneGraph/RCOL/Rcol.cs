@@ -436,7 +436,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             return DbpfScriptable.IsTGIRAssignment(this, item, sv);
         }
 
-        public virtual IDbpfScriptable Indexed(int index)
+        public virtual IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();
         }

@@ -159,10 +159,16 @@ namespace Sims2Tools.DBPF.BHAV
 
         public bool Assignment(string item, ScriptValue sv)
         {
-            throw new NotImplementedException();
+            if (item.Equals("filename"))
+            {
+                SetKeyName(sv);
+                return true;
+            }
+
+            return DbpfScriptable.IsTGIRAssignment(this, item, sv);
         }
 
-        public IDbpfScriptable Indexed(int index)
+        public IDbpfScriptable Indexed(int index, bool clone)
         {
             Trace.Assert(index >= 0 && index < instructions.Count, $"Instruction index {index} out of range");
 

@@ -149,7 +149,7 @@ namespace Sims2Tools.DBPF.TRCN
             return false;
         }
 
-        public IDbpfScriptable Indexed(int index)
+        public IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();
         }

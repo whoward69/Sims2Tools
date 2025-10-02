@@ -269,7 +269,7 @@ namespace Sims2Tools.DBPF.BHAV
             throw new NotImplementedException();
         }
 
-        public IDbpfScriptable Indexed(int index)
+        public IDbpfScriptable Indexed(int index, bool clone)
         {
             Trace.Assert(index >= 0 && index < operands.Count, $"Operand index {index} out of range");
 
