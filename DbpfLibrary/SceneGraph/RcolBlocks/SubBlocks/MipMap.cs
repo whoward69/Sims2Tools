@@ -96,7 +96,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         {
             if (item != null)
             {
-                datatype = MipMapType.Texture;
+                datatype = MipMapType.SimPE_PlainData;
                 img = item.Texture;
                 data = item.Data;
             }

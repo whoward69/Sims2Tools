@@ -23,6 +23,7 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Xml;
 
+#region dbpfscript.txt details
 /*
  * General notes on the dbpfscript.txt file
  * 
@@ -184,6 +185,7 @@ using System.Xml;
  * normalChar ::= {any valid character other than the <specialChar>s or space}
  * 
  */
+#endregion
 
 namespace DbpfScripter
 {
@@ -255,6 +257,7 @@ namespace DbpfScripter
                 odsCache.Clear();
                 variables.Clear();
                 messages.Clear();
+                lastErrorLine = -1;
 
                 generatedGuids.Clear();
                 generatedGroups.Clear();
@@ -766,7 +769,12 @@ namespace DbpfScripter
 
                             if (result)
                             {
-                                if (!isClone) activePackage.Remove(resKey);
+                                if (!isClone)
+                                {
+                                    activePackage.UnCommit(resKey);
+                                    activePackage.Remove(resKey);
+                                }
+
                                 activePackage.Commit(res, true);
                             }
 
@@ -987,6 +995,7 @@ namespace DbpfScripter
                     if (item.StartsWith("\""))
                     {
                         item = EvaluateString(item);
+                        item = item.Substring(1, item.Length - 2);
                     }
 
                     bool ok = currentScriptableObject.Assignment(item, new ScriptValue(value, scriptConstants));
@@ -1861,6 +1870,7 @@ namespace DbpfScripter
         #endregion
 
         #region Error Reporting
+        int lastErrorLine;
         internal string ReportErrorNull(string msg)
         {
             ReportErrorFalse(msg);
@@ -1872,9 +1882,13 @@ namespace DbpfScripter
         {
             if (!scriptWorker.CancellationPending)
             {
-                ReportProgress($"!!{msg} at line {parserState.ScriptLineIndex}");
+                if (!(lastErrorLine == parserState.ScriptLineIndex))
+                {
+                    ReportProgress($"!!{msg} at line {parserState.ScriptLineIndex}");
 
-                ++countErrors;
+                    ++countErrors;
+                    lastErrorLine = parserState.ScriptLineIndex;
+                }
             }
 
             return false;

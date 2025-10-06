@@ -282,7 +282,7 @@ namespace Sims2Tools.DBPF.Package
             {
                 if (GetEntryByKey(resource) == null)
                 {
-                    newEntriesByKey.Add(resource, new DBPFEntry(resource));
+                    newEntriesByKey.Add(new DBPFKey(resource), new DBPFEntry(resource));
                 }
 
                 resourceCache.Commit(resource, ignoreDirty);
