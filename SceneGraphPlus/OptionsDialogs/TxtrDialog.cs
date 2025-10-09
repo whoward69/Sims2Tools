@@ -244,7 +244,7 @@ namespace SceneGraphPlus.Dialogs.Options
             {
                 if (imageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new Exception("Unsupported file extension");
+                    ddsData = DdsLoader.ParseDDS(imageName);
                 }
                 else
                 {

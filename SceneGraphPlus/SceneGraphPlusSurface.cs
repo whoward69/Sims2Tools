@@ -3099,10 +3099,13 @@ namespace SceneGraphPlus.Surface
 
                                 foreach (string slaveSubset in slaveSubsets)
                                 {
-                                    if (!gmdcSubsets.Contains(slaveSubset))
+                                    if (!string.IsNullOrWhiteSpace(slaveSubset))
                                     {
-                                        block.IsSubsetGmndSlavedValid = false;
-                                        break;
+                                        if (!gmdcSubsets.Contains(slaveSubset))
+                                        {
+                                            block.IsSubsetGmndSlavedValid = false;
+                                            break;
+                                        }
                                     }
                                 }
 
