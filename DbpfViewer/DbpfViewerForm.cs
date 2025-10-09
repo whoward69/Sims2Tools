@@ -503,7 +503,9 @@ namespace DbpfViewer
             sender.VisualMode = ProgressBarDisplayMode.CustomText;
             sender.SetProgress(0, "Loading Objects");
 
+#if !DEBUG
             try
+#endif
             {
                 using (DBPFFile package = new DBPFFile(packageFile))
                 {
@@ -565,6 +567,7 @@ namespace DbpfViewer
                     args.Result = found;
                 }
             }
+#if !DEBUG
             catch (Exception ex)
             {
                 logger.Error(ex.Message);
@@ -575,6 +578,7 @@ namespace DbpfViewer
                     throw ex;
                 }
             }
+#endif
         }
 
         private void DoAsyncWork_FillGrid_Data(ProgressDialog sender, DoWorkEventArgs e)
@@ -705,6 +709,12 @@ namespace DbpfViewer
                     {
                         splitContainer.Panel2Collapsed = false;
                         splitContainer.SplitterDistance = (int)RegistryTools.GetSetting(DbpfViewerApp.RegistryKey, "splitter", splitContainer.SplitterDistance);
+                    }
+
+                    // TODO - DBPF Viewer - test stuff
+                    if (res is Bhav bhav)
+                    {
+                        bhav.ReorderInstructionTree();
                     }
                 }
 
@@ -894,6 +904,53 @@ namespace DbpfViewer
         private void OnSavePngClicked(object sender, EventArgs e)
         {
             DoImageSave(pictImage.Image, pictName, "png", "PNG", null);
+        }
+
+        private void OnDragEnter(object sender, DragEventArgs e)
+        {
+            DataObject data = e.Data as DataObject;
+
+            if (data.ContainsFileDropList())
+            {
+                string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                if (rawFiles != null && rawFiles.Length == 1)
+                {
+                    bool allOk = true;
+
+                    foreach (string rawFile in rawFiles)
+                    {
+                        if (!Path.GetFileName(rawFile).EndsWith(".package"))
+                        {
+                            allOk = false;
+                            break;
+                        }
+                    }
+
+                    if (allOk)
+                    {
+                        e.Effect = DragDropEffects.Copy;
+                    }
+                }
+            }
+        }
+
+        private void OnDragDrop(object sender, DragEventArgs e)
+        {
+            DataObject data = e.Data as DataObject;
+
+            if (data.ContainsFileDropList())
+            {
+                string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                if (rawFiles != null)
+                {
+                    foreach (string rawFile in rawFiles)
+                    {
+                        DoWork_FillGrid(rawFile);
+                    }
+                }
+            }
         }
     }
 }

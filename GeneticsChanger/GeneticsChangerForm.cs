@@ -180,13 +180,13 @@ namespace GeneticsChanger
                 else
                 {
                     logger.Warn("'cigen.package' not found - some thumbnails will NOT display.");
-                    MsgBox.Show("'cigen.package' not found - some thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                    if (!Sims2ToolsLib.MuteThumbnailWarnings) MsgBox.Show("'cigen.package' not found - some thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
                 }
             }
             else
             {
                 logger.Warn("'Sims2HomePath' not set - some thumbnails will NOT display.");
-                MsgBox.Show("'Sims2HomePath' not set - some thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                if (!Sims2ToolsLib.MuteThumbnailWarnings) MsgBox.Show("'Sims2HomePath' not set - some thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
             }
         }
 

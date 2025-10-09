@@ -431,6 +431,7 @@ namespace DbpfViewer
             // 
             // gridResources
             // 
+            this.gridResources.AllowDrop = true;
             this.gridResources.AllowUserToAddRows = false;
             this.gridResources.AllowUserToDeleteRows = false;
             this.gridResources.AllowUserToOrderColumns = true;
@@ -456,6 +457,8 @@ namespace DbpfViewer
             this.gridResources.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellContentClick);
             this.gridResources.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridResources.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
+            this.gridResources.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop);
+            this.gridResources.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter);
             // 
             // colType
             // 
