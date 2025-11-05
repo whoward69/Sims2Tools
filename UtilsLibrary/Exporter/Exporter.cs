@@ -59,6 +59,8 @@ namespace Sims2Tools.Exporter
 
         public void Extract(DBPFResource resource)
         {
+            if (resource == null) return;
+
             exportPackage.Commit(resource, true);
         }
 

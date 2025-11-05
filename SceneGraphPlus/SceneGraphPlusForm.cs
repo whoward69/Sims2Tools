@@ -1085,7 +1085,18 @@ namespace SceneGraphPlus
                 }
                 else if (res is Mmat mmat)
                 {
-                    if (mmat.DefaultMaterial) startBlock.Text = $"{startBlock.Text} (Def)";
+                    string suffix = "";
+
+                    if (mmat.IsHiddenInCatalog)
+                    {
+                        suffix = " (Hide)";
+                    }
+                    else if (mmat.DefaultMaterial)
+                    {
+                        suffix = "(Def)";
+                    }
+
+                    startBlock.Text = $"{startBlock.Text}{suffix}";
 
                     startBlock.ConnectTo(0, "model", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, mmat.GetItem("modelName").StringValue, IsPrefixLowerCase), ref freeCol));
                     freeCol += DrawingSurface.ColumnGap;

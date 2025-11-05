@@ -65,82 +65,37 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
         private int ca_resources;
         private int ca_food, ca_food_decay;
 
-        public FamiVersions Version
-        {
-            get { return version; }
-        }
-
-        public FamiFlags Flags
-        {
-            get { return flags; }
-        }
-
-        public uint AlbumGUID
-        {
-            get { return albumGUID; }
-        }
-
-        public int BusinessMoney
-        {
-            get { return businessmoney; }
-        }
-
-        public int Money
-        {
-            get
-            {
-                return money;
-            }
-        }
-
-        public int CastAwayResources
-        {
-            get { return ca_resources; }
-        }
-
-        public int CastAwayFood
-        {
-            get { return ca_food; }
-        }
-
-        public int CastAwayFoodDecay
-        {
-            get { return ca_food_decay; }
-        }
-
-        public uint Friends
-        {
-            get { return friends; }
-        }
-
-        public uint[] Members
-        {
-            get
-            {
-                return sims;
-            }
-        }
-
-        public uint LotInstance
-        {
-            get { return lotinstance; }
-        }
-
-        public uint VacationLotInstance
-        {
-            get { return vacationlot; }
-        }
-
-        public uint CurrentlyOnLotInstance
-        {
-            get { return businesslot; }
-        }
-
         uint subhood;
-        public uint SubHoodNumber
-        {
-            get { return subhood; }
-        }
+
+        public FamiVersions Version => version;
+
+        public FamiFlags Flags => flags;
+
+        public TypeInstanceID NameInstance => (TypeInstanceID)strinstance;
+
+        public uint AlbumGUID => albumGUID;
+
+        public int BusinessMoney => businessmoney;
+
+        public int Money => money;
+
+        public int CastAwayResources => ca_resources;
+
+        public int CastAwayFood => ca_food;
+
+        public int CastAwayFoodDecay => ca_food_decay;
+
+        public uint Friends => friends;
+
+        public uint[] Members => sims;
+
+        public TypeInstanceID LotInstance => (TypeInstanceID)lotinstance;
+
+        public TypeInstanceID VacationLotInstance => (TypeInstanceID)vacationlot;
+
+        public uint CurrentlyOnLotInstance => businesslot;
+
+        public uint SubHoodNumber => subhood;
 
         public Fami(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
@@ -184,9 +139,9 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
             XmlElement element = XmlHelper.CreateInstElement(parent, NAME, "familyId", InstanceID);
 
             // element.SetAttribute("version", Version.ToString());
-            element.SetAttribute("lotId", Helper.Hex8PrefixString(LotInstance));
+            element.SetAttribute("lotId", LotInstance.ToString());
             if ((int)version >= (int)FamiVersions.Business) element.SetAttribute("businessId", Helper.Hex8PrefixString(businesslot));
-            if ((int)version >= (int)FamiVersions.Voyage) element.SetAttribute("vacationId", Helper.Hex8PrefixString(VacationLotInstance));
+            if ((int)version >= (int)FamiVersions.Voyage) element.SetAttribute("vacationId", VacationLotInstance.ToString());
 
             element.SetAttribute("nameId", Helper.Hex8PrefixString(strinstance));
             element.SetAttribute("money", Money.ToString());

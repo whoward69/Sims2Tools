@@ -53,6 +53,9 @@ namespace Sims2Tools.DBPF.SceneGraph.MMAT
             get { return this.GetItem("materialStateFlags").UIntegerValue; }
         }
 
+        public bool IsVisibleInCatalog => (MaterialStateFlags == 0x00);
+        public bool IsHiddenInCatalog => (MaterialStateFlags != 0x00);
+
         public string ModelName
         {
             get { return this.GetItem("modelName").StringValue; }

@@ -357,6 +357,7 @@ namespace SceneGraphPlus.Shapes
 
         private bool missing = false;
         private bool available = false;
+        private bool selected = false;
         private bool editable = true; // This should be called "readonly" but hey, that's a reserved word!
         private bool editing = false;
         private bool deleteMe = false;
@@ -789,6 +790,12 @@ namespace SceneGraphPlus.Shapes
 
         public bool IsMissingOrClone => IsMissing || IsClone;
 
+        public bool IsSelected
+        {
+            get => selected;
+            set => selected = value;
+        }
+
         public bool IsAvailable
         {
             get => (IsMissing && available);
@@ -971,6 +978,14 @@ namespace SceneGraphPlus.Shapes
             return !IsLeft(that);
         }
 
+        public double DistanceFrom(Point p)
+        {
+            int a = Centre.X - p.X;
+            int b = Centre.Y - p.Y;
+
+            return Math.Sqrt((a * a) + (b * b));
+        }
+
         public int DistanceAbove(GraphBlock that)
         {
             return (that.Centre.Y - this.Centre.Y);
@@ -1050,6 +1065,19 @@ namespace SceneGraphPlus.Shapes
             return result;
         }
 
+        public bool HitTest(Point p1, Point p2)
+        {
+            if (IsDeleted || IsDeleteMe) return false;
+            if (IsHidden) return false;
+
+            int x1 = Math.Min(p1.X, p2.X);
+            int y1 = Math.Min(p1.Y, p2.Y);
+            int x2 = Math.Max(p1.X, p2.X);
+            int y2 = Math.Max(p1.Y, p2.Y);
+
+            return (x1 <= Centre.X && Centre.X <= x2 && y1 <= Centre.Y && Centre.Y <= y2);
+        }
+
         public override void Move(Point delta)
         {
             Centre = new Point(Centre.X + delta.X, Centre.Y + delta.Y);
@@ -1073,7 +1101,7 @@ namespace SceneGraphPlus.Shapes
             {
                 g.DrawPath(new Pen(Color.Black, 2) { DashStyle = DashStyle.Dash }, path);
             }
-            else if (IsEditing)
+            else if (IsEditing || IsSelected)
             {
                 g.DrawPath(new Pen(Color.Black, 2), path);
             }

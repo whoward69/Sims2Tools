@@ -70,9 +70,9 @@ namespace SceneGraphPlus.Dialogs.Options
             this.lblMmatSubset = new System.Windows.Forms.Label();
             this.comboAddMmatSubset = new System.Windows.Forms.ComboBox();
             this.btnMmatCreate = new System.Windows.Forms.Button();
-            this.grpNewGZPS = new System.Windows.Forms.GroupBox();
-            this.textGzpsNewName = new System.Windows.Forms.TextBox();
+            this.grpNewGzps = new System.Windows.Forms.GroupBox();
             this.lblGzpsName = new System.Windows.Forms.Label();
+            this.textGzpsName = new System.Windows.Forms.TextBox();
             this.btnGzpsCreate = new System.Windows.Forms.Button();
             this.dlgColourPicker = new System.Windows.Forms.ColorDialog();
             this.grpStdMat = new System.Windows.Forms.GroupBox();
@@ -87,7 +87,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.grpChangeTexture.SuspendLayout();
             this.panelDdsOptions.SuspendLayout();
             this.grpNewMmat.SuspendLayout();
-            this.grpNewGZPS.SuspendLayout();
+            this.grpNewGzps.SuspendLayout();
             this.grpStdMat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackDiffAlpha)).BeginInit();
             this.SuspendLayout();
@@ -465,35 +465,33 @@ namespace SceneGraphPlus.Dialogs.Options
             this.btnMmatCreate.UseVisualStyleBackColor = true;
             this.btnMmatCreate.Click += new System.EventHandler(this.OnAddMmatClicked);
             // 
-            // grpNewGZPS
+            // grpNewGzps
             // 
-            this.grpNewGZPS.Controls.Add(this.textGzpsNewName);
-            this.grpNewGZPS.Controls.Add(this.lblGzpsName);
-            this.grpNewGZPS.Controls.Add(this.btnGzpsCreate);
-            this.grpNewGZPS.Location = new System.Drawing.Point(12, 249);
-            this.grpNewGZPS.Name = "grpNewGZPS";
-            this.grpNewGZPS.Size = new System.Drawing.Size(560, 47);
-            this.grpNewGZPS.TabIndex = 40;
-            this.grpNewGZPS.TabStop = false;
-            this.grpNewGZPS.Text = "New GZPS:";
-            // 
-            // textGzpsNewName
-            // 
-            this.textGzpsNewName.Location = new System.Drawing.Point(84, 15);
-            this.textGzpsNewName.Name = "textGzpsNewName";
-            this.textGzpsNewName.Size = new System.Drawing.Size(383, 21);
-            this.textGzpsNewName.TabIndex = 36;
-            this.textGzpsNewName.TextChanged += new System.EventHandler(this.OnGzpsNameChanged);
-            this.textGzpsNewName.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnGzpsNameKeyUp);
+            this.grpNewGzps.Controls.Add(this.lblGzpsName);
+            this.grpNewGzps.Controls.Add(this.textGzpsName);
+            this.grpNewGzps.Controls.Add(this.btnGzpsCreate);
+            this.grpNewGzps.Location = new System.Drawing.Point(12, 249);
+            this.grpNewGzps.Name = "grpNewGzps";
+            this.grpNewGzps.Size = new System.Drawing.Size(560, 47);
+            this.grpNewGzps.TabIndex = 39;
+            this.grpNewGzps.TabStop = false;
+            this.grpNewGzps.Text = "New MMAT:";
             // 
             // lblGzpsName
             // 
             this.lblGzpsName.AutoSize = true;
-            this.lblGzpsName.Location = new System.Drawing.Point(6, 18);
+            this.lblGzpsName.Location = new System.Drawing.Point(28, 18);
             this.lblGzpsName.Name = "lblGzpsName";
-            this.lblGzpsName.Size = new System.Drawing.Size(72, 15);
+            this.lblGzpsName.Size = new System.Drawing.Size(48, 15);
             this.lblGzpsName.TabIndex = 35;
-            this.lblGzpsName.Text = "New Name:";
+            this.lblGzpsName.Text = "Subset:";
+            // 
+            // textGzpsName
+            // 
+            this.textGzpsName.Location = new System.Drawing.Point(82, 15);
+            this.textGzpsName.Name = "textGzpsName";
+            this.textGzpsName.Size = new System.Drawing.Size(241, 21);
+            this.textGzpsName.TabIndex = 34;
             // 
             // btnGzpsCreate
             // 
@@ -603,9 +601,9 @@ namespace SceneGraphPlus.Dialogs.Options
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.ClientSize = new System.Drawing.Size(584, 306);
             this.Controls.Add(this.grpNewMmat);
+            this.Controls.Add(this.grpNewGzps);
             this.Controls.Add(this.grpChangeTexture);
             this.Controls.Add(this.grpDuplicate);
-            this.Controls.Add(this.grpNewGZPS);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -622,8 +620,8 @@ namespace SceneGraphPlus.Dialogs.Options
             this.panelDdsOptions.PerformLayout();
             this.grpNewMmat.ResumeLayout(false);
             this.grpNewMmat.PerformLayout();
-            this.grpNewGZPS.ResumeLayout(false);
-            this.grpNewGZPS.PerformLayout();
+            this.grpNewGzps.ResumeLayout(false);
+            this.grpNewGzps.PerformLayout();
             this.grpStdMat.ResumeLayout(false);
             this.grpStdMat.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackDiffAlpha)).EndInit();
@@ -648,9 +646,9 @@ namespace SceneGraphPlus.Dialogs.Options
         private System.Windows.Forms.Label lblMmatSubset;
         private System.Windows.Forms.ComboBox comboAddMmatSubset;
         private System.Windows.Forms.Button btnMmatCreate;
-        private System.Windows.Forms.GroupBox grpNewGZPS;
-        private System.Windows.Forms.TextBox textGzpsNewName;
+        private System.Windows.Forms.GroupBox grpNewGzps;
         private System.Windows.Forms.Label lblGzpsName;
+        private System.Windows.Forms.TextBox textGzpsName;
         private System.Windows.Forms.Button btnGzpsCreate;
         private System.Windows.Forms.Panel panelDdsOptions;
         private System.Windows.Forms.CheckBox ckbRemoveLifos;

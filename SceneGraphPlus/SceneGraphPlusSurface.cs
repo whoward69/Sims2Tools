@@ -16,6 +16,7 @@ using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.OBJD;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.CRES;
@@ -72,6 +73,8 @@ namespace SceneGraphPlus.Surface
         public static readonly int ColumnGap = Properties.Settings.Default.ColumnGap;
         public static readonly int RowGap = Properties.Settings.Default.RowGap;
 
+        public readonly Cursor CursorArrowPlus;
+
         #region Surface Dynamic Controls (context menus, dialogs, tooltip and thumbnail)
         private readonly Label lblTooltip = new Label();
         private readonly PictureBox picThumbnail = new PictureBox();
@@ -80,25 +83,25 @@ namespace SceneGraphPlus.Surface
         private readonly SaveFileDialog selectFileDialog;
 
         private readonly ContextMenuStrip menuContextBlock;
-        private readonly ToolStripMenuItem menuItemContextTexture;
-        private readonly ToolStripMenuItem menuItemContextDelete;
-        private readonly ToolStripMenuItem menuItemContextDeleteChain;
-        private readonly ToolStripMenuItem menuItemContextExtract;
-        private readonly ToolStripMenuItem menuItemContextExport;
-        private readonly ToolStripMenuItem menuItemContextHide;
-        private readonly ToolStripMenuItem menuItemContextHideChain;
-        private readonly ToolStripMenuItem menuItemContextFixTgir;
-        private readonly ToolStripMenuItem menuItemContextFixFileList;
-        private readonly ToolStripMenuItem menuItemContextFixLight;
-        private readonly ToolStripMenuItem menuItemContextFixLanguages;
-        private readonly ToolStripMenuItem menuItemContextCopySgName;
-        private readonly ToolStripMenuItem menuItemContextClosePackage;
-        private readonly ToolStripMenuItem menuItemContextOpenPackage;
-        private readonly ToolStripMenuItem menuItemContextSplitBlock;
+        private readonly ToolStripMenuItem menuItemContextBlockTexture;
+        private readonly ToolStripMenuItem menuItemContextBlockDelete;
+        private readonly ToolStripMenuItem menuItemContextBlockDeleteChain;
+        private readonly ToolStripMenuItem menuItemContextBlockExtract;
+        private readonly ToolStripMenuItem menuItemContextBlockExport;
+        private readonly ToolStripMenuItem menuItemContextBlockHide;
+        private readonly ToolStripMenuItem menuItemContextBlockHideChain;
+        private readonly ToolStripMenuItem menuItemContextBlockFixTgir;
+        private readonly ToolStripMenuItem menuItemContextBlockFixFileList;
+        private readonly ToolStripMenuItem menuItemContextBlockFixLight;
+        private readonly ToolStripMenuItem menuItemContextBlockFixLanguages;
+        private readonly ToolStripMenuItem menuItemContextBlockCopySgName;
+        private readonly ToolStripMenuItem menuItemContextBlockClosePackage;
+        private readonly ToolStripMenuItem menuItemContextBlockOpenPackage;
+        private readonly ToolStripMenuItem menuItemContextBlockSplitBlock;
 
         private readonly ContextMenuStrip menuContextConnector;
-        private readonly ToolStripMenuItem menuItemContextSplitMulti;
-        private readonly ToolStripMenuItem menuItemContextUnlink;
+        private readonly ToolStripMenuItem menuItemContextConnectorSplitMulti;
+        private readonly ToolStripMenuItem menuItemContextConnectorUnlink;
         #endregion
 
         #region Surface Options and Mode Tracking
@@ -153,7 +156,8 @@ namespace SceneGraphPlus.Surface
         #endregion
 
         #region Surface Selected Shape Tracking
-        private GraphBlock selectedBlock = null;
+        private List<GraphBlock> selectedBlocks = new List<GraphBlock>();
+        private GraphBlock firstSelectedBlock = null;
         private HashSet<GraphBlock> selectedBlockChain = null;
         private GraphBlock hoverBlock = null;
         private GraphBlock editBlock = null;
@@ -163,11 +167,19 @@ namespace SceneGraphPlus.Surface
         private GraphConnector hoverConnector = null;
         private GraphConnector dropOntoConnector = null;
         private GraphConnector contextConnector = null;
+
+        private bool IsSingleSelect => (selectedBlocks.Count == 1);
+        private bool IsMultiSelect => (selectedBlocks.Count > 1);
         #endregion
 
         #region Surface Mouse Tracking
         private bool moving;
+        private Point startPoint = Point.Empty;
         private Point previousPoint = Point.Empty;
+
+        private bool banding;
+        private Point bandingStart = Point.Empty;
+        private Point bandingLast = Point.Empty;
 
         private DateTime mouseLastClick;
         private bool inDoubleClick = false;
@@ -188,117 +200,120 @@ namespace SceneGraphPlus.Surface
             this.owningForm = owningForm;
             this.packageCache = packageCache;
 
+            MemoryStream cursorMemoryStream = new MemoryStream(Properties.Resources.ArrowPlus);
+            this.CursorArrowPlus = new Cursor(cursorMemoryStream);
+
             #region Block Context Menu Initialisation
             {
                 menuContextBlock = new ContextMenuStrip();
-                menuItemContextTexture = new ToolStripMenuItem();
-                menuItemContextDelete = new ToolStripMenuItem();
-                menuItemContextDeleteChain = new ToolStripMenuItem();
-                menuItemContextHide = new ToolStripMenuItem();
-                menuItemContextHideChain = new ToolStripMenuItem();
-                menuItemContextExtract = new ToolStripMenuItem();
-                menuItemContextExport = new ToolStripMenuItem();
-                menuItemContextFixTgir = new ToolStripMenuItem();
-                menuItemContextFixFileList = new ToolStripMenuItem();
-                menuItemContextFixLight = new ToolStripMenuItem();
-                menuItemContextFixLanguages = new ToolStripMenuItem();
-                menuItemContextCopySgName = new ToolStripMenuItem();
-                menuItemContextClosePackage = new ToolStripMenuItem();
-                menuItemContextOpenPackage = new ToolStripMenuItem();
-                menuItemContextSplitBlock = new ToolStripMenuItem();
+                menuItemContextBlockTexture = new ToolStripMenuItem();
+                menuItemContextBlockDelete = new ToolStripMenuItem();
+                menuItemContextBlockDeleteChain = new ToolStripMenuItem();
+                menuItemContextBlockHide = new ToolStripMenuItem();
+                menuItemContextBlockHideChain = new ToolStripMenuItem();
+                menuItemContextBlockExtract = new ToolStripMenuItem();
+                menuItemContextBlockExport = new ToolStripMenuItem();
+                menuItemContextBlockFixTgir = new ToolStripMenuItem();
+                menuItemContextBlockFixFileList = new ToolStripMenuItem();
+                menuItemContextBlockFixLight = new ToolStripMenuItem();
+                menuItemContextBlockFixLanguages = new ToolStripMenuItem();
+                menuItemContextBlockCopySgName = new ToolStripMenuItem();
+                menuItemContextBlockClosePackage = new ToolStripMenuItem();
+                menuItemContextBlockOpenPackage = new ToolStripMenuItem();
+                menuItemContextBlockSplitBlock = new ToolStripMenuItem();
 
                 menuContextBlock.SuspendLayout();
 
                 menuContextBlock.Items.AddRange(new ToolStripItem[] {
-                    menuItemContextTexture,
-                    menuItemContextHide, menuItemContextHideChain,
-                    menuItemContextExtract, menuItemContextExport,
-                    menuItemContextFixTgir, menuItemContextFixFileList, menuItemContextFixLight, menuItemContextFixLanguages,
-                    menuItemContextCopySgName,
-                    menuItemContextClosePackage, menuItemContextOpenPackage,
-                    menuItemContextSplitBlock,
-                    menuItemContextDelete, menuItemContextDeleteChain
+                    menuItemContextBlockTexture,
+                    menuItemContextBlockHide, menuItemContextBlockHideChain,
+                    menuItemContextBlockExtract, menuItemContextBlockExport,
+                    menuItemContextBlockFixTgir, menuItemContextBlockFixFileList, menuItemContextBlockFixLight, menuItemContextBlockFixLanguages,
+                    menuItemContextBlockCopySgName,
+                    menuItemContextBlockClosePackage, menuItemContextBlockOpenPackage,
+                    menuItemContextBlockSplitBlock,
+                    menuItemContextBlockDelete, menuItemContextBlockDeleteChain
                 });
                 menuContextBlock.Name = "menuContextBlock";
                 menuContextBlock.Size = new Size(223, 48);
                 menuContextBlock.Opening += new CancelEventHandler(OnContextBlockOpening);
 
-                menuItemContextTexture.Name = "menuItemContextTexture";
-                menuItemContextTexture.Size = new Size(222, 22);
-                menuItemContextTexture.Text = "Show Texture";
-                menuItemContextTexture.Click += new EventHandler(OnContextBlockTexture);
+                menuItemContextBlockTexture.Name = "menuItemContextBlockTexture";
+                menuItemContextBlockTexture.Size = new Size(222, 22);
+                menuItemContextBlockTexture.Text = "Show Texture";
+                menuItemContextBlockTexture.Click += new EventHandler(OnContextBlockTexture);
 
-                menuItemContextDelete.Name = "menuItemContextDelete";
-                menuItemContextDelete.Size = new Size(222, 22);
-                menuItemContextDelete.Text = "Delete";
-                menuItemContextDelete.Click += new EventHandler(OnContextBlockDelete);
+                menuItemContextBlockDelete.Name = "menuItemContextBlockDelete";
+                menuItemContextBlockDelete.Size = new Size(222, 22);
+                menuItemContextBlockDelete.Text = "Delete";
+                menuItemContextBlockDelete.Click += new EventHandler(OnContextBlockDelete);
 
-                menuItemContextDeleteChain.Name = "menuItemContextDeleteChain";
-                menuItemContextDeleteChain.Size = new Size(222, 22);
-                menuItemContextDeleteChain.Text = "Delete Chain";
-                menuItemContextDeleteChain.Click += new EventHandler(OnContextBlockDeleteChain);
+                menuItemContextBlockDeleteChain.Name = "menuItemContextBlockDeleteChain";
+                menuItemContextBlockDeleteChain.Size = new Size(222, 22);
+                menuItemContextBlockDeleteChain.Text = "Delete Chain";
+                menuItemContextBlockDeleteChain.Click += new EventHandler(OnContextBlockDeleteChain);
 
-                menuItemContextHide.Name = "menuItemContextHide";
-                menuItemContextHide.Size = new Size(222, 22);
-                menuItemContextHide.Text = "Hide";
-                menuItemContextHide.Click += new EventHandler(OnContextBlockHide);
+                menuItemContextBlockHide.Name = "menuItemContextBlockHide";
+                menuItemContextBlockHide.Size = new Size(222, 22);
+                menuItemContextBlockHide.Text = "Hide";
+                menuItemContextBlockHide.Click += new EventHandler(OnContextBlockHide);
 
-                menuItemContextHideChain.Name = "menuItemContextHideChain";
-                menuItemContextHideChain.Size = new Size(222, 22);
-                menuItemContextHideChain.Text = "Hide Chain";
-                menuItemContextHideChain.Click += new EventHandler(OnContextBlockHideChain);
+                menuItemContextBlockHideChain.Name = "menuItemContextBlockHideChain";
+                menuItemContextBlockHideChain.Size = new Size(222, 22);
+                menuItemContextBlockHideChain.Text = "Hide Chain";
+                menuItemContextBlockHideChain.Click += new EventHandler(OnContextBlockHideChain);
 
-                menuItemContextExtract.Name = "menuItemContextExtract";
-                menuItemContextExtract.Size = new Size(222, 22);
-                menuItemContextExtract.Text = "Extract";
-                menuItemContextExtract.ToolTipText = "Extract in SimPe package.xml format";
-                menuItemContextExtract.Click += new EventHandler(OnContextBlockExtract);
+                menuItemContextBlockExtract.Name = "menuItemContextBlockExtract";
+                menuItemContextBlockExtract.Size = new Size(222, 22);
+                menuItemContextBlockExtract.Text = "Extract";
+                menuItemContextBlockExtract.ToolTipText = "Extract in SimPe package.xml format";
+                menuItemContextBlockExtract.Click += new EventHandler(OnContextBlockExtract);
 
-                menuItemContextExport.Name = "menuItemContextExport";
-                menuItemContextExport.Size = new Size(222, 22);
-                menuItemContextExport.Text = "Export";
-                menuItemContextExport.ToolTipText = "Export as a .package file";
-                menuItemContextExport.Click += new EventHandler(OnContextBlockExport);
+                menuItemContextBlockExport.Name = "menuItemContextBlockExport";
+                menuItemContextBlockExport.Size = new Size(222, 22);
+                menuItemContextBlockExport.Text = "Export";
+                menuItemContextBlockExport.ToolTipText = "Export as a .package file";
+                menuItemContextBlockExport.Click += new EventHandler(OnContextBlockExport);
 
-                menuItemContextFixTgir.Name = "menuItemContextFixTgir";
-                menuItemContextFixTgir.Size = new Size(222, 22);
-                menuItemContextFixTgir.Text = "Fix TGI";
-                menuItemContextFixTgir.Click += new EventHandler(OnContextBlockFixTgir);
+                menuItemContextBlockFixTgir.Name = "menuItemContextBlockFixTgir";
+                menuItemContextBlockFixTgir.Size = new Size(222, 22);
+                menuItemContextBlockFixTgir.Text = "Fix TGI";
+                menuItemContextBlockFixTgir.Click += new EventHandler(OnContextBlockFixTgir);
 
-                menuItemContextFixFileList.Name = "menuItemContextFixFileList";
-                menuItemContextFixFileList.Size = new Size(222, 22);
-                menuItemContextFixFileList.Text = "Fix File List";
-                menuItemContextFixFileList.Click += new EventHandler(OnContextBlockFixFileList);
+                menuItemContextBlockFixFileList.Name = "menuItemContextBlockFixFileList";
+                menuItemContextBlockFixFileList.Size = new Size(222, 22);
+                menuItemContextBlockFixFileList.Text = "Fix File List";
+                menuItemContextBlockFixFileList.Click += new EventHandler(OnContextBlockFixFileList);
 
-                menuItemContextFixLight.Name = "menuItemContextFixLight";
-                menuItemContextFixLight.Size = new Size(222, 22);
-                menuItemContextFixLight.Text = "Fix Light";
-                menuItemContextFixLight.Click += new EventHandler(OnContextBlockFixLight);
+                menuItemContextBlockFixLight.Name = "menuItemContextBlockFixLight";
+                menuItemContextBlockFixLight.Size = new Size(222, 22);
+                menuItemContextBlockFixLight.Text = "Fix Light";
+                menuItemContextBlockFixLight.Click += new EventHandler(OnContextBlockFixLight);
 
-                menuItemContextFixLanguages.Name = "menuItemContextFixLanguages";
-                menuItemContextFixLanguages.Size = new Size(222, 22);
-                menuItemContextFixLanguages.Text = "Fix Languages";
-                menuItemContextFixLanguages.Click += new EventHandler(OnContextBlockFixLanguages);
+                menuItemContextBlockFixLanguages.Name = "menuItemContextBlockFixLanguages";
+                menuItemContextBlockFixLanguages.Size = new Size(222, 22);
+                menuItemContextBlockFixLanguages.Text = "Fix Languages";
+                menuItemContextBlockFixLanguages.Click += new EventHandler(OnContextBlockFixLanguages);
 
-                menuItemContextCopySgName.Name = "menuItemContextCopySgName";
-                menuItemContextCopySgName.Size = new Size(222, 22);
-                menuItemContextCopySgName.Text = "Copy SG Name From Parent";
-                menuItemContextCopySgName.Click += new EventHandler(OnContextBlockCopySgName);
+                menuItemContextBlockCopySgName.Name = "menuItemContextBlockCopySgName";
+                menuItemContextBlockCopySgName.Size = new Size(222, 22);
+                menuItemContextBlockCopySgName.Text = "Copy SG Name From Parent";
+                menuItemContextBlockCopySgName.Click += new EventHandler(OnContextBlockCopySgName);
 
-                menuItemContextClosePackage.Name = "menuItemContextClosePackage";
-                menuItemContextClosePackage.Size = new Size(222, 22);
-                menuItemContextClosePackage.Text = "Close Associated Package";
-                menuItemContextClosePackage.Click += new EventHandler(OnContextBlockClosePackage);
+                menuItemContextBlockClosePackage.Name = "menuItemContextBlockClosePackage";
+                menuItemContextBlockClosePackage.Size = new Size(222, 22);
+                menuItemContextBlockClosePackage.Text = "Close Associated Package";
+                menuItemContextBlockClosePackage.Click += new EventHandler(OnContextBlockClosePackage);
 
-                menuItemContextOpenPackage.Name = "menuItemContextOpenPackage";
-                menuItemContextOpenPackage.Size = new Size(222, 22);
-                menuItemContextOpenPackage.Text = "Open Associated Package";
-                menuItemContextOpenPackage.Click += new EventHandler(OnContextBlockOpenPackage);
+                menuItemContextBlockOpenPackage.Name = "menuItemContextBlockOpenPackage";
+                menuItemContextBlockOpenPackage.Size = new Size(222, 22);
+                menuItemContextBlockOpenPackage.Text = "Open Associated Package";
+                menuItemContextBlockOpenPackage.Click += new EventHandler(OnContextBlockOpenPackage);
 
-                menuItemContextSplitBlock.Name = "menuItemContextSplitBlock";
-                menuItemContextSplitBlock.Size = new Size(222, 22);
-                menuItemContextSplitBlock.Text = "Make Clone(s)";
-                menuItemContextSplitBlock.Click += new EventHandler(OnContextBlockSplitBlock);
+                menuItemContextBlockSplitBlock.Name = "menuItemContextBlockSplitBlock";
+                menuItemContextBlockSplitBlock.Size = new Size(222, 22);
+                menuItemContextBlockSplitBlock.Text = "Make Clone(s)";
+                menuItemContextBlockSplitBlock.Click += new EventHandler(OnContextBlockSplitBlock);
 
                 menuContextBlock.ResumeLayout(false);
             }
@@ -307,24 +322,24 @@ namespace SceneGraphPlus.Surface
             #region Connector Context Menu Initialisation
             {
                 menuContextConnector = new ContextMenuStrip();
-                menuItemContextSplitMulti = new ToolStripMenuItem();
-                menuItemContextUnlink = new ToolStripMenuItem();
+                menuItemContextConnectorSplitMulti = new ToolStripMenuItem();
+                menuItemContextConnectorUnlink = new ToolStripMenuItem();
                 menuContextConnector.SuspendLayout();
 
-                menuContextConnector.Items.AddRange(new ToolStripItem[] { menuItemContextSplitMulti, menuItemContextUnlink });
+                menuContextConnector.Items.AddRange(new ToolStripItem[] { menuItemContextConnectorSplitMulti, menuItemContextConnectorUnlink });
                 menuContextConnector.Name = "menuContextConnector";
                 menuContextConnector.Size = new Size(223, 48);
                 menuContextConnector.Opening += new CancelEventHandler(OnContextConnectorOpening);
 
-                menuItemContextSplitMulti.Name = "menuItemContextSplitMulti";
-                menuItemContextSplitMulti.Size = new Size(222, 22);
-                menuItemContextSplitMulti.Text = "Split Multi-Connector";
-                menuItemContextSplitMulti.Click += new EventHandler(OnContextConnectorSplitMulti);
+                menuItemContextConnectorSplitMulti.Name = "menuItemContextSplitMulti";
+                menuItemContextConnectorSplitMulti.Size = new Size(222, 22);
+                menuItemContextConnectorSplitMulti.Text = "Split Multi-Connector";
+                menuItemContextConnectorSplitMulti.Click += new EventHandler(OnContextConnectorSplitMulti);
 
-                menuItemContextUnlink.Name = "menuItemContextUnlink";
-                menuItemContextUnlink.Size = new Size(222, 22);
-                menuItemContextUnlink.Text = "Remove STR# Entry";
-                menuItemContextUnlink.Click += new EventHandler(OnContextConnectorUnlink);
+                menuItemContextConnectorUnlink.Name = "menuItemContextUnlink";
+                menuItemContextConnectorUnlink.Size = new Size(222, 22);
+                menuItemContextConnectorUnlink.Text = "Remove STR# Entry";
+                menuItemContextConnectorUnlink.Click += new EventHandler(OnContextConnectorUnlink);
 
                 menuContextConnector.ResumeLayout(false);
             }
@@ -382,7 +397,7 @@ namespace SceneGraphPlus.Surface
             hideMissingBlocks = false;
 
             editBlock = null;
-            selectedBlock = null;
+            DeselectBlocks(false);
             selectedBlockChain = null;
             hoverBlock = null;
             dropOntoBlocks.Clear();
@@ -401,6 +416,81 @@ namespace SceneGraphPlus.Surface
             {
                 owningForm.UpdateEditor(editBlock);
             }
+        }
+
+        private void DeselectBlocks(bool invalidate)
+        {
+            foreach (GraphBlock block in selectedBlocks)
+            {
+                block.IsSelected = false;
+            }
+
+            selectedBlocks.Clear();
+            firstSelectedBlock = null;
+
+            ChangeCursor();
+
+            if (invalidate) Invalidate();
+        }
+
+        private void SelectSingleBlock(GraphBlock block)
+        {
+            DeselectBlocks(false);
+
+            if (block != null)
+            {
+                firstSelectedBlock = block;
+                firstSelectedBlock.IsSelected = true;
+
+                selectedBlocks.Add(firstSelectedBlock);
+            }
+
+            Invalidate();
+        }
+
+        private void SelectBlock(GraphBlock block)
+        {
+            if (selectedBlocks.Count == 0)
+            {
+                SelectSingleBlock(block);
+            }
+            else
+            {
+                block.IsSelected = true;
+
+                selectedBlocks.Add(block);
+
+                ChangeCursor();
+
+                Invalidate();
+            }
+        }
+
+        private void DeselectEditBlock()
+        {
+            if (editBlock != null)
+            {
+                editBlock.IsEditing = false;
+                owningForm.UpdateEditor(null);
+
+                editBlock = null;
+
+                Invalidate();
+            }
+        }
+
+        private void SelectEditBlock(GraphBlock block)
+        {
+            if (block == editBlock) return;
+
+            DeselectEditBlock();
+
+            editBlock = block;
+            editBlock.IsEditing = true;
+
+            owningForm.UpdateEditor(editBlock);
+
+            Invalidate();
         }
         #endregion
 
@@ -596,9 +686,7 @@ namespace SceneGraphPlus.Surface
             {
                 if (block.Equals(editBlock))
                 {
-                    editBlock = null;
-
-                    owningForm.UpdateEditor(editBlock);
+                    DeselectEditBlock();
                 }
 
                 allBlocks.Remove(block);
@@ -617,9 +705,9 @@ namespace SceneGraphPlus.Surface
         /// Mark this unattached block for deletion.
         /// Disconnect block from children and discard associated connectors.
         /// </summary>
-        private void MarkBlockForDeletion(GraphBlock block)
+        private void MarkBlockForDeletion(GraphBlock block, bool ignoreInConnectors)
         {
-            Trace.Assert(block.GetInConnectors().Count == 0, "Cannot delete block with in connectors");
+            Trace.Assert(ignoreInConnectors || block.GetInConnectors().Count == 0, "Cannot delete block with in connectors");
             Trace.Assert(block.IsEditable, "Cannot delete a 'read-only' block");
 
             foreach (GraphConnector connector in block.GetOutConnectors())
@@ -632,8 +720,7 @@ namespace SceneGraphPlus.Surface
 
             if (block.Equals(editBlock))
             {
-                editBlock = null;
-                owningForm.UpdateEditor(editBlock);
+                DeselectEditBlock();
             }
         }
 
@@ -643,10 +730,9 @@ namespace SceneGraphPlus.Surface
         /// </summary>
         private void MarkChainForDeletion(GraphBlock startBlock)
         {
-            Trace.Assert(contextBlock.GetInConnectors().Count == 0, "Cannot delete chain with in connectors");
-            Trace.Assert(contextBlock.IsEditable, "Cannot delete a 'read-only' block");
+            Trace.Assert(startBlock.GetInConnectors().Count <= 1, "Cannot delete block with multiple in connectors");
 
-            foreach (GraphConnector connector in startBlock.GetOutConnectors()) // GetOutConnectors() allows us to use DisconnectFrom() below
+            foreach (GraphConnector connector in startBlock.GetOutConnectors()) // GetOutConnectors() allows us to use UnlinkFrom() below
             {
                 if (connector.EndBlock.GetInConnectors().Count == 1)
                 {
@@ -656,7 +742,7 @@ namespace SceneGraphPlus.Surface
                 }
             }
 
-            MarkBlockForDeletion(startBlock);
+            MarkBlockForDeletion(startBlock, true);
         }
 
         private bool SeenIdenticalConnector(int i)
@@ -727,7 +813,7 @@ namespace SceneGraphPlus.Surface
             {
                 bool wanted = !(meshOnly || materialsOnly);
 
-                if (startBlock.TypeId == Mmat.TYPE)
+                if (startBlock.TypeId == Mmat.TYPE || startBlock.TypeId == Gzps.TYPE || startBlock.TypeId == Xmol.TYPE || startBlock.TypeId == Xtol.TYPE)
                 {
                     if (meshOnly)
                     {
@@ -769,8 +855,7 @@ namespace SceneGraphPlus.Surface
 
             if (startBlock.Equals(editBlock))
             {
-                editBlock = null;
-                owningForm.UpdateEditor(editBlock);
+                DeselectEditBlock();
             }
         }
         #endregion
@@ -989,67 +1074,76 @@ namespace SceneGraphPlus.Surface
         {
             if (contextBlock != null)
             {
-                if (!contextBlock.IsMissingOrClone)
+                if (IsMultiSelect)
                 {
-                    menuItemContextTexture.Visible = (contextBlock.TypeId == Mmat.TYPE || contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE);
+                    if (!selectedBlocks.Contains(contextBlock))
+                    {
+                        DeselectBlocks(false);
+                        SelectEditBlock(contextBlock);
+                    }
+                }
 
-                    menuItemContextDelete.Visible = advancedMode;
-                    menuItemContextDelete.Enabled = (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0);
+                if (NoneMissingOrClone())
+                {
+                    menuItemContextBlockTexture.Visible = !IsMultiSelect && (contextBlock.TypeId == Mmat.TYPE || contextBlock.TypeId == Txmt.TYPE || contextBlock.TypeId == Txtr.TYPE || contextBlock.TypeId == Lifo.TYPE);
 
-                    menuItemContextDeleteChain.Visible = advancedMode;
-                    menuItemContextDeleteChain.Enabled = false;
+                    menuItemContextBlockDelete.Visible = !IsMultiSelect && advancedMode;
+                    menuItemContextBlockDelete.Enabled = (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0 && contextBlock.OutConnectors.Count == 0);
+
+                    menuItemContextBlockDeleteChain.Visible = !IsMultiSelect && advancedMode;
+                    menuItemContextBlockDeleteChain.Enabled = false;
                     if (contextBlock.IsEditable && contextBlock.GetInConnectors().Count == 0)
                     {
-                        menuItemContextDeleteChain.Enabled = true;
+                        menuItemContextBlockDeleteChain.Enabled = true;
 
                         foreach (GraphBlock block in GetBlockChain(contextBlock, false, false, false))
                         {
                             if (!block.IsEditable)
                             {
-                                menuItemContextDeleteChain.Enabled = false;
+                                menuItemContextBlockDeleteChain.Enabled = false;
                                 break;
                             }
                         }
                     }
 
-                    menuItemContextHide.Visible = advancedMode;
-                    menuItemContextHide.Enabled = (contextBlock.GetInConnectors().Count == 0);
+                    menuItemContextBlockHide.Visible = !IsMultiSelect && advancedMode;
+                    menuItemContextBlockHide.Enabled = (contextBlock.GetInConnectors().Count == 0);
 
-                    menuItemContextHideChain.Visible = advancedMode;
-                    menuItemContextHideChain.Enabled = (contextBlock.GetInConnectors().Count == 0);
+                    menuItemContextBlockHideChain.Visible = !IsMultiSelect && advancedMode;
+                    menuItemContextBlockHideChain.Enabled = (contextBlock.GetInConnectors().Count == 0);
 
-                    menuItemContextExtract.Visible = menuItemContextExport.Visible = false;
+                    menuItemContextBlockExtract.Visible = menuItemContextBlockExport.Visible = false;
                     if (contextBlock.TypeId == Cres.TYPE)
                     {
-                        menuItemContextExtract.Text = "Extract Mesh";
-                        menuItemContextExtract.Visible = true;
+                        menuItemContextBlockExtract.Text = (!IsMultiSelect ? "Extract Mesh" : "Extract Mesh");
+                        menuItemContextBlockExtract.Visible = true;
 
-                        menuItemContextExport.Text = "Export Mesh";
-                        menuItemContextExport.Visible = true;
+                        menuItemContextBlockExport.Text = (!IsMultiSelect ? "Export Mesh" : "Export Meshes");
+                        menuItemContextBlockExport.Visible = true;
                     }
-                    else if (contextBlock.TypeId == Gzps.TYPE || contextBlock.TypeId == Mmat.TYPE)
+                    else if (contextBlock.TypeId == Mmat.TYPE || contextBlock.TypeId == Gzps.TYPE || contextBlock.TypeId == Xmol.TYPE || contextBlock.TypeId == Xtol.TYPE)
                     {
-                        menuItemContextExtract.Text = "Extract Recolour";
-                        menuItemContextExtract.Visible = true;
+                        menuItemContextBlockExtract.Text = (!IsMultiSelect ? "Extract Recolour" : "Extract Recolours");
+                        menuItemContextBlockExtract.Visible = true;
 
-                        menuItemContextExport.Text = "Export Recolour";
-                        menuItemContextExport.Visible = true;
+                        menuItemContextBlockExport.Text = (!IsMultiSelect ? "Export Recolour" : "Export Recolours");
+                        menuItemContextBlockExport.Visible = true;
                     }
 
-                    menuItemContextFixTgir.Visible = !contextBlock.IsTgirValid;
-                    menuItemContextFixFileList.Visible = (contextBlock.TypeId == Txmt.TYPE) && !contextBlock.IsDirty && !contextBlock.IsFileListValid;
-                    menuItemContextFixLight.Visible = (contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE) && !contextBlock.IsDirty && !contextBlock.IsLightValid;
-                    menuItemContextFixLanguages.Visible = (contextBlock.TypeId == Str.TYPE) && !contextBlock.IsDirty && !contextBlock.IsDefaultLangValid;
+                    menuItemContextBlockFixTgir.Visible = CanFixTgi();
+                    menuItemContextBlockFixFileList.Visible = (contextBlock.TypeId == Txmt.TYPE) && CanFixFilelist();
+                    menuItemContextBlockFixLight.Visible = (contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE) && CanFixLight();
+                    menuItemContextBlockFixLanguages.Visible = (contextBlock.TypeId == Str.TYPE) && CanFixLanguages();
 
-                    menuItemContextCopySgName.Visible = (contextBlock.SoleRcolParent != null);
-                    menuItemContextCopySgName.Enabled = (contextBlock.SoleRcolParent?.SgBaseName != null && !(contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE));
+                    menuItemContextBlockCopySgName.Visible = !IsMultiSelect && (contextBlock.SoleRcolParent != null);
+                    menuItemContextBlockCopySgName.Enabled = (contextBlock.SoleRcolParent?.SgBaseName != null && !(contextBlock.TypeId == Lamb.TYPE || contextBlock.TypeId == Ldir.TYPE || contextBlock.TypeId == Lpnt.TYPE || contextBlock.TypeId == Lspt.TYPE));
 
-                    menuItemContextClosePackage.Visible = true;
-                    menuItemContextClosePackage.Enabled = !HasPendingEdits(contextBlock.PackagePath);
-                    menuItemContextOpenPackage.Visible = false;
+                    menuItemContextBlockClosePackage.Visible = true;
+                    menuItemContextBlockClosePackage.Enabled = CanClosePackages();
+                    menuItemContextBlockOpenPackage.Visible = false;
 
-                    menuItemContextSplitBlock.Visible = advancedMode;
-                    menuItemContextSplitBlock.Enabled = (contextBlock.GetInConnectors().Count > 1);
+                    menuItemContextBlockSplitBlock.Visible = !IsMultiSelect && advancedMode;
+                    menuItemContextBlockSplitBlock.Enabled = (contextBlock.GetInConnectors().Count > 1);
                 }
                 else
                 {
@@ -1060,60 +1154,185 @@ namespace SceneGraphPlus.Surface
 
                     e.Cancel = true;
 
-                    if (contextBlock.IsAvailable && !contextBlock.IsMaxis)
+                    if (!IsMultiSelect)
                     {
-                        menuItemContextOpenPackage.Visible = true;
-                        menuItemContextOpenPackage.Enabled = true;
+                        if (contextBlock.IsAvailable && !contextBlock.IsMaxis)
+                        {
+                            menuItemContextBlockOpenPackage.Visible = true;
+                            menuItemContextBlockOpenPackage.Enabled = true;
 
-                        e.Cancel = false;
+                            e.Cancel = false;
+                        }
                     }
 
-                    if (contextBlock.IsMaxis)
+                    if (AllMaxis())
                     {
                         if (contextBlock.TypeId == Cres.TYPE)
                         {
                             if (GameData.GetMaxisResource(contextBlock.TypeId, contextBlock.Key) != null)
                             {
-                                menuItemContextExtract.Text = "Extract Maxis Mesh";
-                                menuItemContextExtract.Visible = true;
-                                menuItemContextExtract.Enabled = true;
+                                menuItemContextBlockExtract.Text = (!IsMultiSelect ? "Extract Maxis Mesh" : "Extract Maxis Meshes");
+                                menuItemContextBlockExtract.Visible = true;
+                                menuItemContextBlockExtract.Enabled = true;
 
-                                menuItemContextExport.Text = "Export Maxis Mesh";
-                                menuItemContextExport.Visible = true;
-                                menuItemContextExport.Enabled = true;
+                                menuItemContextBlockExport.Text = (!IsMultiSelect ? "Export Maxis Mesh" : "Export Maxis Meshes");
+                                menuItemContextBlockExport.Visible = true;
+                                menuItemContextBlockExport.Enabled = true;
 
                                 e.Cancel = false;
                             }
                         }
-                        else if (contextBlock.TypeId == Gzps.TYPE)
+                        else if (contextBlock.TypeId == Mmat.TYPE || contextBlock.TypeId == Gzps.TYPE || contextBlock.TypeId == Xmol.TYPE || contextBlock.TypeId == Xtol.TYPE)
                         {
                             if (GameData.GetMaxisResource(contextBlock.TypeId, contextBlock.Key) != null)
                             {
-                                menuItemContextExtract.Text = "Extract Maxis Recolour";
-                                menuItemContextExtract.Visible = true;
-                                menuItemContextExtract.Enabled = true;
+                                menuItemContextBlockExtract.Text = (!IsMultiSelect ? "Extract Maxis Recolour" : "Extract Maxis Recolours");
+                                menuItemContextBlockExtract.Visible = true;
+                                menuItemContextBlockExtract.Enabled = true;
 
-                                menuItemContextExport.Text = "Export Maxis Recolour";
-                                menuItemContextExport.Visible = true;
-                                menuItemContextExport.Enabled = true;
+                                menuItemContextBlockExport.Text = (!IsMultiSelect ? "Export Maxis Recolour" : "Export Maxis Recolours");
+                                menuItemContextBlockExport.Visible = true;
+                                menuItemContextBlockExport.Enabled = true;
 
                                 e.Cancel = false;
                             }
                         }
                     }
 
-                    if (advancedMode && contextBlock.GetInConnectors().Count > 1)
+                    if (!IsMultiSelect)
                     {
-                        menuItemContextSplitBlock.Visible = true;
-                        menuItemContextSplitBlock.Enabled = true;
+                        if (advancedMode && contextBlock.GetInConnectors().Count > 1)
+                        {
+                            menuItemContextBlockSplitBlock.Visible = true;
+                            menuItemContextBlockSplitBlock.Enabled = true;
 
-                        e.Cancel = false;
+                            e.Cancel = false;
+                        }
                     }
                 }
             }
             else
             {
                 e.Cancel = true;
+            }
+        }
+
+        private bool NoneMissingOrClone()
+        {
+            if (!IsMultiSelect)
+            {
+                return !contextBlock.IsMissingOrClone;
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (block.IsMissingOrClone) return false;
+                }
+
+                return true;
+            }
+        }
+
+        private bool AllMaxis()
+        {
+            if (!IsMultiSelect)
+            {
+                return contextBlock.IsMaxis;
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (!block.IsMaxis) return false;
+                }
+
+                return true;
+            }
+        }
+
+        private bool CanFixTgi()
+        {
+            if (!IsMultiSelect)
+            {
+                return !contextBlock.IsTgirValid;
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (!block.IsTgirValid) return true;
+                }
+
+                return false;
+            }
+        }
+
+        private bool CanFixFilelist()
+        {
+            if (!IsMultiSelect)
+            {
+                return !contextBlock.IsDirty && !contextBlock.IsFileListValid;
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (!block.IsDirty && !block.IsFileListValid) return true;
+                }
+
+                return false;
+            }
+        }
+
+        private bool CanFixLight()
+        {
+            if (!IsMultiSelect)
+            {
+                return !contextBlock.IsDirty && !contextBlock.IsLightValid;
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (!block.IsDirty && !block.IsLightValid) return true;
+                }
+
+                return false;
+            }
+        }
+
+        private bool CanFixLanguages()
+        {
+            if (!IsMultiSelect)
+            {
+                return !contextBlock.IsDirty && !contextBlock.IsDefaultLangValid;
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (!block.IsDirty && !block.IsDefaultLangValid) return true;
+                }
+
+                return false;
+            }
+        }
+
+        private bool CanClosePackages()
+        {
+            if (!IsMultiSelect)
+            {
+                return !HasPendingEdits(contextBlock.PackagePath);
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (HasPendingEdits(block.PackagePath)) return false;
+                }
+
+                return true;
             }
         }
 
@@ -1127,7 +1346,7 @@ namespace SceneGraphPlus.Surface
         private void OnContextBlockDelete(object sender, EventArgs e)
         {
             Trace.Assert(contextBlock.OutConnectors.Count == 0, "Cannot delete block with out connectors");
-            MarkBlockForDeletion(contextBlock);
+            MarkBlockForDeletion(contextBlock, false);
 
             Invalidate();
         }
@@ -1147,8 +1366,7 @@ namespace SceneGraphPlus.Surface
 
             if (contextBlock.Equals(editBlock))
             {
-                editBlock = null;
-                owningForm.UpdateEditor(editBlock);
+                DeselectEditBlock();
             }
 
             Invalidate();
@@ -1165,42 +1383,66 @@ namespace SceneGraphPlus.Surface
 
         private void OnContextBlockExport(object sender, EventArgs e)
         {
-            if (selectFileDialog.ShowDialog() == DialogResult.OK)
+            if (!IsMultiSelect)
             {
-                IExporter exporter = new Exporter();
-
-                exporter.Open(selectFileDialog.FileName);
-
-                if (contextBlock.IsMaxis)
+                if (contextBlock.TypeId == Cres.TYPE)
                 {
-                    if (contextBlock.TypeId == Cres.TYPE)
-                    {
-                        ExtractMaxisMesh(exporter);
-                    }
-                    else if (contextBlock.TypeId == Gzps.TYPE)
-                    {
-                        ExtractMaxisRecolour(exporter);
-                    }
-
-                    exporter.Close();
+                    selectFileDialog.Title = $"Export as .package file - {contextBlock.SgBaseName}";
                 }
                 else
                 {
-                    if (contextBlock.TypeId == Cres.TYPE)
+                    selectFileDialog.Title = $"Export as .package file - {contextBlock.BlockName}";
+                }
+
+                if (selectFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    if (File.Exists(selectFileDialog.FileName))
                     {
-                        ExtractCustomMesh(exporter);
-                    }
-                    else
-                    {
-                        ExtractCustomRecolour(exporter);
+                        // TODO - SceneGraph Plus - exporting - or should we disallow this?
+                        Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(selectFileDialog.FileName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
                     }
 
-
-                    exporter.Close();
-
-                    owningForm.AddPackage(selectFileDialog.FileName);
+                    ExportBlock(contextBlock, selectFileDialog.FileName);
 
                     Invalidate();
+                }
+            }
+            else
+            {
+                try
+                {
+                    foreach (GraphBlock block in selectedBlocks)
+                    {
+                        if (block.TypeId == Cres.TYPE)
+                        {
+                            selectFileDialog.Title = $"Export as .package file - {block.SgBaseName}";
+                        }
+                        else
+                        {
+                            selectFileDialog.Title = $"Export as .package file - {block.BlockName}";
+                        }
+
+                        int a = allBlocks.Count;
+
+                        if (selectFileDialog.ShowDialog() == DialogResult.OK)
+                        {
+                            if (File.Exists(selectFileDialog.FileName))
+                            {
+                                // TODO - SceneGraph Plus - exporting - or should we disallow this?
+                                Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(selectFileDialog.FileName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                            }
+
+                            ExportBlock(block, selectFileDialog.FileName);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                finally
+                {
+                    DeselectBlocks(true);
                 }
             }
         }
@@ -1213,51 +1455,85 @@ namespace SceneGraphPlus.Surface
 
                 extractor.Open(selectPathDialog.FileName);
 
-                if (contextBlock.IsMaxis)
+                if (!IsMultiSelect)
                 {
-                    if (contextBlock.TypeId == Cres.TYPE)
-                    {
-                        ExtractMaxisMesh(extractor);
-                    }
-                    else if (contextBlock.TypeId == Gzps.TYPE)
-                    {
-                        ExtractMaxisRecolour(extractor);
-                    }
+                    ExtractBlock(extractor, contextBlock);
                 }
                 else
                 {
-                    if (contextBlock.TypeId == Cres.TYPE)
+                    foreach (GraphBlock block in selectedBlocks)
                     {
-                        ExtractCustomMesh(extractor);
-                    }
-                    else
-                    {
-                        ExtractCustomRecolour(extractor);
+                        ExtractBlock(extractor, block);
                     }
                 }
 
                 extractor.Close();
+
+                if (IsMultiSelect)
+                {
+                    DeselectBlocks(true);
+                }
             }
         }
 
         private void OnContextBlockFixTgir(object sender, EventArgs e)
         {
-            FixTgir(contextBlock);
+            if (!IsMultiSelect)
+            {
+                FixTgir(contextBlock);
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (!block.IsTgirValid) FixTgir(block);
+                }
+            }
         }
 
         private void OnContextBlockFixFileList(object sender, EventArgs e)
         {
-            FixIssues(contextBlock);
+            if (!IsMultiSelect)
+            {
+                FixIssues(contextBlock);
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (!block.IsDirty && !block.IsFileListValid) FixIssues(block);
+                }
+            }
         }
 
         private void OnContextBlockFixLight(object sender, EventArgs e)
         {
-            FixIssues(contextBlock);
+            if (!IsMultiSelect)
+            {
+                FixIssues(contextBlock);
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (!block.IsDirty && !block.IsLightValid) FixIssues(block);
+                }
+            }
         }
 
         private void OnContextBlockFixLanguages(object sender, EventArgs e)
         {
-            FixIssues(contextBlock);
+            if (!IsMultiSelect)
+            {
+                FixIssues(contextBlock);
+            }
+            else
+            {
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    if (!block.IsDirty && !block.IsDefaultLangValid) FixIssues(block);
+                }
+            }
         }
 
         private void OnContextBlockCopySgName(object sender, EventArgs e)
@@ -1300,7 +1576,27 @@ namespace SceneGraphPlus.Surface
 
         private void OnContextBlockClosePackage(object sender, EventArgs e)
         {
-            owningForm.ClosePackage(contextBlock.PackagePath);
+            if (!IsMultiSelect)
+            {
+                owningForm.ClosePackage(contextBlock.PackagePath);
+            }
+            else
+            {
+                HashSet<string> allreadyClosed = new HashSet<string>();
+
+                foreach (GraphBlock block in selectedBlocks)
+                {
+                    string packagePath = block.PackagePath;
+
+                    if (!allreadyClosed.Contains(packagePath))
+                    {
+                        allreadyClosed.Add(packagePath);
+                        owningForm.ClosePackage(packagePath);
+                    }
+                }
+
+                DeselectBlocks(true);
+            }
         }
         #endregion
 
@@ -1311,13 +1607,13 @@ namespace SceneGraphPlus.Surface
             {
                 if (CountIdenticalConnectors(allConnectors.IndexOf(contextConnector)) > 1)
                 {
-                    menuItemContextSplitMulti.Visible = true;
-                    menuItemContextUnlink.Visible = false;
+                    menuItemContextConnectorSplitMulti.Visible = true;
+                    menuItemContextConnectorUnlink.Visible = false;
                 }
                 else if (contextConnector.StartBlock.TypeId == Str.TYPE && (contextConnector.EndBlock.TypeId == Cres.TYPE || contextConnector.EndBlock.TypeId == Txmt.TYPE))
                 {
-                    menuItemContextUnlink.Visible = true;
-                    menuItemContextSplitMulti.Visible = false;
+                    menuItemContextConnectorUnlink.Visible = true;
+                    menuItemContextConnectorSplitMulti.Visible = false;
                 }
                 else
                 {
@@ -1383,7 +1679,7 @@ namespace SceneGraphPlus.Surface
 
             foreach (GraphBlock block in allBlocks)
             {
-                if (block.TypeId == Gzps.TYPE || block.TypeId == Aged.TYPE || block.TypeId == Xmol.TYPE || block.TypeId == Xtol.TYPE)
+                if (block.TypeId == Aged.TYPE || block.TypeId == Gzps.TYPE || block.TypeId == Xmol.TYPE || block.TypeId == Xtol.TYPE)
                 {
                     if (filters.Exclude(block.Text))
                     {
@@ -1417,29 +1713,90 @@ namespace SceneGraphPlus.Surface
 
             if (startBlock.Equals(editBlock))
             {
-                editBlock = null;
-                owningForm.UpdateEditor(editBlock);
+                DeselectEditBlock();
             }
         }
         #endregion
 
         #region Extraction
-        private void ExtractCustomMesh(IExporter exporter)
+        private void ExportBlock(GraphBlock block, string filename)
         {
-            ExtractCustomMeshOrRecolour(exporter, true);
+            IExporter exporter = new Exporter();
+
+            exporter.Open(filename);
+
+            if (block.IsMaxis)
+            {
+                if (block.TypeId == Cres.TYPE)
+                {
+                    ExtractMaxisMesh(exporter, block);
+                }
+                else
+                {
+                    ExtractMaxisRecolour(exporter, block);
+                }
+
+                exporter.Close();
+            }
+            else
+            {
+                if (block.TypeId == Cres.TYPE)
+                {
+                    ExtractCustomMesh(exporter, block);
+                }
+                else
+                {
+                    ExtractCustomRecolour(exporter, block);
+                }
+
+                exporter.Close();
+
+                owningForm.AddPackage(filename);
+            }
         }
 
-        private void ExtractCustomRecolour(IExporter exporter)
+        private void ExtractBlock(IExporter extractor, GraphBlock block)
         {
-            ExtractCustomMeshOrRecolour(exporter, false);
+            if (block.IsMaxis)
+            {
+                if (block.TypeId == Cres.TYPE)
+                {
+                    ExtractMaxisMesh(extractor, block);
+                }
+                else
+                {
+                    ExtractMaxisRecolour(extractor, block);
+                }
+            }
+            else
+            {
+                if (block.TypeId == Cres.TYPE)
+                {
+                    ExtractCustomMesh(extractor, block);
+                }
+                else
+                {
+                    ExtractCustomRecolour(extractor, block);
+                }
+            }
         }
 
-        private void ExtractCustomMeshOrRecolour(IExporter exporter, bool meshOnly)
+        private void ExtractCustomMesh(IExporter exporter, GraphBlock block)
+        {
+            ExtractCustomMeshOrRecolour(exporter, block, true);
+        }
+
+        private void ExtractCustomRecolour(IExporter exporter, GraphBlock block)
+        {
+            ExtractCustomMeshOrRecolour(exporter, block, false);
+        }
+
+        private void ExtractCustomMeshOrRecolour(IExporter exporter, GraphBlock startBlock, bool meshOnly)
         {
             List<GraphBlock> exportedBlocks = new List<GraphBlock>();
             bool exporting = (exporter is Exporter);
 
-            foreach (GraphBlock block in GetBlockChain(contextBlock, meshOnly, !meshOnly, false))
+            foreach (GraphBlock block in GetBlockChain(startBlock, meshOnly, !meshOnly, false))
             {
                 if (!(block.IsMaxis || block.IsMissingOrClone))
                 {
@@ -1454,28 +1811,72 @@ namespace SceneGraphPlus.Surface
 
                         UpdateRefsToChildren(exportPackage, res, block, owningForm.IsPrefixLowerCase);
 
-                        if (contextBlock.TypeId == Cres.TYPE && (block.TypeId == Cres.TYPE || block.TypeId == Shpe.TYPE || block.TypeId == Gmnd.TYPE || block.TypeId == Gmdc.TYPE))
+                        if (startBlock.TypeId == Cres.TYPE && (block.TypeId == Cres.TYPE || block.TypeId == Shpe.TYPE || block.TypeId == Gmnd.TYPE || block.TypeId == Gmdc.TYPE))
                         {
                             exporter.Extract(res);
                             if (exporting) exportedBlocks.Add(block);
                         }
-                        else if (contextBlock.TypeId == Mmat.TYPE && (block.TypeId == Mmat.TYPE || block.TypeId == Txmt.TYPE || block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE))
+                        else if (startBlock.TypeId == Mmat.TYPE && (block.TypeId == Mmat.TYPE || block.TypeId == Txmt.TYPE || block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE))
                         {
                             exporter.Extract(res);
                             if (exporting) exportedBlocks.Add(block);
                         }
-                        else if (contextBlock.TypeId == Gzps.TYPE && (block.TypeId == Gzps.TYPE || block.TypeId == Txmt.TYPE || block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE))
+                        else if ((startBlock.TypeId == Gzps.TYPE || startBlock.TypeId == Xmol.TYPE || startBlock.TypeId == Xtol.TYPE) && (block.TypeId == Gzps.TYPE || block.TypeId == Xmol.TYPE || block.TypeId == Xtol.TYPE || block.TypeId == Txmt.TYPE || block.TypeId == Txtr.TYPE || block.TypeId == Lifo.TYPE))
                         {
-                            if (block.TypeId == Gzps.TYPE)
+                            if (block.TypeId == Gzps.TYPE || block.TypeId == Xmol.TYPE || block.TypeId == Xtol.TYPE)
                             {
-                                DBPFResource idrRes = exportPackage.GetResourceByKey(new DBPFKey(Idr.TYPE, block.Key));
-                                exporter.Extract(idrRes);
+                                // We also need the 3IDR paired with the GZPS/XMOL/XTOL
+                                Idr binxIdr = (Idr)exportPackage.GetResourceByKey(new DBPFKey(Idr.TYPE, block.Key));
+                                exporter.Extract(binxIdr);
 
-                                DBPFResource binxRes = exportPackage.GetResourceByKey(new DBPFKey(Binx.TYPE, block.Key));
-                                exporter.Extract(binxRes);
+                                // We also need the associated BINX, we'll start by assuming the GZPS/3IDR/BINX is a triple
+                                Binx binx = (Binx)exportPackage.GetResourceByKey(new DBPFKey(Binx.TYPE, block.Key));
+                                DBPFKey objectKey = binxIdr.GetItem(binx.ObjectIdx);
+
+                                if (!block.Key.Equals(objectKey))
+                                {
+                                    // Rats! Not a triple.  We need to find the BINX.3IDR pair that references this block
+                                    binx = null;
+
+                                    foreach (DBPFEntry entry in exportPackage.GetEntriesByType(Binx.TYPE))
+                                    {
+                                        Binx thisBinx = (Binx)exportPackage.GetResourceByEntry(entry);
+                                        binxIdr = (Idr)exportPackage.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+
+                                        if (binxIdr != null)
+                                        {
+                                            objectKey = binxIdr.GetItem(thisBinx.ObjectIdx);
+
+                                            if (block.Key.Equals(objectKey))
+                                            {
+                                                // Found it!
+                                                binx = thisBinx;
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    if (binx != null)
+                                    {
+                                        // Need this as well
+                                        exporter.Extract(binxIdr);
+                                    }
+                                }
+
+                                if (binx != null)
+                                {
+                                    exporter.Extract(binx);
+
+                                    exporter.Extract(exportPackage.GetResourceByKey(binxIdr.GetItem(binx.StringSetIdx)));
+                                }
+                                else
+                                {
+                                    // Oh fuck!
+                                }
                             }
 
                             exporter.Extract(res);
+
                             if (exporting) exportedBlocks.Add(block);
                         }
                     }
@@ -1507,25 +1908,25 @@ namespace SceneGraphPlus.Surface
                             connector.EndBlock.UnlinkFrom(connector);
                         }
 
-                        // TODO - SceneGraph Plus - exporting - and for GZPS et al, delete the associated BINX/3IDR resources
+                        // TODO - SceneGraph Plus - exporting - and for GZPS et al, delete the associated BINX/3IDR/STR# resources
                         CacheableDbpfFile package = packageCache.GetOrOpen(deletableBlock.PackagePath);
                         package.Remove(deletableBlock.OriginalKey);
                         owningForm.RemoveResource(package, deletableBlock.OriginalKey);
 
                         exportedBlocks.Remove(deletableBlock);
 
-                        MarkBlockForDeletion(deletableBlock);
+                        MarkBlockForDeletion(deletableBlock, false);
                         deletableBlock.Discard();
                     }
                 } while (exportedBlocks.Count > 0 && deletableBlock != null);
             }
         }
 
-        private void ExtractMaxisMesh(IExporter exporter)
+        private void ExtractMaxisMesh(IExporter exporter, GraphBlock block)
         {
-            if (contextBlock.TypeId == Cres.TYPE)
+            if (block.TypeId == Cres.TYPE)
             {
-                DBPFKey cresKey = contextBlock.Key;
+                DBPFKey cresKey = block.Key;
 
                 string maxisPath = GameData.GetMaxisPackagePath(Cres.TYPE, cresKey, true);
 
@@ -1572,11 +1973,11 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-        private void ExtractMaxisRecolour(IExporter exporter)
+        private void ExtractMaxisRecolour(IExporter exporter, GraphBlock block)
         {
-            if (contextBlock.TypeId == Gzps.TYPE)
+            if (block.TypeId == Gzps.TYPE || block.TypeId == Xmol.TYPE || block.TypeId == Xtol.TYPE)
             {
-                DBPFKey gzpsKey = contextBlock.Key;
+                DBPFKey gzpsKey = block.Key;
 
                 string maxisPath = GameData.GetMaxisPackagePath(Gzps.TYPE, gzpsKey, true);
 
@@ -1686,6 +2087,51 @@ namespace SceneGraphPlus.Surface
 
             base.OnKeyUp(e);
         }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if ((e.KeyCode == Keys.M || e.KeyCode == Keys.Oemcomma) && ((e.Modifiers & Keys.Control) == Keys.Control))
+            {
+                // Ctrl-M - enable move of selected multiple blocks
+                // Ctrl-Shift-M - enable move of selected multiple block chains
+                // Ctrl-Shift-Comma - enable move of selected multiple block chains, right only
+
+                if (IsMultiSelect)
+                {
+                    bool includeChain = ((e.Modifiers & Keys.Shift) == Keys.Shift);
+                    selectedBlockChain = new HashSet<GraphBlock>();
+
+                    foreach (GraphBlock block in selectedBlocks)
+                    {
+                        if (includeChain)
+                        {
+                            foreach (GraphBlock chainBlock in GetBlockChain(block, false, false, (e.KeyCode == Keys.Oemcomma)))
+                            {
+                                selectedBlockChain.Add(chainBlock);
+                            }
+                        }
+                        else
+                        {
+                            selectedBlockChain.Add(block);
+                        }
+                    }
+
+                    startPoint = previousPoint = MousePosition;
+                    moving = true;
+                }
+            }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                MouseEventArgs mouseEventArgs = new MouseEventArgs(MouseButtons.Left, 1, startPoint.X, startPoint.Y, 0);
+
+                // Fake a MouseMove back to the starting position
+                OnMouseMove(mouseEventArgs);
+                // Fake a MouseUp
+                OnMouseUp(mouseEventArgs);
+            }
+
+            base.OnKeyDown(e);
+        }
         #endregion
 
         #region Mouse Tracking
@@ -1696,10 +2142,12 @@ namespace SceneGraphPlus.Surface
             mouseClickTimer.Stop();
         }
 
-        protected override void OnMouseDown(MouseEventArgs e)
+        protected override void OnMouseDown(MouseEventArgs mouseEventArgs)
         {
-            if (e.Button == MouseButtons.Left)
+            if (mouseEventArgs.Button == MouseButtons.Left)
             {
+                DeselectBlocks(false);
+
                 if (advancedMode)
                 {
                     DateTime now = DateTime.Now;
@@ -1709,12 +2157,12 @@ namespace SceneGraphPlus.Surface
                         inDoubleClick = false;
 
                         // If double click is valid, respond
-                        if (doubleClickArea.Contains(e.Location) && ((now - mouseLastClick) < doubleClickMaxTime))
+                        if (doubleClickArea.Contains(mouseEventArgs.Location) && ((now - mouseLastClick) < doubleClickMaxTime))
                         {
                             mouseClickTimer.Stop();
-                            selectedBlock = null;
+                            DeselectBlocks(true);
 
-                            OnBlockDoubleClick(PointToScreen(e.Location));
+                            OnBlockDoubleClick(PointToScreen(mouseEventArgs.Location));
                         }
 
                         return;
@@ -1724,83 +2172,187 @@ namespace SceneGraphPlus.Surface
                     mouseClickTimer.Stop(); mouseClickTimer.Start();
                     mouseLastClick = now;
                     inDoubleClick = true;
-                    doubleClickArea = new Rectangle(e.Location.X - (SystemInformation.DoubleClickSize.Width / 2), e.Location.Y - (SystemInformation.DoubleClickSize.Width / 2), SystemInformation.DoubleClickSize.Width, SystemInformation.DoubleClickSize.Height);
+                    doubleClickArea = new Rectangle(mouseEventArgs.Location.X - (SystemInformation.DoubleClickSize.Width / 2), mouseEventArgs.Location.Y - (SystemInformation.DoubleClickSize.Width / 2), SystemInformation.DoubleClickSize.Width, SystemInformation.DoubleClickSize.Height);
                 }
 
                 // Left-Click to drag, Shift-Left-Click to drag and drop onto a block, Ctrl-Left-Click to drag and drop onto a connector
+                bool hitAnything = false;
                 for (int i = allBlocks.Count - 1; i >= 0; i--)
                 {
                     if (hideMissingBlocks && allBlocks[i].IsMissing) continue;
 
-                    if (allBlocks[i].HitTest(e.Location))
+                    if (allBlocks[i].HitTest(mouseEventArgs.Location))
                     {
-                        selectedBlock = allBlocks[i];
+                        if (firstSelectedBlock == null)
+                        {
+                            firstSelectedBlock = allBlocks[i];
+                        }
+
+                        SelectBlock(allBlocks[i]);
+
+                        hitAnything = true;
                         break;
                     }
                 }
 
-                if (selectedBlock != null)
+                if (!hitAnything)
+                {
+                    DeselectEditBlock();
+
+                    banding = true;
+                    bandingStart = bandingLast = mouseEventArgs.Location;
+                }
+
+                if (IsSingleSelect /* firstSelectedBlock != null */)
                 {
                     moving = true;
-                    previousPoint = e.Location;
+                    startPoint = previousPoint = mouseEventArgs.Location;
 
-                    if (selectedBlock != editBlock && editBlock != null) editBlock.IsEditing = false;
+                    if (firstSelectedBlock != editBlock && editBlock != null) editBlock.IsEditing = false;
 
-                    editBlock = selectedBlock;
-                    owningForm.UpdateEditor(editBlock);
-                    editBlock.IsEditing = true;
+                    SelectEditBlock(firstSelectedBlock);
                 }
             }
-            else if (e.Button == MouseButtons.Right)
+            else if (mouseEventArgs.Button == MouseButtons.Right)
             {
-                lblTooltip.Visible = picThumbnail.Visible = false;
-
-                contextBlock = null;
-                contextConnector = null;
-
-                for (int i = allBlocks.Count - 1; i >= 0; i--)
+                if (Form.ModifierKeys == (Keys.Shift | Keys.Control))
                 {
-                    if (hideMissingBlocks && allBlocks[i].IsMissing) continue;
-
-                    if (allBlocks[i].HitTest(e.Location))
+                    bool hitAnything = false;
+                    for (int i = allBlocks.Count - 1; i >= 0; i--)
                     {
-                        contextBlock = allBlocks[i];
-                        break;
+                        if (hideMissingBlocks && allBlocks[i].IsMissing) continue;
+
+                        if (allBlocks[i].HitTest(mouseEventArgs.Location))
+                        {
+                            DeselectBlocks(false);
+                            DeselectEditBlock();
+                            SelectSingleBlock(allBlocks[i]);
+
+                            foreach (GraphBlock block in allBlocks)
+                            {
+                                if (hideMissingBlocks && block.IsMissing) continue;
+                                if (block == firstSelectedBlock) continue;
+
+                                if (block.TypeId == firstSelectedBlock.TypeId)
+                                {
+                                    SelectBlock(block);
+                                }
+                            }
+
+                            Invalidate();
+                            hitAnything = true;
+                            break;
+                        }
+                    }
+
+                    if (!hitAnything)
+                    {
+                        DeselectBlocks(false);
+                        DeselectEditBlock();
                     }
                 }
-
-                for (int i = allConnectors.Count - 1; i >= 0; i--)
+                else if (Form.ModifierKeys == Keys.Shift)
                 {
-                    if (allConnectors[i].HitTest(e.Location))
+                    bool hitAnything = false;
+                    for (int i = allBlocks.Count - 1; i >= 0; i--)
                     {
-                        contextConnector = allConnectors[i];
-                        break;
+                        if (hideMissingBlocks && allBlocks[i].IsMissing) continue;
+
+                        if (allBlocks[i].HitTest(mouseEventArgs.Location))
+                        {
+                            if (firstSelectedBlock == null)
+                            {
+                                if (editBlock != null)
+                                {
+                                    SelectSingleBlock(editBlock);
+                                }
+
+                                SelectBlock(allBlocks[i]);
+
+                                if (firstSelectedBlock != editBlock && editBlock != null) editBlock.IsEditing = false;
+
+                                SelectEditBlock(firstSelectedBlock);
+                            }
+                            else
+                            {
+                                if (firstSelectedBlock.TypeId == allBlocks[i].TypeId)
+                                {
+                                    SelectBlock(allBlocks[i]);
+                                }
+                            }
+
+                            hitAnything = true;
+                            break;
+                        }
+                    }
+
+                    if (!hitAnything)
+                    {
+                        DeselectBlocks(false);
+                        DeselectEditBlock();
                     }
                 }
+                else if (Form.ModifierKeys == Keys.Control)
+                {
+                }
+                else
+                {
+                    lblTooltip.Visible = picThumbnail.Visible = false;
 
-                if (connectorsOver && contextConnector != null)
-                {
-                    menuContextConnector.Show(Cursor.Position);
-                }
-                else if (contextBlock != null)
-                {
-                    menuContextBlock.Show(Cursor.Position);
-                }
-                else if (!connectorsOver && contextConnector != null)
-                {
-                    menuContextConnector.Show(Cursor.Position);
+                    contextBlock = null;
+                    contextConnector = null;
+
+                    for (int i = allBlocks.Count - 1; i >= 0; i--)
+                    {
+                        if (hideMissingBlocks && allBlocks[i].IsMissing) continue;
+
+                        if (allBlocks[i].HitTest(mouseEventArgs.Location))
+                        {
+                            contextBlock = allBlocks[i];
+                            break;
+                        }
+                    }
+
+                    for (int i = allConnectors.Count - 1; i >= 0; i--)
+                    {
+                        if (allConnectors[i].HitTest(mouseEventArgs.Location))
+                        {
+                            contextConnector = allConnectors[i];
+                            break;
+                        }
+                    }
+
+                    if (connectorsOver && contextConnector != null)
+                    {
+                        menuContextConnector.Show(Cursor.Position);
+                    }
+                    else if (contextBlock != null)
+                    {
+                        menuContextBlock.Show(Cursor.Position);
+                    }
+                    else if (!connectorsOver && contextConnector != null)
+                    {
+                        menuContextConnector.Show(Cursor.Position);
+                    }
+                    else
+                    {
+                        DeselectBlocks(false);
+                        DeselectEditBlock();
+                    }
                 }
             }
 
-            base.OnMouseDown(e);
+            base.OnMouseDown(mouseEventArgs);
         }
 
-        protected override void OnMouseUp(MouseEventArgs e)
+        protected override void OnMouseUp(MouseEventArgs mouseEventArgs)
         {
-            if (e.Button == MouseButtons.Left)
+            if (mouseEventArgs.Button == MouseButtons.Left)
             {
                 if (moving)
                 {
+                    // Trace.Assert(IsSingleSelect, "Cannot move multiple blocks");
+
                     lblTooltip.Visible = picThumbnail.Visible = false;
 
                     if (Form.ModifierKeys == Keys.Shift)
@@ -1815,7 +2367,7 @@ namespace SceneGraphPlus.Surface
                                 List<GraphConnector> inConnectors = dropOntoBlock.GetInConnectors();
                                 foreach (GraphConnector connector in inConnectors)
                                 {
-                                    connector.SetEndBlock(selectedBlock, true);
+                                    connector.SetEndBlock(firstSelectedBlock, true);
                                     dropOntoBlock.UnlinkFrom(connector);
 
                                     connector.StartBlock.SetDirty();
@@ -1840,10 +2392,10 @@ namespace SceneGraphPlus.Surface
 
                             GraphBlock disconnectedEndBlock = dropOntoConnector.EndBlock;
 
-                            dropOntoConnector.SetEndBlock(selectedBlock, true);
-                            if (selectedBlock.TypeId == Txmt.TYPE && dropOntoConnector.StartBlock.TypeId == Mmat.TYPE)
+                            dropOntoConnector.SetEndBlock(firstSelectedBlock, true);
+                            if (firstSelectedBlock.TypeId == Txmt.TYPE && dropOntoConnector.StartBlock.TypeId == Mmat.TYPE)
                             {
-                                dropOntoConnector.StartBlock.BlockName = selectedBlock.SgFullName;
+                                dropOntoConnector.StartBlock.BlockName = firstSelectedBlock.SgFullName;
                             }
 
                             dropOntoConnector.StartBlock.SetDirty();
@@ -1868,10 +2420,10 @@ namespace SceneGraphPlus.Surface
 
                                 if (!dropOntoBlock.IsMissingOrClone)
                                 {
-                                    Trace.Assert(selectedBlock.TypeId == Cres.TYPE || selectedBlock.TypeId == Txmt.TYPE, "Can only ctrl-shift-drop a CRES or TXMT block!");
+                                    Trace.Assert(firstSelectedBlock.TypeId == Cres.TYPE || firstSelectedBlock.TypeId == Txmt.TYPE, "Can only ctrl-shift-drop a CRES or TXMT block!");
                                     Trace.Assert(dropOntoBlock.TypeId == Str.TYPE, "Can only ctrl-shift-drop onto a STR!");
 
-                                    string sgFullName = selectedBlock.SgFullName;
+                                    string sgFullName = firstSelectedBlock.SgFullName;
                                     if (sgFullName.EndsWith("_cres", StringComparison.OrdinalIgnoreCase)) sgFullName = sgFullName.Substring(0, sgFullName.Length - 5);
                                     if (sgFullName.EndsWith("_txmt", StringComparison.OrdinalIgnoreCase)) sgFullName = sgFullName.Substring(0, sgFullName.Length - 5);
 
@@ -1883,7 +2435,7 @@ namespace SceneGraphPlus.Surface
                                     package.Commit(str);
                                     dropOntoBlock.SetDirty();
 
-                                    dropOntoBlock.ConnectTo(index, sgFullName, selectedBlock);
+                                    dropOntoBlock.ConnectTo(index, sgFullName, firstSelectedBlock);
                                 }
                             }
 
@@ -1903,18 +2455,25 @@ namespace SceneGraphPlus.Surface
                         int offsetX = (gridX == ColumnGap) ? ColumnGap / 2 : 0;
                         int offsetY = (gridY == RowGap) ? RowGap / 2 : 0;
 
+                        if (firstSelectedBlock == null && selectedBlockChain != null)
+                        {
+                            IEnumerator<GraphBlock> en = selectedBlockChain.GetEnumerator();
+                            en.MoveNext();
+                            firstSelectedBlock = en.Current;
+                        }
+
                         Point newCentre;
 
                         if (gridScale <= 1.0f)
                         {
-                            newCentre = new Point(((selectedBlock.Centre.X + gridX / 2) / gridX) * gridX - offsetX, ((selectedBlock.Centre.Y + gridY / 2) / gridY) * gridY - offsetY);
+                            newCentre = new Point(((firstSelectedBlock.Centre.X + gridX / 2) / gridX) * gridX - offsetX, ((firstSelectedBlock.Centre.Y + gridY / 2) / gridY) * gridY - offsetY);
                         }
                         else
                         {
-                            newCentre = new Point(((selectedBlock.Centre.X + gridX) / gridX) * gridX - offsetX, ((selectedBlock.Centre.Y + gridY) / gridY) * gridY - offsetY);
+                            newCentre = new Point(((firstSelectedBlock.Centre.X + gridX) / gridX) * gridX - offsetX, ((firstSelectedBlock.Centre.Y + gridY) / gridY) * gridY - offsetY);
                         }
 
-                        Point delta = new Point(newCentre.X - selectedBlock.Centre.X, newCentre.Y - selectedBlock.Centre.Y);
+                        Point delta = new Point(newCentre.X - firstSelectedBlock.Centre.X, newCentre.Y - firstSelectedBlock.Centre.Y);
 
                         if (selectedBlockChain != null)
                         {
@@ -1925,58 +2484,107 @@ namespace SceneGraphPlus.Surface
                         }
                         else
                         {
-                            selectedBlock.Centre = newCentre;
+                            firstSelectedBlock.Centre = newCentre;
                         }
 
                         this.Invalidate();
                     }
 
-                    selectedBlock = null;
+                    DeselectBlocks(true);
                     selectedBlockChain = null;
                     moving = false;
+                    banding = false;
+                }
+                else if (banding)
+                {
+                    List<GraphBlock> bandedBlocks = new List<GraphBlock>();
+
+                    foreach (GraphBlock block in allBlocks)
+                    {
+                        if (hideMissingBlocks && block.IsMissing) continue;
+
+                        if (block.HitTest(bandingStart, bandingLast))
+                        {
+                            bandedBlocks.Add(block);
+                        }
+                    }
+
+                    double shortestDistance = double.MaxValue;
+                    GraphBlock firstBandedBlock = null;
+
+                    foreach (GraphBlock block in bandedBlocks)
+                    {
+                        double distance = block.DistanceFrom(bandingStart);
+
+                        if (distance < shortestDistance)
+                        {
+                            shortestDistance = distance;
+                            firstBandedBlock = block;
+                        }
+                    }
+
+                    SelectSingleBlock(firstBandedBlock);
+
+                    foreach (GraphBlock block in bandedBlocks)
+                    {
+                        if (block != firstBandedBlock)
+                        {
+                            if (firstBandedBlock.TypeId == block.TypeId)
+                            {
+                                SelectBlock(block);
+                            }
+                        }
+                    }
+
+                    banding = false;
+                    Invalidate();
                 }
             }
-            else if (e.Button == MouseButtons.Right)
+            else if (mouseEventArgs.Button == MouseButtons.Right)
             {
             }
 
-            base.OnMouseUp(e);
+            base.OnMouseUp(mouseEventArgs);
         }
 
-        protected override void OnMouseMove(MouseEventArgs e)
+        protected override void OnMouseMove(MouseEventArgs mouseEventArgs)
         {
             if (moving)
             {
+                // Trace.Assert(IsSingleSelect, "Cannot move multiple blocks");
+
                 lblTooltip.Visible = picThumbnail.Visible = false;
 
-                Point delta = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
+                Point delta = new Point(mouseEventArgs.X - previousPoint.X, mouseEventArgs.Y - previousPoint.Y);
 
-                if ((Form.ModifierKeys & Keys.Alt) == Keys.Alt)
+                if (selectedBlockChain == null && (Form.ModifierKeys & Keys.Alt) == Keys.Alt)
                 {
                     if (advancedMode)
                     {
-                        if (selectedBlockChain == null)
-                        {
-                            selectedBlockChain = GetBlockChain(selectedBlock, false, false, (Form.ModifierKeys & Keys.Control) != Keys.Control);
-                        }
+                        selectedBlockChain = GetBlockChain(firstSelectedBlock, false, false, (Form.ModifierKeys & Keys.Control) != Keys.Control);
+                    }
+                }
 
-                        foreach (GraphBlock block in selectedBlockChain)
-                        {
-                            block.Move(delta);
-                        }
+                if (selectedBlockChain != null)
+                {
+                    foreach (GraphBlock block in selectedBlockChain)
+                    {
+                        if (firstSelectedBlock == null) firstSelectedBlock = block;
+
+                        block.Move(delta);
                     }
                 }
                 else
                 {
-                    selectedBlock.Move(delta);
+                    firstSelectedBlock.Move(delta);
                 }
 
-                previousPoint = e.Location;
+                previousPoint = mouseEventArgs.Location;
 
-                bool canDrop = (!selectedBlock.IsClone) && (Form.ModifierKeys != Keys.Alt);
-                if (!advancedMode && selectedBlock.IsMissing) canDrop = false;
+                bool canDrop = (!firstSelectedBlock.IsClone) && (Form.ModifierKeys != Keys.Alt);
+                if (!advancedMode && firstSelectedBlock.IsMissing) canDrop = false;
 
-                if (selectedBlock.TypeId == Str.TYPE) canDrop = false;
+                if (firstSelectedBlock.TypeId == Str.TYPE) canDrop = false;
 
                 if (canDrop)
                 {
@@ -1990,7 +2598,7 @@ namespace SceneGraphPlus.Surface
 
                             if (hideMissingBlocks && block.IsMissing) continue;
 
-                            if (block != selectedBlock && block.GetInConnectors().Count > 0 && block.TypeId == selectedBlock.TypeId && block.HitTest(selectedBlock.Centre))
+                            if (block != firstSelectedBlock && block.GetInConnectors().Count > 0 && block.TypeId == firstSelectedBlock.TypeId && block.HitTest(firstSelectedBlock.Centre))
                             {
                                 if (!dropOntoBlocks.Contains(block))
                                 {
@@ -2020,9 +2628,9 @@ namespace SceneGraphPlus.Surface
                         {
                             GraphConnector connector = allConnectors[i];
 
-                            if (connector.HitTest(selectedBlock.Centre))
+                            if (connector.HitTest(firstSelectedBlock.Centre))
                             {
-                                if (connector.EndBlock.TypeId == selectedBlock.TypeId)
+                                if (connector.EndBlock.TypeId == firstSelectedBlock.TypeId)
                                 {
                                     connector.BorderVisible = true;
 
@@ -2049,7 +2657,7 @@ namespace SceneGraphPlus.Surface
                     }
                     else if (Form.ModifierKeys == (Keys.Shift | Keys.Control))
                     {
-                        if (selectedBlock.TypeId == Cres.TYPE || selectedBlock.TypeId == Txmt.TYPE)
+                        if (firstSelectedBlock.TypeId == Cres.TYPE || firstSelectedBlock.TypeId == Txmt.TYPE)
                         {
                             List<GraphBlock> currentDropOntoBlocks = new List<GraphBlock>();
 
@@ -2059,11 +2667,11 @@ namespace SceneGraphPlus.Surface
 
                                 if (hideMissingBlocks && block.IsMissing) continue;
 
-                                if (block.TypeId == Str.TYPE && block.HitTest(selectedBlock.Centre))
+                                if (block.TypeId == Str.TYPE && block.HitTest(firstSelectedBlock.Centre))
                                 {
                                     // "UnderstoodStrings"
-                                    if ((selectedBlock.TypeId == Cres.TYPE && block.InstanceId == DBPFData.STR_MODELS) ||
-                                        (selectedBlock.TypeId == Txmt.TYPE && block.InstanceId == DBPFData.STR_MATERIALS))
+                                    if ((firstSelectedBlock.TypeId == Cres.TYPE && block.InstanceId == DBPFData.STR_MODELS) ||
+                                        (firstSelectedBlock.TypeId == Txmt.TYPE && block.InstanceId == DBPFData.STR_MATERIALS))
                                     {
                                         if (!dropOntoBlocks.Contains(block))
                                         {
@@ -2091,6 +2699,11 @@ namespace SceneGraphPlus.Surface
 
                 this.Invalidate();
             }
+            else if (banding)
+            {
+                bandingLast = mouseEventArgs.Location;
+                Invalidate();
+            }
             else
             {
                 GraphBlock currentHoverBlock = null;
@@ -2099,7 +2712,7 @@ namespace SceneGraphPlus.Surface
                 {
                     if (hideMissingBlocks && allBlocks[i].IsMissing) continue;
 
-                    if (allBlocks[i].HitTest(e.Location))
+                    if (allBlocks[i].HitTest(mouseEventArgs.Location))
                     {
                         currentHoverBlock = allBlocks[i];
                         break;
@@ -2118,11 +2731,11 @@ namespace SceneGraphPlus.Surface
                         {
                             if (hoverBlock.TypeId == Mmat.TYPE || hoverBlock.TypeId == Objd.TYPE || hoverBlock.TypeId == Gmnd.TYPE || hoverBlock.TypeId == Txmt.TYPE || hoverBlock.TypeId == Txtr.TYPE)
                             {
-                                this.Cursor = Cursors.Hand;
+                                ChangeCursor(Cursors.Hand);
                             }
                             else
                             {
-                                this.Cursor = Cursors.Default;
+                                ChangeCursor();
                             }
                         }
 
@@ -2169,7 +2782,7 @@ namespace SceneGraphPlus.Surface
                 {
                     if (hoverBlock != null)
                     {
-                        if (advancedMode) this.Cursor = Cursors.Default;
+                        if (advancedMode) ChangeCursor();
 
                         lblTooltip.Visible = picThumbnail.Visible = false;
 
@@ -2191,7 +2804,7 @@ namespace SceneGraphPlus.Surface
 
                         if (hideMissingBlocks && (connector.StartBlock.IsMissing || connector.EndBlock.IsMissing)) continue;
 
-                        if (connector.HitTest(e.Location))
+                        if (connector.HitTest(mouseEventArgs.Location))
                         {
                             currentHoverConnector = allConnectors[i];
                             break;
@@ -2250,7 +2863,7 @@ namespace SceneGraphPlus.Surface
                 }
             }
 
-            base.OnMouseMove(e);
+            base.OnMouseMove(mouseEventArgs);
         }
         #endregion
 
@@ -2300,7 +2913,18 @@ namespace SceneGraphPlus.Surface
                             ValidateBlock(hoverBlock);
                         }
 
-                        hoverBlock.Text = $"MMAT{(mmat.DefaultMaterial ? " (Def)" : "")}";
+                        string suffix = "";
+
+                        if (mmat.IsHiddenInCatalog)
+                        {
+                            suffix = " (Hide)";
+                        }
+                        else if (mmat.DefaultMaterial)
+                        {
+                            suffix = "(Def)";
+                        }
+
+                        hoverBlock.Text = $"MMAT{suffix}";
                     }
                 }
                 else if (hoverBlock.TypeId == Objd.TYPE)
@@ -2438,8 +3062,8 @@ namespace SceneGraphPlus.Surface
                     Txmt txmt = (Txmt)txmtPackage.GetResourceByKey(hoverBlock.OriginalKey);
                     Trace.Assert(txmt != null, $"Double-Click: Missing resource for {hoverBlock.OriginalKey}");
 
-                    GraphBlock mmatBlock = null;
                     GraphBlock gzpsBlock = null;
+                    GraphBlock mmatBlock = null;
                     GraphBlock shpeBlock = null;
                     GraphBlock objdBlock = null;
 
@@ -2449,18 +3073,16 @@ namespace SceneGraphPlus.Surface
                     TypeGroupID mmatGroup;
                     string cresSgName = null;
                     List<string> subsets = new List<string>();
-                    CacheableDbpfFile gzpsPackage = null;
-                    Gzps gzps = null;
 
                     foreach (GraphConnector inConnector in hoverBlock.GetInConnectors())
                     {
-                        if (inConnector.StartBlock.TypeId == Mmat.TYPE)
-                        {
-                            mmatBlock = inConnector.StartBlock;
-                        }
-                        else if (inConnector.StartBlock.TypeId == Gzps.TYPE)
+                        if (inConnector.StartBlock.TypeId == Gzps.TYPE)
                         {
                             gzpsBlock = inConnector.StartBlock;
+                        }
+                        else if (inConnector.StartBlock.TypeId == Mmat.TYPE)
+                        {
+                            mmatBlock = inConnector.StartBlock;
                         }
                         else if (inConnector.StartBlock.TypeId == Shpe.TYPE)
                         {
@@ -2471,15 +3093,10 @@ namespace SceneGraphPlus.Surface
 
                     if (gzpsBlock != null)
                     {
-                        // TXMT -> GZPS/3IDR
-                        gzpsPackage = packageCache.GetOrAdd(gzpsBlock.PackagePath);
-                        gzps = (Gzps)gzpsPackage.GetResourceByKey(gzpsBlock.OriginalKey);
-                        Idr idr = (Idr)packageCache.GetOrAdd(gzpsBlock.PackagePath).GetResourceByKey(new DBPFKey(Idr.TYPE, gzpsBlock.OriginalKey));
+                        // TXMT -> GZPS
+                        Gzps gzps = (Gzps)packageCache.GetOrAdd(gzpsBlock.PackagePath).GetResourceByKey(gzpsBlock.OriginalKey);
 
-                        if (idr == null)
-                        {
-                            gzps = null;
-                        }
+                        // TODO - SceneGraph Plus - clothing recolours - New GZPS, we also need the associated 3IDR, the BINX and its associated 3IDR (which may be the same as the GZPS one) and the STR#
                     }
                     else if (mmatBlock != null)
                     {
@@ -2607,7 +3224,7 @@ namespace SceneGraphPlus.Surface
                     }
 
                     bool removeLifos = false;
-                    if ((new TxmtDialog().ShowDialog(owningForm, mouseScreenLocation, txmtPackage, hoverBlock, txmt, guid, mmatGroup, cresSgName, subsets, gzpsPackage, gzps, txtr, lifos, out removeLifos)) == DialogResult.OK)
+                    if ((new TxmtDialog().ShowDialog(owningForm, mouseScreenLocation, txmtPackage, hoverBlock, txmt, guid, mmatGroup, cresSgName, subsets, txtr, lifos, out removeLifos)) == DialogResult.OK)
                     {
                         if (txtr != null && txtr.IsDirty)
                         {
@@ -2628,7 +3245,7 @@ namespace SceneGraphPlus.Surface
                                         package.Remove(lifoBlock.OriginalKey);
                                         owningForm.RemoveResource(package, lifoBlock.OriginalKey);
 
-                                        MarkBlockForDeletion(lifoBlock);
+                                        MarkBlockForDeletion(lifoBlock, false);
                                     }
 
                                     lifoConnector.StartBlock.UnconnectTo(lifoConnector);
@@ -2724,7 +3341,7 @@ namespace SceneGraphPlus.Surface
                                     package.Remove(lifoBlock.OriginalKey);
                                     owningForm.RemoveResource(package, lifoBlock.OriginalKey);
 
-                                    MarkBlockForDeletion(lifoBlock);
+                                    MarkBlockForDeletion(lifoBlock, false);
                                 }
 
                                 lifoConnector.StartBlock.UnconnectTo(lifoConnector);
@@ -2749,6 +3366,7 @@ namespace SceneGraphPlus.Surface
                         }
                     }
                 }
+                // TODO - SceneGraph Plus - clothing recolours - Add a GZPS/XMOL/XTOL pop-up, and when we do, make sure the associated STR# can be edited as well
             }
             else if (hoverConnector != null)
             {
@@ -2936,6 +3554,23 @@ namespace SceneGraphPlus.Surface
         #endregion
 
         #region Surface Painting
+        private void ChangeCursor()
+        {
+            if (IsMultiSelect)
+            {
+                this.Cursor = CursorArrowPlus;
+            }
+            else
+            {
+                this.Cursor = Cursors.Default;
+            }
+        }
+
+        private void ChangeCursor(Cursor cursor)
+        {
+            if (!(Form.ModifierKeys == Keys.Shift)) this.Cursor = cursor;
+        }
+
         public new void Invalidate()
         {
             base.Invalidate();
@@ -2959,7 +3594,23 @@ namespace SceneGraphPlus.Surface
             }
 
             // Any selected block (being dragged) is always on top
-            selectedBlock?.Draw(e.Graphics, false);
+            firstSelectedBlock?.Draw(e.Graphics, false);
+
+            if (banding)
+            {
+                if (!bandingStart.Equals(bandingLast))
+                {
+                    Pen pen = new Pen(Color.Black, 1);
+
+                    int x = bandingStart.X;
+                    if (bandingLast.X < x) x = bandingLast.X;
+
+                    int y = bandingStart.Y;
+                    if (bandingLast.Y < y) y = bandingLast.Y;
+
+                    e.Graphics.DrawRectangle(pen, x, y, Math.Abs(bandingLast.X - bandingStart.X), Math.Abs(bandingStart.Y - bandingLast.Y));
+                }
+            }
 
             owningForm.UpdateForm();
         }
@@ -2968,7 +3619,14 @@ namespace SceneGraphPlus.Surface
         {
             foreach (GraphBlock block in allBlocks)
             {
-                if (block != selectedBlock) block.Draw(g, hideMissingBlocks);
+                //                if (!selectedBlocks.Contains(block)) // if we leave this condition in, blocks don't draw in the multi-select export loop
+                block.Draw(g, hideMissingBlocks);
+            }
+
+            foreach (GraphBlock block in selectedBlocks)
+            {
+                if (block != firstSelectedBlock)
+                    block.Draw(g, hideMissingBlocks);
             }
         }
 

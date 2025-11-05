@@ -41,6 +41,7 @@ namespace Sims2Tools.DBPF.BHAV
         private int newNumber = -1;
 
         public ushort OpCode => opcode;
+        public int Index => index;
         public byte NodeVersion => nodeversion;
         public ushort TrueTarget => addrTrue;
         public ushort FalseTarget => addrFalse;

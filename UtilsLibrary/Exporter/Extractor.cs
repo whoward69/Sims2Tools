@@ -117,6 +117,8 @@ namespace Sims2Tools.Exporter
 
         public void Extract(DBPFResource resource)
         {
+            if (resource == null) return;
+
             if (!typeLongNames.TryGetValue(resource.TypeID, out string typeLongName)) typeLongName = DBPFData.TypeName(resource.TypeID);
             if (!typeExtns.TryGetValue(resource.TypeID, out string typeExtn)) typeExtn = "simpe";
 

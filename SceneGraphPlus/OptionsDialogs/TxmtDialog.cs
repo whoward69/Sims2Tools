@@ -11,8 +11,6 @@ using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Images;
 using Sims2Tools.DBPF.Package;
-using Sims2Tools.DBPF.SceneGraph.GZPS;
-using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
@@ -36,9 +34,6 @@ namespace SceneGraphPlus.Dialogs.Options
         private CacheableDbpfFile txmtPackage;
         private Txmt txmt;
 
-        private CacheableDbpfFile gzpsPackage;
-        private Gzps gzps;
-
         private TypeGUID guid;
         private TypeGroupID mmatGroup;
         private string cresSgName;
@@ -52,7 +47,6 @@ namespace SceneGraphPlus.Dialogs.Options
         private string initialBlendMode;
 
         private string originalTxmtName = null;
-        private string originalGzpsName = null;
 
         private bool dataLoading = true;
 
@@ -61,32 +55,22 @@ namespace SceneGraphPlus.Dialogs.Options
             InitializeComponent();
         }
 
-        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile txmtPackage, GraphBlock txmtBlock, Txmt txmt, TypeGUID guid, TypeGroupID mmatGroup, string cresSgName, List<string> subsets, CacheableDbpfFile gzpsPackage, Gzps gzps, Txtr txtr, List<Lifo> lifos, out bool removeLifos)
+        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile txmtPackage, GraphBlock txmtBlock, Txmt txmt, TypeGUID guid, TypeGroupID mmatGroup, string cresSgName, List<string> subsets, Txtr txtr, List<Lifo> lifos, out bool removeLifos)
         {
             this.form = form;
             this.txmtPackage = txmtPackage;
             this.txmt = txmt;
             this.lifos = lifos;
 
-            this.gzpsPackage = gzpsPackage;
-            this.gzps = gzps;
-
             this.guid = guid;
             this.mmatGroup = mmatGroup;
             this.cresSgName = cresSgName;
-            this.originalGzpsName = gzps?.Name;
             this.txtr = txtr;
 
             this.Location = new Point(location.X + 5, location.Y + 5);
 
-            grpNewGZPS.Visible = (gzps != null);
-            grpNewMmat.Visible = !grpNewGZPS.Visible;
-
-            // TODO - SceneGraph Plus - gzps - remove this when Create GZPS/3IDR/BINX/STR# is working!
-            grpNewGZPS.Visible = false;
-
-            originalGzpsName = gzps?.Name;
-            textGzpsNewName.Text = originalGzpsName;
+            grpNewMmat.Visible = (mmatGroup != DBPFData.GROUP_NULL);
+            grpNewGzps.Visible = false; // TODO - SceneGraph Plus - clothing recolours - allow for a New GZPS
 
             ckbRemoveLifos.Checked = this.removeLifos = false;
             ckbRemoveLifos.Visible = (lifos.Count > 0);
@@ -361,6 +345,27 @@ namespace SceneGraphPlus.Dialogs.Options
             return null;
         }
 
+        private void OnAddGzpsClicked(object sender, EventArgs e)
+        {
+            // TODO - SceneGraph Plus - clothing recolours - Create GZPS
+            /*
+            if (btnDuplicate.Enabled)
+            {
+                OnDuplicateClicked(btnDuplicate, null);
+            }
+            else
+            {
+                Mmat newMmat = CreateRecolour(txmt);
+
+                if (newMmat != null)
+                {
+                    txmtPackage.Commit(newMmat, true);
+                    form.AddResource(txmtPackage, newMmat, true);
+                }
+            }
+            */
+        }
+
         private void UpdateTexture(Txmt txmtToUpdate, Txtr txtrToUpdate, List<Lifo> lifosToUpdate)
         {
             if (txtrToUpdate == null)
@@ -376,102 +381,6 @@ namespace SceneGraphPlus.Dialogs.Options
 
                 this.removeLifos = ckbRemoveLifos.Checked;
             }
-        }
-
-        private void OnGzpsNameKeyUp(object sender, KeyEventArgs e)
-        {
-            OnGzpsNameChanged(textGzpsNewName, null);
-        }
-
-        private void OnGzpsNameChanged(object sender, EventArgs e)
-        {
-            btnDuplicate.Enabled = false;
-
-            if (!string.IsNullOrWhiteSpace(textGzpsNewName.Text))
-            {
-                btnGzpsCreate.Enabled = !textGzpsNewName.Text.Equals(originalGzpsName, StringComparison.OrdinalIgnoreCase);
-            }
-        }
-
-        private void OnAddGzpsClicked(object sender, EventArgs e)
-        {
-            if (btnDuplicate.Enabled)
-            {
-                OnDuplicateClicked(btnDuplicate, null);
-            }
-            else
-            {
-                Gzps newGzps = CreateGzpsPair(txmt, txmt);
-
-                if (newGzps != null)
-                {
-                    txmtPackage.Commit(newGzps, true);
-                    form.AddResource(txmtPackage, newGzps, true);
-                }
-            }
-        }
-
-        private Gzps CreateGzpsPair(Txmt oldTxmt, Txmt newTxmt)
-        {
-            Gzps newGzps = null;
-
-            if (!string.IsNullOrWhiteSpace(textGzpsNewName.Text) && !textGzpsNewName.Text.Equals(originalGzpsName, StringComparison.OrdinalIgnoreCase))
-            {
-                Idr idr = (Idr)gzpsPackage.GetResourceByKey(new DBPFKey(Idr.TYPE, gzps));
-
-                if (idr != null)
-                {
-                    uint nextInstance = gzps.InstanceID.AsUInt() + 1;
-                    bool unusedInstanceFound = true;
-
-                    while (unusedInstanceFound)
-                    {
-                        unusedInstanceFound = true;
-
-                        foreach (DBPFEntry entry in gzpsPackage.GetEntriesByType(Gzps.TYPE))
-                        {
-                            if (entry.InstanceID.AsUInt() == nextInstance)
-                            {
-                                ++nextInstance;
-                                unusedInstanceFound = false;
-                                break;
-                            }
-                        }
-
-                        foreach (DBPFEntry entry in gzpsPackage.GetEntriesByType(Idr.TYPE))
-                        {
-                            if (entry.InstanceID.AsUInt() == nextInstance)
-                            {
-                                ++nextInstance;
-                                unusedInstanceFound = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    // TODO - SceneGraph Plus - gzps - create a new GZPS resource linked to this TXMT
-
-                    // Clone the GZPS as newGzps
-                    //   Change instance to nextInstance
-                    //   Change name to textGzpsNewName.Text
-                    //   Change creator to Sims2ToolsLib.CreatorGUID
-
-                    // Clone the 3IDR as newIdr
-                    //   Change instance to nextInstance
-                    //   foreach (refkey) 
-                    //     if (refkey.Type == GZPS) change key to newGzps
-                    //     if (refkey == oldTxmt) change key to newTxmt
-
-                    // Clone the BINX as newBinx
-                    //   Change instance to nextInstance
-
-                    // Clone the STR# as newStr
-                    //   Change instance to nextInstance
-                    //   Change text to what?
-                }
-            }
-
-            return newGzps;
         }
 
         private void OnFormatChanged(object sender, EventArgs e)
