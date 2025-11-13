@@ -219,14 +219,33 @@ namespace DbpfScripter
 
             if (textSaveName.Text.Length > 0)
             {
-                if (textSavePath.Text.Length > 0)
+                string savePath = textSavePath.Text;
+                string tmplPath = textTemplatePath.Text;
+
+                if (savePath.Length > 0)
                 {
-                    if (textTemplatePath.Text.Length > 0 && Directory.Exists(textTemplatePath.Text))
+                    if (tmplPath.Length > 0 && Directory.Exists(tmplPath))
                     {
-                        if (!textSavePath.Text.StartsWith(textTemplatePath.Text))
+                        if (savePath.StartsWith(tmplPath))
                         {
-                            btnGO.Enabled = File.Exists($"{textTemplatePath.Text}\\dbpfscript.txt");
+                            if (savePath.Length > tmplPath.Length)
+                            {
+                                char nextCharInSavePath = savePath[tmplPath.Length];
+
+                                if (nextCharInSavePath == '\\' || nextCharInSavePath == '/')
+                                {
+                                    // savePath is a sub-folder of tmplPath - that's not allowed!
+                                    return; // btnGO was disabled at the start
+                                }
+                            }
+                            else
+                            {
+                                // Paths are the same - that's not allowed!
+                                return; // btnGO was disabled at the start
+                            }
                         }
+
+                        btnGO.Enabled = File.Exists($"{tmplPath}\\dbpfscript.txt");
                     }
                 }
             }

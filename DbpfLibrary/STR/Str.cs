@@ -47,6 +47,27 @@ namespace Sims2Tools.DBPF.STR
         }
         #endregion
 
+        public Str Duplicate(DBPFKey newKey, bool defLangOnly)
+        {
+            Str newStr = new Str(newKey);
+
+            List<StrItem> defLangItems = new List<StrItem>();
+
+            foreach (StrItem item in LanguageItems(MetaData.Languages.Default))
+            {
+                defLangItems.Add(new StrItem(MetaData.Languages.Default, item.Title, item.Description));
+            }
+
+            newStr.languages.Add(MetaData.Languages.Default, defLangItems);
+
+            if (!defLangOnly)
+            {
+                // TODO - DBPF Library - STR# - duplicate the other languages
+            }
+
+            return newStr;
+        }
+
         #region Clean/Dirty State
         public override bool IsDirty
         {

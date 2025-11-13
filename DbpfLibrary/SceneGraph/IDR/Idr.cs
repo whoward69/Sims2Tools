@@ -31,12 +31,31 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
         protected long readStart, readEnd, writeStart, writeEnd;
 #endif
 
-        public override string KeyName
+        private List<DBPFScriptableKey> items;
+
+        public override string KeyName => "3D ID Referencing File";
+
+        public Idr(DBPFEntry entry, int expectedItems = 0) : base(entry)
         {
-            get => "3D ID Referencing File";
+            items = new List<DBPFScriptableKey>(expectedItems);
         }
 
-        private List<DBPFScriptableKey> items;
+        public Idr(DBPFEntry entry, DbpfReader reader) : base(entry)
+        {
+            Unserialize(reader);
+        }
+
+        public Idr Duplicate(DBPFKey newKey)
+        {
+            Idr newIdr = new Idr(new DBPFEntry(newKey), items.Count);
+
+            for (int i = 0; i < items.Count; ++i)
+            {
+                newIdr.AddItem((uint)i, new DBPFKey(items[i]));
+            }
+
+            return newIdr;
+        }
 
         public ReadOnlyCollection<DBPFKey> Items => (new List<DBPFKey>(items)).AsReadOnly();
 
@@ -87,16 +106,6 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
             }
 
             SetItem(idx, value);
-        }
-
-        public Idr(DBPFEntry entry, int expectedItems = 0) : base(entry)
-        {
-            items = new List<DBPFScriptableKey>(expectedItems);
-        }
-
-        public Idr(DBPFEntry entry, DbpfReader reader) : base(entry)
-        {
-            Unserialize(reader);
         }
 
         protected void Unserialize(DbpfReader reader)

@@ -10,6 +10,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using System.Xml;
@@ -32,6 +33,25 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
             sgIdrIndexes.AddRange(CresIndexes);
             sgIdrIndexes.AddRange(ShpeIndexes);
             sgIdrIndexes.AddRange(TxmtIndexes);
+        }
+
+        public Gzps Duplicate(DBPFKey dbpfKey, string newName)
+        {
+            Gzps newGzps = new Gzps(new DBPFEntry(dbpfKey));
+
+            foreach (string itemName in GetItemNames())
+            {
+                CpfItem item = GetItem(itemName).Clone();
+
+                if (itemName.Equals("name"))
+                {
+                    item.StringValue = newName;
+                }
+
+                newGzps.AddItem(item);
+            }
+
+            return newGzps;
         }
 
         public string Type

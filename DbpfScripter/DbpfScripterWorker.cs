@@ -55,11 +55,14 @@ using System.Xml;
  * initBlock ::= INIT [ (<initContents>)+ ]
  * odsBlock ::= <odsName> [ (<initContents>)+ ]
  * odsName ::= "<fileName>.ods"
- * initContents ::= (<assert> | <message> | <initialiser>)
+ * initContents ::= (<assert> | <comment> | <message> | <initialiser>)
  * 
  * -- For assert, see subactions below
  * 
- * -- Messages display a text string to the user at the end of the script's execution
+ * -- Comments display a text string to the user DURING the script's execution
+ * comment ::= comment BRA <string> KET
+ * 
+ * -- Messages display a text string to the user AT THE END OF the script's execution
  * message ::= message BRA <string> KET
  * 
  * -- Initialisers define a named variable and its initial value
@@ -325,7 +328,7 @@ namespace DbpfScripter
                 }
                 else
                 {
-                    // ReportErrorNull("Ummmm ....");
+                    if (isDevMode) ReportErrorNull("Ummmm ....");
                 }
             }
         }
@@ -393,22 +396,29 @@ namespace DbpfScripter
 
                             int count = (int)sv;
 
-                            bool processed = false;
-
-                            parserState.StartRepeat();
-
-                            for (int iter = 0; iter < count; ++iter)
+                            if (count > 0)
                             {
-                                processed = ProcessBlocks(iter);
+                                bool processed = false;
 
-                                if (!processed) break;
+                                parserState.StartRepeat();
 
-                                if (iter < (count - 1)) parserState.NextRepeat();
+                                for (int iter = 0; iter < count; ++iter)
+                                {
+                                    processed = ProcessBlocks(iter);
+
+                                    if (!processed) break;
+
+                                    if (iter < (count - 1)) parserState.NextRepeat();
+                                }
+
+                                if (!scriptWorker.CancellationPending) parserState.EndRepeat();
+
+                                return processed && SkipCloseSquareBracket();
                             }
-
-                            if (!scriptWorker.CancellationPending) parserState.EndRepeat();
-
-                            return processed && SkipCloseSquareBracket();
+                            else
+                            {
+                                return SkipBlock();
+                            }
                         }
                     }
                 }
@@ -540,6 +550,10 @@ namespace DbpfScripter
             if (nextToken.Equals("assert", StringComparison.OrdinalIgnoreCase))
             {
                 return ProcessAssert();
+            }
+            else if (nextToken.Equals("comment", StringComparison.OrdinalIgnoreCase))
+            {
+                return ProcessComment();
             }
             else if (nextToken.Equals("message", StringComparison.OrdinalIgnoreCase))
             {
@@ -825,6 +839,31 @@ namespace DbpfScripter
             {
                 return ProcessAssignment(iteration);
             }
+        }
+
+        private bool ProcessComment()
+        {
+            string token = parserState.ReadNextToken();
+
+            if (token != null && token.Equals("comment") && SkipOpenBracket())
+            {
+                string comment = parserState.ReadNextToken();
+
+                if (comment != null && SkipCloseBracket())
+                {
+                    comment = EvaluateString(comment);
+
+                    if (comment.StartsWith("\"") && comment.EndsWith("\""))
+                    {
+                        comment = comment.Substring(1, comment.Length - 2);
+                    }
+
+                    ReportProgress(comment);
+                    return true;
+                }
+            }
+
+            return ReportErrorFalse("Invalid COMMENT");
         }
 
         private bool ProcessMessage()

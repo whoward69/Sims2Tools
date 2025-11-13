@@ -10,6 +10,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using System.Xml;
@@ -23,10 +24,7 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x0C560F39;
         public const string NAME = "BINX";
 
-        public override string KeyName
-        {
-            get => "Binary Index";
-        }
+        public override string KeyName => "Binary Index";
 
         public Binx(DBPFEntry entry) : base(entry)
         {
@@ -37,22 +35,31 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
             sgIdrIndexes.Add(ObjectIdx);
         }
 
-        public uint ObjectIdx
+        public Binx Duplicate(DBPFKey dbpfKey)
         {
-            get { return this.GetItem("objectidx").UIntegerValue; }
+            Binx newBinx = new Binx(new DBPFEntry(dbpfKey));
+
+            foreach (string itemName in GetItemNames())
+            {
+                CpfItem item = GetItem(itemName).Clone();
+
+                newBinx.AddItem(item);
+            }
+
+            return newBinx;
         }
 
-        public uint StringSetIdx
-        {
-            get { return this.GetItem("stringsetidx").UIntegerValue; }
-        }
+        public uint ObjectIdx => GetItem("objectidx").UIntegerValue;
+
+        public uint StringSetIdx => GetItem("stringsetidx").UIntegerValue;
+        public uint StringIndex => GetItem("stringindex").UIntegerValue;
+
+        public int SortIndex => GetItem("sortindex").IntegerValue;
 
         /* Other known item names for use with this.GetSaveItem(itemName)
          * iconidx (uint) - should reference IMG by TGIR
          * binidx (uint) - should reference a COLL by TGIR
          * creatorid (string)
-         * sortindex (int)
-         * stringindex (uint)
          */
 
         public override XmlElement AddXml(XmlElement parent)
