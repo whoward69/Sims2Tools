@@ -15,6 +15,7 @@ using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -29,10 +30,20 @@ namespace DbpfScripter
         private MruList MyMruList;
         private Updater MyUpdater;
 
-        DbpfScripterWorker dbpfScripterWorker;
+        private List<int> errorOffsets = new List<int>();
+        private int currentError = -1;
+
+        private List<int> commentOffsets = new List<int>();
+        private int currentComment = -1;
+
+        private DbpfScripterWorker dbpfScripterWorker;
 
         public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
         public bool IsDevelopmentMode => IsAdvancedMode && menuItemDeveloper.Checked;
+
+        private readonly Color colourWarn = Color.FromName(Properties.Settings.Default.WarnColour);
+        private readonly Color colourGood = Color.FromName(Properties.Settings.Default.GoodColour);
+        private readonly Color colourInfo = Color.FromName(Properties.Settings.Default.InfoColour);
 
         public DbpfScripterForm()
         {
@@ -53,6 +64,12 @@ namespace DbpfScripter
 
         private void ScriptWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs args)
         {
+            errorOffsets.Clear();
+            btnNextError.Visible = btnPrevError.Visible = false;
+
+            commentOffsets.Clear();
+            btnNextComment.Visible = btnPrevComment.Visible = false;
+
             dbpfScripterWorker.ProcessScript();
         }
 
@@ -71,12 +88,21 @@ namespace DbpfScripter
                 if (msg.StartsWith("!!"))
                 {
                     msg = msg.Substring(2);
-                    textMessages.SelectionColor = Color.Red;
+                    textMessages.SelectionColor = colourWarn;
+
+                    errorOffsets.Add(textMessages.TextLength);
+                }
+                else if (msg.StartsWith("++"))
+                {
+                    msg = msg.Substring(2);
+                    textMessages.SelectionColor = colourGood;
+
+                    commentOffsets.Add(textMessages.TextLength);
                 }
                 else if (msg.StartsWith("--"))
                 {
                     msg = msg.Substring(2);
-                    textMessages.SelectionColor = Color.Gray;
+                    textMessages.SelectionColor = colourInfo;
                 }
 
                 textMessages.AppendText(msg);
@@ -106,6 +132,24 @@ namespace DbpfScripter
                 if (e.Cancelled == true)
                 {
                 }
+            }
+
+            if (errorOffsets.Count > 1)
+            {
+                btnNextError.Visible = btnPrevError.Visible = true;
+
+                currentError = errorOffsets.Count;
+                ScrollErrorIntoView();
+            }
+
+            if (commentOffsets.Count > 1)
+            {
+                btnNextComment.Visible = btnPrevComment.Visible = true;
+
+                currentComment = commentOffsets.Count;
+
+                btnPrevComment.Enabled = (currentComment != 0);
+                btnNextComment.Enabled = (currentComment < (commentOffsets.Count - 1));
             }
 
             btnGO.Text = "&GO";
@@ -272,6 +316,80 @@ namespace DbpfScripter
             if (config.ShowDialog() == DialogResult.OK)
             {
             }
+        }
+
+        private void OnPrevError(object sender, EventArgs e)
+        {
+            --currentError;
+
+            ScrollErrorIntoView();
+        }
+
+        private void OnNextError(object sender, EventArgs e)
+        {
+            ++currentError;
+
+            ScrollErrorIntoView();
+        }
+
+        private void ScrollErrorIntoView()
+        {
+            if (currentError < 0)
+            {
+                currentError = 0;
+            }
+            else if (currentError > (errorOffsets.Count - 1))
+            {
+                currentError = errorOffsets.Count - 1;
+            }
+
+            textMessages.SelectionStart = errorOffsets[currentError];
+
+            int start = textMessages.GetFirstCharIndexOfCurrentLine();
+            int end = start + textMessages.Lines[textMessages.GetLineFromCharIndex(start)].Length;
+
+            textMessages.Select(start, end);
+            textMessages.ScrollToCaret();
+
+            btnPrevError.Enabled = (currentError != 0);
+            btnNextError.Enabled = (currentError < (errorOffsets.Count - 1));
+        }
+
+        private void OnPrevComment(object sender, EventArgs e)
+        {
+            --currentComment;
+
+            ScrollCommentIntoView();
+        }
+
+        private void OnNextComment(object sender, EventArgs e)
+        {
+            ++currentComment;
+
+            ScrollCommentIntoView();
+        }
+
+        private void ScrollCommentIntoView()
+        {
+            if (currentComment < 0)
+            {
+                currentComment = 0;
+            }
+            else if (currentComment > (commentOffsets.Count - 1))
+            {
+                currentComment = commentOffsets.Count - 1;
+            }
+
+            textMessages.SelectionStart = commentOffsets[currentComment];
+
+            int start = textMessages.GetFirstCharIndexOfCurrentLine();
+            int end = start + textMessages.Lines[textMessages.GetLineFromCharIndex(start)].Length;
+
+            textMessages.Select(start, end);
+            textMessages.ScrollToCaret();
+
+            btnPrevComment.Enabled = (currentComment != 0);
+            btnNextComment.Enabled = (currentComment < (commentOffsets.Count - 1));
         }
     }
 }

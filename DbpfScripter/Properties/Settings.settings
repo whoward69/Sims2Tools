@@ -5,5 +5,14 @@
     <Setting Name="MruSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">8</Value>
     </Setting>
+    <Setting Name="InfoColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Gray</Value>
+    </Setting>
+    <Setting Name="WarnColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Red</Value>
+    </Setting>
+    <Setting Name="GoodColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Green</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

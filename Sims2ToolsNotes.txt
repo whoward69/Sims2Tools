@@ -5,8 +5,8 @@ Deploy Sims2Utils App To Web Site
 2) Open "D:\Tomcat6.0\webapps\ROOT\Sims2\Notes\Sims2Tools.html"
 3) App version in Visual Studio should be "one more" than in the file
 4) Change to "Release", clean and build
-5) Change to "Debug", clean, code cleanup (Analyze menu), build and analyze (Build menu)
-6) Open "C:\Users\whowa\Documents\Visual Studio 2022\Projects\Sims2Tools", change into app's sub-dir, then "bin"
+5) Change to "Debug", clean, code cleanup (Project menu, towards the bottom), build and analyze (Build menu)
+6) Open "C:\Users\whowa\Documents\Visual Studio 2026\Projects\Sims2Tools", change into app's sub-dir, then "bin"
 7) Copy "Debug" and "Release" sub-folders
 8) Open "D:\Tomcat6.0\webapps\ROOT\Sims2\Notes", then the app's web page sub-dir and paste in
 9) Rename "Release" as "{App}{Version}", eg "HcduPlusV1.4"

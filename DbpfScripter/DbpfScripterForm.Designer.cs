@@ -51,6 +51,7 @@ namespace DbpfScripter
             this.menuItemSavePath = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConfiguration = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemDdsUtilsPath = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
@@ -73,7 +74,10 @@ namespace DbpfScripter
             this.textSaveName = new System.Windows.Forms.TextBox();
             this.lblSaveName = new System.Windows.Forms.Label();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.menuItemDdsUtilsPath = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnPrevError = new System.Windows.Forms.Button();
+            this.btnNextError = new System.Windows.Forms.Button();
+            this.btnPrevComment = new System.Windows.Forms.Button();
+            this.btnNextComment = new System.Windows.Forms.Button();
             this.menuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -144,6 +148,13 @@ namespace DbpfScripter
             this.menuItemConfiguration.Size = new System.Drawing.Size(183, 22);
             this.menuItemConfiguration.Text = "Configuration...";
             this.menuItemConfiguration.Click += new System.EventHandler(this.OnConfigClicked);
+            // 
+            // menuItemDdsUtilsPath
+            // 
+            this.menuItemDdsUtilsPath.Name = "menuItemDdsUtilsPath";
+            this.menuItemDdsUtilsPath.Size = new System.Drawing.Size(183, 22);
+            this.menuItemDdsUtilsPath.Text = "DDS Utils Path...";
+            this.menuItemDdsUtilsPath.Click += new System.EventHandler(this.OnDdsUtilsPathClicked);
             // 
             // toolStripSeparator2
             // 
@@ -255,7 +266,6 @@ namespace DbpfScripter
             this.lblProgress.Size = new System.Drawing.Size(59, 15);
             this.lblProgress.TabIndex = 4;
             this.lblProgress.Text = "Progress:";
-            this.lblProgress.Visible = false;
             // 
             // btnGO
             // 
@@ -318,7 +328,7 @@ namespace DbpfScripter
             this.textMessages.Location = new System.Drawing.Point(121, 146);
             this.textMessages.Name = "textMessages";
             this.textMessages.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.textMessages.Size = new System.Drawing.Size(648, 153);
+            this.textMessages.Size = new System.Drawing.Size(648, 183);
             this.textMessages.TabIndex = 11;
             this.textMessages.Text = "";
             // 
@@ -345,18 +355,61 @@ namespace DbpfScripter
             this.toolTip.SetToolTip(this.lblSaveName, "File name part used to replace any occurance of \"template\" in the input .package " +
         "file name(s)");
             // 
-            // menuItemDdsUtilsPath
+            // btnPrevError
             // 
-            this.menuItemDdsUtilsPath.Name = "menuItemDdsUtilsPath";
-            this.menuItemDdsUtilsPath.Size = new System.Drawing.Size(183, 22);
-            this.menuItemDdsUtilsPath.Text = "DDS Utils Path...";
-            this.menuItemDdsUtilsPath.Click += new System.EventHandler(this.OnDdsUtilsPathClicked);
+            this.btnPrevError.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnPrevError.Location = new System.Drawing.Point(13, 263);
+            this.btnPrevError.Name = "btnPrevError";
+            this.btnPrevError.Size = new System.Drawing.Size(102, 30);
+            this.btnPrevError.TabIndex = 16;
+            this.btnPrevError.Text = "Prev Error";
+            this.btnPrevError.UseVisualStyleBackColor = true;
+            this.btnPrevError.Visible = false;
+            this.btnPrevError.Click += new System.EventHandler(this.OnPrevError);
+            // 
+            // btnNextError
+            // 
+            this.btnNextError.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnNextError.Location = new System.Drawing.Point(13, 299);
+            this.btnNextError.Name = "btnNextError";
+            this.btnNextError.Size = new System.Drawing.Size(102, 30);
+            this.btnNextError.TabIndex = 17;
+            this.btnNextError.Text = "Next Error";
+            this.btnNextError.UseVisualStyleBackColor = true;
+            this.btnNextError.Visible = false;
+            this.btnNextError.Click += new System.EventHandler(this.OnNextError);
+            // 
+            // btnPrevComment
+            // 
+            this.btnPrevComment.Location = new System.Drawing.Point(13, 173);
+            this.btnPrevComment.Name = "btnPrevComment";
+            this.btnPrevComment.Size = new System.Drawing.Size(102, 30);
+            this.btnPrevComment.TabIndex = 16;
+            this.btnPrevComment.Text = "Prev Comment";
+            this.btnPrevComment.UseVisualStyleBackColor = true;
+            this.btnPrevComment.Visible = false;
+            this.btnPrevComment.Click += new System.EventHandler(this.OnPrevComment);
+            // 
+            // btnNextComment
+            // 
+            this.btnNextComment.Location = new System.Drawing.Point(13, 209);
+            this.btnNextComment.Name = "btnNextComment";
+            this.btnNextComment.Size = new System.Drawing.Size(102, 30);
+            this.btnNextComment.TabIndex = 17;
+            this.btnNextComment.Text = "Next Comment";
+            this.btnNextComment.UseVisualStyleBackColor = true;
+            this.btnNextComment.Visible = false;
+            this.btnNextComment.Click += new System.EventHandler(this.OnNextComment);
             // 
             // DbpfScripterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 311);
+            this.ClientSize = new System.Drawing.Size(784, 341);
+            this.Controls.Add(this.btnNextError);
+            this.Controls.Add(this.btnPrevError);
+            this.Controls.Add(this.btnNextComment);
+            this.Controls.Add(this.btnPrevComment);
             this.Controls.Add(this.textSaveName);
             this.Controls.Add(this.lblSaveName);
             this.Controls.Add(this.textMessages);
@@ -373,7 +426,7 @@ namespace DbpfScripter
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(800, 350);
+            this.MinimumSize = new System.Drawing.Size(800, 380);
             this.Name = "DbpfScripterForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
             this.Load += new System.EventHandler(this.OnLoad);
@@ -418,6 +471,10 @@ namespace DbpfScripter
         private System.Windows.Forms.ToolStripMenuItem menuItemDeveloper;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.ToolStripMenuItem menuItemDdsUtilsPath;
+        private System.Windows.Forms.Button btnPrevError;
+        private System.Windows.Forms.Button btnNextError;
+        private System.Windows.Forms.Button btnPrevComment;
+        private System.Windows.Forms.Button btnNextComment;
     }
 }
 

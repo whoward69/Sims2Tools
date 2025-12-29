@@ -139,7 +139,7 @@ using System.Xml;
  * shpeName ::= (item | {any current subset name})
  * value ::= <varRef> | <string> | <hexConstant> | <function>
  * 
- * -- TODO
+ * -- Indexing
  * indexing ::= <index> (CLONE)? [ (<subaction>)+ ]
  * index ::= (<varRef> | <indexKey>)	// Where <varRef> must evaluate to an <indexKey>
  * indexKey ::= (PLUS | (<digit>)+)
@@ -858,7 +858,7 @@ namespace DbpfScripter
                         comment = comment.Substring(1, comment.Length - 2);
                     }
 
-                    ReportProgress(comment);
+                    ReportProgress($"++{comment}");
                     return true;
                 }
             }
