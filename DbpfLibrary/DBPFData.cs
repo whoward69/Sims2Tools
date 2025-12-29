@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.Cigen.CGN1;
 using Sims2Tools.DBPF.CLST;
 using Sims2Tools.DBPF.CTSS;
+using Sims2Tools.DBPF.FWAV;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Images.IMG;
@@ -129,6 +130,7 @@ namespace Sims2Tools.DBPF
             ModTypeNames.Add(Bcon.TYPE, Bcon.NAME);
             ModTypeNames.Add(Bhav.TYPE, Bhav.NAME);
             ModTypeNames.Add(Ctss.TYPE, Ctss.NAME);
+            ModTypeNames.Add(Fwav.TYPE, Fwav.NAME);
             ModTypeNames.Add(Glob.TYPE, Glob.NAME);
             ModTypeNames.Add(Objd.TYPE, Objd.NAME);
             ModTypeNames.Add(Objf.TYPE, Objf.NAME);

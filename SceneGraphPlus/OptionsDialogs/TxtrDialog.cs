@@ -6,6 +6,8 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using SceneGraphPlus.OptionsDialogs;
+using SceneGraphPlus.OptionsDialogs.Helpers;
 using Sims2Tools;
 using Sims2Tools.DBPF.Images;
 using Sims2Tools.DBPF.SceneGraph.LIFO;
@@ -23,8 +25,6 @@ namespace SceneGraphPlus.Dialogs.Options
 {
     public partial class TxtrDialog : Form
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         private SceneGraphPlusForm form;
         private CacheableDbpfFile package;
         private Txtr txtr;
@@ -190,95 +190,9 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private void UpdateTexture(Txtr txtrToUpdate, List<Lifo> lifosToUpdate)
         {
-            UpdateTextureHelper(txtrToUpdate, (ckbRemoveLifos.Checked ? null : lifosToUpdate), textNewImage.Text, GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters);
+            OptionsHelper.UpdateTextureFromFile(txtrToUpdate, (ckbRemoveLifos.Checked ? null : lifosToUpdate), textNewImage.Text, OptionsHelper.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters);
 
             this.removeLifos = ckbRemoveLifos.Checked;
-        }
-
-        public static DdsFormats GetTextureFormat(bool radioDxt1, bool radioDxt3, bool radioDxt5, bool radioRaw8, bool radioRaw24, bool radioRaw32)
-        {
-            if (radioDxt1) return DdsFormats.DXT1Format;
-            else if (radioDxt3) return DdsFormats.DXT3Format;
-            else if (radioDxt5) return DdsFormats.DXT5Format;
-            else if (radioRaw8) return DdsFormats.Raw8Bit;
-            else if (radioRaw24) return DdsFormats.Raw24Bit;
-            else if (radioRaw32) return DdsFormats.Raw32Bit;
-            else return DdsFormats.Unknown;
-        }
-
-        public static void UpdateTextureHelper(Txtr txtrToUpdate, List<Lifo> lifosToUpdate, string imageName, DdsFormats format, string sLevels, ComboBox comboSharpen, CheckedListBox ckbFilters)
-        {
-            DDSData[] ddsData;
-
-            if (string.IsNullOrWhiteSpace(sLevels) || !uint.TryParse(sLevels, out uint levels))
-            {
-                levels = txtrToUpdate.ImageData.MipMapLevels;
-            }
-
-            if (format == DdsFormats.DXT1Format || format == DdsFormats.DXT3Format || format == DdsFormats.DXT5Format)
-            {
-                if (imageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
-                {
-                    ddsData = DdsLoader.ParseDDS(imageName);
-                }
-                else
-                {
-                    string extraParameters = $"-sharpenMethod {comboSharpen.Text}";
-
-                    foreach (string filter in ckbFilters.CheckedItems)
-                    {
-                        if (filter.Equals("Dither"))
-                        {
-                            extraParameters += $" -dither";
-                        }
-                        else
-                        {
-                            extraParameters += $" -{filter}";
-                        }
-                    }
-
-                    ddsData = (new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger)).BuildDDS(imageName, levels, format, extraParameters);
-                }
-            }
-            else if (format == DdsFormats.Raw8Bit || format == DdsFormats.Raw24Bit || format == DdsFormats.Raw32Bit)
-            {
-                if (imageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
-                {
-                    ddsData = DdsLoader.ParseDDS(imageName);
-                }
-                else
-                {
-                    ddsData = (new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger)).BuildDDS(imageName, levels, format, "");
-                }
-            }
-            else
-            {
-                throw new Exception("Unsupported DDS Format");
-            }
-
-            Trace.Assert(txtrToUpdate.ImageData.MipMapLevels == ddsData.Length, $"Incorrect number of MipMaps! Expected {txtrToUpdate.ImageData.MipMapLevels}, got {ddsData.Length}");
-            txtrToUpdate.UpdateFromDDSData(ddsData, (lifosToUpdate == null));
-
-            if (lifosToUpdate != null)
-            {
-                int lifoIndex = 0;
-
-                MipMap[] mipmaps = txtrToUpdate.ImageData.MipMapBlocks[0].MipMaps;
-
-                for (int mipMapIndex = 0; mipMapIndex < mipmaps.Length; ++mipMapIndex)
-                {
-                    if (mipmaps[mipMapIndex].IsLifoRef)
-                    {
-                        if (lifosToUpdate[lifoIndex] != null)
-                        {
-                            Lifo lifo = lifosToUpdate[lifoIndex];
-                            lifo.UpdateFromDDSData(ddsData[mipmaps.Length - 1 - mipMapIndex]);
-                        }
-
-                        ++lifoIndex;
-                    }
-                }
-            }
         }
 
         private void OnFormatChanged(object sender, EventArgs e)

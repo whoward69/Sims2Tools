@@ -365,6 +365,7 @@ namespace SceneGraphPlus.Shapes
         private bool hidden = false;
         private bool filtered = false;
 
+        private bool epFlagsValid = true;
         private bool fileListValid = true;
         private bool lightValid = true;
         private bool subsetMmatValid = true;
@@ -531,6 +532,22 @@ namespace SceneGraphPlus.Shapes
             blockRef.SetSoundKey(name);
 
             SetDirty();
+        }
+
+        public bool IsEpFlagsValid
+        {
+            get => (IsClone ? clonedFrom.IsEpFlagsValid : epFlagsValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsEpFlagsValid = value;
+                }
+                else
+                {
+                    epFlagsValid = value;
+                }
+            }
         }
 
         public bool IsFileListValid
@@ -714,7 +731,7 @@ namespace SceneGraphPlus.Shapes
 
         public bool HasIssues => HasNonFixableIssues || !(IsFileListValid && IsLightValid && IsDefaultLangValid);
         public bool HasFixableIssues => !IsDirty && !(IsFileListValid && IsLightValid && IsDefaultLangValid);
-        public bool HasNonFixableIssues => !(IsSubsetMmatValid && IsSubsetShpeValid && IsSubsetStrValid && IsSubsetGmndMeshValid && IsSubsetGmndDesignableValid && IsSubsetGmndSlavedValid && IsIdrValid);
+        public bool HasNonFixableIssues => !(IsEpFlagsValid && IsSubsetMmatValid && IsSubsetShpeValid && IsSubsetStrValid && IsSubsetGmndMeshValid && IsSubsetGmndDesignableValid && IsSubsetGmndSlavedValid && IsIdrValid);
 
         public string IssuesToolTip
         {
@@ -723,6 +740,8 @@ namespace SceneGraphPlus.Shapes
                 string issues = "\r\n";
 
                 if (!IsTgirValid) issues = $"{issues}Invalid TGIR\r\n";
+
+                if (!IsEpFlagsValid) issues = $"{issues}Invalid EP Flags\r\n";
 
                 if (!IsFileListValid) issues = $"{issues}Invalid File List\r\n";
 

@@ -384,13 +384,13 @@ namespace OutfitOrganiser
                 else
                 {
                     logger.Warn("'cigen.package' not found - thumbnails will NOT display.");
-                    MsgBox.Show("'cigen.package' not found - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'cigen.package' not found - thumbnails will NOT display.")).ShowDialog();
                 }
             }
             else
             {
                 logger.Warn("'Sims2HomePath' not set - thumbnails will NOT display.");
-                MsgBox.Show("'Sims2HomePath' not set - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'Sims2HomePath' not set - thumbnails will NOT display.")).ShowDialog();
             }
 
             downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2DownloadsPath}"));
@@ -2566,6 +2566,17 @@ namespace OutfitOrganiser
         {
             ignoreEdits = true;
 
+            // TODO - DBPF Library - CASThumbnails hash - testing only
+            /*
+            Cpf thumbnailOwner = outfitData.ThumbnailOwner;
+            if (thumbnailOwner != null)
+            {
+                uint thumbnailHash = Hashes.CasThumbnailHash(thumbnailOwner);
+                logger.Info($"CAS Thumbnail: {thumbnailOwner.ToString()} -> 0x0C7E9A76-0xFFFFFFFF-{thumbnailOwner.InstanceID.ToString()}-{Helper.Hex8PrefixString(thumbnailHash)}");
+            }
+            */
+            // TODO - DBPF Library - CASThumbnails hash - testing only ends
+
             uint newGenderValue = outfitData.Gender;
             if (append)
             {
@@ -3430,7 +3441,7 @@ namespace OutfitOrganiser
                                     foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                     {
                                         Binx binx = (Binx)package.GetResourceByEntry(item);
-                                        Idr idr = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
+                                        Idr idr = (Idr)package.GetResourceByTGIR(Hashes.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
 
                                         if (idr != null)
                                         {

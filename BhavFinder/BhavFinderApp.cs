@@ -19,7 +19,7 @@ namespace BhavFinder
         public static string AppName = "BHAV Finder";
 
         public static int AppVersionMajor = 2;
-        public static int AppVersionMinor = 5;
+        public static int AppVersionMinor = 6;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;

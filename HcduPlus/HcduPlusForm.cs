@@ -328,7 +328,7 @@ namespace HcduPlus
                                                             worker.ReportProgress((int)((done / total) * 100.0), cpNew);
                                                         }
 
-                                                        cpData.AddTGI(typeId, groupId, instanceId, scanDataStore.NamesByTgiGet(Hash.TGIHash(instanceId, typeId, groupId)));
+                                                        cpData.AddTGI(typeId, groupId, instanceId, scanDataStore.NamesByTgiGet(Hashes.TGIHash(instanceId, typeId, groupId)));
                                                     }
                                                 }
                                             }
@@ -381,7 +381,7 @@ namespace HcduPlus
                                         TypeGroupID group = (TypeGroupID)Convert.ToUInt32(scanPackages[i].Substring(4, 8), 16);
                                         TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(scanPackages[i].Substring(15, 8), 16);
 
-                                        cpData.AddTGI(Objd.TYPE, group, instance, scanDataStore.NamesByTgiGet(Hash.TGIHash(instance, Objd.TYPE, group)));
+                                        cpData.AddTGI(Objd.TYPE, group, instance, scanDataStore.NamesByTgiGet(Hashes.TGIHash(instance, Objd.TYPE, group)));
                                     }
                                 }
                             }
@@ -405,7 +405,7 @@ namespace HcduPlus
                                     TypeGroupID group = (TypeGroupID)Convert.ToUInt32(scanPackages[0].Substring(4, 8), 16);
                                     TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(scanPackages[0].Substring(15, 8), 16);
 
-                                    cpData.AddTGI(Objd.TYPE, group, instance, scanDataStore.NamesByTgiGet(Hash.TGIHash(instance, Objd.TYPE, group)));
+                                    cpData.AddTGI(Objd.TYPE, group, instance, scanDataStore.NamesByTgiGet(Hashes.TGIHash(instance, Objd.TYPE, group)));
                                 }
                             }
                         }

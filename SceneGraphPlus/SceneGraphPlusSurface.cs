@@ -10,6 +10,7 @@
 using Microsoft.WindowsAPICodePack.Dialogs;
 using SceneGraphPlus.Data;
 using SceneGraphPlus.Dialogs.Options;
+using SceneGraphPlus.OptionsDialogs.Helpers;
 using SceneGraphPlus.Shapes;
 using Sims2Tools;
 using Sims2Tools.DBPF;
@@ -1556,6 +1557,7 @@ namespace SceneGraphPlus.Surface
 
         private void OnContextBlockSplitBlock(object sender, EventArgs e)
         {
+            // TODO - SceneGraph Plus - splitting a GZPS -> TXMT is very dangerous as the 3IDR index may have been reused!
             int shiftMultiplier = 0;
 
             foreach (GraphConnector connector in contextBlock.GetInConnectors())
@@ -2867,7 +2869,7 @@ namespace SceneGraphPlus.Surface
         }
         #endregion
 
-        #region Double Click Tracking
+        #region Double Click Processing
         private void OnBlockDoubleClick(Point mouseScreenLocation)
         {
             if (hoverBlock != null)
@@ -3055,6 +3057,123 @@ namespace SceneGraphPlus.Surface
                         }
                     }
                 }
+                else if (hoverBlock.TypeId == Gzps.TYPE)
+                {
+                    // TODO - SceneGraph Plus - options dialogs - can this also be used for XMOLs and XTOLS?
+                    CacheableDbpfFile gzpsPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
+
+                    Gzps gzps = (Gzps)gzpsPackage.GetResourceByKey(hoverBlock.OriginalKey);
+                    Trace.Assert(gzps != null, $"Double-Click: Missing resource for {hoverBlock.OriginalKey}");
+
+                    Idr idrForGzps = (Idr)gzpsPackage.GetResourceByKey(new DBPFKey(Idr.TYPE, gzps));
+
+                    Binx binx = null;
+                    Idr idrForBinx = null;
+
+                    Str str = null;
+                    int strIndex = -1;
+
+                    foreach (DBPFEntry entry in gzpsPackage.GetEntriesByType(Binx.TYPE))
+                    {
+                        binx = (Binx)gzpsPackage.GetResourceByEntry(entry);
+                        Idr idr = (Idr)gzpsPackage.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
+
+                        if (idr != null)
+                        {
+                            DBPFKey objectKey = idr.GetItem(binx.ObjectIdx);
+
+                            if (gzps.Equals(objectKey))
+                            {
+                                // We've found the required binx/3idr pair
+                                idrForBinx = idr;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (idrForBinx != null)
+                    {
+                        str = (Str)gzpsPackage.GetResourceByKey(idrForBinx.GetItem(binx.StringSetIdx));
+                        strIndex = (int)binx.StringIndex;
+                    }
+
+                    bool removeLifos = false;
+
+                    int numOverrides = (int)gzps.GetItem("numoverrides").UIntegerValue;
+                    List<MaterialData> materials = new List<MaterialData>(numOverrides);
+
+                    HashSet<uint> seenIdrRefs = new HashSet<uint>();
+
+                    for (int i = 0; i < numOverrides; ++i)
+                    {
+                        string subset = gzps.GetItem($"override{i}subset").StringValue;
+                        uint idrIndex = gzps.GetItem($"override{i}resourcekeyidx").UIntegerValue;
+
+                        if (seenIdrRefs.Contains(idrIndex))
+                        {
+                            foreach (MaterialData materialData in materials)
+                            {
+                                if (materialData.idrIndex == idrIndex)
+                                {
+                                    materialData.subsets.Add(subset);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            MaterialData materialData = new MaterialData();
+                            materials.Add(materialData);
+
+                            materialData.subsets.Add(subset);
+                            materialData.idrIndex = idrIndex;
+
+                            seenIdrRefs.Add(idrIndex);
+
+                            GraphBlock txmtBlock = hoverBlock.OutConnectorByLabel(materialData.SubsetDisplay)?.EndBlock;
+                            GraphBlock txtrBlock = txmtBlock?.OutConnectorByLabel("stdMatBaseTextureName")?.EndBlock;
+
+                            if (txmtBlock != null && !txmtBlock.IsMissing)
+                            {
+                                materialData.txmtPackage = packageCache.GetOrAdd(txmtBlock.PackagePath);
+                                materialData.txmt = (Txmt)materialData.txmtPackage.GetResourceByKey(txmtBlock.Key);
+
+                                if (txtrBlock != null && !txtrBlock.IsMissing)
+                                {
+                                    materialData.txtrPackage = packageCache.GetOrAdd(txtrBlock.PackagePath);
+                                    materialData.txtr = (Txtr)materialData.txmtPackage.GetResourceByKey(txtrBlock.Key);
+
+                                    // TODO - we need to set up lifos as well
+                                    BuildLifoLists(txtrBlock, materialData.lifoConectors, materialData.lifos);
+                                }
+                            }
+                        }
+                    }
+
+                    if ((new GzpsDialog().ShowDialog(owningForm, mouseScreenLocation, gzpsPackage, hoverBlock, gzps, idrForGzps, binx, idrForBinx, str, strIndex, materials, out removeLifos)) == DialogResult.OK)
+                    {
+                        // TODO - what goes in here? We must be looping the materials list
+                        foreach (MaterialData material in materials)
+                        {
+                            if (material.txtr != null && material.txtr.IsDirty)
+                            {
+                                material.txtrPackage.Commit(material.txtr);
+                                material.txtrBlock.SetDirty();
+
+                                UpdateLifos(removeLifos, material.lifoConectors, material.lifos);
+                            }
+
+                        }
+
+                        // TODO - what goes in here?
+                    }
+
+                    if (str != null && str.IsDirty)
+                    {
+                        gzpsPackage.Commit(str);
+                        hoverBlock.SetDirty();
+                    }
+                }
                 else if (hoverBlock.TypeId == Txmt.TYPE)
                 {
                     CacheableDbpfFile txmtPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
@@ -3091,14 +3210,7 @@ namespace SceneGraphPlus.Surface
                         }
                     }
 
-                    if (gzpsBlock != null)
-                    {
-                        // TXMT -> GZPS
-                        Gzps gzps = (Gzps)packageCache.GetOrAdd(gzpsBlock.PackagePath).GetResourceByKey(gzpsBlock.OriginalKey);
-
-                        // TODO - SceneGraph Plus - clothing recolours - New GZPS, we also need the associated 3IDR, the BINX and its associated 3IDR (which may be the same as the GZPS one) and the STR#
-                    }
-                    else if (mmatBlock != null)
+                    if (mmatBlock != null)
                     {
                         // TXMT -> MMAT -> OBJD
                         Mmat mmat = (Mmat)packageCache.GetOrAdd(mmatBlock.PackagePath).GetResourceByKey(mmatBlock.OriginalKey);
@@ -3193,6 +3305,7 @@ namespace SceneGraphPlus.Surface
                     CacheableDbpfFile txtrPackage = null;
                     Txtr txtr = null;
 
+                    bool removeLifos = false;
                     List<GraphConnector> lifoConectors = new List<GraphConnector>();
                     List<Lifo> lifos = new List<Lifo>();
 
@@ -3201,29 +3314,9 @@ namespace SceneGraphPlus.Surface
                         txtrPackage = packageCache.GetOrAdd(txtrBlock.PackagePath);
                         txtr = (Txtr)txtrPackage.GetResourceByKey(txtrBlock.OriginalKey);
 
-
-                        foreach (GraphConnector outConnector in txtrBlock.OutConnectors)
-                        {
-                            if (outConnector.EndBlock.TypeId == Lifo.TYPE)
-                            {
-                                lifoConectors.Add(outConnector);
-
-                                GraphBlock lifoBlock = outConnector.EndBlock;
-                                Lifo lifo = null;
-
-                                CacheableDbpfFile lifoPackage = packageCache.GetOrAdd(lifoBlock.PackagePath);
-
-                                if (lifoPackage != null)
-                                {
-                                    lifo = (Lifo)lifoPackage.GetResourceByKey(lifoBlock.Key);
-                                }
-
-                                lifos.Add(lifo);
-                            }
-                        }
+                        BuildLifoLists(txtrBlock, lifoConectors, lifos);
                     }
 
-                    bool removeLifos = false;
                     if ((new TxmtDialog().ShowDialog(owningForm, mouseScreenLocation, txmtPackage, hoverBlock, txmt, guid, mmatGroup, cresSgName, subsets, txtr, lifos, out removeLifos)) == DialogResult.OK)
                     {
                         if (txtr != null && txtr.IsDirty)
@@ -3231,43 +3324,7 @@ namespace SceneGraphPlus.Surface
                             txtrPackage.Commit(txtr);
                             txtrBlock.SetDirty();
 
-                            if (removeLifos)
-                            {
-                                foreach (GraphConnector lifoConnector in lifoConectors)
-                                {
-                                    GraphBlock lifoBlock = lifoConnector.EndBlock;
-
-                                    lifoBlock.UnlinkFrom(lifoConnector);
-
-                                    if (lifoBlock.GetInConnectors().Count == 0)
-                                    {
-                                        CacheableDbpfFile package = packageCache.GetOrOpen(lifoBlock.PackagePath);
-                                        package.Remove(lifoBlock.OriginalKey);
-                                        owningForm.RemoveResource(package, lifoBlock.OriginalKey);
-
-                                        MarkBlockForDeletion(lifoBlock, false);
-                                    }
-
-                                    lifoConnector.StartBlock.UnconnectTo(lifoConnector);
-                                    lifoConnector.Discard();
-                                }
-                            }
-                            else
-                            {
-                                // The LIFOs were updated, so mark the blocks as dirty
-                                for (int index = 0; index < lifoConectors.Count; ++index)
-                                {
-                                    GraphConnector lifoConnector = lifoConectors[index];
-                                    Lifo lifo = lifos[index];
-
-                                    if (lifo != null && lifo.IsDirty)
-                                    {
-                                        packageCache.GetOrAdd(lifoConnector.EndBlock.PackagePath).Commit(lifo);
-
-                                        lifoConnector.EndBlock.SetDirty();
-                                    }
-                                }
-                            }
+                            UpdateLifos(removeLifos, lifoConectors, lifos);
                         }
 
                         if (txmt.IsDirty)
@@ -3366,7 +3423,6 @@ namespace SceneGraphPlus.Surface
                         }
                     }
                 }
-                // TODO - SceneGraph Plus - clothing recolours - Add a GZPS/XMOL/XTOL pop-up, and when we do, make sure the associated STR# can be edited as well
             }
             else if (hoverConnector != null)
             {
@@ -3375,6 +3431,73 @@ namespace SceneGraphPlus.Surface
             else
             {
                 // Must have been over the background
+            }
+        }
+
+        private void BuildLifoLists(GraphBlock txtrBlock, List<GraphConnector> lifoConectors, List<Lifo> lifos)
+        {
+            if (txtrBlock != null)
+            {
+                foreach (GraphConnector outConnector in txtrBlock.OutConnectors)
+                {
+                    if (outConnector.EndBlock.TypeId == Lifo.TYPE)
+                    {
+                        lifoConectors.Add(outConnector);
+
+                        GraphBlock lifoBlock = outConnector.EndBlock;
+                        Lifo lifo = null;
+
+                        CacheableDbpfFile lifoPackage = packageCache.GetOrAdd(lifoBlock.PackagePath);
+
+                        if (lifoPackage != null)
+                        {
+                            lifo = (Lifo)lifoPackage.GetResourceByKey(lifoBlock.Key);
+                        }
+
+                        lifos.Add(lifo);
+                    }
+                }
+            }
+        }
+
+        private void UpdateLifos(bool removeLifos, List<GraphConnector> lifoConectors, List<Lifo> lifos)
+        {
+            if (removeLifos)
+            {
+                foreach (GraphConnector lifoConnector in lifoConectors)
+                {
+                    GraphBlock lifoBlock = lifoConnector.EndBlock;
+
+                    lifoBlock.UnlinkFrom(lifoConnector);
+
+                    if (lifoBlock.GetInConnectors().Count == 0)
+                    {
+                        CacheableDbpfFile package = packageCache.GetOrOpen(lifoBlock.PackagePath);
+                        package.Remove(lifoBlock.OriginalKey);
+                        owningForm.RemoveResource(package, lifoBlock.OriginalKey);
+
+                        MarkBlockForDeletion(lifoBlock, false);
+                    }
+
+                    lifoConnector.StartBlock.UnconnectTo(lifoConnector);
+                    lifoConnector.Discard();
+                }
+            }
+            else
+            {
+                // The LIFOs were updated, so mark the blocks as dirty
+                for (int index = 0; index < lifoConectors.Count; ++index)
+                {
+                    GraphConnector lifoConnector = lifoConectors[index];
+                    Lifo lifo = lifos[index];
+
+                    if (lifo != null && lifo.IsDirty)
+                    {
+                        packageCache.GetOrAdd(lifoConnector.EndBlock.PackagePath).Commit(lifo);
+
+                        lifoConnector.EndBlock.SetDirty();
+                    }
+                }
             }
         }
         #endregion

@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.BCON;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.Cigen.CGN1;
 using Sims2Tools.DBPF.CTSS;
+using Sims2Tools.DBPF.FWAV;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Images.IMG;
@@ -544,6 +545,10 @@ namespace Sims2Tools.DBPF.Package
             else if (entry.TypeID == Ctss.TYPE)
             {
                 res = new Ctss(entry, reader);
+            }
+            else if (entry.TypeID == Fwav.TYPE)
+            {
+                res = new Fwav(entry, reader);
             }
             else if (entry.TypeID == Glob.TYPE)
             {

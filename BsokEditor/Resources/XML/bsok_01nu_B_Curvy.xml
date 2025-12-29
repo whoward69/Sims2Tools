@@ -9,6 +9,7 @@
 					<role name="Officer / Command" code="0x00000DEB"/>
 					<role name="Tech / Engineering" code="0x00000DE9"/>
 					<role name="Medical / Science" code="0x00000DE7"/>
+					<role name="Business / Formal" code="0x00000DE6"/>
 					<role name="Rebel / Outlaw" code="0x00000DE5"/>
 					<role name="Entertainment / Merrie Minstrels" code="0x00000DE4"/>
 					<role name="Media / Action News" code="0x00000DE3"/>
@@ -21,6 +22,7 @@
 					<role name="Officer / Command" code="0x00000DDB"/>
 					<role name="Tech / Engineering" code="0x00000DD9"/>
 					<role name="Medical / Science" code="0x00000DD7"/>
+					<role name="Business / Formal" code="0x00000DD6"/>
 					<role name="Rebel / Outlaw" code="0x00000DD5"/>
 					<role name="Entertainment / Merrie Minstrels" code="0x00000DD4"/>
 					<role name="Media / Action News" code="0x00000DD3"/>
@@ -33,6 +35,7 @@
 					<role name="Officer / Command" code="0x00000DCB"/>
 					<role name="Tech / Engineering" code="0x00000DC9"/>
 					<role name="Medical / Science" code="0x00000DC7"/>
+					<role name="Business / Formal" code="0x00000DC6"/>
 					<role name="Rebel / Outlaw" code="0x00000DC5"/>
 					<role name="Entertainment / Merrie Minstrels" code="0x00000DC4"/>
 					<role name="Media / Action News" code="0x00000DC3"/>
@@ -45,6 +48,7 @@
 					<role name="Officer / Command" code="0x00000DBB"/>
 					<role name="Tech / Engineering" code="0x00000DB9"/>
 					<role name="Medical / Science" code="0x00000DB7"/>
+					<role name="Business / Formal" code="0x00000DB6"/>
 					<role name="Rebel / Outlaw" code="0x00000DB5"/>
 					<role name="Entertainment / Merrie Minstrels" code="0x00000DB4"/>
 					<role name="Media / Action News" code="0x00000DB3"/>

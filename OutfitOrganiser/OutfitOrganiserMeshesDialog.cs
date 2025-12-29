@@ -276,7 +276,7 @@ namespace OutfitOrganiser
                                 foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                 {
                                     Binx binx = (Binx)package.GetResourceByEntry(item);
-                                    Idr idr = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
+                                    Idr idr = (Idr)package.GetResourceByTGIR(Hashes.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
 
                                     if (idr != null)
                                     {

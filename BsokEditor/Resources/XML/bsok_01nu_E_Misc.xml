@@ -9,6 +9,7 @@
 					<role name="Officer / Command" code="0x00000D4B"/>
 					<role name="Tech / Engineering" code="0x00000D49"/>
 					<role name="Medical / Science" code="0x00000D47"/>
+					<role name="Business / Formal" code="0x00000D46"/>
 					<role name="Rebel / Outlaw" code="0x00000D45"/>
 					<role name="Entertainment / Merrie Minstrels" code="0x00000D44"/>
 					<role name="Media / Action News" code="0x00000D43"/>
@@ -21,6 +22,7 @@
 					<role name="Officer / Command" code="0x00000D3B"/>
 					<role name="Tech / Engineering" code="0x00000D39"/>
 					<role name="Medical / Science" code="0x00000D37"/>
+					<role name="Business / Formal" code="0x00000D36"/>
 					<role name="Rebel / Outlaw" code="0x00000D35"/>
 					<role name="Entertainment / Merrie Minstrels" code="0x00000D34"/>
 					<role name="Media / Action News" code="0x00000D33"/>
@@ -33,6 +35,7 @@
 					<role name="Officer / Command" code="0x00000D2B"/>
 					<role name="Tech / Engineering" code="0x00000D29"/>
 					<role name="Medical / Science" code="0x00000D27"/>
+					<role name="Business / Formal" code="0x00000D26"/>
 					<role name="Rebel / Outlaw" code="0x00000D25"/>
 					<role name="Entertainment / Merrie Minstrels" code="0x00000D24"/>
 					<role name="Media / Action News" code="0x00000D23"/>
@@ -45,6 +48,7 @@
 					<role name="Officer / Command" code="0x00000D1B"/>
 					<role name="Tech / Engineering" code="0x00000D19"/>
 					<role name="Medical / Science" code="0x00000D17"/>
+					<role name="Business / Formal" code="0x00000D16"/>
 					<role name="Rebel / Outlaw" code="0x00000D15"/>
 					<role name="Entertainment / Merrie Minstrels" code="0x00000D14"/>
 					<role name="Media / Action News" code="0x00000D13"/>
@@ -57,6 +61,7 @@
 					<role name="Officer / Command" code="0x00000D0B"/>
 					<role name="Tech / Engineering" code="0x00000D09"/>
 					<role name="Medical / Science" code="0x00000D07"/>
+					<role name="Business / Formal" code="0x00000D06"/>
 					<role name="Rebel / Outlaw" code="0x00000D05"/>
 					<role name="Entertainment / Merrie Minstrels" code="0x00000D04"/>
 					<role name="Media / Action News" code="0x00000D03"/>

@@ -18,6 +18,11 @@ namespace Sims2Tools.DBPF.Images.THUB
 {
     public class Thub : Img
     {
+
+        // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
+        // What about other image types (see link above)
+        //   0x4D533EDD (THUB for XNGB in CANHObjectsThumbnails)
+
         public static readonly TypeTypeID[] TYPES = new TypeTypeID[]
         {
             (TypeTypeID) 0xAC2950C1, // object

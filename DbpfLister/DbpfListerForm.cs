@@ -1,19 +1,27 @@
 ﻿using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
+using Sims2Tools.DBPF.Cigen;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
+using Sims2Tools.DBPF.FWAV;
 using Sims2Tools.DBPF.Groups;
 using Sims2Tools.DBPF.Groups.GROP;
+using Sims2Tools.DBPF.Images;
+using Sims2Tools.DBPF.Neighbourhood.FAMI;
+using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.OBJD;
+using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.CRES;
+using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
+using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
@@ -25,6 +33,7 @@ using Sims2Tools.DBPF.UI;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFLR;
 using Sims2Tools.DBPF.XWNT;
+using Sims2Tools.Exporter;
 using Sims2Tools.Files;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -40,6 +49,8 @@ namespace DbpfLister
 {
     public partial class DbpfListerForm : Form
     {
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public DbpfListerForm()
         {
             InitializeComponent();
@@ -65,7 +76,47 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
-            FindWallmasks("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+            FindFwavRefs("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // ProcessObjdEpFlags("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads");
+
+            // ListWardrobeContents("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Neighborhoods\\N001\\N001_Neighborhood.package");
+
+            /*
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Double Deluxe\\Base\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\University Life\\EP1\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Double Deluxe\\EP2\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Best of Business\\EP3\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP1\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Glamour Life Stuff\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\EP4\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Seasons\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Double Deluxe\\SP4\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Best of Business\\SP5\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Bon Voyage\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\University Life\\SP6\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Free Time\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Best of Business\\SP7\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\University Life\\SP8\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Apartment Life\\TSData\\Res\\Objects\\objects.package");
+            CountExprOperators("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection\\Fun with Pets\\SP9\\TSData\\Res\\Objects\\objects.package", true);
+            */
+
+            // CountBhavFormats("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // ExtractAllTypes("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection", "C:\\Users\\whowa\\Desktop\\AllKnownResources.package");
+            // FindAllTypes("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Fun with Pets\\SP9", "C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection");
+
+            // FindXngbProperties("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // CountTxtrFormats("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // IDdsBuilder ddsBuilder = new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger);
+            // ddsBuilder.BuildDDS(@"C:\Users\whowa\Desktop\AppleBlue.png", 9, DdsFormats.DXT3Format, null);
+
+            // FindGzps("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // FindWallmasks("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
             // FindHighestShpeSubsets("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
@@ -136,6 +187,322 @@ namespace DbpfLister
         private void OnCopyClicked(object sender, EventArgs e)
         {
             Clipboard.SetText(textMessages.Text);
+        }
+
+        private void FindFwavRefs(string baseFolder)
+        {
+            SortedSet<string> audioRefs = new SortedSet<string>();
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Fwav.TYPE))
+                        {
+                            Fwav fwav = (Fwav)package.GetResourceByEntry(entry);
+
+                            audioRefs.Add(fwav.AudioFileName);
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            foreach (string audioRef in audioRefs)
+            {
+                textMessages.AppendText($"{audioRef}\r\n");
+            }
+        }
+
+        private void ProcessObjdEpFlags(string baseFolder)
+        {
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                using (DBPFFile package = new DBPFFile(packagePath))
+                {
+                    foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
+                    {
+                        Objd objd = (Objd)package.GetResourceByEntry(entry);
+
+                        if (!objd.IsEpFlagsValid)
+                        {
+                            textMessages.AppendText($"{objd}: {packagePath}\r\n");
+                        }
+                    }
+
+                    package.Close();
+                }
+            }
+        }
+
+        private void ListWardrobeContents(string hoodPackagePath)
+        {
+            try
+            {
+                string cigenPath = $"{Sims2ToolsLib.Sims2HomePath}\\cigen.package";
+                CigenFile cigenCache = new CigenFile(cigenPath);
+
+                using (DBPFFile package = new DBPFFile(hoodPackagePath))
+                {
+                    foreach (DBPFEntry famiEntry in package.GetEntriesByType(Fami.TYPE))
+                    {
+                        if (!(famiEntry.InstanceID == DBPFData.INSTANCE_NULL || famiEntry.InstanceID.AsUInt() >= 0x7F00))
+                        {
+                            if (famiEntry.InstanceID.AsUInt() == 0x001E)
+                            {
+                                try
+                                {
+                                    Fami fami = (Fami)package.GetResourceByEntry(famiEntry);
+
+                                    Str str = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, fami));
+
+                                    string familyName = str.LanguageItems(MetaData.Languages.Default)[0].Title;
+                                    TypeInstanceID familyInstance = fami.InstanceID;
+
+                                    textMessages.AppendText($"{familyName}\r\n");
+
+                                    foreach (DBPFEntry idrEntry in package.GetEntriesByType(Idr.TYPE))
+                                    {
+                                        if (idrEntry.InstanceID.AsUInt() > 0x7FFF)
+                                        {
+                                            Binx binx = (Binx)package.GetResourceByKey(new DBPFKey(Binx.TYPE, idrEntry));
+                                            Idr idr = (Idr)package.GetResourceByEntry(idrEntry);
+
+                                            if (binx != null && idr != null)
+                                            {
+                                                DBPFKey collKey = idr.GetItem(binx.GetItem("binidx").UIntegerValue);
+
+                                                if (collKey.InstanceID == familyInstance)
+                                                {
+                                                    DBPFKey resKey = idr.GetItem(binx.GetItem("objectidx").UIntegerValue);
+
+                                                    if (resKey.TypeID == Gzps.TYPE)
+                                                    {
+                                                        textMessages.AppendText($"  {resKey} {(cigenCache.HasThumbnail(resKey) ? "with thumbnail" : "")}\r\n");
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (Exception e2)
+                                {
+                                    textMessages.AppendText($"{e2.Message} - {hoodPackagePath}\r\n");
+                                }
+                            }
+                        }
+                    }
+
+                    package.Close();
+                }
+
+                cigenCache.Close();
+            }
+            catch (Exception e1)
+            {
+                textMessages.AppendText($"{e1.Message} - {hoodPackagePath}\r\n");
+            }
+        }
+
+        private void CountBhavFormats(string baseFolder)
+        {
+            Dictionary<ushort, HashSet<DBPFKey>> counts = new Dictionary<ushort, HashSet<DBPFKey>>
+            {
+                { 0x8000, new HashSet<DBPFKey>() },
+                { 0x8001, new HashSet<DBPFKey>() },
+                { 0x8002, new HashSet<DBPFKey>() },
+                { 0x8003, new HashSet<DBPFKey>() },
+                { 0x8004, new HashSet<DBPFKey>() },
+                { 0x8005, new HashSet<DBPFKey>() },
+                { 0x8006, new HashSet<DBPFKey>() },
+                { 0x8007, new HashSet<DBPFKey>() },
+                { 0x8008, new HashSet<DBPFKey>() },
+                { 0x8009, new HashSet<DBPFKey>() }
+            };
+
+            Bhav mostLocals = null;
+            Bhav mostParams = null;
+
+            HashSet<string> packages = new HashSet<string>();
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        List<DBPFEntry> bhavEntries = package.GetEntriesByType(Bhav.TYPE);
+
+                        if (bhavEntries != null && bhavEntries.Count > 0)
+                        {
+                            foreach (DBPFEntry bhavEntry in bhavEntries)
+                            {
+                                try
+                                {
+                                    Bhav bhav = (Bhav)package.GetResourceByEntry(bhavEntry);
+
+                                    if (bhav != null)
+                                    {
+                                        if (mostLocals == null)
+                                        {
+                                            mostLocals = bhav;
+                                        }
+                                        else if (bhav.Header.LocalVarCount > mostLocals.Header.LocalVarCount)
+                                        {
+                                            mostLocals = bhav;
+                                        }
+
+                                        if (mostParams == null)
+                                        {
+                                            mostParams = bhav;
+                                        }
+                                        else if (bhav.Header.ArgCount > mostParams.Header.ArgCount)
+                                        {
+                                            mostParams = bhav;
+                                        }
+
+                                        // counts[bhav.Header.Format].Add(bhav);
+
+                                        if (bhav.Header.CacheFlags != 0x00)
+                                        {
+                                            // textMessages.AppendText($"{Helper.Hex4PrefixString(bhav.Header.CacheFlags)}\t{bhav.GroupID}\t{bhav.InstanceID}\t{bhav.KeyName}\t{packagePath.Substring(baseFolder.Length + 1)}\r\n");
+                                        }
+
+                                        if (bhav.Header.Format == 0x8007)
+                                        {
+                                            packages.Add(packagePath);
+                                            // textMessages.AppendText($"{Helper.Hex4PrefixString(bhav.Header.Format)}\t{bhav.GroupID}\t{bhav.InstanceID}\t{bhav.KeyName}\t{packagePath.Substring(baseFolder.Length + 1)}\r\n");
+                                        }
+                                    }
+                                }
+                                catch (Exception)
+                                {
+
+                                }
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+
+            if (mostParams != null)
+            {
+                textMessages.AppendText($"Most Params: {mostParams.Header.ArgCount} in {mostParams.GroupID}-{mostParams.InstanceID} {mostParams.KeyName}\r\n");
+            }
+
+            if (mostLocals != null)
+            {
+                textMessages.AppendText($"Most Locals: {mostLocals.Header.LocalVarCount} in {mostLocals.GroupID}-{mostLocals.InstanceID} {mostLocals.KeyName}\r\n");
+            }
+
+            /*
+            foreach (ushort format in counts.Keys)
+            {
+                textMessages.AppendText($"{Helper.Hex4PrefixString(format)}: {counts[format].Count}\r\n");
+            }
+            */
+
+            /*
+            foreach (string packagePath in packages)
+            {
+                textMessages.AppendText($"{packagePath}\r\n");
+            }
+            */
+        }
+
+        private void CountTxtrFormats(string baseFolder)
+        {
+            Dictionary<DdsFormats, int> counts = new Dictionary<DdsFormats, int>
+            {
+                { DdsFormats.DXT1Format, 0 },
+                { DdsFormats.DXT3Format, 0 },
+                { DdsFormats.DXT5Format, 0 },
+                { DdsFormats.ExtRaw8Bit, 0 },
+                { DdsFormats.Raw8Bit, 0 },
+                { DdsFormats.ExtRaw24Bit, 0 },
+                { DdsFormats.Raw24Bit, 0 },
+                { DdsFormats.Raw32Bit, 0 },
+                { DdsFormats.Unknown, 0 }
+            };
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        List<DBPFEntry> txtrEntries = package.GetEntriesByType(Txtr.TYPE);
+
+                        if (txtrEntries != null && txtrEntries.Count > 0)
+                        {
+                            // textMessages.AppendText($"{packagePath.Substring(baseFolder.Length + 1)}\r\n");
+
+                            foreach (DBPFEntry txtrEntry in txtrEntries)
+                            {
+                                try
+                                {
+                                    Txtr txtr = (Txtr)package.GetResourceByEntry(txtrEntry);
+                                    CImageData data = txtr?.ImageData;
+
+                                    if (data != null)
+                                    {
+                                        counts[data.Format] += 1;
+
+                                        switch (data.Format)
+                                        {
+                                            case DdsFormats.DXT1Format:
+                                            case DdsFormats.DXT3Format:
+                                            case DdsFormats.DXT5Format:
+                                                break;
+
+                                            case DdsFormats.ExtRaw8Bit:
+                                            case DdsFormats.Raw8Bit:
+                                                break;
+
+                                            case DdsFormats.ExtRaw24Bit:
+                                            case DdsFormats.Raw24Bit:
+                                                break;
+
+                                            case DdsFormats.Raw32Bit:
+                                                break;
+
+                                            case DdsFormats.Unknown:
+                                                break;
+                                        }
+                                    }
+                                }
+                                catch (Exception)
+                                {
+
+                                }
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            foreach (DdsFormats format in counts.Keys)
+            {
+                textMessages.AppendText($"{format}: {counts[format]}\r\n");
+            }
         }
 
         private void FindTxtr(string packagePath)
@@ -438,7 +805,14 @@ namespace DbpfLister
 
                             if (name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)) name = name.Substring(0, name.Length - 5);
 
-                            writer.WriteLine($"{rcol.TypeID},{rcol.GroupID},{rcol.InstanceID},{rcol.ResourceID},{name},{packagePath.Substring(baseFolder.Length + 1)}");
+                            string extra = "";
+
+                            if (rcol is Txtr txtr)
+                            {
+                                extra = $",{txtr.ImageData.Format.ToString()}";
+                            }
+
+                            writer.WriteLine($"{rcol.TypeID},{rcol.GroupID},{rcol.InstanceID},{rcol.ResourceID},{name},{packagePath.Substring(baseFolder.Length + 1)}{extra}");
                         }
 
                         package.Close();
@@ -533,6 +907,59 @@ namespace DbpfLister
                 {
                     textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
                 }
+            }
+        }
+
+        private void FindGzps(string baseFolder)
+        {
+            SortedDictionary<uint, int> allFlags = new SortedDictionary<uint, int>();
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Gzps.TYPE))
+                        {
+                            try
+                            {
+                                Gzps gzps = (Gzps)package.GetResourceByEntry(entry);
+
+                                uint flag = gzps.GetItem("flags").UIntegerValue;
+
+                                if (allFlags.ContainsKey(flag))
+                                {
+                                    allFlags[flag]++;
+                                }
+                                else
+                                {
+                                    allFlags.Add(flag, 1);
+                                }
+
+                                if (flag == 0x28 || flag == 0x29)
+                                {
+                                    textMessages.AppendText($"{Helper.Hex2PrefixString(flag)} - {gzps.Name}\r\n");
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                                textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+
+            foreach (uint flag in allFlags.Keys)
+            {
+                textMessages.AppendText($"{Helper.Hex4PrefixString(flag)}  {allFlags[flag]}\r\n");
             }
         }
 
@@ -714,6 +1141,174 @@ namespace DbpfLister
             textMessages.AppendText($"Most subsets is {most} in {res}\r\n");
         }
 
+        private void ExtractAllTypes(string baseFolder, string userFolder, string outputPackagePath)
+        {
+            HashSet<TypeTypeID> seen = new HashSet<TypeTypeID>();
+
+            IExporter exporter = new Exporter();
+            exporter.Open(outputPackagePath);
+
+            ExtractAllTypesIn(baseFolder, exporter, seen);
+            ExtractAllTypesIn(userFolder, exporter, seen);
+
+            exporter.Close();
+        }
+
+        private void ExtractAllTypesIn(string folder, IExporter exporter, HashSet<TypeTypeID> seen)
+        {
+            foreach (string packagePath in Directory.GetFiles(folder, "*.package", SearchOption.AllDirectories))
+            {
+                if (packagePath.EndsWith("CAS!.package")) continue;
+                if (packagePath.EndsWith("NeighborhoodManager.package")) continue;
+
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetAllEntries())
+                        {
+                            if (!seen.Contains(entry.TypeID))
+                            {
+                                seen.Add(entry.TypeID);
+
+                                exporter.Extract(package, entry);
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
+        private void FindAllTypes(string baseFolder, string startFolder, string userFolder)
+        {
+            Dictionary<TypeTypeID, string> allTypes = new Dictionary<TypeTypeID, string>();
+
+            FindAllTypesIn($"{baseFolder}\\{startFolder}", allTypes);
+            FindAllTypesIn(baseFolder, allTypes);
+            FindAllTypesIn(userFolder, allTypes);
+
+            foreach (TypeTypeID typeID in allTypes.Keys)
+            {
+                string typeName = DBPFData.TypeName(typeID);
+
+                if (typeName.StartsWith("0x"))
+                {
+                    textMessages.AppendText($"{typeID}\t\t{allTypes[typeID]}\r\n");
+                }
+                else
+                {
+                    textMessages.AppendText($"{typeID}\t{typeName}\t{allTypes[typeID]}\r\n");
+                }
+            }
+        }
+
+        private void FindAllTypesIn(string folder, Dictionary<TypeTypeID, string> allTypes)
+        {
+            foreach (string packagePath in Directory.GetFiles(folder, "*.package", SearchOption.AllDirectories))
+            {
+                if (packagePath.EndsWith("CAS!.package")) continue;
+                if (packagePath.EndsWith("NeighborhoodManager.package")) continue;
+
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetAllEntries())
+                        {
+                            if (!allTypes.ContainsKey(entry.TypeID))
+                            {
+                                allTypes.Add(entry.TypeID, packagePath);
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+
+        private void FindXngbProperties(string baseFolder)
+        {
+            Dictionary<string, HashSet<string>> xngbPropertyValues = new Dictionary<string, HashSet<string>>();
+            HashSet<string> thumbnails = new HashSet<string>();
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Xngb.TYPE))
+                        {
+                            try
+                            {
+                                Xngb xngb = (Xngb)package.GetResourceByEntry(entry);
+
+                                // CpfItem item = xngb.GetItem("showincatalog");
+                                // if (item != null && item.BooleanValue) continue;
+
+                                CpfItem thumbGroup = xngb.GetItem("thumbnailgroupid");
+                                CpfItem thumbInstance = xngb.GetItem("thumbnailinstanceid");
+                                CpfItem sort = xngb.GetItem("sort");
+
+                                if (thumbGroup != null & thumbInstance != null && sort != null)
+                                {
+                                    thumbnails.Add(sort.StringValue);
+                                }
+
+                                foreach (string property in xngb.GetItemNames())
+                                {
+                                    if (!xngbPropertyValues.ContainsKey(property))
+                                    {
+                                        xngbPropertyValues.Add(property, new HashSet<string>());
+                                    }
+
+                                    xngbPropertyValues[property].Add(xngb.GetItem(property).StringValue);
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                                // textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    // textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+
+            foreach (string thumb in thumbnails)
+            {
+                textMessages.AppendText($"{thumb}\r\n");
+            }
+
+            /*
+            foreach (string property in xngbPropertyValues.Keys)
+            {
+                string values = "";
+
+                foreach (string value in xngbPropertyValues[property])
+                {
+                    values = $"{values}, {value}";
+                }
+
+                textMessages.AppendText($"{property}: {values.Substring(2)}\r\n");
+            }
+            */
+        }
+
         private void FindXmolNonMeshoverlay(string baseFolder)
         {
             foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
@@ -848,6 +1443,50 @@ namespace DbpfLister
                 }
 
                 textMessages.AppendText("\r\n");
+            }
+        }
+
+
+        private int[] operatorCounts = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        private void CountExprOperators(string packagePath, bool displayResults = false)
+        {
+            textMessages.AppendText($"--- {packagePath}\r\n");
+
+            using (DBPFFile package = new DBPFFile(packagePath))
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(Bhav.TYPE))
+                {
+                    Bhav bhav = (Bhav)package.GetResourceByEntry(entry);
+
+                    foreach (Instruction instruction in bhav.Instructions)
+                    {
+                        if (instruction.OpCode == 0x0002)
+                        {
+                            Operand op5 = instruction.Operands[5];
+
+                            if (op5 < 0 || op5 >= operatorCounts.Length)
+                            {
+                                textMessages.AppendText($"  Unknown operator {op5} at line {instruction.Index} in BHAV {bhav.InstanceID}\r\n");
+                            }
+                            else
+                            {
+                                ++operatorCounts[op5];
+                            }
+                        }
+                    }
+                }
+
+                package.Close();
+            }
+
+            if (displayResults)
+            {
+                textMessages.AppendText($"---\r\n");
+
+                for (uint i = 0; i < operatorCounts.Length; ++i)
+                {
+                    textMessages.AppendText($"{Helper.Hex2PrefixString(i)}\t{operatorCounts[i]}\r\n");
+                }
             }
         }
 
@@ -1128,6 +1767,16 @@ namespace DbpfLister
                     }
                 }
             }
+        }
+
+        private void OnHashStringChanged(object sender, EventArgs e)
+        {
+            // string hashString = textHashString.Text;
+
+            // textGroupHash.Text = Hashes.GroupIDHash(hashString).ToString();
+            // textCrc24.Text = Hashes.InstanceIDHash(hashString).ToString();
+            // textCrc32.Text = Hashes.ResourceIDHash(hashString).ToString();
+            // textThumbHash.Text = Helper.Hex8PrefixString(Hashes.ThumbnailHash(hashString));
         }
     }
 }

@@ -19,10 +19,10 @@ namespace OutfitOrganiser
         public static readonly string AppName = "Outfit Organiser";
 
         public static readonly int AppVersionMajor = 3;
-        public static readonly int AppVersionMinor = 3;
+        public static readonly int AppVersionMinor = 4;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 2;
+        private static readonly int AppVersionDebug = 0;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release

@@ -69,6 +69,21 @@ namespace Sims2Tools.DBPF.OBJD
             SetRawData(ObjdIndex.Guid2, (ushort)((((uint)newGuid) & 0xFFFF0000) >> 16));
         }
 
+        public bool IsEpFlagsValid
+        {
+            get
+            {
+                if (GetRawData(ObjdIndex.Version1) <= 0x008B)
+                {
+                    return true;
+                }
+                else
+                {
+                    return ((GetRawData(ObjdIndex.ValidEPFlags1) + GetRawData(ObjdIndex.ValidEPFlags2)) != 0x0000);
+                }
+            }
+        }
+
         public bool IsRawDataValid(int index)
         {
             return (data != null && index < data.Length);

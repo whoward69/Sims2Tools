@@ -23,9 +23,8 @@ namespace Sims2Tools.DBPF.Images.JPG
         public new const string NAME = "JPG";
 
         // What about other image types (see link above)
-        //   0x0C7E9A76
+        //   0x0C7E9A76 (CASThumbnails entry)
         //   0x424D505F
-        //   0x4D533EDD (THUB for XNGB in CANHObjectsThumbnails)
 
         public Jpg(DBPFEntry entry, DbpfReader reader) : base(entry, reader) { }
     }

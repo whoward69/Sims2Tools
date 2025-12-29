@@ -179,6 +179,7 @@ namespace Sims2Tools.DBPF.IO
             return m_reader.ReadSingle();
         }
 
+        // Read a null terminated string of unknown length
         public string ReadPChar()
         {
             string s = "";

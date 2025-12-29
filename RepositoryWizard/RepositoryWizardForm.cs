@@ -254,13 +254,13 @@ namespace RepositoryWizard
                 else
                 {
                     logger.Warn("'cigen.package' not found - thumbnails will NOT display.");
-                    MsgBox.Show("'cigen.package' not found - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'cigen.package' not found - thumbnails will NOT display.")).ShowDialog();
                 }
             }
             else
             {
                 logger.Warn("'Sims2HomePath' not set - thumbnails will NOT display.");
-                MsgBox.Show("'Sims2HomePath' not set - thumbnails will NOT display.", "Warning!", MessageBoxButtons.OK);
+                if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'Sims2HomePath' not set - thumbnails will NOT display.")).ShowDialog();
             }
         }
 
@@ -2323,7 +2323,7 @@ namespace RepositoryWizard
                                     foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                     {
                                         Binx binx = (Binx)package.GetResourceByEntry(item);
-                                        Idr idr = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
+                                        Idr idr = (Idr)package.GetResourceByTGIR(Hashes.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
 
                                         if (idr != null)
                                         {
@@ -2690,7 +2690,7 @@ namespace RepositoryWizard
                 {
                     foreach (Gmnd gmnd in gmnds)
                     {
-                        gmnd.RemoveDesignModeEnabled(slaveSubsetName);
+                        gmnd.RemoveDesignModeEnabledSubset(slaveSubsetName);
                     }
 
                     foreach (Shpe shpe in shpes)
@@ -2725,7 +2725,7 @@ namespace RepositoryWizard
                 {
                     foreach (Gmnd gmnd in gmnds)
                     {
-                        if (!(gmnd.AddDesignModeEnabled(masterSubsetName) &&
+                        if (!(gmnd.AddDesignModeEnabledSubset(masterSubsetName) &&
                               gmnd.SetMaterialsMeshName(masterSubsetName, masterMeshName)))
                         {
                             MsgBox.Show("Too many designable subsets!", "Repository Wizard - Object");

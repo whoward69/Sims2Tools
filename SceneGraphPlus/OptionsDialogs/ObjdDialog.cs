@@ -193,7 +193,7 @@ namespace SceneGraphPlus.Dialogs.Options
 
                 if (textDesc.Enabled && !originalDesc.Equals(textDesc.Text))
                 {
-                    ctss.LanguageItems(Languages.Default)[1].Title = textDesc.Text;
+                    defStrings[1].Title = textDesc.Text;
                 }
             }
         }

@@ -1082,6 +1082,8 @@ namespace SceneGraphPlus
                     // Adding this block makes it look like the OBJD is broken when this STR# is not required by the object
                     // freeCol += DrawingSurface.ColumnGap;
                     // startBlock.ConnectTo(2, "Sound ID Names", AddBlockByKey(package, new BlockRef(package, Str.TYPE, new DBPFKey(Str.TYPE, objd.GroupID, DBPFData.STR_SOUNDS, DBPFData.RESOURCE_NULL)), ref freeCol));
+
+                    startBlock.IsEpFlagsValid = objd.IsEpFlagsValid;
                 }
                 else if (res is Mmat mmat)
                 {

@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <bsok>
+  <!-- FROZEN - see https://blueheavensims.tumblr.com/post/798792735549259776/support-for-legacy-bsok-ending-1112025 -->
 	<genre name="Legacy BSOK">
 		<style name="Body Shapes">
 			<group name="Curvy Sizes" gender="female">

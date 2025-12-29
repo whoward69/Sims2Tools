@@ -83,6 +83,7 @@
     <Compile Include="CTSS\Ctss.cs" />
     <Compile Include="DBPFData.cs" />
     <Compile Include="DBPFScriptable.cs" />
+    <Compile Include="FWAV\Fwav.cs" />
     <Compile Include="Groups\GroupsFile.cs" />
     <Compile Include="Groups\GROP\GropItem.cs" />
     <Compile Include="Groups\GROP\Grop.cs" />

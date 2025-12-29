@@ -229,7 +229,7 @@ namespace HcduPlus.DataStore
 
         public override bool NamesByTgiContains(DBPFKey entry)
         {
-            return namesByTGI.ContainsKey(Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID));
+            return namesByTGI.ContainsKey(Hashes.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID));
         }
 
         public override string NamesByTgiGet(int tgiHash)
@@ -239,7 +239,7 @@ namespace HcduPlus.DataStore
 
         public override void NamesByTgiAdd(DBPFKey entry, string resourceName)
         {
-            int tgiHash = Hash.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID);
+            int tgiHash = Hashes.TGIHash(entry.InstanceID, entry.TypeID, entry.GroupID);
 
             if (!namesByTGI.ContainsKey(tgiHash))
             {

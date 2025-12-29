@@ -401,7 +401,7 @@ namespace BsokEditor
                             Binx binx = (Binx)package.GetResourceByEntry(entry);
                             seenBinx.Add(entry);
 
-                            Idr idr = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(binx.InstanceID, DBPFData.RESOURCE_NULL, Idr.TYPE, binx.GroupID));
+                            Idr idr = (Idr)package.GetResourceByTGIR(Hashes.TGIRHash(binx.InstanceID, DBPFData.RESOURCE_NULL, Idr.TYPE, binx.GroupID));
 
                             if (IsBsokPackage(package, binx, idr, out Cpf cpf))
                             {

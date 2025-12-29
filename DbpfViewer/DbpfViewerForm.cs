@@ -551,7 +551,7 @@ namespace DbpfViewer
                                     row["Instance"] = entry.InstanceID.ToString();
                                     row["Name"] = resource.KeyName;
 
-                                    row["Hash"] = Hash.TGIRHash(entry.InstanceID, entry.ResourceID, entry.TypeID, entry.GroupID);
+                                    row["Hash"] = Hashes.TGIRHash(entry.InstanceID, entry.ResourceID, entry.TypeID, entry.GroupID);
 
                                     sender.SetData(row);
                                     sender.SetProgress((int)((++done / (float)total) * 100.0));

@@ -18,10 +18,12 @@ namespace Sims2Tools.DBPF.Utils
 {
     public class Hashes
     {
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         static private readonly CRC crc24 = new CRC(CRCParameters.GetParameters(CRCStandard.CRC24));
         static private readonly CRC crc32 = new CRC(new CRCParameters(32, 0x04C11DB7, 0xffffffff, 0, false));
 
-        public static uint ToUInt(byte[] input)
+        private static uint ToUInt(byte[] input)
         {
             ulong ret = 0;
             foreach (byte b in input)
@@ -31,6 +33,31 @@ namespace Sims2Tools.DBPF.Utils
             }
 
             return (uint)ret;
+        }
+
+        public static int TGIHash(TypeInstanceID instanceID, TypeTypeID type, TypeGroupID group)
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + instanceID.GetHashCode();
+                hash = hash * 23 + type.GetHashCode();
+                hash = hash * 23 + group.GetHashCode();
+                return hash;
+            }
+        }
+
+        public static int TGIRHash(TypeInstanceID instanceID, TypeResourceID resourceID, TypeTypeID type, TypeGroupID group)
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + instanceID.GetHashCode();
+                hash = hash * 23 + resourceID.GetHashCode();
+                hash = hash * 23 + type.GetHashCode();
+                hash = hash * 23 + group.GetHashCode();
+                return hash;
+            }
         }
 
         public static TypeGroupID GroupIDHash(string name)
@@ -65,6 +92,34 @@ namespace Sims2Tools.DBPF.Utils
         public static uint ThumbnailHash(string texturename)
         {
             return ToUInt(crc32.ComputeHash(Encoding.ASCII.GetBytes(texturename.Trim().ToLower())));
+        }
+
+        public static uint CasThumbnailHash(DBPFKey ownerKey)
+        {
+            // TODO - DBPF Library - CASThumbnails hash - wtf is the hash???
+            string name;
+            uint hash;
+
+            // This is NOT a hash of TGI, TIG, GTI, GIT, ITG or IGT
+            // This is NOT a hash of GRI, GIR, RGI, RIG, IGR or IRG
+            // This is NOT a hash of IG or GI
+
+            // Changing these is KNOWN to change the hash values
+            //   Instance
+            //   Group
+
+            // Changing these is KNOWN NOT to change the hash value
+            //   GZPS name
+
+            // Suspicions
+            //   THINK that type affects the hash value as CASThumbnails includes thumbnails for
+            //     clothing, hair, glasses, facepaints, eyebrows
+
+            name = "CASThumbnail" + ownerKey.TypeID.AsUInt().ToString() + ownerKey.GroupID.AsUInt().ToString() + ownerKey.InstanceID.AsUInt().ToString();
+            hash = ToUInt(crc32.ComputeHash(Helper.ToBytes(name.Trim().ToLower(), 0)));
+            logger.Info($"TGI: {Helper.Hex8PrefixString(hash)} - {name}");
+
+            return hash;
         }
 
         public static string StripHashFromName(string filename)

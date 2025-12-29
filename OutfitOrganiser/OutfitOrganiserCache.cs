@@ -121,7 +121,7 @@ namespace OutfitOrganiser
 
             if (binx != null)
             {
-                Idr idrForBinx = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
+                Idr idrForBinx = (Idr)package.GetResourceByTGIR(Hashes.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
 
                 if (idrForBinx != null)
                 {
@@ -152,7 +152,7 @@ namespace OutfitOrganiser
 
                     if (res is Xtol)
                     {
-                        idrForCpf = (Idr)package.GetResourceByTGIR(Hash.TGIRHash(cpf.InstanceID, cpf.ResourceID, Idr.TYPE, cpf.GroupID));
+                        idrForCpf = (Idr)package.GetResourceByTGIR(Hashes.TGIRHash(cpf.InstanceID, cpf.ResourceID, Idr.TYPE, cpf.GroupID));
                     }
 
                     if (idrForCpf != null)

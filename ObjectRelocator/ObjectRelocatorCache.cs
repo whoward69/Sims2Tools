@@ -491,7 +491,7 @@ namespace ObjectRelocator
                             }
                             else
                             {
-                                Str str = (Str)package.GetResourceByTGIR(Hash.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
+                                Str str = (Str)package.GetResourceByTGIR(Hashes.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
 
                                 if (str != null)
                                 {
@@ -617,7 +617,7 @@ namespace ObjectRelocator
         {
             if (Sims2ToolsLib.IsSims2HomePathSet)
             {
-                thumbCacheBuyMode = new ThumbnailDbpfCache($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\ObjectThumbnails.package");
+                thumbCacheBuyMode= new ThumbnailDbpfCache($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\ObjectThumbnails.package");
                 thumbCacheBuildMode = new ThumbnailDbpfCache($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\BuildModeThumbnails.package");
             }
         }
@@ -682,7 +682,7 @@ namespace ObjectRelocator
                 {
                     try
                     {
-                        Str str = (Str)package.GetResourceByTGIR(Hash.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
+                        Str str = (Str)package.GetResourceByTGIR(Hashes.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
 
                         if (str != null)
                         {
@@ -698,7 +698,7 @@ namespace ObjectRelocator
 
                             TypeInstanceID thumbInstanceID = (TypeInstanceID)Hashes.ThumbnailHash(groupId, cresname);
                             TypeResourceID thumbResourceID = (TypeResourceID)groupId.AsUInt();
-                            int hash = Hash.TGIRHash(thumbInstanceID, thumbResourceID, Thub.TYPES[(int)Thub.ThubTypeIndex.Object], DBPFData.GROUP_LOCAL);
+                            int hash = Hashes.TGIRHash(thumbInstanceID, thumbResourceID, Thub.TYPES[(int)Thub.ThubTypeIndex.Object], DBPFData.GROUP_LOCAL);
 
                             thub = (Thub)thumbCacheBuyMode?.GetResourceByTGIR(hash);
 
@@ -783,13 +783,13 @@ namespace ObjectRelocator
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0270:Use coalesce expression", Justification = "<Pending>")]
         private Thub GetBuildThumbnailByTGIR(TypeTypeID typeId, TypeGroupID groupId, TypeInstanceID instanceId, TypeResourceID resourceId)
         {
-            Thub thub = (Thub)thumbCacheBuildMode?.GetResourceByTGIR(Hash.TGIRHash(instanceId, resourceId, typeId, groupId));
+            Thub thub = (Thub)thumbCacheBuildMode?.GetResourceByTGIR(Hashes.TGIRHash(instanceId, resourceId, typeId, groupId));
 
             if (thub == null)
-                thub = (Thub)thumbCacheBuildMode?.GetResourceByTGIR(Hash.TGIRHash(instanceId, DBPFData.RESOURCE_NULL, typeId, groupId));
+                thub = (Thub)thumbCacheBuildMode?.GetResourceByTGIR(Hashes.TGIRHash(instanceId, DBPFData.RESOURCE_NULL, typeId, groupId));
 
             if (thub == null)
-                thub = (Thub)thumbCacheBuildMode?.GetResourceByTGIR(Hash.TGIRHash(instanceId, (TypeResourceID)0xFFFFFFFF, typeId, groupId));
+                thub = (Thub)thumbCacheBuildMode?.GetResourceByTGIR(Hashes.TGIRHash(instanceId, (TypeResourceID)0xFFFFFFFF, typeId, groupId));
 
             return thub;
         }

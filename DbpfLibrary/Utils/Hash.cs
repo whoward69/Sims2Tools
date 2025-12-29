@@ -32,30 +32,5 @@ namespace Sims2Tools.DBPF.Utils
             }
             return (TypeGroupID)((crc & 0x00FFFFFF) | 0x7F000000);
         }
-
-        public static int TGIHash(TypeInstanceID instanceID, TypeTypeID type, TypeGroupID group)
-        {
-            unchecked
-            {
-                int hash = 17;
-                hash = hash * 23 + instanceID.GetHashCode();
-                hash = hash * 23 + type.GetHashCode();
-                hash = hash * 23 + group.GetHashCode();
-                return hash;
-            }
-        }
-
-        public static int TGIRHash(TypeInstanceID instanceID, TypeResourceID resourceID, TypeTypeID type, TypeGroupID group)
-        {
-            unchecked
-            {
-                int hash = 17;
-                hash = hash * 23 + instanceID.GetHashCode();
-                hash = hash * 23 + resourceID.GetHashCode();
-                hash = hash * 23 + type.GetHashCode();
-                hash = hash * 23 + group.GetHashCode();
-                return hash;
-            }
-        }
     }
 }

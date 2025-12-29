@@ -102,6 +102,13 @@
     <Compile Include="Dialogs\TextureDialog.Designer.cs">
       <DependentUpon>TextureDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="OptionsDialogs\GzpsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsDialogs\GzpsDialog.Designer.cs">
+      <DependentUpon>GzpsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OptionsDialogs\OptionsHelper.cs" />
     <Compile Include="OptionsDialogs\TxtrDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -142,6 +149,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TextureDialog.resx">
       <DependentUpon>TextureDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsDialogs\GzpsDialog.resx">
+      <DependentUpon>GzpsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsDialogs\TxtrDialog.resx">
       <DependentUpon>TxtrDialog.cs</DependentUpon>

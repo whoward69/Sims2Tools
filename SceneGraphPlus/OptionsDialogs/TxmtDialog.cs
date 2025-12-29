@@ -6,6 +6,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using SceneGraphPlus.OptionsDialogs.Helpers;
 using SceneGraphPlus.Shapes;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Data;
@@ -13,7 +14,6 @@ using Sims2Tools.DBPF.Images;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.MMAT;
-using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DbpfCache;
@@ -28,8 +28,6 @@ namespace SceneGraphPlus.Dialogs.Options
 {
     public partial class TxmtDialog : Form
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
         private SceneGraphPlusForm form;
         private CacheableDbpfFile txmtPackage;
         private Txmt txmt;
@@ -60,17 +58,18 @@ namespace SceneGraphPlus.Dialogs.Options
             this.form = form;
             this.txmtPackage = txmtPackage;
             this.txmt = txmt;
-            this.lifos = lifos;
 
             this.guid = guid;
             this.mmatGroup = mmatGroup;
             this.cresSgName = cresSgName;
             this.txtr = txtr;
 
+            // TODO - SceneGraph Plus - tidy - use MaterialData to pass txmtPackage, txmt, txtr, lifos
+            this.lifos = lifos;
+
             this.Location = new Point(location.X + 5, location.Y + 5);
 
             grpNewMmat.Visible = (mmatGroup != DBPFData.GROUP_NULL);
-            grpNewGzps.Visible = false; // TODO - SceneGraph Plus - clothing recolours - allow for a New GZPS
 
             ckbRemoveLifos.Checked = this.removeLifos = false;
             ckbRemoveLifos.Visible = (lifos.Count > 0);
@@ -169,69 +168,19 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private void OnDuplicateClicked(object sender, EventArgs e)
         {
-            Txmt newTxmt = txmt.Duplicate(textTxmtNewName.Text);
+            Txmt newTxmt = OptionsHelper.DuplicateTxmt(form, txmtPackage, btnChangeTexture.Enabled, 
+                                                       txmt, textTxmtNewName.Text, btnDiffCoefs.BackColor, comboAlphaBlendMode.SelectedItem.ToString(), ckbLightingEnabled.Checked, trackDiffAlpha.Value, 
+                                                       txtr, textNewImage.Text, OptionsHelper.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters, 
+                                                       lifos, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
 
-            GraphBlock newTxtrBlock = null;
-
-            if (!(Form.ModifierKeys == Keys.Control))
+            if (updateRemoveLifos)
             {
-                Txtr newTxtr = null;
-                List<Lifo> newLifos = new List<Lifo>(lifos.Count);
-
-                if (txtr != null)
-                {
-                    newTxtr = txtr.Duplicate(textTxmtNewName.Text);
-
-                    for (int index = 0; index < lifos.Count; ++index)
-                    {
-                        newLifos.Add(lifos[index].Duplicate(newTxtr.SgName, lifos.Count - 1 - index));
-                    }
-
-                    if (newLifos.Count > 0)
-                    {
-                        int index = 0;
-
-                        foreach (MipMap mipmap in newTxtr.ImageData.MipMapBlocks[0].MipMaps)
-                        {
-                            if (mipmap.IsLifoRef)
-                            {
-                                mipmap.SetLifoFile(newLifos[index++].SgName);
-                            }
-                        }
-                    }
-                }
-
-                if (btnChangeTexture.Enabled)
-                {
-                    UpdateTexture(newTxmt, newTxtr, newLifos);
-                }
-
-                if (newTxtr != null)
-                {
-                    // Do the LIFOs first, as that way the TXTR will link to them and not create "missing" LIFO blocks first
-                    foreach (Lifo newLifo in newLifos)
-                    {
-                        txmtPackage.Commit(newLifo, true);
-                        form.AddResource(txmtPackage, newLifo, true);
-                    }
-
-                    txmtPackage.Commit(newTxtr, true);
-                    newTxtrBlock = form.AddResource(txmtPackage, newTxtr, true);
-                }
-            }
-
-            // Do the TXTR (and any LIFOs) first, as that way the TXMT will link to the new TXTR and not create "missing" TXTR block first
-            txmtPackage.Commit(newTxmt, true);
-            GraphBlock newTxmtBlock = form.AddResource(txmtPackage, newTxmt, true);
-
-            if (newTxtrBlock != null)
-            {
-                newTxmtBlock.OutConnectorByLabel("stdMatBaseTextureName").SetEndBlock(newTxtrBlock, true);
+                this.removeLifos = ckbRemoveLifos.Checked;
             }
 
             if (btnMmatCreate.Enabled)
             {
-                Mmat newMmat = CreateRecolour(newTxmt);
+                Mmat newMmat = CreateMmatRecolour(newTxmt);
 
                 if (newMmat != null)
                 {
@@ -282,7 +231,14 @@ namespace SceneGraphPlus.Dialogs.Options
             }
             else
             {
-                UpdateTexture(txmt, txtr, lifos);
+                OptionsHelper.UpdateMaterial(txmt, btnDiffCoefs.BackColor, comboAlphaBlendMode.SelectedItem.ToString(), ckbLightingEnabled.Checked, trackDiffAlpha.Value,
+                                             txtr, textNewImage.Text, OptionsHelper.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters,
+                                             lifos, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
+
+                if (updateRemoveLifos)
+                {
+                    this.removeLifos = ckbRemoveLifos.Checked;
+                }
             }
         }
 
@@ -299,7 +255,7 @@ namespace SceneGraphPlus.Dialogs.Options
             }
             else
             {
-                Mmat newMmat = CreateRecolour(txmt);
+                Mmat newMmat = CreateMmatRecolour(txmt);
 
                 if (newMmat != null)
                 {
@@ -309,7 +265,7 @@ namespace SceneGraphPlus.Dialogs.Options
             }
         }
 
-        private Mmat CreateRecolour(Txmt targetTxmt)
+        private Mmat CreateMmatRecolour(Txmt targetTxmt)
         {
             if (comboAddMmatSubset.SelectedIndex != 0)
             {
@@ -343,44 +299,6 @@ namespace SceneGraphPlus.Dialogs.Options
             }
 
             return null;
-        }
-
-        private void OnAddGzpsClicked(object sender, EventArgs e)
-        {
-            // TODO - SceneGraph Plus - clothing recolours - Create GZPS
-            /*
-            if (btnDuplicate.Enabled)
-            {
-                OnDuplicateClicked(btnDuplicate, null);
-            }
-            else
-            {
-                Mmat newMmat = CreateRecolour(txmt);
-
-                if (newMmat != null)
-                {
-                    txmtPackage.Commit(newMmat, true);
-                    form.AddResource(txmtPackage, newMmat, true);
-                }
-            }
-            */
-        }
-
-        private void UpdateTexture(Txmt txmtToUpdate, Txtr txtrToUpdate, List<Lifo> lifosToUpdate)
-        {
-            if (txtrToUpdate == null)
-            {
-                ColourHelper.SetTxmtPropertyFromColour(txmtToUpdate, "stdMatDiffCoef", btnDiffCoefs.BackColor);
-                txmtToUpdate.MaterialDefinition.SetProperty("stdMatAlphaBlendMode", comboAlphaBlendMode.SelectedItem.ToString().ToLower());
-                txmtToUpdate.MaterialDefinition.SetProperty("stdMatLightingEnabled", (ckbLightingEnabled.Checked ? "1" : "0"));
-                txmtToUpdate.MaterialDefinition.SetProperty("stdMatUntexturedDiffAlpha", (trackDiffAlpha.Value / 100.0).ToString("0.00"));
-            }
-            else
-            {
-                TxtrDialog.UpdateTextureHelper(txtrToUpdate, (ckbRemoveLifos.Checked ? null : lifosToUpdate), textNewImage.Text, TxtrDialog.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters);
-
-                this.removeLifos = ckbRemoveLifos.Checked;
-            }
         }
 
         private void OnFormatChanged(object sender, EventArgs e)

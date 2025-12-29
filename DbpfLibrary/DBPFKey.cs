@@ -77,7 +77,7 @@ namespace Sims2Tools.DBPF
             get
             {
                 if (tgiHash == 0)
-                    tgiHash = Hash.TGIHash(InstanceID, TypeID, GroupID);
+                    tgiHash = Hashes.TGIHash(InstanceID, TypeID, GroupID);
 
                 return tgiHash;
             }
@@ -88,7 +88,7 @@ namespace Sims2Tools.DBPF
             get
             {
                 if (tgirHash == 0)
-                    tgirHash = Hash.TGIRHash(InstanceID, ResourceID, TypeID, GroupID);
+                    tgirHash = Hashes.TGIRHash(InstanceID, ResourceID, TypeID, GroupID);
 
                 return tgirHash;
             }

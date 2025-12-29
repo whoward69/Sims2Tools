@@ -9,6 +9,7 @@
 					<role name="Officer / Command" code="0x00000DFB"/>
 					<role name="Tech / Engineering" code="0x00000DF9"/>
 					<role name="Medical / Science" code="0x00000DF7"/>
+					<role name="Business / Formal" code="0x00000DF6"/>
 					<role name="Rebel / Outlaw" code="0x00000DF5"/>
 					<role name="Entertainment / Merrie Minstrels" code="0x00000DF4"/>
 					<role name="Media / Action News" code="0x00000DF3"/>
