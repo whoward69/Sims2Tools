@@ -1,7 +1,7 @@
 ﻿/*
  * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2025
+ * William Howard - 2020-2026
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -473,10 +473,11 @@ namespace ObjectRelocator
             if (objd.GetRawData(ObjdIndex.BuildModeType) != 0x0000) return false;
 
             // Ignore "globals", eg controllers, emitters and the like
-            if (objd.GetRawData(ObjdIndex.IsGlobalSimObject) != 0x0000) return false;
+            if (!menuItemIncludeSpecialObjects.Checked && objd.GetRawData(ObjdIndex.IsGlobalSimObject) != 0x0000) return false;
 
             // Only normal objects and vehicles
-            if (objd.Type == ObjdType.Normal || objd.Type == ObjdType.Vehicle)
+            if (objd.Type == ObjdType.Normal || objd.Type == ObjdType.Vehicle ||
+                menuItemIncludeSpecialObjects.Checked && (objd.Type == ObjdType.Memory || objd.Type == ObjdType.Outfit || objd.Type == ObjdType.Person || objd.Type == ObjdType.SimType || objd.Type == ObjdType.Template))
             {
                 // Single or multi-tile object?
                 if (objd.GetRawData(ObjdIndex.MultiTileMasterId) == 0x0000)
@@ -594,6 +595,8 @@ namespace ObjectRelocator
                 {
                     if (IsBuyMode)
                     {
+                        if (menuItemIncludeSpecialObjects.Checked) return true;
+
                         return !(objectData.GetRawData(ObjdIndex.RoomSortFlags) == 0 && objectData.GetRawData(ObjdIndex.FunctionSortFlags) == 0 /* && objectData.GetRawData(ObjdIndex.FunctionSubSort) == 0 */ && objectData.GetRawData(ObjdIndex.CommunitySort) == 0);
                     }
                     else
@@ -693,6 +696,11 @@ namespace ObjectRelocator
         #endregion
 
         #region Options Menu Actions
+        private void OnOptionsOpening(object sender, EventArgs e)
+        {
+            menuItemExcludeHidden.Enabled = !menuItemIncludeSpecialObjects.Checked;
+        }
+
         private void OnShowHideName(object sender, EventArgs e)
         {
             gridViewResources.Columns["colName"].Visible = menuItemShowName.Checked;
@@ -792,6 +800,22 @@ namespace ObjectRelocator
                 DoWork_FillGrid(folder, false);
             }
         }
+
+        private void OnIncludeSpecialObjectsClicked(object sender, EventArgs e)
+        {
+            if (!menuItemIncludeSpecialObjects.Checked)
+            {
+                if (MsgBox.Show("Do you really want to include special objects?\n(Memories, Outfits, People, SimTypes and Templates)\n\nThis is NOT recommended.",
+                                "Include Special Objects", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No) return;
+            }
+
+            menuItemIncludeSpecialObjects.Checked = !menuItemIncludeSpecialObjects.Checked;
+
+            if (IsBuyMode)
+            {
+                DoWork_FillGrid(folder, false);
+            }
+        }
         #endregion
 
         #region Mode Menu Actions
@@ -853,6 +877,7 @@ namespace ObjectRelocator
             menuItemModifyAllModels.Visible = IsAdvancedMode;
             menuItemSeparatorFilters.Visible = IsAdvancedMode;
             menuItemDisableBuildModeSortFilters.Visible = IsAdvancedMode;
+            menuItemIncludeSpecialObjects.Visible = IsAdvancedMode;
 
             // Right-click context menu entries
             menuItemContextStripCTSSCrap.Visible = IsAdvancedMode;

@@ -1,7 +1,7 @@
 ﻿/*
  * SceneGraph Plus - a utility for repairing scene graphs
  *
- * William Howard - 2020-2025
+ * William Howard - 2020-2026
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -168,9 +168,9 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private void OnDuplicateClicked(object sender, EventArgs e)
         {
-            Txmt newTxmt = OptionsHelper.DuplicateTxmt(form, txmtPackage, btnChangeTexture.Enabled, 
-                                                       txmt, textTxmtNewName.Text, btnDiffCoefs.BackColor, comboAlphaBlendMode.SelectedItem.ToString(), ckbLightingEnabled.Checked, trackDiffAlpha.Value, 
-                                                       txtr, textNewImage.Text, OptionsHelper.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters, 
+            Txmt newTxmt = OptionsHelper.DuplicateTxmt(form, txmtPackage, btnChangeTexture.Enabled,
+                                                       txmt, textTxmtNewName.Text, btnDiffCoefs.BackColor, comboAlphaBlendMode.SelectedItem.ToString(), ckbLightingEnabled.Checked, trackDiffAlpha.Value,
+                                                       txtr, textNewImage.Text, OptionsHelper.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters,
                                                        lifos, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
 
             if (updateRemoveLifos)

@@ -1,7 +1,7 @@
 ﻿/*
  * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2025
+ * William Howard - 2020-2026
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -617,7 +617,7 @@ namespace ObjectRelocator
         {
             if (Sims2ToolsLib.IsSims2HomePathSet)
             {
-                thumbCacheBuyMode= new ThumbnailDbpfCache($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\ObjectThumbnails.package");
+                thumbCacheBuyMode = new ThumbnailDbpfCache($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\ObjectThumbnails.package");
                 thumbCacheBuildMode = new ThumbnailDbpfCache($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\BuildModeThumbnails.package");
             }
         }

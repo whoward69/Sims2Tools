@@ -1,7 +1,7 @@
 ﻿/*
  * Object Relocator - a utility for moving objects in the Buy/Build Mode catalogues
  *
- * William Howard - 2020-2025
+ * William Howard - 2020-2026
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -80,6 +80,7 @@ namespace ObjectRelocator
             this.menuItemModifyAllModels = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparatorFilters = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemDisableBuildModeSortFilters = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemIncludeSpecialObjects = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewResources = new System.Windows.Forms.DataGridView();
             this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -397,16 +398,18 @@ namespace ObjectRelocator
             this.menuItemSeparatorModels,
             this.menuItemModifyAllModels,
             this.menuItemSeparatorFilters,
-            this.menuItemDisableBuildModeSortFilters});
+            this.menuItemDisableBuildModeSortFilters,
+            this.menuItemIncludeSpecialObjects});
             this.menuOptions.Name = "menuOptions";
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
+            this.menuOptions.DropDownOpening += new System.EventHandler(this.OnOptionsOpening);
             // 
             // menuItemShowName
             // 
             this.menuItemShowName.CheckOnClick = true;
             this.menuItemShowName.Name = "menuItemShowName";
-            this.menuItemShowName.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowName.Size = new System.Drawing.Size(253, 22);
             this.menuItemShowName.Text = "Show &Name";
             this.menuItemShowName.Click += new System.EventHandler(this.OnShowHideName);
             // 
@@ -414,7 +417,7 @@ namespace ObjectRelocator
             // 
             this.menuItemShowPath.CheckOnClick = true;
             this.menuItemShowPath.Name = "menuItemShowPath";
-            this.menuItemShowPath.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowPath.Size = new System.Drawing.Size(253, 22);
             this.menuItemShowPath.Text = "Show &Path";
             this.menuItemShowPath.Click += new System.EventHandler(this.OnShowHidePath);
             // 
@@ -422,7 +425,7 @@ namespace ObjectRelocator
             // 
             this.menuItemShowGuids.CheckOnClick = true;
             this.menuItemShowGuids.Name = "menuItemShowGuids";
-            this.menuItemShowGuids.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowGuids.Size = new System.Drawing.Size(253, 22);
             this.menuItemShowGuids.Text = "Show &GUIDs";
             this.menuItemShowGuids.Click += new System.EventHandler(this.OnShowHideGuids);
             // 
@@ -430,7 +433,7 @@ namespace ObjectRelocator
             // 
             this.menuItemShowDepreciation.CheckOnClick = true;
             this.menuItemShowDepreciation.Name = "menuItemShowDepreciation";
-            this.menuItemShowDepreciation.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowDepreciation.Size = new System.Drawing.Size(253, 22);
             this.menuItemShowDepreciation.Text = "Show &Depreciation";
             this.menuItemShowDepreciation.Click += new System.EventHandler(this.OnShowHideDepreciation);
             // 
@@ -438,7 +441,7 @@ namespace ObjectRelocator
             // 
             this.menuItemShowHoodView.CheckOnClick = true;
             this.menuItemShowHoodView.Name = "menuItemShowHoodView";
-            this.menuItemShowHoodView.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowHoodView.Size = new System.Drawing.Size(253, 22);
             this.menuItemShowHoodView.Text = "Show &Hood View";
             this.menuItemShowHoodView.Click += new System.EventHandler(this.OnShowHideHoodView);
             // 
@@ -446,7 +449,7 @@ namespace ObjectRelocator
             // 
             this.menuItemShowShowInCatalog.CheckOnClick = true;
             this.menuItemShowShowInCatalog.Name = "menuItemShowShowInCatalog";
-            this.menuItemShowShowInCatalog.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowShowInCatalog.Size = new System.Drawing.Size(253, 22);
             this.menuItemShowShowInCatalog.Text = "Show In &Catalog";
             this.menuItemShowShowInCatalog.Click += new System.EventHandler(this.OnShowHideShowInCatalog);
             // 
@@ -454,34 +457,34 @@ namespace ObjectRelocator
             // 
             this.menuItemShowNoDuplicate.CheckOnClick = true;
             this.menuItemShowNoDuplicate.Name = "menuItemShowNoDuplicate";
-            this.menuItemShowNoDuplicate.Size = new System.Drawing.Size(243, 22);
+            this.menuItemShowNoDuplicate.Size = new System.Drawing.Size(253, 22);
             this.menuItemShowNoDuplicate.Text = "Show No D&uplicate";
             this.menuItemShowNoDuplicate.Click += new System.EventHandler(this.OnShowHideNoDuplicate);
             // 
             // menuItemSeparator3
             // 
             this.menuItemSeparator3.Name = "menuItemSeparator3";
-            this.menuItemSeparator3.Size = new System.Drawing.Size(240, 6);
+            this.menuItemSeparator3.Size = new System.Drawing.Size(250, 6);
             // 
             // menuItemExcludeHidden
             // 
             this.menuItemExcludeHidden.CheckOnClick = true;
             this.menuItemExcludeHidden.Name = "menuItemExcludeHidden";
-            this.menuItemExcludeHidden.Size = new System.Drawing.Size(243, 22);
+            this.menuItemExcludeHidden.Size = new System.Drawing.Size(253, 22);
             this.menuItemExcludeHidden.Text = "E&xclude Hidden";
             this.menuItemExcludeHidden.Click += new System.EventHandler(this.OnExcludeHidden);
             // 
             // menuItemSeparator4
             // 
             this.menuItemSeparator4.Name = "menuItemSeparator4";
-            this.menuItemSeparator4.Size = new System.Drawing.Size(240, 6);
+            this.menuItemSeparator4.Size = new System.Drawing.Size(250, 6);
             // 
             // menuItemHideLocals
             // 
             this.menuItemHideLocals.CheckOnClick = true;
             this.menuItemHideLocals.Name = "menuItemHideLocals";
             this.menuItemHideLocals.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-            this.menuItemHideLocals.Size = new System.Drawing.Size(243, 22);
+            this.menuItemHideLocals.Size = new System.Drawing.Size(253, 22);
             this.menuItemHideLocals.Text = "Hide &Local Objects";
             this.menuItemHideLocals.Click += new System.EventHandler(this.OnHideLocalsClicked);
             // 
@@ -490,33 +493,40 @@ namespace ObjectRelocator
             this.menuItemHideNonLocals.CheckOnClick = true;
             this.menuItemHideNonLocals.Name = "menuItemHideNonLocals";
             this.menuItemHideNonLocals.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
-            this.menuItemHideNonLocals.Size = new System.Drawing.Size(243, 22);
+            this.menuItemHideNonLocals.Size = new System.Drawing.Size(253, 22);
             this.menuItemHideNonLocals.Text = "Hide Non-Local Objects";
             this.menuItemHideNonLocals.Click += new System.EventHandler(this.OnHideNonLocalsClicked);
             // 
             // menuItemSeparatorModels
             // 
             this.menuItemSeparatorModels.Name = "menuItemSeparatorModels";
-            this.menuItemSeparatorModels.Size = new System.Drawing.Size(240, 6);
+            this.menuItemSeparatorModels.Size = new System.Drawing.Size(250, 6);
             // 
             // menuItemModifyAllModels
             // 
             this.menuItemModifyAllModels.Name = "menuItemModifyAllModels";
-            this.menuItemModifyAllModels.Size = new System.Drawing.Size(243, 22);
+            this.menuItemModifyAllModels.Size = new System.Drawing.Size(253, 22);
             this.menuItemModifyAllModels.Text = "Modify All Models (CRES/SHPE)";
             this.menuItemModifyAllModels.Click += new System.EventHandler(this.OnModifyAllModelsClicked);
             // 
             // menuItemSeparatorFilters
             // 
             this.menuItemSeparatorFilters.Name = "menuItemSeparatorFilters";
-            this.menuItemSeparatorFilters.Size = new System.Drawing.Size(240, 6);
+            this.menuItemSeparatorFilters.Size = new System.Drawing.Size(250, 6);
             // 
             // menuItemDisableBuildModeSortFilters
             // 
             this.menuItemDisableBuildModeSortFilters.Name = "menuItemDisableBuildModeSortFilters";
-            this.menuItemDisableBuildModeSortFilters.Size = new System.Drawing.Size(243, 22);
+            this.menuItemDisableBuildModeSortFilters.Size = new System.Drawing.Size(253, 22);
             this.menuItemDisableBuildModeSortFilters.Text = "Disable Build Mode Sort Filters";
             this.menuItemDisableBuildModeSortFilters.Click += new System.EventHandler(this.OnDisableBuildModeSortFiltersClicked);
+            // 
+            // menuItemIncludeSpecialObjects
+            // 
+            this.menuItemIncludeSpecialObjects.Name = "menuItemIncludeSpecialObjects";
+            this.menuItemIncludeSpecialObjects.Size = new System.Drawing.Size(253, 22);
+            this.menuItemIncludeSpecialObjects.Text = "Include Buy Mode Special Objects";
+            this.menuItemIncludeSpecialObjects.Click += new System.EventHandler(this.OnIncludeSpecialObjectsClicked);
             // 
             // gridViewResources
             // 
@@ -1685,6 +1695,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuItemModifyAllModels;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparatorModels;
         private System.Windows.Forms.ToolStripMenuItem menuItemDisableBuildModeSortFilters;
+        private System.Windows.Forms.ToolStripMenuItem menuItemIncludeSpecialObjects;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextEditTitleDesc;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemSaveAll;

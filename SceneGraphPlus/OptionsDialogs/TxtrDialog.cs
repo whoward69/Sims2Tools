@@ -1,14 +1,12 @@
 ﻿/*
  * SceneGraph Plus - a utility for repairing scene graphs
  *
- * William Howard - 2020-2025
+ * William Howard - 2020-2026
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using SceneGraphPlus.OptionsDialogs;
 using SceneGraphPlus.OptionsDialogs.Helpers;
-using Sims2Tools;
 using Sims2Tools.DBPF.Images;
 using Sims2Tools.DBPF.SceneGraph.LIFO;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
@@ -16,7 +14,6 @@ using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DbpfCache;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;

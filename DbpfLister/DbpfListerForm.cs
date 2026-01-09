@@ -1,4 +1,12 @@
-﻿using Sims2Tools;
+﻿/*
+ * DBPF Lister - a utility for testing the DBPF Library
+ *
+ * William Howard - 2020-2026
+ *
+ * Permission granted to use this code in any way, except to claim it as your own or sell it
+ */
+
+using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.Cigen;
@@ -12,7 +20,6 @@ using Sims2Tools.DBPF.Images;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.OBJD;
-using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.AGED;
 using Sims2Tools.DBPF.SceneGraph.BINX;
@@ -26,6 +33,7 @@ using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
+using Sims2Tools.DBPF.Sounds;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
@@ -44,6 +52,7 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace DbpfLister
 {
@@ -76,7 +85,9 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
-            FindFwavRefs("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+            FindSounds("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // FindFwavRefs("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
             // ProcessObjdEpFlags("C:\\Users\\whowa\\Documents\\EA Games\\The Sims™ 2 Ultimate Collection\\Downloads");
 
@@ -187,6 +198,82 @@ namespace DbpfLister
         private void OnCopyClicked(object sender, EventArgs e)
         {
             Clipboard.SetText(textMessages.Text);
+        }
+
+        private void FindSounds(string baseFolder)
+        {
+            Dictionary<DBPFKey, List<string>> soundsByKey = new Dictionary<DBPFKey, List<string>>();
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        string relPath = packagePath.Substring(baseFolder.Length + 1);
+
+                        textMessages.AppendText($"{relPath}\r\n");
+
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Audio.TYPE))
+                        {
+                            if (!soundsByKey.ContainsKey(entry))
+                            {
+                                List<string> paths = new List<string>();
+
+                                Audio audio = (Audio)package.GetResourceByEntry(entry);
+
+                                if (audio.IsINI)
+                                {
+                                    paths.Add("INI");
+                                }
+                                else if (audio.IsSPX)
+                                {
+                                    paths.Add("SPX");
+                                }
+                                else if (audio.IsXA)
+                                {
+                                    paths.Add("XA");
+                                }
+                                else
+                                {
+                                    paths.Add("MP3");
+                                }
+
+                                soundsByKey.Add(entry, paths);
+                            }
+
+                            soundsByKey[entry].Add(relPath);
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+
+            using (StreamWriter writer = new StreamWriter($"C:/Users/whowa/Desktop/Sims2Sounds.csv"))
+            {
+                writer.WriteLine("Group ID,Resource ID,Instance ID,Format,Path(s)");
+
+
+                foreach (DBPFKey key in soundsByKey.Keys)
+                {
+                    writer.Write($"{key.GroupID},{key.ResourceID},{key.InstanceID}");
+
+                    foreach (string s in soundsByKey[key])
+                    {
+                        writer.Write($",{s}");
+                    }
+
+                    writer.WriteLine();
+                }
+
+                writer.Close();
+            }
+
         }
 
         private void FindFwavRefs(string baseFolder)

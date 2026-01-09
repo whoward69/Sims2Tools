@@ -1,7 +1,7 @@
 ﻿/*
  * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
- * William Howard - 2020-2025
+ * William Howard - 2020-2026
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
@@ -13,7 +13,7 @@ namespace Sims2Tools
 {
     public class Sims2ToolsLib
     {
-        public static string Copyright = "CopyRight (c) 2020-2025 - William Howard";
+        public static string Copyright = "CopyRight (c) 2020-2026 - William Howard";
 
         public static string RegistryKey = @"WHoward\Sims2Tools";
         private static readonly string Sims2PathKey = "Sims2Path"; // This is the path to the directory containing the TSBin sub-directory that contains the executable used to start the game.
