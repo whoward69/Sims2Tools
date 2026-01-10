@@ -31,6 +31,7 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 #endregion
 
@@ -1467,6 +1468,8 @@ namespace ObjectRelocator
                     row.Cells["colTitle"].Value = selectedObject.Title;
                     row.Cells["colDescription"].Value = selectedObject.Description;
 
+                    row.Cells["colName"].Value = selectedObject.KeyName;
+
                     row.Cells["colRooms"].Value = BuildRoomsString(selectedObject);
                     row.Cells["colFunction"].Value = BuildFunctionString(selectedObject);
                     row.Cells["colCommunity"].Value = BuildCommunityString(selectedObject);
@@ -2688,6 +2691,7 @@ namespace ObjectRelocator
                     {
                         ObjectDbpfData objectData = mouseRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
+                        menuItemContextEditName.Enabled = true;
                         menuItemContextEditTitleDesc.Enabled = objectData.HasTitleAndDescription;
 
                         Image thumbnail = thumbCache.GetThumbnail(packageCache, objectData, IsBuyMode);
@@ -2696,7 +2700,8 @@ namespace ObjectRelocator
                     }
                     else
                     {
-                        menuItemContextEditTitleDesc.Enabled = false;
+                        menuItemContextEditName.Enabled = true;
+                        menuItemContextEditTitleDesc.Enabled = true;
 
                         menuContextSaveThumb.Enabled = menuContextReplaceThumb.Enabled = menuContextDeleteThumb.Enabled = false;
                     }
@@ -2727,23 +2732,119 @@ namespace ObjectRelocator
             }
         }
 
+        private string lastSearch = "";
+        private string lastReplace = "";
+        private RegexOptions lastOptions = RegexOptions.None;
+
+        private void OnEditNameClicked(object sender, EventArgs e)
+        {
+            if (gridViewResources.SelectedRows.Count == 0) return;
+
+            if (gridViewResources.SelectedRows.Count == 1)
+            {
+                DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+                ObjectDbpfData selectedObject = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                TextEntryDialog dialog = new TextEntryDialog("Change OBJD Name", "Name:", selectedObject.KeyName);
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    selectedObject.KeyName = dialog.TextEntry;
+
+                    UpdateGridRow(selectedObject);
+
+                    ReselectRows(new List<ObjectDbpfData>(1) { selectedObject });
+                }
+            }
+            else
+            {
+                SearchReplaceDialog dialog = new SearchReplaceDialog("Change OBJD Names", lastSearch, lastReplace, lastOptions);
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+                    foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+                    {
+                        selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
+                    }
+
+                    foreach (ObjectDbpfData selectedObject in selectedData)
+                    {
+                        if (Regex.IsMatch(selectedObject.KeyName, lastSearch, lastOptions))
+                        {
+                            selectedObject.KeyName = Regex.Replace(selectedObject.KeyName, lastSearch, lastReplace, lastOptions);
+
+                            UpdateGridRow(selectedObject);
+                        }
+                    }
+
+                    ReselectRows(selectedData);
+                }
+            }
+        }
+
         private void OnEditTitleDescClicked(object sender, EventArgs e)
         {
-            if (gridViewResources.SelectedRows.Count > 1) return;
+            if (gridViewResources.SelectedRows.Count == 0) return;
 
-            DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
-            ObjectDbpfData selectedObject = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
-
-            TitleAndDescEntryDialog dialog = new TitleAndDescEntryDialog(selectedObject.Title, selectedObject.Description);
-
-            if (dialog.ShowDialog() == DialogResult.OK)
+            if (gridViewResources.SelectedRows.Count == 1)
             {
-                selectedObject.SetStrItem("Title", dialog.Title);
-                selectedObject.SetStrItem("Description", dialog.Description);
+                DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+                ObjectDbpfData selectedObject = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
-                UpdateGridRow(selectedObject);
+                TitleAndDescEntryDialog dialog = new TitleAndDescEntryDialog(selectedObject.Title, selectedObject.Description);
 
-                ReselectRows(new List<ObjectDbpfData>(1) { selectedObject });
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    selectedObject.SetStrItem("Title", dialog.Title);
+                    selectedObject.SetStrItem("Description", dialog.Description);
+
+                    UpdateGridRow(selectedObject);
+
+                    ReselectRows(new List<ObjectDbpfData>(1) { selectedObject });
+                }
+            }
+            else
+            {
+                SearchReplaceDialog dialog = new SearchReplaceDialog("Change Catalogue Entry", lastSearch, lastReplace, lastOptions);
+
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    lastSearch = dialog.TextSearch;
+                    lastReplace = dialog.TextReplace;
+                    lastOptions = dialog.RegexOptions;
+
+                    List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+                    foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+                    {
+                        selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
+                    }
+
+                    foreach (ObjectDbpfData selectedObject in selectedData)
+                    {
+                        bool updated = false;
+
+                        if (Regex.IsMatch(selectedObject.Title, lastSearch, lastOptions))
+                        {
+                            selectedObject.SetStrItem("Title", Regex.Replace(selectedObject.Title, lastSearch, lastReplace, lastOptions));
+
+                            updated = true;
+                        }
+
+                        if (Regex.IsMatch(selectedObject.Description, lastSearch, lastOptions))
+                        {
+                            selectedObject.SetStrItem("Description", Regex.Replace(selectedObject.Description, lastSearch, lastReplace, lastOptions));
+
+                            updated = true;
+                        }
+
+                        if (updated) UpdateGridRow(selectedObject);
+                    }
+
+                    ReselectRows(selectedData);
+                }
             }
         }
 

@@ -131,6 +131,12 @@
     <Compile Include="Dialogs\TextEntryDialog.Designer.cs">
       <DependentUpon>TextEntryDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\SearchReplaceDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\SearchReplaceDialog.Designer.cs">
+      <DependentUpon>SearchReplaceDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Exporter\Exporter.cs" />
     <Compile Include="Exporter\IExporter.cs" />
     <Compile Include="Exporter\Extractor.cs" />
@@ -199,6 +205,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TextEntryDialog.resx">
       <DependentUpon>TextEntryDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SearchReplaceDialog.resx">
+      <DependentUpon>SearchReplaceDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\ThumbnailWarningDialog.resx">
       <DependentUpon>ThumbnailWarningDialog.cs</DependentUpon>

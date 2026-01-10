@@ -101,6 +101,7 @@ namespace ObjectRelocator
             this.colShowInCatalog = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colObjectData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextObjects = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuItemContextEditName = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemContextEditTitleDesc = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemContextStripCTSSCrap = new System.Windows.Forms.ToolStripMenuItem();
@@ -736,6 +737,7 @@ namespace ObjectRelocator
             // menuContextObjects
             // 
             this.menuContextObjects.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemContextEditName,
             this.menuItemContextEditTitleDesc,
             this.toolStripSeparator3,
             this.menuItemContextStripCTSSCrap,
@@ -758,10 +760,19 @@ namespace ObjectRelocator
             this.menuContextObjects.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             this.menuContextObjects.Opened += new System.EventHandler(this.OnContextMenuOpened);
             // 
+            // menuItemContextEditName
+            // 
+            this.menuItemContextEditName.Name = "menuItemContextEditName";
+            this.menuItemContextEditName.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.N)));
+            this.menuItemContextEditName.Size = new System.Drawing.Size(300, 22);
+            this.menuItemContextEditName.Text = "Change &OBJD Name";
+            this.menuItemContextEditName.Click += new System.EventHandler(this.OnEditNameClicked);
+            // 
             // menuItemContextEditTitleDesc
             // 
             this.menuItemContextEditTitleDesc.Name = "menuItemContextEditTitleDesc";
-            this.menuItemContextEditTitleDesc.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            this.menuItemContextEditTitleDesc.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
             | System.Windows.Forms.Keys.R)));
             this.menuItemContextEditTitleDesc.Size = new System.Drawing.Size(300, 22);
             this.menuItemContextEditTitleDesc.Text = "&Change Title and Description";
@@ -1696,6 +1707,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripSeparator menuItemSeparatorModels;
         private System.Windows.Forms.ToolStripMenuItem menuItemDisableBuildModeSortFilters;
         private System.Windows.Forms.ToolStripMenuItem menuItemIncludeSpecialObjects;
+        private System.Windows.Forms.ToolStripMenuItem menuItemContextEditName;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextEditTitleDesc;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemSaveAll;

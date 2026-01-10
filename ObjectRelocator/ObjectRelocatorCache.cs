@@ -157,7 +157,15 @@ namespace ObjectRelocator
 
         public TypeGroupID GroupID => res.GroupID;
 
-        public string KeyName => res.KeyName;
+        public string KeyName
+        {
+            get => res.KeyName;
+            set
+            {
+                res.SetKeyName(value);
+                UpdatePackage();
+            }
+        }
 
         public string Guid => (IsObjd) ? (res as Objd).Guid.ToString() : (IsCpf ? Helper.Hex8PrefixString(GetUIntItem("guid")) : "");
 
@@ -638,17 +646,11 @@ namespace ObjectRelocator
 
         public void Close()
         {
-            if (thumbCacheBuyMode != null)
-            {
-                thumbCacheBuyMode.Close();
-                thumbCacheBuyMode = null;
-            }
+            thumbCacheBuyMode?.Close();
+            thumbCacheBuyMode = null;
 
-            if (thumbCacheBuildMode != null)
-            {
-                thumbCacheBuildMode.Close();
-                thumbCacheBuildMode = null;
-            }
+            thumbCacheBuildMode?.Close();
+            thumbCacheBuildMode = null;
         }
 
         public Image GetThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode)

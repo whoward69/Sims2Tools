@@ -60,7 +60,7 @@ namespace Sims2Tools.DBPF.NREF
         {
             if (item.Equals("filename"))
             {
-                this._keyName = sv;
+                SetKeyName(item);
                 return true;
             }
 
