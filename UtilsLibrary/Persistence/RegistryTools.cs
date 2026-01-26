@@ -68,6 +68,19 @@ namespace Sims2Tools.Utils.Persistence
 
         public delegate void VersionChangeCallback(int prevVersionMajor, int prevVersionMinor);
 
+        public static void RemoveAppSettings(string AppRegKey)
+        {
+            RegistryKey reg_key = Registry.CurrentUser.OpenSubKey("Software", true);
+
+            try
+            {
+                reg_key.DeleteSubKeyTree(AppRegKey);
+            }
+            catch
+            {
+            }
+        }
+
         public static void LoadAppSettings(string AppRegKey, int versionMajor, int versionMinor, VersionChangeCallback versionChange = null)
         {
             int verMajor = (int)GetSetting(AppRegKey, "VersionMajor", 0);

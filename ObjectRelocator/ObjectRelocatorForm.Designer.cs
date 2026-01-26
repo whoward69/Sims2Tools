@@ -1195,6 +1195,7 @@ namespace ObjectRelocator
             this.ckbBuyNoDuplicate.TabIndex = 5;
             this.ckbBuyNoDuplicate.Text = "No Duplicate";
             this.ckbBuyNoDuplicate.UseVisualStyleBackColor = true;
+            this.ckbBuyNoDuplicate.Click += new System.EventHandler(this.OnBuyNoDuplicateClicked);
             // 
             // grpCommunity
             // 
