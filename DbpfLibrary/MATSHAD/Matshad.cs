@@ -10,28 +10,25 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
-using System.Xml;
+using Sims2Tools.DBPF.TXT;
 
-namespace Sims2Tools.DBPF.Neighbourhood.XNGB
+namespace Sims2Tools.DBPF.MATSHAD
 {
-    public class Xngb : Cpf
+    public class Matshad : Txt
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
-        public static readonly TypeTypeID TYPE = (TypeTypeID)0x6D619378;
-        public const string NAME = "XNGB";
+        public static readonly TypeTypeID TYPE = (TypeTypeID)0xCD7FE87A;
+        public const string NAME = "MATSHAD";
 
-        public Xngb(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
+        public Matshad(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
+            Unserialize();
         }
 
-        public bool IsEffects => "effects".Equals(GetItem("sort")?.StringValue);
-
-        public override XmlElement AddXml(XmlElement parent)
+        protected void Unserialize()
         {
-            return AddXml(parent, NAME);
         }
     }
 }

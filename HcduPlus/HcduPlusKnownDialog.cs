@@ -19,16 +19,16 @@ namespace HcduPlus
 {
     public partial class HcduPlusKnownDialog : Form
     {
-        private readonly KnownConflicts data;
+        private readonly KnownConflicts knownConflicts;
 
         public HcduPlusKnownDialog()
         {
             InitializeComponent();
         }
 
-        public HcduPlusKnownDialog(KnownConflicts data) : this()
+        public HcduPlusKnownDialog(KnownConflicts knownConflicts) : this()
         {
-            gridKnownConflicts.DataSource = this.data = data;
+            gridKnownConflicts.DataSource = this.knownConflicts = knownConflicts;
         }
 
         private void OnRowValidating(object sender, DataGridViewCellCancelEventArgs e)
@@ -66,12 +66,12 @@ namespace HcduPlus
 
         private void OnOkClicked(object sender, EventArgs e)
         {
-            data.CommitEdits();
+            knownConflicts.CommitEdits();
         }
 
         private void OnResetClicked(object sender, EventArgs e)
         {
-            data.ResetRegexs();
+            knownConflicts.ResetRegexs();
         }
 
         private DataGridViewCellEventArgs mouseLocation = null;
@@ -121,14 +121,30 @@ namespace HcduPlus
 
         private void OnPasteKnownConflictClicked(object sender, EventArgs e)
         {
-            data.Paste();
+            knownConflicts.Paste();
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.V && e.Control)
             {
-                data.Paste();
+                knownConflicts.Paste();
+            }
+        }
+
+        private void OnImportClicked(object sender, EventArgs e)
+        {
+            if (importFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                knownConflicts.LoadXml(importFileDialog.FileName);
+            }
+        }
+
+        private void OnExportClicked(object sender, EventArgs e)
+        {
+            if (exportFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                knownConflicts.SaveXml(exportFileDialog.FileName);
             }
         }
     }

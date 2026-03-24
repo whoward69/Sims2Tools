@@ -91,6 +91,7 @@
     <Compile Include="Images\DdsLoader.cs" />
     <Compile Include="IO\TempFiles.cs" />
     <Compile Include="Logger\DBPFLogger.cs" />
+    <Compile Include="MATSHAD\Matshad.cs" />
     <Compile Include="Neighbourhood\XNGB\Xngb.cs" />
     <Compile Include="SceneGraph\AGED\Aged.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\MipMap.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="TTAB\Ttab.cs" />
     <Compile Include="TTAB\TtabMotives.cs" />
     <Compile Include="TTAB\TtabItem.cs" />
+    <Compile Include="TXT\Txt.cs" />
     <Compile Include="UI\Ui.cs" />
     <Compile Include="Utils\Decompressor.cs" />
     <Compile Include="IO\DbpfReader.cs" />

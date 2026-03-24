@@ -12,14 +12,14 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.TXT;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Xml;
 
 namespace Sims2Tools.DBPF.UI
 {
-    public class Ui : DBPFResource
+    public class Ui : Txt
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x00000000;
@@ -29,39 +29,24 @@ namespace Sims2Tools.DBPF.UI
 
         public ReadOnlyCollection<string> Lines => lines.AsReadOnly();
 
-        public Ui(DBPFEntry entry, DbpfReader reader) : base(entry)
+        public Ui(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
-            Unserialize(reader, (int)entry.DataSize);
+            Unserialize();
         }
 
-        protected void Unserialize(DbpfReader reader, int len)
+        protected void Unserialize()
         {
-            using (MemoryStream ms = new MemoryStream(reader.ReadBytes(len)))
+            using (StringReader strr = new StringReader(Text.Replace("& ", "&amp; ")))
             {
-                using (StreamReader sr = new StreamReader(ms))
+                string line;
+
+                while ((line = strr.ReadLine()) != null)
                 {
-                    using (StringReader strr = new StringReader(sr.ReadToEnd().Replace("& ", "&amp; ")))
-                    {
-                        string line;
-
-                        while ((line = strr.ReadLine()) != null)
-                        {
-                            lines.Add(line);
-                        }
-
-                        strr.Close();
-                    }
-
-                    sr.Close();
+                    lines.Add(line);
                 }
 
-                ms.Close();
+                strr.Close();
             }
-        }
-
-        public override XmlElement AddXml(XmlElement parent)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

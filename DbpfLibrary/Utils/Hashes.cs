@@ -11,6 +11,9 @@
  */
 
 using Classless.Hasher;
+using Sims2Tools.DBPF.CPF;
+using Sims2Tools.DBPF.Images.JPG;
+using Sims2Tools.DBPF.SceneGraph.XHTN;
 using System;
 using System.Text;
 
@@ -94,32 +97,39 @@ namespace Sims2Tools.DBPF.Utils
             return ToUInt(crc32.ComputeHash(Encoding.ASCII.GetBytes(texturename.Trim().ToLower())));
         }
 
-        public static uint CasThumbnailHash(DBPFKey ownerKey)
+        public static DBPFKey CasThumbnailHash(Cpf ownerCpf)
         {
-            // TODO - DBPF Library - CASThumbnails hash - wtf is the hash???
-            string name;
-            uint hash;
+            uint genderCode = ownerCpf.Gender;
+            string gender = "";
 
-            // This is NOT a hash of TGI, TIG, GTI, GIT, ITG or IGT
-            // This is NOT a hash of GRI, GIR, RGI, RIG, IGR or IRG
-            // This is NOT a hash of IG or GI
+            if ((genderCode & 0x01) == 0x01) gender += "female";
+            if ((genderCode & 0x02) == 0x02) gender += "male";
 
-            // Changing these is KNOWN to change the hash values
-            //   Instance
-            //   Group
+            uint ageCode = ownerCpf.Age;
+            string age = "";
 
-            // Changing these is KNOWN NOT to change the hash value
-            //   GZPS name
+            if ((ageCode & 0x20) == 0x20) age += "baby";
+            if ((ageCode & 0x01) == 0x01) age += "toddler";
+            if ((ageCode & 0x02) == 0x02) age += "child";
+            if ((ageCode & 0x04) == 0x04) age += "teen";
+            if ((ageCode & 0x40) == 0x40) age += "youngadult";
+            if ((ageCode & 0x08) == 0x08) age += "adult";
+            if ((ageCode & 0x10) == 0x10) age += "elder";
 
-            // Suspicions
-            //   THINK that type affects the hash value as CASThumbnails includes thumbnails for
-            //     clothing, hair, glasses, facepaints, eyebrows
+            Int32 t = (Int32)ownerCpf.TypeID.AsUInt();
+            Int32 g = (Int32)ownerCpf.GroupID.AsUInt();
+            Int32 i = (Int32)ownerCpf.InstanceID.AsUInt();
 
-            name = "CASThumbnail" + ownerKey.TypeID.AsUInt().ToString() + ownerKey.GroupID.AsUInt().ToString() + ownerKey.InstanceID.AsUInt().ToString();
-            hash = ToUInt(crc32.ComputeHash(Helper.ToBytes(name.Trim().ToLower(), 0)));
-            logger.Info($"TGI: {Helper.Hex8PrefixString(hash)} - {name}");
+            string hashMagic = $"{age}{gender}_{g}-{t}-{i}";
 
-            return hash;
+            if (ownerCpf is Xhtn)
+            {
+                hashMagic += $"_{ownerCpf.GetItem("hairtone").StringValue}";
+            }
+
+            uint hashInstance = ToUInt(crc32.ComputeHash(Helper.ToBytes(hashMagic.Trim().ToLower(), 0)));
+
+            return new DBPFKey(Jpg.TYPES[(int)Jpg.JpgTypeIndex.CasThumbnail], DBPFData.GROUP_LOCAL, (TypeInstanceID)hashInstance, (TypeResourceID)ownerCpf.InstanceID.AsUInt());
         }
 
         public static string StripHashFromName(string filename)

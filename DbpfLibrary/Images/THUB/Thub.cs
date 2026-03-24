@@ -18,10 +18,8 @@ namespace Sims2Tools.DBPF.Images.THUB
 {
     public class Thub : Img
     {
-
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         // What about other image types (see link above)
-        //   0x4D533EDD (THUB for XNGB in CANHObjectsThumbnails)
 
         public static readonly TypeTypeID[] TYPES = new TypeTypeID[]
         {
@@ -36,7 +34,8 @@ namespace Sims2Tools.DBPF.Images.THUB
             (TypeTypeID) 0xCC44B5EC, // modular stair
             (TypeTypeID) 0xCC489E46, // roof
             (TypeTypeID) 0xEC3126C4, // terrain
-            (TypeTypeID) 0x8C31125E  // wall
+            (TypeTypeID) 0x8C31125E, // wall
+            (TypeTypeID) 0x4D533EDD  // hood deco
         };
 
         public enum ThubTypeIndex
@@ -52,10 +51,10 @@ namespace Sims2Tools.DBPF.Images.THUB
             ModularStair,
             Roof,
             Terrain,
-            Wall
+            Wall,
+            HoodDeco
         }
 
-        // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public new static readonly TypeTypeID TYPE = TYPES[(int)ThubTypeIndex.Object];
         public new const string NAME = "THUB";
 

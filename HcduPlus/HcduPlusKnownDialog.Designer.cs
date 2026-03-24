@@ -46,11 +46,15 @@ namespace HcduPlus
             this.colLoadsLater = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuConflictGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemRemove = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemPaste = new System.Windows.Forms.ToolStripMenuItem();
             this.btnKnownCancel = new System.Windows.Forms.Button();
             this.btnKnownOk = new System.Windows.Forms.Button();
             this.btnReset = new System.Windows.Forms.Button();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemPaste = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnImport = new System.Windows.Forms.Button();
+            this.btnExport = new System.Windows.Forms.Button();
+            this.importFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.exportFileDialog = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.gridKnownConflicts)).BeginInit();
             this.menuConflictGrid.SuspendLayout();
             this.SuspendLayout();
@@ -99,16 +103,29 @@ namespace HcduPlus
             this.toolStripSeparator1,
             this.menuItemPaste});
             this.menuConflictGrid.Name = "menuConflictGrid";
-            this.menuConflictGrid.Size = new System.Drawing.Size(181, 76);
+            this.menuConflictGrid.Size = new System.Drawing.Size(144, 54);
             this.menuConflictGrid.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnConflictMenuClosing);
             this.menuConflictGrid.Opening += new System.ComponentModel.CancelEventHandler(this.OnConflictMenuOpening);
             // 
             // menuItemRemove
             // 
             this.menuItemRemove.Name = "menuItemRemove";
-            this.menuItemRemove.Size = new System.Drawing.Size(180, 22);
+            this.menuItemRemove.Size = new System.Drawing.Size(143, 22);
             this.menuItemRemove.Text = "Remove";
             this.menuItemRemove.Click += new System.EventHandler(this.OnRemoveKnownConflictClicked);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(140, 6);
+            // 
+            // menuItemPaste
+            // 
+            this.menuItemPaste.Name = "menuItemPaste";
+            this.menuItemPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
+            this.menuItemPaste.Size = new System.Drawing.Size(143, 22);
+            this.menuItemPaste.Text = "Paste";
+            this.menuItemPaste.Click += new System.EventHandler(this.OnPasteKnownConflictClicked);
             // 
             // btnKnownCancel
             // 
@@ -138,28 +155,51 @@ namespace HcduPlus
             // 
             // btnReset
             // 
-            this.btnReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnReset.Location = new System.Drawing.Point(12, 309);
             this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(143, 30);
+            this.btnReset.Size = new System.Drawing.Size(80, 30);
             this.btnReset.TabIndex = 3;
             this.btnReset.Text = "&Reset";
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.OnResetClicked);
             // 
-            // toolStripSeparator1
+            // btnImport
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.btnImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnImport.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnImport.Location = new System.Drawing.Point(98, 309);
+            this.btnImport.Name = "btnImport";
+            this.btnImport.Size = new System.Drawing.Size(80, 30);
+            this.btnImport.TabIndex = 4;
+            this.btnImport.Text = "&Import";
+            this.btnImport.UseVisualStyleBackColor = true;
+            this.btnImport.Click += new System.EventHandler(this.OnImportClicked);
             // 
-            // menuItemPaste
+            // btnExport
             // 
-            this.menuItemPaste.Name = "menuItemPaste";
-            this.menuItemPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.menuItemPaste.Size = new System.Drawing.Size(180, 22);
-            this.menuItemPaste.Text = "Paste";
-            this.menuItemPaste.Click += new System.EventHandler(this.OnPasteKnownConflictClicked);
+            this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnExport.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnExport.Location = new System.Drawing.Point(184, 309);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(80, 30);
+            this.btnExport.TabIndex = 5;
+            this.btnExport.Text = "&Export";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.OnExportClicked);
+            // 
+            // importFileDialog
+            // 
+            this.importFileDialog.DefaultExt = "xml";
+            this.importFileDialog.FileName = "MyKnownConflicts.xml";
+            this.importFileDialog.Filter = "XML files|*.xml|All files|*.*";
+            // 
+            // exportFileDialog
+            // 
+            this.exportFileDialog.DefaultExt = "xml";
+            this.exportFileDialog.FileName = "MyKnownConflicts.xml";
+            this.exportFileDialog.Filter = "XML files|*.xml|All files|*.*";
             // 
             // HcduPlusKnownDialog
             // 
@@ -167,6 +207,8 @@ namespace HcduPlus
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnKnownCancel;
             this.ClientSize = new System.Drawing.Size(675, 347);
+            this.Controls.Add(this.btnExport);
+            this.Controls.Add(this.btnImport);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.btnKnownOk);
             this.Controls.Add(this.btnKnownCancel);
@@ -194,5 +236,9 @@ namespace HcduPlus
         private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsLater;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemPaste;
+        private System.Windows.Forms.Button btnImport;
+        private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.OpenFileDialog importFileDialog;
+        private System.Windows.Forms.SaveFileDialog exportFileDialog;
     }
 }

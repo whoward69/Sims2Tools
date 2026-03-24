@@ -19,11 +19,16 @@ using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.Images.IMG;
+using Sims2Tools.DBPF.MATSHAD;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.COLL;
+using Sims2Tools.DBPF.SceneGraph.CRES;
+using Sims2Tools.DBPF.SceneGraph.GMDC;
+using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
+using Sims2Tools.DBPF.SceneGraph.SHPE;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.SLOT;
@@ -70,6 +75,8 @@ namespace HcduPlus
         private readonly bool megaMindMode = false;
 
         private bool formUpdates = true;
+
+        private string currentPackagePath = null;
 
         private long countPackages = 0;
         private readonly Dictionary<TypeTypeID, long> countTypes = new Dictionary<TypeTypeID, long>();
@@ -437,16 +444,16 @@ namespace HcduPlus
                     try
 #endif
                     {
+                        currentPackagePath = files[fileIndex];
 #if DEBUG
-                        if (Debugger.IsAttached) logger.Debug($"Processing: {files[fileIndex]}");
+                        if (Debugger.IsAttached) logger.Debug($"Processing: {currentPackagePath}");
 #endif
-                        string packagePath = files[fileIndex];
-                        int pos = packagePath.IndexOf(".zip\\");
+                        int pos = currentPackagePath.IndexOf(".zip\\");
 
                         if (pos != -1)
                         {
-                            string zipFile = packagePath.Substring(0, pos + 4);
-                            string zipEntryName = packagePath.Substring(pos + 5);
+                            string zipFile = currentPackagePath.Substring(0, pos + 4);
+                            string zipEntryName = currentPackagePath.Substring(pos + 5);
 
                             using (ZipArchive zip = ZipFile.Open(zipFile, ZipArchiveMode.Read))
                             {
@@ -467,7 +474,7 @@ namespace HcduPlus
                         }
                         else
                         {
-                            using (DBPFFile package = new DBPFFile(files[fileIndex]))
+                            using (DBPFFile package = new DBPFFile(currentPackagePath))
                             {
                                 ProcessPackage(package, fileIndex, dataStore);
 
@@ -481,7 +488,7 @@ namespace HcduPlus
                         logger.Error(ex.Message);
                         logger.Info(ex.StackTrace);
 
-                        string partialPath = files[fileIndex].Substring(folder.Length + 1);
+                        string partialPath = currentPackagePath.Substring(folder.Length + 1);
                         int pos = partialPath.LastIndexOf(@"\");
 
                         string fileDetails;
@@ -592,7 +599,7 @@ namespace HcduPlus
                 logger.Error(e.Error.Message);
                 logger.Info(e.Error.StackTrace);
 
-                MsgBox.Show("An error occured while scanning", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show($"An error occured while scanning\n{currentPackagePath}\n\n{e.Error.Message}", "Error!", MessageBoxButtons.OK);
             }
             else
             {
@@ -703,6 +710,8 @@ namespace HcduPlus
                 menuItemGlob.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Glob.NAME, 1) != 0); OnGlobClicked(menuItemGlob, null);
                 menuItemGzps.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Gzps.NAME, 1) != 0); OnGzpsClicked(menuItemGzps, null);
                 menuItemImg.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Img.NAME, 1) != 0); OnImgClicked(menuItemImg, null);
+                menuItemMatshad.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Matshad.NAME, 0) != 0); OnMatshadClicked(menuItemMatshad, null);
+                menuItemMesh.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", "MESH", 0) != 0); OnMeshClicked(menuItemMesh, null);
                 menuItemObjd.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objd.NAME, 1) != 0); OnObjdClicked(menuItemObjd, null);
                 menuItemObjf.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Objf.NAME, 1) != 0); OnObjfClicked(menuItemObjf, null);
                 menuItemSlot.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Slot.NAME, 1) != 0); OnSlotClicked(menuItemSlot, null);
@@ -756,27 +765,34 @@ namespace HcduPlus
                 hcduWorker.CancelAsync();
             }
 
-            RegistryTools.SaveAppSettings(HcduPlusApp.RegistryKey, HcduPlusApp.AppVersionMajor, HcduPlusApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(HcduPlusApp.RegistryKey, this);
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey, textModsPath.Name, textModsPath.Text);
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey, textScanPath.Name, textScanPath.Text);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(HcduPlusApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(HcduPlusApp.RegistryKey, HcduPlusApp.AppVersionMajor, HcduPlusApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(HcduPlusApp.RegistryKey, this);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey, textModsPath.Name, textModsPath.Text);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey, textScanPath.Name, textScanPath.Text);
 
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemIncludeKnownConflicts.Name, menuItemIncludeKnownConflicts.Checked ? 1 : 0);
-            knownConflicts.SaveRegexs();
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemIncludeKnownConflicts.Name, menuItemIncludeKnownConflicts.Checked ? 1 : 0);
+                knownConflicts.SaveRegexs();
 
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, menuItemGuidConflicts.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemMaxisGuidConflicts.Name, menuItemMaxisGuidConflicts.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, menuItemInternalConflicts.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, menuItemHomeCrafterConflicts.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, menuItemStoreVersionConflicts.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemCastawaysConflicts.Name, menuItemCastawaysConflicts.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, menuItemGuidConflicts.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemMaxisGuidConflicts.Name, menuItemMaxisGuidConflicts.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, menuItemInternalConflicts.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, menuItemHomeCrafterConflicts.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, menuItemStoreVersionConflicts.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemCastawaysConflicts.Name, menuItemCastawaysConflicts.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", checkModsSavedSims.Name, checkModsSavedSims.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", checkScanSavedSims.Name, checkScanSavedSims.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", checkModsSavedSims.Name, checkModsSavedSims.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", checkScanSavedSims.Name, checkScanSavedSims.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionNoLoad.Name, menuItemOptionNoLoad.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionSgNames.Name, menuItemOptionSgNames.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionExpandZips.Name, menuItemOptionExpandZips.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionNoLoad.Name, menuItemOptionNoLoad.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionSgNames.Name, menuItemOptionSgNames.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionExpandZips.Name, menuItemOptionExpandZips.Checked ? 1 : 0);
+            }
         }
 
         private void OnSelectModsClicked(object sender, EventArgs e)
@@ -937,7 +953,7 @@ namespace HcduPlus
             text += $"Mods conflict report for '{scanPath}'";
 
             DateTime now = DateTime.Now;
-            text += $" at {now.ToShortDateString()} {now.ToShortTimeString()}";
+            text += $" at {now:d} {now:t}";
 
             foreach (ConflictPair cp in allCurrentConflicts)
             {
@@ -960,7 +976,7 @@ namespace HcduPlus
                 writer.Write($"Mods conflict report for '{scanPath}'");
 
                 DateTime now = DateTime.Now;
-                writer.WriteLine($" at {now.ToShortDateString()} {now.ToShortTimeString()}");
+                writer.WriteLine($" at {now:d} {now:t}");
 
                 foreach (ConflictPair cp in allCurrentConflicts)
                 {
@@ -987,6 +1003,8 @@ namespace HcduPlus
             if (!menuItemGlob.Checked) { menuItemGlob.Checked = true; OnGlobClicked(menuItemGlob, null); }
             if (!menuItemGzps.Checked) { menuItemGzps.Checked = true; OnGzpsClicked(menuItemGzps, null); }
             if (!menuItemImg.Checked) { menuItemImg.Checked = true; OnImgClicked(menuItemImg, null); }
+            if (!menuItemMatshad.Checked) { menuItemMatshad.Checked = true; OnMatshadClicked(menuItemMatshad, null); }
+            if (!menuItemMesh.Checked) { menuItemMesh.Checked = true; OnMeshClicked(menuItemMesh, null); }
             if (!menuItemObjd.Checked) { menuItemObjd.Checked = true; OnObjdClicked(menuItemObjd, null); }
             if (!menuItemObjf.Checked) { menuItemObjf.Checked = true; OnObjfClicked(menuItemObjf, null); }
             if (!menuItemSlot.Checked) { menuItemSlot.Checked = true; OnSlotClicked(menuItemSlot, null); }
@@ -1010,6 +1028,8 @@ namespace HcduPlus
             if (menuItemGlob.Checked) { menuItemGlob.Checked = false; OnGlobClicked(menuItemGlob, null); }
             if (menuItemGzps.Checked) { menuItemGzps.Checked = false; OnGzpsClicked(menuItemGzps, null); }
             if (menuItemImg.Checked) { menuItemImg.Checked = false; OnImgClicked(menuItemImg, null); }
+            if (menuItemMatshad.Checked) { menuItemMatshad.Checked = false; OnMatshadClicked(menuItemMatshad, null); }
+            if (menuItemMesh.Checked) { menuItemMesh.Checked = false; OnMeshClicked(menuItemMesh, null); }
             if (menuItemObjd.Checked) { menuItemObjd.Checked = false; OnObjdClicked(menuItemObjd, null); }
             if (menuItemObjf.Checked) { menuItemObjf.Checked = false; OnObjfClicked(menuItemObjf, null); }
             if (menuItemSlot.Checked) { menuItemSlot.Checked = false; OnSlotClicked(menuItemSlot, null); }
@@ -1106,6 +1126,40 @@ namespace HcduPlus
                 enabledResources.Remove(Img.TYPE);
 
             RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Img.NAME, enabled ? 1 : 0);
+        }
+
+        private void OnMatshadClicked(object sender, EventArgs e)
+        {
+            bool enabled = ((ToolStripMenuItem)sender).Checked;
+
+            if (enabled)
+                enabledResources.Add(Matshad.TYPE);
+            else
+                enabledResources.Remove(Matshad.TYPE);
+
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", Matshad.NAME, enabled ? 1 : 0);
+        }
+
+        private void OnMeshClicked(object sender, EventArgs e)
+        {
+            bool enabled = ((ToolStripMenuItem)sender).Checked;
+
+            if (enabled)
+            {
+                enabledResources.Add(Cres.TYPE);
+                enabledResources.Add(Shpe.TYPE);
+                enabledResources.Add(Gmnd.TYPE);
+                enabledResources.Add(Gmdc.TYPE);
+            }
+            else
+            {
+                enabledResources.Remove(Cres.TYPE);
+                enabledResources.Remove(Shpe.TYPE);
+                enabledResources.Remove(Gmnd.TYPE);
+                enabledResources.Remove(Gmdc.TYPE);
+            }
+
+            RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Resources", "MESH", enabled ? 1 : 0);
         }
 
         private void OnObjdClicked(object sender, EventArgs e)

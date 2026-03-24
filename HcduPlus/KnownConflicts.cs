@@ -14,9 +14,11 @@ using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace HcduPlus.Conflict
 {
@@ -135,7 +137,7 @@ namespace HcduPlus.Conflict
 
         public void ResetRegexs()
         {
-            LoadRegexs(-1);
+            LoadXml("Resources/XML/defaultconflicts.xml");
         }
 
         public void LoadRegexs()
@@ -145,15 +147,15 @@ namespace HcduPlus.Conflict
 
         private void LoadRegexs(int count)
         {
-            this.Clear();
-            reKnownConflicts.Clear();
-
             if (count == -1)
             {
-                ParseXml("Resources/XML/defaultconflicts.xml");
+                ResetRegexs();
             }
             else
             {
+                this.Clear();
+                reKnownConflicts.Clear();
+
                 for (int i = 0; i < count; i++)
                 {
                     if (RegistryTools.GetSetting(KnownRegistryKey, $"Earlier{i}", null) is string reA &&
@@ -192,11 +194,19 @@ namespace HcduPlus.Conflict
             }
         }
 
-        private void ParseXml(string xml)
+        public void LoadXml(string xmlFilePath)
+        {
+            this.Clear();
+            reKnownConflicts.Clear();
+
+            ParseXml(xmlFilePath);
+        }
+
+        private void ParseXml(string xmlFilePath)
         {
             try
             {
-                XmlReader reader = XmlReader.Create(xml);
+                XmlReader reader = XmlReader.Create(xmlFilePath);
 
                 string earlier = null;
                 string later = null;
@@ -229,6 +239,47 @@ namespace HcduPlus.Conflict
                 logger.Info(ex.StackTrace);
 
                 MsgBox.Show("An error occured while reading default conflicts", "Error!", MessageBoxButtons.OK);
+            }
+        }
+
+        public void SaveXml(string xmlFilePath)
+        {
+            using (StreamWriter writer = new StreamWriter(xmlFilePath))
+            {
+                XmlDocument doc = new XmlDocument();
+
+                XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+                XmlElement root = doc.DocumentElement;
+                doc.InsertBefore(xmlDeclaration, root);
+
+                DateTime now = DateTime.Now;
+                doc.AppendChild(doc.CreateComment($"{now:d} {now:t}"));
+
+                XmlElement eleConflicts = doc.CreateElement(string.Empty, "conflicts", string.Empty);
+                doc.AppendChild(eleConflicts);
+
+                foreach (ConflictRegexPair reKnown in reKnownConflicts)
+                {
+                    if (reKnown.IsValid)
+                    {
+                        XmlElement eleConflict = doc.CreateElement(string.Empty, "conflict", string.Empty);
+                        eleConflicts.AppendChild(eleConflict);
+
+                        XmlElement eleEarlier = doc.CreateElement(string.Empty, "earlier", string.Empty);
+                        XmlText eleEarlierText = doc.CreateTextNode(reKnown.RegexA.ToString());
+                        eleEarlier.AppendChild(eleEarlierText);
+                        eleConflict.AppendChild(eleEarlier);
+
+                        XmlElement eleLater = doc.CreateElement(string.Empty, "later", string.Empty);
+                        XmlText eleLaterText = doc.CreateTextNode(reKnown.RegexB.ToString());
+                        eleLater.AppendChild(eleLaterText);
+                        eleConflict.AppendChild(eleLater);
+                    }
+                }
+
+                writer.Write(XDocument.Parse(doc.OuterXml).ToString());
+
+                writer.Close();
             }
         }
     }

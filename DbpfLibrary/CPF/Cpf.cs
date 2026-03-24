@@ -25,7 +25,10 @@ namespace Sims2Tools.DBPF.CPF
 {
     public abstract class Cpf : DBPFResource, IDbpfScriptable, IDisposable
     {
-        private static readonly byte[] SIGNATURE = { 0xE0, 0x50, 0xE7, 0xCB, 0x02, 0x00 };
+        private static readonly byte[] SIGNATURE = { 0xE0, 0x50, 0xE7, 0xCB };
+        private static readonly ushort DefaultVersion = 0x0002;
+
+        private ushort version;
 
         private List<CpfItem> items;
 
@@ -66,6 +69,7 @@ namespace Sims2Tools.DBPF.CPF
 
         public Cpf(DBPFEntry entry) : base(entry)
         {
+            version = DefaultVersion;
             items = new List<CpfItem>();
         }
 
@@ -80,10 +84,12 @@ namespace Sims2Tools.DBPF.CPF
         {
             long pos = reader.Position;
 
-            byte[] id = reader.ReadBytes(0x06);
+            byte[] id = reader.ReadBytes(0x04);
 
             if (Enumerable.SequenceEqual(id, SIGNATURE))
             {
+                version = reader.ReadUInt16();
+
                 uint entries = reader.ReadUInt32();
 
                 items = new List<CpfItem>((int)entries);
@@ -192,6 +198,7 @@ namespace Sims2Tools.DBPF.CPF
             get
             {
                 uint size = (uint)SIGNATURE.Length;
+                size += 2; // Version as UInt16
                 size += 4; // Count of entries as UInt32
 
                 for (int i = 0; i < items.Count; i++)
@@ -206,6 +213,8 @@ namespace Sims2Tools.DBPF.CPF
         public override void Serialize(DbpfWriter writer)
         {
             writer.WriteBytes(SIGNATURE);
+
+            writer.WriteUInt16(version);
 
             writer.WriteUInt32((uint)items.Count);
 

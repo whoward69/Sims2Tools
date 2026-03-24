@@ -21,6 +21,7 @@ using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.JPG;
 using Sims2Tools.DBPF.Images.THUB;
+using Sims2Tools.DBPF.MATSHAD;
 using Sims2Tools.DBPF.Neighbourhood.BNFO;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.FAMT;
@@ -134,6 +135,7 @@ namespace Sims2Tools.DBPF
             ModTypeNames.Add(Glob.TYPE, Glob.NAME);
             ModTypeNames.Add(Objd.TYPE, Objd.NAME);
             ModTypeNames.Add(Objf.TYPE, Objf.NAME);
+            ModTypeNames.Add(Matshad.TYPE, Matshad.NAME);
             ModTypeNames.Add(Nref.TYPE, Nref.NAME);
             ModTypeNames.Add(Slot.TYPE, Slot.NAME);
             ModTypeNames.Add(Str.TYPE, Str.NAME);
@@ -145,8 +147,21 @@ namespace Sims2Tools.DBPF
             ModTypeNames.Add(Vers.TYPE, Vers.NAME);
 
             ImgTypeNames.Add(Img.TYPE, Img.NAME);
-            ImgTypeNames.Add(Jpg.TYPE, Jpg.NAME);
-            ImgTypeNames.Add(Thub.TYPE, Thub.NAME);
+            ImgTypeNames.Add(Jpg.TYPES[(int)Jpg.JpgTypeIndex.Normal], Jpg.NAME);
+            ImgTypeNames.Add(Jpg.TYPES[(int)Jpg.JpgTypeIndex.CasThumbnail], Jpg.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.Object], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.Awning], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.Chimney], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.Dormer], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.FenceArch], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.FenceOrHalfwall], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.Floor], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.FoundationOrPool], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.HoodDeco], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.ModularStair], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.Roof], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.Terrain], Thub.NAME);
+            ImgTypeNames.Add(Thub.TYPES[(int)Thub.ThubTypeIndex.Wall], Thub.NAME);
 
             RcolTypeNames.Add(Anim.TYPE, Anim.NAME);
             RcolTypeNames.Add(Cine.TYPE, Cine.NAME);

@@ -22,6 +22,7 @@ using Sims2Tools.DBPF.Images.JPG;
 using Sims2Tools.DBPF.Images.THUB;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Logger;
+using Sims2Tools.DBPF.MATSHAD;
 using Sims2Tools.DBPF.Neighbourhood.BNFO;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.FAMT;
@@ -451,7 +452,7 @@ namespace Sims2Tools.DBPF.Package
 
         public string GetFilenameByEntry(DBPFEntry entry)
         {
-            if (entry.TypeID == Ui.TYPE)
+            if (entry.TypeID == Matshad.TYPE || entry.TypeID == Ui.TYPE)
             {
                 return "";
             }
@@ -621,21 +622,20 @@ namespace Sims2Tools.DBPF.Package
             {
                 res = new Img(entry, reader);
             }
-            else if (entry.TypeID == Jpg.TYPE)
+            else if (entry.TypeID == Jpg.TYPES[(int)Jpg.JpgTypeIndex.Normal] ||
+                     entry.TypeID == Jpg.TYPES[(int)Jpg.JpgTypeIndex.CasThumbnail])
             {
                 res = new Jpg(entry, reader);
             }
-            else if (entry.TypeID == Thub.TYPE)
-            {
-                res = new Thub(entry, reader);
-            }
-            else if (entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Awning] ||
+            else if (entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Object] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Awning] ||
                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Chimney] ||
                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Dormer] ||
                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceArch] ||
                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FenceOrHalfwall] ||
                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Floor] ||
                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.FoundationOrPool] ||
+                     entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.HoodDeco] ||
                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.ModularStair] ||
                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Roof] ||
                      entry.TypeID == Thub.TYPES[(int)Thub.ThubTypeIndex.Terrain] ||
@@ -811,8 +811,12 @@ namespace Sims2Tools.DBPF.Package
                 res = new Grop(entry, reader);
             }
             //
-            // UI Resources
+            // TXT Resources
             //
+            else if (entry.TypeID == Matshad.TYPE)
+            {
+                res = new Matshad(entry, reader);
+            }
             else if (entry.TypeID == Ui.TYPE)
             {
                 res = new Ui(entry, reader);
