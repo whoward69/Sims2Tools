@@ -56,13 +56,25 @@ namespace ObjectRelocator
             this.menuMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBuyMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemBuildMode = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemDecoMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemRecurse = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMakeReplacements = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemFolder = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemDirRename = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemDirAdd = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemDirMove = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemDirDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemPackage = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemPkgRename = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemPkgMove = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemPkgMerge = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemPkgDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowName = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowPath = new System.Windows.Forms.ToolStripMenuItem();
@@ -81,13 +93,27 @@ namespace ObjectRelocator
             this.menuItemSeparatorFilters = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemDisableBuildModeSortFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemIncludeSpecialObjects = new System.Windows.Forms.ToolStripMenuItem();
-            this.gridViewResources = new System.Windows.Forms.DataGridView();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.splitTopBottom = new System.Windows.Forms.SplitContainer();
+            this.splitTopLeftRight = new System.Windows.Forms.SplitContainer();
+            this.treeFolders = new System.Windows.Forms.TreeView();
+            this.gridPackageFiles = new System.Windows.Forms.DataGridView();
+            this.colPackageFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPackageIcon = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.menuContextPackages = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextPkgRename = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextPkgMove = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextPkgMerge = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextPkgSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuContextPkgDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.gridResources = new System.Windows.Forms.DataGridView();
             this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDescription = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colPath = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colResName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colResPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colResPath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colGuid = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colRooms = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colFunction = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -98,6 +124,10 @@ namespace ObjectRelocator
             this.colPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDepreciation = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colHoodView = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colSurface = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAllowLot = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAllowRoad = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colRemoveOnPlop = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colShowInCatalog = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colObjectData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextObjects = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -118,22 +148,21 @@ namespace ObjectRelocator
             this.menuItemContextRemoveThumbCamera = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemContextMoveFiles = new System.Windows.Forms.ToolStripMenuItem();
-            this.comboFunction = new System.Windows.Forms.ComboBox();
-            this.comboSubfunction = new System.Windows.Forms.ComboBox();
-            this.comboBuild = new System.Windows.Forms.ComboBox();
-            this.comboSubbuild = new System.Windows.Forms.ComboBox();
-            this.comboSurfacetype = new System.Windows.Forms.ComboBox();
-            this.textBuyPrice = new System.Windows.Forms.TextBox();
-            this.textBuildPrice = new System.Windows.Forms.TextBox();
-            this.lblDepLimit = new System.Windows.Forms.Label();
-            this.textDepLimit = new System.Windows.Forms.TextBox();
-            this.lblDepInitial = new System.Windows.Forms.Label();
-            this.textDepInitial = new System.Windows.Forms.TextBox();
-            this.lblDepDaily = new System.Windows.Forms.Label();
-            this.textDepDaily = new System.Windows.Forms.TextBox();
-            this.ckbDepSelf = new System.Windows.Forms.CheckBox();
-            this.lblDepSelf = new System.Windows.Forms.Label();
-            this.btnSave = new System.Windows.Forms.Button();
+            this.panelDecoModeEditor = new System.Windows.Forms.Panel();
+            this.grpDecoSort = new System.Windows.Forms.GroupBox();
+            this.comboDecoSort = new System.Windows.Forms.ComboBox();
+            this.grpDecoSurfaceType = new System.Windows.Forms.GroupBox();
+            this.comboDecoSurfaceType = new System.Windows.Forms.ComboBox();
+            this.grpDecoPlacement = new System.Windows.Forms.GroupBox();
+            this.ckbDecoAllowInLot = new System.Windows.Forms.CheckBox();
+            this.ckbDecoAllowOnRoad = new System.Windows.Forms.CheckBox();
+            this.ckbDecoRemoveOnPlop = new System.Windows.Forms.CheckBox();
+            this.grpDecoShowInCatalog = new System.Windows.Forms.GroupBox();
+            this.ckbDecoShowInCatalog = new System.Windows.Forms.CheckBox();
+            this.panelBuyModeEditor = new System.Windows.Forms.Panel();
+            this.grpBuyPlacement = new System.Windows.Forms.GroupBox();
+            this.ckbBuyQuarterTile = new System.Windows.Forms.CheckBox();
+            this.ckbBuyNoDuplicate = new System.Windows.Forms.CheckBox();
             this.grpRooms = new System.Windows.Forms.GroupBox();
             this.ckbRoomNursery = new System.Windows.Forms.CheckBox();
             this.ckbRoomStudy = new System.Windows.Forms.CheckBox();
@@ -144,10 +173,6 @@ namespace ObjectRelocator
             this.ckbRoomDiningroom = new System.Windows.Forms.CheckBox();
             this.ckbRoomBedroom = new System.Windows.Forms.CheckBox();
             this.ckbRoomBathroom = new System.Windows.Forms.CheckBox();
-            this.panelBuyModeEditor = new System.Windows.Forms.Panel();
-            this.grpBuyPlacement = new System.Windows.Forms.GroupBox();
-            this.ckbBuyQuarterTile = new System.Windows.Forms.CheckBox();
-            this.ckbBuyNoDuplicate = new System.Windows.Forms.CheckBox();
             this.grpCommunity = new System.Windows.Forms.GroupBox();
             this.ckbCommStreet = new System.Windows.Forms.CheckBox();
             this.ckbCommShopping = new System.Windows.Forms.CheckBox();
@@ -164,42 +189,81 @@ namespace ObjectRelocator
             this.grpBuyPrice = new System.Windows.Forms.GroupBox();
             this.lblLinkDepreciation = new System.Windows.Forms.Label();
             this.ckbLinkDep = new System.Windows.Forms.CheckBox();
+            this.textBuyPrice = new System.Windows.Forms.TextBox();
             this.grpDepreciation = new System.Windows.Forms.GroupBox();
+            this.lblDepLimit = new System.Windows.Forms.Label();
+            this.textDepLimit = new System.Windows.Forms.TextBox();
+            this.lblDepInitial = new System.Windows.Forms.Label();
+            this.textDepInitial = new System.Windows.Forms.TextBox();
+            this.textDepDaily = new System.Windows.Forms.TextBox();
+            this.lblDepSelf = new System.Windows.Forms.Label();
+            this.lblDepDaily = new System.Windows.Forms.Label();
+            this.ckbDepSelf = new System.Windows.Forms.CheckBox();
             this.grpFunction = new System.Windows.Forms.GroupBox();
+            this.comboFunction = new System.Windows.Forms.ComboBox();
             this.grpSubfunction = new System.Windows.Forms.GroupBox();
+            this.comboSubfunction = new System.Windows.Forms.ComboBox();
+            this.panelBuildModeEditor = new System.Windows.Forms.Panel();
+            this.grpBuild = new System.Windows.Forms.GroupBox();
+            this.comboBuild = new System.Windows.Forms.ComboBox();
+            this.grpSubbuild = new System.Windows.Forms.GroupBox();
+            this.comboSubbuild = new System.Windows.Forms.ComboBox();
+            this.grpBuildSurfaceType = new System.Windows.Forms.GroupBox();
+            this.comboSurfaceType = new System.Windows.Forms.ComboBox();
             this.grpBuildPlacement = new System.Windows.Forms.GroupBox();
             this.ckbBuildQuarterTile = new System.Windows.Forms.CheckBox();
             this.ckbBuildNoDuplicate = new System.Windows.Forms.CheckBox();
             this.grpBuildShowInCatalog = new System.Windows.Forms.GroupBox();
             this.ckbBuildShowInCatalog = new System.Windows.Forms.CheckBox();
-            this.grpBuild = new System.Windows.Forms.GroupBox();
-            this.grpSubbuild = new System.Windows.Forms.GroupBox();
-            this.grpBuildSurfaceType = new System.Windows.Forms.GroupBox();
             this.grpBuildPrice = new System.Windows.Forms.GroupBox();
-            this.panelBuildModeEditor = new System.Windows.Forms.Panel();
+            this.textBuildPrice = new System.Windows.Forms.TextBox();
+            this.menuContextFolders = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextDirRename = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextDirAdd = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextDirMove = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextDirDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.btnSave = new System.Windows.Forms.Button();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemConfirmDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
+            this.splitTopBottom.Panel1.SuspendLayout();
+            this.splitTopBottom.Panel2.SuspendLayout();
+            this.splitTopBottom.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitTopLeftRight)).BeginInit();
+            this.splitTopLeftRight.Panel1.SuspendLayout();
+            this.splitTopLeftRight.Panel2.SuspendLayout();
+            this.splitTopLeftRight.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).BeginInit();
+            this.menuContextPackages.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridResources)).BeginInit();
             this.menuContextObjects.SuspendLayout();
-            this.grpRooms.SuspendLayout();
+            this.panelDecoModeEditor.SuspendLayout();
+            this.grpDecoSort.SuspendLayout();
+            this.grpDecoSurfaceType.SuspendLayout();
+            this.grpDecoPlacement.SuspendLayout();
+            this.grpDecoShowInCatalog.SuspendLayout();
             this.panelBuyModeEditor.SuspendLayout();
             this.grpBuyPlacement.SuspendLayout();
+            this.grpRooms.SuspendLayout();
             this.grpCommunity.SuspendLayout();
             this.grpUse.SuspendLayout();
             this.grpBuyPrice.SuspendLayout();
             this.grpDepreciation.SuspendLayout();
             this.grpFunction.SuspendLayout();
             this.grpSubfunction.SuspendLayout();
-            this.grpBuildPlacement.SuspendLayout();
-            this.grpBuildShowInCatalog.SuspendLayout();
+            this.panelBuildModeEditor.SuspendLayout();
             this.grpBuild.SuspendLayout();
             this.grpSubbuild.SuspendLayout();
             this.grpBuildSurfaceType.SuspendLayout();
+            this.grpBuildPlacement.SuspendLayout();
+            this.grpBuildShowInCatalog.SuspendLayout();
             this.grpBuildPrice.SuspendLayout();
-            this.panelBuildModeEditor.SuspendLayout();
+            this.menuContextFolders.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -209,11 +273,13 @@ namespace ObjectRelocator
             this.menuFile,
             this.menuHelp,
             this.menuMode,
+            this.menuItemFolder,
+            this.menuItemPackage,
             this.menuOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
-            this.menuMain.Size = new System.Drawing.Size(914, 24);
+            this.menuMain.Size = new System.Drawing.Size(984, 24);
             this.menuMain.TabIndex = 0;
             this.menuMain.Text = "menuStrip";
             // 
@@ -306,13 +372,15 @@ namespace ObjectRelocator
             this.menuMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemBuyMode,
             this.menuItemBuildMode,
-            this.toolStripSeparator7,
+            this.menuItemDecoMode,
             this.menuItemAdvanced,
             this.toolStripSeparator4,
             this.menuItemRecurse,
             this.menuItemSeparator5,
             this.menuItemAutoBackup,
-            this.menuItemMakeReplacements});
+            this.menuItemMakeReplacements,
+            this.toolStripSeparator5,
+            this.menuItemConfirmDelete});
             this.menuMode.Name = "menuMode";
             this.menuMode.Size = new System.Drawing.Size(50, 20);
             this.menuMode.Text = "&Mode";
@@ -326,7 +394,7 @@ namespace ObjectRelocator
             this.menuItemBuyMode.ShortcutKeys = System.Windows.Forms.Keys.F2;
             this.menuItemBuyMode.Size = new System.Drawing.Size(180, 22);
             this.menuItemBuyMode.Text = "Buy Mode";
-            this.menuItemBuyMode.Click += new System.EventHandler(this.OnBuyBuildModeClicked);
+            this.menuItemBuyMode.Click += new System.EventHandler(this.OnModeClicked);
             // 
             // menuItemBuildMode
             // 
@@ -334,12 +402,15 @@ namespace ObjectRelocator
             this.menuItemBuildMode.ShortcutKeys = System.Windows.Forms.Keys.F3;
             this.menuItemBuildMode.Size = new System.Drawing.Size(180, 22);
             this.menuItemBuildMode.Text = "Build Mode";
-            this.menuItemBuildMode.Click += new System.EventHandler(this.OnBuyBuildModeClicked);
+            this.menuItemBuildMode.Click += new System.EventHandler(this.OnModeClicked);
             // 
-            // toolStripSeparator7
+            // menuItemDecoMode
             // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(177, 6);
+            this.menuItemDecoMode.Name = "menuItemDecoMode";
+            this.menuItemDecoMode.ShortcutKeys = System.Windows.Forms.Keys.F4;
+            this.menuItemDecoMode.Size = new System.Drawing.Size(180, 22);
+            this.menuItemDecoMode.Text = "Deco Mode";
+            this.menuItemDecoMode.Click += new System.EventHandler(this.OnModeClicked);
             // 
             // menuItemAdvanced
             // 
@@ -360,6 +431,7 @@ namespace ObjectRelocator
             this.menuItemRecurse.Name = "menuItemRecurse";
             this.menuItemRecurse.Size = new System.Drawing.Size(180, 22);
             this.menuItemRecurse.Text = "Include &Sub-Folders";
+            this.menuItemRecurse.Click += new System.EventHandler(this.OnRecurseClicked);
             // 
             // menuItemSeparator5
             // 
@@ -380,6 +452,102 @@ namespace ObjectRelocator
             this.menuItemMakeReplacements.Size = new System.Drawing.Size(180, 22);
             this.menuItemMakeReplacements.Text = "&Make Replacements";
             this.menuItemMakeReplacements.Click += new System.EventHandler(this.OnMakeReplcementsClicked);
+            // 
+            // menuItemFolder
+            // 
+            this.menuItemFolder.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemDirRename,
+            this.menuItemDirAdd,
+            this.menuItemDirMove,
+            this.toolStripSeparator9,
+            this.menuItemDirDelete});
+            this.menuItemFolder.Name = "menuItemFolder";
+            this.menuItemFolder.Size = new System.Drawing.Size(52, 20);
+            this.menuItemFolder.Text = "Fol&der";
+            this.menuItemFolder.DropDownOpening += new System.EventHandler(this.OnFolderMenuOpening);
+            // 
+            // menuItemDirRename
+            // 
+            this.menuItemDirRename.Name = "menuItemDirRename";
+            this.menuItemDirRename.Size = new System.Drawing.Size(117, 22);
+            this.menuItemDirRename.Text = "&Rename";
+            this.menuItemDirRename.Click += new System.EventHandler(this.OnFolderRenameClicked);
+            // 
+            // menuItemDirAdd
+            // 
+            this.menuItemDirAdd.Name = "menuItemDirAdd";
+            this.menuItemDirAdd.Size = new System.Drawing.Size(117, 22);
+            this.menuItemDirAdd.Text = "&Add";
+            this.menuItemDirAdd.Click += new System.EventHandler(this.OnFolderAddClicked);
+            // 
+            // menuItemDirMove
+            // 
+            this.menuItemDirMove.Name = "menuItemDirMove";
+            this.menuItemDirMove.Size = new System.Drawing.Size(117, 22);
+            this.menuItemDirMove.Text = "&Move";
+            this.menuItemDirMove.Click += new System.EventHandler(this.OnFolderMoveClicked);
+            // 
+            // toolStripSeparator9
+            // 
+            this.toolStripSeparator9.Name = "toolStripSeparator9";
+            this.toolStripSeparator9.Size = new System.Drawing.Size(114, 6);
+            // 
+            // menuItemDirDelete
+            // 
+            this.menuItemDirDelete.Name = "menuItemDirDelete";
+            this.menuItemDirDelete.Size = new System.Drawing.Size(117, 22);
+            this.menuItemDirDelete.Text = "&Delete";
+            this.menuItemDirDelete.Click += new System.EventHandler(this.OnFolderDeleteClicked);
+            // 
+            // menuItemPackage
+            // 
+            this.menuItemPackage.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemPkgRename,
+            this.menuItemPkgMove,
+            this.menuItemPkgMerge,
+            this.toolStripSeparator10,
+            this.menuItemPkgDelete});
+            this.menuItemPackage.Name = "menuItemPackage";
+            this.menuItemPackage.Size = new System.Drawing.Size(63, 20);
+            this.menuItemPackage.Text = "&Package";
+            this.menuItemPackage.DropDownOpening += new System.EventHandler(this.OnPackageMenuOpening);
+            // 
+            // menuItemPkgRename
+            // 
+            this.menuItemPkgRename.Name = "menuItemPkgRename";
+            this.menuItemPkgRename.Size = new System.Drawing.Size(185, 22);
+            this.menuItemPkgRename.Text = "&Rename";
+            this.menuItemPkgRename.Click += new System.EventHandler(this.OnPkgRenameClicked);
+            // 
+            // menuItemPkgMove
+            // 
+            this.menuItemPkgMove.Name = "menuItemPkgMove";
+            this.menuItemPkgMove.Size = new System.Drawing.Size(185, 22);
+            this.menuItemPkgMove.Text = "&Move";
+            this.menuItemPkgMove.Click += new System.EventHandler(this.OnPkgMoveClicked);
+            // 
+            // menuItemPkgMerge
+            // 
+            this.menuItemPkgMerge.Name = "menuItemPkgMerge";
+            this.menuItemPkgMerge.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.M)));
+            this.menuItemPkgMerge.Size = new System.Drawing.Size(185, 22);
+            this.menuItemPkgMerge.Text = "Mer&ge";
+            this.menuItemPkgMerge.Click += new System.EventHandler(this.OnPkgMergeClicked);
+            // 
+            // toolStripSeparator10
+            // 
+            this.toolStripSeparator10.Name = "toolStripSeparator10";
+            this.toolStripSeparator10.Size = new System.Drawing.Size(182, 6);
+            // 
+            // menuItemPkgDelete
+            // 
+            this.menuItemPkgDelete.Name = "menuItemPkgDelete";
+            this.menuItemPkgDelete.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.D)));
+            this.menuItemPkgDelete.Size = new System.Drawing.Size(185, 22);
+            this.menuItemPkgDelete.Text = "&Delete";
+            this.menuItemPkgDelete.Click += new System.EventHandler(this.OnPkgDeleteClicked);
             // 
             // menuOptions
             // 
@@ -529,16 +697,175 @@ namespace ObjectRelocator
             this.menuItemIncludeSpecialObjects.Text = "Include Buy Mode Special Objects";
             this.menuItemIncludeSpecialObjects.Click += new System.EventHandler(this.OnIncludeSpecialObjectsClicked);
             // 
-            // gridViewResources
+            // toolStripSeparator7
             // 
-            this.gridViewResources.AllowUserToAddRows = false;
-            this.gridViewResources.AllowUserToDeleteRows = false;
-            this.gridViewResources.AllowUserToOrderColumns = true;
-            this.gridViewResources.AllowUserToResizeRows = false;
-            this.gridViewResources.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(114, 6);
+            // 
+            // splitTopBottom
+            // 
+            this.splitTopBottom.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gridViewResources.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.splitTopBottom.Location = new System.Drawing.Point(0, 24);
+            this.splitTopBottom.Name = "splitTopBottom";
+            this.splitTopBottom.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitTopBottom.Panel1
+            // 
+            this.splitTopBottom.Panel1.Controls.Add(this.splitTopLeftRight);
+            // 
+            // splitTopBottom.Panel2
+            // 
+            this.splitTopBottom.Panel2.Controls.Add(this.gridResources);
+            this.splitTopBottom.Panel2.Controls.Add(this.panelDecoModeEditor);
+            this.splitTopBottom.Panel2.Controls.Add(this.panelBuyModeEditor);
+            this.splitTopBottom.Panel2.Controls.Add(this.panelBuildModeEditor);
+            this.splitTopBottom.Size = new System.Drawing.Size(984, 537);
+            this.splitTopBottom.SplitterDistance = 221;
+            this.splitTopBottom.TabIndex = 1;
+            // 
+            // splitTopLeftRight
+            // 
+            this.splitTopLeftRight.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitTopLeftRight.Location = new System.Drawing.Point(0, 0);
+            this.splitTopLeftRight.Name = "splitTopLeftRight";
+            // 
+            // splitTopLeftRight.Panel1
+            // 
+            this.splitTopLeftRight.Panel1.Controls.Add(this.treeFolders);
+            // 
+            // splitTopLeftRight.Panel2
+            // 
+            this.splitTopLeftRight.Panel2.Controls.Add(this.gridPackageFiles);
+            this.splitTopLeftRight.Size = new System.Drawing.Size(984, 221);
+            this.splitTopLeftRight.SplitterDistance = 217;
+            this.splitTopLeftRight.TabIndex = 0;
+            // 
+            // treeFolders
+            // 
+            this.treeFolders.AllowDrop = true;
+            this.treeFolders.BackColor = System.Drawing.SystemColors.Window;
+            this.treeFolders.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeFolders.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
+            this.treeFolders.HideSelection = false;
+            this.treeFolders.Location = new System.Drawing.Point(0, 0);
+            this.treeFolders.Name = "treeFolders";
+            this.treeFolders.Size = new System.Drawing.Size(217, 221);
+            this.treeFolders.TabIndex = 0;
+            this.treeFolders.DrawNode += new System.Windows.Forms.DrawTreeNodeEventHandler(this.OnTreeFolder_DrawNode);
+            this.treeFolders.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.OnTreeFolder_ItemDrag);
+            this.treeFolders.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnTreeFolderClicked);
+            this.treeFolders.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnTreeFolder_DragDrop);
+            this.treeFolders.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnTreeFolder_DragEnter);
+            this.treeFolders.DragOver += new System.Windows.Forms.DragEventHandler(this.OnTreeFolder_DragOver);
+            // 
+            // gridPackageFiles
+            // 
+            this.gridPackageFiles.AllowUserToAddRows = false;
+            this.gridPackageFiles.AllowUserToDeleteRows = false;
+            this.gridPackageFiles.AllowUserToOrderColumns = true;
+            this.gridPackageFiles.AllowUserToResizeRows = false;
+            this.gridPackageFiles.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.gridPackageFiles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridPackageFiles.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colPackageFile,
+            this.colPackagePath,
+            this.colPackageIcon});
+            this.gridPackageFiles.ContextMenuStrip = this.menuContextPackages;
+            this.gridPackageFiles.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gridPackageFiles.Location = new System.Drawing.Point(0, 0);
+            this.gridPackageFiles.Name = "gridPackageFiles";
+            this.gridPackageFiles.ReadOnly = true;
+            this.gridPackageFiles.RowHeadersVisible = false;
+            this.gridPackageFiles.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.gridPackageFiles.Size = new System.Drawing.Size(763, 221);
+            this.gridPackageFiles.TabIndex = 0;
+            this.gridPackageFiles.MultiSelectChanged += new System.EventHandler(this.OnPackageSelectionChanged);
+            this.gridPackageFiles.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
+            this.gridPackageFiles.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
+            this.gridPackageFiles.SelectionChanged += new System.EventHandler(this.OnPackageSelectionChanged);
+            this.gridPackageFiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnPkgGrid_MouseDown);
+            // 
+            // colPackageFile
+            // 
+            this.colPackageFile.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colPackageFile.DataPropertyName = "Name";
+            this.colPackageFile.HeaderText = "Package File";
+            this.colPackageFile.Name = "colPackageFile";
+            this.colPackageFile.ReadOnly = true;
+            // 
+            // colPackagePath
+            // 
+            this.colPackagePath.DataPropertyName = "PackagePath";
+            this.colPackagePath.HeaderText = "PackagePath";
+            this.colPackagePath.Name = "colPackagePath";
+            this.colPackagePath.ReadOnly = true;
+            this.colPackagePath.Visible = false;
+            // 
+            // colPackageIcon
+            // 
+            this.colPackageIcon.DataPropertyName = "PackageIcon";
+            this.colPackageIcon.HeaderText = "Icon";
+            this.colPackageIcon.Name = "colPackageIcon";
+            this.colPackageIcon.ReadOnly = true;
+            this.colPackageIcon.Visible = false;
+            // 
+            // menuContextPackages
+            // 
+            this.menuContextPackages.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuContextPkgRename,
+            this.menuContextPkgMove,
+            this.menuContextPkgMerge,
+            this.menuContextPkgSeparator1,
+            this.menuContextPkgDelete});
+            this.menuContextPackages.Name = "menuContextPackages";
+            this.menuContextPackages.Size = new System.Drawing.Size(118, 98);
+            this.menuContextPackages.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuPackagesOpening);
+            // 
+            // menuContextPkgRename
+            // 
+            this.menuContextPkgRename.Name = "menuContextPkgRename";
+            this.menuContextPkgRename.Size = new System.Drawing.Size(117, 22);
+            this.menuContextPkgRename.Text = "&Rename";
+            this.menuContextPkgRename.Click += new System.EventHandler(this.OnPkgRenameClicked);
+            // 
+            // menuContextPkgMove
+            // 
+            this.menuContextPkgMove.Name = "menuContextPkgMove";
+            this.menuContextPkgMove.Size = new System.Drawing.Size(117, 22);
+            this.menuContextPkgMove.Text = "&Move";
+            this.menuContextPkgMove.Click += new System.EventHandler(this.OnPkgMoveClicked);
+            // 
+            // menuContextPkgMerge
+            // 
+            this.menuContextPkgMerge.Name = "menuContextPkgMerge";
+            this.menuContextPkgMerge.Size = new System.Drawing.Size(117, 22);
+            this.menuContextPkgMerge.Text = "Mer&ge";
+            this.menuContextPkgMerge.Click += new System.EventHandler(this.OnPkgMergeClicked);
+            // 
+            // menuContextPkgSeparator1
+            // 
+            this.menuContextPkgSeparator1.Name = "menuContextPkgSeparator1";
+            this.menuContextPkgSeparator1.Size = new System.Drawing.Size(114, 6);
+            // 
+            // menuContextPkgDelete
+            // 
+            this.menuContextPkgDelete.Name = "menuContextPkgDelete";
+            this.menuContextPkgDelete.Size = new System.Drawing.Size(117, 22);
+            this.menuContextPkgDelete.Text = "&Delete";
+            this.menuContextPkgDelete.Click += new System.EventHandler(this.OnPkgDeleteClicked);
+            // 
+            // gridResources
+            // 
+            this.gridResources.AllowUserToAddRows = false;
+            this.gridResources.AllowUserToDeleteRows = false;
+            this.gridResources.AllowUserToOrderColumns = true;
+            this.gridResources.AllowUserToResizeRows = false;
+            this.gridResources.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gridResources.BackgroundColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -546,15 +873,15 @@ namespace ObjectRelocator
             dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridViewResources.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.gridViewResources.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.gridViewResources.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.gridResources.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.gridResources.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridResources.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colVisible,
             this.colTitle,
             this.colDescription,
-            this.colName,
-            this.colPackagePath,
-            this.colPath,
+            this.colResName,
+            this.colResPackagePath,
+            this.colResPath,
             this.colGuid,
             this.colRooms,
             this.colFunction,
@@ -565,22 +892,26 @@ namespace ObjectRelocator
             this.colPrice,
             this.colDepreciation,
             this.colHoodView,
+            this.colSurface,
+            this.colAllowLot,
+            this.colAllowRoad,
+            this.colRemoveOnPlop,
             this.colShowInCatalog,
             this.colObjectData});
-            this.gridViewResources.ContextMenuStrip = this.menuContextObjects;
-            this.gridViewResources.Location = new System.Drawing.Point(4, 27);
-            this.gridViewResources.Name = "gridViewResources";
-            this.gridViewResources.ReadOnly = true;
-            this.gridViewResources.RowHeadersVisible = false;
-            this.gridViewResources.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridViewResources.Size = new System.Drawing.Size(905, 314);
-            this.gridViewResources.TabIndex = 1;
-            this.gridViewResources.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
-            this.gridViewResources.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
-            this.gridViewResources.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
-            this.gridViewResources.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
-            this.gridViewResources.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
-            this.gridViewResources.SelectionChanged += new System.EventHandler(this.OnGridSelectionChanged);
+            this.gridResources.ContextMenuStrip = this.menuContextObjects;
+            this.gridResources.Location = new System.Drawing.Point(0, 0);
+            this.gridResources.Name = "gridResources";
+            this.gridResources.ReadOnly = true;
+            this.gridResources.RowHeadersVisible = false;
+            this.gridResources.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.gridResources.Size = new System.Drawing.Size(984, 133);
+            this.gridResources.TabIndex = 1;
+            this.gridResources.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
+            this.gridResources.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
+            this.gridResources.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
+            this.gridResources.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
+            this.gridResources.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
+            this.gridResources.SelectionChanged += new System.EventHandler(this.OnGridSelectionChanged);
             // 
             // colVisible
             // 
@@ -606,30 +937,30 @@ namespace ObjectRelocator
             this.colDescription.ReadOnly = true;
             this.colDescription.Visible = false;
             // 
-            // colName
+            // colResName
             // 
-            this.colName.DataPropertyName = "Name";
-            this.colName.HeaderText = "Name";
-            this.colName.MinimumWidth = 50;
-            this.colName.Name = "colName";
-            this.colName.ReadOnly = true;
+            this.colResName.DataPropertyName = "Name";
+            this.colResName.HeaderText = "Name";
+            this.colResName.MinimumWidth = 50;
+            this.colResName.Name = "colResName";
+            this.colResName.ReadOnly = true;
             // 
-            // colPackagePath
+            // colResPackagePath
             // 
-            this.colPackagePath.DataPropertyName = "PackagePath";
-            this.colPackagePath.HeaderText = "PackagePath";
-            this.colPackagePath.Name = "colPackagePath";
-            this.colPackagePath.ReadOnly = true;
-            this.colPackagePath.Visible = false;
+            this.colResPackagePath.DataPropertyName = "PackagePath";
+            this.colResPackagePath.HeaderText = "PackagePath";
+            this.colResPackagePath.Name = "colResPackagePath";
+            this.colResPackagePath.ReadOnly = true;
+            this.colResPackagePath.Visible = false;
             // 
-            // colPath
+            // colResPath
             // 
-            this.colPath.DataPropertyName = "Path";
-            this.colPath.HeaderText = "Path";
-            this.colPath.MinimumWidth = 50;
-            this.colPath.Name = "colPath";
-            this.colPath.ReadOnly = true;
-            this.colPath.Width = 150;
+            this.colResPath.DataPropertyName = "Path";
+            this.colResPath.HeaderText = "Path";
+            this.colResPath.MinimumWidth = 50;
+            this.colResPath.Name = "colResPath";
+            this.colResPath.ReadOnly = true;
+            this.colResPath.Width = 150;
             // 
             // colGuid
             // 
@@ -717,6 +1048,34 @@ namespace ObjectRelocator
             this.colHoodView.ReadOnly = true;
             this.colHoodView.Width = 85;
             // 
+            // colSurface
+            // 
+            this.colSurface.DataPropertyName = "Surface";
+            this.colSurface.HeaderText = "Surface";
+            this.colSurface.Name = "colSurface";
+            this.colSurface.ReadOnly = true;
+            // 
+            // colAllowLot
+            // 
+            this.colAllowLot.DataPropertyName = "AllowLot";
+            this.colAllowLot.HeaderText = "Allow In Lot";
+            this.colAllowLot.Name = "colAllowLot";
+            this.colAllowLot.ReadOnly = true;
+            // 
+            // colAllowRoad
+            // 
+            this.colAllowRoad.DataPropertyName = "AllowRoad";
+            this.colAllowRoad.HeaderText = "Allow On Road";
+            this.colAllowRoad.Name = "colAllowRoad";
+            this.colAllowRoad.ReadOnly = true;
+            // 
+            // colRemoveOnPlop
+            // 
+            this.colRemoveOnPlop.DataPropertyName = "RemoveOnPlop";
+            this.colRemoveOnPlop.HeaderText = "Remove On Lot Plop";
+            this.colRemoveOnPlop.Name = "colRemoveOnPlop";
+            this.colRemoveOnPlop.ReadOnly = true;
+            // 
             // colShowInCatalog
             // 
             this.colShowInCatalog.DataPropertyName = "ShowInCatalog";
@@ -755,7 +1114,7 @@ namespace ObjectRelocator
             this.toolStripSeparator6,
             this.menuItemContextMoveFiles});
             this.menuContextObjects.Name = "menuContextGrid";
-            this.menuContextObjects.Size = new System.Drawing.Size(301, 260);
+            this.menuContextObjects.Size = new System.Drawing.Size(301, 282);
             this.menuContextObjects.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextObjects.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             this.menuContextObjects.Opened += new System.EventHandler(this.OnContextMenuOpened);
@@ -772,7 +1131,7 @@ namespace ObjectRelocator
             // menuItemContextEditTitleDesc
             // 
             this.menuItemContextEditTitleDesc.Name = "menuItemContextEditTitleDesc";
-            this.menuItemContextEditTitleDesc.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift)
+            this.menuItemContextEditTitleDesc.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.R)));
             this.menuItemContextEditTitleDesc.Size = new System.Drawing.Size(300, 22);
             this.menuItemContextEditTitleDesc.Text = "&Change Title and Description";
@@ -877,157 +1236,177 @@ namespace ObjectRelocator
             this.menuItemContextMoveFiles.Text = "&Move Package Files";
             this.menuItemContextMoveFiles.Click += new System.EventHandler(this.OnMoveFilesClicked);
             // 
-            // comboFunction
+            // panelDecoModeEditor
             // 
-            this.comboFunction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboFunction.FormattingEnabled = true;
-            this.comboFunction.Location = new System.Drawing.Point(5, 20);
-            this.comboFunction.Name = "comboFunction";
-            this.comboFunction.Size = new System.Drawing.Size(128, 23);
-            this.comboFunction.TabIndex = 5;
-            this.comboFunction.SelectedIndexChanged += new System.EventHandler(this.OnFunctionSortChanged);
+            this.panelDecoModeEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelDecoModeEditor.Controls.Add(this.grpDecoSort);
+            this.panelDecoModeEditor.Controls.Add(this.grpDecoSurfaceType);
+            this.panelDecoModeEditor.Controls.Add(this.grpDecoPlacement);
+            this.panelDecoModeEditor.Controls.Add(this.grpDecoShowInCatalog);
+            this.panelDecoModeEditor.Enabled = false;
+            this.panelDecoModeEditor.Location = new System.Drawing.Point(0, 135);
+            this.panelDecoModeEditor.Name = "panelDecoModeEditor";
+            this.panelDecoModeEditor.Size = new System.Drawing.Size(984, 174);
+            this.panelDecoModeEditor.TabIndex = 25;
+            this.panelDecoModeEditor.Visible = false;
             // 
-            // comboSubfunction
+            // grpDecoSort
             // 
-            this.comboSubfunction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboSubfunction.FormattingEnabled = true;
-            this.comboSubfunction.Location = new System.Drawing.Point(5, 20);
-            this.comboSubfunction.Name = "comboSubfunction";
-            this.comboSubfunction.Size = new System.Drawing.Size(107, 23);
-            this.comboSubfunction.TabIndex = 7;
-            this.comboSubfunction.SelectedIndexChanged += new System.EventHandler(this.OnFunctionSubsortChanged);
+            this.grpDecoSort.Controls.Add(this.comboDecoSort);
+            this.grpDecoSort.Location = new System.Drawing.Point(120, 0);
+            this.grpDecoSort.Name = "grpDecoSort";
+            this.grpDecoSort.Size = new System.Drawing.Size(140, 170);
+            this.grpDecoSort.TabIndex = 0;
+            this.grpDecoSort.TabStop = false;
+            this.grpDecoSort.Text = "Sort:";
             // 
-            // comboBuild
+            // comboDecoSort
             // 
-            this.comboBuild.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBuild.FormattingEnabled = true;
-            this.comboBuild.Location = new System.Drawing.Point(5, 20);
-            this.comboBuild.Name = "comboBuild";
-            this.comboBuild.Size = new System.Drawing.Size(128, 23);
-            this.comboBuild.TabIndex = 5;
-            this.comboBuild.SelectedIndexChanged += new System.EventHandler(this.OnBuildSortChanged);
+            this.comboDecoSort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboDecoSort.FormattingEnabled = true;
+            this.comboDecoSort.Location = new System.Drawing.Point(5, 20);
+            this.comboDecoSort.Name = "comboDecoSort";
+            this.comboDecoSort.Size = new System.Drawing.Size(128, 23);
+            this.comboDecoSort.TabIndex = 5;
+            this.comboDecoSort.SelectedIndexChanged += new System.EventHandler(this.OnDecoSortChanged);
             // 
-            // comboSubbuild
+            // grpDecoSurfaceType
             // 
-            this.comboSubbuild.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboSubbuild.FormattingEnabled = true;
-            this.comboSubbuild.Location = new System.Drawing.Point(5, 20);
-            this.comboSubbuild.Name = "comboSubbuild";
-            this.comboSubbuild.Size = new System.Drawing.Size(107, 23);
-            this.comboSubbuild.TabIndex = 7;
-            this.comboSubbuild.SelectedIndexChanged += new System.EventHandler(this.OnBuildSubsortChanged);
+            this.grpDecoSurfaceType.Controls.Add(this.comboDecoSurfaceType);
+            this.grpDecoSurfaceType.Location = new System.Drawing.Point(390, 0);
+            this.grpDecoSurfaceType.Name = "grpDecoSurfaceType";
+            this.grpDecoSurfaceType.Size = new System.Drawing.Size(115, 83);
+            this.grpDecoSurfaceType.TabIndex = 7;
+            this.grpDecoSurfaceType.TabStop = false;
+            this.grpDecoSurfaceType.Text = "Surface:";
             // 
-            // comboSurfacetype
+            // comboDecoSurfaceType
             // 
-            this.comboSurfacetype.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboSurfacetype.FormattingEnabled = true;
-            this.comboSurfacetype.Location = new System.Drawing.Point(5, 20);
-            this.comboSurfacetype.Name = "comboSurfacetype";
-            this.comboSurfacetype.Size = new System.Drawing.Size(102, 23);
-            this.comboSurfacetype.TabIndex = 8;
-            this.comboSurfacetype.SelectedIndexChanged += new System.EventHandler(this.OnBuildSurfacetypeChanged);
+            this.comboDecoSurfaceType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboDecoSurfaceType.FormattingEnabled = true;
+            this.comboDecoSurfaceType.Location = new System.Drawing.Point(5, 20);
+            this.comboDecoSurfaceType.Name = "comboDecoSurfaceType";
+            this.comboDecoSurfaceType.Size = new System.Drawing.Size(102, 23);
+            this.comboDecoSurfaceType.TabIndex = 8;
+            this.comboDecoSurfaceType.SelectedIndexChanged += new System.EventHandler(this.OnDecoSurfaceTypeChanged);
             // 
-            // textBuyPrice
+            // grpDecoPlacement
             // 
-            this.textBuyPrice.Location = new System.Drawing.Point(5, 20);
-            this.textBuyPrice.Name = "textBuyPrice";
-            this.textBuyPrice.Size = new System.Drawing.Size(80, 21);
-            this.textBuyPrice.TabIndex = 13;
-            this.textBuyPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
-            this.textBuyPrice.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnBuyPriceKeyUp);
+            this.grpDecoPlacement.Controls.Add(this.ckbDecoAllowInLot);
+            this.grpDecoPlacement.Controls.Add(this.ckbDecoAllowOnRoad);
+            this.grpDecoPlacement.Controls.Add(this.ckbDecoRemoveOnPlop);
+            this.grpDecoPlacement.Location = new System.Drawing.Point(390, 88);
+            this.grpDecoPlacement.Name = "grpDecoPlacement";
+            this.grpDecoPlacement.Size = new System.Drawing.Size(137, 81);
+            this.grpDecoPlacement.TabIndex = 5;
+            this.grpDecoPlacement.TabStop = false;
+            this.grpDecoPlacement.Text = "Placement:";
             // 
-            // textBuildPrice
+            // ckbDecoAllowInLot
             // 
-            this.textBuildPrice.Location = new System.Drawing.Point(5, 20);
-            this.textBuildPrice.Name = "textBuildPrice";
-            this.textBuildPrice.Size = new System.Drawing.Size(80, 21);
-            this.textBuildPrice.TabIndex = 13;
-            this.textBuildPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
-            this.textBuildPrice.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnBuildPriceKeyUp);
+            this.ckbDecoAllowInLot.AutoSize = true;
+            this.ckbDecoAllowInLot.Location = new System.Drawing.Point(10, 15);
+            this.ckbDecoAllowInLot.Name = "ckbDecoAllowInLot";
+            this.ckbDecoAllowInLot.Size = new System.Drawing.Size(88, 19);
+            this.ckbDecoAllowInLot.TabIndex = 4;
+            this.ckbDecoAllowInLot.Text = "Allow In Lot";
+            this.ckbDecoAllowInLot.UseVisualStyleBackColor = true;
+            this.ckbDecoAllowInLot.Click += new System.EventHandler(this.OnDecoAllowInLotClicked);
             // 
-            // lblDepLimit
+            // ckbDecoAllowOnRoad
             // 
-            this.lblDepLimit.AutoSize = true;
-            this.lblDepLimit.Location = new System.Drawing.Point(5, 23);
-            this.lblDepLimit.Name = "lblDepLimit";
-            this.lblDepLimit.Size = new System.Drawing.Size(34, 15);
-            this.lblDepLimit.TabIndex = 15;
-            this.lblDepLimit.Text = "Limit";
+            this.ckbDecoAllowOnRoad.AutoSize = true;
+            this.ckbDecoAllowOnRoad.Location = new System.Drawing.Point(10, 32);
+            this.ckbDecoAllowOnRoad.Name = "ckbDecoAllowOnRoad";
+            this.ckbDecoAllowOnRoad.Size = new System.Drawing.Size(107, 19);
+            this.ckbDecoAllowOnRoad.TabIndex = 4;
+            this.ckbDecoAllowOnRoad.Text = "Allow On Road";
+            this.ckbDecoAllowOnRoad.UseVisualStyleBackColor = true;
+            this.ckbDecoAllowOnRoad.Click += new System.EventHandler(this.OnDecoAllowOnRoadClicked);
             // 
-            // textDepLimit
+            // ckbDecoRemoveOnPlop
             // 
-            this.textDepLimit.Location = new System.Drawing.Point(50, 20);
-            this.textDepLimit.Name = "textDepLimit";
-            this.textDepLimit.Size = new System.Drawing.Size(60, 21);
-            this.textDepLimit.TabIndex = 16;
-            this.textDepLimit.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
-            this.textDepLimit.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnDepreciationLimitKeyUp);
+            this.ckbDecoRemoveOnPlop.AutoSize = true;
+            this.ckbDecoRemoveOnPlop.Location = new System.Drawing.Point(10, 49);
+            this.ckbDecoRemoveOnPlop.Name = "ckbDecoRemoveOnPlop";
+            this.ckbDecoRemoveOnPlop.Size = new System.Drawing.Size(119, 19);
+            this.ckbDecoRemoveOnPlop.TabIndex = 4;
+            this.ckbDecoRemoveOnPlop.Text = "Remove On Plop";
+            this.ckbDecoRemoveOnPlop.UseVisualStyleBackColor = true;
+            this.ckbDecoRemoveOnPlop.Click += new System.EventHandler(this.OnDecoRemoveOnPlopClicked);
             // 
-            // lblDepInitial
+            // grpDecoShowInCatalog
             // 
-            this.lblDepInitial.AutoSize = true;
-            this.lblDepInitial.Location = new System.Drawing.Point(5, 50);
-            this.lblDepInitial.Name = "lblDepInitial";
-            this.lblDepInitial.Size = new System.Drawing.Size(36, 15);
-            this.lblDepInitial.TabIndex = 17;
-            this.lblDepInitial.Text = "Initial";
+            this.grpDecoShowInCatalog.Controls.Add(this.ckbDecoShowInCatalog);
+            this.grpDecoShowInCatalog.Location = new System.Drawing.Point(511, 0);
+            this.grpDecoShowInCatalog.Name = "grpDecoShowInCatalog";
+            this.grpDecoShowInCatalog.Size = new System.Drawing.Size(148, 83);
+            this.grpDecoShowInCatalog.TabIndex = 6;
+            this.grpDecoShowInCatalog.TabStop = false;
+            this.grpDecoShowInCatalog.Text = "Catalog:";
             // 
-            // textDepInitial
+            // ckbDecoShowInCatalog
             // 
-            this.textDepInitial.Location = new System.Drawing.Point(50, 47);
-            this.textDepInitial.Name = "textDepInitial";
-            this.textDepInitial.Size = new System.Drawing.Size(60, 21);
-            this.textDepInitial.TabIndex = 18;
-            this.textDepInitial.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
-            this.textDepInitial.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnDepreciationInitialKeyUp);
+            this.ckbDecoShowInCatalog.AutoSize = true;
+            this.ckbDecoShowInCatalog.Location = new System.Drawing.Point(10, 15);
+            this.ckbDecoShowInCatalog.Name = "ckbDecoShowInCatalog";
+            this.ckbDecoShowInCatalog.Size = new System.Drawing.Size(57, 19);
+            this.ckbDecoShowInCatalog.TabIndex = 4;
+            this.ckbDecoShowInCatalog.Text = "Show";
+            this.ckbDecoShowInCatalog.UseVisualStyleBackColor = true;
+            this.ckbDecoShowInCatalog.Click += new System.EventHandler(this.OnDecoShowInCatalogClicked);
             // 
-            // lblDepDaily
+            // panelBuyModeEditor
             // 
-            this.lblDepDaily.AutoSize = true;
-            this.lblDepDaily.Location = new System.Drawing.Point(5, 77);
-            this.lblDepDaily.Name = "lblDepDaily";
-            this.lblDepDaily.Size = new System.Drawing.Size(34, 15);
-            this.lblDepDaily.TabIndex = 19;
-            this.lblDepDaily.Text = "Daily";
+            this.panelBuyModeEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelBuyModeEditor.Controls.Add(this.grpBuyPlacement);
+            this.panelBuyModeEditor.Controls.Add(this.grpRooms);
+            this.panelBuyModeEditor.Controls.Add(this.grpCommunity);
+            this.panelBuyModeEditor.Controls.Add(this.grpUse);
+            this.panelBuyModeEditor.Controls.Add(this.grpBuyPrice);
+            this.panelBuyModeEditor.Controls.Add(this.grpDepreciation);
+            this.panelBuyModeEditor.Controls.Add(this.grpFunction);
+            this.panelBuyModeEditor.Controls.Add(this.grpSubfunction);
+            this.panelBuyModeEditor.Enabled = false;
+            this.panelBuyModeEditor.Location = new System.Drawing.Point(0, 135);
+            this.panelBuyModeEditor.Name = "panelBuyModeEditor";
+            this.panelBuyModeEditor.Size = new System.Drawing.Size(984, 174);
+            this.panelBuyModeEditor.TabIndex = 25;
             // 
-            // textDepDaily
+            // grpBuyPlacement
             // 
-            this.textDepDaily.Location = new System.Drawing.Point(50, 74);
-            this.textDepDaily.Name = "textDepDaily";
-            this.textDepDaily.Size = new System.Drawing.Size(60, 21);
-            this.textDepDaily.TabIndex = 20;
-            this.textDepDaily.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
-            this.textDepDaily.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnDepreciationDailyKeyUp);
+            this.grpBuyPlacement.Controls.Add(this.ckbBuyQuarterTile);
+            this.grpBuyPlacement.Controls.Add(this.ckbBuyNoDuplicate);
+            this.grpBuyPlacement.Location = new System.Drawing.Point(390, 105);
+            this.grpBuyPlacement.Name = "grpBuyPlacement";
+            this.grpBuyPlacement.Size = new System.Drawing.Size(115, 64);
+            this.grpBuyPlacement.TabIndex = 5;
+            this.grpBuyPlacement.TabStop = false;
+            this.grpBuyPlacement.Text = "Placement:";
             // 
-            // ckbDepSelf
+            // ckbBuyQuarterTile
             // 
-            this.ckbDepSelf.AutoSize = true;
-            this.ckbDepSelf.Location = new System.Drawing.Point(50, 104);
-            this.ckbDepSelf.Name = "ckbDepSelf";
-            this.ckbDepSelf.Size = new System.Drawing.Size(15, 14);
-            this.ckbDepSelf.TabIndex = 21;
-            this.ckbDepSelf.UseVisualStyleBackColor = true;
-            this.ckbDepSelf.Click += new System.EventHandler(this.OnDepreciationSelfClicked);
+            this.ckbBuyQuarterTile.AutoSize = true;
+            this.ckbBuyQuarterTile.Location = new System.Drawing.Point(10, 15);
+            this.ckbBuyQuarterTile.Name = "ckbBuyQuarterTile";
+            this.ckbBuyQuarterTile.Size = new System.Drawing.Size(90, 19);
+            this.ckbBuyQuarterTile.TabIndex = 4;
+            this.ckbBuyQuarterTile.Text = "Quarter Tile";
+            this.ckbBuyQuarterTile.UseVisualStyleBackColor = true;
+            this.ckbBuyQuarterTile.Click += new System.EventHandler(this.OnBuyQuarterTileClicked);
             // 
-            // lblDepSelf
+            // ckbBuyNoDuplicate
             // 
-            this.lblDepSelf.AutoSize = true;
-            this.lblDepSelf.Location = new System.Drawing.Point(5, 103);
-            this.lblDepSelf.Name = "lblDepSelf";
-            this.lblDepSelf.Size = new System.Drawing.Size(28, 15);
-            this.lblDepSelf.TabIndex = 22;
-            this.lblDepSelf.Text = "Self";
-            // 
-            // btnSave
-            // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(822, 490);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(88, 26);
-            this.btnSave.TabIndex = 23;
-            this.btnSave.Text = "&Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.OnSaveClicked);
+            this.ckbBuyNoDuplicate.AutoSize = true;
+            this.ckbBuyNoDuplicate.Location = new System.Drawing.Point(10, 32);
+            this.ckbBuyNoDuplicate.Name = "ckbBuyNoDuplicate";
+            this.ckbBuyNoDuplicate.Size = new System.Drawing.Size(97, 19);
+            this.ckbBuyNoDuplicate.TabIndex = 5;
+            this.ckbBuyNoDuplicate.Text = "No Duplicate";
+            this.ckbBuyNoDuplicate.UseVisualStyleBackColor = true;
+            this.ckbBuyNoDuplicate.Click += new System.EventHandler(this.OnBuyNoDuplicateClicked);
             // 
             // grpRooms
             // 
@@ -1145,57 +1524,6 @@ namespace ObjectRelocator
             this.ckbRoomBathroom.Text = "Bathroom";
             this.ckbRoomBathroom.UseVisualStyleBackColor = true;
             this.ckbRoomBathroom.Click += new System.EventHandler(this.OnRoomBathroomClicked);
-            // 
-            // panelBuyModeEditor
-            // 
-            this.panelBuyModeEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelBuyModeEditor.Controls.Add(this.grpBuyPlacement);
-            this.panelBuyModeEditor.Controls.Add(this.grpRooms);
-            this.panelBuyModeEditor.Controls.Add(this.grpCommunity);
-            this.panelBuyModeEditor.Controls.Add(this.grpUse);
-            this.panelBuyModeEditor.Controls.Add(this.grpBuyPrice);
-            this.panelBuyModeEditor.Controls.Add(this.grpDepreciation);
-            this.panelBuyModeEditor.Controls.Add(this.grpFunction);
-            this.panelBuyModeEditor.Controls.Add(this.grpSubfunction);
-            this.panelBuyModeEditor.Enabled = false;
-            this.panelBuyModeEditor.Location = new System.Drawing.Point(4, 347);
-            this.panelBuyModeEditor.Name = "panelBuyModeEditor";
-            this.panelBuyModeEditor.Size = new System.Drawing.Size(905, 169);
-            this.panelBuyModeEditor.TabIndex = 25;
-            // 
-            // grpBuyPlacement
-            // 
-            this.grpBuyPlacement.Controls.Add(this.ckbBuyQuarterTile);
-            this.grpBuyPlacement.Controls.Add(this.ckbBuyNoDuplicate);
-            this.grpBuyPlacement.Location = new System.Drawing.Point(390, 105);
-            this.grpBuyPlacement.Name = "grpBuyPlacement";
-            this.grpBuyPlacement.Size = new System.Drawing.Size(115, 64);
-            this.grpBuyPlacement.TabIndex = 5;
-            this.grpBuyPlacement.TabStop = false;
-            this.grpBuyPlacement.Text = "Placement:";
-            // 
-            // ckbBuyQuarterTile
-            // 
-            this.ckbBuyQuarterTile.AutoSize = true;
-            this.ckbBuyQuarterTile.Location = new System.Drawing.Point(10, 15);
-            this.ckbBuyQuarterTile.Name = "ckbBuyQuarterTile";
-            this.ckbBuyQuarterTile.Size = new System.Drawing.Size(90, 19);
-            this.ckbBuyQuarterTile.TabIndex = 4;
-            this.ckbBuyQuarterTile.Text = "Quarter Tile";
-            this.ckbBuyQuarterTile.UseVisualStyleBackColor = true;
-            this.ckbBuyQuarterTile.Click += new System.EventHandler(this.OnBuyQuarterTileClicked);
-            // 
-            // ckbBuyNoDuplicate
-            // 
-            this.ckbBuyNoDuplicate.AutoSize = true;
-            this.ckbBuyNoDuplicate.Location = new System.Drawing.Point(10, 32);
-            this.ckbBuyNoDuplicate.Name = "ckbBuyNoDuplicate";
-            this.ckbBuyNoDuplicate.Size = new System.Drawing.Size(97, 19);
-            this.ckbBuyNoDuplicate.TabIndex = 5;
-            this.ckbBuyNoDuplicate.Text = "No Duplicate";
-            this.ckbBuyNoDuplicate.UseVisualStyleBackColor = true;
-            this.ckbBuyNoDuplicate.Click += new System.EventHandler(this.OnBuyNoDuplicateClicked);
             // 
             // grpCommunity
             // 
@@ -1377,6 +1705,15 @@ namespace ObjectRelocator
             this.ckbLinkDep.TabIndex = 23;
             this.ckbLinkDep.UseVisualStyleBackColor = true;
             // 
+            // textBuyPrice
+            // 
+            this.textBuyPrice.Location = new System.Drawing.Point(5, 20);
+            this.textBuyPrice.Name = "textBuyPrice";
+            this.textBuyPrice.Size = new System.Drawing.Size(80, 21);
+            this.textBuyPrice.TabIndex = 13;
+            this.textBuyPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.textBuyPrice.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnBuyPriceKeyUp);
+            // 
             // grpDepreciation
             // 
             this.grpDepreciation.Controls.Add(this.lblDepLimit);
@@ -1394,6 +1731,79 @@ namespace ObjectRelocator
             this.grpDepreciation.TabStop = false;
             this.grpDepreciation.Text = "Depreciation:";
             // 
+            // lblDepLimit
+            // 
+            this.lblDepLimit.AutoSize = true;
+            this.lblDepLimit.Location = new System.Drawing.Point(5, 23);
+            this.lblDepLimit.Name = "lblDepLimit";
+            this.lblDepLimit.Size = new System.Drawing.Size(34, 15);
+            this.lblDepLimit.TabIndex = 15;
+            this.lblDepLimit.Text = "Limit";
+            // 
+            // textDepLimit
+            // 
+            this.textDepLimit.Location = new System.Drawing.Point(50, 20);
+            this.textDepLimit.Name = "textDepLimit";
+            this.textDepLimit.Size = new System.Drawing.Size(60, 21);
+            this.textDepLimit.TabIndex = 16;
+            this.textDepLimit.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.textDepLimit.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnDepreciationLimitKeyUp);
+            // 
+            // lblDepInitial
+            // 
+            this.lblDepInitial.AutoSize = true;
+            this.lblDepInitial.Location = new System.Drawing.Point(5, 50);
+            this.lblDepInitial.Name = "lblDepInitial";
+            this.lblDepInitial.Size = new System.Drawing.Size(36, 15);
+            this.lblDepInitial.TabIndex = 17;
+            this.lblDepInitial.Text = "Initial";
+            // 
+            // textDepInitial
+            // 
+            this.textDepInitial.Location = new System.Drawing.Point(50, 47);
+            this.textDepInitial.Name = "textDepInitial";
+            this.textDepInitial.Size = new System.Drawing.Size(60, 21);
+            this.textDepInitial.TabIndex = 18;
+            this.textDepInitial.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.textDepInitial.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnDepreciationInitialKeyUp);
+            // 
+            // textDepDaily
+            // 
+            this.textDepDaily.Location = new System.Drawing.Point(50, 74);
+            this.textDepDaily.Name = "textDepDaily";
+            this.textDepDaily.Size = new System.Drawing.Size(60, 21);
+            this.textDepDaily.TabIndex = 20;
+            this.textDepDaily.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.textDepDaily.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnDepreciationDailyKeyUp);
+            // 
+            // lblDepSelf
+            // 
+            this.lblDepSelf.AutoSize = true;
+            this.lblDepSelf.Location = new System.Drawing.Point(5, 103);
+            this.lblDepSelf.Name = "lblDepSelf";
+            this.lblDepSelf.Size = new System.Drawing.Size(28, 15);
+            this.lblDepSelf.TabIndex = 22;
+            this.lblDepSelf.Text = "Self";
+            // 
+            // lblDepDaily
+            // 
+            this.lblDepDaily.AutoSize = true;
+            this.lblDepDaily.Location = new System.Drawing.Point(5, 77);
+            this.lblDepDaily.Name = "lblDepDaily";
+            this.lblDepDaily.Size = new System.Drawing.Size(34, 15);
+            this.lblDepDaily.TabIndex = 19;
+            this.lblDepDaily.Text = "Daily";
+            // 
+            // ckbDepSelf
+            // 
+            this.ckbDepSelf.AutoSize = true;
+            this.ckbDepSelf.Location = new System.Drawing.Point(50, 104);
+            this.ckbDepSelf.Name = "ckbDepSelf";
+            this.ckbDepSelf.Size = new System.Drawing.Size(15, 14);
+            this.ckbDepSelf.TabIndex = 21;
+            this.ckbDepSelf.UseVisualStyleBackColor = true;
+            this.ckbDepSelf.Click += new System.EventHandler(this.OnDepreciationSelfClicked);
+            // 
             // grpFunction
             // 
             this.grpFunction.Controls.Add(this.comboFunction);
@@ -1404,6 +1814,16 @@ namespace ObjectRelocator
             this.grpFunction.TabStop = false;
             this.grpFunction.Text = "Function Sort:";
             // 
+            // comboFunction
+            // 
+            this.comboFunction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboFunction.FormattingEnabled = true;
+            this.comboFunction.Location = new System.Drawing.Point(5, 20);
+            this.comboFunction.Name = "comboFunction";
+            this.comboFunction.Size = new System.Drawing.Size(128, 23);
+            this.comboFunction.TabIndex = 5;
+            this.comboFunction.SelectedIndexChanged += new System.EventHandler(this.OnFunctionSortChanged);
+            // 
             // grpSubfunction
             // 
             this.grpSubfunction.Controls.Add(this.comboSubfunction);
@@ -1413,6 +1833,93 @@ namespace ObjectRelocator
             this.grpSubfunction.TabIndex = 6;
             this.grpSubfunction.TabStop = false;
             this.grpSubfunction.Text = "Function Subsort:";
+            // 
+            // comboSubfunction
+            // 
+            this.comboSubfunction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSubfunction.FormattingEnabled = true;
+            this.comboSubfunction.Location = new System.Drawing.Point(5, 20);
+            this.comboSubfunction.Name = "comboSubfunction";
+            this.comboSubfunction.Size = new System.Drawing.Size(107, 23);
+            this.comboSubfunction.TabIndex = 7;
+            this.comboSubfunction.SelectedIndexChanged += new System.EventHandler(this.OnFunctionSubsortChanged);
+            // 
+            // panelBuildModeEditor
+            // 
+            this.panelBuildModeEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelBuildModeEditor.Controls.Add(this.grpBuild);
+            this.panelBuildModeEditor.Controls.Add(this.grpSubbuild);
+            this.panelBuildModeEditor.Controls.Add(this.grpBuildSurfaceType);
+            this.panelBuildModeEditor.Controls.Add(this.grpBuildPlacement);
+            this.panelBuildModeEditor.Controls.Add(this.grpBuildShowInCatalog);
+            this.panelBuildModeEditor.Controls.Add(this.grpBuildPrice);
+            this.panelBuildModeEditor.Enabled = false;
+            this.panelBuildModeEditor.Location = new System.Drawing.Point(0, 135);
+            this.panelBuildModeEditor.Name = "panelBuildModeEditor";
+            this.panelBuildModeEditor.Size = new System.Drawing.Size(984, 174);
+            this.panelBuildModeEditor.TabIndex = 25;
+            this.panelBuildModeEditor.Visible = false;
+            // 
+            // grpBuild
+            // 
+            this.grpBuild.Controls.Add(this.comboBuild);
+            this.grpBuild.Location = new System.Drawing.Point(120, 0);
+            this.grpBuild.Name = "grpBuild";
+            this.grpBuild.Size = new System.Drawing.Size(140, 170);
+            this.grpBuild.TabIndex = 0;
+            this.grpBuild.TabStop = false;
+            this.grpBuild.Text = "Build Sort:";
+            // 
+            // comboBuild
+            // 
+            this.comboBuild.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBuild.FormattingEnabled = true;
+            this.comboBuild.Location = new System.Drawing.Point(5, 20);
+            this.comboBuild.Name = "comboBuild";
+            this.comboBuild.Size = new System.Drawing.Size(128, 23);
+            this.comboBuild.TabIndex = 5;
+            this.comboBuild.SelectedIndexChanged += new System.EventHandler(this.OnBuildSortChanged);
+            // 
+            // grpSubbuild
+            // 
+            this.grpSubbuild.Controls.Add(this.comboSubbuild);
+            this.grpSubbuild.Location = new System.Drawing.Point(265, 0);
+            this.grpSubbuild.Name = "grpSubbuild";
+            this.grpSubbuild.Size = new System.Drawing.Size(120, 170);
+            this.grpSubbuild.TabIndex = 6;
+            this.grpSubbuild.TabStop = false;
+            this.grpSubbuild.Text = "Build Subsort:";
+            // 
+            // comboSubbuild
+            // 
+            this.comboSubbuild.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSubbuild.FormattingEnabled = true;
+            this.comboSubbuild.Location = new System.Drawing.Point(5, 20);
+            this.comboSubbuild.Name = "comboSubbuild";
+            this.comboSubbuild.Size = new System.Drawing.Size(107, 23);
+            this.comboSubbuild.TabIndex = 7;
+            this.comboSubbuild.SelectedIndexChanged += new System.EventHandler(this.OnBuildSubsortChanged);
+            // 
+            // grpBuildSurfaceType
+            // 
+            this.grpBuildSurfaceType.Controls.Add(this.comboSurfaceType);
+            this.grpBuildSurfaceType.Location = new System.Drawing.Point(390, 0);
+            this.grpBuildSurfaceType.Name = "grpBuildSurfaceType";
+            this.grpBuildSurfaceType.Size = new System.Drawing.Size(115, 100);
+            this.grpBuildSurfaceType.TabIndex = 7;
+            this.grpBuildSurfaceType.TabStop = false;
+            this.grpBuildSurfaceType.Text = "Surface Type:";
+            // 
+            // comboSurfaceType
+            // 
+            this.comboSurfaceType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboSurfaceType.FormattingEnabled = true;
+            this.comboSurfaceType.Location = new System.Drawing.Point(5, 20);
+            this.comboSurfaceType.Name = "comboSurfaceType";
+            this.comboSurfaceType.Size = new System.Drawing.Size(102, 23);
+            this.comboSurfaceType.TabIndex = 8;
+            this.comboSurfaceType.SelectedIndexChanged += new System.EventHandler(this.OnBuildSurfaceTypeChanged);
             // 
             // grpBuildPlacement
             // 
@@ -1468,36 +1975,6 @@ namespace ObjectRelocator
             this.ckbBuildShowInCatalog.UseVisualStyleBackColor = true;
             this.ckbBuildShowInCatalog.Click += new System.EventHandler(this.OnBuildShowInCatalogClicked);
             // 
-            // grpBuild
-            // 
-            this.grpBuild.Controls.Add(this.comboBuild);
-            this.grpBuild.Location = new System.Drawing.Point(120, 0);
-            this.grpBuild.Name = "grpBuild";
-            this.grpBuild.Size = new System.Drawing.Size(140, 170);
-            this.grpBuild.TabIndex = 0;
-            this.grpBuild.TabStop = false;
-            this.grpBuild.Text = "Build Sort:";
-            // 
-            // grpSubbuild
-            // 
-            this.grpSubbuild.Controls.Add(this.comboSubbuild);
-            this.grpSubbuild.Location = new System.Drawing.Point(265, 0);
-            this.grpSubbuild.Name = "grpSubbuild";
-            this.grpSubbuild.Size = new System.Drawing.Size(120, 170);
-            this.grpSubbuild.TabIndex = 6;
-            this.grpSubbuild.TabStop = false;
-            this.grpSubbuild.Text = "Build Subsort:";
-            // 
-            // grpBuildSurfaceType
-            // 
-            this.grpBuildSurfaceType.Controls.Add(this.comboSurfacetype);
-            this.grpBuildSurfaceType.Location = new System.Drawing.Point(390, 0);
-            this.grpBuildSurfaceType.Name = "grpBuildSurfaceType";
-            this.grpBuildSurfaceType.Size = new System.Drawing.Size(115, 100);
-            this.grpBuildSurfaceType.TabIndex = 7;
-            this.grpBuildSurfaceType.TabStop = false;
-            this.grpBuildSurfaceType.Text = "Surface Type:";
-            // 
             // grpBuildPrice
             // 
             this.grpBuildPrice.Controls.Add(this.textBuildPrice);
@@ -1508,22 +1985,66 @@ namespace ObjectRelocator
             this.grpBuildPrice.TabStop = false;
             this.grpBuildPrice.Text = "Price:";
             // 
-            // panelBuildModeEditor
+            // textBuildPrice
             // 
-            this.panelBuildModeEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelBuildModeEditor.Controls.Add(this.grpBuild);
-            this.panelBuildModeEditor.Controls.Add(this.grpSubbuild);
-            this.panelBuildModeEditor.Controls.Add(this.grpBuildSurfaceType);
-            this.panelBuildModeEditor.Controls.Add(this.grpBuildPlacement);
-            this.panelBuildModeEditor.Controls.Add(this.grpBuildShowInCatalog);
-            this.panelBuildModeEditor.Controls.Add(this.grpBuildPrice);
-            this.panelBuildModeEditor.Enabled = false;
-            this.panelBuildModeEditor.Location = new System.Drawing.Point(4, 347);
-            this.panelBuildModeEditor.Name = "panelBuildModeEditor";
-            this.panelBuildModeEditor.Size = new System.Drawing.Size(905, 169);
-            this.panelBuildModeEditor.TabIndex = 25;
-            this.panelBuildModeEditor.Visible = false;
+            this.textBuildPrice.Location = new System.Drawing.Point(5, 20);
+            this.textBuildPrice.Name = "textBuildPrice";
+            this.textBuildPrice.Size = new System.Drawing.Size(80, 21);
+            this.textBuildPrice.TabIndex = 13;
+            this.textBuildPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress);
+            this.textBuildPrice.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnBuildPriceKeyUp);
+            // 
+            // menuContextFolders
+            // 
+            this.menuContextFolders.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuContextDirRename,
+            this.menuContextDirAdd,
+            this.menuContextDirMove,
+            this.toolStripSeparator7,
+            this.menuContextDirDelete});
+            this.menuContextFolders.Name = "contextMenuFolders";
+            this.menuContextFolders.Size = new System.Drawing.Size(118, 98);
+            this.menuContextFolders.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuFoldersClosing);
+            this.menuContextFolders.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuFoldersOpening);
+            // 
+            // menuContextDirRename
+            // 
+            this.menuContextDirRename.Name = "menuContextDirRename";
+            this.menuContextDirRename.Size = new System.Drawing.Size(117, 22);
+            this.menuContextDirRename.Text = "&Rename";
+            this.menuContextDirRename.Click += new System.EventHandler(this.OnFolderRenameClicked);
+            // 
+            // menuContextDirAdd
+            // 
+            this.menuContextDirAdd.Name = "menuContextDirAdd";
+            this.menuContextDirAdd.Size = new System.Drawing.Size(117, 22);
+            this.menuContextDirAdd.Text = "&Add";
+            this.menuContextDirAdd.Click += new System.EventHandler(this.OnFolderAddClicked);
+            // 
+            // menuContextDirMove
+            // 
+            this.menuContextDirMove.Name = "menuContextDirMove";
+            this.menuContextDirMove.Size = new System.Drawing.Size(117, 22);
+            this.menuContextDirMove.Text = "&Move";
+            this.menuContextDirMove.Click += new System.EventHandler(this.OnFolderMoveClicked);
+            // 
+            // menuContextDirDelete
+            // 
+            this.menuContextDirDelete.Name = "menuContextDirDelete";
+            this.menuContextDirDelete.Size = new System.Drawing.Size(117, 22);
+            this.menuContextDirDelete.Text = "&Delete";
+            this.menuContextDirDelete.Click += new System.EventHandler(this.OnFolderDeleteClicked);
+            // 
+            // btnSave
+            // 
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.Location = new System.Drawing.Point(892, 532);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(88, 26);
+            this.btnSave.TabIndex = 23;
+            this.btnSave.Text = "&Save";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.OnSaveClicked);
             // 
             // saveAsFileDialog
             // 
@@ -1552,35 +2073,62 @@ namespace ObjectRelocator
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
             // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
+            // 
+            // menuItemConfirmDelete
+            // 
+            this.menuItemConfirmDelete.CheckOnClick = true;
+            this.menuItemConfirmDelete.Name = "menuItemConfirmDelete";
+            this.menuItemConfirmDelete.Size = new System.Drawing.Size(180, 22);
+            this.menuItemConfirmDelete.Text = "Confirm &Delete";
+            // 
             // ObjectRelocatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(914, 519);
+            this.ClientSize = new System.Drawing.Size(984, 561);
             this.Controls.Add(this.menuMain);
-            this.Controls.Add(this.btnSave);
             this.Controls.Add(this.thumbBox);
-            this.Controls.Add(this.gridViewResources);
-            this.Controls.Add(this.panelBuildModeEditor);
-            this.Controls.Add(this.panelBuyModeEditor);
+            this.Controls.Add(this.btnSave);
+            this.Controls.Add(this.splitTopBottom);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(930, 450);
+            this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "ObjectRelocatorForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
             this.Load += new System.EventHandler(this.OnLoad);
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).EndInit();
+            this.splitTopBottom.Panel1.ResumeLayout(false);
+            this.splitTopBottom.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).EndInit();
+            this.splitTopBottom.ResumeLayout(false);
+            this.splitTopLeftRight.Panel1.ResumeLayout(false);
+            this.splitTopLeftRight.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitTopLeftRight)).EndInit();
+            this.splitTopLeftRight.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gridPackageFiles)).EndInit();
+            this.menuContextPackages.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gridResources)).EndInit();
             this.menuContextObjects.ResumeLayout(false);
-            this.grpRooms.ResumeLayout(false);
-            this.grpRooms.PerformLayout();
+            this.panelDecoModeEditor.ResumeLayout(false);
+            this.grpDecoSort.ResumeLayout(false);
+            this.grpDecoSurfaceType.ResumeLayout(false);
+            this.grpDecoPlacement.ResumeLayout(false);
+            this.grpDecoPlacement.PerformLayout();
+            this.grpDecoShowInCatalog.ResumeLayout(false);
+            this.grpDecoShowInCatalog.PerformLayout();
             this.panelBuyModeEditor.ResumeLayout(false);
             this.grpBuyPlacement.ResumeLayout(false);
             this.grpBuyPlacement.PerformLayout();
+            this.grpRooms.ResumeLayout(false);
+            this.grpRooms.PerformLayout();
             this.grpCommunity.ResumeLayout(false);
             this.grpCommunity.PerformLayout();
             this.grpUse.ResumeLayout(false);
@@ -1591,16 +2139,17 @@ namespace ObjectRelocator
             this.grpDepreciation.PerformLayout();
             this.grpFunction.ResumeLayout(false);
             this.grpSubfunction.ResumeLayout(false);
+            this.panelBuildModeEditor.ResumeLayout(false);
+            this.grpBuild.ResumeLayout(false);
+            this.grpSubbuild.ResumeLayout(false);
+            this.grpBuildSurfaceType.ResumeLayout(false);
             this.grpBuildPlacement.ResumeLayout(false);
             this.grpBuildPlacement.PerformLayout();
             this.grpBuildShowInCatalog.ResumeLayout(false);
             this.grpBuildShowInCatalog.PerformLayout();
-            this.grpBuild.ResumeLayout(false);
-            this.grpSubbuild.ResumeLayout(false);
-            this.grpBuildSurfaceType.ResumeLayout(false);
             this.grpBuildPrice.ResumeLayout(false);
             this.grpBuildPrice.PerformLayout();
-            this.panelBuildModeEditor.ResumeLayout(false);
+            this.menuContextFolders.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -1619,6 +2168,16 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuItemExit;
         private System.Windows.Forms.ToolStripMenuItem menuHelp;
         private System.Windows.Forms.ToolStripMenuItem menuItemAbout;
+        private System.Windows.Forms.ToolStripMenuItem menuItemFolder;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDirRename;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDirAdd;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDirMove;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDirDelete;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPackage;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPkgRename;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPkgMove;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPkgMerge;
+        private System.Windows.Forms.ToolStripMenuItem menuItemPkgDelete;
         private System.Windows.Forms.ToolStripMenuItem menuOptions;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowGuids;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowDepreciation;
@@ -1633,9 +2192,27 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuItemAutoBackup;
         private System.Windows.Forms.ToolStripMenuItem menuItemMakeReplacements;
         private CommonOpenFileDialog selectPathDialog;
-        private System.Windows.Forms.DataGridView gridViewResources;
+        private System.Windows.Forms.SplitContainer splitTopBottom;
+        private System.Windows.Forms.SplitContainer splitTopLeftRight;
+        private System.Windows.Forms.TreeView treeFolders;
+        private System.Windows.Forms.DataGridView gridPackageFiles;
+        private System.Windows.Forms.ContextMenuStrip menuContextPackages;
+        private System.Windows.Forms.ToolStripMenuItem menuContextPkgRename;
+        private System.Windows.Forms.ToolStripMenuItem menuContextPkgMove;
+        private System.Windows.Forms.ToolStripMenuItem menuContextPkgMerge;
+        private System.Windows.Forms.ToolStripMenuItem menuContextPkgDelete;
+        private System.Windows.Forms.ToolStripSeparator menuContextPkgSeparator1;
+        private System.Windows.Forms.ContextMenuStrip menuContextResources;
+        private System.Windows.Forms.ToolStripMenuItem menuContextResRestore;
+        private System.Windows.Forms.ContextMenuStrip menuContextFolders;
+        private System.Windows.Forms.ToolStripMenuItem menuContextDirRename;
+        private System.Windows.Forms.ToolStripMenuItem menuContextDirAdd;
+        private System.Windows.Forms.ToolStripMenuItem menuContextDirMove;
+        private System.Windows.Forms.ToolStripMenuItem menuContextDirDelete;
+        private System.Windows.Forms.DataGridView gridResources;
         private System.Windows.Forms.Panel panelBuyModeEditor;
         private System.Windows.Forms.Panel panelBuildModeEditor;
+        private System.Windows.Forms.Panel panelDecoModeEditor;
         private System.Windows.Forms.GroupBox grpRooms;
         private System.Windows.Forms.GroupBox grpFunction;
         private System.Windows.Forms.GroupBox grpSubfunction;
@@ -1647,6 +2224,8 @@ namespace ObjectRelocator
         private System.Windows.Forms.GroupBox grpBuyPrice;
         private System.Windows.Forms.GroupBox grpBuildPrice;
         private System.Windows.Forms.GroupBox grpDepreciation;
+        private System.Windows.Forms.GroupBox grpDecoSort;
+        private System.Windows.Forms.GroupBox grpDecoSurfaceType;
         private System.Windows.Forms.Label lblDepLimit;
         private System.Windows.Forms.Label lblDepInitial;
         private System.Windows.Forms.Label lblDepDaily;
@@ -1656,7 +2235,9 @@ namespace ObjectRelocator
         private System.Windows.Forms.ComboBox comboSubfunction;
         private System.Windows.Forms.ComboBox comboBuild;
         private System.Windows.Forms.ComboBox comboSubbuild;
-        private System.Windows.Forms.ComboBox comboSurfacetype;
+        private System.Windows.Forms.ComboBox comboSurfaceType;
+        private System.Windows.Forms.ComboBox comboDecoSort;
+        private System.Windows.Forms.ComboBox comboDecoSurfaceType;
         private System.Windows.Forms.CheckBox ckbRoomNursery;
         private System.Windows.Forms.CheckBox ckbRoomStudy;
         private System.Windows.Forms.CheckBox ckbRoomOutside;
@@ -1691,6 +2272,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.SaveFileDialog saveAsFileDialog;
         private System.Windows.Forms.ToolStripMenuItem menuItemBuyMode;
         private System.Windows.Forms.ToolStripMenuItem menuItemBuildMode;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDecoMode;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator5;
         private System.Windows.Forms.GroupBox grpBuyPlacement;
         private System.Windows.Forms.CheckBox ckbBuyQuarterTile;
@@ -1698,6 +2280,10 @@ namespace ObjectRelocator
         private System.Windows.Forms.GroupBox grpBuildPlacement;
         private System.Windows.Forms.CheckBox ckbBuildQuarterTile;
         private System.Windows.Forms.CheckBox ckbBuildNoDuplicate;
+        private System.Windows.Forms.GroupBox grpDecoPlacement;
+        private System.Windows.Forms.CheckBox ckbDecoAllowInLot;
+        private System.Windows.Forms.CheckBox ckbDecoAllowOnRoad;
+        private System.Windows.Forms.CheckBox ckbDecoRemoveOnPlop;
         private System.Windows.Forms.ToolStripSeparator menuItemSeparator6;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextMoveFiles;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowName;
@@ -1726,12 +2312,25 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuItemContextStripCTSSCrap;
         private System.Windows.Forms.Label lblLinkDepreciation;
         private System.Windows.Forms.CheckBox ckbLinkDep;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
+        private System.Windows.Forms.GroupBox grpBuildShowInCatalog;
+        private System.Windows.Forms.CheckBox ckbBuildShowInCatalog;
+        private System.Windows.Forms.GroupBox grpDecoShowInCatalog;
+        private System.Windows.Forms.CheckBox ckbDecoShowInCatalog;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colPackageFile;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colPackagePath;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colPackageIcon;
         private System.Windows.Forms.DataGridViewTextBoxColumn colVisible;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTitle;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDescription;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colPackagePath;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colPath;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colResName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colResPackagePath;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colResPath;
         private System.Windows.Forms.DataGridViewTextBoxColumn colGuid;
         private System.Windows.Forms.DataGridViewTextBoxColumn colRooms;
         private System.Windows.Forms.DataGridViewTextBoxColumn colFunction;
@@ -1742,13 +2341,13 @@ namespace ObjectRelocator
         private System.Windows.Forms.DataGridViewTextBoxColumn colPrice;
         private System.Windows.Forms.DataGridViewTextBoxColumn colDepreciation;
         private System.Windows.Forms.DataGridViewTextBoxColumn colHoodView;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colSurface;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAllowLot;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAllowRoad;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colRemoveOnPlop;
         private System.Windows.Forms.DataGridViewTextBoxColumn colShowInCatalog;
         private System.Windows.Forms.DataGridViewTextBoxColumn colObjectData;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
-        private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.GroupBox grpBuildShowInCatalog;
-        private System.Windows.Forms.CheckBox ckbBuildShowInCatalog;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem menuItemConfirmDelete;
     }
 }

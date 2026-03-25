@@ -11,6 +11,8 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.CLST;
+using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.CRES;
@@ -28,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -52,6 +55,9 @@ namespace ObjectRelocator
 
         private readonly DbpfFileCache packageCache = new DbpfFileCache();
 
+        private string rootFolder = null;
+        private string lastFolder = null;
+
         private MruList MyMruList;
         private Updater MyUpdater;
 
@@ -62,14 +68,18 @@ namespace ObjectRelocator
 
         private readonly TypeTypeID[] buyModeResources = new TypeTypeID[] { Objd.TYPE };
         private readonly TypeTypeID[] buildModeResources = new TypeTypeID[] { Objd.TYPE, Xfnc.TYPE, Xobj.TYPE };
+        private readonly TypeTypeID[] decoModeResources = new TypeTypeID[] { Xngb.TYPE };
 
-        private readonly ResourcesDataTable dataTableResources = new ResourcesDataTable();
+        private readonly ObjectRelocatorPackageData dataPackageFiles = new ObjectRelocatorPackageData();
+        private readonly ObjectRelocatorResourceData dataResources = new ObjectRelocatorResourceData();
 
-        private string folder = null;
         private bool buyMode = true;
+        private bool buildMode = false;
+        private bool decoMode = false;
 
         private bool IsBuyMode => buyMode;
-        private bool IsBuildMode => !buyMode;
+        private bool IsBuildMode => buildMode;
+        private bool IsDecoMode => decoMode;
 
         private bool dataLoading = false;
         private bool ignoreEdits = false;
@@ -93,17 +103,17 @@ namespace ObjectRelocator
             };
 
         private readonly UintNamedValue[] buildSortItems = {
-                new UintNamedValue("", 0x0000),
+                new UintNamedValue("",                0x0000),
                 new UintNamedValue("Doors & Windows", 0x0008),
                 new UintNamedValue("Floor Coverings", 0x1000),
-                new UintNamedValue("Garden Centre", 0x0004),
-                new UintNamedValue("Other", 0x0001),
-                new UintNamedValue("Wall Coverings", 0x2000),
+                new UintNamedValue("Garden Centre",   0x0004),
+                new UintNamedValue("Other",           0x0001),
+                new UintNamedValue("Wall Coverings",  0x2000),
                 new UintNamedValue("Walls", 0x4000)
             };
 
         // These are "fake" values
-        private readonly UintNamedValue[] surfacetypeItems = {
+        private readonly UintNamedValue[] surfaceTypeItems = {
                 new UintNamedValue("",       0x0000),
                 new UintNamedValue("cment",  0x0001),
                 new UintNamedValue("cpet",   0x0002),
@@ -150,6 +160,21 @@ namespace ObjectRelocator
             Wallpaper,
             Wood
         }
+
+        private readonly StringNamedValue[] decoSortItems = {
+                new StringNamedValue("Effects",  "effects"),
+                new StringNamedValue("Flora",    "flora"),
+                new StringNamedValue("Landmark", "landmark"),
+                new StringNamedValue("Misc",     "misc"),
+                new StringNamedValue("Stone",    "stone"),
+            };
+
+        private readonly UintNamedValue[] decoSurfaceTypeItems = {
+                new UintNamedValue("Land",         0x0000),
+                new UintNamedValue("Water",        0x0001),
+                new UintNamedValue("Land & Water", 0x0002),
+            };
+
         #endregion
 
         public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
@@ -160,7 +185,7 @@ namespace ObjectRelocator
             logger.Info(ObjectRelocatorApp.AppProduct);
 
             InitializeComponent();
-            this.Text = $"{ObjectRelocatorApp.AppTitle} - {(IsBuyMode ? "Buy" : "Build")} Mode";
+            SetTitle(lastFolder);
 
             ObjectDbpfData.SetCache(packageCache);
 
@@ -172,9 +197,13 @@ namespace ObjectRelocator
             comboFunction.Items.AddRange(functionSortItems);
 
             comboBuild.Items.AddRange(buildSortItems);
-            comboSurfacetype.Items.AddRange(surfacetypeItems);
+            comboSurfaceType.Items.AddRange(surfaceTypeItems);
 
-            gridViewResources.DataSource = dataTableResources;
+            comboDecoSort.Items.AddRange(decoSortItems);
+            comboDecoSurfaceType.Items.AddRange(decoSurfaceTypeItems);
+
+            gridPackageFiles.DataSource = dataPackageFiles;
+            gridResources.DataSource = dataResources;
 
             thumbCache = new ThumbnailCache();
 
@@ -211,15 +240,16 @@ namespace ObjectRelocator
             menuItemShowNoDuplicate.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowNoDuplicate.Name, 0) != 0); OnShowHideNoDuplicate(menuItemShowNoDuplicate, null);
 
             menuItemRecurse.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, 1) != 0);
+            menuItemConfirmDelete.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemConfirmDelete.Name, 0) != 0);
 
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
 
             menuItemMakeReplacements.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemMakeReplacements.Name, 0) != 0); OnMakeReplcementsClicked(menuItemMakeReplacements, null);
 
-            buyMode = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemBuyMode.Name, 1) != 0);
-            // As we're simulating a click to change mode, we need to change mode first!
-            buyMode = !buyMode; OnBuyBuildModeClicked(null, null);
+            int mode = (int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemBuyMode.Name, 1);
+            buyMode = buildMode = decoMode = false;
+            OnModeClicked(((mode == 1) ? menuItemBuyMode : (mode == 0 ? menuItemBuildMode : menuItemDecoMode)), null);
 
             ckbLinkDep.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", ckbLinkDep.Name, 0) != 0);
 
@@ -231,10 +261,10 @@ namespace ObjectRelocator
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            if (IsAnyDirty() || IsThumbCacheDirty())
+            if (IsAnyResourceDirty() || IsThumbCacheDirty())
             {
-                string qualifier = IsAnyHiddenDirty() ? " HIDDEN" : "";
-                string type = (IsAnyDirty() ? (IsThumbCacheDirty() ? "object and thumbnail" : "object") : "thumbnail");
+                string qualifier = IsAnyHiddenResourceDirty() ? " HIDDEN" : "";
+                string type = (IsAnyResourceDirty() ? (IsThumbCacheDirty() ? "object and thumbnail" : "object") : "thumbnail");
 
                 if (MsgBox.Show($"There are{qualifier} unsaved {type} changes, do you really want to exit?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
@@ -252,7 +282,7 @@ namespace ObjectRelocator
                 RegistryTools.SaveAppSettings(ObjectRelocatorApp.RegistryKey, ObjectRelocatorApp.AppVersionMajor, ObjectRelocatorApp.AppVersionMinor);
                 RegistryTools.SaveFormSettings(ObjectRelocatorApp.RegistryKey, this);
 
-                RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemBuyMode.Name, buyMode ? 1 : 0);
+                RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemBuyMode.Name, (IsBuyMode ? 1 : (IsDecoMode ? 2 : 0)));
 
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemExcludeHidden.Name, menuItemExcludeHidden.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemHideNonLocals.Name, menuItemHideNonLocals.Checked ? 1 : 0);
@@ -267,6 +297,7 @@ namespace ObjectRelocator
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowNoDuplicate.Name, menuItemShowNoDuplicate.Checked ? 1 : 0);
 
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, menuItemRecurse.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemConfirmDelete.Name, menuItemConfirmDelete.Checked ? 1 : 0);
 
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
@@ -275,6 +306,30 @@ namespace ObjectRelocator
 
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", ckbLinkDep.Name, ckbLinkDep.Checked ? 1 : 0);
             }
+        }
+
+        private void SetTitle(string folder)
+        {
+            string displayPath = "";
+
+            if (folder != null)
+            {
+                if (Sims2ToolsLib.IsSims2HomePathSet && folder.StartsWith($"{Sims2ToolsLib.Sims2DownloadsPath}"))
+                {
+                    displayPath = $" - {folder.Substring(Sims2ToolsLib.Sims2HomePath.Length + 1)}";
+                }
+                else
+                {
+                    displayPath = $" - {folder}";
+                }
+
+                if (menuItemRecurse.Checked)
+                {
+                    displayPath += " (including sub-folders)";
+                }
+            }
+
+            this.Text = $"{ObjectRelocatorApp.AppTitle} - {(IsBuyMode ? "Buy" : (IsBuildMode ? "Build" : "Hood Deco"))} Mode{displayPath}";
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -289,150 +344,252 @@ namespace ObjectRelocator
         #endregion
 
         #region Worker
-        private void DoWork_FillGrid(string folder, bool ignoreDirty)
+        private void DoWork_FillTree(string folder, bool ignoreDirty, bool updateMru)
+        {
+            DoWork_FillTreeOrGrids(folder, ignoreDirty, updateMru, true, false, false);
+        }
+
+        private void DoWork_FillPackageGrid(string folder)
+        {
+            DoWork_FillTreeOrGrids(folder, false, false, false, true, false);
+        }
+
+        private void DoWork_FillResourceGrid(string folder, bool ignoreDirty)
+        {
+            DoWork_FillTreeOrGrids(folder, ignoreDirty, false, false, false, true);
+        }
+
+        private void DoWork_FillTreeOrGrids(string folder, bool ignoreDirty, bool updateMru, bool updateFolders, bool updatePackages, bool updateResources)
         {
             if (folder == null) return;
 
-            if (!ignoreDirty && IsAnyDirty())
+            if (!ignoreDirty && IsAnyPackageDirty())
             {
-                string qualifier = IsAnyHiddenDirty() ? " HIDDEN" : "";
+                string qualifier = IsAnyHiddenResourceDirty() ? " HIDDEN" : "";
 
-                if (MsgBox.Show($"There are{qualifier} unsaved changes, do you really want to reload?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                if (MsgBox.Show($"There are{qualifier} unsaved changes, do you really want to change folder?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
                     return;
                 }
             }
 
-            this.folder = folder;
-
-            this.Text = $"{ObjectRelocatorApp.AppTitle} - {(IsBuyMode ? "Buy" : "Build")} Mode - {(new DirectoryInfo(folder)).FullName}";
-            menuItemSelectFolder.Enabled = false;
-            menuItemRecentFolders.Enabled = false;
-
-            dataLoading = true;
-            dataTableResources.BeginLoadData();
-
-            dataTableResources.Clear();
-            panelBuyModeEditor.Enabled = false;
-            panelBuildModeEditor.Enabled = false;
-
-            ProgressDialog progressDialog = new ProgressDialog();
-            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid);
-            progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_FillGrid_Data);
-
-            DialogResult result = progressDialog.ShowDialog();
-
-            dataTableResources.EndLoadData();
-            dataLoading = false;
-
-            menuItemRecentFolders.Enabled = true;
-            menuItemSelectFolder.Enabled = true;
-
-            if (result == DialogResult.Abort)
+            if (Directory.Exists(folder))
             {
-                MyMruList.RemoveFile(folder);
+                SetTitle(folder);
 
-                logger.Error(progressDialog.Result.Error.Message);
-                logger.Info(progressDialog.Result.Error.StackTrace);
+                menuItemSelectFolder.Enabled = false;
+                menuItemRecentFolders.Enabled = false;
 
-                MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
-            }
-            else
-            {
-                MyMruList.AddFile(folder);
+                dataLoading = !updateResources;
 
-                if (result == DialogResult.Cancel)
+                panelBuyModeEditor.Enabled = false;
+                panelBuildModeEditor.Enabled = false;
+                panelDecoModeEditor.Enabled = false;
+                dataResources.Clear();
+
+                if (updateResources)
                 {
+                    ClearEditor();
+                    ignoreEdits = true;
                 }
                 else
                 {
-                    panelBuyModeEditor.Enabled = true;
-                    panelBuildModeEditor.Enabled = true;
+                    dataPackageFiles.Clear();
+                }
+
+                if (updatePackages)
+                {
+                    lastFolder = folder;
+                }
+
+                if (updateFolders)
+                {
+                    treeFolders.Nodes.Clear();
+                    lastFolder = null;
+                }
+
+                ProgressDialog progressDialog = new ProgressDialog(new WorkerPackage(folder, updateFolders, updatePackages, updateResources));
+                progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessFoldersOrPackagesOrResources);
+                progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_DoTask);
+
+                DialogResult result = progressDialog.ShowDialog();
+
+                dataLoading = false;
+
+                menuItemRecentFolders.Enabled = true;
+                menuItemSelectFolder.Enabled = true;
+
+                if (result == DialogResult.Abort)
+                {
+                    if (updateMru) MyMruList.RemoveFile(folder);
+
+                    logger.Error(progressDialog.Result.Error.Message);
+                    logger.Info(progressDialog.Result.Error.StackTrace);
+
+                    MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
+                }
+                else
+                {
+                    if (updateMru) MyMruList.AddFile(folder);
+
+                    if (result == DialogResult.Cancel)
+                    {
+                        if (updateFolders) treeFolders.Nodes.Clear();
+                    }
+                    else
+                    {
+                        if (updateFolders)
+                        {
+                            treeFolders.Nodes[0]?.Expand();
+                            OnTreeFolderClicked(treeFolders, new TreeNodeMouseClickEventArgs(treeFolders.Nodes[0], MouseButtons.Left, 1, 0, 0));
+                        }
+
+                        if (updateResources)
+                        {
+                            ignoreEdits = false;
+
+                            if (dataResources.Rows.Count > 0)
+                            {
+                                panelBuyModeEditor.Enabled = true;
+                                panelBuildModeEditor.Enabled = true;
+                                panelDecoModeEditor.Enabled = true;
+                            }
+                        }
+                    }
 
                     UpdateFormState();
-
-                    OnGridSelectionChanged(gridViewResources, null);
                 }
+            }
+            else
+            {
+                if (updateMru) MyMruList.RemoveFile(folder);
             }
         }
 
-        private void DoAsyncWork_FillGrid(ProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_ProcessFoldersOrPackagesOrResources(ProgressDialog sender, DoWorkEventArgs args)
         {
-            // object myArgument = args.Argument; // As passed to the Sims2ToolsProgressDialog constructor
+            WorkerPackage workPackage = args.Argument as WorkerPackage; // As passed to the Sims2ToolsProgressDialog constructor
 
             sender.VisualMode = ProgressBarDisplayMode.CustomText;
-            sender.SetProgress(0, "Loading Objects");
 
-            string[] packages = Directory.GetFiles(folder, "*.package", (menuItemRecurse.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly));
-
-            uint totalPackages = (uint)packages.Length;
-            uint donePackages = 0;
-            uint foundResources = 0;
-
-            foreach (string packagePath in packages)
+#if !DEBUG
+            try
+#endif
             {
+                if (workPackage.UpdateFolders)
+                {
+                    sender.SetProgress(0, "Loading Folder Tree");
+
+                    WorkerTreeTask task = new WorkerTreeTask(treeFolders.Nodes, workPackage.Folder, (new DirectoryInfo(workPackage.Folder)).Name, null);
+                    sender.SetData(task);
+
+                    if (!PopulateChildNodes(sender, task.ChildNode, workPackage.Folder))
+                    {
+                        args.Cancel = true;
+                        return;
+                    }
+                }
+                else if (workPackage.UpdatePackages)
+                {
+                    sender.SetProgress(0, "Loading Packages");
+
+                    foreach (string packagePath in Directory.GetFiles(workPackage.Folder, "*.package", menuItemRecurse.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
+                    {
+                        if (sender.CancellationPending)
+                        {
+                            args.Cancel = true;
+                            return;
+                        }
+
+                        DataRow packageRow = dataPackageFiles.NewRow();
+
+                        packageRow["Name"] = (new FileInfo(packagePath)).Name;
+
+                        packageRow["PackagePath"] = packagePath;
+                        packageRow["PackageIcon"] = null;
+
+                        sender.SetData(new WorkerGridTask(dataPackageFiles, packageRow));
+                    }
+                }
+                else if (workPackage.UpdateResources)
+                {
+                    sender.SetProgress(0, "Loading Objects");
+
+                    List<string> packages = new List<string>();
+
+                    foreach (DataGridViewRow packageRow in gridPackageFiles.SelectedRows)
+                    {
+                        packages.Add(packageRow.Cells["colPackagePath"].Value as string);
+                    }
+
+                    uint totalPackages = (uint)packages.Count;
+                    uint donePackages = 0;
+                    uint foundResources = 0;
+
+                    foreach (string packagePath in packages)
+                    {
 #if !DEBUG
                 try
 #else
-                logger.Debug($"Processing: {packagePath}");
+                        logger.Debug($"Processing: {packagePath}");
 #endif
-                {
-                    sender.VisualMode = ProgressBarDisplayMode.Percentage;
-
-                    using (CacheableDbpfFile package = packageCache.GetOrOpen(packagePath))
-                    {
-                        bool showHoodView = menuItemShowHoodView.Checked;
-
-                        if (package.PackageName.Equals("objects.package"))
                         {
-                            showHoodView = false;
-                        }
+                            sender.VisualMode = ProgressBarDisplayMode.Percentage;
 
-                        int totalResources = 0;
-                        int doneResources = 0;
-
-                        foreach (TypeTypeID type in (IsBuyMode ? buyModeResources : buildModeResources))
-                        {
-                            totalResources += package.GetEntriesByType(type).Count;
-                        }
-
-                        foreach (TypeTypeID type in (IsBuyMode ? buyModeResources : buildModeResources))
-                        {
-                            List<DBPFEntry> resources = package.GetEntriesByType(type);
-
-                            foreach (DBPFEntry entry in resources)
+                            using (CacheableDbpfFile package = packageCache.GetOrOpen(packagePath))
                             {
-                                if (sender.CancellationPending)
+                                bool showHoodView = menuItemShowHoodView.Checked;
+
+                                if (package.PackageName.Equals("objects.package"))
                                 {
-                                    args.Cancel = true;
-                                    return;
+                                    showHoodView = false;
                                 }
 
-                                DBPFResource res = package.GetResourceByEntry(entry);
+                                int totalResources = 0;
+                                int doneResources = 0;
 
-                                if (IsModeResource(res))
+                                TypeTypeID[] modeResources = (IsBuyMode ? buyModeResources : (IsBuildMode ? buildModeResources : decoModeResources));
+
+                                foreach (TypeTypeID type in modeResources)
                                 {
-                                    sender.SetData(FillRow(package, dataTableResources.NewRow(), res, showHoodView));
-
-                                    ++foundResources;
+                                    totalResources += package.GetEntriesByType(type).Count;
                                 }
 
-                                ++doneResources;
-
-                                // For most .package files this will never trigger, it's here for the likes of objects.package
-                                if (doneResources % 100 == 0)
+                                foreach (TypeTypeID type in modeResources)
                                 {
-                                    sender.SetProgress((int)((doneResources / (float)totalResources) * 100.0));
+                                    foreach (DBPFEntry entry in package.GetEntriesByType(type))
+                                    {
+                                        if (sender.CancellationPending)
+                                        {
+                                            args.Cancel = true;
+                                            return;
+                                        }
+
+                                        DBPFResource res = package.GetResourceByEntry(entry);
+
+                                        if (IsModeResource(res))
+                                        {
+                                            AddToGrid(sender, package, ObjectDbpfData.Create(package, res), showHoodView);
+
+                                            ++foundResources;
+                                        }
+
+                                        ++doneResources;
+
+                                        // For most .package files this will never trigger, it's here for the likes of objects.package
+                                        if (doneResources % 100 == 0)
+                                        {
+                                            sender.SetProgress((int)((doneResources / (float)totalResources) * 100.0));
+                                        }
+                                    }
                                 }
+
+                                sender.SetProgress((int)((++donePackages / (float)totalPackages) * 100.0));
+                                package.Close();
+
+                                args.Result = foundResources;
                             }
                         }
-
-                        sender.SetProgress((int)((++donePackages / (float)totalPackages) * 100.0));
-                        package.Close();
-
-                        args.Result = foundResources;
-                    }
-                }
 #if !DEBUG
                 catch (Exception ex)
                 {
@@ -445,30 +602,136 @@ namespace ObjectRelocator
                     }
                 }
 #endif
+                    }
+
+                }
+            }
+#if !DEBUG
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                logger.Info(ex.StackTrace);
+
+                if (MsgBox.Show($"An error occured while processing\n{workPackage.Folder}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                {
+                    throw ex;
+                }
+            }
+#endif
+        }
+
+        private void AddToGrid(ProgressDialog sender, CacheableDbpfFile package, ObjectDbpfData objectData, bool showHoodView)
+        {
+            if (objectData != null)
+            {
+                DataRow resourceRow = dataResources.NewRow();
+
+                resourceRow["Visible"] = "Yes";
+                resourceRow["ObjectData"] = objectData;
+
+                resourceRow["PackagePath"] = package.PackagePath;
+                resourceRow["Path"] = BuildPathString(package.PackagePath);
+
+                resourceRow["Title"] = objectData.Title;
+                resourceRow["Description"] = objectData.Description;
+
+                resourceRow["Name"] = objectData.KeyName;
+                resourceRow["Guid"] = objectData.Guid;
+
+                if (IsBuyMode)
+                {
+                    resourceRow["Rooms"] = BuildRoomsString(objectData);
+                    resourceRow["Function"] = BuildFunctionString(objectData);
+                    resourceRow["Community"] = BuildCommunityString(objectData);
+                    resourceRow["Use"] = BuildUseString(objectData);
+
+                    resourceRow["QuarterTile"] = BuildQuarterTileString(objectData);
+                    resourceRow["NoDuplicate"] = BuildNoDuplicateString(objectData);
+
+                    resourceRow["Price"] = objectData.GetRawData(ObjdIndex.Price);
+                    resourceRow["Depreciation"] = BuildDepreciationString(objectData);
+
+                    resourceRow["HoodView"] = BuildHoodViewString(objectData, showHoodView);
+                }
+                else if (IsBuildMode)
+                {
+                    if (objectData.IsObjd)
+                    {
+                        resourceRow["Function"] = BuildBuildString(objectData);
+
+                        resourceRow["QuarterTile"] = BuildQuarterTileString(objectData);
+                        resourceRow["NoDuplicate"] = BuildNoDuplicateString(objectData);
+
+                        resourceRow["Price"] = objectData.GetRawData(ObjdIndex.Price);
+                    }
+                    else if (objectData.IsCpf)
+                    {
+                        resourceRow["Function"] = BuildBuildString(objectData);
+
+                        resourceRow["ShowInCatalog"] = BuildShowInCatalogString(objectData);
+
+                        resourceRow["Price"] = objectData.GetUIntItem("cost");
+                    }
+
+                    resourceRow["HoodView"] = BuildHoodViewString(objectData, showHoodView);
+                }
+                else
+                {
+                    resourceRow["Function"] = BuildDecoSortString(objectData);
+
+                    resourceRow["Surface"] = BuildDecoSurfaceString(objectData);
+                    resourceRow["AllowLot"] = BuildDecoAllowLotString(objectData);
+                    resourceRow["AllowRoad"] = BuildDecoAllowRoadString(objectData);
+                    resourceRow["RemoveOnPlop"] = BuildDecoRemoveOnPlopString(objectData);
+
+                    resourceRow["ShowInCatalog"] = BuildShowInCatalogString(objectData);
+                }
+
+                sender.SetData(new WorkerGridTask(dataResources, resourceRow));
             }
         }
 
-        private void DoAsyncWork_FillGrid_Data(ProgressDialog sender, DoWorkEventArgs e)
+        private void DoAsyncWork_DoTask(ProgressDialog sender, DoWorkEventArgs e)
         {
             if (InvokeRequired)
             {
-                Invoke((MethodInvoker)delegate { DoAsyncWork_FillGrid_Data(sender, e); });
+                Invoke((MethodInvoker)delegate { DoAsyncWork_DoTask(sender, e); });
                 return;
             }
 
             // This will be run on main (UI) thread 
-            DataRow row = e.Argument as DataRow;
-            dataTableResources.Append(row);
+            IWorkerTask task = e.Argument as IWorkerTask;
+            task.DoTask();
         }
         #endregion
 
         #region Worker Helpers
+        private bool PopulateChildNodes(ProgressDialog sender, TreeNode parent, string baseDir)
+        {
+            foreach (string subDir in Directory.GetDirectories(baseDir, "*", SearchOption.TopDirectoryOnly))
+            {
+                if (sender.CancellationPending)
+                {
+                    return false;
+                }
+
+                WorkerTreeTask task = new WorkerTreeTask(parent.Nodes, subDir, (new DirectoryInfo(subDir)).Name, menuContextFolders);
+                sender.SetData(task);
+
+                if (!PopulateChildNodes(sender, task.ChildNode, subDir)) return false;
+            }
+
+            return true;
+        }
+
         private bool IsModeResource(DBPFResource res)
         {
             if (IsBuyMode)
                 return IsBuyModeResource(res);
-            else
+            else if (IsBuildMode)
                 return IsBuildModeResource(res);
+            else
+                return IsDecoModeResource(res);
         }
 
         private bool IsBuyModeResource(DBPFResource res)
@@ -556,6 +819,18 @@ namespace ObjectRelocator
 
             return false;
         }
+
+        private bool IsDecoModeResource(DBPFResource res)
+        {
+            if (res == null) return false;
+
+            if (res is Xngb /*xngb*/)
+            {
+                return true;
+            }
+
+            return false;
+        }
         #endregion
 
         #region Form State
@@ -564,11 +839,11 @@ namespace ObjectRelocator
             return thumbCache.IsDirty;
         }
 
-        private bool IsAnyDirty()
+        private bool IsAnyPackageDirty()
         {
-            foreach (DataRow row in dataTableResources.Rows)
+            foreach (DataRow packageRow in dataPackageFiles.Rows)
             {
-                if ((row["ObjectData"] as ObjectDbpfData).IsDirty)
+                if (packageCache.Contains(packageRow["PackagePath"] as string))
                 {
                     return true;
                 }
@@ -577,13 +852,29 @@ namespace ObjectRelocator
             return false;
         }
 
-        private bool IsAnyHiddenDirty()
+        private bool IsAnyResourceDirty()
         {
-            foreach (DataRow row in dataTableResources.Rows)
+            foreach (DataRow resourceRow in dataResources.Rows)
             {
-                if (!row["Visible"].Equals("Yes") && (row["ObjectData"] as ObjectDbpfData).IsDirty)
+                if ((resourceRow["ObjectData"] as ObjectDbpfData).IsDirty)
                 {
                     return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsAnyHiddenResourceDirty()
+        {
+            foreach (DataRow resourceRow in dataResources.Rows)
+            {
+                if (!resourceRow["Visible"].Equals("Yes"))
+                {
+                    if ((resourceRow["ObjectData"] as ObjectDbpfData).IsDirty)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -607,7 +898,7 @@ namespace ObjectRelocator
 
                         return !(objectData.GetRawData(ObjdIndex.RoomSortFlags) == 0 && objectData.GetRawData(ObjdIndex.FunctionSortFlags) == 0 /* && objectData.GetRawData(ObjdIndex.FunctionSubSort) == 0 */ && objectData.GetRawData(ObjdIndex.CommunitySort) == 0);
                     }
-                    else
+                    else if (IsBuildMode)
                     {
                         return !(objectData.GetRawData(ObjdIndex.BuildModeType) == 0 /* && objectData.GetRawData(ObjdIndex.BuildModeSubsort) == 0*/);
                     }
@@ -636,13 +927,13 @@ namespace ObjectRelocator
             menuItemSaveAll.Enabled = btnSave.Enabled = false;
 
             // Update the visibility in the underlying DataTable, do NOT use the Visible property of the DataGridView rows!!!
-            foreach (DataRow row in dataTableResources.Rows)
+            foreach (DataRow row in dataResources.Rows)
             {
                 row["Visible"] = IsVisibleObject(row["ObjectData"] as ObjectDbpfData) ? "Yes" : "No";
             }
 
             // Update the highlight state of the rows in the DataGridView
-            foreach (DataGridViewRow row in gridViewResources.Rows)
+            foreach (DataGridViewRow row in gridResources.Rows)
             {
                 ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
@@ -671,7 +962,7 @@ namespace ObjectRelocator
 
             UpdateFormState();
 
-            foreach (DataGridViewRow row in gridViewResources.Rows)
+            foreach (DataGridViewRow row in gridResources.Rows)
             {
                 row.Selected = selectedData.Contains(row.Cells["colObjectData"].Value as ObjectDbpfData);
             }
@@ -683,13 +974,15 @@ namespace ObjectRelocator
         {
             if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                DoWork_FillGrid(selectPathDialog.FileName, false);
+                rootFolder = selectPathDialog.FileName;
+                DoWork_FillTree(rootFolder, false, true);
             }
         }
 
         private void MyMruList_FolderSelected(string folder)
         {
-            DoWork_FillGrid(folder, false);
+            rootFolder = folder;
+            DoWork_FillTree(rootFolder, false, true);
         }
 
         private void OnConfigurationClicked(object sender, EventArgs e)
@@ -711,38 +1004,38 @@ namespace ObjectRelocator
 
         private void OnShowHideName(object sender, EventArgs e)
         {
-            gridViewResources.Columns["colName"].Visible = menuItemShowName.Checked;
+            gridResources.Columns["colResName"].Visible = menuItemShowName.Checked;
         }
 
         private void OnShowHidePath(object sender, EventArgs e)
         {
-            gridViewResources.Columns["colPath"].Visible = menuItemShowPath.Checked;
+            gridResources.Columns["colResPath"].Visible = menuItemShowPath.Checked;
         }
 
         private void OnShowHideGuids(object sender, EventArgs e)
         {
-            gridViewResources.Columns["colGuid"].Visible = menuItemShowGuids.Checked;
+            gridResources.Columns["colGuid"].Visible = menuItemShowGuids.Checked;
         }
 
         private void OnShowHideDepreciation(object sender, EventArgs e)
         {
-            gridViewResources.Columns["colDepreciation"].Visible = menuItemShowDepreciation.Checked;
+            gridResources.Columns["colDepreciation"].Visible = menuItemShowDepreciation.Checked;
             grpDepreciation.Visible = menuItemShowDepreciation.Checked;
         }
 
         private void OnShowHideHoodView(object sender, EventArgs e)
         {
-            gridViewResources.Columns["colHoodView"].Visible = menuItemShowHoodView.Checked;
+            gridResources.Columns["colHoodView"].Visible = menuItemShowHoodView.Checked;
         }
 
         private void OnShowHideShowInCatalog(object sender, EventArgs e)
         {
-            gridViewResources.Columns["colShowInCatalog"].Visible = (IsBuildMode && menuItemShowShowInCatalog.Checked);
+            gridResources.Columns["colShowInCatalog"].Visible = (IsBuildMode && menuItemShowShowInCatalog.Checked);
         }
 
         private void OnShowHideNoDuplicate(object sender, EventArgs e)
         {
-            gridViewResources.Columns["colNoDuplicate"].Visible = menuItemShowNoDuplicate.Checked;
+            gridResources.Columns["colNoDuplicate"].Visible = menuItemShowNoDuplicate.Checked;
         }
 
         private void OnExcludeHidden(object sender, EventArgs e)
@@ -805,7 +1098,7 @@ namespace ObjectRelocator
 
             if (IsBuildMode)
             {
-                DoWork_FillGrid(folder, false);
+                DoWork_FillResourceGrid(lastFolder, false);
             }
         }
 
@@ -821,7 +1114,7 @@ namespace ObjectRelocator
 
             if (IsBuyMode)
             {
-                DoWork_FillGrid(folder, false);
+                DoWork_FillResourceGrid(lastFolder, false);
             }
         }
         #endregion
@@ -832,14 +1125,15 @@ namespace ObjectRelocator
             menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
         }
 
-        private void OnBuyBuildModeClicked(object sender, EventArgs e)
+        private void OnModeClicked(object sender, EventArgs e)
         {
             ToolStripMenuItem menuItemMode = sender as ToolStripMenuItem;
 
             if (menuItemMode == menuItemBuyMode && IsBuyMode) return;
             if (menuItemMode == menuItemBuildMode && IsBuildMode) return;
+            if (menuItemMode == menuItemDecoMode && IsDecoMode) return;
 
-            if (IsAnyDirty())
+            if (IsAnyResourceDirty())
             {
                 if (MsgBox.Show($"There are unsaved changes, do you really want to change mode?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
@@ -847,32 +1141,51 @@ namespace ObjectRelocator
                 }
             }
 
-            buyMode = !buyMode;
+            buyMode = (menuItemMode == menuItemBuyMode);
+            buildMode = (menuItemMode == menuItemBuildMode);
+            decoMode = (menuItemMode == menuItemDecoMode);
 
-            this.Text = $"{ObjectRelocatorApp.AppTitle} - {(IsBuyMode ? "Buy" : "Build")} Mode";
+            SetTitle(lastFolder);
 
-            menuItemBuildMode.Checked = IsBuildMode;
             menuItemBuyMode.Checked = IsBuyMode;
+            menuItemBuildMode.Checked = IsBuildMode;
+            menuItemDecoMode.Checked = IsDecoMode;
 
             menuItemShowDepreciation.Enabled = IsBuyMode;
 
             panelBuyModeEditor.Visible = IsBuyMode;
             panelBuildModeEditor.Visible = IsBuildMode;
+            panelDecoModeEditor.Visible = IsDecoMode;
 
-            gridViewResources.Columns["colRooms"].Visible = IsBuyMode;
-            gridViewResources.Columns["colCommunity"].Visible = IsBuyMode;
-            gridViewResources.Columns["colUse"].Visible = IsBuyMode;
-            gridViewResources.Columns["colDepreciation"].Visible = IsBuyMode;
-            gridViewResources.Columns["colFunction"].HeaderText = IsBuyMode ? "Function" : "Build";
-            gridViewResources.Columns["colShowInCatalog"].Visible = (IsBuildMode && menuItemShowShowInCatalog.Checked);
-            gridViewResources.Columns["colNoDuplicate"].Visible = menuItemShowNoDuplicate.Checked;
+            gridResources.Columns["colRooms"].Visible = IsBuyMode;
+            gridResources.Columns["colCommunity"].Visible = IsBuyMode;
+            gridResources.Columns["colUse"].Visible = IsBuyMode;
+            gridResources.Columns["colDepreciation"].Visible = IsBuyMode;
+            gridResources.Columns["colFunction"].HeaderText = IsBuyMode ? "Function" : (IsBuildMode ? "Build" : "Sort");
+            gridResources.Columns["colShowInCatalog"].Visible = ((IsBuildMode || IsDecoMode) && menuItemShowShowInCatalog.Checked);
+            gridResources.Columns["colNoDuplicate"].Visible = !IsDecoMode && menuItemShowNoDuplicate.Checked;
 
-            DoWork_FillGrid(folder, true);
+            gridResources.Columns["colQuarterTile"].Visible = !IsDecoMode;
+            gridResources.Columns["colNoDuplicate"].Visible = !IsDecoMode;
+            gridResources.Columns["colPrice"].Visible = !IsDecoMode;
+            gridResources.Columns["colHoodView"].Visible = !IsDecoMode;
+
+            gridResources.Columns["colSurface"].Visible = IsDecoMode;
+            gridResources.Columns["colAllowLot"].Visible = IsDecoMode;
+            gridResources.Columns["colAllowRoad"].Visible = IsDecoMode;
+            gridResources.Columns["colRemoveOnPlop"].Visible = IsDecoMode;
+
+            DoWork_FillResourceGrid(lastFolder, true);
         }
 
         private void OnMakeReplcementsClicked(object sender, EventArgs e)
         {
             btnSave.Text = (menuItemMakeReplacements.Checked) ? "&Save As..." : "&Save";
+        }
+
+        private void OnRecurseClicked(object sender, EventArgs e)
+        {
+            DoWork_FillPackageGrid(lastFolder);
         }
 
         private void OnAdvancedModeChanged(object sender, EventArgs e)
@@ -898,16 +1211,390 @@ namespace ObjectRelocator
             // Resource grid columns
             if (IsAdvancedMode)
             {
-                gridViewResources.Columns["colHoodView"].Visible = menuItemShowHoodView.Checked;
-                gridViewResources.Columns["colShowInCatalog"].Visible = (IsBuildMode && menuItemShowShowInCatalog.Checked);
-                gridViewResources.Columns["colNoDuplicate"].Visible = menuItemShowNoDuplicate.Checked;
+                gridResources.Columns["colHoodView"].Visible = menuItemShowHoodView.Checked;
+                gridResources.Columns["colShowInCatalog"].Visible = (IsBuildMode && menuItemShowShowInCatalog.Checked);
+                gridResources.Columns["colNoDuplicate"].Visible = menuItemShowNoDuplicate.Checked;
             }
             else
             {
-                gridViewResources.Columns["colHoodView"].Visible = false;
-                gridViewResources.Columns["colShowInCatalog"].Visible = false;
-                gridViewResources.Columns["colNoDuplicate"].Visible = false;
+                gridResources.Columns["colHoodView"].Visible = false;
+                gridResources.Columns["colShowInCatalog"].Visible = false;
+                gridResources.Columns["colNoDuplicate"].Visible = false;
             }
+        }
+        #endregion
+
+        #region Folder Menu Actions
+        private void OnFolderMenuOpening(object sender, EventArgs e)
+        {
+            if (treeFolders.Nodes.Count == 0 || treeFolders.SelectedNode == null || treeFolders.SelectedNode.Equals(treeFolders.TopNode) || lastFolder == null)
+            {
+                menuItemDirRename.Enabled = false;
+                menuItemDirAdd.Enabled = false;
+                menuItemDirMove.Enabled = false;
+                menuItemDirDelete.Enabled = false;
+            }
+            else
+            {
+                menuItemDirRename.Enabled = !IsAnyPackageDirty();
+                menuItemDirAdd.Enabled = true;
+                menuItemDirMove.Enabled = !IsAnyPackageDirty();
+
+                DirectoryInfo di = new DirectoryInfo(lastFolder);
+                menuItemDirDelete.Enabled = ((di.GetDirectories().Length + di.GetFiles().Length) == 0);
+            }
+        }
+
+        private void OnFolderRenameClicked(object sender, EventArgs e)
+        {
+            Debug.Assert(treeFolders.SelectedNode.Name.Equals(lastFolder));
+
+            string fromFolderPath = treeFolders.SelectedNode.Name;
+
+            if (IsAnyPackageDirty())
+            {
+                MsgBox.Show("Cannot rename a folder with unsaved changes.", "Folder Rename Error");
+                return;
+            }
+
+            TextEntryDialog rename = new TextEntryDialog("Folder Rename", "Please enter a new name for the folder", new FileInfo(fromFolderPath).Name);
+
+            if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
+            {
+                string toFolderPath = $"{new FileInfo(fromFolderPath).DirectoryName}\\{rename.TextEntry}";
+
+                if (Directory.Exists(toFolderPath))
+                {
+                    MsgBox.Show($"Name clash, {rename.TextEntry} already exists.", "Folder Rename Error");
+                    return;
+                }
+
+                try
+                {
+                    Directory.Move(fromFolderPath, toFolderPath);
+
+                    DoWork_FillTree(rootFolder, false, false);
+                    TreeFolder_ExpandNode(toFolderPath);
+                }
+                catch (Exception)
+                {
+                    MsgBox.Show($"Error trying to move {fromFolderPath} to {toFolderPath}", "Folder Move Error!");
+                }
+            }
+        }
+
+        private void OnFolderAddClicked(object sender, EventArgs e)
+        {
+            Debug.Assert(treeFolders.SelectedNode.Name.Equals(lastFolder));
+
+            string baseFolderPath = treeFolders.SelectedNode.Name;
+
+            TextEntryDialog rename = new TextEntryDialog("New Folder", "Please enter the name for the new folder", "");
+
+            if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
+            {
+                string newFolderPath = $"{baseFolderPath}\\{rename.TextEntry}";
+
+                if (Directory.Exists(newFolderPath))
+                {
+                    MsgBox.Show($"Name clash, {rename.TextEntry} already exists.", "New Folder Error");
+                    return;
+                }
+
+                Directory.CreateDirectory(newFolderPath);
+
+                TreeNode selectedNode = treeFolders.SelectedNode;
+                TreeFolder_InsertNode(selectedNode, newFolderPath, new DirectoryInfo(newFolderPath).Name);
+                treeFolders.Sort();
+                treeFolders.SelectedNode = selectedNode;
+            }
+        }
+
+        private void OnFolderMoveClicked(object sender, EventArgs e)
+        {
+            Debug.Assert(treeFolders.SelectedNode.Name.Equals(lastFolder));
+
+            string fromFolderPath = treeFolders.SelectedNode.Name;
+
+            if (IsAnyPackageDirty())
+            {
+                MsgBox.Show("Cannot move a folder with unsaved changes.", "Folder Move Error");
+                return;
+            }
+
+            if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                string toFolderPath = $"{selectPathDialog.FileName}\\{new DirectoryInfo(fromFolderPath).Name}";
+
+                if (Directory.Exists(toFolderPath))
+                {
+                    MsgBox.Show($"Name clash, {new DirectoryInfo(fromFolderPath).Name} already exists in the selected folder", "Folder Move Error");
+                    return;
+                }
+
+                try
+                {
+                    Directory.Move(fromFolderPath, toFolderPath);
+
+                    DoWork_FillTree(rootFolder, false, false);
+                    TreeFolder_ExpandNode(fromFolderPath);
+                }
+                catch (Exception)
+                {
+                    MsgBox.Show($"Error trying to move {fromFolderPath} to {toFolderPath}", "Folder Move Error!");
+                }
+            }
+        }
+
+        private void OnFolderDeleteClicked(object sender, EventArgs e)
+        {
+            DirectoryInfo di = new DirectoryInfo(lastFolder);
+            Debug.Assert((di.GetDirectories().Length + di.GetFiles().Length) == 0);
+
+            if (!menuItemConfirmDelete.Checked || MsgBox.Show($"Delete {lastFolder}?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                try
+                {
+                    Directory.Delete(lastFolder);
+
+                    TreeNode parentNode = treeFolders.SelectedNode.Parent;
+                    treeFolders.SelectedNode.Remove();
+                    treeFolders.SelectedNode = parentNode;
+
+                    DoWork_FillPackageGrid(parentNode.Name);
+                }
+                catch (Exception)
+                {
+                    MsgBox.Show($"Error trying to delete {lastFolder}", "Folder Delete Error!");
+                }
+            }
+        }
+        #endregion
+
+        #region Package Menu Actions
+        private void OnPackageMenuOpening(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow selectedPackageRow in gridPackageFiles.SelectedRows)
+            {
+                if (packageCache.Contains(selectedPackageRow.Cells["colPackagePath"].Value as string))
+                {
+                    menuItemPkgRename.Enabled = false;
+                    menuItemPkgMove.Enabled = false;
+                    menuItemPkgMerge.Enabled = false;
+                    menuItemPkgDelete.Enabled = false;
+
+                    return;
+                }
+            }
+
+            int selPackages = gridPackageFiles.SelectedRows.Count;
+            menuItemPkgRename.Enabled = (selPackages == 1);
+            menuItemPkgMove.Enabled = (selPackages > 0);
+            menuItemPkgMerge.Enabled = (selPackages > 1 && selPackages <= Properties.Settings.Default.MaxMergeFiles);
+            menuItemPkgDelete.Enabled = (selPackages > 0);
+        }
+
+        private void OnPkgRenameClicked(object sender, EventArgs e)
+        {
+            int selPackages = gridPackageFiles.SelectedRows.Count;
+
+            if (selPackages != 1)
+            {
+                MsgBox.Show("Can only rename one file at a time.", "Package Rename Error");
+                return;
+            }
+
+            PackageRename(gridPackageFiles.SelectedRows[0]);
+        }
+
+        private void OnPkgMoveClicked(object sender, EventArgs e)
+        {
+            if (selectPathDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                foreach (DataGridViewRow selectedPackageRow in gridPackageFiles.SelectedRows)
+                {
+                    string fromPackagePath = selectedPackageRow.Cells["colPackagePath"].Value as string;
+                    string toPackagePath = $"{selectPathDialog.FileName}\\{new DirectoryInfo(fromPackagePath).Name}";
+
+                    if (File.Exists(toPackagePath))
+                    {
+                        MsgBox.Show($"Name clash, {selectPathDialog.FileName} already exists in the selected folder", "Package Move Error");
+                        return;
+                    }
+                }
+
+                foreach (DataGridViewRow selectedPackageRow in gridPackageFiles.SelectedRows)
+                {
+                    string fromPackagePath = selectedPackageRow.Cells["colPackagePath"].Value as string;
+                    string toPackagePath = $"{selectPathDialog.FileName}\\{new DirectoryInfo(fromPackagePath).Name}";
+
+                    try
+                    {
+                        File.Move(fromPackagePath, toPackagePath);
+                    }
+                    catch (Exception)
+                    {
+                        MsgBox.Show($"Error trying to move {fromPackagePath} to {toPackagePath}", "File Move Error!");
+                    }
+                }
+
+                DoWork_FillPackageGrid(lastFolder);
+            }
+        }
+
+        private void OnPkgMergeClicked(object sender, EventArgs e)
+        {
+            // TODO - Object Relocator - changes to the way Merge works
+            // Ask for new name
+            // Create empty .package file with new name
+            // Merge selected .package files into new package
+            // Commit & close new .package file
+            // Delete all selected .package files
+            int selPackages = gridPackageFiles.SelectedRows.Count;
+
+            if (selPackages < 2)
+            {
+                MsgBox.Show("Cannot merge a single file.", "Package Merge Error");
+                return;
+            }
+
+            DataGridViewRow masterPackageRow = null;
+            DBPFFile masterPackage = null;
+
+            foreach (DataGridViewRow selectedPackageRow in gridPackageFiles.SelectedRows)
+            {
+                string fromPackagePath = selectedPackageRow.Cells["colPackagePath"].Value as string;
+
+                if (masterPackage == null)
+                {
+                    masterPackageRow = selectedPackageRow;
+                    masterPackage = new DBPFFile(fromPackagePath);
+                }
+                else
+                {
+                    using (DBPFFile package = new DBPFFile(fromPackagePath))
+                    {
+                        FileInfo fi = new FileInfo(fromPackagePath);
+                        TypeGroupID groupId = Hashes.GroupIDHash(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
+
+                        foreach (DBPFEntry entry in package.GetAllEntries())
+                        {
+                            if (entry.TypeID == Clst.TYPE) continue;
+
+                            DBPFKey key = entry;
+                            byte[] item = package.GetOriginalItemByEntry(entry);
+
+                            if (entry.GroupID == DBPFData.GROUP_LOCAL)
+                            {
+                                key = new DBPFKey(entry.TypeID, groupId, entry.InstanceID, entry.ResourceID);
+                            }
+
+                            masterPackage.Commit(key, item);
+                        }
+
+                        package.Close();
+                    }
+
+                    try
+                    {
+                        Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(fromPackagePath, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                    }
+                    catch (Exception)
+                    {
+                        MsgBox.Show($"Error trying to remove {fromPackagePath}, you should delete this file manually.", "Package Merge Error!");
+                    }
+                }
+            }
+
+            if (masterPackage != null)
+            {
+                try
+                {
+                    string backupName = masterPackage.Update(menuItemAutoBackup.Checked);
+                    masterPackage.Close();
+
+                    if (PackageRename(masterPackageRow))
+                    {
+                        if (File.Exists(backupName))
+                        {
+                            Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(backupName, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    MsgBox.Show($"Error trying to update {masterPackage.PackageName}", "Package Merge Error!");
+                }
+            }
+
+            DoWork_FillPackageGrid(lastFolder);
+        }
+
+        private void OnPkgDeleteClicked(object sender, EventArgs e)
+        {
+            if (!menuItemConfirmDelete.Checked || MsgBox.Show($"Delete selected package(s)?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                foreach (DataGridViewRow selectedPackageRow in gridPackageFiles.SelectedRows)
+                {
+                    string fromPackagePath = selectedPackageRow.Cells["colPackagePath"].Value as string;
+
+                    // Recycle Bin - see https://social.microsoft.com/Forums/en-US/f2411a7f-34b6-4f30-a25f-9d456fe1c47b/c-send-files-or-folder-to-recycle-bin?forum=netfxbcl
+                    Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(fromPackagePath, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                }
+
+                DoWork_FillPackageGrid(lastFolder);
+            }
+        }
+
+        private bool PackageRename(DataGridViewRow packageRow)
+        {
+            bool wasRenamed = false;
+            string fromPackagePath = packageRow.Cells["colPackagePath"].Value as string;
+
+            TextEntryDialog rename = new TextEntryDialog("Package Rename", "Please enter a new name for the package", new FileInfo(fromPackagePath).Name);
+
+            if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
+            {
+                string renameTo = rename.TextEntry;
+                if (!renameTo.EndsWith(".package", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    renameTo += ".package";
+                }
+
+                string toPackagePath = $"{new FileInfo(fromPackagePath).DirectoryName}\\{renameTo}";
+
+                if (File.Exists(toPackagePath))
+                {
+                    MsgBox.Show($"Name clash, {renameTo} already exists.", "Package Rename Error");
+                    return wasRenamed;
+                }
+
+                try
+                {
+                    File.Move(fromPackagePath, toPackagePath);
+
+                    packageRow.Cells["colPackageFile"].Value = renameTo;
+                    packageRow.Cells["colPackagePath"].Value = toPackagePath;
+
+                    foreach (DataRow resourceRow in dataResources.Rows)
+                    {
+                        ObjectDbpfData objectData = resourceRow["ObjectData"] as ObjectDbpfData;
+
+                        if (objectData.PackagePath.Equals(fromPackagePath))
+                        {
+                            objectData.Rename(fromPackagePath, toPackagePath);
+                        }
+                    }
+
+                    wasRenamed = true;
+                }
+                catch (Exception)
+                {
+                    MsgBox.Show($"Error trying to move {fromPackagePath} to {toPackagePath}", "File Move Error!");
+                }
+            }
+
+            return wasRenamed;
         }
         #endregion
 
@@ -918,16 +1605,16 @@ namespace ObjectRelocator
             {
                 int index = e.RowIndex;
 
-                if (index < dataTableResources.Rows.Count)
+                if (index < dataResources.Rows.Count)
                 {
-                    DataGridViewRow row = gridViewResources.Rows[index];
+                    DataGridViewRow row = gridResources.Rows[index];
                     ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
                     if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colTitle"))
                     {
                         e.ToolTipText = row.Cells["colDescription"].Value as string;
                     }
-                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colName"))
+                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colResName"))
                     {
                         if (menuItemShowGuids.Checked)
                         {
@@ -954,9 +1641,13 @@ namespace ObjectRelocator
                         if (objectData.IsObjd)
                         {
                             if (IsBuyMode)
+                            {
                                 e.ToolTipText = $"{Helper.Hex4PrefixString(objectData.GetRawData(ObjdIndex.FunctionSortFlags))} - {Helper.Hex4PrefixString(objectData.GetRawData(ObjdIndex.FunctionSubSort))}";
-                            else
+                            }
+                            else if (IsBuildMode)
+                            {
                                 e.ToolTipText = $"{Helper.Hex4PrefixString(objectData.GetRawData(ObjdIndex.BuildModeType))} - {Helper.Hex4PrefixString(objectData.GetRawData(ObjdIndex.BuildModeSubsort))}";
+                            }
                         }
                         else if (objectData.IsXobj)
                         {
@@ -994,22 +1685,89 @@ namespace ObjectRelocator
 
         private Image GetThumbnail(DataGridViewRow row)
         {
-            return thumbCache.GetThumbnail(packageCache, row.Cells["colObjectData"].Value as ObjectDbpfData, IsBuyMode);
+            return thumbCache.GetThumbnail(packageCache, row.Cells["colObjectData"].Value as ObjectDbpfData, IsBuyMode, IsBuildMode, IsDecoMode);
         }
 
         #endregion
 
-        #region Grid Management
+        #region Folder Tree Management
+        private void OnTreeFolder_DrawNode(object sender, DrawTreeNodeEventArgs e)
+        {
+            if (e.Node == null) return;
+
+            // if treeview's HideSelection property is "True", 
+            // this will always returns "False" on unfocused treeview
+            bool selected = (e.State & TreeNodeStates.Selected) == TreeNodeStates.Selected;
+            bool unfocused = !e.Node.TreeView.Focused;
+
+            // we need to do owner drawing only on a selected node
+            // and when the treeview is unfocused, else let the OS do it for us
+            if (selected && unfocused)
+            {
+                Font font = e.Node.NodeFont ?? e.Node.TreeView.Font;
+                e.Graphics.FillRectangle(SystemBrushes.Highlight, e.Bounds);
+                TextRenderer.DrawText(e.Graphics, e.Node.Text, font, e.Bounds, SystemColors.HighlightText, TextFormatFlags.GlyphOverhangPadding);
+            }
+            else
+            {
+                e.DrawDefault = true;
+            }
+        }
+
+        private void OnTreeFolderClicked(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            treeFolders.SelectedNode = e.Node;
+            DoWork_FillPackageGrid(e.Node.Name);
+        }
+
+        private void TreeFolder_InsertNode(TreeNode parent, string key, string text)
+        {
+            TreeNode child = parent.Nodes.Add(key, text);
+            child.ContextMenuStrip = menuContextFolders;
+        }
+
+        private void TreeFolder_ExpandNode(string key)
+        {
+            TreeFolder_ExpandNode(treeFolders.Nodes, key);
+        }
+
+        private bool TreeFolder_ExpandNode(TreeNodeCollection nodes, string key)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                if (node.Name.Equals(key))
+                {
+                    node.Expand();
+                    treeFolders.SelectedNode = node;
+                    OnTreeFolderClicked(treeFolders, new TreeNodeMouseClickEventArgs(node, MouseButtons.Left, 1, 0, 0));
+                    return true;
+                }
+
+                if (TreeFolder_ExpandNode(node.Nodes, key)) return true;
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region Package Grid Management
+        private void OnPackageSelectionChanged(object sender, EventArgs e)
+        {
+            DoWork_FillResourceGrid(lastFolder, true);
+        }
+        #endregion
+
+        #region Resource Grid Management
         private void OnGridSelectionChanged(object sender, EventArgs e)
         {
             if (dataLoading) return;
 
             ClearEditor();
 
-            if (gridViewResources.SelectedRows.Count >= 1)
+            if (gridResources.SelectedRows.Count >= 1)
             {
                 bool append = false;
-                foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+                foreach (DataGridViewRow row in gridResources.SelectedRows)
                 {
                     ObjectDbpfData objectDbpfData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
@@ -1026,7 +1784,7 @@ namespace ObjectRelocator
 
         private void OnResourceBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
-            if (gridViewResources.SortedColumn != null)
+            if (gridResources.SortedColumn != null)
             {
                 UpdateFormState();
             }
@@ -1034,85 +1792,9 @@ namespace ObjectRelocator
         #endregion
 
         #region Grid Row Fill
-        private DataRow FillRow(CacheableDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
-        {
-            row["PackagePath"] = package.PackagePath;
-            row["Path"] = BuildPathString(package.PackagePath);
-
-            if (IsBuyMode)
-                return FillBuyModeRow(package, row, res, showHoodView);
-            else
-                return FillBuildModeRow(package, row, res, showHoodView);
-        }
-
-        private DataRow FillBuyModeRow(CacheableDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
-        {
-            ObjectDbpfData objectData = ObjectDbpfData.Create(package, res);
-
-            row["Visible"] = "Yes";
-            row["ObjectData"] = objectData;
-
-            row["Title"] = objectData.Title;
-            row["Description"] = objectData.Description;
-
-            row["Name"] = objectData.KeyName;
-            row["Guid"] = objectData.Guid;
-
-            row["Rooms"] = BuildRoomsString(objectData);
-            row["Function"] = BuildFunctionString(objectData);
-            row["Community"] = BuildCommunityString(objectData);
-            row["Use"] = BuildUseString(objectData);
-
-            row["QuarterTile"] = BuildQuarterTileString(objectData);
-            row["NoDuplicate"] = BuildNoDuplicateString(objectData);
-
-            row["Price"] = objectData.GetRawData(ObjdIndex.Price);
-            row["Depreciation"] = BuildDepreciationString(objectData);
-
-            row["HoodView"] = BuildHoodViewString(objectData, showHoodView);
-
-            return row;
-        }
-
-        private DataRow FillBuildModeRow(CacheableDbpfFile package, DataRow row, DBPFResource res, bool showHoodView)
-        {
-            ObjectDbpfData objectData = ObjectDbpfData.Create(package, res);
-
-            row["Visible"] = "Yes";
-            row["ObjectData"] = objectData;
-
-            row["Title"] = objectData.Title;
-            row["Description"] = objectData.Description;
-
-            row["Name"] = objectData.KeyName;
-            row["Guid"] = objectData.Guid;
-
-            if (objectData.IsObjd)
-            {
-                row["Function"] = BuildBuildString(objectData);
-
-                row["QuarterTile"] = BuildQuarterTileString(objectData);
-                row["NoDuplicate"] = BuildNoDuplicateString(objectData);
-
-                row["Price"] = objectData.GetRawData(ObjdIndex.Price);
-            }
-            else if (objectData.IsCpf)
-            {
-                row["Function"] = BuildBuildString(objectData);
-
-                row["ShowInCatalog"] = BuildShowInCatalogString(objectData);
-
-                row["Price"] = objectData.GetUIntItem("cost");
-            }
-
-            row["HoodView"] = BuildHoodViewString(objectData, showHoodView);
-
-            return row;
-        }
-
         private string BuildPathString(string packagePath)
         {
-            return new FileInfo(packagePath).FullName.Substring(folder.Length + 1);
+            return new FileInfo(packagePath).FullName.Substring(lastFolder.Length + 1);
         }
 
         private string BuildRoomsString(ObjectDbpfData objectData)
@@ -1446,6 +2128,58 @@ namespace ObjectRelocator
             return "unknown";
         }
 
+        private string BuildDecoSortString(ObjectDbpfData objectData)
+        {
+            if (objectData.IsXngb)
+            {
+                return CapitaliseString(objectData.DecoSort);
+            }
+
+            return "n/a";
+        }
+
+        private string BuildDecoSurfaceString(ObjectDbpfData objectData)
+        {
+            if (objectData.IsXngb)
+            {
+                uint decoSurface = objectData.DecoSurface;
+
+                return ((decoSurface == 0x00) ? "Land" : ((decoSurface == 0x01) ? "Water" : "Land & Water"));
+            }
+
+            return "n/a";
+        }
+
+        private string BuildDecoAllowLotString(ObjectDbpfData objectData)
+        {
+            if (objectData.IsXngb)
+            {
+                return objectData.IsAllowLot ? "Yes" : "No";
+            }
+
+            return "n/a";
+        }
+
+        private string BuildDecoAllowRoadString(ObjectDbpfData objectData)
+        {
+            if (objectData.IsXngb)
+            {
+                return objectData.IsAllowRoad ? "Yes" : "No";
+            }
+
+            return "n/a";
+        }
+
+        private string BuildDecoRemoveOnPlopString(ObjectDbpfData objectData)
+        {
+            if (objectData.IsXngb)
+            {
+                return objectData.IsRemoveOnPlop ? "Yes" : "No";
+            }
+
+            return "n/a";
+        }
+
         private string CapitaliseString(string s)
         {
             if (string.IsNullOrWhiteSpace(s) || s.Length == 1) return s;
@@ -1458,14 +2192,22 @@ namespace ObjectRelocator
         private void UpdateGridRow(ObjectDbpfData selectedObject)
         {
             if (IsBuyMode)
+            {
                 UpdateBuyModeGridRow(selectedObject);
-            else
+            }
+            else if (IsBuildMode)
+            {
                 UpdateBuildModeGridRow(selectedObject);
+            }
+            else
+            {
+                UpdateDecoModeGridRow(selectedObject);
+            }
         }
 
         private void UpdateBuyModeGridRow(ObjectDbpfData selectedObject)
         {
-            foreach (DataGridViewRow row in gridViewResources.Rows)
+            foreach (DataGridViewRow row in gridResources.Rows)
             {
                 if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Equals(selectedObject))
                 {
@@ -1475,7 +2217,7 @@ namespace ObjectRelocator
                     row.Cells["colTitle"].Value = selectedObject.Title;
                     row.Cells["colDescription"].Value = selectedObject.Description;
 
-                    row.Cells["colName"].Value = selectedObject.KeyName;
+                    row.Cells["colResName"].Value = selectedObject.KeyName;
 
                     row.Cells["colRooms"].Value = BuildRoomsString(selectedObject);
                     row.Cells["colFunction"].Value = BuildFunctionString(selectedObject);
@@ -1495,7 +2237,7 @@ namespace ObjectRelocator
 
         private void UpdateBuildModeGridRow(ObjectDbpfData selectedObject)
         {
-            foreach (DataGridViewRow row in gridViewResources.Rows)
+            foreach (DataGridViewRow row in gridResources.Rows)
             {
                 if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Equals(selectedObject))
                 {
@@ -1505,7 +2247,7 @@ namespace ObjectRelocator
                     row.Cells["colTitle"].Value = selectedObject.Title;
                     row.Cells["colDescription"].Value = selectedObject.Description;
 
-                    row.Cells["colName"].Value = selectedObject.KeyName;
+                    row.Cells["colResName"].Value = selectedObject.KeyName;
 
                     row.Cells["colFunction"].Value = BuildBuildString(selectedObject);
                     row.Cells["colQuarterTile"].Value = BuildQuarterTileString(selectedObject);
@@ -1529,6 +2271,36 @@ namespace ObjectRelocator
                 }
             }
         }
+
+
+        private void UpdateDecoModeGridRow(ObjectDbpfData selectedObject)
+        {
+            foreach (DataGridViewRow row in gridResources.Rows)
+            {
+                if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Equals(selectedObject))
+                {
+                    bool oldDataLoading = dataLoading;
+                    dataLoading = true;
+
+                    row.Cells["colTitle"].Value = selectedObject.Title;
+                    row.Cells["colDescription"].Value = selectedObject.Description;
+
+                    row.Cells["colResName"].Value = selectedObject.KeyName;
+
+                    row.Cells["colFunction"].Value = BuildDecoSortString(selectedObject);
+
+                    row.Cells["colSurface"].Value = BuildDecoSurfaceString(selectedObject);
+                    row.Cells["colAllowLot"].Value = BuildDecoAllowLotString(selectedObject);
+                    row.Cells["colAllowRoad"].Value = BuildDecoAllowRoadString(selectedObject);
+                    row.Cells["colRemoveOnPlop"].Value = BuildDecoRemoveOnPlopString(selectedObject);
+
+                    row.Cells["colShowInCatalog"].Value = BuildShowInCatalogString(selectedObject);
+
+                    dataLoading = oldDataLoading;
+                    return;
+                }
+            }
+        }
         #endregion
 
         #region Selected Row Update
@@ -1538,7 +2310,7 @@ namespace ObjectRelocator
 
             List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            foreach (DataGridViewRow row in gridResources.SelectedRows)
             {
                 selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
             }
@@ -1548,6 +2320,10 @@ namespace ObjectRelocator
                 if (selectedObject.IsObjd)
                 {
                     if (index != ObjdIndex.NONE) UpdateObjdData(selectedObject, index, (ushort)nv.Value);
+                }
+                else if (selectedObject.IsXngb)
+                {
+                    UpdateCpfData(selectedObject, itemName, (ushort)nv.Value);
                 }
                 else
                 {
@@ -1564,13 +2340,35 @@ namespace ObjectRelocator
             ReselectRows(selectedData);
         }
 
+        private void UpdateSelectedRows(StringNamedValue nv, ObjdIndex index, string itemName)
+        {
+            if (ignoreEdits) return;
+
+            List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
+
+            foreach (DataGridViewRow row in gridResources.SelectedRows)
+            {
+                selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
+            }
+
+            foreach (ObjectDbpfData selectedObject in selectedData)
+            {
+                if (selectedObject.IsXngb)
+                {
+                    UpdateCpfData(selectedObject, itemName, nv.Value);
+                }
+            }
+
+            ReselectRows(selectedData);
+        }
+
         private void UpdateSelectedRows(ushort data, ObjdIndex index, string itemName)
         {
             if (ignoreEdits) return;
 
             List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            foreach (DataGridViewRow row in gridResources.SelectedRows)
             {
                 selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
             }
@@ -1596,7 +2394,7 @@ namespace ObjectRelocator
 
             List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            foreach (DataGridViewRow row in gridResources.SelectedRows)
             {
                 selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
             }
@@ -1615,7 +2413,7 @@ namespace ObjectRelocator
 
             List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            foreach (DataGridViewRow row in gridResources.SelectedRows)
             {
                 selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
             }
@@ -1670,16 +2468,26 @@ namespace ObjectRelocator
         #endregion
 
         #region Editor
-        ushort cachedRoomFlags, cachedFunctionFlags, cachedSubfunctionFlags, cachedUseFlags, cachedCommunityFlags, cachedQuarterTile, cachedNoDuplicate, cachedShowInCatalog, cachedBuildFlags, cachedSubbuildFlags, cachedSurfacetype;
+        ushort cachedRoomFlags, cachedFunctionFlags, cachedSubfunctionFlags, cachedUseFlags, cachedCommunityFlags, cachedQuarterTile, cachedNoDuplicate, cachedShowInCatalog, cachedBuildFlags, cachedSubbuildFlags, cachedSurfacetype, cachedAllowInLot, cachedAllowOnRoad, cachedRemoveOnPlop;
+        string cachedDecoSort;
 
         private void ClearEditor()
         {
             ignoreEdits = true;
 
             if (IsBuyMode)
+            {
                 ClearBuyModeEditor();
-            else
+
+            }
+            else if (IsBuildMode)
+            {
                 ClearBuildModeEditor();
+            }
+            else
+            {
+                ClearDecoModeEditor();
+            }
 
             ignoreEdits = false;
         }
@@ -1732,14 +2540,30 @@ namespace ObjectRelocator
             textBuildPrice.Text = "";
         }
 
+        private void ClearDecoModeEditor()
+        {
+            ckbDecoAllowInLot.Checked = false;
+            ckbDecoAllowOnRoad.Checked = false;
+            ckbDecoRemoveOnPlop.Checked = false;
+            ckbDecoShowInCatalog.Checked = false;
+        }
+
         private void UpdateEditor(ObjectDbpfData objectData, bool append)
         {
             ignoreEdits = true;
 
             if (IsBuyMode)
+            {
                 UpdateBuyModeEditor(objectData, append);
-            else
+            }
+            else if (IsBuildMode)
+            {
                 UpdateBuildModeEditor(objectData, append);
+            }
+            else
+            {
+                UpdateDecoModeEditor(objectData, append);
+            }
 
             ignoreEdits = false;
         }
@@ -1951,7 +2775,7 @@ namespace ObjectRelocator
                     }
                 }
 
-                comboSurfacetype.SelectedIndex = -1;
+                comboSurfaceType.SelectedIndex = -1;
 
                 if (append)
                 {
@@ -2014,7 +2838,7 @@ namespace ObjectRelocator
 
                         string st = objectData.GetStrItem("surfacetype");
 
-                        foreach (UintNamedValue nv in surfacetypeItems)
+                        foreach (UintNamedValue nv in surfaceTypeItems)
                         {
                             if (nv.Name.Equals(st))
                             {
@@ -2071,7 +2895,7 @@ namespace ObjectRelocator
 
                     if (cachedSurfacetype != fakeSurfacetype)
                     {
-                        comboSurfacetype.SelectedIndex = -1;
+                        comboSurfaceType.SelectedIndex = -1;
                     }
                 }
                 else
@@ -2091,11 +2915,11 @@ namespace ObjectRelocator
 
                     cachedSurfacetype = fakeSurfacetype;
 
-                    foreach (object o in comboSurfacetype.Items)
+                    foreach (object o in comboSurfaceType.Items)
                     {
                         if ((o as UintNamedValue).Value == cachedSurfacetype)
                         {
-                            comboSurfacetype.SelectedItem = o;
+                            comboSurfaceType.SelectedItem = o;
                             break;
                         }
                     }
@@ -2117,6 +2941,110 @@ namespace ObjectRelocator
                 }
             }
         }
+
+        private void UpdateDecoModeEditor(ObjectDbpfData objectData, bool append)
+        {
+            string newDecoSort = objectData.GetStrItem("sort");
+            if (append)
+            {
+                if (!cachedDecoSort.Equals(newDecoSort))
+                {
+                    comboDecoSort.SelectedIndex = -1;
+                }
+            }
+            else
+            {
+                cachedDecoSort = newDecoSort;
+
+                foreach (object o in comboDecoSort.Items)
+                {
+                    if ((o as StringNamedValue).Value.Equals(cachedDecoSort))
+                    {
+                        comboDecoSort.SelectedItem = o;
+                        break;
+                    }
+                }
+            }
+
+            ushort newSurface = (ushort)objectData.GetUIntItem("placementsurface");
+            if (append)
+            {
+                if (cachedSurfacetype != newSurface)
+                {
+                    comboDecoSurfaceType.SelectedIndex = -1;
+                }
+            }
+            else
+            {
+                cachedSurfacetype = newSurface;
+
+                foreach (object o in comboDecoSurfaceType.Items)
+                {
+                    if ((o as UintNamedValue).Value == cachedSurfacetype)
+                    {
+                        comboDecoSurfaceType.SelectedItem = o;
+                        break;
+                    }
+                }
+            }
+
+            ushort newAllowInLot = (ushort)objectData.GetUIntItem("allowedinlot");
+            if (append)
+            {
+                if (cachedAllowInLot != newAllowInLot)
+                {
+                    ckbDecoAllowInLot.CheckState = CheckState.Indeterminate;
+                }
+            }
+            else
+            {
+                cachedAllowInLot = newAllowInLot;
+                ckbDecoAllowInLot.CheckState = (cachedAllowInLot == 0x00) ? CheckState.Unchecked : ((cachedAllowInLot == 0x01) ? CheckState.Checked : CheckState.Indeterminate);
+            }
+
+            ushort newAllowOnRoad = (ushort)objectData.GetUIntItem("allowedonroad");
+            if (append)
+            {
+                if (cachedAllowOnRoad != newAllowOnRoad)
+                {
+                    ckbDecoAllowOnRoad.CheckState = CheckState.Indeterminate;
+                }
+            }
+            else
+            {
+                cachedAllowOnRoad = newAllowOnRoad;
+                ckbDecoAllowOnRoad.CheckState = (cachedAllowOnRoad == 0x00) ? CheckState.Unchecked : ((cachedAllowOnRoad == 0x01) ? CheckState.Checked : CheckState.Indeterminate);
+            }
+
+            ushort newRemoveOnPlop = (ushort)objectData.GetUIntItem("removeonlotplop");
+            if (append)
+            {
+                if (cachedRemoveOnPlop != newRemoveOnPlop)
+                {
+                    ckbDecoRemoveOnPlop.CheckState = CheckState.Indeterminate;
+                }
+            }
+            else
+            {
+                cachedRemoveOnPlop = newRemoveOnPlop;
+                ckbDecoRemoveOnPlop.CheckState = (cachedRemoveOnPlop == 0x00) ? CheckState.Unchecked : ((cachedRemoveOnPlop == 0x01) ? CheckState.Checked : CheckState.Indeterminate);
+            }
+
+            ushort newShowInCatalog = (ushort)objectData.GetUIntItem("showincatalog");
+            if (append)
+            {
+                if ((cachedShowInCatalog == ShowInCatalogOff && newShowInCatalog != ShowInCatalogOff) || (cachedShowInCatalog != ShowInCatalogOff && newShowInCatalog == ShowInCatalogOff))
+                {
+                    ckbDecoShowInCatalog.CheckState = CheckState.Indeterminate;
+                }
+            }
+            else
+            {
+                cachedShowInCatalog = newShowInCatalog;
+                ckbDecoShowInCatalog.CheckState = (cachedShowInCatalog == ShowInCatalogOff) ? CheckState.Unchecked : ((cachedShowInCatalog == ShowInCatalogOn) ? CheckState.Checked : CheckState.Indeterminate);
+            }
+        }
+
         #endregion
 
         #region Dropdown Events
@@ -2361,14 +3289,29 @@ namespace ObjectRelocator
             }
         }
 
-        private void OnBuildSurfacetypeChanged(object sender, EventArgs e)
+        private void OnBuildSurfaceTypeChanged(object sender, EventArgs e)
         {
-            if (comboSurfacetype.SelectedIndex != -1)
+            if (comboSurfaceType.SelectedIndex != -1)
             {
-                UpdateSelectedRows(comboSurfacetype.SelectedItem as UintNamedValue, ObjdIndex.NONE, "surfacetype");
+                UpdateSelectedRows(comboSurfaceType.SelectedItem as UintNamedValue, ObjdIndex.NONE, "surfacetype");
             }
         }
 
+        private void OnDecoSortChanged(object sender, EventArgs e)
+        {
+            if (comboDecoSort.SelectedIndex != -1)
+            {
+                UpdateSelectedRows(comboDecoSort.SelectedItem as StringNamedValue, ObjdIndex.NONE, "sort");
+            }
+        }
+
+        private void OnDecoSurfaceTypeChanged(object sender, EventArgs e)
+        {
+            if (comboDecoSurfaceType.SelectedIndex != -1)
+            {
+                UpdateSelectedRows(comboDecoSurfaceType.SelectedItem as UintNamedValue, ObjdIndex.NONE, "placementsurface");
+            }
+        }
         #endregion
 
         #region Checkbox Events
@@ -2503,7 +3446,7 @@ namespace ObjectRelocator
             {
                 List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-                foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+                foreach (DataGridViewRow row in gridResources.SelectedRows)
                 {
                     selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
                 }
@@ -2515,6 +3458,26 @@ namespace ObjectRelocator
 
                 ReselectRows(selectedData);
             }
+        }
+
+        private void OnDecoAllowInLotClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows((ushort)(ckbDecoAllowInLot.Checked ? 0x01 : 0x00), ObjdIndex.NONE, "allowedinlot");
+        }
+
+        private void OnDecoAllowOnRoadClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows((ushort)(ckbDecoAllowOnRoad.Checked ? 0x01 : 0x00), ObjdIndex.NONE, "allowedonroad");
+        }
+
+        private void OnDecoRemoveOnPlopClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows((ushort)(ckbDecoRemoveOnPlop.Checked ? 0x01 : 0x00), ObjdIndex.NONE, "removeonlotplop");
+        }
+
+        private void OnDecoShowInCatalogClicked(object sender, EventArgs e)
+        {
+            if (IsAutoUpdate) UpdateSelectedRows((ushort)(ckbDecoShowInCatalog.Checked ? 0x01 : 0x00), ObjdIndex.NONE, "showincatalog");
         }
         #endregion
 
@@ -2641,11 +3604,11 @@ namespace ObjectRelocator
             mouseLocation = e;
             Point MousePosition = Cursor.Position;
 
-            if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < gridViewResources.RowCount && e.ColumnIndex < gridViewResources.ColumnCount)
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < gridResources.RowCount && e.ColumnIndex < gridResources.ColumnCount)
             {
-                DataGridViewRow row = gridViewResources.Rows[e.RowIndex];
+                DataGridViewRow row = gridResources.Rows[e.RowIndex];
 
-                if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colTitle") || row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colName"))
+                if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colTitle") || row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colResName"))
                 {
                     Image thumbnail = GetThumbnail(row);
 
@@ -2665,7 +3628,66 @@ namespace ObjectRelocator
         }
         #endregion
 
-        #region Context Menu
+        #region Folders Context Menu
+        private void OnContextMenuFoldersOpening(object sender, CancelEventArgs e)
+        {
+            menuContextDirRename.Enabled = !IsAnyPackageDirty();
+            menuContextDirAdd.Enabled = true;
+            menuContextDirMove.Enabled = !IsAnyPackageDirty();
+
+            DirectoryInfo di = new DirectoryInfo(lastFolder);
+            menuContextDirDelete.Enabled = ((di.GetDirectories().Length + di.GetFiles().Length) == 0);
+        }
+
+        private void OnContextMenuFoldersClosing(object sender, ToolStripDropDownClosingEventArgs e)
+        {
+        }
+        #endregion
+
+        #region Packages Context Menu
+        private void OnContextMenuPackagesOpening(object sender, CancelEventArgs e)
+        {
+            if (mouseLocation == null || mouseLocation.RowIndex == -1)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            // Mouse has to be over a selected row
+            foreach (DataGridViewRow mouseOverPackageRow in gridPackageFiles.SelectedRows)
+            {
+                if (mouseLocation.RowIndex == mouseOverPackageRow.Index)
+                {
+                    foreach (DataGridViewRow selectedPackageRow in gridPackageFiles.SelectedRows)
+                    {
+                        if (packageCache.Contains(selectedPackageRow.Cells["colPackagePath"].Value as string))
+                        {
+                            menuContextPkgRename.Enabled = false;
+                            menuContextPkgMove.Enabled = false;
+                            menuContextPkgMerge.Enabled = false;
+                            menuContextPkgDelete.Enabled = false;
+
+                            return;
+                        }
+                    }
+
+                    int selPackages = gridPackageFiles.SelectedRows.Count;
+
+                    menuContextPkgRename.Enabled = (selPackages == 1);
+                    menuContextPkgMove.Enabled = (selPackages > 0);
+                    menuContextPkgMerge.Enabled = (selPackages > 1);
+                    menuContextPkgDelete.Enabled = (selPackages > 0);
+
+                    return;
+                }
+            }
+
+            e.Cancel = true;
+            return;
+        }
+        #endregion
+
+        #region Resource Context Menu
         private void OnContextMenuOpening(object sender, CancelEventArgs e)
         {
             if (mouseLocation == null || mouseLocation.RowIndex == -1)
@@ -2675,7 +3697,7 @@ namespace ObjectRelocator
             }
 
             // Mouse has to be over a selected row
-            foreach (DataGridViewRow mouseRow in gridViewResources.SelectedRows)
+            foreach (DataGridViewRow mouseRow in gridResources.SelectedRows)
             {
                 if (mouseLocation.RowIndex == mouseRow.Index)
                 {
@@ -2683,7 +3705,7 @@ namespace ObjectRelocator
 
                     menuItemContextRowRestore.Enabled = false;
 
-                    foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
+                    foreach (DataGridViewRow selectedRow in gridResources.SelectedRows)
                     {
                         if ((selectedRow.Cells["colObjectData"].Value as ObjectDbpfData).IsDirty)
                         {
@@ -2694,14 +3716,14 @@ namespace ObjectRelocator
                         }
                     }
 
-                    if (gridViewResources.SelectedRows.Count == 1)
+                    if (gridResources.SelectedRows.Count == 1)
                     {
                         ObjectDbpfData objectData = mouseRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
                         menuItemContextEditName.Enabled = true;
                         menuItemContextEditTitleDesc.Enabled = objectData.HasTitleAndDescription;
 
-                        Image thumbnail = thumbCache.GetThumbnail(packageCache, objectData, IsBuyMode);
+                        Image thumbnail = thumbCache.GetThumbnail(packageCache, objectData, IsBuyMode, IsBuildMode, IsDecoMode);
                         menuContextSaveThumb.Enabled = (thumbnail != null);
                         menuContextReplaceThumb.Enabled = menuContextDeleteThumb.Enabled = (thumbnail != null) && !menuItemMakeReplacements.Checked;
                     }
@@ -2713,10 +3735,10 @@ namespace ObjectRelocator
                         menuContextSaveThumb.Enabled = menuContextReplaceThumb.Enabled = menuContextDeleteThumb.Enabled = false;
                     }
 
-                    menuItemContextStripCTSSCrap.Enabled = (gridViewResources.SelectedRows.Count > 0);
-                    menuItemContextHoodVisible.Enabled = (gridViewResources.SelectedRows.Count > 0);
-                    menuItemContextHoodInvisible.Enabled = (gridViewResources.SelectedRows.Count > 0);
-                    menuItemContextRemoveThumbCamera.Enabled = (gridViewResources.SelectedRows.Count > 0);
+                    menuItemContextStripCTSSCrap.Enabled = (gridResources.SelectedRows.Count > 0);
+                    menuItemContextHoodVisible.Enabled = (gridResources.SelectedRows.Count > 0);
+                    menuItemContextHoodInvisible.Enabled = (gridResources.SelectedRows.Count > 0);
+                    menuItemContextRemoveThumbCamera.Enabled = (gridResources.SelectedRows.Count > 0);
 
                     return;
                 }
@@ -2745,11 +3767,11 @@ namespace ObjectRelocator
 
         private void OnEditNameClicked(object sender, EventArgs e)
         {
-            if (gridViewResources.SelectedRows.Count == 0) return;
+            if (gridResources.SelectedRows.Count == 0) return;
 
-            if (gridViewResources.SelectedRows.Count == 1)
+            if (gridResources.SelectedRows.Count == 1)
             {
-                DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+                DataGridViewRow selectedRow = gridResources.SelectedRows[0];
                 ObjectDbpfData selectedObject = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
                 TextEntryDialog dialog = new TextEntryDialog("Change OBJD Name", "Name:", selectedObject.KeyName);
@@ -2771,7 +3793,7 @@ namespace ObjectRelocator
                 {
                     List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-                    foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+                    foreach (DataGridViewRow row in gridResources.SelectedRows)
                     {
                         selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
                     }
@@ -2793,11 +3815,11 @@ namespace ObjectRelocator
 
         private void OnEditTitleDescClicked(object sender, EventArgs e)
         {
-            if (gridViewResources.SelectedRows.Count == 0) return;
+            if (gridResources.SelectedRows.Count == 0) return;
 
-            if (gridViewResources.SelectedRows.Count == 1)
+            if (gridResources.SelectedRows.Count == 1)
             {
-                DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+                DataGridViewRow selectedRow = gridResources.SelectedRows[0];
                 ObjectDbpfData selectedObject = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
                 TitleAndDescEntryDialog dialog = new TitleAndDescEntryDialog(selectedObject.Title, selectedObject.Description);
@@ -2824,7 +3846,7 @@ namespace ObjectRelocator
 
                     List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-                    foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+                    foreach (DataGridViewRow row in gridResources.SelectedRows)
                     {
                         selectedData.Add(row.Cells["colObjectData"].Value as ObjectDbpfData);
                     }
@@ -2859,7 +3881,7 @@ namespace ObjectRelocator
         {
             List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            foreach (DataGridViewRow row in gridResources.SelectedRows)
             {
                 ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
@@ -2871,7 +3893,7 @@ namespace ObjectRelocator
 
             foreach (ObjectDbpfData objectData in selectedData)
             {
-                foreach (DataGridViewRow row in gridViewResources.Rows)
+                foreach (DataGridViewRow row in gridResources.Rows)
                 {
                     if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Equals(objectData))
                     {
@@ -2895,7 +3917,7 @@ namespace ObjectRelocator
         {
             List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            foreach (DataGridViewRow row in gridResources.SelectedRows)
             {
                 ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
@@ -2907,7 +3929,7 @@ namespace ObjectRelocator
 
             foreach (ObjectDbpfData objectData in selectedData)
             {
-                foreach (DataGridViewRow row in gridViewResources.Rows)
+                foreach (DataGridViewRow row in gridResources.Rows)
                 {
                     if ((row.Cells["colObjectData"].Value as ObjectDbpfData).Equals(objectData))
                     {
@@ -2932,7 +3954,7 @@ namespace ObjectRelocator
 
         private void OnSaveThumbClicked(object sender, EventArgs e)
         {
-            DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+            DataGridViewRow selectedRow = gridResources.SelectedRows[0];
             ObjectDbpfData objectData = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
             saveThumbnailDialog.DefaultExt = "png";
@@ -2945,7 +3967,7 @@ namespace ObjectRelocator
             {
                 using (Stream stream = saveThumbnailDialog.OpenFile())
                 {
-                    Image thumbnail = thumbCache.GetThumbnail(packageCache, objectData, IsBuyMode);
+                    Image thumbnail = thumbCache.GetThumbnail(packageCache, objectData, IsBuyMode, IsBuildMode, IsDecoMode);
 
                     thumbnail?.Save(stream, (saveThumbnailDialog.FileName.EndsWith("jpg") ? ImageFormat.Jpeg : ImageFormat.Png));
 
@@ -2956,7 +3978,7 @@ namespace ObjectRelocator
 
         private void OnReplaceThumbClicked(object sender, EventArgs e)
         {
-            DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+            DataGridViewRow selectedRow = gridResources.SelectedRows[0];
             ObjectDbpfData objectData = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
             if (openThumbnailDialog.ShowDialog() == DialogResult.OK)
@@ -2965,7 +3987,7 @@ namespace ObjectRelocator
                 {
                     Image newThumbnail = Image.FromFile(openThumbnailDialog.FileName);
 
-                    thumbCache.ReplaceThumbnail(packageCache, objectData, IsBuyMode, newThumbnail);
+                    thumbCache.ReplaceThumbnail(packageCache, objectData, IsBuyMode, IsBuildMode, IsDecoMode, newThumbnail);
 
                     if (IsThumbCacheDirty())
                     {
@@ -2982,12 +4004,12 @@ namespace ObjectRelocator
 
         private void OnDeleteThumbClicked(object sender, EventArgs e)
         {
-            DataGridViewRow selectedRow = gridViewResources.SelectedRows[0];
+            DataGridViewRow selectedRow = gridResources.SelectedRows[0];
             ObjectDbpfData objectData = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
 
             if (objectData?.ThumbnailOwner != null)
             {
-                thumbCache.DeleteThumbnail(packageCache, objectData, IsBuyMode);
+                thumbCache.DeleteThumbnail(packageCache, objectData, IsBuyMode, IsBuildMode, IsDecoMode);
 
                 if (IsThumbCacheDirty())
                 {
@@ -3002,7 +4024,7 @@ namespace ObjectRelocator
             {
                 HashSet<string> fromPaths = new HashSet<string>();
 
-                foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
+                foreach (DataGridViewRow selectedRow in gridResources.SelectedRows)
                 {
                     string fromPackagePath = selectedRow.Cells["colPackagePath"].Value as string;
                     string toPackagePath = $"{selectPathDialog.FileName}\\{new DirectoryInfo(fromPackagePath).Name}";
@@ -3033,7 +4055,7 @@ namespace ObjectRelocator
                     }
                 }
 
-                DoWork_FillGrid(folder, false);
+                DoWork_FillResourceGrid(lastFolder, false);
 
             }
         }
@@ -3046,7 +4068,7 @@ namespace ObjectRelocator
         {
             List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            foreach (DataGridViewRow row in gridResources.SelectedRows)
             {
                 ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
@@ -3102,7 +4124,7 @@ namespace ObjectRelocator
         {
             List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
 
-            foreach (DataGridViewRow row in gridViewResources.SelectedRows)
+            foreach (DataGridViewRow row in gridResources.SelectedRows)
             {
                 ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
@@ -3130,6 +4152,177 @@ namespace ObjectRelocator
             }
 
             ReselectRows(selectedData);
+        }
+        #endregion
+
+        #region Drag And Drop
+        private void OnTreeFolder_ItemDrag(object sender, ItemDragEventArgs e)
+        {
+            // See https://www.c-sharpcorner.com/blogs/perform-drag-and-drop-operation-on-treeview-node-in-c-sharp-net
+            if (e.Button == MouseButtons.Left)
+            {
+                if (!IsAnyPackageDirty()) DoDragDrop(e.Item, DragDropEffects.Move);
+            }
+
+            // For grid -> tree see https://social.msdn.microsoft.com/Forums/windows/en-US/37845d81-0d0c-4696-97ca-df68570c5325/how-to-drag-amp-drop-from-datagridview-to-treeview?forum=winforms
+        }
+
+        private void OnTreeFolder_DragEnter(object sender, DragEventArgs e)
+        {
+            if (rootFolder != null)
+            {
+                e.Effect = e.AllowedEffect;
+            }
+            else
+            {
+                DataObject data = e.Data as DataObject;
+
+                if (data.ContainsFileDropList())
+                {
+                    string[] folders = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                    if (folders != null && folders.Length == 1)
+                    {
+                        if (Directory.Exists(folders[0]))
+                        {
+                            e.Effect = DragDropEffects.Copy;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void OnTreeFolder_DragOver(object sender, DragEventArgs e)
+        {
+            Point targetPoint = treeFolders.PointToClient(new Point(e.X, e.Y));
+            treeFolders.SelectedNode = treeFolders.GetNodeAt(targetPoint);
+        }
+
+        private void OnTreeFolder_DragDrop(object sender, DragEventArgs e)
+        {
+            if (rootFolder != null)
+            {
+                Point targetPoint = treeFolders.PointToClient(new Point(e.X, e.Y));
+                TreeNode targetNode = treeFolders.GetNodeAt(targetPoint);
+
+                TreeNode draggedNode = (TreeNode)e.Data.GetData(typeof(TreeNode));
+                if (draggedNode != null)
+                {
+                    if (!draggedNode.Equals(targetNode) && !ContainsNode(draggedNode, targetNode))
+                    {
+                        if (e.Effect == DragDropEffects.Move)
+                        {
+                            string fromFolderPath = draggedNode.Name;
+                            string toFolderPath = $"{targetNode.Name}\\{new DirectoryInfo(fromFolderPath).Name}";
+
+                            if (Directory.Exists(toFolderPath))
+                            {
+                                MsgBox.Show($"Name clash, {new DirectoryInfo(fromFolderPath).Name} already exists in the selected folder", "Folder Move Error");
+                                return;
+                            }
+
+                            try
+                            {
+                                Directory.Move(fromFolderPath, toFolderPath);
+
+                                DoWork_FillTree(rootFolder, false, false);
+                                TreeFolder_ExpandNode(fromFolderPath);
+                            }
+                            catch (Exception)
+                            {
+                                MsgBox.Show($"Error trying to move {fromFolderPath} to {toFolderPath}", "Folder Move Error!");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    List<string> draggedPackages = (List<string>)e.Data.GetData(typeof(List<string>));
+                    if (draggedPackages != null && draggedPackages.Count > 0)
+                    {
+                        string fromFolderPath = lastFolder;
+
+                        foreach (string fromPackagePath in draggedPackages)
+                        {
+                            string toPackagePath = $"{targetNode.Name}\\{new FileInfo(fromPackagePath).Name}";
+
+                            if (File.Exists(toPackagePath))
+                            {
+                                MsgBox.Show($"Name clash, {new FileInfo(fromPackagePath).Name} already exists in the selected folder", "Package Move Error");
+                                return;
+                            }
+                        }
+
+                        foreach (string fromPackagePath in draggedPackages)
+                        {
+                            string toPackagePath = $"{targetNode.Name}\\{new FileInfo(fromPackagePath).Name}";
+
+                            try
+                            {
+                                File.Move(fromPackagePath, toPackagePath);
+                            }
+                            catch (Exception)
+                            {
+                                MsgBox.Show($"Error trying to move {fromPackagePath} to {toPackagePath}", "File Move Error!");
+                            }
+                        }
+
+                        DoWork_FillTree(rootFolder, false, false);
+                        TreeFolder_ExpandNode(fromFolderPath);
+                    }
+                }
+            }
+            else
+            {
+                DataObject data = e.Data as DataObject;
+
+                if (data.ContainsFileDropList())
+                {
+                    string[] folders = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                    if (folders != null && folders.Length == 1)
+                    {
+                        if (Directory.Exists(folders[0]))
+                        {
+                            rootFolder = folders[0];
+                            DoWork_FillTree(rootFolder, false, true);
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool ContainsNode(TreeNode node1, TreeNode node2)
+        {
+            if (node2.Parent == null) return false;
+            if (node2.Parent.Equals(node1)) return true;
+
+            return ContainsNode(node1, node2.Parent);
+        }
+
+        private void OnPkgGrid_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                if (gridPackageFiles.CurrentRow != null)
+                {
+                    List<string> packages = new List<string>();
+
+                    if (gridPackageFiles.CurrentRow.Selected)
+                    {
+                        foreach (DataGridViewRow selectedPackageRow in gridPackageFiles.SelectedRows)
+                        {
+                            packages.Add(selectedPackageRow.Cells["colPackagePath"].Value as string);
+                        }
+                    }
+                    else
+                    {
+                        packages.Add(gridPackageFiles.CurrentRow.Cells["colPackagePath"].Value as string);
+                    }
+
+                    gridPackageFiles.DoDragDrop(packages, DragDropEffects.Copy);
+                }
+            }
         }
         #endregion
 
@@ -3170,7 +4363,7 @@ namespace ObjectRelocator
         {
             Dictionary<string, List<ObjectDbpfData>> dirtyObjectsByPackage = new Dictionary<string, List<ObjectDbpfData>>();
 
-            foreach (DataGridViewRow row in gridViewResources.Rows)
+            foreach (DataGridViewRow row in gridResources.Rows)
             {
                 ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
@@ -3216,7 +4409,7 @@ namespace ObjectRelocator
             {
                 List<ObjectDbpfData> editedObjects = new List<ObjectDbpfData>();
 
-                foreach (DataGridViewRow row in gridViewResources.Rows)
+                foreach (DataGridViewRow row in gridResources.Rows)
                 {
                     ObjectDbpfData editedObject = row.Cells["colObjectData"].Value as ObjectDbpfData;
 

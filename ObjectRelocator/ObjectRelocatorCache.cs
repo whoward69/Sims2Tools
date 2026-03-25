@@ -12,6 +12,7 @@ using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.THUB;
+using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.CRES;
@@ -25,9 +26,11 @@ using Sims2Tools.DBPF.XROF;
 using Sims2Tools.DbpfCache;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using static Sims2Tools.DBPF.Data.MetaData;
+using static Sims2Tools.DBPF.Images.THUB.Thub;
 
 namespace ObjectRelocator
 {
@@ -41,9 +44,9 @@ namespace ObjectRelocator
             ObjectDbpfData.cache = cache;
         }
 
-        private readonly string packagePath;
-        private readonly string packageNameNoExtn;
-        private readonly string packageName;
+        private string packagePath;
+        private string packageNameNoExtn;
+        private string packageName;
 
         private readonly DBPFResource res = null;
         private readonly Str strings = null;
@@ -70,6 +73,8 @@ namespace ObjectRelocator
         public bool IsCpf => (res is Cpf);
         public bool IsXobj => (res is Xobj);
         public bool IsXfnc => (res is Xfnc);
+        public bool IsXngb => (res is Xngb);
+        public bool IsXngbEffects => (res is Xngb && (res as Xngb).IsEffects);
 
         public List<Cres> Cress => cress;
         public List<Shpe> Shpes => shpes;
@@ -271,7 +276,7 @@ namespace ObjectRelocator
             }
             else if (res is Cpf cpf)
             {
-                if (cpf is Xfnc || cpf is Xobj)
+                if (cpf is Xfnc || cpf is Xobj || cpf is Xngb)
                 {
                     TypeGroupID strGroupId = (TypeGroupID)cpf.GetItem("stringsetgroupid").UIntegerValue;
                     TypeInstanceID strInstanceId = (TypeInstanceID)cpf.GetItem("stringsetid").UIntegerValue;
@@ -299,6 +304,15 @@ namespace ObjectRelocator
             {
                 if (shpe.IsDirty) dbpfPackage.Commit(shpe);
             }
+        }
+
+        public void Rename(string fromPackagePath, string toPackagePath)
+        {
+            Debug.Assert(packagePath.Equals(fromPackagePath));
+
+            packagePath = toPackagePath;
+            packageName = new FileInfo(packagePath).Name;
+            packageNameNoExtn = packageName.Substring(0, packageName.LastIndexOf('.'));
         }
 
         public void UpdatePackage()
@@ -598,6 +612,16 @@ namespace ObjectRelocator
             return false;
         }
 
+        public string DecoSort => (res as Xngb).GetItem("sort").StringValue;
+
+        public uint DecoSurface => (res as Xngb).GetItem("placementsurface").UIntegerValue;
+
+        public bool IsAllowLot => ((res as Xngb).GetItem("allowedinlot").UIntegerValue != 0x00);
+
+        public bool IsAllowRoad => ((res as Xngb).GetItem("allowedonroad").UIntegerValue != 0x00);
+
+        public bool IsRemoveOnPlop => ((res as Xngb).GetItem("removeonlotplop").UIntegerValue != 0x00);
+
         public bool Equals(ObjectDbpfData other)
         {
             return this.packagePath.Equals(other.packagePath) && this.res.Equals(other.res);
@@ -620,6 +644,7 @@ namespace ObjectRelocator
     {
         private ThumbnailDbpfCache thumbCacheBuyMode = null;
         private ThumbnailDbpfCache thumbCacheBuildMode = null;
+        private ThumbnailDbpfCache thumbCacheDecoMode = null;
 
         public ThumbnailCache()
         {
@@ -627,21 +652,24 @@ namespace ObjectRelocator
             {
                 thumbCacheBuyMode = new ThumbnailDbpfCache($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\ObjectThumbnails.package");
                 thumbCacheBuildMode = new ThumbnailDbpfCache($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\BuildModeThumbnails.package");
+                thumbCacheDecoMode = new ThumbnailDbpfCache($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\CANHObjectsThumbnails.package");
             }
         }
 
-        public bool IsDirty => (thumbCacheBuyMode != null && thumbCacheBuyMode.IsDirty) || (thumbCacheBuildMode != null && thumbCacheBuildMode.IsDirty);
+        public bool IsDirty => (thumbCacheBuyMode != null && thumbCacheBuyMode.IsDirty) || (thumbCacheBuildMode != null && thumbCacheBuildMode.IsDirty) || (thumbCacheDecoMode != null && thumbCacheDecoMode.IsDirty);
 
         public void SetClean()
         {
             thumbCacheBuyMode?.SetClean();
             thumbCacheBuildMode?.SetClean();
+            thumbCacheDecoMode?.SetClean();
         }
 
         public void Update(bool autoBackup)
         {
             thumbCacheBuyMode?.Update(autoBackup);
             thumbCacheBuildMode?.Update(autoBackup);
+            thumbCacheDecoMode?.Update(autoBackup);
         }
 
         public void Close()
@@ -651,30 +679,37 @@ namespace ObjectRelocator
 
             thumbCacheBuildMode?.Close();
             thumbCacheBuildMode = null;
+
+            thumbCacheDecoMode?.Close();
+            thumbCacheDecoMode = null;
         }
 
-        public Image GetThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode)
+        public Image GetThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode, bool buildMode, bool decoMode)
         {
-            return GetThub(packageCache, objectData, buyMode)?.Image;
+            return GetThub(packageCache, objectData, buyMode, buildMode, decoMode)?.Image;
         }
 
-        private Thub GetThub(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode)
+        private Img GetThub(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode, bool buildMode, bool decoMode)
         {
-            Thub thub = null;
+            Img thumb = null;
 
             if (objectData.IsObjd && (buyMode ? thumbCacheBuyMode : thumbCacheBuildMode) != null)
             {
-                thub = GetThub(packageCache, objectData, objectData.ThumbnailOwner as Objd, buyMode);
+                thumb = GetThub(packageCache, objectData, objectData.ThumbnailOwner as Objd, buyMode, buildMode, decoMode);
             }
-            else if (!buyMode && thumbCacheBuildMode != null)
+            else if (buildMode && thumbCacheBuildMode != null)
             {
-                thub = GetBuildThub(packageCache, objectData, objectData.ThumbnailOwner as Cpf);
+                thumb = GetBuildThub(packageCache, objectData, objectData.ThumbnailOwner as Cpf);
+            }
+            else if (decoMode && thumbCacheDecoMode != null)
+            {
+                thumb = GetDecoThub(packageCache, objectData, objectData.ThumbnailOwner as Xngb);
             }
 
-            return thub;
+            return thumb;
         }
 
-        private Thub GetThub(DbpfFileCache packageCache, ObjectDbpfData objectData, Objd objd, bool buyMode)
+        private Thub GetThub(DbpfFileCache packageCache, ObjectDbpfData objectData, Objd objd, bool buyMode, bool buildMode, bool decoMode)
         {
             Thub thub = null;
 
@@ -782,6 +817,46 @@ namespace ObjectRelocator
             return thub;
         }
 
+        private Img GetDecoThub(DbpfFileCache packageCache, ObjectDbpfData objectData, Xngb xngb)
+        {
+            Img thub = null;
+
+            if (xngb.IsEffects)
+            {
+                using (CacheableDbpfFile package = packageCache.GetOrOpen(objectData.PackagePath))
+                {
+                    if (package != null)
+                    {
+                        try
+                        {
+                            TypeGroupID thumbGroupId = (TypeGroupID)xngb.GetItem("thumbnailgroupid").UIntegerValue;
+                            TypeInstanceID thumbInstanceID = (TypeInstanceID)xngb.GetItem("thumbnailinstanceid").UIntegerValue;
+
+                            thub = (Thub)package.GetResourceByKey(new DBPFKey(Thub.TYPES[(int)ThubTypeIndex.HoodDeco], thumbGroupId, thumbInstanceID, DBPFData.RESOURCE_NULL));
+
+                            if (thub == null)
+                            {
+                                thub = (Img)package.GetResourceByKey(new DBPFKey(Img.TYPE, thumbGroupId, thumbInstanceID, DBPFData.RESOURCE_NULL));
+                            }
+                        }
+                        finally
+                        {
+                            package.Close();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                TypeTypeID thumbTypeID = Thub.TYPES[(int)ThubTypeIndex.HoodDeco];
+                TypeInstanceID thumbInstanceID = (TypeInstanceID)xngb.GetItem("guid").UIntegerValue;
+
+                thub = (Thub)thumbCacheDecoMode.GetResourceByKey(new DBPFKey(thumbTypeID, DBPFData.GROUP_LOCAL, thumbInstanceID, DBPFData.RESOURCE_NULL));
+            }
+
+            return thub;
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0270:Use coalesce expression", Justification = "<Pending>")]
         private Thub GetBuildThumbnailByTGIR(TypeTypeID typeId, TypeGroupID groupId, TypeInstanceID instanceId, TypeResourceID resourceId)
         {
@@ -796,40 +871,54 @@ namespace ObjectRelocator
             return thub;
         }
 
-        public bool ReplaceThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode, Image newThumbnail)
+        public bool ReplaceThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode, bool buildMode, bool decoMode, Image newThumbnail)
         {
-            // TODO - Object Relocator - some build mode objects have their thumbnails in the buy mode cache!
-            ThumbnailDbpfCache thumbCache = (buyMode ? thumbCacheBuyMode : thumbCacheBuildMode);
-
-            if (thumbCache != null)
+            if (decoMode && objectData.IsXngbEffects)
             {
-                Thub thub = GetThub(packageCache, objectData, buyMode);
+                // TODO - Object Relocator - some deco objects have the thumbnail in their .package file
+            }
+            else
+            {
+                // TODO - Object Relocator - some build objects have their thumbnails in the buy mode cache!
+                ThumbnailDbpfCache thumbCache = (buyMode ? thumbCacheBuyMode : (buildMode ? thumbCacheBuildMode : thumbCacheDecoMode));
 
-                if (thub != null)
+                if (thumbCache != null)
                 {
-                    thub.Image = Img.MakeThumbnail(newThumbnail);
+                    Img thumb = GetThub(packageCache, objectData, buyMode, buildMode, decoMode);
 
-                    thumbCache.Commit(thub);
+                    if (thumb != null)
+                    {
+                        thumb.Image = Img.MakeThumbnail(newThumbnail);
 
-                    return true;
+                        thumbCache.Commit(thumb);
+
+                        return true;
+                    }
                 }
             }
 
             return false;
         }
 
-        public bool DeleteThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode)
+        public bool DeleteThumbnail(DbpfFileCache packageCache, ObjectDbpfData objectData, bool buyMode, bool buildMode, bool decoMode)
         {
-            // TODO - Object Relocator - some build mode objects have their thumbnails in the buy mode cache!
-            ThumbnailDbpfCache thumbCache = (buyMode ? thumbCacheBuyMode : thumbCacheBuildMode);
+            // TODO - Object Relocator - some build objects have their thumbnails in the buy mode cache!
+            ThumbnailDbpfCache thumbCache = (buyMode ? thumbCacheBuyMode : (buildMode ? thumbCacheBuildMode : thumbCacheDecoMode));
 
             if (objectData.IsObjd && thumbCache != null)
             {
-                return thumbCache.Remove(GetThub(packageCache, objectData, objectData.ThumbnailOwner as Objd, buyMode));
+                return thumbCache.Remove(GetThub(packageCache, objectData, objectData.ThumbnailOwner as Objd, buyMode, buildMode, decoMode));
             }
-            else if (!buyMode && thumbCache != null)
+            else if (buildMode && thumbCache != null)
             {
                 return thumbCache.Remove(GetBuildThub(packageCache, objectData, objectData.ThumbnailOwner as Cpf));
+            }
+            else if (decoMode && thumbCache != null)
+            {
+                if (!objectData.IsXngbEffects)
+                {
+                    thumbCache.Remove(GetDecoThub(packageCache, objectData, objectData.ThumbnailOwner as Xngb));
+                }
             }
 
             return false;

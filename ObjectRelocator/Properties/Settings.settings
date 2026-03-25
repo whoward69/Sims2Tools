@@ -23,5 +23,8 @@
     <Setting Name="ThumbnailBackground" Type="System.String" Scope="User">
       <Value Profile="(Default)">WhiteSmoke</Value>
     </Setting>
+    <Setting Name="MaxMergeFiles" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">12</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

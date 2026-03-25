@@ -11,9 +11,22 @@ using System.Data;
 namespace ObjectRelocator
 {
     [System.ComponentModel.DesignerCategory("")]
-    class ResourcesDataTable : DataTable
+    class ObjectRelocatorPackageData : DataTable
     {
-        public ResourcesDataTable()
+        public ObjectRelocatorPackageData()
+        {
+            // Must match the order in the DataGridView control
+            this.Columns.Add(new DataColumn("Name", typeof(string)));
+
+            this.Columns.Add(new DataColumn("PackagePath", typeof(string)));
+            this.Columns.Add(new DataColumn("PackageIcon", typeof(object)));
+        }
+    }
+
+    [System.ComponentModel.DesignerCategory("")]
+    class ObjectRelocatorResourceData : DataTable
+    {
+        public ObjectRelocatorResourceData()
         {
             // Must match the order in the DataGridView control
             this.Columns.Add(new DataColumn("Visible", typeof(string)));
@@ -34,6 +47,10 @@ namespace ObjectRelocator
             this.Columns.Add(new DataColumn("Depreciation", typeof(string)));
             this.Columns.Add(new DataColumn("HoodView", typeof(string)));
             this.Columns.Add(new DataColumn("ShowInCatalog", typeof(string)));
+            this.Columns.Add(new DataColumn("Surface", typeof(string)));
+            this.Columns.Add(new DataColumn("AllowLot", typeof(string)));
+            this.Columns.Add(new DataColumn("AllowRoad", typeof(string)));
+            this.Columns.Add(new DataColumn("RemoveOnPlop", typeof(string)));
 
             this.Columns.Add(new DataColumn("ObjectData", typeof(object)));
 
