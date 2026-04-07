@@ -14,6 +14,8 @@ using Sims2Tools;
 using Sims2Tools.Cache;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Cigen;
+using Sims2Tools.DBPF.Images.JPG;
+using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.AGED;
@@ -71,7 +73,7 @@ namespace SceneGraphPlus
         // UnderstoodTypes - also need to add TypeBlockColour and TypeRow to the Settings.settings file (see https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors?view=windowsdesktop-8.0 for colour names)
         public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() {
             Mmat.TYPE,
-            Objd.TYPE, Str.TYPE,    // OBJDs MUST be processed before STRs
+            Objd.TYPE, Xngb.TYPE, Str.TYPE,    // OBJDs MUST be processed before STRs
             Aged.TYPE,
             Gzps.TYPE, Xfnc.TYPE, Xmol.TYPE, Xtol.TYPE, Xobj.TYPE, Xflr.TYPE, Xrof.TYPE,
             Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE,
@@ -88,6 +90,7 @@ namespace SceneGraphPlus
         };
 
         private CigenFile cigenCache = null;
+        private DBPFFile casThumbnailsPackage = null;
         private static readonly DbpfFileCache packageCache = new DbpfFileCache();
 
         private readonly DrawingSurface surface;
@@ -127,11 +130,11 @@ namespace SceneGraphPlus
 
         public new void Dispose()
         {
-            if (cigenCache != null)
-            {
-                cigenCache.Close();
-                cigenCache = null;
-            }
+            cigenCache?.Close();
+            cigenCache = null;
+
+            casThumbnailsPackage?.Close();
+            casThumbnailsPackage = null;
 
             base.Dispose();
         }
@@ -160,6 +163,7 @@ namespace SceneGraphPlus
             menuItemGridNormal.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridNormal.Name, 1) != 0); if (menuItemGridNormal.Checked) lastGridItem = menuItemGridNormal;
             menuItemGridFine.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridFine.Name, 0) != 0); if (menuItemGridFine.Checked) lastGridItem = menuItemGridFine;
             menuItemGridDrop.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridDrop.Name, 0) != 0);
+            menuItemGridAutoRealignFilters.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridAutoRealignFilters.Name, 0) != 0);
 
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
@@ -178,7 +182,19 @@ namespace SceneGraphPlus
                 else
                 {
                     logger.Warn("'cigen.package' not found - thumbnails will NOT display.");
-                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'cigen.package' not found - thumbnails will NOT display.")).ShowDialog();
+                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'cigen.package' not found - some thumbnails will NOT display.")).ShowDialog();
+                }
+
+                string casThumbnailsPath = $"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\CASThumbnails.package";
+
+                if (File.Exists(casThumbnailsPath))
+                {
+                    casThumbnailsPackage = new DBPFFile(casThumbnailsPath);
+                }
+                else
+                {
+                    logger.Warn("'CASThumbnails.package' not found - thumbnails will NOT display.");
+                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'CASThumbnails.package' not found - some thumbnails will NOT display.")).ShowDialog();
                 }
             }
             else
@@ -207,30 +223,38 @@ namespace SceneGraphPlus
                 return;
             }
 
-            RegistryTools.SaveAppSettings(SceneGraphPlusApp.RegistryKey, SceneGraphPlusApp.AppVersionMajor, SceneGraphPlusApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(SceneGraphPlusApp.RegistryKey, this);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey, "splitter", splitContainer.SplitterDistance);
-
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemHideMissing.Name, menuItemHideMissing.Checked ? 1 : 0);
-
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemConnectorsOver.Name, menuItemConnectorsOver.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemConnectorsUnder.Name, menuItemConnectorsUnder.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemClearOptionalNames.Name, menuItemClearOptionalNames.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemSetOptionalNames.Name, menuItemSetOptionalNames.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixOptionalNames.Name, menuItemPrefixOptionalNames.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixLowerCase.Name, menuItemPrefixLowerCase.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
-
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridCoarse.Name, menuItemGridCoarse.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridNormal.Name, menuItemGridNormal.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridFine.Name, menuItemGridFine.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridDrop.Name, menuItemGridDrop.Checked ? 1 : 0);
-
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
-            RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
-
             if (textureDialog != null && !textureDialog.IsDisposed) textureDialog.Close();
             if (filtersDialog != null && !filtersDialog.IsDisposed) filtersDialog.Close();
+
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(SceneGraphPlusApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(SceneGraphPlusApp.RegistryKey, SceneGraphPlusApp.AppVersionMajor, SceneGraphPlusApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(SceneGraphPlusApp.RegistryKey, this);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey, "splitter", splitContainer.SplitterDistance);
+
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemHideMissing.Name, menuItemHideMissing.Checked ? 1 : 0);
+
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemConnectorsOver.Name, menuItemConnectorsOver.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemConnectorsUnder.Name, menuItemConnectorsUnder.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemClearOptionalNames.Name, menuItemClearOptionalNames.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemSetOptionalNames.Name, menuItemSetOptionalNames.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixOptionalNames.Name, menuItemPrefixOptionalNames.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixLowerCase.Name, menuItemPrefixLowerCase.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
+
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridCoarse.Name, menuItemGridCoarse.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridNormal.Name, menuItemGridNormal.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridFine.Name, menuItemGridFine.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridDrop.Name, menuItemGridDrop.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridAutoRealignFilters.Name, menuItemGridAutoRealignFilters.Checked ? 1 : 0);
+
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
+            }
         }
 
         private void OnFormResize(object sender, EventArgs e)
@@ -672,9 +696,28 @@ namespace SceneGraphPlus
             textureDialog.Focus();
         }
 
-        public Image GetThumbnail(DBPFKey key)
+        public Image GetThumbnail(GraphBlock block)
         {
-            return cigenCache?.GetThumbnail(key);
+            Image thumbnail = cigenCache?.GetThumbnail(block.OriginalKey);
+
+            if (thumbnail == null)
+            {
+                if (casThumbnailsPackage != null)
+                {
+                    if (block.TypeId == Gzps.TYPE)
+                    {
+                        CacheableDbpfFile gzpsPackage = packageCache.GetOrAdd(block.PackagePath);
+
+                        Gzps gzps = (Gzps)gzpsPackage.GetResourceByKey(block.OriginalKey);
+
+                        DBPFKey casThubmnailKey = Hashes.CasThumbnailHash(gzps);
+
+                        thumbnail = ((Jpg)casThumbnailsPackage.GetResourceByKey(casThubmnailKey))?.Image;
+                    }
+                }
+            }
+
+            return thumbnail;
         }
 
         public string GetAvailablePath(DBPFKey key)
@@ -1085,6 +1128,12 @@ namespace SceneGraphPlus
 
                     startBlock.IsEpFlagsValid = objd.IsEpFlagsValid;
                 }
+                else if (res is Xngb xngb)
+                {
+                    startBlock.ConnectTo(0, "model", AddBlockByName(package, new BlockRef(package, Cres.TYPE, DBPFData.GROUP_SG_MAXIS, xngb.GetItem("modelname").StringValue, IsPrefixLowerCase), ref freeCol));
+
+                    startBlock.IsXngbValid = xngb.IsValid;
+                }
                 else if (res is Mmat mmat)
                 {
                     string suffix = "";
@@ -1473,6 +1522,10 @@ namespace SceneGraphPlus
             {
                 return objd.KeyName;
             }
+            else if (res is Xngb xngb)
+            {
+                return xngb.Name;
+            }
             else if (res is Mmat mmat)
             {
                 return mmat.Name;
@@ -1608,6 +1661,10 @@ namespace SceneGraphPlus
                 return null;
             }
             else if (res is Objd)
+            {
+                return null;
+            }
+            else if (res is Xngb)
             {
                 return null;
             }
@@ -1866,6 +1923,11 @@ namespace SceneGraphPlus
         private void OnGridDropChanged(object sender, EventArgs e)
         {
             surface.DropToGrid = menuItemGridDrop.Checked;
+        }
+
+        private void OnGridAutoFilterAlignChanged(object sender, EventArgs e)
+        {
+            surface.AutoFilterAlign = menuItemGridAutoRealignFilters.Checked;
         }
 
         private void OnSurfacePanelResize(object sender, EventArgs e)

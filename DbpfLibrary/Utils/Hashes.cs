@@ -99,13 +99,16 @@ namespace Sims2Tools.DBPF.Utils
 
         public static DBPFKey CasThumbnailHash(Cpf ownerCpf)
         {
-            uint genderCode = ownerCpf.Gender;
+            return CasThumbnailHash(ownerCpf, ownerCpf.Gender, ownerCpf.Age, ownerCpf.Hairtone);
+        }
+
+        public static DBPFKey CasThumbnailHash(DBPFKey ownerKey, uint genderCode, uint ageCode, string hairtone)
+        {
             string gender = "";
 
             if ((genderCode & 0x01) == 0x01) gender += "female";
             if ((genderCode & 0x02) == 0x02) gender += "male";
 
-            uint ageCode = ownerCpf.Age;
             string age = "";
 
             if ((ageCode & 0x20) == 0x20) age += "baby";
@@ -116,20 +119,20 @@ namespace Sims2Tools.DBPF.Utils
             if ((ageCode & 0x08) == 0x08) age += "adult";
             if ((ageCode & 0x10) == 0x10) age += "elder";
 
-            Int32 t = (Int32)ownerCpf.TypeID.AsUInt();
-            Int32 g = (Int32)ownerCpf.GroupID.AsUInt();
-            Int32 i = (Int32)ownerCpf.InstanceID.AsUInt();
+            Int32 t = (Int32)ownerKey.TypeID.AsUInt();
+            Int32 g = (Int32)ownerKey.GroupID.AsUInt();
+            Int32 i = (Int32)ownerKey.InstanceID.AsUInt();
 
             string hashMagic = $"{age}{gender}_{g}-{t}-{i}";
 
-            if (ownerCpf is Xhtn)
+            if (ownerKey.TypeID == Xhtn.TYPE)
             {
-                hashMagic += $"_{ownerCpf.GetItem("hairtone").StringValue}";
+                hashMagic += $"_{hairtone}";
             }
 
             uint hashInstance = ToUInt(crc32.ComputeHash(Helper.ToBytes(hashMagic.Trim().ToLower(), 0)));
 
-            return new DBPFKey(Jpg.TYPES[(int)Jpg.JpgTypeIndex.CasThumbnail], DBPFData.GROUP_LOCAL, (TypeInstanceID)hashInstance, (TypeResourceID)ownerCpf.InstanceID.AsUInt());
+            return new DBPFKey(Jpg.TYPES[(int)Jpg.JpgTypeIndex.CasThumbnail], DBPFData.GROUP_LOCAL, (TypeInstanceID)hashInstance, (TypeResourceID)ownerKey.InstanceID.AsUInt());
         }
 
         public static string StripHashFromName(string filename)

@@ -215,5 +215,11 @@
     <Setting Name="NonFixableIssueColour" Type="System.String" Scope="User">
       <Value Profile="(Default)">White</Value>
     </Setting>
+    <Setting Name="XngbBlockColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">SkyBlue</Value>
+    </Setting>
+    <Setting Name="XngbRow" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

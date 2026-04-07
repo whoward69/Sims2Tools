@@ -30,9 +30,13 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private string originalTxtrName = null;
 
+        private readonly TextureOptions txtrOpts;
+
         public TxtrDialog()
         {
             InitializeComponent();
+
+            txtrOpts = new TextureOptions(textNewImage, radioDxt1, radioDxt3, radioDxt5, radioRaw8, radioRaw24, radioRaw32, textLevels, comboSharpen, ckbFilters);
         }
 
         public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile package, Txtr txtr, string txtrname, List<Lifo> lifos, out bool removeLifos)
@@ -187,7 +191,7 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private void UpdateTexture(Txtr txtrToUpdate, List<Lifo> lifosToUpdate)
         {
-            OptionsHelper.UpdateTextureFromFile(txtrToUpdate, (ckbRemoveLifos.Checked ? null : lifosToUpdate), textNewImage.Text, OptionsHelper.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters);
+            OptionsHelper.UpdateTextureFromFile(txtrToUpdate, (ckbRemoveLifos.Checked ? null : lifosToUpdate), txtrOpts);
 
             this.removeLifos = ckbRemoveLifos.Checked;
         }

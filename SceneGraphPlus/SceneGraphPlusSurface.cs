@@ -16,6 +16,7 @@ using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.CTSS;
+using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.AGED;
@@ -113,6 +114,8 @@ namespace SceneGraphPlus.Surface
         private bool dropToGrid = false;
         private float gridScale = 1.0f;
 
+        private bool autoFilterAlign = false;
+
         public bool HideMissingBlocks
         {
             set
@@ -154,10 +157,16 @@ namespace SceneGraphPlus.Surface
             get => gridScale;
             set => gridScale = value;
         }
+
+        public bool AutoFilterAlign
+        {
+            get => autoFilterAlign;
+            set => autoFilterAlign = value;
+        }
         #endregion
 
         #region Surface Selected Shape Tracking
-        private List<GraphBlock> selectedBlocks = new List<GraphBlock>();
+        private readonly List<GraphBlock> selectedBlocks = new List<GraphBlock>();
         private GraphBlock firstSelectedBlock = null;
         private HashSet<GraphBlock> selectedBlockChain = null;
         private GraphBlock hoverBlock = null;
@@ -185,7 +194,7 @@ namespace SceneGraphPlus.Surface
         private DateTime mouseLastClick;
         private bool inDoubleClick = false;
         private Rectangle doubleClickArea;
-        private TimeSpan doubleClickMaxTime;
+        private readonly TimeSpan doubleClickMaxTime;
         private readonly Timer mouseClickTimer;
         #endregion
 
@@ -299,7 +308,7 @@ namespace SceneGraphPlus.Surface
                 menuItemContextBlockCopySgName.Name = "menuItemContextBlockCopySgName";
                 menuItemContextBlockCopySgName.Size = new Size(222, 22);
                 menuItemContextBlockCopySgName.Text = "Copy SG Name From Parent";
-                menuItemContextBlockCopySgName.Click += new EventHandler(OnContextBlockCopySgName);
+                menuItemContextBlockCopySgName.Click += new EventHandler(OnContextBlockCopySgNameFromParent);
 
                 menuItemContextBlockClosePackage.Name = "menuItemContextBlockClosePackage";
                 menuItemContextBlockClosePackage.Size = new Size(222, 22);
@@ -1423,8 +1432,6 @@ namespace SceneGraphPlus.Surface
                             selectFileDialog.Title = $"Export as .package file - {block.BlockName}";
                         }
 
-                        int a = allBlocks.Count;
-
                         if (selectFileDialog.ShowDialog() == DialogResult.OK)
                         {
                             if (File.Exists(selectFileDialog.FileName))
@@ -1537,18 +1544,21 @@ namespace SceneGraphPlus.Surface
             }
         }
 
-        private void OnContextBlockCopySgName(object sender, EventArgs e)
+        private void OnContextBlockCopySgNameFromParent(object sender, EventArgs e)
         {
-            string sgName = contextBlock.SoleRcolParent?.SgBaseName;
+            SetSgName(contextBlock.SoleRcolParent?.SgBaseName, contextBlock);
+        }
 
+        private void SetSgName(string sgName, GraphBlock targetBlock)
+        {
             if (sgName != null)
             {
-                contextBlock.SetSgFullName(sgName, owningForm.IsPrefixLowerCase);
-                contextBlock.SetDirty();
+                targetBlock.SetSgFullName(sgName, owningForm.IsPrefixLowerCase);
+                targetBlock.SetDirty();
 
                 Invalidate();
 
-                if (contextBlock.Equals(editBlock))
+                if (targetBlock.Equals(editBlock))
                 {
                     owningForm.UpdateEditor(editBlock);
                 }
@@ -1557,7 +1567,7 @@ namespace SceneGraphPlus.Surface
 
         private void OnContextBlockSplitBlock(object sender, EventArgs e)
         {
-            // TODO - SceneGraph Plus - splitting a GZPS -> TXMT is very dangerous as the 3IDR index may have been reused!
+            // TODO - SceneGraph Plus - cloning - splitting a GZPS -> TXMT is very dangerous as the 3IDR index may have been reused!
             int shiftMultiplier = 0;
 
             foreach (GraphConnector connector in contextBlock.GetInConnectors())
@@ -1689,6 +1699,8 @@ namespace SceneGraphPlus.Surface
                     }
                 }
             }
+
+            if (AutoFilterAlign) RealignAll();
         }
 
         private void FilterChain(GraphBlock startBlock)
@@ -2731,7 +2743,7 @@ namespace SceneGraphPlus.Surface
 
                         if (advancedMode)
                         {
-                            if (hoverBlock.TypeId == Mmat.TYPE || hoverBlock.TypeId == Objd.TYPE || hoverBlock.TypeId == Gmnd.TYPE || hoverBlock.TypeId == Txmt.TYPE || hoverBlock.TypeId == Txtr.TYPE)
+                            if (hoverBlock.TypeId == Gmnd.TYPE || hoverBlock.TypeId == Gzps.TYPE || hoverBlock.TypeId == Mmat.TYPE || hoverBlock.TypeId == Objd.TYPE || hoverBlock.TypeId == Txmt.TYPE || hoverBlock.TypeId == Txtr.TYPE)
                             {
                                 ChangeCursor(Cursors.Hand);
                             }
@@ -2748,7 +2760,7 @@ namespace SceneGraphPlus.Surface
 
                         if (Form.ModifierKeys == Keys.Shift)
                         {
-                            thumbnail = owningForm.GetThumbnail(hoverBlock.Key);
+                            thumbnail = owningForm.GetThumbnail(hoverBlock);
 
                             if (thumbnail != null)
                             {
@@ -2767,6 +2779,18 @@ namespace SceneGraphPlus.Surface
                                 if (hoverBlock.IsAvailable)
                                 {
                                     toolTip = $"{toolTip}\r\nin {owningForm.GetAvailablePath(hoverBlock.Key)}";
+                                }
+
+                                // TODO - CAS Thumbnails - TESTING ONLY
+                                if (hoverBlock.OriginalKey.TypeID == Gzps.TYPE)
+                                {
+                                    CacheableDbpfFile gzpsPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
+
+                                    Gzps gzps = (Gzps)gzpsPackage.GetResourceByKey(hoverBlock.OriginalKey);
+
+                                    DBPFKey casThumbnailKey = Hashes.CasThumbnailHash(gzps);
+
+                                    toolTip = $"{toolTip}\r\nCAS Thumbnail - {casThumbnailKey}";
                                 }
 
                                 toolTip = $"{toolTip}{hoverBlock.IssuesToolTip}";
@@ -3059,7 +3083,6 @@ namespace SceneGraphPlus.Surface
                 }
                 else if (hoverBlock.TypeId == Gzps.TYPE)
                 {
-                    // TODO - SceneGraph Plus - options dialogs - can this also be used for XMOLs and XTOLS?
                     CacheableDbpfFile gzpsPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
 
                     Gzps gzps = (Gzps)gzpsPackage.GetResourceByKey(hoverBlock.OriginalKey);
@@ -3097,8 +3120,6 @@ namespace SceneGraphPlus.Surface
                         strIndex = (int)binx.StringIndex;
                     }
 
-                    bool removeLifos = false;
-
                     int numOverrides = (int)gzps.GetItem("numoverrides").UIntegerValue;
                     List<MaterialData> materials = new List<MaterialData>(numOverrides);
 
@@ -3113,20 +3134,17 @@ namespace SceneGraphPlus.Surface
                         {
                             foreach (MaterialData materialData in materials)
                             {
-                                if (materialData.idrIndex == idrIndex)
+                                if (materialData.IdrIndex == idrIndex)
                                 {
-                                    materialData.subsets.Add(subset);
+                                    materialData.AddSubset(subset);
                                     break;
                                 }
                             }
                         }
                         else
                         {
-                            MaterialData materialData = new MaterialData();
+                            MaterialData materialData = new MaterialData(idrIndex, subset);
                             materials.Add(materialData);
-
-                            materialData.subsets.Add(subset);
-                            materialData.idrIndex = idrIndex;
 
                             seenIdrRefs.Add(idrIndex);
 
@@ -3135,37 +3153,29 @@ namespace SceneGraphPlus.Surface
 
                             if (txmtBlock != null && !txmtBlock.IsMissing)
                             {
-                                materialData.txmtPackage = packageCache.GetOrAdd(txmtBlock.PackagePath);
-                                materialData.txmt = (Txmt)materialData.txmtPackage.GetResourceByKey(txmtBlock.Key);
+                                CacheableDbpfFile package = packageCache.GetOrAdd(txmtBlock.PackagePath);
+                                materialData.SetTxmtData(txmtBlock, package, (Txmt)package?.GetResourceByKey(txmtBlock.Key));
 
                                 if (txtrBlock != null && !txtrBlock.IsMissing)
                                 {
-                                    materialData.txtrPackage = packageCache.GetOrAdd(txtrBlock.PackagePath);
-                                    materialData.txtr = (Txtr)materialData.txmtPackage.GetResourceByKey(txtrBlock.Key);
+                                    package = packageCache.GetOrAdd(txtrBlock.PackagePath);
+                                    materialData.SetTxtrData(txtrBlock, package, (Txtr)package?.GetResourceByKey(txtrBlock.Key));
 
-                                    // TODO - we need to set up lifos as well
-                                    BuildLifoLists(txtrBlock, materialData.lifoConectors, materialData.lifos);
+                                    BuildLifoLists(txtrBlock, materialData.LifoConnectors, materialData.LifoResources);
                                 }
                             }
                         }
                     }
 
-                    if ((new GzpsDialog().ShowDialog(owningForm, mouseScreenLocation, gzpsPackage, hoverBlock, gzps, idrForGzps, binx, idrForBinx, str, strIndex, materials, out removeLifos)) == DialogResult.OK)
+                    if ((new GzpsDialog().ShowDialog(owningForm, mouseScreenLocation, gzpsPackage, hoverBlock, gzps, idrForGzps, binx, idrForBinx, str, strIndex, materials, out bool removeLifos)) == DialogResult.OK)
                     {
-                        // TODO - what goes in here? We must be looping the materials list
                         foreach (MaterialData material in materials)
                         {
-                            if (material.txtr != null && material.txtr.IsDirty)
+                            if (material.CommitTxtr())
                             {
-                                material.txtrPackage.Commit(material.txtr);
-                                material.txtrBlock.SetDirty();
-
-                                UpdateLifos(removeLifos, material.lifoConectors, material.lifos);
+                                UpdateLifos(removeLifos, material.LifoConnectors, material.LifoResources);
                             }
-
                         }
-
-                        // TODO - what goes in here?
                     }
 
                     if (str != null && str.IsDirty)
@@ -3176,10 +3186,12 @@ namespace SceneGraphPlus.Surface
                 }
                 else if (hoverBlock.TypeId == Txmt.TYPE)
                 {
-                    CacheableDbpfFile txmtPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
+                    MaterialData matData = new MaterialData();
 
-                    Txmt txmt = (Txmt)txmtPackage.GetResourceByKey(hoverBlock.OriginalKey);
-                    Trace.Assert(txmt != null, $"Double-Click: Missing resource for {hoverBlock.OriginalKey}");
+                    CacheableDbpfFile txmtPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
+                    matData.SetTxmtData(hoverBlock, txmtPackage, (Txmt)txmtPackage?.GetResourceByKey(hoverBlock.OriginalKey));
+
+                    Trace.Assert(matData.TxmtResource != null, $"Double-Click: Missing resource for {matData.TxmtBlock.OriginalKey}");
 
                     GraphBlock gzpsBlock = null;
                     GraphBlock mmatBlock = null;
@@ -3188,8 +3200,8 @@ namespace SceneGraphPlus.Surface
 
                     GraphConnector shpeConnector = null;
 
-                    TypeGUID guid;
-                    TypeGroupID mmatGroup;
+                    TypeGUID guid = DBPFData.GUID_NULL;
+                    TypeGroupID mmatGroup = DBPFData.GROUP_NULL;
                     string cresSgName = null;
                     List<string> subsets = new List<string>();
 
@@ -3258,82 +3270,70 @@ namespace SceneGraphPlus.Surface
                         }
                     }
 
-                    Objd objd = (Objd)txmtPackage.GetResourceByKey(objdBlock?.OriginalKey);
-
-                    if (objd != null)
+                    if (objdBlock != null)
                     {
-                        int defaultGraphic = objd.GetRawData(ObjdIndex.DefaultGraphic);
-                        List<GraphBlock> gmndBlocks = GetGmndBlocks(shpeBlock);
+                        Objd objd = (Objd)packageCache.GetOrAdd(objdBlock.PackagePath).GetResourceByKey(objdBlock.OriginalKey);
 
-                        guid = objd.Guid;
-                        mmatGroup = objd.GroupID;
-
-                        if (gmndBlocks != null)
+                        if (objd != null)
                         {
-                            GraphBlock cresBlock = objdBlock.OutConnectorByLabel("Model Names").EndBlock.OutConnectorByIndex(defaultGraphic).EndBlock;
+                            int defaultGraphic = objd.GetRawData(ObjdIndex.DefaultGraphic);
+                            List<GraphBlock> gmndBlocks = GetGmndBlocks(shpeBlock);
 
-                            if (cresBlock != null)
+                            guid = objd.Guid;
+                            mmatGroup = objd.GroupID;
+
+                            if (gmndBlocks != null)
                             {
-                                cresSgName = cresBlock.SgFullName;
-                            }
+                                GraphBlock cresBlock = objdBlock.OutConnectorByLabel("Model Names").EndBlock.OutConnectorByIndex(defaultGraphic).EndBlock;
 
-                            foreach (GraphBlock gmndBlock in gmndBlocks)
-                            {
-                                CacheableDbpfFile gmndPackage = packageCache.GetOrAdd(gmndBlock.PackagePath);
-                                Gmnd gmnd = (Gmnd)gmndPackage.GetResourceByKey(gmndBlock.OriginalKey);
-
-                                if (gmnd != null)
+                                if (cresBlock != null)
                                 {
-                                    foreach (string subset in gmnd.GetDesignModeEnabledSubsets())
+                                    cresSgName = cresBlock.SgFullName;
+                                }
+
+                                foreach (GraphBlock gmndBlock in gmndBlocks)
+                                {
+                                    CacheableDbpfFile gmndPackage = packageCache.GetOrAdd(gmndBlock.PackagePath);
+                                    Gmnd gmnd = (Gmnd)gmndPackage.GetResourceByKey(gmndBlock.OriginalKey);
+
+                                    if (gmnd != null)
                                     {
-                                        if (shpeConnector.Label.Equals(subset))
+                                        foreach (string subset in gmnd.GetDesignModeEnabledSubsets())
                                         {
-                                            if (!subsets.Contains(subset)) subsets.Add(subset);
+                                            if (shpeConnector.Label.Equals(subset))
+                                            {
+                                                if (!subsets.Contains(subset)) subsets.Add(subset);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    else
-                    {
-                        guid = DBPFData.GUID_NULL;
-                        mmatGroup = DBPFData.GROUP_NULL;
-                    }
 
                     GraphBlock txtrBlock = hoverBlock.OutConnectorByLabel("stdMatBaseTextureName")?.EndBlock;
-                    CacheableDbpfFile txtrPackage = null;
-                    Txtr txtr = null;
 
-                    bool removeLifos = false;
                     List<GraphConnector> lifoConectors = new List<GraphConnector>();
                     List<Lifo> lifos = new List<Lifo>();
 
                     if (txtrBlock != null)
                     {
-                        txtrPackage = packageCache.GetOrAdd(txtrBlock.PackagePath);
-                        txtr = (Txtr)txtrPackage.GetResourceByKey(txtrBlock.OriginalKey);
+                        CacheableDbpfFile txtrPackage = packageCache.GetOrAdd(txtrBlock.PackagePath);
+                        matData.SetTxtrData(txtrBlock, txtrPackage, (Txtr)txtrPackage?.GetResourceByKey(txtrBlock.OriginalKey));
 
-                        BuildLifoLists(txtrBlock, lifoConectors, lifos);
+                        BuildLifoLists(txtrBlock, matData.LifoConnectors, matData.LifoResources);
                     }
 
-                    if ((new TxmtDialog().ShowDialog(owningForm, mouseScreenLocation, txmtPackage, hoverBlock, txmt, guid, mmatGroup, cresSgName, subsets, txtr, lifos, out removeLifos)) == DialogResult.OK)
+                    if ((new TxmtDialog().ShowDialog(owningForm, mouseScreenLocation, matData, guid, mmatGroup, cresSgName, subsets, out bool removeLifos)) == DialogResult.OK)
                     {
-                        if (txtr != null && txtr.IsDirty)
+                        if (matData.CommitTxtr())
                         {
-                            txtrPackage.Commit(txtr);
-                            txtrBlock.SetDirty();
-
                             UpdateLifos(removeLifos, lifoConectors, lifos);
                         }
 
-                        if (txmt.IsDirty)
-                        {
-                            txmtPackage.Commit(txmt);
-                            hoverBlock.SetDirty();
-                        }
+                        matData.CommitTxmt();
 
-                        if (txmt.IsDirty || (txtr != null && txtr.IsDirty))
+                        if (matData.IsDirty)
                         {
                             Invalidate();
                         }
@@ -3371,8 +3371,7 @@ namespace SceneGraphPlus.Surface
                         }
                     }
 
-                    bool removeLifos = false;
-                    if ((new TxtrDialog().ShowDialog(owningForm, mouseScreenLocation, txtrPackage, txtr, hoverBlock.SgBaseName, lifos, out removeLifos)) == DialogResult.OK)
+                    if ((new TxtrDialog().ShowDialog(owningForm, mouseScreenLocation, txtrPackage, txtr, hoverBlock.SgBaseName, lifos, out bool removeLifos)) == DialogResult.OK)
                     {
                         if (txtr.IsDirty)
                         {
@@ -3509,6 +3508,7 @@ namespace SceneGraphPlus.Surface
             return _GetGmndBlock(startBlock);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
         private GraphBlock _GetGmndBlock(GraphBlock startBlock)
         {
             if (startBlock == null) return null;
@@ -4094,6 +4094,10 @@ namespace SceneGraphPlus.Surface
             {
                 objd.SetKeyName(block.BlockName);
             }
+            else if (res is Xngb xngb)
+            {
+                xngb.GetItem("name").StringValue = block.BlockName;
+            }
             else if (res is Mmat)
             {
                 // Name is derived from associated TXMT and can't be changed
@@ -4203,6 +4207,7 @@ namespace SceneGraphPlus.Surface
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
         private void UpdateMaterialName(Txmt txmt, string basename, bool prefixNames, bool prefixLowerCase)
         {
             // This will cause the game to crash if the Type is SimSkin (and possibly others)
@@ -4269,6 +4274,17 @@ namespace SceneGraphPlus.Surface
             else if (res is Objd)
             {
                 // STR# resources are in the same group as the OBJD, so can't be changed
+            }
+            else if (res is Xngb xngb)
+            {
+                Trace.Assert(endBlock.TypeId == Cres.TYPE, "Expecting CRES for EndBlock");
+
+                if (endBlock.TypeId == Cres.TYPE)
+                {
+                    xngb.GetItem("modelname").StringValue = endBlock.SgFullName;
+                }
+
+                package.Commit(xngb);
             }
             else if (res is Mmat mmat)
             {

@@ -28,8 +28,8 @@ namespace SceneGraphPlus.OptionsDialogs.Helpers
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         public static Txmt DuplicateTxmt(SceneGraphPlusForm form, CacheableDbpfFile txmtPackage, bool changeTexture,
-                                         Txmt oldTxmt, string newTxmtName, Color backColour, string blendMode, bool lightingEnabled, int diffAlpha, // TODO - SceneGraph Plus - tidy - ue MaterialOptions for these four
-                                         Txtr oldTxtr, string imageName, DdsFormats ddsFormat, string levels, ComboBox comboSharpen, CheckedListBox ckbFilters, // TODO - SceneGraph Plus - tidy - use TextureOptions for these five
+                                         Txmt oldTxmt, string newTxmtName, MaterialOptions matOpts,
+                                         Txtr oldTxtr, ITextureValues txtrVals,
                                          List<Lifo> oldLifos, bool removeLifos, out bool updateRemoveLifos)
         {
             Txmt newTxmt = oldTxmt.Duplicate(newTxmtName);
@@ -67,8 +67,8 @@ namespace SceneGraphPlus.OptionsDialogs.Helpers
 
                 if (changeTexture)
                 {
-                    OptionsHelper.UpdateMaterial(newTxmt, backColour, blendMode, lightingEnabled, diffAlpha,
-                                                 newTxtr, imageName, ddsFormat, levels, comboSharpen, ckbFilters,
+                    OptionsHelper.UpdateMaterial(newTxmt, matOpts,
+                                                 newTxtr, txtrVals,
                                                  newLifos, removeLifos, out updateRemoveLifos);
                 }
 
@@ -98,47 +98,45 @@ namespace SceneGraphPlus.OptionsDialogs.Helpers
             return newTxmt;
         }
 
-        public static void UpdateMaterial(Txmt txmtToUpdate, Color backColour, string blendMode, bool lightingEnabled, int diffAlpha,
-                                          Txtr txtrToUpdate, string imageName, DdsFormats ddsFormat, string levels, ComboBox comboSharpen, CheckedListBox ckbFilters,
+        public static void UpdateMaterial(Txmt txmtToUpdate, MaterialOptions matOpts,
+                                          Txtr txtrToUpdate, ITextureValues txtrVals,
                                           List<Lifo> lifosToUpdate, bool removeLifos, out bool updateRemoveLifos)
         {
             if (txtrToUpdate == null)
             {
-                ColourHelper.SetTxmtPropertyFromColour(txmtToUpdate, "stdMatDiffCoef", backColour);
-                txmtToUpdate.MaterialDefinition.SetProperty("stdMatAlphaBlendMode", blendMode.ToLower());
-                txmtToUpdate.MaterialDefinition.SetProperty("stdMatLightingEnabled", (lightingEnabled ? "1" : "0"));
-                txmtToUpdate.MaterialDefinition.SetProperty("stdMatUntexturedDiffAlpha", (diffAlpha / 100.0).ToString("0.00"));
+                ColourHelper.SetTxmtPropertyFromColour(txmtToUpdate, "stdMatDiffCoef", matOpts.BackColour);
+                txmtToUpdate.MaterialDefinition.SetProperty("stdMatAlphaBlendMode", matOpts.BlendMode.ToLower());
+                txmtToUpdate.MaterialDefinition.SetProperty("stdMatLightingEnabled", (matOpts.LightingEnabled ? "1" : "0"));
+                txmtToUpdate.MaterialDefinition.SetProperty("stdMatUntexturedDiffAlpha", (matOpts.DiffAlpha / 100.0).ToString("0.00"));
 
                 updateRemoveLifos = false;
             }
             else
             {
-                OptionsHelper.UpdateTextureFromFile(txtrToUpdate, (removeLifos ? null : lifosToUpdate), imageName, ddsFormat, levels, comboSharpen, ckbFilters);
+                OptionsHelper.UpdateTextureFromFile(txtrToUpdate, (removeLifos ? null : lifosToUpdate), txtrVals);
 
                 updateRemoveLifos = true;
             }
         }
 
-        public static void UpdateTextureFromFile(Txtr txtrToUpdate, List<Lifo> lifosToUpdate, string imageName, DdsFormats format, string sLevels, ComboBox comboSharpen, CheckedListBox ckbFilters)
+        public static void UpdateTextureFromFile(Txtr txtrToUpdate, List<Lifo> lifosToUpdate, ITextureValues txtrVals)
         {
             DDSData[] ddsData;
 
-            if (string.IsNullOrWhiteSpace(sLevels) || !uint.TryParse(sLevels, out uint levels))
-            {
-                levels = txtrToUpdate.ImageData.MipMapLevels;
-            }
+            uint levels = txtrVals.Levels;
+            if (levels < 1) levels = txtrToUpdate.ImageData.MipMapLevels;
 
-            if (format == DdsFormats.DXT1Format || format == DdsFormats.DXT3Format || format == DdsFormats.DXT5Format)
+            if (txtrVals.IsDxtFormat)
             {
-                if (imageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
+                if (txtrVals.ImageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
                 {
-                    ddsData = DdsLoader.ParseDDS(imageName);
+                    ddsData = DdsLoader.ParseDDS(txtrVals.ImageName);
                 }
                 else
                 {
-                    string extraParameters = $"-sharpenMethod {comboSharpen.Text}";
+                    string extraParameters = $"-sharpenMethod {txtrVals.Sharpen}";
 
-                    foreach (string filter in ckbFilters.CheckedItems)
+                    foreach (string filter in txtrVals.Filters)
                     {
                         if (filter.Equals("Dither"))
                         {
@@ -150,18 +148,18 @@ namespace SceneGraphPlus.OptionsDialogs.Helpers
                         }
                     }
 
-                    ddsData = (new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger)).BuildDDS(imageName, levels, format, extraParameters);
+                    ddsData = (new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger)).BuildDDS(txtrVals.ImageName, levels, txtrVals.DdsFormat, extraParameters);
                 }
             }
-            else if (format == DdsFormats.Raw8Bit || format == DdsFormats.Raw24Bit || format == DdsFormats.Raw32Bit)
+            else if (txtrVals.IsRawFormat)
             {
-                if (imageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
+                if (txtrVals.ImageName.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
                 {
-                    ddsData = DdsLoader.ParseDDS(imageName);
+                    ddsData = DdsLoader.ParseDDS(txtrVals.ImageName);
                 }
                 else
                 {
-                    ddsData = (new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger)).BuildDDS(imageName, levels, format, "");
+                    ddsData = (new NvidiaDdsBuilder(Sims2ToolsLib.Sims2DdsUtilsPath, logger)).BuildDDS(txtrVals.ImageName, levels, txtrVals.DdsFormat, "");
                 }
             }
             else
@@ -208,45 +206,266 @@ namespace SceneGraphPlus.OptionsDialogs.Helpers
 
     public class MaterialOptions
     {
-        public Color backColour = Color.Empty;
-        public string blendMode = null;
-        public bool lightingEnabled = false;
-        public int diffAlpha = 0;
+        private readonly Button btnDiffCoefs;
+        private readonly ComboBox comboAlphaBlendMode;
+        private readonly CheckBox ckbLightingEnabled;
+        private readonly TrackBar trackDiffAlpha;
 
-        public MaterialOptions()
+        public Color BackColour => btnDiffCoefs != null ? btnDiffCoefs.BackColor : Color.Empty;
+        public string BlendMode => comboAlphaBlendMode?.SelectedItem.ToString();
+        public bool LightingEnabled => ckbLightingEnabled != null && ckbLightingEnabled.Checked;
+        public int DiffAlpha => trackDiffAlpha != null ? trackDiffAlpha.Value : 0;
+
+        public MaterialOptions(Button btnDiffCoefs, ComboBox comboAlphaBlendMode, CheckBox ckbLightingEnabled, TrackBar trackDiffAlpha)
+        {
+            this.btnDiffCoefs = btnDiffCoefs;
+            this.comboAlphaBlendMode = comboAlphaBlendMode;
+            this.ckbLightingEnabled = ckbLightingEnabled;
+            this.trackDiffAlpha = trackDiffAlpha;
+        }
+    }
+
+    public class MaterialOptionsNone : MaterialOptions
+    {
+        public MaterialOptionsNone() : base(null, null, null, null)
         {
         }
     }
 
-    public class TextureOptions
+    public interface ITextureValues
     {
-        public string ImageName = "";
-        public DdsFormats DdsFormat;
-        public string Levels;
-        public List<int> Filters = new List<int>();
-        public string Sharpen = "None";
+        string ImageName { get; }
+        DdsFormats DdsFormat { get; }
+        uint Levels { get; }
 
-        public TextureOptions()
+        string Sharpen { get; }
+
+        List<string> Filters { get; }
+
+        bool IsDxtFormat { get; }
+        bool IsRawFormat { get; }
+    }
+
+    /*
+     * Collection of controls used to gather TXTR values
+     */
+    public class TextureOptions : ITextureValues
+    {
+        private readonly TextBox textNewImage;
+        private readonly RadioButton radioDxt1;
+        private readonly RadioButton radioDxt3;
+        private readonly RadioButton radioDxt5;
+        private readonly RadioButton radioRaw8;
+        private readonly RadioButton radioRaw24;
+        private readonly RadioButton radioRaw32;
+        private readonly TextBox textLevels;
+        private readonly ComboBox comboSharpen;
+        private readonly CheckedListBox ckbFilters;
+
+        public string ImageName => textNewImage.Text;
+
+        public DdsFormats DdsFormat => OptionsHelper.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked);
+
+        public bool IsDxtFormat => (radioDxt1.Checked || radioDxt3.Checked || radioDxt5.Checked);
+        public bool IsRawFormat => (radioRaw8.Checked || radioRaw24.Checked || radioRaw32.Checked);
+
+        public uint Levels
         {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(textLevels.Text) || !uint.TryParse(textLevels.Text, out uint levels))
+                {
+                    levels = 0;
+                }
+
+                return levels;
+            }
         }
+
+        public string Sharpen => comboSharpen.Text;
+
+        public List<string> Filters
+        {
+            get
+            {
+                List<string> filters = new List<string>();
+
+                foreach (string filter in ckbFilters.CheckedItems)
+                {
+                    filters.Add(filter);
+                }
+
+                return filters;
+            }
+        }
+
+        public TextureOptions(TextBox textNewImage, RadioButton radioDxt1, RadioButton radioDxt3, RadioButton radioDxt5, RadioButton radioRaw8, RadioButton radioRaw24, RadioButton radioRaw32, TextBox textLevels, ComboBox comboSharpen, CheckedListBox ckbFilters)
+        {
+            this.textNewImage = textNewImage;
+            this.radioDxt1 = radioDxt1;
+            this.radioDxt3 = radioDxt3;
+            this.radioDxt5 = radioDxt5;
+            this.radioRaw8 = radioRaw8;
+            this.radioRaw24 = radioRaw24;
+            this.radioRaw32 = radioRaw32;
+            this.textLevels = textLevels;
+            this.comboSharpen = comboSharpen;
+            this.ckbFilters = ckbFilters;
+        }
+
+        public void Update(TextureValues values)
+        {
+            textNewImage.Text = values.ImageName;
+
+            if (values.DdsFormat == DdsFormats.DXT1Format)
+            {
+                radioDxt1.Checked = true;
+            }
+            else if (values.DdsFormat == DdsFormats.DXT3Format)
+            {
+                radioDxt3.Checked = true;
+            }
+            else if (values.DdsFormat == DdsFormats.DXT5Format)
+            {
+                radioDxt5.Checked = true;
+            }
+            else if (values.DdsFormat == DdsFormats.Raw8Bit || values.DdsFormat == DdsFormats.ExtRaw8Bit)
+            {
+                radioRaw8.Checked = true;
+            }
+            else if (values.DdsFormat == DdsFormats.Raw24Bit || values.DdsFormat == DdsFormats.ExtRaw24Bit)
+            {
+                radioRaw24.Checked = true;
+            }
+            else if (values.DdsFormat == DdsFormats.Raw32Bit)
+            {
+                radioRaw32.Checked = true;
+            }
+
+            textLevels.Text = values.StrLevels;
+
+            comboSharpen.SelectedItem = values.Sharpen;
+
+            ckbFilters.ClearSelected();
+            foreach (int filter in values.FilterIndexes)
+            {
+                ckbFilters.SetItemChecked(filter, true);
+            }
+        }
+    }
+
+    /*
+     * Representation of the state of the controls in a TextureOptions class
+     */
+    public class TextureValues : ITextureValues
+    {
+        private string imageName;
+        private DdsFormats ddsFormat;
+        private string levels;
+        private string sharpen;
+        private readonly List<int> filterIndexes = new List<int>();
+        private readonly List<string> filterStrings = new List<string>();
+
+        public string ImageName
+        {
+            get => imageName;
+            set => imageName = value;
+        }
+
+        public DdsFormats DdsFormat
+        {
+            get => ddsFormat;
+            set => ddsFormat = value;
+        }
+
+        public bool IsDxtFormat => (ddsFormat == DdsFormats.DXT1Format || ddsFormat == DdsFormats.DXT3Format || ddsFormat == DdsFormats.DXT5Format);
+        public bool IsRawFormat => (ddsFormat == DdsFormats.Raw8Bit || ddsFormat == DdsFormats.ExtRaw8Bit || ddsFormat == DdsFormats.Raw24Bit || ddsFormat == DdsFormats.ExtRaw24Bit || ddsFormat == DdsFormats.Raw32Bit);
+
+        public string StrLevels
+        {
+            get => levels;
+            set => levels = value;
+        }
+
+        public uint Levels
+        {
+            get
+            {
+                uint level;
+
+                try
+                {
+                    level = uint.Parse(levels);
+                }
+                catch (FormatException)
+                {
+                    level = 0;
+                }
+
+                return level;
+            }
+        }
+
+        public string Sharpen
+        {
+            get => sharpen;
+            set => sharpen = value;
+        }
+
+        public void ClearFilters()
+        {
+            filterIndexes.Clear();
+            filterStrings.Clear();
+        }
+        public void AddFilter(int index, string name)
+        {
+            filterIndexes.Add(index);
+            filterStrings.Add(name);
+        }
+
+        public List<int> FilterIndexes => filterIndexes;
+        public List<string> Filters => filterStrings;
     }
 
     public class MaterialData
     {
-        public List<string> subsets = new List<string>();
+        private uint idrIndex;
+        private readonly List<string> subsets = new List<string>();
 
-        public uint idrIndex;
+        private GraphBlock txmtBlock;
+        private CacheableDbpfFile txmtPackage;
+        private Txmt txmt;
 
-        public GraphBlock txmtBlock;
-        public CacheableDbpfFile txmtPackage;
-        public Txmt txmt;
+        private GraphBlock txtrBlock;
+        private CacheableDbpfFile txtrPackage;
+        private Txtr txtr;
 
-        public GraphBlock txtrBlock;
-        public CacheableDbpfFile txtrPackage;
-        public Txtr txtr;
+        private readonly List<GraphConnector> lifoConectors = new List<GraphConnector>();
+        private readonly List<Lifo> lifos = new List<Lifo>();
 
-        public List<GraphConnector> lifoConectors = new List<GraphConnector>();
-        public List<Lifo> lifos = new List<Lifo>();
+
+        public GraphBlock TxmtBlock => txmtBlock;
+        public CacheableDbpfFile TxmtPackage => txmtPackage;
+        public Txmt TxmtResource => txmt;
+
+        public GraphBlock TxtrBlock => txtrBlock;
+        public CacheableDbpfFile TxtrPackage => txtrPackage;
+        public Txtr TxtrResource => txtr;
+
+        public List<GraphConnector> LifoConnectors => lifoConectors;
+        public List<Lifo> LifoResources => lifos;
+
+        public uint IdrIndex => idrIndex;
+
+        public void UpdateIdrIndex(uint value)
+        {
+            idrIndex = value;
+        }
+
+        public void AddSubset(string subset)
+        {
+            subsets.Add(subset);
+        }
 
         public string SubsetDisplay
         {
@@ -276,6 +495,58 @@ namespace SceneGraphPlus.OptionsDialogs.Helpers
 
                 return s;
             }
+        }
+
+        public bool IsDirty => (txmt.IsDirty || (txtr != null && txtr.IsDirty));
+
+        public MaterialData()
+        {
+        }
+
+        public MaterialData(uint idrIndex, string subset) : base()
+        {
+            this.idrIndex = idrIndex;
+            this.subsets.Add(subset);
+        }
+
+        public void SetTxmtData(GraphBlock block, CacheableDbpfFile package, Txmt txmt)
+        {
+            txmtBlock = block;
+            txmtPackage = package;
+            this.txmt = txmt;
+        }
+
+        public bool CommitTxmt()
+        {
+            if (txmt.IsDirty)
+            {
+                txmtPackage.Commit(txmt);
+                txmtBlock.SetDirty();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public void SetTxtrData(GraphBlock block, CacheableDbpfFile package, Txtr txtr)
+        {
+            txtrBlock = block;
+            txtrPackage = package;
+            this.txtr = txtr;
+        }
+
+        public bool CommitTxtr()
+        {
+            if (txtr != null && txtr.IsDirty)
+            {
+                txtrPackage.Commit(txtr);
+                txtrBlock.SetDirty();
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

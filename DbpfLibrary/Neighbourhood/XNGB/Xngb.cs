@@ -27,6 +27,25 @@ namespace Sims2Tools.DBPF.Neighbourhood.XNGB
         {
         }
 
+        public bool IsValid
+        {
+            get
+            {
+                if (IsEffects)
+                {
+                    return (GetItem("thumbnailgroupid") != null && GetItem("thumbnailinstanceid") != null);
+                }
+
+                return GetItem("resourcerestypeid")?.UIntegerValue == 0x6D619378
+                    && GetItem("resourcegroupid")?.UIntegerValue == GroupID.AsUInt()
+                    && GetItem("resourceid")?.UIntegerValue == InstanceID.AsUInt()
+
+                    && GetItem("stringsetrestypeid")?.UIntegerValue == 0x53545223
+                    && GetItem("stringsetgroupid") != null
+                    && GetItem("stringsetid") != null;
+            }
+        }
+
         public bool IsEffects => "effects".Equals(GetItem("sort")?.StringValue);
 
         public override XmlElement AddXml(XmlElement parent)

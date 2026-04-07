@@ -94,7 +94,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
 
         public void SetItem(uint idx, DBPFKey value)
         {
-            items[(int)idx] = new DBPFScriptableKey(value.TypeID, value.GroupID, value.InstanceID, value.ResourceID);
+            items[(int)idx] = new DBPFScriptableKey(value);
             _isDirty = true;
         }
 
@@ -106,6 +106,14 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
             }
 
             SetItem(idx, value);
+        }
+
+        public uint AppendItem(DBPFKey value)
+        {
+            items.Add(new DBPFScriptableKey(value));
+            _isDirty = true;
+
+            return (uint)(items.Count - 1);
         }
 
         protected void Unserialize(DbpfReader reader)

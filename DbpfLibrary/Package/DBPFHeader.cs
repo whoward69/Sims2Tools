@@ -115,6 +115,10 @@ namespace Sims2Tools.DBPF.Package
             {
                 indexMinorVersion = reader.ReadUInt32();
             }
+            else
+            {
+                indexMinorVersion = 0;
+            }
 
             reader.Skip(32);
 

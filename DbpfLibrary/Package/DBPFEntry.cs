@@ -77,5 +77,7 @@ namespace Sims2Tools.DBPF.Package
 
             return false;
         }
+
+        public override string ToString() => base.ToString();
     }
 }

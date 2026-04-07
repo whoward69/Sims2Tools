@@ -80,6 +80,7 @@ namespace SceneGraphPlus
             this.menuItemGridFine = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemGridDrop = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemGridAutoRealignFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.menuPackages = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -405,7 +406,8 @@ namespace SceneGraphPlus
             this.menuItemGridNormal,
             this.menuItemGridFine,
             this.toolStripSeparator3,
-            this.menuItemGridDrop});
+            this.menuItemGridDrop,
+            this.menuItemGridAutoRealignFilters});
             this.menuGrid.Name = "menuGrid";
             this.menuGrid.Size = new System.Drawing.Size(41, 20);
             this.menuGrid.Text = "&Grid";
@@ -414,19 +416,19 @@ namespace SceneGraphPlus
             // 
             this.menuItemGridRealign.Name = "menuItemGridRealign";
             this.menuItemGridRealign.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
-            this.menuItemGridRealign.Size = new System.Drawing.Size(196, 22);
+            this.menuItemGridRealign.Size = new System.Drawing.Size(205, 22);
             this.menuItemGridRealign.Text = "&Realign To Grid";
             this.menuItemGridRealign.Click += new System.EventHandler(this.OnGridRealign);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(193, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(202, 6);
             // 
             // menuItemGridCoarse
             // 
             this.menuItemGridCoarse.Name = "menuItemGridCoarse";
-            this.menuItemGridCoarse.Size = new System.Drawing.Size(196, 22);
+            this.menuItemGridCoarse.Size = new System.Drawing.Size(205, 22);
             this.menuItemGridCoarse.Text = "&Coarse Grid";
             this.menuItemGridCoarse.CheckedChanged += new System.EventHandler(this.OnGridScaleChanged);
             this.menuItemGridCoarse.Click += new System.EventHandler(this.OnGridScale);
@@ -434,7 +436,7 @@ namespace SceneGraphPlus
             // menuItemGridNormal
             // 
             this.menuItemGridNormal.Name = "menuItemGridNormal";
-            this.menuItemGridNormal.Size = new System.Drawing.Size(196, 22);
+            this.menuItemGridNormal.Size = new System.Drawing.Size(205, 22);
             this.menuItemGridNormal.Text = "&Normal Grid";
             this.menuItemGridNormal.CheckedChanged += new System.EventHandler(this.OnGridScaleChanged);
             this.menuItemGridNormal.Click += new System.EventHandler(this.OnGridScale);
@@ -442,7 +444,7 @@ namespace SceneGraphPlus
             // menuItemGridFine
             // 
             this.menuItemGridFine.Name = "menuItemGridFine";
-            this.menuItemGridFine.Size = new System.Drawing.Size(196, 22);
+            this.menuItemGridFine.Size = new System.Drawing.Size(205, 22);
             this.menuItemGridFine.Text = "&Fine Grid";
             this.menuItemGridFine.CheckedChanged += new System.EventHandler(this.OnGridScaleChanged);
             this.menuItemGridFine.Click += new System.EventHandler(this.OnGridScale);
@@ -450,15 +452,23 @@ namespace SceneGraphPlus
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(193, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(202, 6);
             // 
             // menuItemGridDrop
             // 
             this.menuItemGridDrop.CheckOnClick = true;
             this.menuItemGridDrop.Name = "menuItemGridDrop";
-            this.menuItemGridDrop.Size = new System.Drawing.Size(196, 22);
+            this.menuItemGridDrop.Size = new System.Drawing.Size(205, 22);
             this.menuItemGridDrop.Text = "&Drop To Grid";
             this.menuItemGridDrop.CheckedChanged += new System.EventHandler(this.OnGridDropChanged);
+            // 
+            // menuItemGridAutoRealignFilters
+            // 
+            this.menuItemGridAutoRealignFilters.CheckOnClick = true;
+            this.menuItemGridAutoRealignFilters.Name = "menuItemGridAutoRealignFilters";
+            this.menuItemGridAutoRealignFilters.Size = new System.Drawing.Size(205, 22);
+            this.menuItemGridAutoRealignFilters.Text = "&Auto Realign After Filters";
+            this.menuItemGridAutoRealignFilters.CheckedChanged += new System.EventHandler(this.OnGridAutoFilterAlignChanged);
             // 
             // menuPackages
             // 
@@ -740,6 +750,7 @@ namespace SceneGraphPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemGridFine;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem menuItemGridDrop;
+        private System.Windows.Forms.ToolStripMenuItem menuItemGridAutoRealignFilters;
         private System.Windows.Forms.Label lblBlockFullSgName;
         private System.Windows.Forms.TextBox textBlockFullSgName;
         private System.Windows.Forms.TextBox textBlockKey;

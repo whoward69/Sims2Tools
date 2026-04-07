@@ -7,7 +7,6 @@
  */
 
 using SceneGraphPlus.OptionsDialogs.Helpers;
-using SceneGraphPlus.Shapes;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Images;
@@ -48,24 +47,30 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private bool dataLoading = true;
 
+        private readonly MaterialOptions matOpts;
+        private readonly TextureOptions txtrOpts;
+
+
         public TxmtDialog()
         {
             InitializeComponent();
+
+            matOpts = new MaterialOptions(btnDiffCoefs, comboAlphaBlendMode, ckbLightingEnabled, trackDiffAlpha);
+            txtrOpts = new TextureOptions(textNewImage, radioDxt1, radioDxt3, radioDxt5, radioRaw8, radioRaw24, radioRaw32, textLevels, comboSharpen, ckbFilters);
         }
 
-        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile txmtPackage, GraphBlock txmtBlock, Txmt txmt, TypeGUID guid, TypeGroupID mmatGroup, string cresSgName, List<string> subsets, Txtr txtr, List<Lifo> lifos, out bool removeLifos)
+        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, MaterialData matData, TypeGUID guid, TypeGroupID mmatGroup, string cresSgName, List<string> subsets, out bool removeLifos)
         {
             this.form = form;
-            this.txmtPackage = txmtPackage;
-            this.txmt = txmt;
+            this.txmtPackage = matData.TxmtPackage;
+            this.txmt = matData.TxmtResource;
 
             this.guid = guid;
             this.mmatGroup = mmatGroup;
             this.cresSgName = cresSgName;
-            this.txtr = txtr;
+            this.txtr = matData.TxtrResource;
 
-            // TODO - SceneGraph Plus - tidy - use MaterialData to pass txmtPackage, txmt, txtr, lifos
-            this.lifos = lifos;
+            this.lifos = matData.LifoResources;
 
             this.Location = new Point(location.X + 5, location.Y + 5);
 
@@ -74,7 +79,7 @@ namespace SceneGraphPlus.Dialogs.Options
             ckbRemoveLifos.Checked = this.removeLifos = false;
             ckbRemoveLifos.Visible = (lifos.Count > 0);
 
-            originalTxmtName = txmtBlock.SgBaseName;
+            originalTxmtName = matData.TxmtBlock.SgBaseName;
             textTxmtNewName.Text = originalTxmtName;
 
             string textureEnabled = txmt.MaterialDefinition.GetProperty("stdMatBaseTextureEnabled");
@@ -169,8 +174,8 @@ namespace SceneGraphPlus.Dialogs.Options
         private void OnDuplicateClicked(object sender, EventArgs e)
         {
             Txmt newTxmt = OptionsHelper.DuplicateTxmt(form, txmtPackage, btnChangeTexture.Enabled,
-                                                       txmt, textTxmtNewName.Text, btnDiffCoefs.BackColor, comboAlphaBlendMode.SelectedItem.ToString(), ckbLightingEnabled.Checked, trackDiffAlpha.Value,
-                                                       txtr, textNewImage.Text, OptionsHelper.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters,
+                                                       txmt, textTxmtNewName.Text, matOpts,
+                                                       txtr, txtrOpts,
                                                        lifos, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
 
             if (updateRemoveLifos)
@@ -231,9 +236,7 @@ namespace SceneGraphPlus.Dialogs.Options
             }
             else
             {
-                OptionsHelper.UpdateMaterial(txmt, btnDiffCoefs.BackColor, comboAlphaBlendMode.SelectedItem.ToString(), ckbLightingEnabled.Checked, trackDiffAlpha.Value,
-                                             txtr, textNewImage.Text, OptionsHelper.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters,
-                                             lifos, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
+                OptionsHelper.UpdateMaterial(txmt, matOpts, txtr, txtrOpts, lifos, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
 
                 if (updateRemoveLifos)
                 {

@@ -10,6 +10,7 @@ using SceneGraphPlus.OptionsDialogs.Helpers;
 using SceneGraphPlus.Shapes;
 using Sims2Tools;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Images;
 using Sims2Tools.DBPF.SceneGraph.BINX;
@@ -44,15 +45,19 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private bool removeLifos;
 
-        private Dictionary<string, TextureOptions> textureOptions = new Dictionary<string, TextureOptions>();
-        private TextureOptions currentOpts;
+        private readonly Dictionary<string, TextureValues> textureValues = new Dictionary<string, TextureValues>();
+        private TextureValues currentValues;
 
         private string originalGzpsName = null;
         private string originalGzpsDesc = null;
 
+        private readonly TextureOptions txtrOpts;
+
         public GzpsDialog()
         {
             InitializeComponent();
+
+            txtrOpts = new TextureOptions(textNewImage, radioDxt1, radioDxt3, radioDxt5, radioRaw8, radioRaw24, radioRaw32, textLevels, comboSharpen, ckbFilters);
         }
 
         public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile gzpsPackage, GraphBlock gzpsBlock, Gzps gzps, Idr idrForGzps, Binx binx, Idr idrForBinx, Str str, int strIndex, List<MaterialData> materials, out bool removeLifos)
@@ -79,7 +84,7 @@ namespace SceneGraphPlus.Dialogs.Options
 
             if (str != null)
             {
-                originalGzpsDesc = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default)[strIndex].Title;
+                originalGzpsDesc = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default)[strIndex - 1].Title;
                 textDesc.Text = originalGzpsDesc;
             }
             else
@@ -91,18 +96,19 @@ namespace SceneGraphPlus.Dialogs.Options
 
             foreach (MaterialData materialData in materials)
             {
-                if (materialData.txtr != null)
+                if (materialData.TxtrResource != null)
                 {
-                    TextureOptions opts = new TextureOptions
+                    TextureValues txtrVals = new TextureValues
                     {
-                        DdsFormat = materialData.txtr.ImageData.Format,
-                        Levels = materialData.txtr.ImageData.MipMapLevels.ToString(),
+                        DdsFormat = materialData.TxtrResource.ImageData.Format,
+                        StrLevels = materialData.TxtrResource.ImageData.MipMapLevels.ToString(),
+                        Sharpen = "None"
                     };
 
-                    textureOptions.Add(materialData.SubsetDisplay, opts);
+                    textureValues.Add(materialData.SubsetDisplay, txtrVals);
                     comboTextureSubset.Items.Add(materialData.SubsetDisplay);
 
-                    lifoCounts += materialData.lifos.Count;
+                    lifoCounts += materialData.LifoResources.Count;
                 }
             }
 
@@ -127,14 +133,28 @@ namespace SceneGraphPlus.Dialogs.Options
             return result;
         }
 
+        private void UpdateForm()
+        {
+            btnDuplicate.Enabled = !string.IsNullOrWhiteSpace(textGzpsNewName.Text) && !textGzpsNewName.Text.Equals(originalGzpsName, StringComparison.OrdinalIgnoreCase);
+
+            panelDdsOptions.Enabled = false;
+
+            if (!string.IsNullOrWhiteSpace(textNewImage.Text))
+            {
+                if (File.Exists(textNewImage.Text))
+                {
+                    panelDdsOptions.Enabled = !textNewImage.Text.EndsWith(".dds", StringComparison.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    btnDuplicate.Enabled = false;
+                }
+            }
+        }
+
         private void OnGzpsNameChanged(object sender, EventArgs e)
         {
-            btnDuplicate.Enabled = false;
-
-            if (!string.IsNullOrWhiteSpace(textGzpsNewName.Text))
-            {
-                btnDuplicate.Enabled = !textGzpsNewName.Text.Equals(originalGzpsName, StringComparison.OrdinalIgnoreCase);
-            }
+            UpdateForm();
         }
 
         private void OnGzpsNameKeyUp(object sender, KeyEventArgs e)
@@ -192,41 +212,64 @@ namespace SceneGraphPlus.Dialogs.Options
             newIdrForBinx.SetItem(newBinx.GetItem("stringsetidx").UIntegerValue, newStrKey);
 
             Str newStr = str.Duplicate(newStrKey, true);
-            newStr.LanguageItems(MetaData.Languages.Default)[strIndex].Title = textDesc.Text;
+            newStr.LanguageItems(MetaData.Languages.Default)[strIndex - 1].Title = textDesc.Text;
 
             Gzps newGzps = gzps.Duplicate(newGzpsKey, textGzpsNewName.Text);
             newGzps.GetItem("creator").StringValue = Sims2ToolsLib.CreatorGUID;
 
+            // TODO - SceneGraph Plus - gzps recolour - need to test idrForBinx and idrForGzps being different
             if (!idrForBinx.Equals(idrForGzps))
             {
-                /* TODO - SceneGraph Plus - clothing recolour - need to sort out the GZPS's 3IDR values
-                   change resourcekeyidx and copy over ref
-                   change shapekeyidx and copy over ref
-                   foreach override
-                     change overrideNresourcekeyidx and copy over ref
-                     change TexturePair.idrIndex
-                */
+                newGzps.GetItem("resourcekeyidx").UIntegerValue = newIdrForBinx.AppendItem(idrForGzps.GetItem(gzps.GetItem("resourcekeyidx").UIntegerValue));
+                newGzps.GetItem("shapekeyidx").UIntegerValue = newIdrForBinx.AppendItem(idrForGzps.GetItem(gzps.GetItem("shapekeyidx").UIntegerValue));
+
+                int numOverrides = (int)newGzps.GetItem("numoverrides").UIntegerValue;
+
+                Dictionary<uint, uint> subsetMap = new Dictionary<uint, uint>(numOverrides);
+
+                for (int i = 0; i < numOverrides; ++i)
+                {
+                    CpfItem gzpsItem = gzps.GetItem($"override{i}resourcekeyidx");
+                    CpfItem newGzpsItem = newGzps.GetItem($"override{i}resourcekeyidx");
+
+                    if (subsetMap.ContainsKey(gzpsItem.UIntegerValue))
+                    {
+                        newGzpsItem.UIntegerValue = subsetMap[gzpsItem.UIntegerValue];
+                    }
+                    else
+                    {
+                        uint newIdx = newIdrForBinx.AppendItem(idrForGzps.GetItem(gzpsItem.UIntegerValue));
+
+                        subsetMap.Add(gzpsItem.UIntegerValue, newIdx);
+
+                        newGzpsItem.UIntegerValue = newIdx;
+                    }
+                }
+
+                foreach (MaterialData material in materials)
+                {
+                    material.UpdateIdrIndex(subsetMap[material.IdrIndex]);
+                }
             }
 
-            // TODO - duplicate the per subset TXMT/TXTR here
+            // TODO - SceneGraph Plus - gzps recolour - need to test with associated LIFOs
             foreach (MaterialData materialData in materials)
             {
-                TextureOptions opts = textureOptions[materialData.SubsetDisplay];
+                ITextureValues txtrVals = textureValues[materialData.SubsetDisplay];
 
-                if (materialData.txtr != null && File.Exists(opts.ImageName))
+                if (materialData.TxtrResource != null && File.Exists(txtrVals.ImageName))
                 {
                     Txmt newTxmt = OptionsHelper.DuplicateTxmt(form, gzpsPackage, true,
-                                                               materialData.txmt, $"{textGzpsNewName.Text}_{materialData.SubsetList}", Color.Empty, null, false, 0,
-                                                               materialData.txtr, opts.ImageName, OptionsHelper.GetTextureFormat(radioDxt1.Checked, radioDxt3.Checked, radioDxt5.Checked, radioRaw8.Checked, radioRaw24.Checked, radioRaw32.Checked), textLevels.Text, comboSharpen, ckbFilters,
-                                                               materialData.lifos, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
+                                                               materialData.TxmtResource, $"{textGzpsNewName.Text}_{materialData.SubsetList}", new MaterialOptionsNone(),
+                                                               materialData.TxtrResource, txtrVals,
+                                                               materialData.LifoResources, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
 
                     if (updateRemoveLifos)
                     {
                         this.removeLifos = ckbRemoveLifos.Checked;
                     }
 
-                    // TODO - need to link newTxmt to the GZPS for the subset(s) in tp.subsetName
-                    newIdrForBinx.SetItem(materialData.idrIndex, newTxmt);
+                    newIdrForBinx.SetItem(materialData.IdrIndex, newTxmt);
                 }
             }
 
@@ -249,7 +292,7 @@ namespace SceneGraphPlus.Dialogs.Options
                 if (str != null)
                 {
                     List<StrItem> defStrings = str.LanguageItems(Languages.Default);
-                    defStrings[strIndex].Title = textDesc.Text;
+                    defStrings[strIndex - 1].Title = textDesc.Text;
                 }
             }
         }
@@ -264,15 +307,7 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private void OnImageNameChanged(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(textNewImage.Text))
-            {
-                if (!File.Exists(textNewImage.Text))
-                {
-                    // TODO - SceneGraph Plus - clothing recolours - what to do if the file doesn't exist?
-                }
-
-                panelDdsOptions.Enabled = !textNewImage.Text.EndsWith(".dds", StringComparison.OrdinalIgnoreCase);
-            }
+            UpdateForm();
 
             OnOptionsChanged(sender, null);
         }
@@ -282,60 +317,13 @@ namespace SceneGraphPlus.Dialogs.Options
             OnImageNameChanged(textNewImage, null);
         }
 
-        private void OnChangeTextureClicked(object sender, EventArgs e)
-        {
-            if (btnDuplicate.Enabled)
-            {
-                OnDuplicateClicked(btnDuplicate, null);
-            }
-            else
-            {
-                // TODO - SceneGraph Plus - clothing recolour - UpdateTexture(gzps, txtr, lifos);
-            }
-        }
-
         bool updatingOpts = false;
         private void OnSelectedSubsetChanged(object sender, EventArgs e)
         {
             updatingOpts = true;
-            currentOpts = textureOptions[comboTextureSubset.SelectedItem as string];
+            currentValues = textureValues[comboTextureSubset.SelectedItem as string];
 
-            textNewImage.Text = currentOpts.ImageName;
-
-            if (currentOpts.DdsFormat == DdsFormats.DXT1Format)
-            {
-                radioDxt1.Checked = true;
-            }
-            else if (currentOpts.DdsFormat == DdsFormats.DXT3Format)
-            {
-                radioDxt3.Checked = true;
-            }
-            else if (currentOpts.DdsFormat == DdsFormats.DXT5Format)
-            {
-                radioDxt5.Checked = true;
-            }
-            else if (currentOpts.DdsFormat == DdsFormats.Raw8Bit || currentOpts.DdsFormat == DdsFormats.ExtRaw8Bit)
-            {
-                radioRaw8.Checked = true;
-            }
-            else if (currentOpts.DdsFormat == DdsFormats.Raw24Bit || currentOpts.DdsFormat == DdsFormats.ExtRaw24Bit)
-            {
-                radioRaw24.Checked = true;
-            }
-            else if (currentOpts.DdsFormat == DdsFormats.Raw32Bit)
-            {
-                radioRaw32.Checked = true;
-            }
-
-            textLevels.Text = currentOpts.Levels;
-
-            ckbFilters.ClearSelected();
-            foreach (int filter in currentOpts.Filters)
-            {
-                ckbFilters.SetItemChecked(filter, true);
-            }
-
-            comboSharpen.SelectedItem = currentOpts.Sharpen;
+            txtrOpts.Update(currentValues);
 
             updatingOpts = false;
         }
@@ -344,27 +332,27 @@ namespace SceneGraphPlus.Dialogs.Options
         {
             if (updatingOpts) return;
 
-            currentOpts.ImageName = textNewImage.Text;
+            currentValues.ImageName = textNewImage.Text;
 
-            if (radioDxt1.Checked) currentOpts.DdsFormat = DdsFormats.DXT1Format;
-            else if (radioDxt3.Checked) currentOpts.DdsFormat = DdsFormats.DXT3Format;
-            else if (radioDxt5.Checked) currentOpts.DdsFormat = DdsFormats.DXT5Format;
-            else if (radioRaw8.Checked) currentOpts.DdsFormat = DdsFormats.Raw8Bit;
-            else if (radioRaw24.Checked) currentOpts.DdsFormat = DdsFormats.Raw24Bit;
-            else if (radioRaw32.Checked) currentOpts.DdsFormat = DdsFormats.Raw32Bit;
+            if (radioDxt1.Checked) currentValues.DdsFormat = DdsFormats.DXT1Format;
+            else if (radioDxt3.Checked) currentValues.DdsFormat = DdsFormats.DXT3Format;
+            else if (radioDxt5.Checked) currentValues.DdsFormat = DdsFormats.DXT5Format;
+            else if (radioRaw8.Checked) currentValues.DdsFormat = DdsFormats.Raw8Bit;
+            else if (radioRaw24.Checked) currentValues.DdsFormat = DdsFormats.Raw24Bit;
+            else if (radioRaw32.Checked) currentValues.DdsFormat = DdsFormats.Raw32Bit;
 
-            currentOpts.Levels = textLevels.Text;
+            currentValues.StrLevels = textLevels.Text;
 
-            currentOpts.Filters.Clear();
+            currentValues.ClearFilters();
             for (int i = 0; i < ckbFilters.Items.Count; ++i)
             {
                 if (ckbFilters.GetItemChecked(i))
                 {
-                    currentOpts.Filters.Add(i);
+                    currentValues.AddFilter(i, ckbFilters.Items[i].ToString());
                 }
             }
 
-            currentOpts.Sharpen = comboSharpen.SelectedText;
+            currentValues.Sharpen = comboSharpen.Text;
         }
     }
 }

@@ -41,6 +41,10 @@ namespace Sims2Tools.DBPF.CPF
         {
             get { CpfItem item = this.GetItem("gender"); return item != null ? item.UIntegerValue : 0; }
         }
+        public string Hairtone
+        {
+            get { return this.GetItem("hairtone")?.StringValue; }
+        }
 
         public override bool IsDirty
         {
@@ -265,6 +269,11 @@ namespace Sims2Tools.DBPF.CPF
             }
 
             return item;
+        }
+
+        public bool HasItem(string name)
+        {
+            return GetItem(name) != null;
         }
 
         public CpfItem GetItem(string name)

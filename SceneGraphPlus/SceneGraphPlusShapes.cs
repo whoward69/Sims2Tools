@@ -376,6 +376,7 @@ namespace SceneGraphPlus.Shapes
         private bool subsetGmndSlavedValid = true;
         private bool defaultLangValid = true;
         private bool idrValid = true;
+        private bool xngbValid = true;
 
         protected GraphBlock clonedFrom = null;
 
@@ -710,6 +711,22 @@ namespace SceneGraphPlus.Shapes
             }
         }
 
+        public bool IsXngbValid
+        {
+            get => (IsClone ? clonedFrom.IsXngbValid : xngbValid);
+            set
+            {
+                if (IsClone)
+                {
+                    clonedFrom.IsXngbValid = value;
+                }
+                else
+                {
+                    xngbValid = value;
+                }
+            }
+        }
+
         public DBPFKey OriginalKey => BlockRef.OriginalKey;
         public DBPFKey Key => BlockRef.Key;
 
@@ -731,7 +748,7 @@ namespace SceneGraphPlus.Shapes
 
         public bool HasIssues => HasNonFixableIssues || !(IsFileListValid && IsLightValid && IsDefaultLangValid);
         public bool HasFixableIssues => !IsDirty && !(IsFileListValid && IsLightValid && IsDefaultLangValid);
-        public bool HasNonFixableIssues => !(IsEpFlagsValid && IsSubsetMmatValid && IsSubsetShpeValid && IsSubsetStrValid && IsSubsetGmndMeshValid && IsSubsetGmndDesignableValid && IsSubsetGmndSlavedValid && IsIdrValid);
+        public bool HasNonFixableIssues => !(IsEpFlagsValid && IsSubsetMmatValid && IsSubsetShpeValid && IsSubsetStrValid && IsSubsetGmndMeshValid && IsSubsetGmndDesignableValid && IsSubsetGmndSlavedValid && IsXngbValid && IsIdrValid);
 
         public string IssuesToolTip
         {
@@ -755,6 +772,8 @@ namespace SceneGraphPlus.Shapes
                 if (!IsSubsetGmndSlavedValid) issues = $"{issues}Invalid Subset(s) in tsDesignModeSlaveSubsets\r\n";
 
                 if (!IsDefaultLangValid) issues = $"{issues}Additional Langauages\r\n";
+
+                if (!IsXngbValid) issues = $"{issues}Invalid self-refs or thumbnail ref\r\n";
 
                 if (!IsIdrValid) issues = $"{issues}Missing 3IDR\r\n";
 

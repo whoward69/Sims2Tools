@@ -32,7 +32,7 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
 
         public Binx(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
-            sgIdrIndexes.Add(ObjectIdx);
+            if (GetItem("objectidx") != null) sgIdrIndexes.Add(ObjectIdx);
         }
 
         public Binx Duplicate(DBPFKey dbpfKey)
@@ -55,12 +55,6 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
         public uint StringIndex => GetItem("stringindex").UIntegerValue;
 
         public int SortIndex => GetItem("sortindex").IntegerValue;
-
-        /* Other known item names for use with this.GetSaveItem(itemName)
-         * iconidx (uint) - should reference IMG by TGIR
-         * binidx (uint) - should reference a COLL by TGIR
-         * creatorid (string)
-         */
 
         public override XmlElement AddXml(XmlElement parent)
         {
