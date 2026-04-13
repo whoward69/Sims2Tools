@@ -37,13 +37,9 @@ namespace Sims2Tools.Helpers
             return Color.Blue; // Keep with Sims 2 using blue as a missing texture
         }
 
-        public static void SetTxmtPropertyFromColour(Txmt txmt, string name, Color colour)
+        public static String ColourToTxmtString(Color colour)
         {
-            if (txmt.MaterialDefinition?.GetProperty(name) != null)
-            {
-                string value = $"{(colour.R / 255.0).ToString("0.00000")},{(colour.G / 255.0).ToString("0.00000")},{(colour.B / 255.0).ToString("0.00000")}";
-                txmt.MaterialDefinition.SetProperty(name, value);
-            }
+            return $"{(colour.R / 255.0).ToString("0.00000")},{(colour.G / 255.0).ToString("0.00000")},{(colour.B / 255.0).ToString("0.00000")}";
         }
     }
 }

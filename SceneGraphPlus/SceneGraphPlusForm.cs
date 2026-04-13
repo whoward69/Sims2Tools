@@ -69,6 +69,8 @@ namespace SceneGraphPlus
     {
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        // TODO - SceneGraph Plus - binx - need to include BINX/3IDR pair in the understood types
+
         // When adding to this List, search for "UnderstoodTypes" (both this file and the Surface file)
         // UnderstoodTypes - also need to add TypeBlockColour and TypeRow to the Settings.settings file (see https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.colors?view=windowsdesktop-8.0 for colour names)
         public static List<TypeTypeID> UnderstoodTypeIds = new List<TypeTypeID>() {

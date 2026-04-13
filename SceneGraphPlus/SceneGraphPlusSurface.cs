@@ -726,6 +726,8 @@ namespace SceneGraphPlus.Surface
                 RemoveShape(connector);
             }
 
+            // TODO - SceneGraph Plus - delete - if this is a GZPS/XTOL/XMOL/etc we may also need to delete the associated 3IDR
+            // TODO - SceneGraph Plus - delete - if this is a GZPS/XTOL/XMOL/etc we should also need to delete the associated BINX/3IDR pair
             block.MarkForDeletion();
 
             if (block.Equals(editBlock))
@@ -1845,7 +1847,7 @@ namespace SceneGraphPlus.Surface
 
                                 // We also need the associated BINX, we'll start by assuming the GZPS/3IDR/BINX is a triple
                                 Binx binx = (Binx)exportPackage.GetResourceByKey(new DBPFKey(Binx.TYPE, block.Key));
-                                DBPFKey objectKey = binxIdr.GetItem(binx.ObjectIdx);
+                                DBPFKey objectKey = (binx == null) ? null : binxIdr.GetItem(binx.ObjectIdx);
 
                                 if (!block.Key.Equals(objectKey))
                                 {
@@ -3094,7 +3096,7 @@ namespace SceneGraphPlus.Surface
                     Idr idrForBinx = null;
 
                     Str str = null;
-                    int strIndex = -1;
+                    uint strIndex = 0;
 
                     foreach (DBPFEntry entry in gzpsPackage.GetEntriesByType(Binx.TYPE))
                     {
@@ -3117,7 +3119,7 @@ namespace SceneGraphPlus.Surface
                     if (idrForBinx != null)
                     {
                         str = (Str)gzpsPackage.GetResourceByKey(idrForBinx.GetItem(binx.StringSetIdx));
-                        strIndex = (int)binx.StringIndex;
+                        strIndex = binx.StringIndex;
                     }
 
                     int numOverrides = (int)gzps.GetItem("numoverrides").UIntegerValue;

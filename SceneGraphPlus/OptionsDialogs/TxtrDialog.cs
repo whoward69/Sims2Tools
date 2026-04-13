@@ -30,13 +30,13 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private string originalTxtrName = null;
 
-        private readonly TextureOptions txtrOpts;
+        private readonly TxtrControls txtrOpts;
 
         public TxtrDialog()
         {
             InitializeComponent();
 
-            txtrOpts = new TextureOptions(textNewImage, radioDxt1, radioDxt3, radioDxt5, radioRaw8, radioRaw24, radioRaw32, textLevels, comboSharpen, ckbFilters);
+            txtrOpts = new TxtrControls(textNewImage, radioDxt1, radioDxt3, radioDxt5, radioRaw8, radioRaw24, radioRaw32, textLevels, comboSharpen, ckbFilters);
         }
 
         public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile package, Txtr txtr, string txtrname, List<Lifo> lifos, out bool removeLifos)

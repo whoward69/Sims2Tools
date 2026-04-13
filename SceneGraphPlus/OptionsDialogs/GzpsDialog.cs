@@ -19,6 +19,7 @@ using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DbpfCache;
+using Sims2Tools.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -39,28 +40,30 @@ namespace SceneGraphPlus.Dialogs.Options
         private Idr idrForBinx;
 
         private Str str;
-        private int strIndex;
+        private uint strIndex;
 
         private List<MaterialData> materials;
 
         private bool removeLifos;
 
-        private readonly Dictionary<string, TextureValues> textureValues = new Dictionary<string, TextureValues>();
-        private TextureValues currentValues;
+        private readonly Dictionary<string, MaterialValues> materialValues = new Dictionary<string, MaterialValues>();
+        private MaterialValues currentValues;
 
         private string originalGzpsName = null;
         private string originalGzpsDesc = null;
 
-        private readonly TextureOptions txtrOpts;
+        private readonly TxmtControls txmtControls;
+        private readonly TxtrControls txtrControls;
 
         public GzpsDialog()
         {
             InitializeComponent();
 
-            txtrOpts = new TextureOptions(textNewImage, radioDxt1, radioDxt3, radioDxt5, radioRaw8, radioRaw24, radioRaw32, textLevels, comboSharpen, ckbFilters);
+            txmtControls = new TxmtControls(btnDiffCoefs, textDiffAlpha, trackDiffAlpha, ckbLightingEnabled, comboAlphaBlendMode);
+            txtrControls = new TxtrControls(textNewImage, radioDxt1, radioDxt3, radioDxt5, radioRaw8, radioRaw24, radioRaw32, textLevels, comboSharpen, ckbFilters);
         }
 
-        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile gzpsPackage, GraphBlock gzpsBlock, Gzps gzps, Idr idrForGzps, Binx binx, Idr idrForBinx, Str str, int strIndex, List<MaterialData> materials, out bool removeLifos)
+        public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, CacheableDbpfFile gzpsPackage, GraphBlock gzpsBlock, Gzps gzps, Idr idrForGzps, Binx binx, Idr idrForBinx, Str str, uint strIndex, List<MaterialData> materials, out bool removeLifos)
         {
             this.form = form;
             this.gzpsPackage = gzpsPackage;
@@ -84,7 +87,7 @@ namespace SceneGraphPlus.Dialogs.Options
 
             if (str != null)
             {
-                originalGzpsDesc = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default)[strIndex - 1].Title;
+                originalGzpsDesc = str.LanguageItems(Sims2Tools.DBPF.Data.MetaData.Languages.Default)[(int)(strIndex - 1)].Title;
                 textDesc.Text = originalGzpsDesc;
             }
             else
@@ -96,20 +99,28 @@ namespace SceneGraphPlus.Dialogs.Options
 
             foreach (MaterialData materialData in materials)
             {
+                comboTextureSubset.Items.Add(materialData.SubsetDisplay);
+
+                TxmtValues txmtValues = null;
+                TxtrValues txtrValues = null;
+
                 if (materialData.TxtrResource != null)
                 {
-                    TextureValues txtrVals = new TextureValues
+                    txtrValues = new TxtrValues
                     {
                         DdsFormat = materialData.TxtrResource.ImageData.Format,
                         StrLevels = materialData.TxtrResource.ImageData.MipMapLevels.ToString(),
                         Sharpen = "None"
                     };
 
-                    textureValues.Add(materialData.SubsetDisplay, txtrVals);
-                    comboTextureSubset.Items.Add(materialData.SubsetDisplay);
-
                     lifoCounts += materialData.LifoResources.Count;
                 }
+                else
+                {
+                    txmtValues = new TxmtValues(materialData.TxmtResource);
+                }
+
+                materialValues.Add(materialData.SubsetDisplay, new MaterialValues(txmtValues, txtrValues));
             }
 
             if (comboTextureSubset.Items.Count > 0)
@@ -168,7 +179,7 @@ namespace SceneGraphPlus.Dialogs.Options
 
             if (!string.IsNullOrWhiteSpace(textDesc.Text))
             {
-                btnDetailsUpdate.Enabled = !textDesc.Text.Equals(originalGzpsDesc);
+                btnDetailsUpdate.Enabled = (str != null) && !textDesc.Text.Equals(originalGzpsDesc);
             }
         }
 
@@ -211,8 +222,19 @@ namespace SceneGraphPlus.Dialogs.Options
             newIdrForBinx.SetItem(newBinx.GetItem("objectidx").UIntegerValue, newGzpsKey);
             newIdrForBinx.SetItem(newBinx.GetItem("stringsetidx").UIntegerValue, newStrKey);
 
-            Str newStr = str.Duplicate(newStrKey, true);
-            newStr.LanguageItems(MetaData.Languages.Default)[strIndex - 1].Title = textDesc.Text;
+            Str newStr;
+            if (str != null)
+            {
+                newStr = str.Duplicate(newStrKey, true);
+                newStr.LanguageItems(MetaData.Languages.Default)[(int)(strIndex - 1)].Title = textDesc.Text;
+            }
+            else
+            {
+                newStr = new Str(newStrKey);
+
+                newStr.AppendLanguageItem(Languages.Default, new StrItem(Languages.Default, textDesc.Text, "", true));
+                newBinx.GetItem("stringindex").UIntegerValue = strIndex = 1;
+            }
 
             Gzps newGzps = gzps.Duplicate(newGzpsKey, textGzpsNewName.Text);
             newGzps.GetItem("creator").StringValue = Sims2ToolsLib.CreatorGUID;
@@ -255,14 +277,24 @@ namespace SceneGraphPlus.Dialogs.Options
             // TODO - SceneGraph Plus - gzps recolour - need to test with associated LIFOs
             foreach (MaterialData materialData in materials)
             {
-                ITextureValues txtrVals = textureValues[materialData.SubsetDisplay];
+                MaterialValues matValues = materialValues[materialData.SubsetDisplay];
 
-                if (materialData.TxtrResource != null && File.Exists(txtrVals.ImageName))
+                if (matValues.HasChanged)
                 {
-                    Txmt newTxmt = OptionsHelper.DuplicateTxmt(form, gzpsPackage, true,
-                                                               materialData.TxmtResource, $"{textGzpsNewName.Text}_{materialData.SubsetList}", new MaterialOptionsNone(),
-                                                               materialData.TxtrResource, txtrVals,
+                    Txmt newTxmt = OptionsHelper.DuplicateTxmt(form, gzpsPackage, matValues.HasTxtrChanged,
+                                                               materialData.TxmtResource, $"{textGzpsNewName.Text}_{materialData.SubsetList}", matValues,
+                                                               materialData.TxtrResource, matValues,
                                                                materialData.LifoResources, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
+
+                    if (matValues.HasTxmtChanged)
+                    {
+                        newTxmt.MaterialDefinition.SetOrAddProperty("stdMatDiffCoef", ColourHelper.ColourToTxmtString(matValues.DiffCoefsColour));
+                        newTxmt.MaterialDefinition.SetOrAddProperty("stdMatAlphaBlendMode", matValues.AlphaBlendMode.ToLower());
+                        newTxmt.MaterialDefinition.SetOrAddProperty("stdMatLightingEnabled", (matValues.LightingEnabled ? "1" : "0"));
+                        newTxmt.MaterialDefinition.SetOrAddProperty("stdMatUntexturedDiffAlpha", (matValues.DiffAlpha / 100.0).ToString("0.00"));
+
+                        gzpsPackage.Commit(newTxmt, true);
+                    }
 
                     if (updateRemoveLifos)
                     {
@@ -292,7 +324,7 @@ namespace SceneGraphPlus.Dialogs.Options
                 if (str != null)
                 {
                     List<StrItem> defStrings = str.LanguageItems(Languages.Default);
-                    defStrings[strIndex - 1].Title = textDesc.Text;
+                    defStrings[(int)(strIndex - 1)].Title = textDesc.Text;
                 }
             }
         }
@@ -309,7 +341,7 @@ namespace SceneGraphPlus.Dialogs.Options
         {
             UpdateForm();
 
-            OnOptionsChanged(sender, null);
+            OnTxtrOptionsChanged(sender, null);
         }
 
         private void OnImageNameKeyUp(object sender, KeyEventArgs e)
@@ -321,14 +353,27 @@ namespace SceneGraphPlus.Dialogs.Options
         private void OnSelectedSubsetChanged(object sender, EventArgs e)
         {
             updatingOpts = true;
-            currentValues = textureValues[comboTextureSubset.SelectedItem as string];
+            currentValues = materialValues[comboTextureSubset.SelectedItem as string];
 
-            txtrOpts.Update(currentValues);
+            if (currentValues.HasTxtr)
+            {
+                ShowHideMaterialControls(false);
+
+                ShowHideTextureControls(true);
+                txtrControls.Update(currentValues);
+            }
+            else
+            {
+                ShowHideTextureControls(false);
+
+                ShowHideMaterialControls(true);
+                txmtControls.Update(currentValues);
+            }
 
             updatingOpts = false;
         }
 
-        private void OnOptionsChanged(object sender, EventArgs e)
+        private void OnTxtrOptionsChanged(object sender, EventArgs e)
         {
             if (updatingOpts) return;
 
@@ -353,6 +398,73 @@ namespace SceneGraphPlus.Dialogs.Options
             }
 
             currentValues.Sharpen = comboSharpen.Text;
+        }
+
+        private void OnSelectColourClicked(object sender, EventArgs e)
+        {
+            if (sender is Button button)
+            {
+                dlgColourPicker.Color = button.BackColor;
+
+                if (dlgColourPicker.ShowDialog() == DialogResult.OK)
+                {
+                    currentValues.DiffCoefsColour = button.BackColor = dlgColourPicker.Color;
+                }
+            }
+        }
+
+        bool changingDiffAlpha = false;
+
+        private void OnDiffAlphaScrolled(object sender, EventArgs e)
+        {
+            if (changingDiffAlpha) return;
+
+            changingDiffAlpha = true;
+            textDiffAlpha.Text = (trackDiffAlpha.Value / 100.0).ToString("0.00");
+            currentValues.DiffAlpha = trackDiffAlpha.Value;
+            changingDiffAlpha = false;
+        }
+
+        private void OnDiffAplhaEdited(object sender, EventArgs e)
+        {
+            if (changingDiffAlpha) return;
+
+            changingDiffAlpha = true;
+            try
+            {
+                currentValues.DiffAlpha = trackDiffAlpha.Value = (int)(float.Parse(textDiffAlpha.Text) * 100);
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                changingDiffAlpha = false;
+            }
+        }
+
+        private void OnLightingChanged(object sender, EventArgs e)
+        {
+            currentValues.LightingEnabled = ckbLightingEnabled.Checked;
+        }
+
+        private void OnBlendModeChanged(object sender, EventArgs e)
+        {
+            currentValues.AlphaBlendMode = comboAlphaBlendMode.SelectedItem.ToString();
+        }
+
+        private void ShowHideTextureControls(bool visible)
+        {
+            lblNewImage.Visible = textNewImage.Visible = btnSelectImage.Visible = visible;
+            panelDdsOptions.Visible = visible;
+        }
+
+        private void ShowHideMaterialControls(bool visible)
+        {
+            lblDiffCoefs.Visible = btnDiffCoefs.Visible = visible;
+            lblDiffAlpha.Visible = textDiffAlpha.Visible = trackDiffAlpha.Visible = visible;
+            lblLightingEnabled.Visible = ckbLightingEnabled.Visible = visible;
+            lblAlphaBlendMode.Visible = comboAlphaBlendMode.Visible = visible;
         }
     }
 }

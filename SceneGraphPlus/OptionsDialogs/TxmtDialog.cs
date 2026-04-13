@@ -47,16 +47,16 @@ namespace SceneGraphPlus.Dialogs.Options
 
         private bool dataLoading = true;
 
-        private readonly MaterialOptions matOpts;
-        private readonly TextureOptions txtrOpts;
+        private readonly TxmtControls txmtControls;
+        private readonly TxtrControls txtrControls;
 
 
         public TxmtDialog()
         {
             InitializeComponent();
 
-            matOpts = new MaterialOptions(btnDiffCoefs, comboAlphaBlendMode, ckbLightingEnabled, trackDiffAlpha);
-            txtrOpts = new TextureOptions(textNewImage, radioDxt1, radioDxt3, radioDxt5, radioRaw8, radioRaw24, radioRaw32, textLevels, comboSharpen, ckbFilters);
+            txmtControls = new TxmtControls(btnDiffCoefs, textDiffAlpha, trackDiffAlpha, ckbLightingEnabled, comboAlphaBlendMode);
+            txtrControls = new TxtrControls(textNewImage, radioDxt1, radioDxt3, radioDxt5, radioRaw8, radioRaw24, radioRaw32, textLevels, comboSharpen, ckbFilters);
         }
 
         public DialogResult ShowDialog(SceneGraphPlusForm form, Point location, MaterialData matData, TypeGUID guid, TypeGroupID mmatGroup, string cresSgName, List<string> subsets, out bool removeLifos)
@@ -121,14 +121,15 @@ namespace SceneGraphPlus.Dialogs.Options
             {
                 btnDiffCoefs.BackColor = initialDiffCoefs = ColourHelper.ColourFromTxmtProperty(txmt, "stdMatDiffCoef");
 
-                initialDiffAlpha = (int)(float.Parse(txmt.MaterialDefinition.GetProperty("stdMatUntexturedDiffAlpha")) * 100);
+                string diffAlpha = txmt.MaterialDefinition.GetProperty("stdMatUntexturedDiffAlpha");
+                initialDiffAlpha = (diffAlpha != null) ? (int)(float.Parse(diffAlpha) * 100) : 0;
                 textDiffAlpha.Text = (initialDiffAlpha / 100).ToString("0.00");
                 trackDiffAlpha.Value = initialDiffAlpha;
 
-                ckbLightingEnabled.Checked = initialLightingEnabled = txmt.MaterialDefinition.GetProperty("stdMatLightingEnabled").Equals("1");
+                ckbLightingEnabled.Checked = initialLightingEnabled = "1".Equals(txmt.MaterialDefinition.GetProperty("stdMatLightingEnabled"));
 
-                initialBlendMode = txmt.MaterialDefinition.GetProperty("stdMatAlphaBlendMode").ToLower();
-                initialBlendMode = $"{initialBlendMode.Substring(0, 1).ToUpper()}{initialBlendMode.Substring(1)}";
+                initialBlendMode = txmt.MaterialDefinition.GetProperty("stdMatAlphaBlendMode")?.ToLower();
+                initialBlendMode = (initialBlendMode != null) ? $"{initialBlendMode.Substring(0, 1).ToUpper()}{initialBlendMode.Substring(1)}" : "None";
                 comboAlphaBlendMode.SelectedItem = initialBlendMode;
             }
 
@@ -174,8 +175,8 @@ namespace SceneGraphPlus.Dialogs.Options
         private void OnDuplicateClicked(object sender, EventArgs e)
         {
             Txmt newTxmt = OptionsHelper.DuplicateTxmt(form, txmtPackage, btnChangeTexture.Enabled,
-                                                       txmt, textTxmtNewName.Text, matOpts,
-                                                       txtr, txtrOpts,
+                                                       txmt, textTxmtNewName.Text, txmtControls,
+                                                       txtr, txtrControls,
                                                        lifos, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
 
             if (updateRemoveLifos)
@@ -236,7 +237,7 @@ namespace SceneGraphPlus.Dialogs.Options
             }
             else
             {
-                OptionsHelper.UpdateMaterial(txmt, matOpts, txtr, txtrOpts, lifos, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
+                OptionsHelper.UpdateMaterial(txmt, txmtControls, txtr, txtrControls, lifos, ckbRemoveLifos.Checked, out bool updateRemoveLifos);
 
                 if (updateRemoveLifos)
                 {

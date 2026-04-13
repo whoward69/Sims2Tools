@@ -42,8 +42,21 @@ namespace SceneGraphPlus.Dialogs.Options
             this.lblNewName = new System.Windows.Forms.Label();
             this.textGzpsNewName = new System.Windows.Forms.TextBox();
             this.grpChangeTexture = new System.Windows.Forms.GroupBox();
+            this.trackDiffAlpha = new System.Windows.Forms.TrackBar();
+            this.comboAlphaBlendMode = new System.Windows.Forms.ComboBox();
+            this.lblAlphaBlendMode = new System.Windows.Forms.Label();
+            this.lblLightingEnabled = new System.Windows.Forms.Label();
+            this.ckbLightingEnabled = new System.Windows.Forms.CheckBox();
+            this.lblDiffAlpha = new System.Windows.Forms.Label();
             this.lblTextureSubset = new System.Windows.Forms.Label();
+            this.textDiffAlpha = new System.Windows.Forms.TextBox();
             this.comboTextureSubset = new System.Windows.Forms.ComboBox();
+            this.lblDiffCoefs = new System.Windows.Forms.Label();
+            this.btnDiffCoefs = new System.Windows.Forms.Button();
+            this.lblSubset = new System.Windows.Forms.Label();
+            this.lblNewImage = new System.Windows.Forms.Label();
+            this.textNewImage = new System.Windows.Forms.TextBox();
+            this.btnSelectImage = new System.Windows.Forms.Button();
             this.panelDdsOptions = new System.Windows.Forms.Panel();
             this.ckbRemoveLifos = new System.Windows.Forms.CheckBox();
             this.radioRaw32 = new System.Windows.Forms.RadioButton();
@@ -59,18 +72,16 @@ namespace SceneGraphPlus.Dialogs.Options
             this.radioDxt1 = new System.Windows.Forms.RadioButton();
             this.radioDxt5 = new System.Windows.Forms.RadioButton();
             this.radioDxt3 = new System.Windows.Forms.RadioButton();
-            this.btnSelectImage = new System.Windows.Forms.Button();
-            this.textNewImage = new System.Windows.Forms.TextBox();
-            this.lblNewImage = new System.Windows.Forms.Label();
-            this.lblSubset = new System.Windows.Forms.Label();
             this.selectImageDialog = new System.Windows.Forms.OpenFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.grpDetails = new System.Windows.Forms.GroupBox();
             this.lblDesc = new System.Windows.Forms.Label();
             this.textDesc = new System.Windows.Forms.TextBox();
             this.btnDetailsUpdate = new System.Windows.Forms.Button();
+            this.dlgColourPicker = new System.Windows.Forms.ColorDialog();
             this.grpDuplicate.SuspendLayout();
             this.grpChangeTexture.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackDiffAlpha)).BeginInit();
             this.panelDdsOptions.SuspendLayout();
             this.grpDetails.SuspendLayout();
             this.SuspendLayout();
@@ -120,19 +131,89 @@ namespace SceneGraphPlus.Dialogs.Options
             // 
             // grpChangeTexture
             // 
+            this.grpChangeTexture.Controls.Add(this.trackDiffAlpha);
+            this.grpChangeTexture.Controls.Add(this.comboAlphaBlendMode);
+            this.grpChangeTexture.Controls.Add(this.lblAlphaBlendMode);
+            this.grpChangeTexture.Controls.Add(this.lblLightingEnabled);
+            this.grpChangeTexture.Controls.Add(this.ckbLightingEnabled);
+            this.grpChangeTexture.Controls.Add(this.lblDiffAlpha);
             this.grpChangeTexture.Controls.Add(this.lblTextureSubset);
+            this.grpChangeTexture.Controls.Add(this.textDiffAlpha);
             this.grpChangeTexture.Controls.Add(this.comboTextureSubset);
-            this.grpChangeTexture.Controls.Add(this.panelDdsOptions);
-            this.grpChangeTexture.Controls.Add(this.btnSelectImage);
-            this.grpChangeTexture.Controls.Add(this.textNewImage);
-            this.grpChangeTexture.Controls.Add(this.lblNewImage);
+            this.grpChangeTexture.Controls.Add(this.lblDiffCoefs);
+            this.grpChangeTexture.Controls.Add(this.btnDiffCoefs);
             this.grpChangeTexture.Controls.Add(this.lblSubset);
+            this.grpChangeTexture.Controls.Add(this.lblNewImage);
+            this.grpChangeTexture.Controls.Add(this.textNewImage);
+            this.grpChangeTexture.Controls.Add(this.btnSelectImage);
+            this.grpChangeTexture.Controls.Add(this.panelDdsOptions);
             this.grpChangeTexture.Location = new System.Drawing.Point(10, 114);
             this.grpChangeTexture.Name = "grpChangeTexture";
             this.grpChangeTexture.Size = new System.Drawing.Size(562, 210);
             this.grpChangeTexture.TabIndex = 38;
             this.grpChangeTexture.TabStop = false;
             this.grpChangeTexture.Text = "Change Texture:";
+            // 
+            // trackDiffAlpha
+            // 
+            this.trackDiffAlpha.Location = new System.Drawing.Point(220, 75);
+            this.trackDiffAlpha.Maximum = 100;
+            this.trackDiffAlpha.Name = "trackDiffAlpha";
+            this.trackDiffAlpha.Size = new System.Drawing.Size(235, 45);
+            this.trackDiffAlpha.TabIndex = 52;
+            this.trackDiffAlpha.TickFrequency = 5;
+            this.trackDiffAlpha.Scroll += new System.EventHandler(this.OnDiffAlphaScrolled);
+            // 
+            // comboAlphaBlendMode
+            // 
+            this.comboAlphaBlendMode.FormattingEnabled = true;
+            this.comboAlphaBlendMode.Items.AddRange(new object[] {
+            "None",
+            "Blend",
+            "Additive"});
+            this.comboAlphaBlendMode.Location = new System.Drawing.Point(171, 126);
+            this.comboAlphaBlendMode.Name = "comboAlphaBlendMode";
+            this.comboAlphaBlendMode.Size = new System.Drawing.Size(103, 23);
+            this.comboAlphaBlendMode.TabIndex = 51;
+            this.comboAlphaBlendMode.Text = "None";
+            this.comboAlphaBlendMode.SelectedIndexChanged += new System.EventHandler(this.OnBlendModeChanged);
+            // 
+            // lblAlphaBlendMode
+            // 
+            this.lblAlphaBlendMode.AutoSize = true;
+            this.lblAlphaBlendMode.Location = new System.Drawing.Point(6, 129);
+            this.lblAlphaBlendMode.Name = "lblAlphaBlendMode";
+            this.lblAlphaBlendMode.Size = new System.Drawing.Size(142, 15);
+            this.lblAlphaBlendMode.TabIndex = 50;
+            this.lblAlphaBlendMode.Text = "stdMatAlphaBlendMode:";
+            // 
+            // lblLightingEnabled
+            // 
+            this.lblLightingEnabled.AutoSize = true;
+            this.lblLightingEnabled.Location = new System.Drawing.Point(6, 105);
+            this.lblLightingEnabled.Name = "lblLightingEnabled";
+            this.lblLightingEnabled.Size = new System.Drawing.Size(137, 15);
+            this.lblLightingEnabled.TabIndex = 49;
+            this.lblLightingEnabled.Text = "stdMatLightingEnabled:";
+            // 
+            // ckbLightingEnabled
+            // 
+            this.ckbLightingEnabled.AutoSize = true;
+            this.ckbLightingEnabled.Location = new System.Drawing.Point(171, 106);
+            this.ckbLightingEnabled.Name = "ckbLightingEnabled";
+            this.ckbLightingEnabled.Size = new System.Drawing.Size(15, 14);
+            this.ckbLightingEnabled.TabIndex = 48;
+            this.ckbLightingEnabled.UseVisualStyleBackColor = true;
+            this.ckbLightingEnabled.CheckedChanged += new System.EventHandler(this.OnLightingChanged);
+            // 
+            // lblDiffAlpha
+            // 
+            this.lblDiffAlpha.AutoSize = true;
+            this.lblDiffAlpha.Location = new System.Drawing.Point(6, 78);
+            this.lblDiffAlpha.Name = "lblDiffAlpha";
+            this.lblDiffAlpha.Size = new System.Drawing.Size(156, 15);
+            this.lblDiffAlpha.TabIndex = 47;
+            this.lblDiffAlpha.Text = "stdMatUntexturedDiffAlpha:";
             // 
             // lblTextureSubset
             // 
@@ -143,6 +224,14 @@ namespace SceneGraphPlus.Dialogs.Options
             this.lblTextureSubset.TabIndex = 45;
             this.lblTextureSubset.Text = "For Subset:";
             // 
+            // textDiffAlpha
+            // 
+            this.textDiffAlpha.Location = new System.Drawing.Point(171, 75);
+            this.textDiffAlpha.Name = "textDiffAlpha";
+            this.textDiffAlpha.Size = new System.Drawing.Size(43, 21);
+            this.textDiffAlpha.TabIndex = 46;
+            this.textDiffAlpha.TextChanged += new System.EventHandler(this.OnDiffAplhaEdited);
+            // 
             // comboTextureSubset
             // 
             this.comboTextureSubset.FormattingEnabled = true;
@@ -151,6 +240,63 @@ namespace SceneGraphPlus.Dialogs.Options
             this.comboTextureSubset.Size = new System.Drawing.Size(115, 23);
             this.comboTextureSubset.TabIndex = 44;
             this.comboTextureSubset.SelectedIndexChanged += new System.EventHandler(this.OnSelectedSubsetChanged);
+            // 
+            // lblDiffCoefs
+            // 
+            this.lblDiffCoefs.AutoSize = true;
+            this.lblDiffCoefs.Location = new System.Drawing.Point(6, 50);
+            this.lblDiffCoefs.Name = "lblDiffCoefs";
+            this.lblDiffCoefs.Size = new System.Drawing.Size(90, 15);
+            this.lblDiffCoefs.TabIndex = 44;
+            this.lblDiffCoefs.Text = "stdMatDiffCoef:";
+            // 
+            // btnDiffCoefs
+            // 
+            this.btnDiffCoefs.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDiffCoefs.Location = new System.Drawing.Point(171, 46);
+            this.btnDiffCoefs.Name = "btnDiffCoefs";
+            this.btnDiffCoefs.Size = new System.Drawing.Size(103, 23);
+            this.btnDiffCoefs.TabIndex = 45;
+            this.btnDiffCoefs.Text = "Select";
+            this.btnDiffCoefs.UseVisualStyleBackColor = true;
+            this.btnDiffCoefs.Click += new System.EventHandler(this.OnSelectColourClicked);
+            // 
+            // lblSubset
+            // 
+            this.lblSubset.AutoSize = true;
+            this.lblSubset.Location = new System.Drawing.Point(22, 17);
+            this.lblSubset.Name = "lblSubset";
+            this.lblSubset.Size = new System.Drawing.Size(0, 15);
+            this.lblSubset.TabIndex = 35;
+            // 
+            // lblNewImage
+            // 
+            this.lblNewImage.AutoSize = true;
+            this.lblNewImage.Location = new System.Drawing.Point(6, 50);
+            this.lblNewImage.Name = "lblNewImage";
+            this.lblNewImage.Size = new System.Drawing.Size(73, 15);
+            this.lblNewImage.TabIndex = 36;
+            this.lblNewImage.Text = "New Image:";
+            // 
+            // textNewImage
+            // 
+            this.textNewImage.Location = new System.Drawing.Point(84, 47);
+            this.textNewImage.Name = "textNewImage";
+            this.textNewImage.Size = new System.Drawing.Size(383, 21);
+            this.textNewImage.TabIndex = 37;
+            this.textNewImage.TextChanged += new System.EventHandler(this.OnImageNameChanged);
+            this.textNewImage.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnImageNameKeyUp);
+            // 
+            // btnSelectImage
+            // 
+            this.btnSelectImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelectImage.Location = new System.Drawing.Point(473, 44);
+            this.btnSelectImage.Name = "btnSelectImage";
+            this.btnSelectImage.Size = new System.Drawing.Size(82, 26);
+            this.btnSelectImage.TabIndex = 38;
+            this.btnSelectImage.Text = "Select";
+            this.btnSelectImage.UseVisualStyleBackColor = true;
+            this.btnSelectImage.Click += new System.EventHandler(this.OnSelectImageClicked);
             // 
             // panelDdsOptions
             // 
@@ -168,7 +314,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.panelDdsOptions.Controls.Add(this.radioDxt1);
             this.panelDdsOptions.Controls.Add(this.radioDxt5);
             this.panelDdsOptions.Controls.Add(this.radioDxt3);
-            this.panelDdsOptions.Location = new System.Drawing.Point(6, 75);
+            this.panelDdsOptions.Location = new System.Drawing.Point(9, 74);
             this.panelDdsOptions.Name = "panelDdsOptions";
             this.panelDdsOptions.Size = new System.Drawing.Size(461, 129);
             this.panelDdsOptions.TabIndex = 43;
@@ -193,7 +339,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.radioRaw32.TabStop = true;
             this.radioRaw32.Text = "Raw 32";
             this.radioRaw32.UseVisualStyleBackColor = true;
-            this.radioRaw32.CheckedChanged += new System.EventHandler(this.OnOptionsChanged);
+            this.radioRaw32.CheckedChanged += new System.EventHandler(this.OnTxtrOptionsChanged);
             // 
             // radioRaw24
             // 
@@ -205,7 +351,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.radioRaw24.TabStop = true;
             this.radioRaw24.Text = "Raw 24";
             this.radioRaw24.UseVisualStyleBackColor = true;
-            this.radioRaw24.CheckedChanged += new System.EventHandler(this.OnOptionsChanged);
+            this.radioRaw24.CheckedChanged += new System.EventHandler(this.OnTxtrOptionsChanged);
             // 
             // radioRaw8
             // 
@@ -217,7 +363,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.radioRaw8.TabStop = true;
             this.radioRaw8.Text = "Raw 8";
             this.radioRaw8.UseVisualStyleBackColor = true;
-            this.radioRaw8.CheckedChanged += new System.EventHandler(this.OnOptionsChanged);
+            this.radioRaw8.CheckedChanged += new System.EventHandler(this.OnTxtrOptionsChanged);
             // 
             // comboSharpen
             // 
@@ -244,7 +390,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.comboSharpen.Size = new System.Drawing.Size(151, 23);
             this.comboSharpen.TabIndex = 49;
             this.comboSharpen.Text = "None";
-            this.comboSharpen.SelectedValueChanged += new System.EventHandler(this.OnOptionsChanged);
+            this.comboSharpen.SelectedValueChanged += new System.EventHandler(this.OnTxtrOptionsChanged);
             // 
             // lblSharpen
             // 
@@ -281,7 +427,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.ckbFilters.ScrollAlwaysVisible = true;
             this.ckbFilters.Size = new System.Drawing.Size(151, 73);
             this.ckbFilters.TabIndex = 46;
-            this.ckbFilters.SelectedValueChanged += new System.EventHandler(this.OnOptionsChanged);
+            this.ckbFilters.SelectedValueChanged += new System.EventHandler(this.OnTxtrOptionsChanged);
             // 
             // lblFilters
             // 
@@ -298,7 +444,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.textLevels.Name = "textLevels";
             this.textLevels.Size = new System.Drawing.Size(55, 21);
             this.textLevels.TabIndex = 45;
-            this.textLevels.TextChanged += new System.EventHandler(this.OnOptionsChanged);
+            this.textLevels.TextChanged += new System.EventHandler(this.OnTxtrOptionsChanged);
             // 
             // lblLevels
             // 
@@ -329,7 +475,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.radioDxt1.TabStop = true;
             this.radioDxt1.Text = "DXT 1";
             this.radioDxt1.UseVisualStyleBackColor = true;
-            this.radioDxt1.CheckedChanged += new System.EventHandler(this.OnOptionsChanged);
+            this.radioDxt1.CheckedChanged += new System.EventHandler(this.OnTxtrOptionsChanged);
             // 
             // radioDxt5
             // 
@@ -341,7 +487,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.radioDxt5.TabStop = true;
             this.radioDxt5.Text = "DXT 5";
             this.radioDxt5.UseVisualStyleBackColor = true;
-            this.radioDxt5.CheckedChanged += new System.EventHandler(this.OnOptionsChanged);
+            this.radioDxt5.CheckedChanged += new System.EventHandler(this.OnTxtrOptionsChanged);
             // 
             // radioDxt3
             // 
@@ -353,44 +499,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.radioDxt3.TabStop = true;
             this.radioDxt3.Text = "DXT 3";
             this.radioDxt3.UseVisualStyleBackColor = true;
-            this.radioDxt3.CheckedChanged += new System.EventHandler(this.OnOptionsChanged);
-            // 
-            // btnSelectImage
-            // 
-            this.btnSelectImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectImage.Location = new System.Drawing.Point(473, 44);
-            this.btnSelectImage.Name = "btnSelectImage";
-            this.btnSelectImage.Size = new System.Drawing.Size(82, 26);
-            this.btnSelectImage.TabIndex = 38;
-            this.btnSelectImage.Text = "Select";
-            this.btnSelectImage.UseVisualStyleBackColor = true;
-            this.btnSelectImage.Click += new System.EventHandler(this.OnSelectImageClicked);
-            // 
-            // textNewImage
-            // 
-            this.textNewImage.Location = new System.Drawing.Point(84, 47);
-            this.textNewImage.Name = "textNewImage";
-            this.textNewImage.Size = new System.Drawing.Size(383, 21);
-            this.textNewImage.TabIndex = 37;
-            this.textNewImage.TextChanged += new System.EventHandler(this.OnImageNameChanged);
-            this.textNewImage.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnImageNameKeyUp);
-            // 
-            // lblNewImage
-            // 
-            this.lblNewImage.AutoSize = true;
-            this.lblNewImage.Location = new System.Drawing.Point(6, 50);
-            this.lblNewImage.Name = "lblNewImage";
-            this.lblNewImage.Size = new System.Drawing.Size(73, 15);
-            this.lblNewImage.TabIndex = 36;
-            this.lblNewImage.Text = "New Image:";
-            // 
-            // lblSubset
-            // 
-            this.lblSubset.AutoSize = true;
-            this.lblSubset.Location = new System.Drawing.Point(22, 17);
-            this.lblSubset.Name = "lblSubset";
-            this.lblSubset.Size = new System.Drawing.Size(0, 15);
-            this.lblSubset.TabIndex = 35;
+            this.radioDxt3.CheckedChanged += new System.EventHandler(this.OnTxtrOptionsChanged);
             // 
             // selectImageDialog
             // 
@@ -442,6 +551,10 @@ namespace SceneGraphPlus.Dialogs.Options
             this.btnDetailsUpdate.UseVisualStyleBackColor = true;
             this.btnDetailsUpdate.Click += new System.EventHandler(this.OnDetailsUpdateClicked);
             // 
+            // dlgColourPicker
+            // 
+            this.dlgColourPicker.FullOpen = true;
+            // 
             // GzpsDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
@@ -461,6 +574,7 @@ namespace SceneGraphPlus.Dialogs.Options
             this.grpDuplicate.PerformLayout();
             this.grpChangeTexture.ResumeLayout(false);
             this.grpChangeTexture.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackDiffAlpha)).EndInit();
             this.panelDdsOptions.ResumeLayout(false);
             this.panelDdsOptions.PerformLayout();
             this.grpDetails.ResumeLayout(false);
@@ -502,5 +616,15 @@ namespace SceneGraphPlus.Dialogs.Options
         private System.Windows.Forms.Button btnDetailsUpdate;
         private System.Windows.Forms.ComboBox comboTextureSubset;
         private System.Windows.Forms.Label lblTextureSubset;
+        private System.Windows.Forms.TrackBar trackDiffAlpha;
+        private System.Windows.Forms.ComboBox comboAlphaBlendMode;
+        private System.Windows.Forms.Label lblAlphaBlendMode;
+        private System.Windows.Forms.Label lblLightingEnabled;
+        private System.Windows.Forms.CheckBox ckbLightingEnabled;
+        private System.Windows.Forms.Label lblDiffAlpha;
+        private System.Windows.Forms.TextBox textDiffAlpha;
+        private System.Windows.Forms.Label lblDiffCoefs;
+        private System.Windows.Forms.Button btnDiffCoefs;
+        private System.Windows.Forms.ColorDialog dlgColourPicker;
     }
 }

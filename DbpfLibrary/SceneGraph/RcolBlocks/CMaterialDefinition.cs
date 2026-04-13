@@ -73,7 +73,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             return null;
         }
 
-        public void SetProperty(string name, string value)
+        public bool SetProperty(string name, string value)
         {
             name = name.Trim().ToLower();
             foreach (MaterialDefinitionProperty mdp in properties)
@@ -81,9 +81,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 if (mdp.Name.Trim().ToLower() == name)
                 {
                     mdp.Value = value;
-                    break;
+                    return true;
                 }
             }
+
+            return false;
         }
 
         public bool AddProperty(string name, string value)
@@ -93,6 +95,14 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             properties.Add(new MaterialDefinitionProperty(name, value));
 
             return true;
+        }
+
+        public void SetOrAddProperty(string name, string value)
+        {
+            if (!SetProperty(name, value))
+            {
+                properties.Add(new MaterialDefinitionProperty(name, value));
+            }
         }
 
         public void ClearFiles()

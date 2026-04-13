@@ -32,8 +32,16 @@ namespace Sims2Tools.DBPF.Utils
                 // Header bytes 6 thru 8 are a 24-bit value giving the size of the decompressed data (big-endian)
                 int headerUncompressedSize = (Data[6] * 256 + Data[7]) * 256 + Data[8];
 
-                Debug.Assert(Data.Length == headerCompressedSize, "Bad compressed size");
+#if DEBUG
+                if (Data.Length != headerCompressedSize)
+                {
+                    // This is wrong (at least as far as SimPe is concerned)
+                    // Let's assume some 3rd party app eff'ed up and forgot the 9 byte header in the count
+                    Debug.Assert(Data.Length == (headerCompressedSize + HEADER_SIZE), "Bad compressed size");
+                }
+
                 Debug.Assert(UncompressedFileSize == headerUncompressedSize, "Bad uncompressed size");
+#endif
 
                 byte[] DecompressedData = new byte[(int)UncompressedFileSize];
                 int DataPos = 0;
