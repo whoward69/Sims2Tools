@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.6.33723.286
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11626.173 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfLibrary", "DbpfLibrary\DbpfLibrary.csproj", "{FBECABCD-0403-4B7E-9992-01562A62DB83}"
 EndProject
@@ -41,6 +41,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SceneGraphPlus", "SceneGraphPlus\SceneGraphPlus.csproj", "{1D189581-0CD4-4EC7-A22F-91FD82A9122B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfScripter", "DbpfScripter\DbpfScripter.csproj", "{8C914166-4907-48FE-9E7E-4F56691688B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClosetCleaner", "ClosetCleaner\ClosetCleaner.csproj", "{592AFB75-61A8-40FC-9DED-59DF26F55543}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -186,6 +188,14 @@ Global
 		{8C914166-4907-48FE-9E7E-4F56691688B3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8C914166-4907-48FE-9E7E-4F56691688B3}.Release|x64.ActiveCfg = Release|Any CPU
 		{8C914166-4907-48FE-9E7E-4F56691688B3}.Release|x64.Build.0 = Release|Any CPU
+		{592AFB75-61A8-40FC-9DED-59DF26F55543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{592AFB75-61A8-40FC-9DED-59DF26F55543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{592AFB75-61A8-40FC-9DED-59DF26F55543}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{592AFB75-61A8-40FC-9DED-59DF26F55543}.Debug|x64.Build.0 = Debug|Any CPU
+		{592AFB75-61A8-40FC-9DED-59DF26F55543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{592AFB75-61A8-40FC-9DED-59DF26F55543}.Release|Any CPU.Build.0 = Release|Any CPU
+		{592AFB75-61A8-40FC-9DED-59DF26F55543}.Release|x64.ActiveCfg = Release|Any CPU
+		{592AFB75-61A8-40FC-9DED-59DF26F55543}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
