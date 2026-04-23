@@ -68,6 +68,7 @@ namespace OutfitOrganiser
 
         private readonly OutfitOrganiserPackageData dataPackageFiles = new OutfitOrganiserPackageData();
         private readonly OutfitOrganiserResourceData dataResources = new OutfitOrganiserResourceData();
+
         private readonly XmlElement configXml;
 
         #region Dropdown Menu Items
@@ -244,11 +245,8 @@ namespace OutfitOrganiser
 
         public new void Dispose()
         {
-            if (cigenCache != null)
-            {
-                cigenCache.Close();
-                cigenCache = null;
-            }
+            cigenCache?.Close();
+            cigenCache = null;
 
             base.Dispose();
         }
@@ -365,6 +363,9 @@ namespace OutfitOrganiser
 
             menuItemPreloadMeshes.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, 0) != 0);
 
+            menuItemRecurse.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemRecurse.Name, 1) != 0);
+            menuItemConfirmDelete.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemConfirmDelete.Name, 0) != 0);
+
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
 
@@ -416,31 +417,41 @@ namespace OutfitOrganiser
                 }
             }
 
-            RegistryTools.SaveAppSettings(OutfitOrganiserApp.RegistryKey, OutfitOrganiserApp.AppVersionMajor, OutfitOrganiserApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(OutfitOrganiserApp.RegistryKey, this);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(OutfitOrganiserApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(OutfitOrganiserApp.RegistryKey, OutfitOrganiserApp.AppVersionMajor, OutfitOrganiserApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(OutfitOrganiserApp.RegistryKey, this);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
 
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitClothing.Name, menuItemOutfitClothing.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitHair.Name, menuItemOutfitHair.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitAccessory.Name, menuItemOutfitAccessory.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitMakeUp.Name, menuItemOutfitMakeUp.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitClothing.Name, menuItemOutfitClothing.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitHair.Name, menuItemOutfitHair.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitAccessory.Name, menuItemOutfitAccessory.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemOutfitMakeUp.Name, menuItemOutfitMakeUp.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemGeneticsSkins.Name, menuItemGeneticsSkins.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemGeneticsEyes.Name, menuItemGeneticsEyes.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemGeneticsSkins.Name, menuItemGeneticsSkins.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemGeneticsEyes.Name, menuItemGeneticsEyes.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResProduct.Name, menuItemShowResProduct.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResProduct.Name, menuItemShowResProduct.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemNumericLayer.Name, menuItemNumericLayer.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetLayer.Name, menuItemAutosetLayer.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetBin.Name, menuItemAutosetBin.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemNumericLayer.Name, menuItemNumericLayer.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetLayer.Name, menuItemAutosetLayer.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemAutosetBin.Name, menuItemAutosetBin.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
-            RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemRecurse.Name, menuItemRecurse.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemConfirmDelete.Name, menuItemConfirmDelete.Checked ? 1 : 0);
+
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
+            }
         }
 
         private void SetTitle(string folder)
@@ -456,6 +467,11 @@ namespace OutfitOrganiser
                 else
                 {
                     displayPath = $" - {folder}";
+                }
+
+                if (menuItemRecurse.Checked)
+                {
+                    displayPath += " (including sub-folders)";
                 }
             }
 
@@ -544,6 +560,8 @@ namespace OutfitOrganiser
         #endregion
 
         #region Worker
+        private string lastPackagePath;
+
         private void DoWork_FillTree(string folder, bool ignoreDirty, bool updateMru)
         {
             DoWork_FillTreeOrGrids(folder, ignoreDirty, updateMru, true, false, false);
@@ -624,7 +642,8 @@ namespace OutfitOrganiser
                     logger.Error(progressDialog.Result.Error.Message);
                     logger.Info(progressDialog.Result.Error.StackTrace);
 
-                    MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
+                    string errorPackagePath = (lastPackagePath != null) ? $"\n{lastPackagePath}" : "";
+                    MsgBox.Show($"An error occured while processing{errorPackagePath}", "Error!", MessageBoxButtons.OK);
                 }
                 else
                 {
@@ -688,9 +707,12 @@ namespace OutfitOrganiser
                 else if (workPackage.UpdatePackages)
                 {
                     sender.SetProgress(0, "Loading Packages");
+                    lastPackagePath = null;
 
-                    foreach (string packagePath in Directory.GetFiles(workPackage.Folder, "*.package", SearchOption.TopDirectoryOnly))
+                    foreach (string packagePath in Directory.GetFiles(workPackage.Folder, "*.package", menuItemRecurse.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
                     {
+                        lastPackagePath = packagePath;
+
                         if (sender.CancellationPending)
                         {
                             args.Cancel = true;
@@ -709,6 +731,8 @@ namespace OutfitOrganiser
                 }
                 else if (workPackage.UpdateResources)
                 {
+                    lastPackagePath = null;
+
                     int rowLimit = gridPackageFiles.SelectedRows.Count;
                     int rowCount = 0;
 
@@ -716,6 +740,8 @@ namespace OutfitOrganiser
                     {
                         using (CacheableDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
                         {
+                            lastPackagePath = package.PackagePath;
+
                             HashSet<DBPFKey> allGzps = new HashSet<DBPFKey>();
 
                             foreach (DBPFEntry gzpsEntry in package.GetEntriesByType(Gzps.TYPE))
@@ -1246,19 +1272,22 @@ namespace OutfitOrganiser
             DirectoryInfo di = new DirectoryInfo(lastFolder);
             Debug.Assert((di.GetDirectories().Length + di.GetFiles().Length) == 0);
 
-            try
+            if (!menuItemConfirmDelete.Checked || MsgBox.Show($"Delete {lastFolder}?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                Directory.Delete(lastFolder);
+                try
+                {
+                    Directory.Delete(lastFolder);
 
-                TreeNode parentNode = treeFolders.SelectedNode.Parent;
-                treeFolders.SelectedNode.Remove();
-                treeFolders.SelectedNode = parentNode;
+                    TreeNode parentNode = treeFolders.SelectedNode.Parent;
+                    treeFolders.SelectedNode.Remove();
+                    treeFolders.SelectedNode = parentNode;
 
-                DoWork_FillPackageGrid(parentNode.Name);
-            }
-            catch (Exception)
-            {
-                MsgBox.Show($"Error trying to delete {lastFolder}", "Folder Delete Error!");
+                    DoWork_FillPackageGrid(parentNode.Name);
+                }
+                catch (Exception)
+                {
+                    MsgBox.Show($"Error trying to delete {lastFolder}", "Folder Delete Error!");
+                }
             }
         }
         #endregion
@@ -1336,7 +1365,7 @@ namespace OutfitOrganiser
 
         private void OnPkgMergeClicked(object sender, EventArgs e)
         {
-            // TODO - Outfit Organiser - changes to the way Merge works
+            // TODO - Outfit Organiser - merging - changes to the way Merge works
             // Ask for new name
             // Create empty .package file with new name
             // Merge selected .package files into new package
@@ -1424,15 +1453,18 @@ namespace OutfitOrganiser
 
         private void OnPkgDeleteClicked(object sender, EventArgs e)
         {
-            foreach (DataGridViewRow selectedPackageRow in gridPackageFiles.SelectedRows)
+            if (!menuItemConfirmDelete.Checked || MsgBox.Show($"Delete selected package(s)?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                string fromPackagePath = selectedPackageRow.Cells["colPackagePath"].Value as string;
+                foreach (DataGridViewRow selectedPackageRow in gridPackageFiles.SelectedRows)
+                {
+                    string fromPackagePath = selectedPackageRow.Cells["colPackagePath"].Value as string;
 
-                // Recycle Bin - see https://social.microsoft.com/Forums/en-US/f2411a7f-34b6-4f30-a25f-9d456fe1c47b/c-send-files-or-folder-to-recycle-bin?forum=netfxbcl
-                Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(fromPackagePath, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                    // Recycle Bin - see https://social.microsoft.com/Forums/en-US/f2411a7f-34b6-4f30-a25f-9d456fe1c47b/c-send-files-or-folder-to-recycle-bin?forum=netfxbcl
+                    Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(fromPackagePath, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                }
+
+                DoWork_FillPackageGrid(lastFolder);
             }
-
-            DoWork_FillPackageGrid(lastFolder);
         }
 
         private bool PackageRename(DataGridViewRow packageRow)
@@ -1462,7 +1494,7 @@ namespace OutfitOrganiser
                 {
                     File.Move(fromPackagePath, toPackagePath);
 
-                    packageRow.Cells["colName"].Value = renameTo;
+                    packageRow.Cells["colPackageFile"].Value = renameTo;
                     packageRow.Cells["colPackagePath"].Value = toPackagePath;
 
                     foreach (DataRow resourceRow in dataResources.Rows)
@@ -2565,17 +2597,6 @@ namespace OutfitOrganiser
         private void UpdateEditor(OutfitDbpfData outfitData, bool append)
         {
             ignoreEdits = true;
-
-            // TODO - DBPF Library - CASThumbnails hash - testing only
-            /*
-            Cpf thumbnailOwner = outfitData.ThumbnailOwner;
-            if (thumbnailOwner != null)
-            {
-                uint thumbnailHash = Hashes.CasThumbnailHash(thumbnailOwner);
-                logger.Info($"CAS Thumbnail: {thumbnailOwner.ToString()} -> 0x0C7E9A76-0xFFFFFFFF-{thumbnailOwner.InstanceID.ToString()}-{Helper.Hex8PrefixString(thumbnailHash)}");
-            }
-            */
-            // TODO - DBPF Library - CASThumbnails hash - testing only ends
 
             uint newGenderValue = outfitData.Gender;
             if (append)
@@ -3788,6 +3809,11 @@ namespace OutfitOrganiser
         {
             Point targetPoint = treeFolders.PointToClient(new Point(e.X, e.Y));
             treeFolders.SelectedNode = treeFolders.GetNodeAt(targetPoint);
+        }
+
+        private void OnRecurseClicked(object sender, EventArgs e)
+        {
+            DoWork_FillPackageGrid(lastFolder);
         }
 
         private void OnTreeFolder_DragDrop(object sender, DragEventArgs e)

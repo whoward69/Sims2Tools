@@ -119,7 +119,7 @@ namespace OutfitOrganiser
 
             Binx binx = (Binx)package.GetResourceByEntry(binxEntry);
 
-            if (binx != null)
+            if (binx != null && binx.GetItem("objectidx") != null)
             {
                 Idr idrForBinx = (Idr)package.GetResourceByTGIR(Hashes.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
 
