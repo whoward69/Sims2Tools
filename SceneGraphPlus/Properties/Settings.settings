@@ -192,13 +192,13 @@
       <Value Profile="(Default)">DodgerBlue</Value>
     </Setting>
     <Setting Name="HlsRow" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">4</Value>
+      <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="TrksBlockColour" Type="System.String" Scope="User">
       <Value Profile="(Default)">SkyBlue</Value>
     </Setting>
     <Setting Name="TrksRow" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="AudioBlockColour" Type="System.String" Scope="User">
       <Value Profile="(Default)">LightSeaGreen</Value>

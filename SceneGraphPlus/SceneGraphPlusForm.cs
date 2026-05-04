@@ -81,7 +81,7 @@ namespace SceneGraphPlus
             Cres.TYPE, Shpe.TYPE, Gmnd.TYPE, Gmdc.TYPE,
             Txmt.TYPE, Txtr.TYPE, Lifo.TYPE,
             Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE,
-            Hls.TYPE, Trks.TYPE, Audio.TYPE };
+            Trks.TYPE, Hls.TYPE, Audio.TYPE };
 
         // When adding to this List, search for "UnderstoodStrings" (both this file and the Surface file)
         public static List<TypeInstanceID> UnderstoodStrInstances = new List<TypeInstanceID>() {
@@ -160,6 +160,7 @@ namespace SceneGraphPlus
             menuItemPrefixOptionalNames.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixOptionalNames.Name, 0) != 0);
             menuItemPrefixLowerCase.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixLowerCase.Name, 1) != 0);
             menuItemPreloadMeshes.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, 0) != 0);
+            menuItemDirectSounds.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemDirectSounds.Name, 0) != 0); OnDirectSoundsClicked(menuItemDirectSounds, null);
 
             menuItemGridCoarse.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridCoarse.Name, 0) != 0); if (menuItemGridCoarse.Checked) lastGridItem = menuItemGridCoarse;
             menuItemGridNormal.Checked = ((int)RegistryTools.GetSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridNormal.Name, 1) != 0); if (menuItemGridNormal.Checked) lastGridItem = menuItemGridNormal;
@@ -247,6 +248,7 @@ namespace SceneGraphPlus
                 RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixOptionalNames.Name, menuItemPrefixOptionalNames.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPrefixLowerCase.Name, menuItemPrefixLowerCase.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemPreloadMeshes.Name, menuItemPreloadMeshes.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Options", menuItemDirectSounds.Name, menuItemDirectSounds.Checked ? 1 : 0);
 
                 RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridCoarse.Name, menuItemGridCoarse.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Grid", menuItemGridNormal.Name, menuItemGridNormal.Checked ? 1 : 0);
@@ -472,11 +474,20 @@ namespace SceneGraphPlus
                     textBlockName.BorderStyle = BorderStyle.Fixed3D;
                 }
             }
-            else if (block.BlockName != null || (block.TypeId == Hls.TYPE || block.TypeId == Trks.TYPE || block.TypeId == Audio.TYPE))
+            else if (block.BlockName != null || (block.TypeId == Trks.TYPE || block.TypeId == Hls.TYPE || block.TypeId == Audio.TYPE))
             {
                 lblBlockName.Visible = true;
                 textBlockName.Visible = true;
                 textBlockName.Text = block.BlockName;
+
+                if (string.IsNullOrEmpty(block.BlockName))
+                {
+                    if (block.TypeId == Trks.TYPE)
+                    {
+                        List<GraphConnector> inConnectors = block.GetInConnectors();
+                        if (inConnectors.Count == 1) textBlockName.Text = inConnectors[0].Label;
+                    }
+                }
 
                 textBlockName.ReadOnly = (!block.IsEditable || block.TypeId == Mmat.TYPE || block.TypeId == Aged.TYPE);
                 textBlockName.BorderStyle = (textBlockName.ReadOnly ? BorderStyle.FixedSingle : BorderStyle.Fixed3D);
@@ -760,12 +771,14 @@ namespace SceneGraphPlus
                 toolStripSeparator8.Visible = true;
                 menuItemLoadMeshesNow.Visible = true;
                 menuItemPreloadMeshes.Visible = true;
+                menuItemDirectSounds.Visible = true;
             }
             else
             {
                 toolStripSeparator8.Visible = false;
                 menuItemLoadMeshesNow.Visible = false;
                 menuItemPreloadMeshes.Visible = false;
+                menuItemDirectSounds.Visible = true;
             }
 
             UpdateForm();
@@ -1053,7 +1066,7 @@ namespace SceneGraphPlus
                     if (entry.InstanceID == DBPFData.STR_MODELS) connectionTypeId = Cres.TYPE;
                     else if (entry.InstanceID == DBPFData.STR_MATERIALS) connectionTypeId = Txmt.TYPE;
                     else if (entry.InstanceID == DBPFData.STR_SUBSETS) connectionTypeId = Gmdc.TYPE; // This is a fudge!
-                    else if (entry.InstanceID == DBPFData.STR_SOUNDS) connectionTypeId = Hls.TYPE;
+                    else if (entry.InstanceID == DBPFData.STR_SOUNDS) connectionTypeId = (menuItemDirectSounds.Checked ? Audio.TYPE : Trks.TYPE);
 
                     if (connectionTypeId != DBPFData.TYPE_NULL)
                     {
@@ -1073,7 +1086,7 @@ namespace SceneGraphPlus
                                             {
                                                 objdBlock.ConnectTo(1, "Material Names", startBlock);
                                             }
-                                            else if (connectionTypeId == Hls.TYPE)
+                                            else if (connectionTypeId == Trks.TYPE || connectionTypeId == Audio.TYPE)
                                             {
                                                 objdBlock.ConnectTo(2, "Sound ID Names", startBlock);
                                             }
@@ -1097,9 +1110,16 @@ namespace SceneGraphPlus
 
                                 if (!string.IsNullOrWhiteSpace(link))
                                 {
-                                    if (connectionTypeId == Hls.TYPE)
+                                    if (connectionTypeId == Trks.TYPE)
                                     {
                                         startBlock.ConnectTo(index, link, AddBlockByKey(package, new BlockRef(package, connectionTypeId, new DBPFKey(connectionTypeId, (TypeGroupID)0xEB8AB356, Hashes.InstanceIDHash(link), Hashes.ResourceIDHash(link))), ref freeCol));
+                                    }
+                                    else if (connectionTypeId == Audio.TYPE)
+                                    {
+                                        string audioBlockName = $"{link}";
+                                        GraphBlock audioBlock = AddBlockByKey(package, new BlockRef(package, connectionTypeId, new DBPFKey(connectionTypeId, (TypeGroupID)0x0B8AB3CD, Hashes.InstanceIDHash(audioBlockName), Hashes.ResourceIDHash(audioBlockName))), ref freeCol);
+                                        audioBlock.BlockName = audioBlockName;
+                                        startBlock.ConnectTo(index, link, audioBlock);
                                     }
                                     else
                                     {
@@ -1469,6 +1489,18 @@ namespace SceneGraphPlus
 
                     startBlock.strData = lght.BaseLight.Name;
                 }
+                else if (res is Trks trks)
+                {
+                    TypeInstanceID instanceLo = (TypeInstanceID)trks.GetItemUInteger("0xff3c2160");
+                    TypeResourceID instanceHi = (TypeResourceID)trks.GetItemUInteger("0xff99d2d5");
+
+                    GraphBlock iniBlock = AddBlockByKey(package, new BlockRef(package, Audio.TYPE, new DBPFKey(Audio.TYPE, (TypeGroupID)0xADD550A7, res.InstanceID, res.ResourceID)), ref freeCol);
+                    iniBlock.Text = "INI";
+                    startBlock.ConnectTo(0, "ini", iniBlock);
+                    freeCol += DrawingSurface.ColumnGap;
+                    startBlock.ConnectTo(1, "hls", AddBlockByKey(package, new BlockRef(package, Hls.TYPE, new DBPFKey(Hls.TYPE, (TypeGroupID)0xEB8AB356, instanceLo, instanceHi)), ref freeCol));
+                    freeCol += DrawingSurface.ColumnGap;
+                }
                 else if (res is Hls hls)
                 {
                     if (hls.Items.Length > 0)
@@ -1476,20 +1508,10 @@ namespace SceneGraphPlus
                         for (int i = 0; i < hls.Items.Length; ++i)
                         {
                             HlsItem item = hls.Items[i];
-                            startBlock.ConnectTo(i, null, AddBlockByKey(package, new BlockRef(package, Trks.TYPE, new DBPFKey(Trks.TYPE, (TypeGroupID)0xEB8AB356, item.InstanceLo, item.InstanceHi)), ref freeCol));
+                            startBlock.ConnectTo(i, null, AddBlockByKey(package, new BlockRef(package, Audio.TYPE, new DBPFKey(Audio.TYPE, (TypeGroupID)0x0B8AB3CD, item.InstanceLo, item.InstanceHi)), ref freeCol));
                             freeCol += DrawingSurface.ColumnGap;
                         }
                     }
-                }
-                else if (res is Trks trks)
-                {
-                    TypeInstanceID instanceLo = (TypeInstanceID)trks.GetItemUInteger("0xff3c2160");
-                    TypeResourceID instanceHi = (TypeResourceID)trks.GetItemUInteger("0xff99d2d5");
-
-                    startBlock.ConnectTo(0, "ini", AddBlockByKey(package, new BlockRef(package, Audio.TYPE, new DBPFKey(Audio.TYPE, (TypeGroupID)0xADD550A7, instanceLo, instanceHi)), ref freeCol));
-                    freeCol += DrawingSurface.ColumnGap;
-                    startBlock.ConnectTo(1, "audio", AddBlockByKey(package, new BlockRef(package, Audio.TYPE, new DBPFKey(Audio.TYPE, (TypeGroupID)0x0B8AB3CD, instanceLo, instanceHi)), ref freeCol));
-                    freeCol += DrawingSurface.ColumnGap;
                 }
                 else if (res is Audio audio)
                 {
@@ -1639,11 +1661,11 @@ namespace SceneGraphPlus
                 // LAMB, LDIR, LPNT and LSPT
                 return null;
             }
-            else if (res is Hls)
+            else if (res is Trks)
             {
                 return null;
             }
-            else if (res is Trks)
+            else if (res is Hls)
             {
                 return null;
             }
@@ -1739,11 +1761,11 @@ namespace SceneGraphPlus
                 // LAMB, LDIR, LPNT and LSPT
                 return lght.KeyName;
             }
-            else if (res is Hls)
+            else if (res is Trks)
             {
                 return null;
             }
-            else if (res is Trks)
+            else if (res is Hls)
             {
                 return null;
             }
@@ -2034,6 +2056,11 @@ namespace SceneGraphPlus
             surface.ConnectorsOver = menuItemConnectorsOver.Checked;
         }
 
+        private void OnDirectSoundsClicked(object sender, EventArgs e)
+        {
+            surface.DirectSounds = menuItemDirectSounds.Checked;
+        }
+
         private void OnSaveAll(object sender, EventArgs e)
         {
             surface.SaveAll(menuItemAutoBackup.Checked, menuItemSetOptionalNames.Checked, menuItemClearOptionalNames.Checked, menuItemPrefixOptionalNames.Checked, IsPrefixLowerCase);
@@ -2092,6 +2119,8 @@ namespace SceneGraphPlus
         private void OnOptionsMenuOpening(object sender, EventArgs e)
         {
             menuItemLoadMeshesNow.Enabled = !(meshCachesLoaded || meshCachesLoading);
+
+            menuItemDirectSounds.Enabled = (packageFiles.Count == 0);
         }
 
         private void OnCreatorClicked(object sender, EventArgs e)

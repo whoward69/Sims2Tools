@@ -101,6 +101,8 @@ namespace SceneGraphPlus
             this.textBlockPackagePath = new System.Windows.Forms.TextBox();
             this.btnFixIssues = new System.Windows.Forms.Button();
             this.btnFixTgi = new System.Windows.Forms.Button();
+            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemDirectSounds = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel2.SuspendLayout();
@@ -263,20 +265,20 @@ namespace SceneGraphPlus
             // 
             this.menuItemAdvanced.CheckOnClick = true;
             this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAdvanced.Size = new System.Drawing.Size(144, 22);
             this.menuItemAdvanced.Text = "Advanced";
             this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(141, 6);
             // 
             // menuItemAutoBackup
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(144, 22);
             this.menuItemAutoBackup.Text = "Auto-Backup";
             // 
             // menuOptions
@@ -294,7 +296,9 @@ namespace SceneGraphPlus
             this.menuItemPrefixLowerCase,
             this.toolStripSeparator7,
             this.menuItemPreloadMeshes,
-            this.menuItemLoadMeshesNow});
+            this.menuItemLoadMeshesNow,
+            this.toolStripSeparator10,
+            this.menuItemDirectSounds});
             this.menuOptions.Name = "menuOptions";
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
@@ -396,6 +400,19 @@ namespace SceneGraphPlus
             this.menuItemLoadMeshesNow.Size = new System.Drawing.Size(281, 22);
             this.menuItemLoadMeshesNow.Text = "Load SG Cache Now";
             this.menuItemLoadMeshesNow.Click += new System.EventHandler(this.OnLoadMeshesNowClicked);
+            // 
+            // toolStripSeparator10
+            // 
+            this.toolStripSeparator10.Name = "toolStripSeparator10";
+            this.toolStripSeparator10.Size = new System.Drawing.Size(278, 6);
+            // 
+            // menuItemDirectSounds
+            // 
+            this.menuItemDirectSounds.CheckOnClick = true;
+            this.menuItemDirectSounds.Name = "menuItemDirectSounds";
+            this.menuItemDirectSounds.Size = new System.Drawing.Size(281, 22);
+            this.menuItemDirectSounds.Text = "Sounds skip TRKS and HLS";
+            this.menuItemDirectSounds.Click += new System.EventHandler(this.OnDirectSoundsClicked);
             // 
             // menuGrid
             // 
@@ -788,5 +805,7 @@ namespace SceneGraphPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemDdsUtilsPath;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
         private System.Windows.Forms.ToolStripMenuItem menuItemCreatorDetails;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDirectSounds;
     }
 }

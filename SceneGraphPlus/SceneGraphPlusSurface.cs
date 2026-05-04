@@ -116,6 +116,8 @@ namespace SceneGraphPlus.Surface
 
         private bool autoFilterAlign = false;
 
+        private bool directSounds = false;
+
         public bool HideMissingBlocks
         {
             set
@@ -163,6 +165,12 @@ namespace SceneGraphPlus.Surface
             get => autoFilterAlign;
             set => autoFilterAlign = value;
         }
+
+        public bool DirectSounds
+        {
+            set => directSounds = value;
+        }
+
         #endregion
 
         #region Surface Selected Shape Tracking
@@ -930,7 +938,7 @@ namespace SceneGraphPlus.Surface
 
                 FixIssues(editBlock);
 
-                if (editBlock.TypeId == Hls.TYPE || editBlock.TypeId == Trks.TYPE || editBlock.TypeId == Audio.TYPE)
+                if (editBlock.TypeId == Trks.TYPE || editBlock.TypeId == Hls.TYPE || editBlock.TypeId == Audio.TYPE)
                 {
                     foreach (GraphConnector connector in editBlock.SoleParent.OutConnectors)
                     {
@@ -2379,19 +2387,34 @@ namespace SceneGraphPlus.Surface
                             {
                                 dropOntoBlock.BorderVisible = false;
 
-                                // Clone the list of in connectors, so we can modify the original within the next loop
-                                List<GraphConnector> inConnectors = dropOntoBlock.GetInConnectors();
-                                foreach (GraphConnector connector in inConnectors)
-                                {
-                                    connector.SetEndBlock(firstSelectedBlock, true);
-                                    dropOntoBlock.UnlinkFrom(connector);
+                                bool makesDirty = true;
 
-                                    connector.StartBlock.SetDirty();
+                                if (directSounds && (Audio.TYPE == firstSelectedBlock.TypeId) && (Str.TYPE == dropOntoBlock.SoleParent?.TypeId))
+                                {
+                                    // TODO - SceneGraph Plus - dropping an Audio block onto a child of STR# Sounds (0x4132) directly
+                                    // Before we do this, we need to rename the block being dropped
+                                    firstSelectedBlock.BlockName = dropOntoBlock.BlockName;
+                                    firstSelectedBlock.UpdateSoundName(dropOntoBlock.BlockName);
+                                    owningForm.UpdateEditor(firstSelectedBlock);
+
+                                    makesDirty = false;
                                 }
 
-                                if (dropOntoBlock.IsMissingOrClone)
                                 {
-                                    if (dropOntoBlock.GetInConnectors().Count == 0) dropOntoBlock.Discard();
+                                    // Clone the list of in connectors, so we can modify the original within the next loop
+                                    List<GraphConnector> inConnectors = dropOntoBlock.GetInConnectors();
+                                    foreach (GraphConnector connector in inConnectors)
+                                    {
+                                        connector.SetEndBlock(firstSelectedBlock, makesDirty);
+                                        dropOntoBlock.UnlinkFrom(connector);
+
+                                        if (makesDirty) connector.StartBlock.SetDirty();
+                                    }
+
+                                    if (dropOntoBlock.IsMissingOrClone)
+                                    {
+                                        if (dropOntoBlock.GetInConnectors().Count == 0) dropOntoBlock.Discard();
+                                    }
                                 }
                             }
 
@@ -2781,18 +2804,6 @@ namespace SceneGraphPlus.Surface
                                 if (hoverBlock.IsAvailable)
                                 {
                                     toolTip = $"{toolTip}\r\nin {owningForm.GetAvailablePath(hoverBlock.Key)}";
-                                }
-
-                                // TODO - CAS Thumbnails - TESTING ONLY
-                                if (hoverBlock.OriginalKey.TypeID == Gzps.TYPE)
-                                {
-                                    CacheableDbpfFile gzpsPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
-
-                                    Gzps gzps = (Gzps)gzpsPackage.GetResourceByKey(hoverBlock.OriginalKey);
-
-                                    DBPFKey casThumbnailKey = Hashes.CasThumbnailHash(gzps);
-
-                                    toolTip = $"{toolTip}\r\nCAS Thumbnail - {casThumbnailKey}";
                                 }
 
                                 toolTip = $"{toolTip}{hoverBlock.IssuesToolTip}";
@@ -4031,7 +4042,7 @@ namespace SceneGraphPlus.Surface
                         {
                             rcol.FixTGIR();
                         }
-                        else if (res is Hls || res is Trks || res is Audio)
+                        else if (res is Trks || res is Hls || res is Audio)
                         {
                             res.ChangeIR(block.Key.InstanceID, block.Key.ResourceID);
                         }
@@ -4108,13 +4119,13 @@ namespace SceneGraphPlus.Surface
             {
                 // AGED has no name
             }
-            else if (res is Hls)
-            {
-                // HLS has no name
-            }
             else if (res is Trks)
             {
                 // TRKS has no name
+            }
+            else if (res is Hls)
+            {
+                // HLS has no name
             }
             else if (res is Audio)
             {
@@ -4248,16 +4259,22 @@ namespace SceneGraphPlus.Surface
             // "UnderstoodTypes" - when adding a new resource type, need to update this block
             if (res is Str str)
             {
-                Trace.Assert(endBlock.TypeId == Cres.TYPE || endBlock.TypeId == Txmt.TYPE || endBlock.TypeId == Hls.TYPE, "Expecting CRES, TXMT or HLS for EndBlock");
+                Trace.Assert(endBlock.TypeId == Cres.TYPE || endBlock.TypeId == Txmt.TYPE || endBlock.TypeId == (directSounds ? Audio.TYPE : Trks.TYPE), $"Expecting CRES, TXMT or {(directSounds ? "AUDIO" : "TRKS")} for EndBlock");
 
                 List<StrItem> items = str.LanguageItems(Languages.Default);
                 Trace.Assert(index < items.Count, "Index out of range");
 
-                if (endBlock.TypeId == Hls.TYPE)
+                if (endBlock.TypeId == Trks.TYPE)
                 {
-                    Trace.Assert(str.InstanceID == DBPFData.STR_SOUNDS, "HLS expected for Sounds");
+                    Trace.Assert(str.InstanceID == DBPFData.STR_SOUNDS, "TRKS expected for Sounds");
 
                     items[index].Title = endBlock.BlockName;
+                }
+                else if (endBlock.TypeId == Audio.TYPE)
+                {
+                    Trace.Assert(str.InstanceID == DBPFData.STR_SOUNDS, "AUDIO expected for Sounds");
+
+                    // items[index].Title = endBlock.BlockName; // We don't need to do this as we set the AUDIO TGIR based on the STR# entry
                 }
                 else
                 {
@@ -4525,17 +4542,17 @@ namespace SceneGraphPlus.Surface
             {
                 Trace.Assert(false, "Lights (LAMB, LDIR, LPNT, LSPT) do not have child resources");
             }
-            else if (res is Hls hls)
-            {
-                Trace.Assert(endBlock.TypeId == Trks.TYPE, "Expecting TRKS for EndBlock");
-                hls.Items[index].InstanceLo = endBlock.Key.InstanceID;
-                hls.Items[index].InstanceHi = endBlock.Key.ResourceID;
-            }
             else if (res is Trks trks)
             {
-                Trace.Assert(endBlock.TypeId == Audio.TYPE, "Expecting AUDIO for EndBlock");
+                Trace.Assert(endBlock.TypeId == Hls.TYPE, "Expecting HLS for EndBlock");
                 trks.SetItemUInteger("0xff3c2160", endBlock.Key.InstanceID.AsUInt());
                 trks.SetItemUInteger("0xff99d2d5", endBlock.Key.ResourceID.AsUInt());
+            }
+            else if (res is Hls hls)
+            {
+                Trace.Assert(endBlock.TypeId == Audio.TYPE, "Expecting AUDIO for EndBlock");
+                hls.Items[index].InstanceLo = endBlock.Key.InstanceID;
+                hls.Items[index].InstanceHi = endBlock.Key.ResourceID;
             }
             else if (res is Audio)
             {
