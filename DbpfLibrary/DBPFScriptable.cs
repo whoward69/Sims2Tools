@@ -22,6 +22,8 @@ namespace Sims2Tools.DBPF
     {
         bool Assert(string item, ScriptValue value);
 
+        ScriptValue Value(string item);
+
         bool Assignment(string item, ScriptValue value);
 
         IDbpfScriptable Indexed(int index, bool clone);
@@ -49,6 +51,24 @@ namespace Sims2Tools.DBPF
 
             return false;
         }
+
+        public static ScriptValue TGIRValue(DBPFResource res, string item)
+        {
+            if (item.Equals("group"))
+            {
+                return new ScriptValue(res.GroupID.ToString());
+            }
+            else if (item.Equals("instance"))
+            {
+                return new ScriptValue(res.InstanceID.ToString());
+            }
+            else if (item.Equals("resource"))
+            {
+                return new ScriptValue(res.ResourceID.ToString());
+            }
+
+            return null;
+        }
     }
 
     public class ScriptValue
@@ -70,6 +90,26 @@ namespace Sims2Tools.DBPF
             }
 
             return null;
+        }
+
+        public ScriptValue(byte value) : this((ushort)value)
+        {
+        }
+
+        public ScriptValue(short value) : this((int)value)
+        {
+        }
+
+        public ScriptValue(ushort value) : this((uint)value)
+        {
+        }
+
+        public ScriptValue(int value) : this(value.ToString())
+        {
+        }
+
+        public ScriptValue(uint value) : this(value.ToString())
+        {
         }
 
         public ScriptValue(string value) : this(value, null)

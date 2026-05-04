@@ -217,6 +217,16 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 
             return base.Assignment(item, sv);
         }
+
+        public override ScriptValue Value(string item)
+        {
+            if (HasProperty(item))
+            {
+                return new ScriptValue(GetProperty(item));
+            }
+
+            return base.Value(item);
+        }
         #endregion
 
         public override XmlElement AddXml(XmlElement parent)

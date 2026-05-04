@@ -34,12 +34,15 @@ using Sims2Tools.DBPF.SceneGraph.TXMT;
 using Sims2Tools.DBPF.SceneGraph.TXTR;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.Sounds;
+using Sims2Tools.DBPF.Sounds.HLS;
+using Sims2Tools.DBPF.Sounds.TRKS;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
 using Sims2Tools.DBPF.UI;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFLR;
+using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XWNT;
 using Sims2Tools.Exporter;
 using Sims2Tools.Files;
@@ -52,7 +55,6 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace DbpfLister
 {
@@ -76,8 +78,15 @@ namespace DbpfLister
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            RegistryTools.SaveAppSettings(DbpfListerApp.RegistryKey, DbpfListerApp.AppVersionMajor, DbpfListerApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(DbpfListerApp.RegistryKey, this);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(DbpfListerApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(DbpfListerApp.RegistryKey, DbpfListerApp.AppVersionMajor, DbpfListerApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(DbpfListerApp.RegistryKey, this);
+            }
         }
 
         private void OnGoClicked(object sender, EventArgs e)
@@ -85,7 +94,16 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
-            FindSounds("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+            // BuildCasClothingCache();
+
+            // FindTxmtTypes("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // FindXfncProperties("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // DumpMaxisGzpsData("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+
+            // FindSounds("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+            FindTracks("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
             // FindFwavRefs("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
@@ -200,10 +218,330 @@ namespace DbpfLister
             Clipboard.SetText(textMessages.Text);
         }
 
+        private void BuildCasClothingCache()
+        {
+            Dictionary<DBPFKey, CasClothingData> casClothingCache = new Dictionary<DBPFKey, CasClothingData>();
+
+            List<string> reverseLoadOrder = new List<string>();
+
+            foreach (string pathKey in Sims2ToolsLib.Sims2PathsInLoadOrder)
+            {
+                reverseLoadOrder.Insert(0, pathKey);
+            }
+
+            try
+            {
+                textMessages.AppendText($"Hunting GZPS in\r\n");
+
+                foreach (string pathKey in reverseLoadOrder)
+                {
+                    string baseFolder = RegistryTools.GetPath(Sims2ToolsLib.RegistryKey, pathKey);
+
+                    if (Directory.Exists(baseFolder))
+                    {
+                        textMessages.AppendText($"  {baseFolder}\r\n");
+
+                        foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+                        {
+                            using (DBPFFile package = new DBPFFile(packagePath))
+                            {
+                                // Find all the GZPS resources
+                                foreach (DBPFEntry entry in package.GetEntriesByType(Gzps.TYPE))
+                                {
+                                    if (casClothingCache.ContainsKey(entry))
+                                    {
+                                        continue;
+                                    }
+
+                                    Gzps gzps = (Gzps)package.GetResourceByEntry(entry);
+
+                                    if (gzps.HasItem("numoverrides") && gzps.GetItem("numoverrides").UIntegerValue > 0)
+                                    {
+                                        CasClothingData data = new CasClothingData(gzps, packagePath);
+                                        casClothingCache.Add(data.resKey, data);
+                                    }
+                                }
+
+                                package.Close();
+                            }
+                        }
+                    }
+                }
+
+                textMessages.AppendText($"Found {casClothingCache.Count} GZPS clothing resources\r\n");
+
+                using (StreamWriter writer = new StreamWriter("C:/Users/whowa/Desktop/MaxisCasThumbnailData.csv"))
+                {
+                    writer.WriteLine("Type,Group,Instance,Resource,Name,Desc,Gender,Age,Package Path");
+
+                    foreach (CasClothingData data in casClothingCache.Values)
+                    {
+                        writer.WriteLine($"{data.resKey.TypeID},{data.resKey.GroupID},{data.resKey.InstanceID},{data.resKey.ResourceID},{data.resName},{data.resDesc},{data.resGender},{data.resAge},{data.resPackagePath}");
+                    }
+
+                    writer.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                textMessages.AppendText($"{e.Message}\r\n");
+                textMessages.AppendText($"{e.StackTrace}\r\n");
+            }
+        }
+
+        private void DumpMaxisGzpsData(string baseFolder)
+        {
+            try
+            {
+                Dictionary<DBPFKey, Gzps> missingIdrs = new Dictionary<DBPFKey, Gzps>();
+
+                using (StreamWriter writer = new StreamWriter("C:/Users/whowa/Desktop/MaxisGzpsData.csv"))
+                {
+                    writer.WriteLine("Package,Group ID,Instance ID,Name,Age,Gender,Version,Product,Species,Parts,Outfit,Flags,Type,Category,Shoe,CRES,SHPE,Subset,TXMT");
+
+                    foreach (string gzpsPackagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+                    {
+                        if (
+                            gzpsPackagePath.Contains("\\Characters\\") ||
+                            gzpsPackagePath.Contains("\\Lots\\") ||
+                            gzpsPackagePath.Contains("\\LotCatalog\\") ||
+                            gzpsPackagePath.Contains("\\GlobalLots\\") ||
+                            gzpsPackagePath.Contains("\\LotTemplates\\")
+                           ) continue;
+
+                        if (
+                            gzpsPackagePath.Contains("\\Collections\\") ||
+                            gzpsPackagePath.Contains("\\Lighting\\") ||
+                            gzpsPackagePath.Contains("\\ObjectScripts\\") ||
+                            gzpsPackagePath.Contains("\\Sound\\") ||
+                            gzpsPackagePath.Contains("\\Text\\") ||
+                            gzpsPackagePath.Contains("\\Thumbnails\\") ||
+                            gzpsPackagePath.Contains("\\UI\\") ||
+                            gzpsPackagePath.Contains("\\Wants\\")
+                           ) continue;
+
+                        if (
+                            gzpsPackagePath.Contains("\\globalcatbin.bundle.package") ||
+                            gzpsPackagePath.Contains("\\HolidayNewYearsPartyPhoneCall_Override.package") ||
+                            gzpsPackagePath.Contains("\\SPObjects.package")
+                           ) continue;
+
+                        if (
+                            gzpsPackagePath.Contains("\\SP8\\TSData\\Res\\Objects\\objects.package") ||
+                            gzpsPackagePath.Contains("\\SP8\\TSData\\Res\\Materials\\Materials.package") ||
+                            gzpsPackagePath.Contains("\\SP8\\TSData\\Res\\Catalog\\Skins\\Skins.package") ||
+                            gzpsPackagePath.Contains("\\SP8\\TSData\\Res\\Catalog\\Materials\\Materials.package") ||
+                            gzpsPackagePath.Contains("\\SP8\\TSData\\Res\\Catalog\\CANHObjects\\catcanhobjects.bundle.package") ||
+                            gzpsPackagePath.Contains("\\SP8\\TSData\\Res\\Catalog\\Patterns\\catpatterns.bundle.package")
+                           ) continue;
+
+                        if (
+                            gzpsPackagePath.Contains("\\FaceInfo.package") ||
+                            gzpsPackagePath.Contains("\\effects.package")
+                           ) continue;
+
+                        textMessages.AppendText($"{gzpsPackagePath}\r\n");
+
+                        using (DBPFFile package = new DBPFFile(gzpsPackagePath))
+                        {
+                            foreach (DBPFEntry entry in package.GetEntriesByType(Gzps.TYPE))
+                            {
+                                Gzps gzps = (Gzps)package.GetResourceByEntry(entry);
+
+                                if (string.IsNullOrEmpty(gzps.Name)) continue;
+
+                                DBPFKey idrKey = new DBPFKey(Idr.TYPE, entry);
+                                Idr idr = (Idr)package.GetResourceByKey(idrKey);
+
+                                if (idr == null)
+                                {
+                                    if (!missingIdrs.ContainsKey(idrKey)) missingIdrs.Add(idrKey, gzps);
+                                }
+                                else
+                                {
+                                    CpfItem item;
+
+                                    item = gzps.GetItem("age");
+                                    string age = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                    item = gzps.GetItem("gender");
+                                    string gender = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                    item = gzps.GetItem("version");
+                                    string version = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                    item = gzps.GetItem("product");
+                                    string product = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                    item = gzps.GetItem("species");
+                                    string species = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                    item = gzps.GetItem("parts");
+                                    string parts = item != null ? Helper.Hex4PrefixString(item.UIntegerValue) : "";
+
+                                    item = gzps.GetItem("outfit");
+                                    string outfit = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                    item = gzps.GetItem("flags");
+                                    string flags = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                    item = gzps.GetItem("type");
+                                    string type = item != null ? item.StringValue : "";
+
+                                    item = gzps.GetItem("category");
+                                    string category = item != null ? Helper.Hex4PrefixString(item.UIntegerValue) : "";
+
+                                    item = gzps.GetItem("shoe");
+                                    string shoe = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                    writer.Write($"{gzpsPackagePath.Substring(baseFolder.Length + 1)},{gzps.GroupID},{gzps.InstanceID},{gzps.Name},{age},{gender},{version},{product},{species},{parts},{outfit},{flags},{type},{category},{shoe}");
+
+                                    item = gzps.GetItem("resourcekeyidx");
+                                    string cres = item != null ? idr.GetItem(item.UIntegerValue).ToString() : "";
+                                    writer.Write($",{cres}");
+
+                                    item = gzps.GetItem("shapekeyidx");
+                                    string shpe = item != null ? idr.GetItem(item.UIntegerValue).ToString() : "";
+                                    writer.Write($",{shpe}");
+
+                                    for (uint subset = 0; subset < gzps.GetItem("numoverrides").UIntegerValue; ++subset)
+                                    {
+                                        writer.Write($",{gzps.GetItem($"override{subset}subset").StringValue}");
+                                        writer.Write($",{idr.GetItem(gzps.GetItem($"override{subset}resourcekeyidx").UIntegerValue)}");
+                                    }
+
+                                    writer.WriteLine();
+                                }
+                            }
+
+                            package.Close();
+                        }
+                    }
+
+                    if (missingIdrs.Count > 0)
+                    {
+                        HashSet<DBPFKey> missingKeys = new HashSet<DBPFKey>(missingIdrs.Keys);
+
+                        foreach (string idrPackagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+                        {
+                            if (
+                                idrPackagePath.Contains("\\Characters\\") ||
+                                idrPackagePath.Contains("\\Lots\\") ||
+                                idrPackagePath.Contains("\\LotCatalog\\") ||
+                                idrPackagePath.Contains("\\GlobalLots\\") ||
+                                idrPackagePath.Contains("\\LotTemplates\\")
+                               ) continue;
+
+                            if (
+                                idrPackagePath.Contains("\\Collections\\") ||
+                                idrPackagePath.Contains("\\Lighting\\") ||
+                                idrPackagePath.Contains("\\ObjectScripts\\") ||
+                                idrPackagePath.Contains("\\Sound\\") ||
+                                idrPackagePath.Contains("\\Text\\") ||
+                                idrPackagePath.Contains("\\Thumbnails\\") ||
+                                idrPackagePath.Contains("\\UI\\") ||
+                                idrPackagePath.Contains("\\Wants\\")
+                               ) continue;
+
+                            if (
+                                idrPackagePath.Contains("\\globalcatbin.bundle.package") ||
+                                idrPackagePath.Contains("\\HolidayNewYearsPartyPhoneCall_Override.package") ||
+                                idrPackagePath.Contains("\\SPObjects.package")
+                               ) continue;
+
+                            if (
+                                idrPackagePath.Contains("\\SP8\\TSData\\Res\\Objects\\objects.package") ||
+                                idrPackagePath.Contains("\\SP8\\TSData\\Res\\Materials\\Materials.package") ||
+                                idrPackagePath.Contains("\\SP8\\TSData\\Res\\Catalog\\Skins\\Skins.package") ||
+                                idrPackagePath.Contains("\\SP8\\TSData\\Res\\Catalog\\Materials\\Materials.package") ||
+                                idrPackagePath.Contains("\\SP8\\TSData\\Res\\Catalog\\CANHObjects\\catcanhobjects.bundle.package") ||
+                                idrPackagePath.Contains("\\SP8\\TSData\\Res\\Catalog\\Patterns\\catpatterns.bundle.package")
+                               ) continue;
+
+                            if (
+                                idrPackagePath.Contains("\\FaceInfo.package") ||
+                                idrPackagePath.Contains("\\effects.package")
+                               ) continue;
+
+                            using (DBPFFile package = new DBPFFile(idrPackagePath))
+                            {
+                                foreach (DBPFEntry entry in package.GetEntriesByType(Idr.TYPE))
+                                {
+                                    if (missingIdrs.TryGetValue(entry, out Gzps gzps))
+                                    {
+                                        missingKeys.Remove(entry);
+
+                                        Idr idr = (Idr)package.GetResourceByEntry(entry);
+
+                                        CpfItem item;
+
+                                        item = gzps.GetItem("age");
+                                        string age = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                        item = gzps.GetItem("gender");
+                                        string gender = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                        item = gzps.GetItem("version");
+                                        string version = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                        item = gzps.GetItem("product");
+                                        string product = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                        item = gzps.GetItem("species");
+                                        string species = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                        item = gzps.GetItem("parts");
+                                        string parts = item != null ? Helper.Hex4PrefixString(item.UIntegerValue) : "";
+
+                                        item = gzps.GetItem("outfit");
+                                        string outfit = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                        item = gzps.GetItem("flags");
+                                        string flags = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                        item = gzps.GetItem("type");
+                                        string type = item != null ? item.StringValue : "";
+
+                                        item = gzps.GetItem("category");
+                                        string category = item != null ? Helper.Hex4PrefixString(item.UIntegerValue) : "";
+
+                                        item = gzps.GetItem("shoe");
+                                        string shoe = item != null ? Helper.Hex2PrefixString(item.UIntegerValue) : "";
+
+                                        writer.Write($"{idrPackagePath.Substring(baseFolder.Length + 1)},{gzps.GroupID},{gzps.InstanceID},{gzps.Name},{age},{gender},{version},{product},{species},{parts},{outfit},{flags},{type},{category},{shoe}");
+
+                                        writer.Write($",{idr.GetItem(gzps.GetItem("resourcekeyidx").UIntegerValue)}");
+                                        writer.Write($",{idr.GetItem(gzps.GetItem("shapekeyidx").UIntegerValue)}");
+
+                                        for (uint subset = 0; subset < gzps.GetItem("numoverrides").UIntegerValue; ++subset)
+                                        {
+                                            writer.Write($",{gzps.GetItem($"override{subset}subset").StringValue}");
+                                            writer.Write($",{idr.GetItem(gzps.GetItem($"override{subset}resourcekeyidx").UIntegerValue)}");
+                                        }
+
+                                        writer.WriteLine();
+                                    }
+                                }
+
+                                package.Close();
+                            }
+                        }
+
+                        textMessages.AppendText($"{missingKeys.Count} GZPS resources without a 3IDR\r\n");
+                    }
+
+                    writer.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                textMessages.AppendText($"{e.Message}\r\n");
+            }
+        }
+
         private void FindSounds(string baseFolder)
         {
             Dictionary<DBPFKey, List<string>> soundsByKey = new Dictionary<DBPFKey, List<string>>();
-
             foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
             {
                 try
@@ -256,12 +594,12 @@ namespace DbpfLister
 
             using (StreamWriter writer = new StreamWriter($"C:/Users/whowa/Desktop/Sims2Sounds.csv"))
             {
-                writer.WriteLine("Group ID,Resource ID,Instance ID,Format,Path(s)");
+                writer.WriteLine("Type ID,Group ID,Resource ID,Instance ID,Format,Path(s)");
 
 
                 foreach (DBPFKey key in soundsByKey.Keys)
                 {
-                    writer.Write($"{key.GroupID},{key.ResourceID},{key.InstanceID}");
+                    writer.Write($"{key.TypeID},{key.GroupID},{key.ResourceID},{key.InstanceID}");
 
                     foreach (string s in soundsByKey[key])
                     {
@@ -273,7 +611,44 @@ namespace DbpfLister
 
                 writer.Close();
             }
+        }
 
+        private void FindTracks(string baseFolder)
+        {
+            using (StreamWriter writer = new StreamWriter($"C:/Users/whowa/Desktop/Sims2Tracks.csv"))
+            {
+                writer.WriteLine("Key,Path");
+
+                foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+                {
+                    try
+                    {
+                        using (DBPFFile package = new DBPFFile(packagePath))
+                        {
+                            string relPath = packagePath.Substring(baseFolder.Length + 1);
+
+                            textMessages.AppendText($"{relPath}\r\n");
+
+                            foreach (DBPFEntry entry in package.GetEntriesByType(Trks.TYPE))
+                            {
+                                writer.WriteLine($"{entry},{relPath}");
+                            }
+
+                            foreach (DBPFEntry entry in package.GetEntriesByType(Hls.TYPE))
+                            {
+                                writer.WriteLine($"{entry},{relPath}");
+                            }
+
+                            package.Close();
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+
+                writer.Close();
+            }
         }
 
         private void FindFwavRefs(string baseFolder)
@@ -896,7 +1271,7 @@ namespace DbpfLister
 
                             if (rcol is Txtr txtr)
                             {
-                                extra = $",{txtr.ImageData.Format.ToString()}";
+                                extra = $",{txtr.ImageData.Format}";
                             }
 
                             writer.WriteLine($"{rcol.TypeID},{rcol.GroupID},{rcol.InstanceID},{rcol.ResourceID},{name},{packagePath.Substring(baseFolder.Length + 1)}{extra}");
@@ -1187,6 +1562,47 @@ namespace DbpfLister
             }
         }
 
+        private void FindTxmtTypes(string baseFolder)
+        {
+            HashSet<string> seenTypes = new HashSet<string>();
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Txmt.TYPE))
+                        {
+                            try
+                            {
+                                Txmt txmt = (Txmt)package.GetResourceByEntry(entry);
+
+                                string type = txmt.MaterialDefinition.MaterialType;
+
+                                if (!seenTypes.Contains(type.ToLower()))
+                                {
+                                    textMessages.AppendText($"{type} - {txmt}\r\n");
+
+                                    seenTypes.Add(type.ToLower());
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                                textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+        }
+
         private void FindHighestShpeSubsets(string baseFolder)
         {
             int most = 0;
@@ -1348,7 +1764,10 @@ namespace DbpfLister
 
                                 if (thumbGroup != null & thumbInstance != null && sort != null)
                                 {
-                                    thumbnails.Add(sort.StringValue);
+                                    // if (sort.StringValue.Equals("effects") && thumbGroup.UIntegerValue != 0 && thumbInstance.UIntegerValue != 0)
+                                    {
+                                        thumbnails.Add(sort.StringValue);
+                                    }
                                 }
 
                                 foreach (string property in xngb.GetItemNames())
@@ -1394,6 +1813,64 @@ namespace DbpfLister
                 textMessages.AppendText($"{property}: {values.Substring(2)}\r\n");
             }
             */
+        }
+
+        private void FindXfncProperties(string baseFolder)
+        {
+            Dictionary<string, HashSet<string>> xngbPropertyValues = new Dictionary<string, HashSet<string>>();
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
+                {
+                    using (DBPFFile package = new DBPFFile(packagePath))
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Xfnc.TYPE))
+                        {
+                            try
+                            {
+                                Xfnc xfnc = (Xfnc)package.GetResourceByEntry(entry);
+
+                                CpfItem height = xfnc.GetItem("height");
+
+                                if (height == null || height.SingleValue == 0) continue;
+
+                                foreach (string property in xfnc.GetItemNames())
+                                {
+                                    if (!xngbPropertyValues.ContainsKey(property))
+                                    {
+                                        xngbPropertyValues.Add(property, new HashSet<string>());
+                                    }
+
+                                    xngbPropertyValues[property].Add(xfnc.GetItem(property).StringValue);
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                                // textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    // textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
+                }
+            }
+
+            foreach (string property in xngbPropertyValues.Keys)
+            {
+                string values = "";
+
+                foreach (string value in xngbPropertyValues[property])
+                {
+                    values = $"{values}, {value}";
+                }
+
+                textMessages.AppendText($"{property}: {values.Substring(2)}\r\n");
+            }
         }
 
         private void FindXmolNonMeshoverlay(string baseFolder)
@@ -1864,6 +2341,29 @@ namespace DbpfLister
             // textCrc24.Text = Hashes.InstanceIDHash(hashString).ToString();
             // textCrc32.Text = Hashes.ResourceIDHash(hashString).ToString();
             // textThumbHash.Text = Helper.Hex8PrefixString(Hashes.ThumbnailHash(hashString));
+        }
+
+        private class CasClothingData
+        {
+            public DBPFKey resKey;
+            public string resPackagePath;
+
+            public string resName;
+            public string resDesc;
+            public uint resAge;
+            public uint resGender;
+            public string resHairtone;
+
+            public CasClothingData(Gzps gzps, string packagePath)
+            {
+                this.resKey = new DBPFKey(gzps);
+                this.resPackagePath = packagePath;
+
+                resName = gzps.Name;
+                resAge = gzps.Age;
+                resGender = gzps.Gender;
+                resHairtone = gzps.Hairtone;
+            }
         }
     }
 }

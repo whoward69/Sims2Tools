@@ -149,6 +149,16 @@ namespace Sims2Tools.DBPF.TRCN
             return false;
         }
 
+        public ScriptValue Value(string item)
+        {
+            if (item.Equals("label"))
+            {
+                return new ScriptValue(constName);
+            }
+
+            return null;
+        }
+
         public IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();

@@ -17,6 +17,8 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.Sounds
 {
+    // See also - https://modthesims.info/t/235268 and https://www.simfileshare.net/download/5910833/
+
     public class Audio : DBPFResource
     {
         // See https://modthesims.info/wiki.php?title=2026960B

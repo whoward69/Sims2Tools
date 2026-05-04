@@ -33,6 +33,10 @@ namespace Sims2Tools.DBPF.CPF
         private List<CpfItem> items;
 
         public string Name => this.GetItem("name")?.StringValue;
+        public uint Category
+        {
+            get { CpfItem item = this.GetItem("category"); return item != null ? item.UIntegerValue : 0; }
+        }
         public uint Age
         {
             get { CpfItem item = this.GetItem("age"); return item != null ? item.UIntegerValue : 0; }
@@ -361,6 +365,23 @@ namespace Sims2Tools.DBPF.CPF
             }
 
             return false;
+        }
+
+        public ScriptValue Value(string item)
+        {
+            ScriptValue value = DbpfScriptable.TGIRValue(this, item);
+
+            if (value == null)
+            {
+                CpfItem cpfItem = GetItem(item);
+
+                if (cpfItem != null)
+                {
+                    value = new ScriptValue(cpfItem.StringValue);
+                }
+            }
+
+            return value;
         }
 
         public IDbpfScriptable Indexed(int index, bool clone)

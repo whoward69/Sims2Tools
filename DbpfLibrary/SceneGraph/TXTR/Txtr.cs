@@ -141,6 +141,16 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
 
             return base.Assignment(item, sv);
         }
+
+        public override ScriptValue Value(string item)
+        {
+            if (item.Equals("image"))
+            {
+                throw new NotImplementedException();
+            }
+
+            return base.Value(item);
+        }
         #endregion
 
         public override XmlElement AddXml(XmlElement parent)

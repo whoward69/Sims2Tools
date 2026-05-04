@@ -142,6 +142,7 @@
     <Compile Include="Exporter\Extractor.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helpers\ColourHelper.cs" />
+    <Compile Include="Helpers\AgeHelper.cs" />
     <Compile Include="Helpers\CpfHelper.cs" />
     <Compile Include="IO\PjseStringFileReader.cs" />
     <Compile Include="IO\Sims2Directory.cs" />

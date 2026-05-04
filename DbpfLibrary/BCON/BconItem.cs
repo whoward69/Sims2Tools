@@ -50,6 +50,16 @@ namespace Sims2Tools.DBPF.BCON
             throw new NotImplementedException();
         }
 
+        public ScriptValue Value(string item)
+        {
+            if (item.Equals("value"))
+            {
+                return new ScriptValue(this.value);
+            }
+
+            throw new NotImplementedException();
+        }
+
         public IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();

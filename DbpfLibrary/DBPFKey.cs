@@ -37,7 +37,7 @@ namespace Sims2Tools.DBPF
         private int tgiHash = 0;
         private int tgirHash = 0;
 
-        private string tgirString = null;
+        private string tgriString = null;
 
         public TypeTypeID TypeID => typeID;
 
@@ -94,14 +94,14 @@ namespace Sims2Tools.DBPF
             }
         }
 
-        public string TGIRString
+        public string TGRIString
         {
             get
             {
-                if (tgirString == null)
-                    tgirString = $"{DBPFData.TypeName(TypeID)}-{GroupID}-{ResourceID}-{InstanceID}";
+                if (tgriString == null)
+                    tgriString = $"{DBPFData.TypeName(TypeID)}-{GroupID}-{ResourceID}-{InstanceID}";
 
-                return tgirString;
+                return tgriString;
             }
         }
 
@@ -145,7 +145,7 @@ namespace Sims2Tools.DBPF
 
         public override int GetHashCode() => TGIRHash;
 
-        public int CompareTo(DBPFKey other) => this.TGIRString.CompareTo(other.TGIRString);
+        public int CompareTo(DBPFKey other) => this.TGRIString.CompareTo(other.TGRIString);
 
         public override string ToString() => $"{DBPFData.TypeName(TypeID)}-{GroupID}-{ResourceID}-{InstanceID}";
     }
@@ -207,6 +207,28 @@ namespace Sims2Tools.DBPF
             }
 
             return false;
+        }
+
+        public ScriptValue Value(string item)
+        {
+            if (item.Equals("type"))
+            {
+                return new ScriptValue(TypeID.ToString());
+            }
+            else if (item.Equals("group"))
+            {
+                return new ScriptValue(GroupID.ToString());
+            }
+            else if (item.Equals("instance"))
+            {
+                return new ScriptValue(InstanceID.ToString());
+            }
+            else if (item.Equals("resource"))
+            {
+                return new ScriptValue(ResourceID.ToString());
+            }
+
+            return null;
         }
 
         public IDbpfScriptable Indexed(int index, bool clone)

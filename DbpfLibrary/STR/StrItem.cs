@@ -171,6 +171,20 @@ namespace Sims2Tools.DBPF.STR
             return false;
         }
 
+        public ScriptValue Value(string item)
+        {
+            if (item.Equals("text") || item.Equals("title"))
+            {
+                return new ScriptValue(Title);
+            }
+            else if (item.Equals("desc"))
+            {
+                return new ScriptValue(Description);
+            }
+
+            return null;
+        }
+
         public IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();

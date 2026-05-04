@@ -18,6 +18,8 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.Sounds.HLS
 {
+    // See also - https://modthesims.info/t/235268 and https://www.simfileshare.net/download/5910833/
+
     public class Hls : DBPFResource
     {
         // See https://modthesims.info/wiki.php?title=7B1ACFCD

@@ -344,6 +344,32 @@ namespace Sims2Tools.DBPF.TTAB
             return false;
         }
 
+        public ScriptValue Value(string item)
+        {
+            if (item.Equals("stringid"))
+            {
+                return new ScriptValue(strindex);
+            }
+            else if (item.Equals("action"))
+            {
+                return new ScriptValue(action);
+            }
+            else if (item.Equals("guardian"))
+            {
+                return new ScriptValue(guard);
+            }
+            else if (item.Equals("flags"))
+            {
+                return new ScriptValue(flags);
+            }
+            else if (item.Equals("flags2"))
+            {
+                return new ScriptValue(flags2);
+            }
+
+            return null;
+        }
+
         public IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();

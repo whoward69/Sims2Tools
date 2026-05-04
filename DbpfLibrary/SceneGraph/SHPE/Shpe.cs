@@ -184,6 +184,16 @@ namespace Sims2Tools.DBPF.SceneGraph.SHPE
             return base.Assignment(item, sv);
         }
 
+        public override ScriptValue Value(string item)
+        {
+            if (HasSubset(item))
+            {
+                return new ScriptValue(GetSubsetMaterial(item));
+            }
+
+            return base.Value(item);
+        }
+
         public override IDbpfScriptable Indexed(int index, bool clone)
         {
             Trace.Assert(index >= 0 && index < cShape.Items.Count, $"Item index {index} out of range");

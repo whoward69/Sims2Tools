@@ -299,6 +299,11 @@ namespace Sims2Tools.DBPF.STR
             return DbpfScriptable.IsTGIRAssignment(this, item, sv);
         }
 
+        public ScriptValue Value(string item)
+        {
+            return DbpfScriptable.TGIRValue(this, item);
+        }
+
         public IDbpfScriptable Indexed(int index, bool clone)
         {
             if (!languages.ContainsKey(MetaData.Languages.Default))

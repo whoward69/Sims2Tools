@@ -17,6 +17,8 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.Sounds.TRKS
 {
+    // See also - https://modthesims.info/t/235268 and https://www.simfileshare.net/download/5910833/
+
     public class Trks : Xml
     {
         // See https://modthesims.info/wiki.php?title=0B9EB87E

@@ -112,12 +112,12 @@ namespace Sims2Tools.DBPF.Utils
             string age = "";
 
             if ((ageCode & 0x20) == 0x20) age += "baby";
-            if ((ageCode & 0x01) == 0x01) age += "toddler";
-            if ((ageCode & 0x02) == 0x02) age += "child";
-            if ((ageCode & 0x04) == 0x04) age += "teen";
-            if ((ageCode & 0x40) == 0x40) age += "youngadult";
-            if ((ageCode & 0x08) == 0x08) age += "adult";
-            if ((ageCode & 0x10) == 0x10) age += "elder";
+            else if ((ageCode & 0x01) == 0x01) age += "toddler";
+            else if ((ageCode & 0x02) == 0x02) age += "child";
+            else if ((ageCode & 0x04) == 0x04) age += "teen";
+            else if ((ageCode & 0x40) == 0x40) age += "youngadult";
+            else if ((ageCode & 0x08) == 0x08) age += "adult";
+            else if ((ageCode & 0x10) == 0x10) age += "elder";
 
             Int32 t = (Int32)ownerKey.TypeID.AsUInt();
             Int32 g = (Int32)ownerKey.GroupID.AsUInt();

@@ -13,9 +13,9 @@ namespace Sims2Tools
 {
     public class Sims2ToolsLib
     {
-        public static string Copyright = "CopyRight (c) 2020-2026 - William Howard";
+        public static readonly string Copyright = "CopyRight (c) 2020-2026 - William Howard";
 
-        public static string RegistryKey = @"WHoward\Sims2Tools";
+        public static readonly string RegistryKey = @"WHoward\Sims2Tools";
         private static readonly string Sims2PathKey = "Sims2Path"; // This is the path to the directory containing the TSBin sub-directory that contains the executable used to start the game.
         private static readonly string Sims2HomePathKey = "Sims2HomePath";
         private static readonly string Sims2InstallPathKey = "Sims2InstallPath";
@@ -42,6 +42,16 @@ namespace Sims2Tools
         private static readonly string Sims2SP8PathKey = "Sims2SP8Path"; // IKEA Home
         private static readonly string Sims2SP9PathKey = "Sims2EP9Path"; // Mansion & Garden
 #pragma warning restore CS0414
+
+        public static readonly string[] Sims2PathsInLoadOrder = {
+            Sims2BasePathKey, Sims2EP1PathKey , Sims2EP2PathKey,
+            Sims2EP3PathKey, Sims2SP1PathKey, Sims2SP2PathKey,
+            Sims2EP4PathKey, Sims2SP3PathKey,
+            Sims2EP5PathKey, Sims2SP4PathKey, Sims2SP5PathKey,
+            Sims2EP6PathKey, Sims2SP6PathKey,
+            Sims2EP7PathKey, Sims2SP7PathKey, Sims2SP8PathKey,
+            Sims2EP8PathKey, Sims2EP9PathKey
+        };
 
         // Need to keep these, but the dependancy on SimPe's configuration data has been removed
         private static readonly string SimPePathKey = "SimPePath";

@@ -281,6 +281,32 @@ namespace Sims2Tools.DBPF.OBJD
             }
         }
 
+        public ScriptValue Value(string item)
+        {
+            ScriptValue value = DbpfScriptable.TGIRValue(this, item);
+
+            if (value == null)
+            {
+                if (item.Equals("filename"))
+                {
+                    value = new ScriptValue(KeyName);
+                }
+                else if (item.Equals("guid"))
+                {
+                    value = new ScriptValue(Guid.ToString());
+                }
+                else
+                {
+                    if (Enum.TryParse(item, out ObjdIndex objdIndex))
+                    {
+                        value = new ScriptValue(GetRawData(objdIndex));
+                    }
+                }
+            }
+
+            return value;
+        }
+
         public IDbpfScriptable Indexed(int index, bool clone)
         {
             throw new NotImplementedException();
