@@ -42,7 +42,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SceneGraphPlus", "SceneGrap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfScripter", "DbpfScripter\DbpfScripter.csproj", "{8C914166-4907-48FE-9E7E-4F56691688B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClosetCleaner", "ClosetCleaner\ClosetCleaner.csproj", "{592AFB75-61A8-40FC-9DED-59DF26F55543}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FamilyManager", "FamilyManager\FamilyManager.csproj", "{592AFB75-61A8-40FC-9DED-59DF26F55543}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
