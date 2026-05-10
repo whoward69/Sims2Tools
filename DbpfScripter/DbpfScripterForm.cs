@@ -209,15 +209,23 @@ namespace DbpfScripter
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            RegistryTools.SaveAppSettings(DbpfScripterApp.RegistryKey, DbpfScripterApp.AppVersionMajor, DbpfScripterApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(DbpfScripterApp.RegistryKey, this);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(DbpfScripterApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(DbpfScripterApp.RegistryKey, DbpfScripterApp.AppVersionMajor, DbpfScripterApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(DbpfScripterApp.RegistryKey, this);
 
-            RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
-            RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey + @"\Mode", menuItemDeveloper.Name, menuItemDeveloper.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
+                RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey + @"\Mode", menuItemDeveloper.Name, menuItemDeveloper.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textTemplatePath.Name, textTemplatePath.Text);
-            RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textSavePath.Name, textSavePath.Text);
-            if (IsDevelopmentMode) RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textSaveName.Name, textSaveName.Text);
+                RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textTemplatePath.Name, textTemplatePath.Text);
+                RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textSavePath.Name, textSavePath.Text);
+
+                if (IsDevelopmentMode) RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textSaveName.Name, textSaveName.Text);
+            }
         }
 
         private void OnModeOpening(object sender, EventArgs e)
@@ -346,7 +354,9 @@ namespace DbpfScripter
             textMessages.SelectionStart = errorOffsets[currentError];
 
             int start = textMessages.GetFirstCharIndexOfCurrentLine();
-            int end = start + textMessages.Lines[textMessages.GetLineFromCharIndex(start)].Length;
+            int index = textMessages.GetLineFromCharIndex(start);
+            if (index >= textMessages.Lines.Length) index = textMessages.Lines.Length - 1;
+            int end = start + textMessages.Lines[index].Length;
 
             textMessages.Select(start, end);
             textMessages.ScrollToCaret();

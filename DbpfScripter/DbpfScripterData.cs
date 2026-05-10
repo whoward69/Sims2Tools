@@ -9,67 +9,122 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace DbpfScripter
 {
     public class ParserState
     {
-        private DbpfScripterWorker myWorker;
+        private readonly DbpfScripterWorker myWorker;
+        private readonly ScriptReader scriptReader;
 
-        private TextReader scriptReader;
-        private int scriptLineIndex = 0;
-        private string scriptLine = null;
-        private string nextToken = null;
+        private readonly Stack<ParserStateData> psDataStack = new Stack<ParserStateData>();
+        private ParserStateData psCurrentData;
 
-        private List<string> storedLines = null;
-        private int restoreLine = -1;
-
-        private int storedScriptLineIndex;
-        private string storedScriptLine = null;
-        private string storedNextToken = null;
-
-        internal int ScriptLineIndex => scriptLineIndex;
-
-        public ParserState(DbpfScripterWorker myWorker, StreamReader scriptReader)
+        public ParserState(DbpfScripterWorker myWorker, string scriptPath)
         {
             this.myWorker = myWorker;
-            this.scriptReader = scriptReader;
+            this.scriptReader = new ScriptReader(scriptPath);
+
+            psCurrentData = new ParserStateData(myWorker, scriptReader, "Main");
+            psDataStack.Push(psCurrentData);
         }
 
         #region Store and Restore
-        internal bool IsRepeating => (storedLines != null);
+        internal bool IsRepeating => (psDataStack.Count > 1);
 
-        internal void StartRepeat()
+        internal void StartRepeat(string label)
         {
-            Trace.Assert(storedLines == null, "Nested StartRepeat() is not supported");
+            ParserStateData psNewData = new ParserStateData(myWorker, scriptReader, label, psCurrentData);
+            psDataStack.Push(psNewData);
 
-            storedScriptLineIndex = scriptLineIndex;
-            storedScriptLine = scriptLine;
-            storedNextToken = nextToken;
-
-            storedLines = new List<string>();
+            psCurrentData = psNewData;
         }
 
         internal void NextRepeat()
         {
-            Trace.Assert(storedLines != null, "NextRepeat() called without a StartRepeat()");
+            psCurrentData.NextRepeat();
+        }
 
+        internal bool EndRepeat()
+        {
+            bool result = psCurrentData.EndRepeat();
+
+            psDataStack.Pop();
+            psCurrentData = psDataStack.Peek();
+
+            return result;
+        }
+        #endregion
+
+        #region Reads and Peeks
+        internal string ReadNextToken() => psCurrentData.ReadNextToken();
+
+        internal string ReadNextLine() => psCurrentData.ReadNextLine();
+
+        internal string PeekNextToken() => psCurrentData.PeekNextToken();
+        #endregion
+
+        #region Data Access
+        internal int ScriptLineIndex => psCurrentData.ScriptLineIndex;
+        #endregion
+    }
+
+    internal class ParserStateData
+    {
+        private readonly DbpfScripterWorker myWorker;
+        private readonly ScriptReader scriptReader;
+
+        private readonly string label;
+
+        private readonly long storedScriptPosition;
+
+        private readonly int storedScriptLineIndex;
+        private readonly string storedScriptLine = null;
+        private readonly string storedNextToken = null;
+
+        private int scriptLineIndex = 0;
+        private string scriptLine = null;
+        private string nextToken = null;
+
+        internal int ScriptLineIndex => scriptLineIndex;
+        public ParserStateData(DbpfScripterWorker myWorker, ScriptReader scriptReader, string label) : this(myWorker, scriptReader, label, 0, null, null)
+        {
+        }
+
+        public ParserStateData(DbpfScripterWorker myWorker, ScriptReader scriptReader, string label, ParserStateData psCurrentData) : this(myWorker, scriptReader, label, psCurrentData.scriptLineIndex, psCurrentData.scriptLine, psCurrentData.nextToken)
+        {
+        }
+
+        private ParserStateData(DbpfScripterWorker myWorker, ScriptReader scriptReader, string label, int scriptLineIndex, string scriptLine, string nextToken)
+        {
+            this.myWorker = myWorker;
+            this.scriptReader = scriptReader;
+
+            this.storedScriptPosition = scriptReader.Position;
+
+            this.label = label;
+
+            storedScriptLineIndex = this.scriptLineIndex = scriptLineIndex;
+            storedScriptLine = this.scriptLine = scriptLine;
+            storedNextToken = this.nextToken = nextToken;
+        }
+
+        #region Store and Restore
+        internal void NextRepeat()
+        {
             scriptLineIndex = storedScriptLineIndex;
             scriptLine = storedScriptLine;
             nextToken = storedNextToken;
 
-            restoreLine = 0;
+            scriptReader.Position = storedScriptPosition;
         }
 
-        internal void EndRepeat()
+        internal bool EndRepeat()
         {
-            Trace.Assert(restoreLine != 0, "EndRepeat() called when restoreLine is 0, have you called NextRepeat() erroneously?");
-
-            restoreLine = -1;
-            storedLines = null;
+            return (scriptReader.Position != storedScriptPosition);
         }
         #endregion
 
@@ -143,19 +198,6 @@ namespace DbpfScripter
         {
             string line;
 
-            if (restoreLine != -1)
-            {
-                do
-                {
-                    Trace.Assert(restoreLine < storedLines.Count, "Trying to restore more lines than were stored!");
-
-                    line = storedLines[restoreLine++];
-                    ++scriptLineIndex;
-                } while (string.IsNullOrEmpty(line));
-
-                return line;
-            }
-
             line = scriptReader.ReadLine();
             ++scriptLineIndex;
 
@@ -165,19 +207,7 @@ namespace DbpfScripter
 
                 if (line.Length == 0 || line.StartsWith("//"))
                 {
-                    if (storedLines != null)
-                    {
-                        storedLines.Add("");
-                    }
-
                     line = ReadNextLine();
-                }
-                else
-                {
-                    if (storedLines != null)
-                    {
-                        storedLines.Add(line);
-                    }
                 }
             }
 
@@ -206,5 +236,58 @@ namespace DbpfScripter
             return (c == ' ' || IsSpecialChar(c));
         }
         #endregion
+
+        public override string ToString()
+        {
+            return $"{label}";
+        }
+    }
+
+
+    public class ScriptReader
+    {
+        private readonly string[] lines;
+        private long position = -1;
+
+        public ScriptReader(string scriptPath)
+        {
+            lines = File.ReadAllLines(scriptPath);
+        }
+
+        public long Position
+        {
+            get => position;
+            set => position = value;
+        }
+
+        public string ReadLine()
+        {
+            if (position >= (lines.Length - 1)) return null;
+
+            return lines[++position];
+        }
+    }
+
+
+    public class Options
+    {
+        private readonly Dictionary<string, ScriptValue> options = new Dictionary<string, ScriptValue>();
+
+        public void Add(string option, ScriptValue value)
+        {
+            options.Remove(option);
+
+            options.Add(option, value);
+        }
+
+        public bool IsTrue(string option)
+        {
+            if (options.TryGetValue(option, out ScriptValue value))
+            {
+                return value.IsTrue;
+            }
+
+            return true;
+        }
     }
 }
