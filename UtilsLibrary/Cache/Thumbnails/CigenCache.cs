@@ -216,7 +216,7 @@ namespace Sims2Tools.Cache.Thumbnails
 #endif
             }
 
-            logger.Debug($"CigenCache: Merged {gameFileKeys.Count} keyed entries in {sw.ElapsedMilliseconds/1000.0}s");
+            logger.Debug($"CigenCache: Merged {gameFileKeys.Count} keyed entries in {sw.ElapsedMilliseconds / 1000.0}s");
             sw.Stop();
 
             return;

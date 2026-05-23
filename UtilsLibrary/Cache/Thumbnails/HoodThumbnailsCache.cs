@@ -179,7 +179,7 @@ namespace Sims2Tools.Cache.Thumbnails
 #endif
             }
 
-            logger.Debug($"CANHObjectsThumbnailsCache: Merged {gameFileKeys.Count} keyed entries in {sw.ElapsedMilliseconds/1000.0}s");
+            logger.Debug($"CANHObjectsThumbnailsCache: Merged {gameFileKeys.Count} keyed entries in {sw.ElapsedMilliseconds / 1000.0}s");
             sw.Stop();
 
             return;

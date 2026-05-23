@@ -182,7 +182,7 @@ namespace Sims2Tools.Cache.Thumbnails
 #endif
             }
 
-            logger.Debug($"BuildModeThumbnailsCache: Merged {gameFileKeys.Count} keyed entries in {sw.ElapsedMilliseconds/1000.0}s");
+            logger.Debug($"BuildModeThumbnailsCache: Merged {gameFileKeys.Count} keyed entries in {sw.ElapsedMilliseconds / 1000.0}s");
             sw.Stop();
 
             return;

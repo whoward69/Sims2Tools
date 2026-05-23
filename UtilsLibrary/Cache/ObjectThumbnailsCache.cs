@@ -13,7 +13,6 @@ using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.THUB;
 using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.OBJD;
-using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XFLR;

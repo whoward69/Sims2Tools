@@ -78,6 +78,7 @@ namespace DbpfScripter
             this.btnNextError = new System.Windows.Forms.Button();
             this.btnPrevComment = new System.Windows.Forms.Button();
             this.btnNextComment = new System.Windows.Forms.Button();
+            this.menuItemCreatorDetails = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -103,6 +104,7 @@ namespace DbpfScripter
             this.menuItemSavePath,
             this.toolStripSeparator1,
             this.menuItemConfiguration,
+            this.menuItemCreatorDetails,
             this.menuItemDdsUtilsPath,
             this.toolStripSeparator2,
             this.menuItemExit});
@@ -401,6 +403,13 @@ namespace DbpfScripter
             this.btnNextComment.Visible = false;
             this.btnNextComment.Click += new System.EventHandler(this.OnNextComment);
             // 
+            // menuItemCreatorDetails
+            // 
+            this.menuItemCreatorDetails.Name = "menuItemCreatorDetails";
+            this.menuItemCreatorDetails.Size = new System.Drawing.Size(183, 22);
+            this.menuItemCreatorDetails.Text = "Creator Details...";
+            this.menuItemCreatorDetails.Click += new System.EventHandler(this.OnCreatorClicked);
+            // 
             // DbpfScripterForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -474,6 +483,7 @@ namespace DbpfScripter
         private System.Windows.Forms.Button btnNextError;
         private System.Windows.Forms.Button btnPrevComment;
         private System.Windows.Forms.Button btnNextComment;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCreatorDetails;
     }
 }
 

@@ -30,10 +30,10 @@ namespace DbpfScripter
         private MruList MyMruList;
         private Updater MyUpdater;
 
-        private List<int> errorOffsets = new List<int>();
+        private readonly List<int> errorOffsets = new List<int>();
         private int currentError = -1;
 
-        private List<int> commentOffsets = new List<int>();
+        private readonly List<int> commentOffsets = new List<int>();
         private int currentComment = -1;
 
         private DbpfScripterWorker dbpfScripterWorker;
@@ -62,14 +62,12 @@ namespace DbpfScripter
             };
         }
 
+        public void TidyUp()
+        {
+        }
+
         private void ScriptWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs args)
         {
-            errorOffsets.Clear();
-            btnNextError.Visible = btnPrevError.Visible = false;
-
-            commentOffsets.Clear();
-            btnNextComment.Visible = btnPrevComment.Visible = false;
-
             dbpfScripterWorker.ProcessScript();
         }
 
@@ -155,6 +153,17 @@ namespace DbpfScripter
             btnGO.Text = "&GO";
         }
 
+        private void ClearPreviousRun()
+        {
+            textMessages.Text = "";
+
+            errorOffsets.Clear();
+            btnNextError.Visible = btnPrevError.Visible = false;
+
+            commentOffsets.Clear();
+            btnNextComment.Visible = btnPrevComment.Visible = false;
+        }
+
         private void OnGoClicked(object sender, System.EventArgs e)
         {
             if (scriptWorker.IsBusy)
@@ -170,7 +179,7 @@ namespace DbpfScripter
                 // This is the Export action
                 btnGO.Text = "Cancel";
 
-                textMessages.Text = "";
+                ClearPreviousRun();
 
                 dbpfScripterWorker = new DbpfScripterWorker(scriptWorker, textTemplatePath.Text, textSavePath.Text, textSaveName.Text, IsDevelopmentMode);
 
@@ -196,7 +205,7 @@ namespace DbpfScripter
 
             textTemplatePath.Text = RegistryTools.GetSetting(DbpfScripterApp.RegistryKey, textTemplatePath.Name, "") as string;
             textSavePath.Text = RegistryTools.GetSetting(DbpfScripterApp.RegistryKey, textSavePath.Name, "") as string;
-            if (IsDevelopmentMode) textSaveName.Text = RegistryTools.GetSetting(DbpfScripterApp.RegistryKey, textSaveName.Name, "") as string;
+            textSaveName.Text = RegistryTools.GetSetting(DbpfScripterApp.RegistryKey, textSaveName.Name, "") as string;
 
             MyUpdater = new Updater(DbpfScripterApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
@@ -224,8 +233,10 @@ namespace DbpfScripter
                 RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textTemplatePath.Name, textTemplatePath.Text);
                 RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textSavePath.Name, textSavePath.Text);
 
-                if (IsDevelopmentMode) RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textSaveName.Name, textSaveName.Text);
+                RegistryTools.SaveSetting(DbpfScripterApp.RegistryKey, textSaveName.Name, textSaveName.Text);
             }
+
+            TidyUp();
         }
 
         private void OnModeOpening(object sender, EventArgs e)
@@ -311,6 +322,15 @@ namespace DbpfScripter
         private void OnConfigClicked(object sender, EventArgs e)
         {
             Form config = new ConfigDialog(false);
+
+            if (config.ShowDialog() == DialogResult.OK)
+            {
+            }
+        }
+
+        private void OnCreatorClicked(object sender, EventArgs e)
+        {
+            Form config = new CreatorConfigDialog();
 
             if (config.ShowDialog() == DialogResult.OK)
             {

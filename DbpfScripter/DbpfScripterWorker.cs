@@ -152,7 +152,7 @@ using System.Xml;
  * indexKey ::= (PLUS | (<digit>)+)
  * 
  * -- Functions for performing specific operations
- * function ::= <fnWord> | <fnByte> | <fnGuid> | <fnGroup> | <fnFamily> | <fnHash> | <fnPath> | <fnIf> | <fnInc>
+ * function ::= <fnWord> | <fnByte> | <fnGuid> | <fnGroup> | <fnFamily> | <fnHash> | <fnPath> | <fnIf> | <fnInc> | <fnCreator>
  * fnWord ::= (loword | hiword) BRA <param> KET
  * fnByte ::= (lobyte | hibyte) BRA <param> KET
  * fnGuid ::= guid BRA (<param> (, <tag>)?)? KET
@@ -162,6 +162,7 @@ using System.Xml;
  * fnPath ::= fullpath BRA <param> KET
  * fnIf ::= if BRA <condition> , <varValue> , <varValue> KET
  * fnInc ::= (preinc | postinc) BRA <param> KET
+ * fnCreator ::= (ccname | ccguid) BRA <param> KET
  * param ::= <varRef>
  * tag ::= <varRef>
  * 
@@ -360,6 +361,8 @@ namespace DbpfScripter
                 {
                     string token = parserState.ReadNextToken();
                     string value;
+                    bool conditionValue = true;
+                    bool negateCondition = false;
 
                     if (token != null)
                     {
@@ -381,10 +384,42 @@ namespace DbpfScripter
                             return ReportErrorFalse("Unknown count (expected variable or constant)");
                         }
 
+                        if ("IF".Equals(PeekNextToken()))
+                        {
+                            parserState.ReadNextToken();
+
+                            if ("NOT".Equals(PeekNextToken()))
+                            {
+                                parserState.ReadNextToken();
+                                negateCondition = true;
+                            }
+
+                            if (PeekNextToken()[0] == '$')
+                            {
+                                conditionValue = (new ScriptValue(EvaluateVariable(ReadVarDefn(), iteration))).IsTrue;
+
+                                if (negateCondition) conditionValue = !conditionValue;
+                            }
+                            else
+                            {
+                                return ReportErrorFalse($"Expected condition variable for IF, got {PeekNextToken()}");
+                            }
+                        }
+
+                        if (!conditionValue)
+                        {
+                            if (SkipOpenSquareBracket())
+                            {
+                                return SkipBlock();
+                            }
+
+                            return ReportErrorFalse("Can't find block opening square bracket");
+                        }
+
                         if (SkipOpenSquareBracket())
                         {
                             ReportProgress("");
-                            ReportProgress($"Processing REPEAT");
+                            ReportProgress($"Processing REPEAT {token}");
 
                             ScriptValue sv = new ScriptValue(value);
 
@@ -403,6 +438,8 @@ namespace DbpfScripter
 
                                 for (int iter = 0; iter < count; ++iter)
                                 {
+                                    ReportProgress($"  Repeating {token} - {(iter + 1)} of {count}");
+
                                     result = ProcessBlocks(iter);
 
                                     if (!result) break;
@@ -499,28 +536,6 @@ namespace DbpfScripter
             }
 
             return ReportErrorFalse("Invalid BLOCK");
-        }
-
-        private bool SkipBlock()
-        {
-            string token = parserState.ReadNextToken();
-
-            while (!"]".Equals(token))
-            {
-                if (token == null)
-                {
-                    return ReportErrorFalse("Can't find block closing square bracket");
-                }
-
-                if ("[".Equals(token))
-                {
-                    if (!SkipBlock()) return false;
-                }
-
-                token = parserState.ReadNextToken();
-            }
-
-            return true;
         }
 
         private bool ProcessInitialisers(string filename, int iteration)
@@ -636,7 +651,7 @@ namespace DbpfScripter
         {
             if (TestEndOfBlock()) return false;
 
-            bool isClone = false;
+            bool isCloneTgri = false;
             bool isIdrNeeded = false;
 
             string simpeFilename = null;
@@ -772,7 +787,7 @@ namespace DbpfScripter
             {
                 parserState.ReadNextToken();
 
-                isClone = true;
+                isCloneTgri = true;
 
                 // Drop through into TGRI parsing
             }
@@ -912,11 +927,11 @@ namespace DbpfScripter
 
                                 if (isIdrNeeded)
                                 {
-                                    result = ProcessTGRI(iteration, new DBPFKey(Idr.TYPE, key), isClone);
+                                    result = ProcessTGRI(iteration, new DBPFKey(Idr.TYPE, key), isCloneTgri);
                                 }
                                 else
                                 {
-                                    result = ProcessTGRI(iteration, key, isClone);
+                                    result = ProcessTGRI(iteration, key, isCloneTgri);
                                 }
 
                                 if (!result) break;
@@ -1003,7 +1018,7 @@ namespace DbpfScripter
                             }
                             else
                             {
-                                return ProcessTGRI(iteration, new DBPFKey(isIdrNeeded ? Idr.TYPE : typeId, groupId, instanceId, resourceId), isClone);
+                                return ProcessTGRI(iteration, new DBPFKey(isIdrNeeded ? Idr.TYPE : typeId, groupId, instanceId, resourceId), isCloneTgri);
                             }
                         }
                     }
@@ -1013,7 +1028,7 @@ namespace DbpfScripter
             return ReportErrorFalse("Invalid ACTION");
         }
 
-        private bool ProcessTGRI(int iteration, DBPFKey resKey, bool isClone)
+        private bool ProcessTGRI(int iteration, DBPFKey resKey, bool isCloneTgri)
         {
             ReportProgress($"Editing {resKey.TGRIString}");
 
@@ -1030,7 +1045,7 @@ namespace DbpfScripter
 
                 if (result)
                 {
-                    if (!isClone)
+                    if (!isCloneTgri)
                     {
                         activePackage.UnCommit(resKey);
                         activePackage.Remove(resKey);
@@ -1327,11 +1342,11 @@ namespace DbpfScripter
         private bool ProcessIndexing(int iteration)
         {
             string index = parserState.ReadNextToken();
-            bool clone = false;
+            bool isCloneIndexItem = false;
 
             if ("CLONE".Equals(PeekNextToken()))
             {
-                clone = true;
+                isCloneIndexItem = true;
                 parserState.ReadNextToken();
             }
 
@@ -1359,7 +1374,7 @@ namespace DbpfScripter
 
                     try
                     {
-                        IDbpfScriptable indexer = currentScriptableObject.Indexed(Int32.Parse(index), clone);
+                        IDbpfScriptable indexer = currentScriptableObject.Indexed(Int32.Parse(index), isCloneIndexItem);
 
                         if (indexer != null)
                         {
@@ -1673,6 +1688,80 @@ namespace DbpfScripter
                     }
                 }
             }
+            else if (function.Equals("or"))
+            {
+                if (SkipOpenBracket())
+                {
+                    value = ReadVarValue(iteration);
+
+                    if (value != null && SkipComma())
+                    {
+                        ScriptValue result = new ScriptValue(value);
+
+                        while (result.IsFalse)
+                        {
+                            value = ReadVarValue(iteration);
+
+                            if (value == null)
+                            {
+                                return ReportErrorNull($"Expected a value, got {parserState.PeekNextToken()}");
+                            }
+
+                            result.LogicalOr(value);
+
+                            if (parserState.PeekNextToken() == ",")
+                            {
+                                SkipComma();
+                            }
+                            else if (parserState.PeekNextToken() == ")")
+                            {
+                                break;
+                            }
+                        }
+
+                        SkipParams();
+
+                        return result;
+                    }
+                }
+            }
+            else if (function.Equals("and"))
+            {
+                if (SkipOpenBracket())
+                {
+                    value = ReadVarValue(iteration);
+
+                    if (value != null && SkipComma())
+                    {
+                        ScriptValue result = new ScriptValue(value);
+
+                        while (result.IsTrue)
+                        {
+                            value = ReadVarValue(iteration);
+
+                            if (value == null)
+                            {
+                                return ReportErrorNull($"Expected a value, got {parserState.PeekNextToken()}");
+                            }
+
+                            result.LogicalAnd(value);
+
+                            if (parserState.PeekNextToken() == ",")
+                            {
+                                SkipComma();
+                            }
+                            else if (parserState.PeekNextToken() == ")")
+                            {
+                                break;
+                            }
+                        }
+
+                        SkipParams();
+
+                        return result;
+                    }
+                }
+            }
             else if (function.Equals("preinc"))
             {
                 if (SkipOpenBracket())
@@ -1704,6 +1793,14 @@ namespace DbpfScripter
                         return value;
                     }
                 }
+            }
+            else if (function.Equals("ccname"))
+            {
+                if (SkipOpenBracket() && SkipCloseBracket()) return Sims2ToolsLib.CreatorNickName;
+            }
+            else if (function.Equals("ccguid"))
+            {
+                if (SkipOpenBracket() && SkipCloseBracket()) return Sims2ToolsLib.CreatorGUID;
             }
             // NOTE: If adding to the function list, must also update IsFunctionName below
 
@@ -1893,13 +1990,15 @@ namespace DbpfScripter
         #region Tests for "is something"
         private bool IsFunctionName(string s)
         {
+            // NOTE: If adding to the function list, must also update EvaluateFunction above
             return s.Equals("loword") || s.Equals("hiword") ||
                    s.Equals("lobyte") || s.Equals("hibyte") ||
                    s.Equals("guid") || s.Equals("group") || s.Equals("family") ||
                    s.Equals("ghash") || s.Equals("rhash") || s.Equals("ihash") ||
                    s.Equals("fullpath") ||
-                   s.Equals("if") ||
-                   s.Equals("preinc") || s.Equals("postinc");
+                   s.Equals("if") || s.Equals("or") || s.Equals("and") ||
+                   s.Equals("preinc") || s.Equals("postinc") ||
+                   s.Equals("ccname") || s.Equals("ccguid");
         }
 
         private bool IsVariableDefn(string s)
@@ -1937,6 +2036,52 @@ namespace DbpfScripter
 
         private bool PeekNextIsComma() => PeekNextToken(",");
         private bool PeekNextIsCloseBracket() => PeekNextToken(")");
+        #endregion
+
+        #region Skip chunks of script
+        private bool SkipParams()
+        {
+            string token = parserState.ReadNextToken();
+
+            while (!")".Equals(token))
+            {
+                if (token == null)
+                {
+                    return ReportErrorFalse("Can't find block closing bracket");
+                }
+
+                if ("(".Equals(token))
+                {
+                    if (!SkipParams()) return false;
+                }
+
+                token = parserState.ReadNextToken();
+            }
+
+            return true;
+        }
+
+        private bool SkipBlock()
+        {
+            string token = parserState.ReadNextToken();
+
+            while (!"]".Equals(token))
+            {
+                if (token == null)
+                {
+                    return ReportErrorFalse("Can't find block closing square bracket");
+                }
+
+                if ("[".Equals(token))
+                {
+                    if (!SkipBlock()) return false;
+                }
+
+                token = parserState.ReadNextToken();
+            }
+
+            return true;
+        }
         #endregion
 
         #region Skip expected tokens
@@ -2032,6 +2177,18 @@ namespace DbpfScripter
             else if (nextToken[0] == '$')
             {
                 value = EvaluateVariable(ReadVarDefn(), iteration);
+            }
+            else if (float.TryParse(nextToken, out float f))
+            {
+                value = parserState.ReadNextToken();
+            }
+            else if ("true".Equals(nextToken, StringComparison.OrdinalIgnoreCase))
+            {
+                value = parserState.ReadNextToken();
+            }
+            else if ("false".Equals(nextToken, StringComparison.OrdinalIgnoreCase))
+            {
+                value = parserState.ReadNextToken();
             }
             else
             {
