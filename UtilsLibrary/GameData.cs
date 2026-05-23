@@ -500,6 +500,7 @@ namespace Sims2Tools
                                 semiGlobalsByGroupID.Add(entry.GroupID, glob.SemiGlobalGroup);
                             }
 
+                            // TODO - DBPF Library - there are more global objects than this!
                             BuildObjectsTable(package, globalObjectsByGroup, globalObjectsByGUID, globalObjectsTgirHashByGUID);
 
                             package.Close();

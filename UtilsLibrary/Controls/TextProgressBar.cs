@@ -165,6 +165,7 @@ namespace Sims2Tools.Controls
         {
             _textColourBrush.Dispose();
             _progressColourBrush.Dispose();
+
             base.Dispose();
         }
     }

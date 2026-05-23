@@ -48,7 +48,7 @@ namespace Sims2Tools
         {
             HashSet<string> allCreatorGuids = new HashSet<string>();
 
-            foreach (string savedSimPath in Directory.GetFiles($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims", "*.package", SearchOption.AllDirectories))
+            foreach (string savedSimPath in Directory.GetFiles(Sims2ToolsLib.Sims2SavedSimsPath, "*.package", SearchOption.AllDirectories))
             {
                 using (DBPFFile savedSim = new DBPFFile(savedSimPath))
                 {

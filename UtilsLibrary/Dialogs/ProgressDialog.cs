@@ -84,7 +84,7 @@ namespace Sims2Tools
 
         private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            progressBar.Value = e.ProgressPercentage;
+            progressBar.Value = Math.Min(e.ProgressPercentage, 100);
 
             if (e.UserState != null && !backgroundWorker.CancellationPending)
                 progressBar.CustomText = e.UserState.ToString();

@@ -112,7 +112,7 @@ namespace Sims2Tools.Exporter
 
         public void Extract(DBPFFile package, DBPFKey key)
         {
-            Extract(key, package.GetOriginalItemByKey(key));
+            Extract(key, package.GetOriginalDataByKey(key));
         }
 
         public void Extract(DBPFResource resource)

@@ -10,9 +10,25 @@ using Sims2Tools.DBPF.Neighbourhood;
 
 namespace Sims2Tools.Helpers
 {
+    public class GenderHelper
+    {
+        public static uint CpfGenderCode(Gender gender)
+        {
+            switch (gender)
+            {
+                case Gender.Male:
+                    return 0x0002;
+                case Gender.Female:
+                    return 0x0001;
+            }
+
+            return 0x0000;
+        }
+    }
+
     public class AgeHelper
     {
-        public static uint AgeCode(LifeSections age)
+        public static uint CpfAgeCode(LifeSections age)
         {
             switch (age)
             {

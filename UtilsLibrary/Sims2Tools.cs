@@ -53,6 +53,16 @@ namespace Sims2Tools
             Sims2EP8PathKey, Sims2EP9PathKey
         };
 
+        public static readonly string[] Sims2PathsInReverseLoadOrder = {
+            Sims2EP9PathKey, Sims2EP8PathKey,
+            Sims2SP8PathKey, Sims2SP7PathKey, Sims2EP7PathKey,
+            Sims2SP6PathKey, Sims2EP6PathKey,
+            Sims2SP5PathKey, Sims2SP4PathKey, Sims2EP5PathKey,
+            Sims2SP3PathKey, Sims2EP4PathKey,
+            Sims2SP2PathKey, Sims2SP1PathKey, Sims2EP3PathKey,
+            Sims2EP2PathKey, Sims2EP1PathKey, Sims2BasePathKey
+        };
+
         // Need to keep these, but the dependancy on SimPe's configuration data has been removed
         private static readonly string SimPePathKey = "SimPePath";
         private static readonly string SimPeKey = @"Ambertation\SimPe\Settings";
@@ -124,6 +134,18 @@ namespace Sims2Tools
                 string downloadsPath = Sims2HomePath;
 
                 if (!string.IsNullOrWhiteSpace(downloadsPath)) downloadsPath = $"{downloadsPath}\\Downloads";
+
+                return downloadsPath;
+            }
+        }
+
+        public static string Sims2SavedSimsPath
+        {
+            get
+            {
+                string downloadsPath = Sims2HomePath;
+
+                if (!string.IsNullOrWhiteSpace(downloadsPath)) downloadsPath = $"{downloadsPath}\\SavedSims";
 
                 return downloadsPath;
             }

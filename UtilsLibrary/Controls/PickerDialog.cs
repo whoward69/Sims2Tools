@@ -32,10 +32,5 @@ namespace Sims2Tools.Controls
         {
             InitializeComponent();
         }
-
-        public new void Dispose()
-        {
-            base.Dispose();
-        }
     }
 }

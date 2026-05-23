@@ -112,7 +112,7 @@ namespace Sims2Tools.DbpfCache
             cache.Clear();
         }
 
-        public CacheableDbpfFile GetOrOpen(string packagePath)
+        public CacheableDbpfFile OpenForReadOnly(string packagePath)
         {
             if (cache.ContainsKey(packagePath))
             {
@@ -122,7 +122,7 @@ namespace Sims2Tools.DbpfCache
             return new CacheableDbpfFile(packagePath, false);
         }
 
-        public CacheableDbpfFile GetOrAdd(string packagePath)
+        public CacheableDbpfFile OpenForUpdate(string packagePath)
         {
             if (!cache.ContainsKey(packagePath))
             {

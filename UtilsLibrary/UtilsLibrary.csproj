@@ -71,9 +71,16 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache\ObjectThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\BuildThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\BuyThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\HoodThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\CasThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\CigenCache.cs" />
     <Compile Include="Cache\GameDataCache.cs" />
     <Compile Include="Cache\PackageCache.cs" />
     <Compile Include="Cache\SceneGraphCache.cs" />
+    <Compile Include="Cache\ClothingThumbnailsCache.cs" />
     <Compile Include="Controls\ControlHelper.cs" />
     <Compile Include="Controls\PickerDialog.cs">
       <SubType>Form</SubType>
@@ -142,7 +149,7 @@
     <Compile Include="Exporter\Extractor.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Helpers\ColourHelper.cs" />
-    <Compile Include="Helpers\AgeHelper.cs" />
+    <Compile Include="Helpers\HoodHelpers.cs" />
     <Compile Include="Helpers\CpfHelper.cs" />
     <Compile Include="IO\PjseStringFileReader.cs" />
     <Compile Include="IO\Sims2Directory.cs" />
