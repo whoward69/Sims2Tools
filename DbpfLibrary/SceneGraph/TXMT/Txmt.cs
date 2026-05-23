@@ -200,7 +200,17 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
         #region IDBPFScriptable
         public override bool Assignment(string item, ScriptValue sv)
         {
-            if (HasProperty(item))
+            if (item.Equals("matDefType"))
+            {
+                MaterialDefinition.MaterialType = sv;
+                return true;
+            }
+            else if (item.Equals("matDefDesc"))
+            {
+                MaterialDefinition.FileDescription = sv;
+                return true;
+            }
+            else if (HasProperty(item))
             {
                 SetProperty(item, sv);
 
@@ -220,7 +230,15 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
 
         public override ScriptValue Value(string item)
         {
-            if (HasProperty(item))
+            if (item.Equals("matDefType"))
+            {
+                return new ScriptValue(MaterialDefinition.MaterialType);
+            }
+            else if (item.Equals("matDefDesc"))
+            {
+                return new ScriptValue(MaterialDefinition.FileDescription);
+            }
+            else if (HasProperty(item))
             {
                 return new ScriptValue(GetProperty(item));
             }

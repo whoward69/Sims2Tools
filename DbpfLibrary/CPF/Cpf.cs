@@ -85,10 +85,10 @@ namespace Sims2Tools.DBPF.CPF
         {
             items = new List<CpfItem>();
 
-            if (reader != null) Unserialize(reader, (int)entry.DataSize);
+            if (reader != null) Unserialize(reader, entry.DataSize);
         }
 
-        internal void Unserialize(DbpfReader reader, int len)
+        internal void Unserialize(DbpfReader reader, uint len)
         {
             long pos = reader.Position;
 
@@ -118,7 +118,7 @@ namespace Sims2Tools.DBPF.CPF
             if (name != null) this._keyName = name;
         }
 
-        private void UnserializeXml(DbpfReader reader, int len)
+        private void UnserializeXml(DbpfReader reader, uint len)
         {
             using (MemoryStream ms = new MemoryStream(reader.ReadBytes(len)))
             {

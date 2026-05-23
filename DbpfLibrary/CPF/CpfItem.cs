@@ -410,8 +410,7 @@ namespace Sims2Tools.DBPF.CPF
         {
             datatype = (MetaData.DataTypes)reader.ReadUInt32();
 
-            int namelength = reader.ReadInt32();
-            name = Helper.ToString(reader.ReadBytes(namelength));
+            name = Helper.ToString(reader.ReadBytes(reader.ReadInt32()));
 
             int valuelength;
             switch (datatype)
@@ -443,7 +442,6 @@ namespace Sims2Tools.DBPF.CPF
             writer.WriteUInt32((uint)datatype);
 
             byte[] bname = Helper.ToBytes(name, 0);
-
             writer.WriteInt32(bname.Length);
             writer.WriteBytes(bname);
 

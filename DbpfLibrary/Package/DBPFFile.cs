@@ -189,7 +189,7 @@ namespace Sims2Tools.DBPF.Package
                     if (resourceIndex.IsDuplicate(entry))
                     {
                         m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
-                        writer.WriteBytes(m_Reader.ReadBytes((int)entry.FileSize));
+                        writer.WriteBytes(m_Reader.ReadBytes(entry.FileSize));
                     }
                     else if (resourceCache.IsResource(entry))
                     {
@@ -204,7 +204,7 @@ namespace Sims2Tools.DBPF.Package
                     else
                     {
                         m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
-                        writer.WriteBytes(m_Reader.ReadBytes((int)entry.FileSize));
+                        writer.WriteBytes(m_Reader.ReadBytes(entry.FileSize));
                     }
                 }
             }
@@ -360,10 +360,17 @@ namespace Sims2Tools.DBPF.Package
 
         private DbpfReader GetDbpfReader(DBPFEntry entry)
         {
-            return DbpfReader.FromStream(new MemoryStream(GetItemByEntry(entry)));
+            return DbpfReader.FromStream(new MemoryStream(GetDataByEntry(entry)));
         }
 
-        private byte[] GetItemByEntry(DBPFEntry entry)
+        private byte[] GetRawDataByEntry(DBPFEntry entry)
+        {
+            m_Reader.Seek(SeekOrigin.Begin, entry.FileOffset);
+
+            return m_Reader.ReadBytes(entry.FileSize);
+        }
+
+        private byte[] GetDataByEntry(DBPFEntry entry)
         {
             if (entry == null) return null;
 
@@ -399,7 +406,7 @@ namespace Sims2Tools.DBPF.Package
             {
                 try
                 {
-                    return Decompressor.Decompress(m_Reader.ReadBytes((int)entry.FileSize), uncompressedSize);
+                    return Decompressor.Decompress(m_Reader.ReadBytes(entry.FileSize), uncompressedSize);
                 }
                 catch (Exception)
                 {
@@ -410,24 +417,31 @@ namespace Sims2Tools.DBPF.Package
                 }
             }
 
-            return m_Reader.ReadBytes((int)entry.FileSize);
+            return m_Reader.ReadBytes(entry.FileSize);
         }
 
-        public byte[] GetItemByKey(DBPFKey key)
+        public byte[] GetRawDataByKey(DBPFKey key, out DBPFEntry entry)
+        {
+            entry = GetEntryByKey(key);
+
+            return (entry != null) ? GetRawDataByEntry(entry) : null;
+        }
+
+        public byte[] GetDataByKey(DBPFKey key)
         {
             DBPFEntry entry = GetEntryByKey(key);
 
-            return (entry != null) ? GetItemByEntry(entry) : null;
+            return (entry != null) ? GetDataByEntry(entry) : null;
         }
 
-        public byte[] GetOriginalItemByKey(DBPFKey key)
+        public byte[] GetOriginalDataByKey(DBPFKey key)
         {
-            return GetItemByEntry(GetEntryByKey(key));
+            return GetDataByEntry(GetEntryByKey(key));
         }
 
-        public byte[] GetOriginalItemByEntry(DBPFEntry entry)
+        public byte[] GetOriginalDataByEntry(DBPFEntry entry)
         {
-            return GetItemByEntry(entry);
+            return GetDataByEntry(entry);
         }
 
         public DBPFEntry GetEntryByTGIR(int tgir)
@@ -475,7 +489,7 @@ namespace Sims2Tools.DBPF.Package
                 }
                 else
                 {
-                    return Helper.ToString(this.GetDbpfReader(entry).ReadBytes(Math.Min((int)entry.FileSize, 0x40)));
+                    return Helper.ToString(this.GetDbpfReader(entry).ReadBytes(Math.Min(entry.FileSize, 0x40)));
                 }
             }
         }
@@ -676,6 +690,10 @@ namespace Sims2Tools.DBPF.Package
             else if (entry.TypeID == Idno.TYPE)
             {
                 res = new Idno(entry, reader);
+            }
+            else if (entry.TypeID == Lotd.TYPE)
+            {
+                res = new Lotd(entry, reader);
             }
             else if (entry.TypeID == Ltxt.TYPE)
             {

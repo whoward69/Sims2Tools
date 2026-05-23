@@ -27,10 +27,10 @@ namespace Sims2Tools.DBPF.NREF
 
         public Nref(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
-            Unserialize(reader, (int)entry.FileSize);
+            Unserialize(reader, entry.FileSize);
         }
 
-        protected void Unserialize(DbpfReader reader, int len)
+        protected void Unserialize(DbpfReader reader, uint len)
         {
             this._keyName = Helper.ToString(reader.ReadBytes(len));
         }

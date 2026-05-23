@@ -68,7 +68,7 @@ namespace Sims2Tools.DBPF.TPRP
             return null;
         }
 
-        // TODO - DBPF Library - _TEST - Serialize Tprp, check this
+        // TODO - DBPF Library - TPRP - _TEST - Serialize Tprp, check this
         private void CleanUp()
         {
             for (int index = paramLabels.Count - 1; index >= 0; --index)
@@ -88,7 +88,7 @@ namespace Sims2Tools.DBPF.TPRP
             }
         }
 
-        // TODO - DBPF Library - _TEST - Unserialize Tprp, check this
+        // TODO - DBPF Library - TPRP - _TEST - Unserialize Tprp, check this
         protected void Unserialize(DbpfReader reader)
         {
             this.duff = false;
@@ -111,7 +111,7 @@ namespace Sims2Tools.DBPF.TPRP
                     this.paramCount = reader.ReadInt32();
                     this.localCount = reader.ReadInt32();
 
-                    // TODO - DBPF Library - _TEST - split this into two arrays
+                    // TODO - DBPF Library - TPRP - _TEST - split this into two arrays
                     for (int index = 0; index < this.paramCount; ++index)
                         this.paramLabels.Add(new TprpParamLabel(reader));
 
@@ -136,7 +136,7 @@ namespace Sims2Tools.DBPF.TPRP
             }
         }
 
-        // TODO - DBPF Library - _TEST - Serialize Tprp
+        // TODO - DBPF Library - TPRP - _TEST - Serialize Tprp
         public override uint FileSize
         {
             get
@@ -169,7 +169,7 @@ namespace Sims2Tools.DBPF.TPRP
             }
         }
 
-        // TODO - DBPF Library - _TEST - Serialize Tprp
+        // TODO - DBPF Library - TPRP - _TEST - Serialize Tprp
         public override void Serialize(DbpfWriter writer)
         {
             Trace.Assert(duff == false, "Cannot serialize a bad resource");

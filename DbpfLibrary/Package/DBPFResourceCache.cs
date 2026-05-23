@@ -46,9 +46,9 @@ namespace Sims2Tools.DBPF.Package
         {
             List<DBPFEntry> entries = new List<DBPFEntry>();
 
-            foreach (DBPFResource resource in resourceByKey.Values)
+            foreach (KeyValuePair<DBPFKey, DBPFResource> kvPair in resourceByKey)
             {
-                entries.Add(new DBPFEntry(resource) { FileOffset = 0, FileSize = resource.FileSize });
+                entries.Add(new DBPFEntry(kvPair.Key) { FileOffset = 0, FileSize = kvPair.Value.FileSize });
             }
 
             foreach (DBPFKey key in itemByKey.Keys)

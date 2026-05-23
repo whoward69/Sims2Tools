@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 
 namespace Sims2Tools.DBPF
 {
@@ -27,7 +28,8 @@ namespace Sims2Tools.DBPF
         int TGIRHash { get; }
     }
 
-    public class DBPFKey : IDBPFKey, IEquatable<DBPFKey>, IComparable<DBPFKey>
+    [Serializable]
+    public class DBPFKey : IDBPFKey, ISerializable, IEquatable<DBPFKey>, IComparable<DBPFKey>
     {
         private TypeTypeID typeID;
         private TypeGroupID groupID;
@@ -146,6 +148,27 @@ namespace Sims2Tools.DBPF
         public override int GetHashCode() => TGIRHash;
 
         public int CompareTo(DBPFKey other) => this.TGRIString.CompareTo(other.TGRIString);
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("typeID", typeID.AsUInt());
+            info.AddValue("groupID", groupID.AsUInt());
+            info.AddValue("resourceID", resourceID.AsUInt());
+            info.AddValue("instanceID", instanceID.AsUInt());
+        }
+
+        protected DBPFKey(SerializationInfo info, StreamingContext context)
+        {
+            typeID = (TypeTypeID)info.GetUInt32("typeID");
+            groupID = (TypeGroupID)info.GetUInt32("groupID");
+            resourceID = (TypeResourceID)info.GetUInt32("resourceID");
+            instanceID = (TypeInstanceID)info.GetUInt32("instanceID");
+
+            tgiHash = 0;
+            tgirHash = 0;
+
+            tgriString = null;
+        }
 
         public override string ToString() => $"{DBPFData.TypeName(TypeID)}-{GroupID}-{ResourceID}-{InstanceID}";
     }

@@ -24,7 +24,7 @@ namespace Sims2Tools.DBPF.Package
         private readonly IDBPFLogger logger;
 #pragma warning restore IDE0052 // Remove unread private members
 
-        private int HeaderSize => (minorVersion >= 1) ? 96 : 92;
+        internal int HeaderSize => (minorVersion >= 1) ? 96 : 92;
 
         private readonly string packagePath;
         internal string PackagePath => packagePath;
@@ -143,7 +143,7 @@ namespace Sims2Tools.DBPF.Package
 
             writer.WriteUInt32(resourceIndex.Count);
             writer.WriteUInt32((uint)(resourceIndex.Offset + HeaderSize));
-            writer.WriteUInt32(resourceIndex.Size);
+            writer.WriteUInt32(resourceIndex.IndexSize);
 
             writer.WriteUInt32(0);
             writer.WriteUInt32(0);

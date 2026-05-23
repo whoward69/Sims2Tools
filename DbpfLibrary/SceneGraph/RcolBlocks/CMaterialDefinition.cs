@@ -34,7 +34,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
 
         string mattype;
-        public string MaterialType => mattype;
+        public string MaterialType
+        {
+            get => mattype;
+
+            set { mattype = value; _isDirty = true; }
+        }
 
         private readonly List<string> fileList = new List<string>();
         public ReadOnlyCollection<string> FileList => new ReadOnlyCollection<string>(fileList);

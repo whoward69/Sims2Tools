@@ -20,24 +20,35 @@ using System.Drawing;
 
 namespace Sims2Tools.DBPF.Cigen
 {
-    public class CigenFile : IDisposable
+    public interface ICigenFile : IDisposable
+    {
+        bool IsAvailable { get; }
+        bool HasThumbnail(DBPFKey ownerKey);
+        Image GetThumbnail(DBPFKey ownerKey);
+
+        void Close();
+    }
+
+    public class CigenFile : ICigenFile
     {
         private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly string cigenPath;
         private readonly DBPFFile cigenPackage = null;
 
         private readonly Cgn1 cigenIndex;
 
-        public string CigenPath => cigenPath;
+        public string PackagePath => cigenPackage?.PackagePath;
 
-        public bool IsDirty => ((cigenPackage != null) && cigenPackage.IsDirty);
+        public bool IsAvailable => (cigenPackage != null);
 
-        public void SetClean() => cigenPackage?.SetClean();
-
-        public CigenFile(string cigenPath)
+        // Do NOT call this unless you are CigenCache!!!
+        public static CigenFile GetCigenFile(string cigenPath)
         {
-            this.cigenPath = cigenPath;
+            return new CigenFile(cigenPath);
+        }
+
+        private CigenFile(string cigenPath)
+        {
             cigenPackage = new DBPFFile(cigenPath);
 
             cigenIndex = (Cgn1)cigenPackage?.GetResourceByKey(new DBPFKey(Cgn1.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000001, (TypeResourceID)0x00000000));
@@ -67,65 +78,81 @@ namespace Sims2Tools.DBPF.Cigen
             return null;
         }
 
-        public bool ReplaceThumbnail(DBPFKey ownerKey, Image thumbnail)
+        public void Update()
         {
             if (cigenPackage != null)
             {
-                ReadOnlyCollection<DBPFKey> imageKeys = GetImageKeys(ownerKey);
+                cigenPackage.Commit(cigenIndex);
 
-                if (imageKeys.Count > 0)
+                if (cigenPackage.IsDirty)
                 {
-                    Img img = (Img)cigenPackage.GetResourceByKey(imageKeys[0]);
-
-                    if (img != null)
-                    {
-                        img.Image = Img.MakeThumbnail(thumbnail);
-
-                        cigenPackage.Commit(img);
-
-                        if (imageKeys.Count > 1)
-                        {
-                            DBPFKey primaryImageKey = null;
-
-                            foreach (DBPFKey imageKey in imageKeys)
-                            {
-                                if (primaryImageKey == null)
-                                {
-                                    primaryImageKey = imageKey;
-                                }
-                                else if (primaryImageKey != imageKey)
-                                {
-                                    img = (Img)cigenPackage.GetResourceByKey(imageKey);
-
-                                    if (img != null)
-                                    {
-                                        cigenPackage.Remove(img);
-                                    }
-                                    else
-                                    {
-                                        logger.Debug($"Missing IMG resource for {imageKey}");
-                                    }
-                                }
-                            }
-                        }
-
-                        return true;
-                    }
+                    cigenPackage.Update(false);
                 }
             }
-
-            return false;
         }
 
-        public void DeleteThumbnail(DBPFKey ownerKey)
+        public void Close()
+        {
+            cigenPackage?.Close();
+        }
+
+        public void Dispose()
+        {
+            Close();
+
+            cigenPackage?.Dispose();
+        }
+
+        #region Cache Merging ONLY
+        public ReadOnlyCollection<DBPFKey> GetKeys()
+        {
+            return (cigenIndex != null) ? cigenIndex.GetKeys() : (new List<DBPFKey>(0)).AsReadOnly();
+        }
+
+        public Cgn1Item GetPrimaryEntry(DBPFKey key)
+        {
+            return cigenIndex?.GetPrimaryEntry(key);
+        }
+
+        public byte[] GetThumbData(Cgn1Item item)
+        {
+            return cigenPackage?.GetDataByKey(item.ImageKey);
+        }
+
+        public byte[] GetRawThumbData(Cgn1Item item, out DBPFEntry entry)
+        {
+            entry = null;
+            return cigenPackage?.GetRawDataByKey(item.ImageKey, out entry);
+        }
+
+        public void AddEntry(Cgn1Item item, byte[] thumbData)
         {
             if (cigenPackage != null)
             {
-                ReadOnlyCollection<DBPFKey> imageKeys = GetImageKeys(ownerKey);
+                DBPFKey thumbKey = item.ImageKey;
+
+                while (cigenPackage.GetEntryByKey(thumbKey) != null)
+                {
+                    thumbKey.ChangeIR(TypeInstanceID.RandomID, thumbKey.ResourceID);
+                }
+
+                cigenPackage.Commit(thumbKey, thumbData);
+
+                item.SetImageKey(thumbKey);
+
+                cigenIndex.AddItem(item);
+            }
+        }
+
+        public void UpdateEntry(Cgn1Item item, byte[] thumbData)
+        {
+            if (cigenPackage != null)
+            {
+                ReadOnlyCollection<DBPFKey> imageKeys = GetImageKeys(item.OwnerKey);
 
                 if (imageKeys.Count > 0)
                 {
-                    if (cigenIndex.RemoveItem(ownerKey))
+                    if (cigenIndex.RemoveItem(item.OwnerKey))
                     {
                         cigenPackage.Commit(cigenIndex);
 
@@ -137,35 +164,13 @@ namespace Sims2Tools.DBPF.Cigen
                             {
                                 cigenPackage.Remove(img);
                             }
-                            else
-                            {
-                                logger.Debug($"Missing IMG resource for {imageKey}");
-                            }
                         }
                     }
                 }
-                else
-                {
-                    logger.Debug($"Missing image key for {ownerKey}");
-                }
             }
-        }
 
-        public string Update(bool autoBackup)
-        {
-            return cigenPackage?.Update(autoBackup);
+            AddEntry(item, thumbData);
         }
-
-
-        public void Close()
-        {
-            cigenPackage?.Close();
-        }
-
-        public void Dispose()
-        {
-            Close();
-            cigenPackage?.Dispose();
-        }
+        #endregion
     }
 }

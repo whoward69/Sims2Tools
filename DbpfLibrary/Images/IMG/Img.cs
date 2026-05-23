@@ -436,7 +436,7 @@ namespace Sims2Tools.DBPF.Images.IMG
 
         protected void Unserialize(DbpfReader reader)
         {
-            imageData = reader.ReadBytes((int)reader.Length);
+            imageData = reader.ReadBytes(reader.Length);
         }
 
         public override uint FileSize => (uint)imageData.Length;

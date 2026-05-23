@@ -53,6 +53,21 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
 
         public bool ContainsKey(DBPFKey key) => theDictionary.ContainsKey(key);
 
+        internal ReadOnlyCollection<DBPFKey> GetKeys()
+        {
+            return new List<DBPFKey>(theDictionary.Keys).AsReadOnly();
+        }
+
+        internal Cgn1Item GetPrimaryEntry(DBPFKey key)
+        {
+            if (theDictionary.ContainsKey(key))
+            {
+                return theDictionary[key].Get(0);
+            }
+
+            return null;
+        }
+
         public ReadOnlyCollection<DBPFKey> GetImageKeys(DBPFKey key)
         {
             List<DBPFKey> imageKeys = new List<DBPFKey>(1);
@@ -163,6 +178,11 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
             return theList.AsReadOnly();
         }
 
+        internal Cgn1Item Get(int index)
+        {
+            return theList[index];
+        }
+
         public void Add(Cgn1Item item)
         {
             theList.Add(item);
@@ -226,6 +246,11 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
         public Cgn1Item(DbpfReader reader)
         {
             this.Unserialize(reader);
+        }
+
+        public void SetImageKey(DBPFKey key)
+        {
+            imageKey = key;
         }
 
         protected void Unserialize(DbpfReader reader)

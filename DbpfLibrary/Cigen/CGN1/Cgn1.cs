@@ -10,6 +10,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
@@ -37,11 +38,27 @@ namespace Sims2Tools.DBPF.Cigen.CGN1
             Unserialize(reader);
         }
 
+        internal ReadOnlyCollection<DBPFKey> GetKeys()
+        {
+            return items.GetKeys();
+        }
+
+        internal Cgn1Item GetPrimaryEntry(DBPFKey key)
+        {
+            return items.GetPrimaryEntry(key);
+        }
+
         public ReadOnlyCollection<DBPFKey> GetImageKeys(DBPFKey ownerKey)
         {
             if (!items.ContainsKey(ownerKey)) return (new List<DBPFKey>(0)).AsReadOnly();
 
             return items.GetImageKeys(ownerKey);
+        }
+
+        public void AddItem(Cgn1Item item)
+        {
+            _isDirty = true;
+            items.Add(item.OwnerKey, item);
         }
 
         public bool RemoveItem(DBPFKey ownerKey)

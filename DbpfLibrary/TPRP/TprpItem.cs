@@ -27,13 +27,13 @@ namespace Sims2Tools.DBPF.TPRP
 
         public TprpItem(DbpfReader reader) => this.Unserialize(reader);
 
-        // TODO - DBPF Library - _TEST - Unserialize TprpItem, check this
+        // TODO - DBPF Library - TPRP - _TEST - Unserialize TprpItem, check this
         protected void Unserialize(DbpfReader reader) => this.label = Helper.ToString(reader.ReadBytes(reader.ReadByte()));
 
-        // TODO - DBPF Library - _TEST - Serialize TprpItem
+        // TODO - DBPF Library - TPRP - _TEST - Serialize TprpItem
         public uint FileSize => (uint)(1 + Helper.ToBytes(label, 0).Length);
 
-        // TODO - DBPF Library - _TEST - Serialize TprpItem
+        // TODO - DBPF Library - TPRP - _TEST - Serialize TprpItem
         public void Serialize(DbpfWriter writer)
         {
 #if DEBUG

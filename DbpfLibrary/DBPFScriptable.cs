@@ -230,6 +230,38 @@ namespace Sims2Tools.DBPF
             sVal = null;
         }
 
+        public bool LogicalOr(string value)
+        {
+            if (this.IsTrue)
+            {
+                dVal = lVal = uVal = 1;
+            }
+            else
+            {
+                dVal = lVal = uVal = (uint)(new ScriptValue(value).IsTrue ? 1 : 0);
+            }
+
+            datatype = MetaData.DataTypes.dtBoolean;
+
+            return this.IsTrue;
+        }
+
+        public bool LogicalAnd(string value)
+        {
+            if (this.IsFalse)
+            {
+                dVal = lVal = uVal = 0;
+            }
+            else
+            {
+                dVal = lVal = uVal = (uint)(new ScriptValue(value).IsTrue ? 1 : 0);
+            }
+
+            datatype = MetaData.DataTypes.dtBoolean;
+
+            return this.IsTrue;
+        }
+
         public override string ToString()
         {
             // If we applied an operator to the ScriptVariable, we need to figure out what the new value is

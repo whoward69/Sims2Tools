@@ -96,7 +96,7 @@ namespace Sims2Tools.DBPF.TTAB
                 this.items.Add(new TtabItem(this.Format, reader));
 
             // TODO - DBPF Library - TTAB - the footer is similar to the OBJD footer, ie, the name of the resource
-            this.footer = reader.ReadBytes((int)(reader.Length - reader.Position));
+            this.footer = reader.ReadBytes(reader.Length - reader.Position);
 
 #if DEBUG
             readEnd = reader.Position;

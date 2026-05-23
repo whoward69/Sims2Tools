@@ -156,10 +156,10 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             else format = DdsFormats.DXT1Format; // size < w*h
 
             long p1 = reader.Position;
-            size = (int)(reader.Length - p1);
+            long extra = reader.Length - p1;
 
             datatype = MipMapType.SimPE_PlainData;
-            data = reader.ReadBytes(size);
+            data = reader.ReadBytes(extra);
 #endif
 
 #if DEBUG

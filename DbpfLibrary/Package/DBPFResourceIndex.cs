@@ -54,6 +54,20 @@ namespace Sims2Tools.DBPF.Package
         {
             get
             {
+                List<DBPFEntry> allEntries = GetAllEntries(true);
+                uint count = (uint)allEntries.Count;
+
+                foreach (DBPFEntry entry in allEntries)
+                {
+                    if (entry.TypeID != Clst.TYPE && entry.UncompressedSize > 0)
+                    {
+                        return count + 1;
+                    }
+                }
+
+                return count;
+
+                /*
                 int count = 0;
                 bool anyCompressed = false;
 
@@ -83,6 +97,7 @@ namespace Sims2Tools.DBPF.Package
                 count += duplicates.Count;
 
                 return (uint)(count + (anyCompressed ? 1 : 0));
+                */
             }
         }
 
@@ -99,9 +114,9 @@ namespace Sims2Tools.DBPF.Package
             return false;
         }
 
-        internal uint Offset => ClstSize();
+        internal uint Offset => ClstSize;
 
-        internal uint Size => Count * IndexEntrySize;
+        internal uint IndexSize => Count * IndexEntrySize;
 
         internal DBPFResourceIndex(IDBPFLogger logger, DBPFHeader header, DBPFResourceCache resourceCache, DbpfReader reader)
         {
@@ -239,6 +254,8 @@ namespace Sims2Tools.DBPF.Package
 
         public void Serialize(DbpfWriter writer)
         {
+            Debug.Assert(writer.Position == header.HeaderSize);
+
             long posClst = writer.Position;
             long posResIndex = writer.Position;
 
@@ -252,10 +269,10 @@ namespace Sims2Tools.DBPF.Package
                 if (indexMinorVersion >= 2) writer.WriteResourceId(DBPFData.RESOURCE_NULL);
 
                 writer.WriteUInt32((uint)posClst);
-                writer.WriteUInt32(ClstSize());
+                writer.WriteUInt32(ClstSize);
             }
 
-            long posNextResource = posResIndex + Size;
+            long posNextResource = posResIndex + IndexSize;
 
             foreach (DBPFEntry entry in GetAllEntries(true))
             {
@@ -272,6 +289,8 @@ namespace Sims2Tools.DBPF.Package
                     posNextResource += entry.FileSize;
                 }
             }
+
+            Debug.Assert(writer.Position == (header.HeaderSize + IndexSize + ClstSize));
         }
 
         internal void Commit(DBPFResource resource, bool ignoreDirty)
@@ -328,19 +347,22 @@ namespace Sims2Tools.DBPF.Package
         #region Clst Handling
         private uint ClstEntrySize => (uint)(indexMinorVersion >= 2 ? 20 : 16);
 
-        private uint ClstSize()
+        private uint ClstSize
         {
-            uint count = 0;
-
-            foreach (DBPFEntry entry in GetAllEntries(true))
+            get
             {
-                if (entry.TypeID != Clst.TYPE && entry.UncompressedSize > 0)
-                {
-                    ++count;
-                }
-            }
+                uint count = 0;
 
-            return count * ClstEntrySize;
+                foreach (DBPFEntry entry in GetAllEntries(true))
+                {
+                    if (entry.TypeID != Clst.TYPE && entry.UncompressedSize > 0)
+                    {
+                        ++count;
+                    }
+                }
+
+                return count * ClstEntrySize;
+            }
         }
 
         private void ReadClst(DbpfReader reader)

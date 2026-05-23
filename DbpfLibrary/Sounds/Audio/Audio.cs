@@ -41,7 +41,7 @@ namespace Sims2Tools.DBPF.Sounds
 
         protected void Unserialize(DbpfReader reader)
         {
-            data = reader.ReadBytes((int)reader.Length);
+            data = reader.ReadBytes(reader.Length);
         }
 
         public override uint FileSize => (uint)data.Length;

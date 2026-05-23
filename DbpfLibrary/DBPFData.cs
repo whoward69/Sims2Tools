@@ -194,6 +194,7 @@ namespace Sims2Tools.DBPF
             OtherTypeNames.Add(Fami.TYPE, Fami.NAME);
             OtherTypeNames.Add(Famt.TYPE, Famt.NAME);
             OtherTypeNames.Add(Idno.TYPE, Idno.NAME);
+            OtherTypeNames.Add(Lotd.TYPE, Lotd.NAME);
             OtherTypeNames.Add(Ltxt.TYPE, Ltxt.NAME);
             OtherTypeNames.Add(Ngbh.TYPE, Ngbh.NAME);
             OtherTypeNames.Add(Sdna.TYPE, Sdna.NAME);
@@ -207,9 +208,9 @@ namespace Sims2Tools.DBPF
             OtherTypeNames.Add(Xrof.TYPE, Xrof.NAME);
             OtherTypeNames.Add(Xwnt.TYPE, Xwnt.NAME);
 
+            OtherTypeNames.Add(Audio.TYPE, Audio.NAME);
             OtherTypeNames.Add(Hls.TYPE, Hls.NAME);
             OtherTypeNames.Add(Trks.TYPE, Trks.NAME);
-            OtherTypeNames.Add(Audio.TYPE, Audio.NAME);
 
             OtherTypeNames.Add(Cgn1.TYPE, Cgn1.NAME);
             OtherTypeNames.Add(Grop.TYPE, Grop.NAME);

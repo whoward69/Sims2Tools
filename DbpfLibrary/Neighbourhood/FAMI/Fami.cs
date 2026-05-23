@@ -13,6 +13,8 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.FAMI
@@ -65,7 +67,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
         private int ca_resources;
         private int ca_food, ca_food_decay;
 
-        uint subhood;
+        private uint subhood;
 
         public FamiVersions Version => version;
 
@@ -75,9 +77,25 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
 
         public uint AlbumGUID => albumGUID;
 
-        public int BusinessMoney => businessmoney;
+        public int BusinessMoney
+        {
+            get => businessmoney;
+            set
+            {
+                businessmoney = value;
+                _isDirty = true;
+            }
+        }
 
-        public int Money => money;
+        public int Money
+        {
+            get => money;
+            set
+            {
+                money = value;
+                _isDirty = true;
+            }
+        }
 
         public int CastAwayResources => ca_resources;
 
@@ -87,7 +105,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
 
         public uint Friends => friends;
 
-        public uint[] Members => sims;
+        public ReadOnlyCollection<uint> Members => new ReadOnlyCollection<uint>(sims);
 
         public TypeInstanceID LotInstance => (TypeInstanceID)lotinstance;
 
@@ -104,35 +122,165 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
 
         protected void Unserialize(DbpfReader reader)
         {
-            _ = reader.ReadUInt32();
+            uint type = reader.ReadUInt32();
+            Debug.Assert(type == TYPE.AsUInt(), "Expected 0x46414D49");
+
             version = (FamiVersions)reader.ReadUInt32();
-            _ = reader.ReadUInt32();
+
+            uint zero = reader.ReadUInt32();
+            Debug.Assert(zero == 0, "Expected 0x00000000");
+
             lotinstance = reader.ReadUInt32();
-            if ((int)version >= (int)FamiVersions.Business) businesslot = reader.ReadUInt32();
-            if ((int)version >= (int)FamiVersions.Voyage) vacationlot = reader.ReadUInt32();
+            if (version >= FamiVersions.Business)
+            {
+                businesslot = reader.ReadUInt32();
+            }
+            if (version >= FamiVersions.Voyage)
+            {
+                vacationlot = reader.ReadUInt32();
+            }
 
             strinstance = reader.ReadUInt32();
             money = reader.ReadInt32();
-            if ((int)version >= (int)FamiVersions.Castaway) ca_food_decay = reader.ReadInt32();
+
+            if (version >= FamiVersions.Castaway)
+            {
+                ca_food_decay = reader.ReadInt32();
+            }
+
             friends = reader.ReadUInt32();
+
             this.flags = new FamiFlags((ushort)reader.ReadUInt32());
+
             uint count = reader.ReadUInt32();
             sims = new uint[count];
-
             for (int i = 0; i < sims.Length; i++)
             {
                 sims[i] = reader.ReadUInt32();
             }
+
             this.albumGUID = reader.ReadUInt32();
-            if ((int)version >= (int)FamiVersions.University) this.subhood = reader.ReadUInt32();
-            if ((int)version >= (int)FamiVersions.Castaway)
+
+            if (version >= FamiVersions.University)
+            {
+                this.subhood = reader.ReadUInt32();
+            }
+
+            if (version >= FamiVersions.Castaway)
             {
                 ca_resources = reader.ReadInt32();
                 ca_food = reader.ReadInt32();
             }
 
-            if ((int)version >= (int)FamiVersions.Business) businessmoney = reader.ReadInt32();
+            if (version >= FamiVersions.Business)
+            {
+                businessmoney = reader.ReadInt32();
+            }
         }
+
+        public override uint FileSize
+        {
+            get
+            {
+                long size = 4 + 4 + 4;
+
+                size += 4;
+                if (version >= FamiVersions.Business)
+                {
+                    size += 4;
+                }
+                if (version >= FamiVersions.Voyage)
+                {
+                    size += 4;
+                }
+
+                size += 4 + 4;
+
+                if (version >= FamiVersions.Castaway)
+                {
+                    size += 4;
+                }
+
+                size += 4 + 4;
+
+                size += 4 + (sims.Length * 4);
+
+                size += 4;
+
+                if (version >= FamiVersions.University)
+                {
+                    size += 4;
+                }
+
+                if (version >= FamiVersions.Castaway)
+                {
+                    size += 4 + 4;
+                }
+
+                if (version >= FamiVersions.Business)
+                {
+                    size += 4;
+                }
+
+                return (uint)size;
+            }
+        }
+
+        public override void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt32(0x46414D49);
+
+            writer.WriteUInt32((uint)version);
+
+            writer.WriteUInt32(0x00000000);
+
+            writer.WriteUInt32(lotinstance);
+            if (version >= FamiVersions.Business)
+            {
+                writer.WriteUInt32(businesslot);
+            }
+            if (version >= FamiVersions.Voyage)
+            {
+                writer.WriteUInt32(vacationlot);
+            }
+
+            writer.WriteUInt32(strinstance);
+            writer.WriteInt32(money);
+
+            if (version >= FamiVersions.Castaway)
+            {
+                writer.WriteInt32(ca_food_decay);
+            }
+
+            writer.WriteUInt32(friends);
+
+            writer.WriteUInt32(flags.Value);
+
+            writer.WriteUInt32((uint)sims.Length);
+            for (int i = 0; i < sims.Length; i++)
+            {
+                writer.WriteUInt32(sims[i]);
+            }
+
+            writer.WriteUInt32(albumGUID);
+
+            if (version >= FamiVersions.University)
+            {
+                writer.WriteUInt32(subhood);
+            }
+
+            if (version >= FamiVersions.Castaway)
+            {
+                writer.WriteInt32(ca_resources);
+                writer.WriteInt32(ca_food);
+            }
+
+            if (version >= FamiVersions.Business)
+            {
+                writer.WriteInt32(businessmoney);
+            }
+        }
+
 
         public override XmlElement AddXml(XmlElement parent)
         {

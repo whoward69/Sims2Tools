@@ -40,15 +40,15 @@ namespace Sims2Tools.DBPF.CPF
         {
             items = new List<CpfItem>();
 
-            Unserialize(reader, (int)entry.DataSize);
+            Unserialize(reader, entry.DataSize);
         }
 
-        internal void Unserialize(DbpfReader reader, int len)
+        internal void Unserialize(DbpfReader reader, uint len)
         {
             UnserializeXml(reader, len);
         }
 
-        private void UnserializeXml(DbpfReader reader, int len)
+        private void UnserializeXml(DbpfReader reader, uint len)
         {
             using (MemoryStream ms = new MemoryStream(reader.ReadBytes(len)))
             {

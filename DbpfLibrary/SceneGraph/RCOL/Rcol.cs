@@ -329,7 +329,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                 long size = dataSize - (reader.Position - startPos);
                 if (size > 0)
                 {
-                    oversize = reader.ReadBytes((int)size);
+                    oversize = reader.ReadBytes(size);
                     logger.Debug($"Reading 'oversize' bytes in RCol '{KeyName}' part of {ToString()}");
                 }
                 else

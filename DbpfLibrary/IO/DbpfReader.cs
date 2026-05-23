@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -94,6 +95,20 @@ namespace Sims2Tools.DBPF.IO
         public byte ReadByte()
         {
             return m_reader.ReadByte();
+        }
+
+        public byte[] ReadBytes(long num)
+        {
+            Trace.Assert(num < Int32.MaxValue, "byte[] size out of range");
+
+            return ReadBytes((int)num);
+        }
+
+        public byte[] ReadBytes(uint num)
+        {
+            Trace.Assert(num < Int32.MaxValue, "byte[] size out of range");
+
+            return ReadBytes((int)num);
         }
 
         public byte[] ReadBytes(int num)

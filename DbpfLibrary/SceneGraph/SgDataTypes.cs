@@ -51,10 +51,6 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public static string SgHash(TypeTypeID typeID, TypeGroupID groupID, TypeResourceID resourceID, TypeInstanceID instanceID)
         {
-#if DEBUG
-            if (groupID == DBPFData.GROUP_LOCAL && !ImmuneTypes.Contains(typeID)) logger.Warn($"Local Group: {DBPFData.TypeName(typeID)}-{groupID}-{resourceID}-{instanceID}");
-#endif
-
             return $"{DBPFData.TypeName(typeID)}-{groupID}-{resourceID}-{instanceID}";
         }
 
@@ -86,10 +82,6 @@ namespace Sims2Tools.DBPF.SceneGraph
             {
                 prefix = $"##{groupID.ToString().ToLower()}!";
             }
-
-#if DEBUG
-            if (groupID == DBPFData.GROUP_LOCAL && !ImmuneTypes.Contains(typeID)) logger.Warn($"Local Group: {SgName(typeID, fileName, prefix)}");
-#endif
 
             return SgName(typeID, fileName, prefix);
         }

@@ -26,10 +26,10 @@ namespace Sims2Tools.DBPF.TXT
 
         public Txt(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
-            Unserialize(reader, (int)entry.DataSize);
+            Unserialize(reader, entry.DataSize);
         }
 
-        internal void Unserialize(DbpfReader reader, int len)
+        internal void Unserialize(DbpfReader reader, uint len)
         {
             using (MemoryStream ms = new MemoryStream(reader.ReadBytes(len)))
             {

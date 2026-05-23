@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.Utils;
 using System;
+using System.Runtime.Serialization;
 
 namespace Sims2Tools.DBPF
 {
@@ -23,7 +24,8 @@ namespace Sims2Tools.DBPF
     /*
      * Data type for strong typing of GUIDs
      */
-    public readonly struct TypeGUID : IComparable<TypeGUID>
+    [Serializable]
+    public readonly struct TypeGUID : ISerializable, IComparable<TypeGUID>
     {
         private readonly uint guid;
 
@@ -52,6 +54,16 @@ namespace Sims2Tools.DBPF
 
         public uint AsUInt() => guid;
         public int AsInt() => (int)guid;
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("guid", guid);
+        }
+
+        private TypeGUID(SerializationInfo info, StreamingContext context)
+        {
+            guid = info.GetUInt32("guid");
+        }
 
         public static TypeGUID RandomID => (TypeGUID)((((uint)(TypeRng.RNG.Next() & 0xFFFF)) << 16) | ((uint)(TypeRng.RNG.Next() & 0xFFFF)));
     }

@@ -136,7 +136,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
                         }
 
                         // What do we need this for?
-                        byte[] _ = reader.ReadBytes((int)Math.Max(0, pos + imgsize - reader.Position));
+                        byte[] _ = reader.ReadBytes(Math.Max(0, pos + imgsize - reader.Position));
                         reader.Seek(SeekOrigin.Begin, pos + imgsize);
 
                         break;
