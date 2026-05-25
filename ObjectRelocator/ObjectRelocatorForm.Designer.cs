@@ -38,7 +38,6 @@ namespace ObjectRelocator
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ObjectRelocatorForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
@@ -63,6 +62,8 @@ namespace ObjectRelocator
             this.menuItemSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMakeReplacements = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemConfirmDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemDirRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemDirAdd = new System.Windows.Forms.ToolStripMenuItem();
@@ -101,7 +102,7 @@ namespace ObjectRelocator
             this.colPackageFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackageIcon = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextPackages = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextPackages = new System.Windows.Forms.ContextMenuStrip();
             this.menuContextPkgRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgMove = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgMerge = new System.Windows.Forms.ToolStripMenuItem();
@@ -130,7 +131,7 @@ namespace ObjectRelocator
             this.colRemoveOnPlop = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colShowInCatalog = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colObjectData = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextObjects = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextObjects = new System.Windows.Forms.ContextMenuStrip();
             this.menuItemContextEditName = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemContextEditTitleDesc = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -139,8 +140,6 @@ namespace ObjectRelocator
             this.menuItemContextRowRestore = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.menuContextSaveThumb = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuContextReplaceThumb = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuContextDeleteThumb = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparatorHood = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemContextHoodVisible = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemContextHoodInvisible = new System.Windows.Forms.ToolStripMenuItem();
@@ -217,7 +216,7 @@ namespace ObjectRelocator
             this.ckbBuildShowInCatalog = new System.Windows.Forms.CheckBox();
             this.grpBuildPrice = new System.Windows.Forms.GroupBox();
             this.textBuildPrice = new System.Windows.Forms.TextBox();
-            this.menuContextFolders = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextFolders = new System.Windows.Forms.ContextMenuStrip();
             this.menuContextDirRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDirAdd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDirMove = new System.Windows.Forms.ToolStripMenuItem();
@@ -227,8 +226,8 @@ namespace ObjectRelocator
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemConfirmDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCachingRemoveThumbnails = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
             this.splitTopBottom.Panel1.SuspendLayout();
@@ -275,7 +274,8 @@ namespace ObjectRelocator
             this.menuMode,
             this.menuItemFolder,
             this.menuItemPackage,
-            this.menuOptions});
+            this.menuOptions,
+            this.menuCaching});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -452,6 +452,18 @@ namespace ObjectRelocator
             this.menuItemMakeReplacements.Size = new System.Drawing.Size(180, 22);
             this.menuItemMakeReplacements.Text = "&Make Replacements";
             this.menuItemMakeReplacements.Click += new System.EventHandler(this.OnMakeReplcementsClicked);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
+            // 
+            // menuItemConfirmDelete
+            // 
+            this.menuItemConfirmDelete.CheckOnClick = true;
+            this.menuItemConfirmDelete.Name = "menuItemConfirmDelete";
+            this.menuItemConfirmDelete.Size = new System.Drawing.Size(180, 22);
+            this.menuItemConfirmDelete.Text = "Confirm &Delete";
             // 
             // menuItemFolder
             // 
@@ -1104,8 +1116,6 @@ namespace ObjectRelocator
             this.menuItemContextRowRestore,
             this.menuItemSeparator6,
             this.menuContextSaveThumb,
-            this.menuContextReplaceThumb,
-            this.menuContextDeleteThumb,
             this.toolStripSeparatorHood,
             this.menuItemContextHoodVisible,
             this.menuItemContextHoodInvisible,
@@ -1114,7 +1124,7 @@ namespace ObjectRelocator
             this.toolStripSeparator6,
             this.menuItemContextMoveFiles});
             this.menuContextObjects.Name = "menuContextGrid";
-            this.menuContextObjects.Size = new System.Drawing.Size(301, 282);
+            this.menuContextObjects.Size = new System.Drawing.Size(301, 238);
             this.menuContextObjects.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextObjects.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             this.menuContextObjects.Opened += new System.EventHandler(this.OnContextMenuOpened);
@@ -1172,20 +1182,6 @@ namespace ObjectRelocator
             this.menuContextSaveThumb.Size = new System.Drawing.Size(300, 22);
             this.menuContextSaveThumb.Text = "Save Thumbnail...";
             this.menuContextSaveThumb.Click += new System.EventHandler(this.OnSaveThumbClicked);
-            // 
-            // menuContextReplaceThumb
-            // 
-            this.menuContextReplaceThumb.Name = "menuContextReplaceThumb";
-            this.menuContextReplaceThumb.Size = new System.Drawing.Size(300, 22);
-            this.menuContextReplaceThumb.Text = "Replace Thumbnail...";
-            this.menuContextReplaceThumb.Click += new System.EventHandler(this.OnReplaceThumbClicked);
-            // 
-            // menuContextDeleteThumb
-            // 
-            this.menuContextDeleteThumb.Name = "menuContextDeleteThumb";
-            this.menuContextDeleteThumb.Size = new System.Drawing.Size(300, 22);
-            this.menuContextDeleteThumb.Text = "Delete Thumbnail";
-            this.menuContextDeleteThumb.Click += new System.EventHandler(this.OnDeleteThumbClicked);
             // 
             // toolStripSeparatorHood
             // 
@@ -2073,17 +2069,20 @@ namespace ObjectRelocator
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
             // 
-            // toolStripSeparator5
+            // menuCaching
             // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
+            this.menuCaching.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemCachingRemoveThumbnails});
+            this.menuCaching.Name = "menuCaching";
+            this.menuCaching.Size = new System.Drawing.Size(63, 20);
+            this.menuCaching.Text = "&Caching";
             // 
-            // menuItemConfirmDelete
+            // menuItemCachingRemoveThumbnails
             // 
-            this.menuItemConfirmDelete.CheckOnClick = true;
-            this.menuItemConfirmDelete.Name = "menuItemConfirmDelete";
-            this.menuItemConfirmDelete.Size = new System.Drawing.Size(180, 22);
-            this.menuItemConfirmDelete.Text = "Confirm &Delete";
+            this.menuItemCachingRemoveThumbnails.Name = "menuItemCachingRemoveThumbnails";
+            this.menuItemCachingRemoveThumbnails.Size = new System.Drawing.Size(219, 22);
+            this.menuItemCachingRemoveThumbnails.Text = "Remove Thumbnails Cache";
+            this.menuItemCachingRemoveThumbnails.Click += new System.EventHandler(this.OnCachingRemoveThumbnails);
             // 
             // ObjectRelocatorForm
             // 
@@ -2097,7 +2096,6 @@ namespace ObjectRelocator
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
-            this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "ObjectRelocatorForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
@@ -2202,8 +2200,6 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuContextPkgMerge;
         private System.Windows.Forms.ToolStripMenuItem menuContextPkgDelete;
         private System.Windows.Forms.ToolStripSeparator menuContextPkgSeparator1;
-        private System.Windows.Forms.ContextMenuStrip menuContextResources;
-        private System.Windows.Forms.ToolStripMenuItem menuContextResRestore;
         private System.Windows.Forms.ContextMenuStrip menuContextFolders;
         private System.Windows.Forms.ToolStripMenuItem menuContextDirRename;
         private System.Windows.Forms.ToolStripMenuItem menuContextDirAdd;
@@ -2305,8 +2301,6 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuItemContextRemoveThumbCamera;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparatorHood;
         private System.Windows.Forms.ToolStripMenuItem menuContextSaveThumb;
-        private System.Windows.Forms.ToolStripMenuItem menuContextReplaceThumb;
-        private System.Windows.Forms.ToolStripMenuItem menuContextDeleteThumb;
         private System.Windows.Forms.SaveFileDialog saveThumbnailDialog;
         private System.Windows.Forms.OpenFileDialog openThumbnailDialog;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextStripCTSSCrap;
@@ -2349,5 +2343,7 @@ namespace ObjectRelocator
         private System.Windows.Forms.DataGridViewTextBoxColumn colObjectData;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem menuItemConfirmDelete;
+        private System.Windows.Forms.ToolStripMenuItem menuCaching;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCachingRemoveThumbnails;
     }
 }

@@ -12,6 +12,7 @@ using SceneGraphPlus.Shapes;
 using SceneGraphPlus.Surface;
 using Sims2Tools;
 using Sims2Tools.Cache;
+using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Cigen;
 using Sims2Tools.DBPF.Images.JPG;
@@ -91,8 +92,7 @@ namespace SceneGraphPlus
             DBPFData.STR_SOUNDS,
         };
 
-        private CigenFile cigenCache = null;
-        private DBPFFile casThumbnailsPackage = null;
+        private readonly ClothingThumbnailsCache clothingThumbnailsCache = new ClothingThumbnailsCache();
         private static readonly DbpfFileCache packageCache = new DbpfFileCache();
 
         private readonly DrawingSurface surface;
@@ -130,15 +130,9 @@ namespace SceneGraphPlus
             surface.Anchor = AnchorStyles.Top | AnchorStyles.Left; // | AnchorStyles.Bottom; // | AnchorStyles.Right;
         }
 
-        public new void Dispose()
+        public void TidyUp()
         {
-            cigenCache?.Close();
-            cigenCache = null;
-
-            casThumbnailsPackage?.Close();
-            casThumbnailsPackage = null;
-
-            base.Dispose();
+            clothingThumbnailsCache.Close();
         }
 
         private void OnLoad(object sender, EventArgs e)
@@ -174,40 +168,8 @@ namespace SceneGraphPlus
             MyUpdater = new Updater(SceneGraphPlusApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
 
-            if (Sims2ToolsLib.IsSims2HomePathSet)
-            {
-                string cigenPath = $"{Sims2ToolsLib.Sims2HomePath}\\cigen.package";
-
-                if (File.Exists(cigenPath))
-                {
-                    cigenCache = new CigenFile(cigenPath);
-                }
-                else
-                {
-                    logger.Warn("'cigen.package' not found - thumbnails will NOT display.");
-                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'cigen.package' not found - some thumbnails will NOT display.")).ShowDialog();
-                }
-
-                string casThumbnailsPath = $"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\CASThumbnails.package";
-
-                if (File.Exists(casThumbnailsPath))
-                {
-                    casThumbnailsPackage = new DBPFFile(casThumbnailsPath);
-                }
-                else
-                {
-                    logger.Warn("'CASThumbnails.package' not found - thumbnails will NOT display.");
-                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'CASThumbnails.package' not found - some thumbnails will NOT display.")).ShowDialog();
-                }
-            }
-            else
-            {
-                logger.Warn("'Sims2HomePath' not set - thumbnails will NOT display.");
-                if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'Sims2HomePath' not set - thumbnails will NOT display.")).ShowDialog();
-            }
-
-            downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2DownloadsPath}"), UnderstoodTypeIds.ToArray());
-            savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims"), UnderstoodTypeIds.ToArray());
+            downloadsSgCache = new SceneGraphCache(new PackageCache(Sims2ToolsLib.Sims2DownloadsPath), UnderstoodTypeIds.ToArray());
+            savedsimsSgCache = new SceneGraphCache(new PackageCache(Sims2ToolsLib.Sims2SavedSimsPath), UnderstoodTypeIds.ToArray());
             meshCachesLoaded = false;
 
             if (IsAdvancedMode && menuItemPreloadMeshes.Checked) CacheMeshes();
@@ -259,6 +221,8 @@ namespace SceneGraphPlus
                 RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
                 RegistryTools.SaveSetting(SceneGraphPlusApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
             }
+
+            TidyUp();
         }
 
         private void OnFormResize(object sender, EventArgs e)
@@ -361,6 +325,13 @@ namespace SceneGraphPlus
                 menuPackages.DropDownItems.Add(menuItem);
             }
         }
+
+        #region Cache Menu Actions
+        private void OnCachingRemoveThumbnails(object sender, EventArgs e)
+        {
+            clothingThumbnailsCache.RemoveCaches();
+        }
+        #endregion
 
         public void UpdateForm()
         {
@@ -666,7 +637,7 @@ namespace SceneGraphPlus
                 }
                 else
                 {
-                    Txmt txmt = (Txmt)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
+                    Txmt txmt = (Txmt)packageCache.OpenForUpdate(block.PackagePath).GetResourceByKey(block.Key);
 
                     if (txmt != null)
                     {
@@ -711,26 +682,7 @@ namespace SceneGraphPlus
 
         public Image GetThumbnail(GraphBlock block)
         {
-            Image thumbnail = cigenCache?.GetThumbnail(block.OriginalKey);
-
-            if (thumbnail == null)
-            {
-                if (casThumbnailsPackage != null)
-                {
-                    if (block.TypeId == Gzps.TYPE)
-                    {
-                        CacheableDbpfFile gzpsPackage = packageCache.GetOrAdd(block.PackagePath);
-
-                        Gzps gzps = (Gzps)gzpsPackage.GetResourceByKey(block.OriginalKey);
-
-                        DBPFKey casThubmnailKey = Hashes.CasThumbnailHash(gzps);
-
-                        thumbnail = ((Jpg)casThumbnailsPackage.GetResourceByKey(casThubmnailKey))?.Image;
-                    }
-                }
-            }
-
-            return thumbnail;
+            return clothingThumbnailsCache.GetThumbnail(block.OriginalKey);
         }
 
         public string GetAvailablePath(DBPFKey key)
@@ -747,7 +699,7 @@ namespace SceneGraphPlus
 
                 if (availablePath != null)
                 {
-                    availablePath = availablePath.Substring($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims".Length + 1);
+                    availablePath = availablePath.Substring(Sims2ToolsLib.Sims2SavedSimsPath.Length + 1);
                 }
             }
 

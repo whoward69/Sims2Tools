@@ -72,6 +72,8 @@ namespace SceneGraphPlus
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemPreloadMeshes = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemLoadMeshesNow = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemDirectSounds = new System.Windows.Forms.ToolStripMenuItem();
             this.menuGrid = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemGridRealign = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -101,8 +103,8 @@ namespace SceneGraphPlus
             this.textBlockPackagePath = new System.Windows.Forms.TextBox();
             this.btnFixIssues = new System.Windows.Forms.Button();
             this.btnFixTgi = new System.Windows.Forms.Button();
-            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemDirectSounds = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCachingRemoveThumbnails = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel2.SuspendLayout();
@@ -117,7 +119,8 @@ namespace SceneGraphPlus
             this.menuItemMode,
             this.menuOptions,
             this.menuGrid,
-            this.menuPackages});
+            this.menuPackages,
+            this.menuCaching});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -711,6 +714,21 @@ namespace SceneGraphPlus
             this.btnFixTgi.UseVisualStyleBackColor = true;
             this.btnFixTgi.Click += new System.EventHandler(this.OnFixTgiClicked);
             // 
+            // menuCaching
+            // 
+            this.menuCaching.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemCachingRemoveThumbnails});
+            this.menuCaching.Name = "menuCaching";
+            this.menuCaching.Size = new System.Drawing.Size(63, 20);
+            this.menuCaching.Text = "&Caching";
+            // 
+            // menuItemCachingRemoveThumbnails
+            // 
+            this.menuItemCachingRemoveThumbnails.Name = "menuItemCachingRemoveThumbnails";
+            this.menuItemCachingRemoveThumbnails.Size = new System.Drawing.Size(219, 22);
+            this.menuItemCachingRemoveThumbnails.Text = "Remove Thumbnails Cache";
+            this.menuItemCachingRemoveThumbnails.Click += new System.EventHandler(this.OnCachingRemoveThumbnails);
+            // 
             // SceneGraphPlusForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -721,7 +739,6 @@ namespace SceneGraphPlus
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
-            this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(800, 673);
             this.Name = "SceneGraphPlusForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
@@ -807,5 +824,7 @@ namespace SceneGraphPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemCreatorDetails;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
         private System.Windows.Forms.ToolStripMenuItem menuItemDirectSounds;
+        private System.Windows.Forms.ToolStripMenuItem menuCaching;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCachingRemoveThumbnails;
     }
 }

@@ -9,6 +9,7 @@
 #region Usings
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
+using Sims2Tools.Cache;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CLST;
@@ -64,7 +65,7 @@ namespace ObjectRelocator
         private static readonly Color colourDirtyHighlight = Color.FromName(Properties.Settings.Default.DirtyHighlight);
         private static readonly Color colourThumbnailBackground = Color.FromName(Properties.Settings.Default.ThumbnailBackground);
 
-        private readonly ThumbnailCache thumbCache;
+        private readonly ObjectThumbnailsCache objectThumbnailsCache = new ObjectThumbnailsCache();
 
         private readonly TypeTypeID[] buyModeResources = new TypeTypeID[] { Objd.TYPE };
         private readonly TypeTypeID[] buildModeResources = new TypeTypeID[] { Objd.TYPE, Xfnc.TYPE, Xobj.TYPE };
@@ -179,7 +180,7 @@ namespace ObjectRelocator
 
         public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
-        #region Constructor and Dispose
+        #region Constructor and TidyUp
         public ObjectRelocatorForm()
         {
             logger.Info(ObjectRelocatorApp.AppProduct);
@@ -205,16 +206,12 @@ namespace ObjectRelocator
             gridPackageFiles.DataSource = dataPackageFiles;
             gridResources.DataSource = dataResources;
 
-            thumbCache = new ThumbnailCache();
-
             thumbBox.BackColor = colourThumbnailBackground;
         }
 
-        public new void Dispose()
+        public void TidyUp()
         {
-            thumbCache.Close();
-
-            base.Dispose();
+            objectThumbnailsCache.Close();
         }
         #endregion
 
@@ -223,6 +220,8 @@ namespace ObjectRelocator
         {
             RegistryTools.LoadAppSettings(ObjectRelocatorApp.RegistryKey, ObjectRelocatorApp.AppVersionMajor, ObjectRelocatorApp.AppVersionMinor);
             RegistryTools.LoadFormSettings(ObjectRelocatorApp.RegistryKey, this);
+            splitTopBottom.SplitterDistance = (int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
+            splitTopLeftRight.SplitterDistance = (int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
 
             MyMruList = new MruList(ObjectRelocatorApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
             MyMruList.FileSelected += MyMruList_FolderSelected;
@@ -261,12 +260,11 @@ namespace ObjectRelocator
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            if (IsAnyResourceDirty() || IsThumbCacheDirty())
+            if (IsAnyResourceDirty())
             {
                 string qualifier = IsAnyHiddenResourceDirty() ? " HIDDEN" : "";
-                string type = (IsAnyResourceDirty() ? (IsThumbCacheDirty() ? "object and thumbnail" : "object") : "thumbnail");
 
-                if (MsgBox.Show($"There are{qualifier} unsaved {type} changes, do you really want to exit?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                if (MsgBox.Show($"There are{qualifier} unsaved changes, do you really want to exit?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
                     e.Cancel = true;
                     return;
@@ -281,6 +279,8 @@ namespace ObjectRelocator
             {
                 RegistryTools.SaveAppSettings(ObjectRelocatorApp.RegistryKey, ObjectRelocatorApp.AppVersionMajor, ObjectRelocatorApp.AppVersionMinor);
                 RegistryTools.SaveFormSettings(ObjectRelocatorApp.RegistryKey, this);
+                RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
+                RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
 
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemBuyMode.Name, (IsBuyMode ? 1 : (IsDecoMode ? 2 : 0)));
 
@@ -306,6 +306,8 @@ namespace ObjectRelocator
 
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", ckbLinkDep.Name, ckbLinkDep.Checked ? 1 : 0);
             }
+
+            TidyUp();
         }
 
         private void SetTitle(string folder)
@@ -344,6 +346,8 @@ namespace ObjectRelocator
         #endregion
 
         #region Worker
+        private string lastPackagePath;
+
         private void DoWork_FillTree(string folder, bool ignoreDirty, bool updateMru)
         {
             DoWork_FillTreeOrGrids(folder, ignoreDirty, updateMru, true, false, false);
@@ -426,7 +430,8 @@ namespace ObjectRelocator
                     logger.Error(progressDialog.Result.Error.Message);
                     logger.Info(progressDialog.Result.Error.StackTrace);
 
-                    MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
+                    string errorPackagePath = (lastPackagePath != null) ? $"\n{lastPackagePath}" : "";
+                    MsgBox.Show($"An error occured while processing\n{errorPackagePath}", "Error!", MessageBoxButtons.OK);
                 }
                 else
                 {
@@ -492,9 +497,12 @@ namespace ObjectRelocator
                 else if (workPackage.UpdatePackages)
                 {
                     sender.SetProgress(0, "Loading Packages");
+                    lastPackagePath = null;
 
                     foreach (string packagePath in Directory.GetFiles(workPackage.Folder, "*.package", menuItemRecurse.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
                     {
+                        lastPackagePath = packagePath;
+
                         if (sender.CancellationPending)
                         {
                             args.Cancel = true;
@@ -514,6 +522,7 @@ namespace ObjectRelocator
                 else if (workPackage.UpdateResources)
                 {
                     sender.SetProgress(0, "Loading Objects");
+                    lastPackagePath = null;
 
                     List<string> packages = new List<string>();
 
@@ -528,6 +537,8 @@ namespace ObjectRelocator
 
                     foreach (string packagePath in packages)
                     {
+                        lastPackagePath = packagePath;
+
 #if !DEBUG
                 try
 #else
@@ -536,7 +547,7 @@ namespace ObjectRelocator
                         {
                             sender.VisualMode = ProgressBarDisplayMode.Percentage;
 
-                            using (CacheableDbpfFile package = packageCache.GetOrOpen(packagePath))
+                            using (CacheableDbpfFile package = packageCache.OpenForReadOnly(packagePath))
                             {
                                 bool showHoodView = menuItemShowHoodView.Checked;
 
@@ -834,11 +845,6 @@ namespace ObjectRelocator
         #endregion
 
         #region Form State
-        private bool IsThumbCacheDirty()
-        {
-            return thumbCache.IsDirty;
-        }
-
         private bool IsAnyPackageDirty()
         {
             foreach (DataRow packageRow in dataPackageFiles.Rows)
@@ -946,11 +952,6 @@ namespace ObjectRelocator
                 {
                     row.DefaultCellStyle.BackColor = Color.Empty;
                 }
-            }
-
-            if (IsThumbCacheDirty())
-            {
-                menuItemSaveAll.Enabled = btnSave.Enabled = true;
             }
 
             updatingFormState = false;
@@ -1444,7 +1445,7 @@ namespace ObjectRelocator
 
         private void OnPkgMergeClicked(object sender, EventArgs e)
         {
-            // TODO - Object Relocator - changes to the way Merge works
+            // TODO - Object Relocator - merging - changes to the way Merge works
             // Ask for new name
             // Create empty .package file with new name
             // Merge selected .package files into new package
@@ -1482,7 +1483,7 @@ namespace ObjectRelocator
                             if (entry.TypeID == Clst.TYPE) continue;
 
                             DBPFKey key = entry;
-                            byte[] item = package.GetOriginalItemByEntry(entry);
+                            byte[] item = package.GetOriginalDataByEntry(entry);
 
                             if (entry.GroupID == DBPFData.GROUP_LOCAL)
                             {
@@ -1598,6 +1599,13 @@ namespace ObjectRelocator
         }
         #endregion
 
+        #region Cache Menu Actions
+        private void OnCachingRemoveThumbnails(object sender, EventArgs e)
+        {
+            objectThumbnailsCache.RemoveCaches();
+        }
+        #endregion
+
         #region Tooltips and Thumbnails
         private void OnToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
         {
@@ -1685,7 +1693,18 @@ namespace ObjectRelocator
 
         private Image GetThumbnail(DataGridViewRow row)
         {
-            return thumbCache.GetThumbnail(packageCache, row.Cells["colObjectData"].Value as ObjectDbpfData, IsBuyMode, IsBuildMode, IsDecoMode);
+            Image thumb = null;
+
+            ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
+
+            using (CacheableDbpfFile package = packageCache.OpenForReadOnly(objectData.PackagePath))
+            {
+                thumb = objectThumbnailsCache.GetThumbnail(package, objectData.ThumbnailOwner);
+
+                package.Close();
+            }
+
+            return thumb;
         }
 
         #endregion
@@ -3723,16 +3742,13 @@ namespace ObjectRelocator
                         menuItemContextEditName.Enabled = true;
                         menuItemContextEditTitleDesc.Enabled = objectData.HasTitleAndDescription;
 
-                        Image thumbnail = thumbCache.GetThumbnail(packageCache, objectData, IsBuyMode, IsBuildMode, IsDecoMode);
+                        Image thumbnail = GetThumbnail(mouseRow);
                         menuContextSaveThumb.Enabled = (thumbnail != null);
-                        menuContextReplaceThumb.Enabled = menuContextDeleteThumb.Enabled = (thumbnail != null) && !menuItemMakeReplacements.Checked;
                     }
                     else
                     {
                         menuItemContextEditName.Enabled = true;
                         menuItemContextEditTitleDesc.Enabled = true;
-
-                        menuContextSaveThumb.Enabled = menuContextReplaceThumb.Enabled = menuContextDeleteThumb.Enabled = false;
                     }
 
                     menuItemContextStripCTSSCrap.Enabled = (gridResources.SelectedRows.Count > 0);
@@ -3935,7 +3951,7 @@ namespace ObjectRelocator
                     {
                         packageCache.SetClean(objectData.PackagePath);
 
-                        using (CacheableDbpfFile package = packageCache.GetOrOpen(objectData.PackagePath))
+                        using (CacheableDbpfFile package = packageCache.OpenForReadOnly(objectData.PackagePath))
                         {
                             ObjectDbpfData originalData = ObjectDbpfData.Create(package, objectData);
 
@@ -3967,53 +3983,11 @@ namespace ObjectRelocator
             {
                 using (Stream stream = saveThumbnailDialog.OpenFile())
                 {
-                    Image thumbnail = thumbCache.GetThumbnail(packageCache, objectData, IsBuyMode, IsBuildMode, IsDecoMode);
+                    Image thumbnail = GetThumbnail(selectedRow);
 
                     thumbnail?.Save(stream, (saveThumbnailDialog.FileName.EndsWith("jpg") ? ImageFormat.Jpeg : ImageFormat.Png));
 
                     stream.Close();
-                }
-            }
-        }
-
-        private void OnReplaceThumbClicked(object sender, EventArgs e)
-        {
-            DataGridViewRow selectedRow = gridResources.SelectedRows[0];
-            ObjectDbpfData objectData = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
-
-            if (openThumbnailDialog.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    Image newThumbnail = Image.FromFile(openThumbnailDialog.FileName);
-
-                    thumbCache.ReplaceThumbnail(packageCache, objectData, IsBuyMode, IsBuildMode, IsDecoMode, newThumbnail);
-
-                    if (IsThumbCacheDirty())
-                    {
-                        menuItemSaveAll.Enabled = btnSave.Enabled = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    logger.Warn("OnReplaceThumbClicked", ex);
-                    MsgBox.Show($"Unable to open/read {openThumbnailDialog.FileName}", "Thumbnail Error");
-                }
-            }
-        }
-
-        private void OnDeleteThumbClicked(object sender, EventArgs e)
-        {
-            DataGridViewRow selectedRow = gridResources.SelectedRows[0];
-            ObjectDbpfData objectData = selectedRow.Cells["colObjectData"].Value as ObjectDbpfData;
-
-            if (objectData?.ThumbnailOwner != null)
-            {
-                thumbCache.DeleteThumbnail(packageCache, objectData, IsBuyMode, IsBuildMode, IsDecoMode);
-
-                if (IsThumbCacheDirty())
-                {
-                    menuItemSaveAll.Enabled = btnSave.Enabled = true;
                 }
             }
         }
@@ -4302,7 +4276,7 @@ namespace ObjectRelocator
 
         private void OnPkgGrid_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left && mouseLocation.RowIndex != -1)
             {
                 if (gridPackageFiles.CurrentRow != null)
                 {
@@ -4343,19 +4317,6 @@ namespace ObjectRelocator
                 Save();
             }
 
-            if (IsThumbCacheDirty())
-            {
-                try
-                {
-                    thumbCache.Update(menuItemAutoBackup.Checked);
-                }
-                catch (Exception ex)
-                {
-                    logger.Warn("Error trying to update thumbnail cache", ex);
-                    MsgBox.Show("Error trying to update thumbnail cache", "Package Update Error!");
-                }
-            }
-
             UpdateFormState();
         }
 
@@ -4382,7 +4343,7 @@ namespace ObjectRelocator
 
             foreach (string packageFile in dirtyObjectsByPackage.Keys)
             {
-                using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
+                using (CacheableDbpfFile dbpfPackage = packageCache.OpenForReadOnly(packageFile))
                 {
                     try
                     {
@@ -4405,7 +4366,7 @@ namespace ObjectRelocator
 
         private void SaveAs(string packageFile)
         {
-            using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
+            using (CacheableDbpfFile dbpfPackage = packageCache.OpenForReadOnly(packageFile))
             {
                 List<ObjectDbpfData> editedObjects = new List<ObjectDbpfData>();
 

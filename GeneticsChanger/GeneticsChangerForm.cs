@@ -93,7 +93,7 @@ namespace GeneticsChanger
         private bool IsAutoUpdate => (!dataLoading && !ignoreEdits);
         public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
-        #region Constructor and Dispose
+        #region Constructor and TidyUp
         public GeneticsChangerForm()
         {
             logger.Info(GeneticsChangerApp.AppProduct);
@@ -129,15 +129,13 @@ namespace GeneticsChanger
             thumbBox.BackColor = colourThumbnailBackground;
         }
 
-        public new void Dispose()
+        public void TidyUp()
         {
             if (cigenCache != null)
             {
                 cigenCache.Close();
                 cigenCache = null;
             }
-
-            base.Dispose();
         }
         #endregion
 
@@ -218,6 +216,8 @@ namespace GeneticsChanger
 
             RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
             RegistryTools.SaveSetting(GeneticsChangerApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
+
+            TidyUp();
         }
 
         private void SetTitle(string folder)
@@ -375,7 +375,7 @@ namespace GeneticsChanger
                     logger.Error(progressDialog.Result.Error.Message);
                     logger.Info(progressDialog.Result.Error.StackTrace);
 
-                    MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
+                    MsgBox.Show($"An error occured while processing\n{lastPackageFile}", "Error!", MessageBoxButtons.OK);
                 }
                 else
                 {

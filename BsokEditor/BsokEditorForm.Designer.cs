@@ -38,7 +38,6 @@ namespace BsokEditor
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BsokEditorForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,7 +71,7 @@ namespace BsokEditor
             this.colShoe = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colResRef = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextGrid = new System.Windows.Forms.ContextMenuStrip();
             this.menuItemContextRowRestore = new System.Windows.Forms.ToolStripMenuItem();
             this.comboBsokGenre = new System.Windows.Forms.ComboBox();
             this.comboGender = new System.Windows.Forms.ComboBox();
@@ -109,6 +108,8 @@ namespace BsokEditor
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
+            this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCachingRemoveThumbnails = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextGrid.SuspendLayout();
@@ -128,7 +129,8 @@ namespace BsokEditor
             this.menuFile,
             this.menuHelp,
             this.menuMode,
-            this.menuOptions});
+            this.menuOptions,
+            this.menuCaching});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -818,6 +820,21 @@ namespace BsokEditor
             this.thumbBox.TabStop = false;
             this.thumbBox.Visible = false;
             // 
+            // menuCaching
+            // 
+            this.menuCaching.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemCachingRemoveThumbnails});
+            this.menuCaching.Name = "menuCaching";
+            this.menuCaching.Size = new System.Drawing.Size(63, 20);
+            this.menuCaching.Text = "&Caching";
+            // 
+            // menuItemCachingRemoveThumbnails
+            // 
+            this.menuItemCachingRemoveThumbnails.Name = "menuItemCachingRemoveThumbnails";
+            this.menuItemCachingRemoveThumbnails.Size = new System.Drawing.Size(219, 22);
+            this.menuItemCachingRemoveThumbnails.Text = "Remove Thumbnails Cache";
+            this.menuItemCachingRemoveThumbnails.Click += new System.EventHandler(this.OnCachingRemoveThumbnails);
+            // 
             // BsokEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -830,7 +847,6 @@ namespace BsokEditor
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
-            this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(930, 450);
             this.Name = "BsokEditorForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
@@ -928,5 +944,7 @@ namespace BsokEditor
         private System.Windows.Forms.GroupBox grpSearch;
         private System.Windows.Forms.TextBox textSearch;
         private System.Windows.Forms.CheckBox ckbCatSkintone;
+        private System.Windows.Forms.ToolStripMenuItem menuCaching;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCachingRemoveThumbnails;
     }
 }

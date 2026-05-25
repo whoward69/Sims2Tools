@@ -216,6 +216,10 @@ namespace HoodExporter
             }
         }
 
+        public void TidyUp()
+        {
+        }
+
         private void ParseXml(string xml, string element, Dictionary<TypeGUID, string> byValue)
         {
             XmlReader reader = XmlReader.Create(xml);
@@ -705,7 +709,7 @@ namespace HoodExporter
                                 {
                                     List<DBPFEntry> imgs = new List<DBPFEntry>(package.GetEntriesByType(Img.TYPE));
 
-                                    foreach (DBPFEntry entry in package.GetEntriesByType(Jpg.TYPE))
+                                    foreach (DBPFEntry entry in package.GetEntriesByType(Jpg.TYPES[(int)Jpg.JpgTypeIndex.Normal]))
                                     {
                                         imgs.Add(entry);
                                     }
@@ -831,7 +835,7 @@ namespace HoodExporter
                         {
                             List<DBPFEntry> imgs = new List<DBPFEntry>(package.GetEntriesByType(Img.TYPE));
 
-                            foreach (DBPFEntry entry in package.GetEntriesByType(Jpg.TYPE))
+                            foreach (DBPFEntry entry in package.GetEntriesByType(Jpg.TYPES[(int)Jpg.JpgTypeIndex.Normal]))
                             {
                                 imgs.Add(entry);
                             }
@@ -916,7 +920,7 @@ namespace HoodExporter
                     {
                         List<DBPFEntry> imgs = new List<DBPFEntry>(package.GetEntriesByType(Img.TYPE));
 
-                        foreach (DBPFEntry entry in package.GetEntriesByType(Jpg.TYPE))
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Jpg.TYPES[(int)Jpg.JpgTypeIndex.Normal]))
                         {
                             imgs.Add(entry);
                         }
@@ -1100,21 +1104,30 @@ namespace HoodExporter
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            RegistryTools.SaveAppSettings(HoodExporterApp.RegistryKey, HoodExporterApp.AppVersionMajor, HoodExporterApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(HoodExporterApp.RegistryKey, this);
-            RegistryTools.SaveSetting(HoodExporterApp.RegistryKey, textHoodPath.Name, textHoodPath.Text);
-            RegistryTools.SaveSetting(HoodExporterApp.RegistryKey, textSavePath.Name, textSavePath.Text);
-
-            RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemPrettyPrint.Name, menuItemPrettyPrint.Checked ? 1 : 0);
-
-            RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemSaveAsPng.Name, menuItemSaveAsPng.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemSaveAsJpg.Name, menuItemSaveAsJpg.Checked ? 1 : 0);
-
-            RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemSimImages.Name, menuItemSimImages.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemLotImages.Name, menuItemLotImages.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemFamilyImages.Name, menuItemFamilyImages.Checked ? 1 : 0);
-
             HoodExporterTransformer.Shutdown();
+
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(HoodExporterApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(HoodExporterApp.RegistryKey, HoodExporterApp.AppVersionMajor, HoodExporterApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(HoodExporterApp.RegistryKey, this);
+                RegistryTools.SaveSetting(HoodExporterApp.RegistryKey, textHoodPath.Name, textHoodPath.Text);
+                RegistryTools.SaveSetting(HoodExporterApp.RegistryKey, textSavePath.Name, textSavePath.Text);
+
+                RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemPrettyPrint.Name, menuItemPrettyPrint.Checked ? 1 : 0);
+
+                RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemSaveAsPng.Name, menuItemSaveAsPng.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemSaveAsJpg.Name, menuItemSaveAsJpg.Checked ? 1 : 0);
+
+                RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemSimImages.Name, menuItemSimImages.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemLotImages.Name, menuItemLotImages.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HoodExporterApp.RegistryKey + @"\Options", menuItemFamilyImages.Name, menuItemFamilyImages.Checked ? 1 : 0);
+            }
+
+            TidyUp();
         }
 
         private void OnSelectHoodPathClicked(object sender, EventArgs e)

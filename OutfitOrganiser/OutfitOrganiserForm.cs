@@ -13,6 +13,7 @@
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.Cache;
+using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Cigen;
@@ -55,7 +56,7 @@ namespace OutfitOrganiser
 
         private readonly DbpfFileCache packageCache = new DbpfFileCache();
 
-        private CigenFile cigenCache = null;
+        private readonly ClothingThumbnailsCache clothingThumbnailsCache = new ClothingThumbnailsCache();
 
         private string rootFolder = null;
         private string lastFolder = null;
@@ -182,7 +183,7 @@ namespace OutfitOrganiser
         private bool IsAutoUpdate => (!dataLoading && !ignoreEdits);
         public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
-        #region Constructor and Dispose
+        #region Constructor and TidyUp
         public OutfitOrganiserForm()
         {
             logger.Info(OutfitOrganiserApp.AppProduct);
@@ -243,12 +244,9 @@ namespace OutfitOrganiser
             thumbBox.BackColor = colourThumbnailBackground;
         }
 
-        public new void Dispose()
+        public void TidyUp()
         {
-            cigenCache?.Close();
-            cigenCache = null;
-
-            base.Dispose();
+            clothingThumbnailsCache.Close();
         }
         #endregion
 
@@ -374,28 +372,8 @@ namespace OutfitOrganiser
             MyUpdater = new Updater(OutfitOrganiserApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
 
-            if (Sims2ToolsLib.IsSims2HomePathSet)
-            {
-                string cigenPath = $"{Sims2ToolsLib.Sims2HomePath}\\cigen.package";
-
-                if (File.Exists(cigenPath))
-                {
-                    cigenCache = new CigenFile(cigenPath);
-                }
-                else
-                {
-                    logger.Warn("'cigen.package' not found - thumbnails will NOT display.");
-                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'cigen.package' not found - thumbnails will NOT display.")).ShowDialog();
-                }
-            }
-            else
-            {
-                logger.Warn("'Sims2HomePath' not set - thumbnails will NOT display.");
-                if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'Sims2HomePath' not set - thumbnails will NOT display.")).ShowDialog();
-            }
-
-            downloadsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2DownloadsPath}"));
-            savedsimsSgCache = new SceneGraphCache(new PackageCache($"{Sims2ToolsLib.Sims2HomePath}\\SavedSims"));
+            downloadsSgCache = new SceneGraphCache(new PackageCache(Sims2ToolsLib.Sims2DownloadsPath));
+            savedsimsSgCache = new SceneGraphCache(new PackageCache(Sims2ToolsLib.Sims2SavedSimsPath));
             meshCachesLoaded = false;
 
             if (IsAdvancedMode && menuItemPreloadMeshes.Checked) CacheMeshes();
@@ -405,10 +383,10 @@ namespace OutfitOrganiser
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            if (IsAnyPackageDirty() || IsCigenDirty())
+            if (IsAnyPackageDirty())
             {
                 string qualifier = IsAnyHiddenResourceDirty() ? " HIDDEN" : "";
-                string type = (IsAnyPackageDirty() ? (IsCigenDirty() ? "resource and thumbnail" : "resource") : "thumbnail");
+                string type = (IsAnyPackageDirty() ? "resource" : "thumbnail");
 
                 if (MsgBox.Show($"There are{qualifier} unsaved {type} changes, do you really want to exit?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
@@ -452,6 +430,8 @@ namespace OutfitOrganiser
                 RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
                 RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
             }
+
+            TidyUp();
         }
 
         private void SetTitle(string folder)
@@ -738,7 +718,7 @@ namespace OutfitOrganiser
 
                     foreach (DataGridViewRow packageRow in gridPackageFiles.SelectedRows)
                     {
-                        using (CacheableDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
+                        using (CacheableDbpfFile package = packageCache.OpenForReadOnly(packageRow.Cells["colPackagePath"].Value as string))
                         {
                             lastPackagePath = package.PackagePath;
 
@@ -937,11 +917,6 @@ namespace OutfitOrganiser
         #endregion
 
         #region Form State
-        private bool IsCigenDirty()
-        {
-            return (cigenCache != null && cigenCache.IsDirty);
-        }
-
         private bool IsAnyPackageDirty()
         {
             foreach (DataRow packageRow in dataPackageFiles.Rows)
@@ -1056,11 +1031,6 @@ namespace OutfitOrganiser
             gridResources.Columns["colTownie"].Visible = menuItemOutfitClothing.Checked || menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked;
 
             grpMultipleOutfits.Visible = !(grpShoe.Visible || grpAccessories.Visible || grpMakeup.Visible || grpHairtone.Visible || grpGenetics.Visible);
-
-            if (IsCigenDirty())
-            {
-                menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
-            }
 
             InUpdateFormState = false;
         }
@@ -1403,7 +1373,7 @@ namespace OutfitOrganiser
                             if (entry.TypeID == Clst.TYPE) continue;
 
                             DBPFKey key = entry;
-                            byte[] item = package.GetOriginalItemByEntry(entry);
+                            byte[] item = package.GetOriginalDataByEntry(entry);
 
                             if (entry.GroupID == DBPFData.GROUP_LOCAL)
                             {
@@ -1611,6 +1581,13 @@ namespace OutfitOrganiser
         }
         #endregion
 
+        #region Cache Menu Actions
+        private void OnCachingRemoveThumbnails(object sender, EventArgs e)
+        {
+            clothingThumbnailsCache.RemoveCaches();
+        }
+        #endregion
+
         #region Tooltips and Thumbnails
         private void OnResourceToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
         {
@@ -1676,20 +1653,7 @@ namespace OutfitOrganiser
 
         private Image GetResourceThumbnail(DBPFKey key)
         {
-            Image thumbnail = null;
-
-            if (key != null)
-            {
-                thumbnail = cigenCache?.GetThumbnail(key);
-
-                if (cigenCache != null && thumbnail == null)
-                {
-                    // Way too many of these to log this way!
-                    // logger.Warn($"Thumbnail missing for {key}");
-                }
-            }
-
-            return thumbnail;
+            return clothingThumbnailsCache.GetThumbnail(key);
         }
         #endregion
 
@@ -3430,7 +3394,7 @@ namespace OutfitOrganiser
             mouseLocation = e;
             Point MousePosition = Cursor.Position;
 
-            if (cigenCache != null && sender is DataGridView grid)
+            if (sender is DataGridView grid)
             {
                 if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < grid.RowCount && e.ColumnIndex < grid.ColumnCount)
                 {
@@ -3457,7 +3421,7 @@ namespace OutfitOrganiser
 
                             if (thumbnail == null)
                             {
-                                using (CacheableDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
+                                using (CacheableDbpfFile package = packageCache.OpenForReadOnly(packageRow.Cells["colPackagePath"].Value as string))
                                 {
                                     foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                     {
@@ -3596,7 +3560,7 @@ namespace OutfitOrganiser
                     Cpf thumbnailOwner = outfitData?.ThumbnailOwner;
                     Image thumbnail = (thumbnailOwner != null) ? GetResourceThumbnail(thumbnailOwner) : outfitData?.Thumbnail;
 
-                    menuContextResSaveThumb.Enabled = menuContextResReplaceThumb.Enabled = menuContextResDeleteThumb.Enabled = ((cigenCache != null) && (gridResources.SelectedRows.Count == 1) && (thumbnail != null));
+                    menuContextResSaveThumb.Enabled = ((gridResources.SelectedRows.Count == 1) && (thumbnail != null));
 
                     menuContextResRepair.Enabled = false;
                     menuContextResRestore.Enabled = false;
@@ -3681,7 +3645,7 @@ namespace OutfitOrganiser
                     {
                         outfitData.UnUpdatePackage();
 
-                        using (CacheableDbpfFile package = packageCache.GetOrOpen(outfitData.PackagePath))
+                        using (CacheableDbpfFile package = packageCache.OpenForReadOnly(outfitData.PackagePath))
                         {
                             OutfitDbpfData originalData = OutfitDbpfData.Create(package, outfitData);
 
@@ -3721,48 +3685,6 @@ namespace OutfitOrganiser
                     thumbnail?.Save(stream, (saveThumbnailDialog.FileName.EndsWith("jpg") ? ImageFormat.Jpeg : ImageFormat.Png));
 
                     stream.Close();
-                }
-            }
-        }
-
-        private void OnResReplaceThumbClicked(object sender, EventArgs e)
-        {
-            DataGridViewRow selectedResourceRow = gridResources.SelectedRows[0];
-            OutfitDbpfData outfitData = selectedResourceRow.Cells["colOutfitData"].Value as OutfitDbpfData;
-
-            if (openThumbnailDialog.ShowDialog() == DialogResult.OK)
-            {
-                try
-                {
-                    Image newThumbnail = Image.FromFile(openThumbnailDialog.FileName);
-
-                    cigenCache.ReplaceThumbnail(outfitData.ThumbnailOwner, newThumbnail);
-
-                    if (IsCigenDirty())
-                    {
-                        menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    logger.Warn("OnResReplaceThumbClicked", ex);
-                    MsgBox.Show($"Unable to open/read {openThumbnailDialog.FileName}", "Thumbnail Error");
-                }
-            }
-        }
-
-        private void OnResDeleteThumbClicked(object sender, EventArgs e)
-        {
-            DataGridViewRow selectedResourceRow = gridResources.SelectedRows[0];
-            OutfitDbpfData outfitData = selectedResourceRow.Cells["colOutfitData"].Value as OutfitDbpfData;
-
-            if (outfitData?.ThumbnailOwner != null)
-            {
-                cigenCache.DeleteThumbnail(outfitData.ThumbnailOwner);
-
-                if (IsCigenDirty())
-                {
-                    menuItemSaveAll.Enabled = btnSaveAll.Enabled = true;
                 }
             }
         }
@@ -3920,7 +3842,7 @@ namespace OutfitOrganiser
 
         private void OnPkgGrid_MouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left && mouseLocation.RowIndex != -1)
             {
                 if (gridPackageFiles.CurrentRow != null)
                 {
@@ -3960,7 +3882,7 @@ namespace OutfitOrganiser
             {
                 string packagePath = packageRow.Cells["colPackagePath"].Value as string;
 
-                using (CacheableDbpfFile package = packageCache.GetOrOpen(packagePath))
+                using (CacheableDbpfFile package = packageCache.OpenForReadOnly(packagePath))
                 {
                     if (package.IsDirty)
                     {
@@ -3985,19 +3907,6 @@ namespace OutfitOrganiser
                     }
 
                     package.Close();
-                }
-            }
-
-            if (IsCigenDirty())
-            {
-                try
-                {
-                    cigenCache.Update(menuItemAutoBackup.Checked);
-                }
-                catch (Exception e)
-                {
-                    logger.Warn("Error trying to update cigen.package", e);
-                    MsgBox.Show("Error trying to update cigen.package", "Package Update Error!");
                 }
             }
 
@@ -4048,7 +3957,7 @@ namespace OutfitOrganiser
         #region Meshes Button
         private void OnMeshesClicked(object sender, EventArgs e)
         {
-            Form meshesDialog = new OutfitOrganiserMeshesDialog(gridResources, packageCache, cigenCache, downloadsSgCache, savedsimsSgCache);
+            Form meshesDialog = new OutfitOrganiserMeshesDialog(gridResources, packageCache, clothingThumbnailsCache, downloadsSgCache, savedsimsSgCache);
 
             if (meshesDialog.ShowDialog() == DialogResult.OK)
             {

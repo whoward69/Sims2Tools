@@ -124,6 +124,10 @@ namespace DbpfCompare
             linkedTreeViewLeft.AddLinkedTreeView(linkedTreeViewRight);
         }
 
+        public void TidyUp()
+        {
+        }
+
         private void OnLoad(object sender, EventArgs e)
         {
             RegistryTools.LoadAppSettings(DbpfCompareApp.RegistryKey, DbpfCompareApp.AppVersionMajor, DbpfCompareApp.AppVersionMinor);
@@ -152,15 +156,24 @@ namespace DbpfCompare
                 }
             }
 
-            RegistryTools.SaveAppSettings(DbpfCompareApp.RegistryKey, DbpfCompareApp.AppVersionMajor, DbpfCompareApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(DbpfCompareApp.RegistryKey, this);
-            RegistryTools.SaveSetting(DbpfCompareApp.RegistryKey, "splitter", splitContainer.SplitterDistance);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(DbpfCompareApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(DbpfCompareApp.RegistryKey, DbpfCompareApp.AppVersionMajor, DbpfCompareApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(DbpfCompareApp.RegistryKey, this);
+                RegistryTools.SaveSetting(DbpfCompareApp.RegistryKey, "splitter", splitContainer.SplitterDistance);
 
-            RegistryTools.SaveSetting(DbpfCompareApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(DbpfCompareApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(DbpfCompareApp.RegistryKey + @"\Options", menuItemExcludeSame.Name, menuItemExcludeSame.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(DbpfCompareApp.RegistryKey + @"\Options", menuItemExcludeLeftMissing.Name, menuItemExcludeLeftMissing.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(DbpfCompareApp.RegistryKey + @"\Options", menuItemExcludeRightMissing.Name, menuItemExcludeRightMissing.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(DbpfCompareApp.RegistryKey + @"\Options", menuItemExcludeSame.Name, menuItemExcludeSame.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(DbpfCompareApp.RegistryKey + @"\Options", menuItemExcludeLeftMissing.Name, menuItemExcludeLeftMissing.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(DbpfCompareApp.RegistryKey + @"\Options", menuItemExcludeRightMissing.Name, menuItemExcludeRightMissing.Checked ? 1 : 0);
+            }
+
+            TidyUp();
         }
 
         private void OnFileOpening(object sender, EventArgs e)
@@ -303,8 +316,8 @@ namespace DbpfCompare
 
                     allResourceData.Add(entry, nodeData);
 
-                    byte[] leftData = packageLeft.GetItemByKey(entry);
-                    byte[] rightData = packageRight.GetItemByKey(entry);
+                    byte[] leftData = packageLeft.GetDataByKey(entry);
+                    byte[] rightData = packageRight.GetDataByKey(entry);
 
                     if (leftData == null && rightData == null)
                     {
@@ -648,7 +661,7 @@ namespace DbpfCompare
                         {
                             if (nodeData.IsToBeCopied)
                             {
-                                byte[] rawData = packageLeft.GetItemByKey(nodeData.Key);
+                                byte[] rawData = packageLeft.GetDataByKey(nodeData.Key);
 
                                 if (rawData != null) packageRight.Commit(nodeData.Key, rawData);
                             }

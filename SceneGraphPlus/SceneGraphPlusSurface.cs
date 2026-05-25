@@ -1830,7 +1830,7 @@ namespace SceneGraphPlus.Surface
 
                         // TODO - SceneGraph Plus - exporting - what do we do about a block with multiple in connectors (eg a TXMT/TXTR ref'ed from multiple places, eg shadows)
 
-                        CacheableDbpfFile exportPackage = packageCache.GetOrOpen(block.PackagePath);
+                        CacheableDbpfFile exportPackage = packageCache.OpenForReadOnly(block.PackagePath);
                         DBPFResource res = exportPackage.GetResourceByKey(block.Key);
 
                         UpdateRefsToChildren(exportPackage, res, block, owningForm.IsPrefixLowerCase);
@@ -1933,7 +1933,7 @@ namespace SceneGraphPlus.Surface
                         }
 
                         // TODO - SceneGraph Plus - exporting - and for GZPS et al, delete the associated BINX/3IDR/STR# resources
-                        CacheableDbpfFile package = packageCache.GetOrOpen(deletableBlock.PackagePath);
+                        CacheableDbpfFile package = packageCache.OpenForReadOnly(deletableBlock.PackagePath);
                         package.Remove(deletableBlock.OriginalKey);
                         owningForm.RemoveResource(package, deletableBlock.OriginalKey);
 
@@ -2391,7 +2391,6 @@ namespace SceneGraphPlus.Surface
 
                                 if (directSounds && (Audio.TYPE == firstSelectedBlock.TypeId) && (Str.TYPE == dropOntoBlock.SoleParent?.TypeId))
                                 {
-                                    // TODO - SceneGraph Plus - dropping an Audio block onto a child of STR# Sounds (0x4132) directly
                                     // Before we do this, we need to rename the block being dropped
                                     firstSelectedBlock.BlockName = dropOntoBlock.BlockName;
                                     firstSelectedBlock.UpdateSoundName(dropOntoBlock.BlockName);
@@ -2466,7 +2465,7 @@ namespace SceneGraphPlus.Surface
                                     if (sgFullName.EndsWith("_cres", StringComparison.OrdinalIgnoreCase)) sgFullName = sgFullName.Substring(0, sgFullName.Length - 5);
                                     if (sgFullName.EndsWith("_txmt", StringComparison.OrdinalIgnoreCase)) sgFullName = sgFullName.Substring(0, sgFullName.Length - 5);
 
-                                    CacheableDbpfFile package = packageCache.GetOrAdd(dropOntoBlock.PackagePath);
+                                    CacheableDbpfFile package = packageCache.OpenForUpdate(dropOntoBlock.PackagePath);
                                     Str str = (Str)package.GetResourceByKey(dropOntoBlock.Key);
 
                                     int index = str.AppendLanguageItem(Languages.Default, new StrItem(Languages.Default, sgFullName, ""));
@@ -2915,7 +2914,7 @@ namespace SceneGraphPlus.Surface
 
                 if (hoverBlock.TypeId == Mmat.TYPE)
                 {
-                    CacheableDbpfFile mmatPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
+                    CacheableDbpfFile mmatPackage = packageCache.OpenForUpdate(hoverBlock.PackagePath);
 
                     Mmat mmat = (Mmat)mmatPackage.GetResourceByKey(hoverBlock.OriginalKey);
                     Trace.Assert(mmat != null, $"Double-Click: Missing resource for {hoverBlock.OriginalKey}");
@@ -2929,7 +2928,7 @@ namespace SceneGraphPlus.Surface
                     {
                         foreach (GraphBlock gmndBlock in gmndBlocks)
                         {
-                            subsets.AddRange(((Gmnd)packageCache.GetOrAdd(gmndBlock.PackagePath).GetResourceByKey(gmndBlock.OriginalKey)).GetDesignModeEnabledSubsets());
+                            subsets.AddRange(((Gmnd)packageCache.OpenForUpdate(gmndBlock.PackagePath).GetResourceByKey(gmndBlock.OriginalKey)).GetDesignModeEnabledSubsets());
                         }
                     }
 
@@ -2968,7 +2967,7 @@ namespace SceneGraphPlus.Surface
                 }
                 else if (hoverBlock.TypeId == Objd.TYPE)
                 {
-                    CacheableDbpfFile objdPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
+                    CacheableDbpfFile objdPackage = packageCache.OpenForUpdate(hoverBlock.PackagePath);
 
                     Objd objd = (Objd)objdPackage.GetResourceByKey(hoverBlock.OriginalKey);
                     Trace.Assert(objd != null, $"Double-Click: Missing resource for {hoverBlock.OriginalKey}");
@@ -2985,19 +2984,19 @@ namespace SceneGraphPlus.Surface
                     if (gmndBlocks.Count > 0)
                     {
                         GraphBlock cresBlock = hoverBlock.OutConnectorByLabel("Model Names").EndBlock.OutConnectorByIndex(defaultGraphic).EndBlock;
-                        cresSgName = ((Cres)packageCache.GetOrAdd(cresBlock.PackagePath).GetResourceByKey(cresBlock.OriginalKey)).SgName;
+                        cresSgName = ((Cres)packageCache.OpenForUpdate(cresBlock.PackagePath).GetResourceByKey(cresBlock.OriginalKey)).SgName;
 
                         foreach (GraphBlock gmndBlock in gmndBlocks)
                         {
                             GraphBlock shpeBlock = GetShpeBlock(gmndBlock);
-                            Shpe shpe = (Shpe)packageCache.GetOrAdd(shpeBlock.PackagePath).GetResourceByKey(shpeBlock.OriginalKey);
+                            Shpe shpe = (Shpe)packageCache.OpenForUpdate(shpeBlock.PackagePath).GetResourceByKey(shpeBlock.OriginalKey);
 
                             GraphBlock gmdcBlock = GetGmdcBlock(gmndBlock);
-                            Gmnd gmnd = (Gmnd)packageCache.GetOrAdd(gmndBlock.PackagePath).GetResourceByKey(gmndBlock.OriginalKey);
+                            Gmnd gmnd = (Gmnd)packageCache.OpenForUpdate(gmndBlock.PackagePath).GetResourceByKey(gmndBlock.OriginalKey);
 
                             if (gmdcBlock != null)
                             {
-                                foreach (string subset in ((Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.OriginalKey)).Subsets)
+                                foreach (string subset in ((Gmdc)packageCache.OpenForUpdate(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.OriginalKey)).Subsets)
                                 {
                                     subsets.Add(subset, new SubsetData(subset, shpe.GetSubsetMaterial(subset), gmndBlock, gmnd));
                                 }
@@ -3042,7 +3041,7 @@ namespace SceneGraphPlus.Surface
                         {
                             if (subsetData.OwningGmnd.IsDirty)
                             {
-                                packageCache.GetOrAdd(subsetData.OwningGmndBlock.PackagePath).Commit(subsetData.OwningGmnd);
+                                packageCache.OpenForUpdate(subsetData.OwningGmndBlock.PackagePath).Commit(subsetData.OwningGmnd);
                                 subsetData.OwningGmndBlock.SetDirty();
 
                                 dirtyGmnds = true;
@@ -3067,7 +3066,7 @@ namespace SceneGraphPlus.Surface
                 }
                 else if (hoverBlock.TypeId == Gmnd.TYPE)
                 {
-                    CacheableDbpfFile gmndPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
+                    CacheableDbpfFile gmndPackage = packageCache.OpenForUpdate(hoverBlock.PackagePath);
 
                     Gmnd gmnd = (Gmnd)gmndPackage.GetResourceByKey(hoverBlock.OriginalKey);
                     Trace.Assert(gmnd != null, $"Double-Click: Missing resource for {hoverBlock.OriginalKey}");
@@ -3079,7 +3078,7 @@ namespace SceneGraphPlus.Surface
                         GraphBlock gmdcBlock = hoverBlock.OutConnectors[0].EndBlock;
                         Trace.Assert(gmdcBlock.TypeId == Gmdc.TYPE, $"Double-Click: Expected a GMDC block");
 
-                        CacheableDbpfFile gmdcPackage = packageCache.GetOrAdd(gmdcBlock.PackagePath);
+                        CacheableDbpfFile gmdcPackage = packageCache.OpenForUpdate(gmdcBlock.PackagePath);
                         gmdc = (Gmdc)gmdcPackage.GetResourceByKey(gmdcBlock.OriginalKey);
                     }
 
@@ -3096,7 +3095,7 @@ namespace SceneGraphPlus.Surface
                 }
                 else if (hoverBlock.TypeId == Gzps.TYPE)
                 {
-                    CacheableDbpfFile gzpsPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
+                    CacheableDbpfFile gzpsPackage = packageCache.OpenForUpdate(hoverBlock.PackagePath);
 
                     Gzps gzps = (Gzps)gzpsPackage.GetResourceByKey(hoverBlock.OriginalKey);
                     Trace.Assert(gzps != null, $"Double-Click: Missing resource for {hoverBlock.OriginalKey}");
@@ -3166,12 +3165,12 @@ namespace SceneGraphPlus.Surface
 
                             if (txmtBlock != null && !txmtBlock.IsMissing)
                             {
-                                CacheableDbpfFile package = packageCache.GetOrAdd(txmtBlock.PackagePath);
+                                CacheableDbpfFile package = packageCache.OpenForUpdate(txmtBlock.PackagePath);
                                 materialData.SetTxmtData(txmtBlock, package, (Txmt)package?.GetResourceByKey(txmtBlock.Key));
 
                                 if (txtrBlock != null && !txtrBlock.IsMissing)
                                 {
-                                    package = packageCache.GetOrAdd(txtrBlock.PackagePath);
+                                    package = packageCache.OpenForUpdate(txtrBlock.PackagePath);
                                     materialData.SetTxtrData(txtrBlock, package, (Txtr)package?.GetResourceByKey(txtrBlock.Key));
 
                                     BuildLifoLists(txtrBlock, materialData.LifoConnectors, materialData.LifoResources);
@@ -3201,7 +3200,7 @@ namespace SceneGraphPlus.Surface
                 {
                     MaterialData matData = new MaterialData();
 
-                    CacheableDbpfFile txmtPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
+                    CacheableDbpfFile txmtPackage = packageCache.OpenForUpdate(hoverBlock.PackagePath);
                     matData.SetTxmtData(hoverBlock, txmtPackage, (Txmt)txmtPackage?.GetResourceByKey(hoverBlock.OriginalKey));
 
                     Trace.Assert(matData.TxmtResource != null, $"Double-Click: Missing resource for {matData.TxmtBlock.OriginalKey}");
@@ -3238,7 +3237,7 @@ namespace SceneGraphPlus.Surface
                     if (mmatBlock != null)
                     {
                         // TXMT -> MMAT -> OBJD
-                        Mmat mmat = (Mmat)packageCache.GetOrAdd(mmatBlock.PackagePath).GetResourceByKey(mmatBlock.OriginalKey);
+                        Mmat mmat = (Mmat)packageCache.OpenForUpdate(mmatBlock.PackagePath).GetResourceByKey(mmatBlock.OriginalKey);
 
                         guid = mmat.ObjectGUID;
                         cresSgName = mmat.ModelName;
@@ -3285,7 +3284,7 @@ namespace SceneGraphPlus.Surface
 
                     if (objdBlock != null)
                     {
-                        Objd objd = (Objd)packageCache.GetOrAdd(objdBlock.PackagePath).GetResourceByKey(objdBlock.OriginalKey);
+                        Objd objd = (Objd)packageCache.OpenForUpdate(objdBlock.PackagePath).GetResourceByKey(objdBlock.OriginalKey);
 
                         if (objd != null)
                         {
@@ -3306,7 +3305,7 @@ namespace SceneGraphPlus.Surface
 
                                 foreach (GraphBlock gmndBlock in gmndBlocks)
                                 {
-                                    CacheableDbpfFile gmndPackage = packageCache.GetOrAdd(gmndBlock.PackagePath);
+                                    CacheableDbpfFile gmndPackage = packageCache.OpenForUpdate(gmndBlock.PackagePath);
                                     Gmnd gmnd = (Gmnd)gmndPackage.GetResourceByKey(gmndBlock.OriginalKey);
 
                                     if (gmnd != null)
@@ -3331,7 +3330,7 @@ namespace SceneGraphPlus.Surface
 
                     if (txtrBlock != null)
                     {
-                        CacheableDbpfFile txtrPackage = packageCache.GetOrAdd(txtrBlock.PackagePath);
+                        CacheableDbpfFile txtrPackage = packageCache.OpenForUpdate(txtrBlock.PackagePath);
                         matData.SetTxtrData(txtrBlock, txtrPackage, (Txtr)txtrPackage?.GetResourceByKey(txtrBlock.OriginalKey));
 
                         BuildLifoLists(txtrBlock, matData.LifoConnectors, matData.LifoResources);
@@ -3356,7 +3355,7 @@ namespace SceneGraphPlus.Surface
                 }
                 else if (hoverBlock.TypeId == Txtr.TYPE)
                 {
-                    CacheableDbpfFile txtrPackage = packageCache.GetOrAdd(hoverBlock.PackagePath);
+                    CacheableDbpfFile txtrPackage = packageCache.OpenForUpdate(hoverBlock.PackagePath);
 
                     Txtr txtr = (Txtr)txtrPackage.GetResourceByKey(hoverBlock.OriginalKey);
                     Trace.Assert(txtr != null, $"Double-Click: Missing resource for {hoverBlock.OriginalKey}");
@@ -3373,7 +3372,7 @@ namespace SceneGraphPlus.Surface
                             GraphBlock lifoBlock = outConnector.EndBlock;
                             Lifo lifo = null;
 
-                            CacheableDbpfFile lifoPackage = packageCache.GetOrAdd(lifoBlock.PackagePath);
+                            CacheableDbpfFile lifoPackage = packageCache.OpenForUpdate(lifoBlock.PackagePath);
 
                             if (lifoPackage != null)
                             {
@@ -3406,7 +3405,7 @@ namespace SceneGraphPlus.Surface
 
                                 if (lifoBlock.GetInConnectors().Count == 0)
                                 {
-                                    CacheableDbpfFile package = packageCache.GetOrOpen(lifoBlock.PackagePath);
+                                    CacheableDbpfFile package = packageCache.OpenForReadOnly(lifoBlock.PackagePath);
                                     package.Remove(lifoBlock.OriginalKey);
                                     owningForm.RemoveResource(package, lifoBlock.OriginalKey);
 
@@ -3427,7 +3426,7 @@ namespace SceneGraphPlus.Surface
 
                                 if (lifo != null && lifo.IsDirty)
                                 {
-                                    packageCache.GetOrAdd(lifoConnector.EndBlock.PackagePath).Commit(lifo);
+                                    packageCache.OpenForUpdate(lifoConnector.EndBlock.PackagePath).Commit(lifo);
 
                                     lifoConnector.EndBlock.SetDirty();
                                 }
@@ -3459,7 +3458,7 @@ namespace SceneGraphPlus.Surface
                         GraphBlock lifoBlock = outConnector.EndBlock;
                         Lifo lifo = null;
 
-                        CacheableDbpfFile lifoPackage = packageCache.GetOrAdd(lifoBlock.PackagePath);
+                        CacheableDbpfFile lifoPackage = packageCache.OpenForUpdate(lifoBlock.PackagePath);
 
                         if (lifoPackage != null)
                         {
@@ -3484,7 +3483,7 @@ namespace SceneGraphPlus.Surface
 
                     if (lifoBlock.GetInConnectors().Count == 0)
                     {
-                        CacheableDbpfFile package = packageCache.GetOrOpen(lifoBlock.PackagePath);
+                        CacheableDbpfFile package = packageCache.OpenForReadOnly(lifoBlock.PackagePath);
                         package.Remove(lifoBlock.OriginalKey);
                         owningForm.RemoveResource(package, lifoBlock.OriginalKey);
 
@@ -3505,7 +3504,7 @@ namespace SceneGraphPlus.Surface
 
                     if (lifo != null && lifo.IsDirty)
                     {
-                        packageCache.GetOrAdd(lifoConnector.EndBlock.PackagePath).Commit(lifo);
+                        packageCache.OpenForUpdate(lifoConnector.EndBlock.PackagePath).Commit(lifo);
 
                         lifoConnector.EndBlock.SetDirty();
                     }
@@ -3568,7 +3567,7 @@ namespace SceneGraphPlus.Surface
 
                 if (objdBlock != null && !objdBlock.IsMissing)
                 {
-                    Objd objd = (Objd)packageCache.GetOrAdd(objdBlock.PackagePath).GetResourceByKey(objdBlock.OriginalKey);
+                    Objd objd = (Objd)packageCache.OpenForUpdate(objdBlock.PackagePath).GetResourceByKey(objdBlock.OriginalKey);
 
                     if (objd != null)
                     {
@@ -3633,7 +3632,7 @@ namespace SceneGraphPlus.Surface
 
                 if (objdBlock != null && !objdBlock.IsMissing)
                 {
-                    Objd objd = (Objd)packageCache.GetOrAdd(objdBlock.PackagePath).GetResourceByKey(objdBlock.OriginalKey);
+                    Objd objd = (Objd)packageCache.OpenForUpdate(objdBlock.PackagePath).GetResourceByKey(objdBlock.OriginalKey);
 
                     if (objd != null)
                     {
@@ -3796,7 +3795,7 @@ namespace SceneGraphPlus.Surface
 
                 if (gmndBlocks.Count > 0)
                 {
-                    Mmat mmat = (Mmat)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
+                    Mmat mmat = (Mmat)packageCache.OpenForUpdate(block.PackagePath).GetResourceByKey(block.Key);
 
                     if (mmat != null)
                     {
@@ -3804,7 +3803,7 @@ namespace SceneGraphPlus.Surface
 
                         foreach (GraphBlock gmndBlock in gmndBlocks)
                         {
-                            Gmnd gmnd = (Gmnd)packageCache.GetOrAdd(gmndBlock.PackagePath).GetResourceByKey(gmndBlock.Key);
+                            Gmnd gmnd = (Gmnd)packageCache.OpenForUpdate(gmndBlock.PackagePath).GetResourceByKey(gmndBlock.Key);
 
                             if (gmnd != null)
                             {
@@ -3825,8 +3824,8 @@ namespace SceneGraphPlus.Surface
 
                 if (gmdcBlock != null)
                 {
-                    Shpe shpe = (Shpe)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
-                    Gmdc gmdc = (Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
+                    Shpe shpe = (Shpe)packageCache.OpenForUpdate(block.PackagePath).GetResourceByKey(block.Key);
+                    Gmdc gmdc = (Gmdc)packageCache.OpenForUpdate(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
 
                     if (shpe != null && gmdc != null)
                     {
@@ -3851,8 +3850,8 @@ namespace SceneGraphPlus.Surface
 
                 if (gmdcBlock != null)
                 {
-                    Gmnd gmnd = (Gmnd)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
-                    Gmdc gmdc = (Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
+                    Gmnd gmnd = (Gmnd)packageCache.OpenForUpdate(block.PackagePath).GetResourceByKey(block.Key);
+                    Gmdc gmdc = (Gmdc)packageCache.OpenForUpdate(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
 
                     if (gmnd != null && gmdc != null)
                     {
@@ -3917,8 +3916,8 @@ namespace SceneGraphPlus.Surface
 
                     if (gmdcBlock != null)
                     {
-                        Str str = (Str)packageCache.GetOrAdd(block.PackagePath).GetResourceByKey(block.Key);
-                        Gmdc gmdc = (Gmdc)packageCache.GetOrAdd(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
+                        Str str = (Str)packageCache.OpenForUpdate(block.PackagePath).GetResourceByKey(block.Key);
+                        Gmdc gmdc = (Gmdc)packageCache.OpenForUpdate(gmdcBlock.PackagePath).GetResourceByKey(gmdcBlock.Key);
 
                         if (str != null && gmdc != null)
                         {
@@ -3977,7 +3976,7 @@ namespace SceneGraphPlus.Surface
             // For each package that has dirty blocks ...
             foreach (KeyValuePair<string, List<GraphBlock>> kvPair in dirtyBlocksByPackage)
             {
-                CacheableDbpfFile package = packageCache.GetOrAdd(kvPair.Key);
+                CacheableDbpfFile package = packageCache.OpenForUpdate(kvPair.Key);
 
                 // ... firstly delete any blocks ...
                 foreach (GraphBlock block in kvPair.Value)
@@ -4067,7 +4066,7 @@ namespace SceneGraphPlus.Surface
             // Finally, save every package that was updated
             foreach (string packagePath in dirtyBlocksByPackage.Keys)
             {
-                CacheableDbpfFile package = packageCache.GetOrOpen(packagePath);
+                CacheableDbpfFile package = packageCache.OpenForReadOnly(packagePath);
 
                 if (package.Update(autoBackup) == null)
                 {
@@ -4572,7 +4571,7 @@ namespace SceneGraphPlus.Surface
 
                 if (!connector.StartBlock.IsDeleted)
                 {
-                    CacheableDbpfFile package = packageCache.GetOrAdd(connector.StartBlock.PackagePath);
+                    CacheableDbpfFile package = packageCache.OpenForUpdate(connector.StartBlock.PackagePath);
 
                     DBPFResource parentRes = package.GetResourceByKey(connector.StartBlock.OriginalKey);
                     Trace.Assert(parentRes != null, "Can't locate parent resource");

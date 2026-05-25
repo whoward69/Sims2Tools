@@ -384,7 +384,9 @@ namespace SceneGraphPlus.OptionsDialogs.Helpers
         private readonly RadioButton radioRaw8;
         private readonly RadioButton radioRaw24;
         private readonly RadioButton radioRaw32;
-        // TODO - SceneGraph Plus - mipmaps - this should be a check box - see https://pforestsims.tumblr.com/post/775717770251976704/mipmaps-in-ts2 and https://www.tumblr.com/chieltbest/783981828619091968/i-just-found-out-that-pretty-much-all-mipmaps-in?source=share
+        // TODO - SceneGraph Plus - mipmaps - this should be a check box
+        // see https://pforestsims.tumblr.com/post/775717770251976704/mipmaps-in-ts2
+        // and https://www.tumblr.com/chieltbest/783981828619091968/i-just-found-out-that-pretty-much-all-mipmaps-in?source=share
         private readonly TextBox textLevels;
         private readonly ComboBox comboSharpen;
         private readonly CheckedListBox ckbFilters;

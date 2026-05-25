@@ -47,7 +47,7 @@ namespace DbpfViewer
     {
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private string packageFile = null;
+        private string lastPackageFile = null;
         private readonly SortedDictionary<string, string> localObjectsByGroupID = new SortedDictionary<string, string>();
 
         private MruList MyMruList;
@@ -69,6 +69,10 @@ namespace DbpfViewer
             this.Text = DbpfViewerApp.AppTitle;
 
             gridResources.DataSource = dbpfData;
+        }
+
+        public void TidyUp()
+        {
         }
 
         private void OnLoad(object sender, EventArgs e)
@@ -104,18 +108,27 @@ namespace DbpfViewer
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            RegistryTools.SaveAppSettings(DbpfViewerApp.RegistryKey, DbpfViewerApp.AppVersionMajor, DbpfViewerApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(DbpfViewerApp.RegistryKey, this);
-            RegistryTools.SaveSetting(DbpfViewerApp.RegistryKey, "splitter", splitContainer.SplitterDistance);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(DbpfViewerApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(DbpfViewerApp.RegistryKey, DbpfViewerApp.AppVersionMajor, DbpfViewerApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(DbpfViewerApp.RegistryKey, this);
+                RegistryTools.SaveSetting(DbpfViewerApp.RegistryKey, "splitter", splitContainer.SplitterDistance);
 
-            RegistryTools.SaveSetting(DbpfViewerApp.RegistryKey + @"\Options", menuItemPrettyPrint.Name, menuItemPrettyPrint.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(DbpfViewerApp.RegistryKey + @"\Options", menuItemPrettyPrint.Name, menuItemPrettyPrint.Checked ? 1 : 0);
+            }
+
+            TidyUp();
         }
 
         private void OnFileOpening(object sender, EventArgs e)
         {
-            menuItemReloadPackage.Enabled = (packageFile != null);
-            menuItemSaveXmlToClipboard.Enabled = (packageFile != null);
-            menuItemSaveXmlAs.Enabled = (packageFile != null);
+            menuItemReloadPackage.Enabled = (lastPackageFile != null);
+            menuItemSaveXmlToClipboard.Enabled = (lastPackageFile != null);
+            menuItemSaveXmlAs.Enabled = (lastPackageFile != null);
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -168,7 +181,7 @@ namespace DbpfViewer
 
             XmlElement eleDbpf = doc.CreateElement(string.Empty, "dbpf", string.Empty);
             doc.AppendChild(eleDbpf);
-            eleDbpf.SetAttribute("file", packageFile);
+            eleDbpf.SetAttribute("file", lastPackageFile);
 
             ProgressDialog progressDialog = new ProgressDialog(eleDbpf);
             progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_GetXml);
@@ -180,7 +193,7 @@ namespace DbpfViewer
                 logger.Error(progressDialog.Result.Error.Message);
                 logger.Info(progressDialog.Result.Error.StackTrace);
 
-                MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show($"An error occured while processing\n{lastPackageFile}", "Error!", MessageBoxButtons.OK);
             }
             else
             {
@@ -307,9 +320,15 @@ namespace DbpfViewer
             bool enabled = ((ToolStripMenuItem)sender).Checked;
 
             if (enabled)
-                enabledResources.Add(Jpg.TYPE);
+            {
+                enabledResources.Add(Jpg.TYPES[(int)Jpg.JpgTypeIndex.Normal]);
+                enabledResources.Add(Jpg.TYPES[(int)Jpg.JpgTypeIndex.CasThumbnail]);
+            }
             else
-                enabledResources.Remove(Jpg.TYPE);
+            {
+                enabledResources.Remove(Jpg.TYPES[(int)Jpg.JpgTypeIndex.Normal]);
+                enabledResources.Remove(Jpg.TYPES[(int)Jpg.JpgTypeIndex.CasThumbnail]);
+            }
 
             RegistryTools.SaveSetting(DbpfViewerApp.RegistryKey + @"\Resources", Jpg.NAME, enabled ? 1 : 0);
         }
@@ -441,7 +460,7 @@ namespace DbpfViewer
 
         private void OnReloadClicked(object sender, EventArgs e)
         {
-            DoWork_FillGrid(packageFile);
+            DoWork_FillGrid(lastPackageFile);
         }
 
         private void OnSelectClicked(object sender, EventArgs e)
@@ -455,7 +474,7 @@ namespace DbpfViewer
 
         private void DoWork_FillGrid(string packageFile)
         {
-            this.packageFile = packageFile;
+            this.lastPackageFile = packageFile;
 
             this.Text = $"{DbpfViewerApp.AppTitle} - {(new FileInfo(packageFile)).Name}";
             menuItemReloadPackage.Enabled = false;
@@ -476,16 +495,16 @@ namespace DbpfViewer
 
             if (result == DialogResult.Abort)
             {
-                MyMruList.RemoveFile(packageFile);
+                MyMruList.RemoveFile(lastPackageFile);
 
                 logger.Error(progressDialog.Result.Error.Message);
                 logger.Info(progressDialog.Result.Error.StackTrace);
 
-                MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show($"An error occured while processing\n{lastPackageFile}", "Error!", MessageBoxButtons.OK);
             }
             else
             {
-                MyMruList.AddFile(packageFile);
+                MyMruList.AddFile(lastPackageFile);
 
                 if (result == DialogResult.Cancel)
                 {
@@ -507,7 +526,7 @@ namespace DbpfViewer
             try
 #endif
             {
-                using (DBPFFile package = new DBPFFile(packageFile))
+                using (DBPFFile package = new DBPFFile(lastPackageFile))
                 {
                     localObjectsByGroupID.Clear();
 
@@ -573,7 +592,7 @@ namespace DbpfViewer
                 logger.Error(ex.Message);
                 logger.Info(ex.StackTrace);
 
-                if (MsgBox.Show($"An error occured while processing\n{packageFile}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                if (MsgBox.Show($"An error occured while processing\n{lastPackageFile}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
                 {
                     throw ex;
                 }
@@ -601,7 +620,7 @@ namespace DbpfViewer
 
             try
             {
-                using (DBPFFile package = new DBPFFile(packageFile))
+                using (DBPFFile package = new DBPFFile(lastPackageFile))
                 {
                     uint total = package.ResourceCount;
                     uint done = 0;
@@ -652,7 +671,7 @@ namespace DbpfViewer
                 logger.Error(ex.Message);
                 logger.Info(ex.StackTrace);
 
-                if (MsgBox.Show($"An error occured while processing\n{packageFile}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                if (MsgBox.Show($"An error occured while processing\n{lastPackageFile}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
                 {
                     throw ex;
                 }
@@ -663,7 +682,7 @@ namespace DbpfViewer
         {
             DataGridViewRow row = (sender as DataGridView).Rows[e.RowIndex];
 
-            using (DBPFFile package = new DBPFFile(packageFile))
+            using (DBPFFile package = new DBPFFile(lastPackageFile))
             {
                 DBPFEntry entry = package.GetEntryByTGIR((int)row.Cells[4].Value);
 
@@ -830,10 +849,10 @@ namespace DbpfViewer
             {
                 DataGridViewRow row = gridResources.Rows[mouseLocation.RowIndex];
 
-                using (DBPFFile package = new DBPFFile(packageFile))
+                using (DBPFFile package = new DBPFFile(lastPackageFile))
                 {
                     DBPFEntry entry = package.GetEntryByTGIR((int)row.Cells[4].Value);
-                    byte[] data = package.GetOriginalItemByEntry(entry);
+                    byte[] data = package.GetOriginalDataByEntry(entry);
 
                     if (data != null)
                     {

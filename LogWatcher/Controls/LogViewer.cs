@@ -271,7 +271,7 @@ namespace LogWatcher.Controls
 
                     foreach (XmlElement cheat in nodeData.ChildNodes)
                     {
-                        dataTableAttributes.Append("", cheat.GetAttribute("key"), cheat.GetAttribute("value"), null);
+                        dataTableAttributes.Append("0", cheat.GetAttribute("key"), cheat.GetAttribute("value"), "0");
                     }
 
                     gridAttributes.Sort(gridAttributes.Columns["colAttrKey"], ListSortDirection.Ascending);

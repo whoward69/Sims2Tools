@@ -75,6 +75,10 @@ namespace WhatCausedThis
             gridByPackage.DataSource = dataByPackage;
         }
 
+        public void TidyUp()
+        {
+        }
+
         private void WctWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
@@ -351,13 +355,23 @@ namespace WhatCausedThis
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            RegistryTools.SaveAppSettings(WhatCausedThisApp.RegistryKey, WhatCausedThisApp.AppVersionMajor, WhatCausedThisApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(WhatCausedThisApp.RegistryKey, this);
-            RegistryTools.SaveSetting(WhatCausedThisApp.RegistryKey, textModsPath.Name, textModsPath.Text);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(WhatCausedThisApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(WhatCausedThisApp.RegistryKey, WhatCausedThisApp.AppVersionMajor, WhatCausedThisApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(WhatCausedThisApp.RegistryKey, this);
 
-            RegistryTools.SaveSetting(WhatCausedThisApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
+                RegistryTools.SaveSetting(WhatCausedThisApp.RegistryKey, textModsPath.Name, textModsPath.Text);
 
-            RegistryTools.SaveSetting(WhatCausedThisApp.RegistryKey + @"\Options", menuItemSecondaryErrors.Name, menuItemSecondaryErrors.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(WhatCausedThisApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
+
+                RegistryTools.SaveSetting(WhatCausedThisApp.RegistryKey + @"\Options", menuItemSecondaryErrors.Name, menuItemSecondaryErrors.Checked ? 1 : 0);
+            }
+
+            TidyUp();
         }
 
         private void OnModeOpening(object sender, EventArgs e)

@@ -36,7 +36,6 @@ namespace DbpfCompare
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DbpfCompareForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,12 +68,12 @@ namespace DbpfCompare
             this.btnSaveRight = new System.Windows.Forms.Button();
             this.textRightPath = new System.Windows.Forms.TextBox();
             this.linkedTreeViewRight = new DbpfCompare.Controls.LinkedTreeView();
-            this.menuContextResource = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextResource = new System.Windows.Forms.ContextMenuStrip();
             this.menuItemContextSelectLeft = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemContextCompare = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemContextCopyRight = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolTipPaths = new System.Windows.Forms.ToolTip(this.components);
-            this.menuContextType = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolTipPaths = new System.Windows.Forms.ToolTip();
+            this.menuContextType = new System.Windows.Forms.ContextMenuStrip();
             this.menuItemContextCopyAllMissingRight = new System.Windows.Forms.ToolStripMenuItem();
             this.saveCsvDialog = new System.Windows.Forms.SaveFileDialog();
             this.menuMain.SuspendLayout();
@@ -245,7 +244,7 @@ namespace DbpfCompare
             // 
             this.menuItemExcludeSame.CheckOnClick = true;
             this.menuItemExcludeSame.Name = "menuItemExcludeSame";
-            this.menuItemExcludeSame.Size = new System.Drawing.Size(174, 22);
+            this.menuItemExcludeSame.Size = new System.Drawing.Size(173, 22);
             this.menuItemExcludeSame.Text = "Exclude Same";
             this.menuItemExcludeSame.Click += new System.EventHandler(this.OnExcludeChanged);
             // 
@@ -253,7 +252,7 @@ namespace DbpfCompare
             // 
             this.menuItemExcludeRightMissing.CheckOnClick = true;
             this.menuItemExcludeRightMissing.Name = "menuItemExcludeRightMissing";
-            this.menuItemExcludeRightMissing.Size = new System.Drawing.Size(174, 22);
+            this.menuItemExcludeRightMissing.Size = new System.Drawing.Size(173, 22);
             this.menuItemExcludeRightMissing.Text = "Exclude Left Only";
             this.menuItemExcludeRightMissing.Click += new System.EventHandler(this.OnExcludeChanged);
             // 
@@ -261,7 +260,7 @@ namespace DbpfCompare
             // 
             this.menuItemExcludeLeftMissing.CheckOnClick = true;
             this.menuItemExcludeLeftMissing.Name = "menuItemExcludeLeftMissing";
-            this.menuItemExcludeLeftMissing.Size = new System.Drawing.Size(174, 22);
+            this.menuItemExcludeLeftMissing.Size = new System.Drawing.Size(173, 22);
             this.menuItemExcludeLeftMissing.Text = "Exclude Right Only";
             this.menuItemExcludeLeftMissing.Click += new System.EventHandler(this.OnExcludeChanged);
             // 
@@ -382,28 +381,28 @@ namespace DbpfCompare
             this.menuItemContextCompare,
             this.menuItemContextCopyRight});
             this.menuContextResource.Name = "menuContextResource";
-            this.menuContextResource.Size = new System.Drawing.Size(209, 92);
+            this.menuContextResource.Size = new System.Drawing.Size(210, 70);
             this.menuContextResource.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextResourceOpening);
             this.menuContextResource.Opened += new System.EventHandler(this.OnContextResourceOpened);
             // 
             // menuItemContextSelectLeft
             // 
             this.menuItemContextSelectLeft.Name = "menuItemContextSelectLeft";
-            this.menuItemContextSelectLeft.Size = new System.Drawing.Size(208, 22);
+            this.menuItemContextSelectLeft.Size = new System.Drawing.Size(209, 22);
             this.menuItemContextSelectLeft.Text = "Select Left Compare";
             this.menuItemContextSelectLeft.Click += new System.EventHandler(this.OnContextSelectLeft);
             // 
             // menuItemContextCompare
             // 
             this.menuItemContextCompare.Name = "menuItemContextCompare";
-            this.menuItemContextCompare.Size = new System.Drawing.Size(208, 22);
+            this.menuItemContextCompare.Size = new System.Drawing.Size(209, 22);
             this.menuItemContextCompare.Text = "Compare To Selected Left";
             this.menuItemContextCompare.Click += new System.EventHandler(this.OnContextCompare);
             // 
             // menuItemContextCopyRight
             // 
             this.menuItemContextCopyRight.Name = "menuItemContextCopyRight";
-            this.menuItemContextCopyRight.Size = new System.Drawing.Size(208, 22);
+            this.menuItemContextCopyRight.Size = new System.Drawing.Size(209, 22);
             this.menuItemContextCopyRight.Text = "Copy To Right";
             this.menuItemContextCopyRight.Click += new System.EventHandler(this.OnContextCopyRight);
             // 
@@ -412,13 +411,13 @@ namespace DbpfCompare
             this.menuContextType.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemContextCopyAllMissingRight});
             this.menuContextType.Name = "menuContextType";
-            this.menuContextType.Size = new System.Drawing.Size(210, 26);
+            this.menuContextType.Size = new System.Drawing.Size(211, 26);
             this.menuContextType.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextTypeOpening);
             // 
             // menuItemContextCopyAllMissingRight
             // 
             this.menuItemContextCopyAllMissingRight.Name = "menuItemContextCopyAllMissingRight";
-            this.menuItemContextCopyAllMissingRight.Size = new System.Drawing.Size(209, 22);
+            this.menuItemContextCopyAllMissingRight.Size = new System.Drawing.Size(210, 22);
             this.menuItemContextCopyAllMissingRight.Text = "Copy All Missing To Right";
             this.menuItemContextCopyAllMissingRight.Click += new System.EventHandler(this.OnContextCopyAllMissingRight);
             // 
@@ -438,7 +437,6 @@ namespace DbpfCompare
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
-            this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(600, 300);
             this.Name = "DbpfCompareForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;

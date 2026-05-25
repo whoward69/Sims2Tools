@@ -55,6 +55,10 @@ namespace WhatCausedThis
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSecondaryErrors = new System.Windows.Forms.ToolStripMenuItem();
             this.wctWorker = new System.ComponentModel.BackgroundWorker();
             this.lblModsPath = new System.Windows.Forms.Label();
             this.textModsPath = new System.Windows.Forms.TextBox();
@@ -78,10 +82,6 @@ namespace WhatCausedThis
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.btnSelectLog = new System.Windows.Forms.Button();
             this.comboFrame = new System.Windows.Forms.ComboBox();
-            this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemSecondaryErrors = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridByPackage)).BeginInit();
             this.SuspendLayout();
@@ -176,6 +176,38 @@ namespace WhatCausedThis
             this.menuItemAbout.Size = new System.Drawing.Size(135, 22);
             this.menuItemAbout.Text = "About...";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
+            // 
+            // menuItemMode
+            // 
+            this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAdvanced});
+            this.menuItemMode.Name = "menuItemMode";
+            this.menuItemMode.Size = new System.Drawing.Size(50, 20);
+            this.menuItemMode.Text = "&Mode";
+            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(127, 22);
+            this.menuItemAdvanced.Text = "Advanced";
+            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
+            // 
+            // menuOptions
+            // 
+            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemSecondaryErrors});
+            this.menuOptions.Name = "menuOptions";
+            this.menuOptions.Size = new System.Drawing.Size(61, 20);
+            this.menuOptions.Text = "&Options";
+            // 
+            // menuItemSecondaryErrors
+            // 
+            this.menuItemSecondaryErrors.CheckOnClick = true;
+            this.menuItemSecondaryErrors.Name = "menuItemSecondaryErrors";
+            this.menuItemSecondaryErrors.Size = new System.Drawing.Size(215, 22);
+            this.menuItemSecondaryErrors.Text = "Use Secondary Error Frame";
             // 
             // wctWorker
             // 
@@ -424,38 +456,6 @@ namespace WhatCausedThis
             this.comboFrame.TabIndex = 21;
             this.comboFrame.SelectedIndexChanged += new System.EventHandler(this.OnFrameChanged);
             // 
-            // menuItemMode
-            // 
-            this.menuItemMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemAdvanced});
-            this.menuItemMode.Name = "menuItemMode";
-            this.menuItemMode.Size = new System.Drawing.Size(50, 20);
-            this.menuItemMode.Text = "&Mode";
-            this.menuItemMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
-            // 
-            // menuItemAdvanced
-            // 
-            this.menuItemAdvanced.CheckOnClick = true;
-            this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
-            this.menuItemAdvanced.Text = "Advanced";
-            this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
-            // 
-            // menuOptions
-            // 
-            this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemSecondaryErrors});
-            this.menuOptions.Name = "menuOptions";
-            this.menuOptions.Size = new System.Drawing.Size(61, 20);
-            this.menuOptions.Text = "&Options";
-            // 
-            // menuItemSecondaryErrors
-            // 
-            this.menuItemSecondaryErrors.CheckOnClick = true;
-            this.menuItemSecondaryErrors.Name = "menuItemSecondaryErrors";
-            this.menuItemSecondaryErrors.Size = new System.Drawing.Size(215, 22);
-            this.menuItemSecondaryErrors.Text = "Use Secondary Error Frame";
-            // 
             // WhatCausedThisForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -484,7 +484,6 @@ namespace WhatCausedThis
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;
-            this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(900, 600);
             this.Name = "WhatCausedThisForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);

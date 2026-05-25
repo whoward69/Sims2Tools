@@ -7,6 +7,8 @@
  */
 
 using Sims2Tools;
+using Sims2Tools.Cache;
+using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.Cigen;
@@ -18,6 +20,7 @@ using Sims2Tools.DBPF.Groups;
 using Sims2Tools.DBPF.Groups.GROP;
 using Sims2Tools.DBPF.Images;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
+using Sims2Tools.DBPF.Neighbourhood.LTXT;
 using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
@@ -49,6 +52,7 @@ using Sims2Tools.Files;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
@@ -70,6 +74,10 @@ namespace DbpfLister
             pictBox.Visible = false;
         }
 
+        public void TidyUp()
+        {
+        }
+
         private void OnLoad(object sender, EventArgs e)
         {
             RegistryTools.LoadAppSettings(DbpfListerApp.RegistryKey, DbpfListerApp.AppVersionMajor, DbpfListerApp.AppVersionMinor);
@@ -87,6 +95,8 @@ namespace DbpfLister
                 RegistryTools.SaveAppSettings(DbpfListerApp.RegistryKey, DbpfListerApp.AppVersionMajor, DbpfListerApp.AppVersionMinor);
                 RegistryTools.SaveFormSettings(DbpfListerApp.RegistryKey, this);
             }
+
+            TidyUp();
         }
 
         private void OnGoClicked(object sender, EventArgs e)
@@ -94,7 +104,29 @@ namespace DbpfLister
             btnGo.Enabled = false;
             textMessages.Text = "=== PROCESSING ===\r\n";
 
-            // BuildCasClothingCache();
+            ProcessObjdNames(Sims2ToolsLib.Sims2DownloadsPath);
+
+            // ResourceTesting();
+
+            /*
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Adult", (TypeInstanceID)0x0081);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Child", (TypeInstanceID)0x0082);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Social", (TypeInstanceID)0x0083);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Loco", (TypeInstanceID)0x0084);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Toddler", (TypeInstanceID)0x0089);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Teen", (TypeInstanceID)0x008A);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Elder", (TypeInstanceID)0x008B);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Cat", (TypeInstanceID)0x008C);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Dog", (TypeInstanceID)0x008D);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Baby", (TypeInstanceID)0x0091);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Reach", (TypeInstanceID)0x0092);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Puppy", (TypeInstanceID)0x0099);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "Kitten", (TypeInstanceID)0x009A);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "SmDog", (TypeInstanceID)0x009B);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "ElderDog", (TypeInstanceID)0x009C);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "ElderSmDog", (TypeInstanceID)0x009D);
+            FindAnimationNames("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection", "ElderCat", (TypeInstanceID)0x009E);
+            */
 
             // FindTxmtTypes("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
@@ -103,7 +135,7 @@ namespace DbpfLister
             // DumpMaxisGzpsData("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
             // FindSounds("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
-            FindTracks("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
+            // FindTracks("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
             // FindFwavRefs("C:\\Program Files\\EA Games\\The Sims 2 Ultimate Collection");
 
@@ -218,74 +250,130 @@ namespace DbpfLister
             Clipboard.SetText(textMessages.Text);
         }
 
-        private void BuildCasClothingCache()
+        private void ResourceTesting()
         {
-            Dictionary<DBPFKey, CasClothingData> casClothingCache = new Dictionary<DBPFKey, CasClothingData>();
-
-            List<string> reverseLoadOrder = new List<string>();
-
-            foreach (string pathKey in Sims2ToolsLib.Sims2PathsInLoadOrder)
+            using (DBPFFile package = new DBPFFile(@"C:\Users\whowa\Desktop\Testing\N001_Neighborhood.package"))
             {
-                reverseLoadOrder.Insert(0, pathKey);
+                DBPFKey ltxtKey = new DBPFKey(Ltxt.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x0000003B, DBPFData.RESOURCE_NULL);
+                DBPFEntry ltxtEntry = package.GetEntryByKey(ltxtKey);
+
+                Ltxt ltxt = (Ltxt)package.GetResourceByKey(ltxtKey);
+
+                uint fileSize = ltxt.FileSize;
+                Debug.Assert(ltxtEntry.DataSize == fileSize, "Weird!");
+
+                string name = ltxt.KeyName;
+                string lotName = ltxt.LotName;
+                string lotDesc = ltxt.LotDesc;
+
+                ltxt.LotName = " ";
+                ltxt.LotName = null;
+
+                ltxt.LotName = "105 Simming Lane";
+                Debug.Assert(ltxt.FileSize == (fileSize + 4), "Weird!");
+
+                ltxt.LotDesc = ltxt.LotName;
+                Debug.Assert(ltxt.FileSize == (fileSize + 6), "Weird!");
+
+                // package.Commit(ltxt);
+
+                DBPFKey famiKey = new DBPFKey(Fami.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000011, DBPFData.RESOURCE_NULL);
+                DBPFEntry famiEntry = package.GetEntryByKey(famiKey);
+
+                Fami fami = (Fami)package.GetResourceByKey(famiKey);
+
+                fileSize = fami.FileSize;
+                Debug.Assert(famiEntry.DataSize == fileSize, "Weird!");
+
+                name = fami.KeyName;
+
+                int money = fami.Money;
+                fami.Money = money + 5000;
+                fami.Money = 123456;
+
+                package.Commit(fami);
+
+                package.Update(true);
+                package.Close();
             }
 
-            try
+            using (DBPFFile package = new DBPFFile(@"C:\Users\whowa\Desktop\Testing\N001_Lot59.package"))
             {
-                textMessages.AppendText($"Hunting GZPS in\r\n");
+                DBPFKey lotdKey = new DBPFKey(Lotd.TYPE, DBPFData.GROUP_LOCAL, DBPFData.INSTANCE_NULL, DBPFData.RESOURCE_NULL);
+                DBPFEntry lotdEntry = package.GetEntryByKey(lotdKey);
 
-                foreach (string pathKey in reverseLoadOrder)
+                Lotd lotd = (Lotd)package.GetResourceByKey(lotdKey);
+
+                uint fileSize = lotd.FileSize;
+                Debug.Assert(lotdEntry.DataSize == fileSize, "Weird!");
+
+                string name = lotd.KeyName;
+                string lotdName = lotd.LotName;
+                string lotdDesc = lotd.LotDesc;
+
+                lotd.LotName = " ";
+                lotd.LotName = null;
+
+                lotd.LotName = "105 Simming Lane";
+                Debug.Assert(lotd.FileSize == (fileSize + 4), "Weird!");
+
+                lotd.LotDesc = lotd.LotName;
+                Debug.Assert(lotd.FileSize == (fileSize + 6), "Weird!");
+
+                // package.Commit(lotd);
+
+                // package.Update(true);
+                package.Close();
+            }
+        }
+
+        private void FindAnimationNames(string baseFolder, string animType, TypeInstanceID animInstance)
+        {
+            HashSet<string> allAnims = new HashSet<string>();
+
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                try
                 {
-                    string baseFolder = RegistryTools.GetPath(Sims2ToolsLib.RegistryKey, pathKey);
-
-                    if (Directory.Exists(baseFolder))
+                    using (DBPFFile package = new DBPFFile(packagePath))
                     {
-                        textMessages.AppendText($"  {baseFolder}\r\n");
-
-                        foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Str.TYPE))
                         {
-                            using (DBPFFile package = new DBPFFile(packagePath))
+                            if (entry.InstanceID == animInstance)
                             {
-                                // Find all the GZPS resources
-                                foreach (DBPFEntry entry in package.GetEntriesByType(Gzps.TYPE))
+                                try
                                 {
-                                    if (casClothingCache.ContainsKey(entry))
-                                    {
-                                        continue;
-                                    }
+                                    Str str = (Str)package.GetResourceByEntry(entry);
 
-                                    Gzps gzps = (Gzps)package.GetResourceByEntry(entry);
-
-                                    if (gzps.HasItem("numoverrides") && gzps.GetItem("numoverrides").UIntegerValue > 0)
+                                    foreach (StrItem item in str.LanguageItems(MetaData.Languages.Default))
                                     {
-                                        CasClothingData data = new CasClothingData(gzps, packagePath);
-                                        casClothingCache.Add(data.resKey, data);
+                                        allAnims.Add(item.Title);
                                     }
                                 }
-
-                                package.Close();
+                                catch (Exception e2)
+                                {
+                                    textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
+                                }
                             }
                         }
+
+                        package.Close();
                     }
                 }
-
-                textMessages.AppendText($"Found {casClothingCache.Count} GZPS clothing resources\r\n");
-
-                using (StreamWriter writer = new StreamWriter("C:/Users/whowa/Desktop/MaxisCasThumbnailData.csv"))
+                catch (Exception e1)
                 {
-                    writer.WriteLine("Type,Group,Instance,Resource,Name,Desc,Gender,Age,Package Path");
-
-                    foreach (CasClothingData data in casClothingCache.Values)
-                    {
-                        writer.WriteLine($"{data.resKey.TypeID},{data.resKey.GroupID},{data.resKey.InstanceID},{data.resKey.ResourceID},{data.resName},{data.resDesc},{data.resGender},{data.resAge},{data.resPackagePath}");
-                    }
-
-                    writer.Close();
+                    textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
                 }
             }
-            catch (Exception e)
+
+            using (StreamWriter writer = new StreamWriter($"C:/Users/whowa/Desktop/{animType}_Anims.txt"))
             {
-                textMessages.AppendText($"{e.Message}\r\n");
-                textMessages.AppendText($"{e.StackTrace}\r\n");
+                foreach (string anim in allAnims)
+                {
+                    writer.WriteLine($"{anim}");
+                }
+
+                writer.Close();
             }
         }
 
@@ -683,6 +771,24 @@ namespace DbpfLister
             }
         }
 
+        private void ProcessObjdNames(string baseFolder)
+        {
+            foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+            {
+                using (DBPFFile package = new DBPFFile(packagePath))
+                {
+                    foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
+                    {
+                        Objd objd = (Objd)package.GetResourceByEntry(entry);
+
+                        textMessages.AppendText($"{objd.Guid}: {objd.KeyName} - {packagePath.Substring(baseFolder.Length + 1)}\r\n");
+                    }
+
+                    package.Close();
+                }
+            }
+        }
+
         private void ProcessObjdEpFlags(string baseFolder)
         {
             foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
@@ -708,8 +814,7 @@ namespace DbpfLister
         {
             try
             {
-                string cigenPath = $"{Sims2ToolsLib.Sims2HomePath}\\cigen.package";
-                CigenFile cigenCache = new CigenFile(cigenPath);
+                ClothingThumbnailsCache clothingThumbnailsCache = new ClothingThumbnailsCache();
 
                 using (DBPFFile package = new DBPFFile(hoodPackagePath))
                 {
@@ -747,7 +852,7 @@ namespace DbpfLister
 
                                                     if (resKey.TypeID == Gzps.TYPE)
                                                     {
-                                                        textMessages.AppendText($"  {resKey} {(cigenCache.HasThumbnail(resKey) ? "with thumbnail" : "")}\r\n");
+                                                        textMessages.AppendText($"  {resKey} {((clothingThumbnailsCache.GetThumbnail(resKey) != null) ? "with thumbnail" : "")}\r\n");
                                                     }
                                                 }
                                             }
@@ -765,7 +870,7 @@ namespace DbpfLister
                     package.Close();
                 }
 
-                cigenCache.Close();
+                clothingThumbnailsCache.Close();
             }
             catch (Exception e1)
             {
@@ -830,7 +935,7 @@ namespace DbpfLister
                                             mostParams = bhav;
                                         }
 
-                                        // counts[bhav.Header.Format].Add(bhav);
+                                        counts[bhav.Header.Format].Add(bhav);
 
                                         if (bhav.Header.CacheFlags != 0x00)
                                         {
@@ -1780,7 +1885,7 @@ namespace DbpfLister
                                     xngbPropertyValues[property].Add(xngb.GetItem(property).StringValue);
                                 }
                             }
-                            catch (Exception e2)
+                            catch (Exception)
                             {
                                 // textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
                             }
@@ -1789,7 +1894,7 @@ namespace DbpfLister
                         package.Close();
                     }
                 }
-                catch (Exception e1)
+                catch (Exception)
                 {
                     // textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
                 }
@@ -1845,7 +1950,7 @@ namespace DbpfLister
                                     xngbPropertyValues[property].Add(xfnc.GetItem(property).StringValue);
                                 }
                             }
-                            catch (Exception e2)
+                            catch (Exception)
                             {
                                 // textMessages.AppendText($"{e2.Message} - {packagePath}\r\n");
                             }
@@ -1854,7 +1959,7 @@ namespace DbpfLister
                         package.Close();
                     }
                 }
-                catch (Exception e1)
+                catch (Exception)
                 {
                     // textMessages.AppendText($"{e1.Message} - {packagePath}\r\n");
                 }
@@ -2011,7 +2116,7 @@ namespace DbpfLister
         }
 
 
-        private int[] operatorCounts = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        private readonly int[] operatorCounts = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         private void CountExprOperators(string packagePath, bool displayResults = false)
         {
             textMessages.AppendText($"--- {packagePath}\r\n");
@@ -2341,29 +2446,6 @@ namespace DbpfLister
             // textCrc24.Text = Hashes.InstanceIDHash(hashString).ToString();
             // textCrc32.Text = Hashes.ResourceIDHash(hashString).ToString();
             // textThumbHash.Text = Helper.Hex8PrefixString(Hashes.ThumbnailHash(hashString));
-        }
-
-        private class CasClothingData
-        {
-            public DBPFKey resKey;
-            public string resPackagePath;
-
-            public string resName;
-            public string resDesc;
-            public uint resAge;
-            public uint resGender;
-            public string resHairtone;
-
-            public CasClothingData(Gzps gzps, string packagePath)
-            {
-                this.resKey = new DBPFKey(gzps);
-                this.resPackagePath = packagePath;
-
-                resName = gzps.Name;
-                resAge = gzps.Age;
-                resGender = gzps.Gender;
-                resHairtone = gzps.Hairtone;
-            }
         }
     }
 }

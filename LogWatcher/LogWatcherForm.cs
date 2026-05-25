@@ -35,6 +35,10 @@ namespace LogWatcher
             this.Text = LogWatcherApp.AppTitle;
         }
 
+        public void TidyUp()
+        {
+        }
+
         private void OnLoad(object sender, EventArgs e)
         {
             RegistryTools.LoadAppSettings(LogWatcherApp.RegistryKey, LogWatcherApp.AppVersionMajor, LogWatcherApp.AppVersionMinor);
@@ -87,8 +91,17 @@ namespace LogWatcher
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            RegistryTools.SaveAppSettings(LogWatcherApp.RegistryKey, LogWatcherApp.AppVersionMajor, LogWatcherApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(LogWatcherApp.RegistryKey, this);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(LogWatcherApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(LogWatcherApp.RegistryKey, LogWatcherApp.AppVersionMajor, LogWatcherApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(LogWatcherApp.RegistryKey, this);
+            }
+
+            TidyUp();
         }
 
         private void OnFileOpening(object sender, EventArgs e)

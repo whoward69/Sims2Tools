@@ -9,6 +9,8 @@
 #region Usings
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
+using Sims2Tools.Cache;
+using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Cigen;
@@ -42,7 +44,7 @@ namespace BsokEditor
     {
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        private CigenFile cigenCache = null;
+        private readonly ClothingThumbnailsCache clothingThumbnailsCache = new ClothingThumbnailsCache();
 
         private string folder = null;
 
@@ -61,7 +63,7 @@ namespace BsokEditor
         private bool IsAutoUpdate => (!dataLoading && !ignoreEdits);
         public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
-        #region Constructor and Dispose
+        #region Constructor and TidyUp
         public BsokEditorForm()
         {
             logger.Info(BsokEditorApp.AppProduct);
@@ -105,25 +107,12 @@ namespace BsokEditor
 
             gridViewResources.DataSource = dataTableResources;
 
-            if (Sims2ToolsLib.IsSims2HomePathSet)
-            {
-                string cigenPath = $"{Sims2ToolsLib.Sims2HomePath}\\cigen.package";
-
-                cigenCache = new CigenFile(cigenPath);
-            }
-
             thumbBox.BackColor = colourThumbnailBackground;
         }
 
-        public new void Dispose()
+        public void TidyUp()
         {
-            if (cigenCache != null)
-            {
-                cigenCache.Close();
-                cigenCache = null;
-            }
-
-            base.Dispose();
+            clothingThumbnailsCache.Close();
         }
         #endregion
 
@@ -268,16 +257,25 @@ namespace BsokEditor
                 }
             }
 
-            RegistryTools.SaveAppSettings(BsokEditorApp.RegistryKey, BsokEditorApp.AppVersionMajor, BsokEditorApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(BsokEditorApp.RegistryKey, this);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(BsokEditorApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(BsokEditorApp.RegistryKey, BsokEditorApp.AppVersionMajor, BsokEditorApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(BsokEditorApp.RegistryKey, this);
 
-            RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemExcludeUnknown.Name, menuItemExcludeUnknown.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowNakedCategory.Name, menuItemShowNakedCategory.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowCategoryShoe.Name, menuItemShowCategoryShoe.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowGenderAge.Name, menuItemShowGenderAge.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemExcludeUnknown.Name, menuItemExcludeUnknown.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowNakedCategory.Name, menuItemShowNakedCategory.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowCategoryShoe.Name, menuItemShowCategoryShoe.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Options", menuItemShowGenderAge.Name, menuItemShowGenderAge.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
-            RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
+                RegistryTools.SaveSetting(BsokEditorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
+            }
+
+            TidyUp();
         }
 
         private void OnExitClicked(object sender, EventArgs e)
@@ -292,6 +290,8 @@ namespace BsokEditor
         #endregion
 
         #region Worker
+        private string lastPackageFile;
+
         private void DoWork_FillGrid(string folder)
         {
             if (folder == null) return;
@@ -342,7 +342,7 @@ namespace BsokEditor
                 logger.Error(progressDialog.Result.Error.Message);
                 logger.Info(progressDialog.Result.Error.StackTrace);
 
-                MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show($"An error occured while processing\n{lastPackageFile}", "Error!", MessageBoxButtons.OK);
             }
             else
             {
@@ -379,6 +379,8 @@ namespace BsokEditor
                 try
 #endif
                 {
+                    lastPackageFile = packageFile;
+
                     using (DBPFFile package = new DBPFFile(packageFile))
                     {
                         sender.VisualMode = ProgressBarDisplayMode.Percentage;
@@ -476,7 +478,7 @@ namespace BsokEditor
                     logger.Error(ex.Message);
                     logger.Info(ex.StackTrace);
 
-                    if (MsgBox.Show($"An error occured while processing\n{packageFile}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                    if (MsgBox.Show($"An error occured while processing\n{lastPackageFile}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
                     {
                         throw ex;
                     }
@@ -692,6 +694,13 @@ namespace BsokEditor
         }
         #endregion
 
+        #region Cache Menu Actions
+        private void OnCachingRemoveThumbnails(object sender, EventArgs e)
+        {
+            clothingThumbnailsCache.RemoveCaches();
+        }
+        #endregion
+
         #region Tooltips and Thumbnails
         private void OnToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
         {
@@ -725,7 +734,7 @@ namespace BsokEditor
 
         private Image GetThumbnail(DataGridViewRow row)
         {
-            return cigenCache?.GetThumbnail(row.Cells["colResRef"].Value as Cpf);
+            return clothingThumbnailsCache.GetThumbnail(row.Cells["colResRef"].Value as Cpf);
         }
         #endregion
 

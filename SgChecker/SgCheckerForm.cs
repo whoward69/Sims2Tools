@@ -89,6 +89,10 @@ namespace SgChecker
             gridDuplicate.DataSource = dataDuplicate;
         }
 
+        public void TidyUp()
+        {
+        }
+
         private void SgWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs args)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
@@ -580,10 +584,20 @@ namespace SgChecker
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            RegistryTools.SaveAppSettings(SgCheckerApp.RegistryKey, SgCheckerApp.AppVersionMajor, SgCheckerApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(SgCheckerApp.RegistryKey, this);
-            RegistryTools.SaveSetting(SgCheckerApp.RegistryKey, textModsPath.Name, textModsPath.Text);
-            RegistryTools.SaveSetting(SgCheckerApp.RegistryKey, textScanPath.Name, textScanPath.Text);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(SgCheckerApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(SgCheckerApp.RegistryKey, SgCheckerApp.AppVersionMajor, SgCheckerApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(SgCheckerApp.RegistryKey, this);
+
+                RegistryTools.SaveSetting(SgCheckerApp.RegistryKey, textModsPath.Name, textModsPath.Text);
+                RegistryTools.SaveSetting(SgCheckerApp.RegistryKey, textScanPath.Name, textScanPath.Text);
+            }
+
+            TidyUp();
         }
 
         private void OnSelectModsClicked(object sender, EventArgs e)

@@ -97,6 +97,10 @@ namespace HcduPlus
             gridByResource.DataSource = dataByResource;
         }
 
+        public void TidyUp()
+        {
+        }
+
         private void HcduWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
@@ -128,7 +132,7 @@ namespace HcduPlus
             bool modsSavedSims = checkModsSavedSims.Checked;
             bool scanSavedSims = checkScanSavedSims.Checked;
 
-            string savedSimsFolder = $"{Sims2ToolsLib.Sims2HomePath}\\SavedSims";
+            string savedSimsFolder = Sims2ToolsLib.Sims2SavedSimsPath;
 
             if (scanFolder.Length == 0 && !scanSavedSims)
             {
@@ -793,6 +797,8 @@ namespace HcduPlus
                 RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionSgNames.Name, menuItemOptionSgNames.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemOptionExpandZips.Name, menuItemOptionExpandZips.Checked ? 1 : 0);
             }
+
+            TidyUp();
         }
 
         private void OnSelectModsClicked(object sender, EventArgs e)

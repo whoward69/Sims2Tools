@@ -42,15 +42,15 @@ namespace OutfitOrganiser
     public partial class OutfitOrganiserMeshesDialog : Form
     {
         private readonly DbpfFileCache packageCache;
-        private readonly CigenFile cigenCache;
+        private readonly ClothingThumbnailsCache clothingThumbnailsCache;
 
         private readonly OutfitOrganiserMeshData dataMeshFiles = new OutfitOrganiserMeshData();
 
-        #region Constructor and Dispose
-        public OutfitOrganiserMeshesDialog(DataGridView gridResources, DbpfFileCache packageCache, CigenFile cigenCache, SceneGraphCache downloadsSgCache, SceneGraphCache savedsimsSgCache)
+        #region Constructor
+        public OutfitOrganiserMeshesDialog(DataGridView gridResources, DbpfFileCache packageCache, ClothingThumbnailsCache clothingThumbnailsCache, SceneGraphCache downloadsSgCache, SceneGraphCache savedsimsSgCache)
         {
             this.packageCache = packageCache;
-            this.cigenCache = cigenCache;
+            this.clothingThumbnailsCache = clothingThumbnailsCache;
 
             InitializeComponent();
 
@@ -209,11 +209,6 @@ namespace OutfitOrganiser
                 return txtmPackageNames.Substring(0, txtmPackageNames.Length - 2);
             }
         }
-
-        public new void Dispose()
-        {
-            base.Dispose();
-        }
         #endregion
 
         #region Form Management
@@ -258,7 +253,7 @@ namespace OutfitOrganiser
             // mouseLocation = e;
             Point MousePosition = Cursor.Position;
 
-            if (cigenCache != null && sender is DataGridView grid)
+            if (sender is DataGridView grid)
             {
                 if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < grid.RowCount && e.ColumnIndex < grid.ColumnCount)
                 {
@@ -271,7 +266,7 @@ namespace OutfitOrganiser
 
                         if (thumbnail == null)
                         {
-                            using (CacheableDbpfFile package = packageCache.GetOrOpen(meshRow.Cells["colPackagePath"].Value as string))
+                            using (CacheableDbpfFile package = packageCache.OpenForReadOnly(meshRow.Cells["colPackagePath"].Value as string))
                             {
                                 foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                 {
@@ -358,20 +353,7 @@ namespace OutfitOrganiser
 
         private Image GetResourceThumbnail(DBPFKey key)
         {
-            Image thumbnail = null;
-
-            if (key != null)
-            {
-                thumbnail = cigenCache?.GetThumbnail(key);
-
-                if (cigenCache != null && thumbnail == null)
-                {
-                    // Way too many of these to log this way!
-                    // logger.Warn($"Thumbnail missing for {key}");
-                }
-            }
-
-            return thumbnail;
+            return clothingThumbnailsCache.GetThumbnail(key);
         }
         #endregion
 

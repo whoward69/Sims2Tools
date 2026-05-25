@@ -127,10 +127,10 @@
   <data name="btnSaveRight.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABYAAAAYCAIAAABx3JocAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        DAAACwwBP0AiyAAAAAd0SU1FB+gEHg0xEzm+YBwAAACXSURBVDhPY4jNnkkhAhnx5st/stGwNUI27yBD
-        zE48iDdl78Zz7+DqgQjdCKCiq09/ABGcgYyAgouPvhLO2L/+7Fu4FpKNAJLzD7/gSdoD10KOERAGXAst
-        jZDOxRKuQEESjMCPCBvh2X3OrO4kVgSUIsoIoFKIbZgIIjVqBAgRNkI27xBQmiACKoNrQTeCDDTcjKAI
-        Zc8EADnPxE7ciNHOAAAAAElFTkSuQmCC
+        DAAACwwBP0AiyAAAAAd0SU1FB+gEHg0xEzm+YBwAAACVSURBVDhPY4jNnkkhYojNnvnmy3+y0bA1Qjbv
+        IEPMTjyIN2XvxnPv8BnBELPz6tMfV5/+gDOQEUPMzsVHXwln7F9/9i35Rlx9+mP+4Rc8SXsoMgLCoIsR
+        0rlYwlU69yAJRuBHhI3w7D5nVncSK/LsPkeUEWZ1JzFthiCI1KgRxBkhm3cIMzlgItm8QziNIAMNNyMo
+        RAA5z8ROCUYUNwAAAABJRU5ErkJggg==
 </value>
   </data>
   <metadata name="menuContextResource.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

@@ -230,7 +230,7 @@ namespace OutfitOrganiser
 
                 Image thumbnail = null;
 
-                using (CacheableDbpfFile package = cache.GetOrOpen(packagePath))
+                using (CacheableDbpfFile package = cache.OpenForReadOnly(packagePath))
                 {
                     CpfItem iconidx = binx.GetItem("iconidx");
 
@@ -259,7 +259,7 @@ namespace OutfitOrganiser
         {
             if (IsDirty)
             {
-                CacheableDbpfFile package = cache.GetOrAdd(packagePath);
+                CacheableDbpfFile package = cache.OpenForUpdate(packagePath);
 
                 if (cpf.IsDirty) package.Commit(cpf);
                 if (idrForCpf.IsDirty) package.Commit(idrForCpf);
@@ -278,7 +278,7 @@ namespace OutfitOrganiser
         {
             if (IsDirty)
             {
-                CacheableDbpfFile package = cache.GetOrAdd(packagePath);
+                CacheableDbpfFile package = cache.OpenForUpdate(packagePath);
 
                 if (cpf.IsDirty) package.UnCommit(cpf);
                 if (idrForCpf.IsDirty) package.UnCommit(idrForCpf);

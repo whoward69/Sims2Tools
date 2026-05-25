@@ -12,6 +12,8 @@
 #region Usings
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
+using Sims2Tools.Cache;
+using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Cigen;
@@ -58,7 +60,7 @@ namespace RepositoryWizard
 
         private readonly DbpfFileCache packageCache = new DbpfFileCache();
 
-        private CigenFile cigenCache = null;
+        private readonly ClothingThumbnailsCache clothingThumbnailsCache = new ClothingThumbnailsCache();
 
         private string rootFolder = null;
         private string lastFolder = null;
@@ -131,7 +133,7 @@ namespace RepositoryWizard
 
         public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
-        #region Constructor and Dispose
+        #region Constructor and TidyUp
         public RepositoryWizardForm()
         {
             logger.Info(RepositoryWizardApp.AppProduct);
@@ -175,15 +177,9 @@ namespace RepositoryWizard
             thumbBox.BackColor = colourThumbnailBackground;
         }
 
-        public new void Dispose()
+        public void TidyUp()
         {
-            if (cigenCache != null)
-            {
-                cigenCache.Close();
-                cigenCache = null;
-            }
-
-            base.Dispose();
+            clothingThumbnailsCache.Close();
         }
         #endregion
 
@@ -242,26 +238,6 @@ namespace RepositoryWizard
 
             MyUpdater = new Updater(RepositoryWizardApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
-
-            if (Sims2ToolsLib.IsSims2HomePathSet)
-            {
-                string cigenPath = $"{Sims2ToolsLib.Sims2HomePath}\\cigen.package";
-
-                if (File.Exists(cigenPath))
-                {
-                    cigenCache = new CigenFile(cigenPath);
-                }
-                else
-                {
-                    logger.Warn("'cigen.package' not found - thumbnails will NOT display.");
-                    if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'cigen.package' not found - thumbnails will NOT display.")).ShowDialog();
-                }
-            }
-            else
-            {
-                logger.Warn("'Sims2HomePath' not set - thumbnails will NOT display.");
-                if (!(IsAdvancedMode && Sims2ToolsLib.MuteThumbnailWarnings)) (new ThumbnailWarningDialog("'Sims2HomePath' not set - thumbnails will NOT display.")).ShowDialog();
-            }
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
@@ -277,34 +253,43 @@ namespace RepositoryWizard
                 }
             }
 
-            RegistryTools.SaveAppSettings(RepositoryWizardApp.RegistryKey, RepositoryWizardApp.AppVersionMajor, RepositoryWizardApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(RepositoryWizardApp.RegistryKey, this);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(RepositoryWizardApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(RepositoryWizardApp.RegistryKey, RepositoryWizardApp.AppVersionMajor, RepositoryWizardApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(RepositoryWizardApp.RegistryKey, this);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
 
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoMerge.Name, menuItemAutoMerge.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Mode", menuItemAutoMerge.Name, menuItemAutoMerge.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardClothing.Name, menuItemWizardClothing.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardObject.Name, menuItemWizardObject.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardClothingStandalone.Name, menuItemWizardClothingStandalone.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardClothing.Name, menuItemWizardClothing.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardObject.Name, menuItemWizardObject.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemWizardClothingStandalone.Name, menuItemWizardClothingStandalone.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResProduct.Name, menuItemShowResProduct.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResSort.Name, menuItemShowResSort.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResToolTip.Name, menuItemShowResToolTip.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResProduct.Name, menuItemShowResProduct.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResSort.Name, menuItemShowResSort.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemShowResToolTip.Name, menuItemShowResToolTip.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyShpeSubsets.Name, menuItemVerifyShpeSubsets.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyGmdcSubsets.Name, menuItemVerifyGmdcSubsets.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyShpeSubsets.Name, menuItemVerifyShpeSubsets.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemVerifyGmdcSubsets.Name, menuItemVerifyGmdcSubsets.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemDeleteLocalOrphans.Name, menuItemDeleteLocalOrphans.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", menuItemDeleteLocalOrphans.Name, menuItemDeleteLocalOrphans.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoCopyMeshFiles.Name, ckbDeRepoCopyMeshFiles.Checked ? 1 : 0);
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoSplitFiles.Name, ckbDeRepoSplitFiles.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoCopyMeshFiles.Name, ckbDeRepoCopyMeshFiles.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Options", ckbDeRepoSplitFiles.Name, ckbDeRepoSplitFiles.Checked ? 1 : 0);
 
-            RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Config", textTooltip.Name, textTooltip.Text);
+                RegistryTools.SaveSetting(RepositoryWizardApp.RegistryKey + @"\Config", textTooltip.Name, textTooltip.Text);
+            }
+
+            TidyUp();
         }
 
         private void SetTitle(string folder)
@@ -392,6 +377,8 @@ namespace RepositoryWizard
         #endregion
 
         #region Worker
+        private string lastPackageFile;
+
         private void DoWork_FillTree(string folder, bool ignoreDirty, bool updateMru)
         {
             DoWork_FillTreeOrGrids(folder, ignoreDirty, updateMru, true, false, false);
@@ -474,7 +461,7 @@ namespace RepositoryWizard
                     logger.Error(progressDialog.Result.Error.Message);
                     logger.Info(progressDialog.Result.Error.StackTrace);
 
-                    MsgBox.Show("An error occured while processing", "Error!", MessageBoxButtons.OK);
+                    MsgBox.Show($"An error occured while processing\n{lastPackageFile}", "Error!", MessageBoxButtons.OK);
                 }
                 else
                 {
@@ -541,6 +528,8 @@ namespace RepositoryWizard
 
                 foreach (string packagePath in Directory.GetFiles(workPackage.Folder, "*.package", SearchOption.TopDirectoryOnly))
                 {
+                    lastPackageFile = packagePath;
+
                     if (sender.CancellationPending)
                     {
                         args.Cancel = true;
@@ -561,7 +550,7 @@ namespace RepositoryWizard
             {
                 foreach (DataGridViewRow packageRow in gridPackageFiles.SelectedRows)
                 {
-                    using (CacheableDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
+                    using (CacheableDbpfFile package = packageCache.OpenForReadOnly(packageRow.Cells["colPackagePath"].Value as string))
                     {
                         TypeTypeID repoTypeID = menuItemWizardClothing.Checked ? Binx.TYPE : Objd.TYPE;
 
@@ -1059,17 +1048,10 @@ namespace RepositoryWizard
                                 if (meshGmnd != null && meshGmnd.GmdcKeys.Count == 1)
                                 {
                                     DBPFKey gmdcKey = meshGmnd.GmdcKeys[0];
-                                    meshGmdc = (Gmdc)meshPackage.GetResourceByKey(gmdcKey);
+                                    meshGmdc = (Gmdc)meshPackage.GetResourceByKey(gmdcKey) ??
+                                               (Gmdc)GameData.GetMaxisResource(Gmdc.TYPE, gmdcKey);
 
                                     if (meshGmdc == null)
-                                    {
-                                        meshGmdc = (Gmdc)GameData.GetMaxisResource(Gmdc.TYPE, gmdcKey);
-                                    }
-
-                                    if (meshGmdc != null)
-                                    {
-                                    }
-                                    else
                                     {
                                         logger.Info($"Mesh {cresKey} has missing GMDC resource - {meshPackagePath}");
                                         meshValid = false;
@@ -1464,20 +1446,7 @@ namespace RepositoryWizard
 
         private Image GetResourceThumbnail(DBPFKey key)
         {
-            Image thumbnail = null;
-
-            if (key != null)
-            {
-                thumbnail = cigenCache.GetThumbnail(key);
-
-                if (cigenCache != null && thumbnail == null)
-                {
-                    // Way too many of these to log this way!
-                    // logger.Warn($"Thumbnail missing for {key}");
-                }
-            }
-
-            return thumbnail;
+            return clothingThumbnailsCache.GetThumbnail(key);
         }
         #endregion
 
@@ -2291,7 +2260,7 @@ namespace RepositoryWizard
         {
             Point MousePosition = Cursor.Position;
 
-            if (cigenCache != null && sender is DataGridView grid)
+            if (sender is DataGridView grid)
             {
                 if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.RowIndex < grid.RowCount && e.ColumnIndex < grid.ColumnCount)
                 {
@@ -2318,7 +2287,7 @@ namespace RepositoryWizard
 
                             if (thumbnail == null)
                             {
-                                using (CacheableDbpfFile package = packageCache.GetOrOpen(packageRow.Cells["colPackagePath"].Value as string))
+                                using (CacheableDbpfFile package = packageCache.OpenForReadOnly(packageRow.Cells["colPackagePath"].Value as string))
                                 {
                                     foreach (DBPFEntry item in package.GetEntriesByType(Binx.TYPE))
                                     {
@@ -2450,7 +2419,7 @@ namespace RepositoryWizard
 
                 if (menuItemAutoMerge.Checked)
                 {
-                    using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(packageFile))
+                    using (CacheableDbpfFile dbpfPackage = packageCache.OpenForReadOnly(packageFile))
                     {
                         bool anyUpdates = false;
 
@@ -2493,7 +2462,7 @@ namespace RepositoryWizard
                     {
                         string rowPackageFile = $"{packageInfo.FullName.Substring(0, packageInfo.FullName.Length - packageInfo.Extension.Length)}_{ExpandMacros(resourceRow, $"{{id}}", true)}{packageInfo.Extension}"; ;
 
-                        using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(rowPackageFile))
+                        using (CacheableDbpfFile dbpfPackage = packageCache.OpenForReadOnly(rowPackageFile))
                         {
                             exitCode = SaveClothingRow(dbpfPackage, resourceRow, clothingMesh, menuItemVerifyShpeSubsets.Checked, menuItemVerifyGmdcSubsets.Checked);
 
@@ -2524,7 +2493,7 @@ namespace RepositoryWizard
                     {
                         RepoWizardDbpfData selectedResource = resourceRow.Cells["colRepoWizardData"].Value as RepoWizardDbpfData;
 
-                        using (CacheableDbpfFile dbpfPackage = packageCache.GetOrOpen(selectedResource.PackagePath))
+                        using (CacheableDbpfFile dbpfPackage = packageCache.OpenForReadOnly(selectedResource.PackagePath))
                         {
                             Objd slaveObjd = null;
 
@@ -3132,7 +3101,7 @@ namespace RepositoryWizard
                                         splitPackage.Commit(binx, true);
 
                                         DBPFEntry strEntry = package.GetEntryByKey(idr.GetItem(binx.GetItem("stringsetidx").UIntegerValue));
-                                        if (strEntry != null) splitPackage.Commit(strEntry, package.GetItemByKey(strEntry));
+                                        if (strEntry != null) splitPackage.Commit(strEntry, package.GetDataByKey(strEntry));
                                     }
 
                                     foreach (uint txmtIdx in gzps.TxmtIndexes)
@@ -3258,7 +3227,7 @@ namespace RepositoryWizard
 
                                     foreach (DBPFKey gmdcKey in gmnd.GmdcKeys)
                                     {
-                                        byte[] gmdcData = originalMeshPackage.GetItemByKey(gmdcKey);
+                                        byte[] gmdcData = originalMeshPackage.GetDataByKey(gmdcKey);
 
                                         if (gmdcData != null)
                                         {

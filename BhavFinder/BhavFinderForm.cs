@@ -139,6 +139,10 @@ namespace BhavFinder
             };
         }
 
+        public void TidyUp()
+        {
+        }
+
         private void ClearOperands()
         {
             foreach (TextBox operand in operands)
@@ -606,15 +610,24 @@ namespace BhavFinder
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            RegistryTools.SaveAppSettings(BhavFinderApp.RegistryKey, BhavFinderApp.AppVersionMajor, BhavFinderApp.AppVersionMinor);
-            RegistryTools.SaveFormSettings(BhavFinderApp.RegistryKey, this);
+            if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
+            {
+                RegistryTools.RemoveAppSettings(BhavFinderApp.RegistryKey);
+            }
+            else
+            {
+                RegistryTools.SaveAppSettings(BhavFinderApp.RegistryKey, BhavFinderApp.AppVersionMajor, BhavFinderApp.AppVersionMinor);
+                RegistryTools.SaveFormSettings(BhavFinderApp.RegistryKey, this);
 
-            RegistryTools.SaveSetting(BhavFinderApp.RegistryKey, textFilePath.Name, textFilePath.Text);
-            RegistryTools.SaveSetting(BhavFinderApp.RegistryKey, checkShowNames.Name, checkShowNames.Checked.ToString());
+                RegistryTools.SaveSetting(BhavFinderApp.RegistryKey, textFilePath.Name, textFilePath.Text);
+                RegistryTools.SaveSetting(BhavFinderApp.RegistryKey, checkShowNames.Name, checkShowNames.Checked.ToString());
 
-            RegistryTools.SaveSetting(BhavFinderApp.RegistryKey + @"\Options", menuItemRestoreFilters.Name, menuItemRestoreFilters.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(BhavFinderApp.RegistryKey + @"\Options", menuItemRestoreFilters.Name, menuItemRestoreFilters.Checked ? 1 : 0);
 
-            SaveFilters();
+                SaveFilters();
+            }
+
+            TidyUp();
         }
 
         private void LoadFilters()

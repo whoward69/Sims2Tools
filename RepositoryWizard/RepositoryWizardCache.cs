@@ -263,7 +263,7 @@ namespace RepositoryWizard
 
                 Image thumbnail = null;
 
-                using (CacheableDbpfFile package = cache.GetOrOpen(packagePath))
+                using (CacheableDbpfFile package = cache.OpenForReadOnly(packagePath))
                 {
                     CpfItem iconidx = binx.GetItem("iconidx");
 

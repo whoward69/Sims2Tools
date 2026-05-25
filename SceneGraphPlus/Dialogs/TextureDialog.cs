@@ -339,7 +339,7 @@ namespace SceneGraphPlus.Dialogs
 
             if (currentTexturePath != null)
             {
-                CacheableDbpfFile package = packageCache.GetOrAdd(currentTexturePath);
+                CacheableDbpfFile package = packageCache.OpenForUpdate(currentTexturePath);
 
                 if (currentTextureKey.TypeID == Txtr.TYPE)
                 {
