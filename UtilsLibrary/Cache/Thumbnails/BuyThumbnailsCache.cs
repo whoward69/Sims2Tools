@@ -40,7 +40,7 @@ namespace Sims2Tools.Cache.Thumbnails
 
         public bool IsAvailable => (buyThumbnailsGameFile != null) || (buyThumbnailsCacheFile != null);
 
-        public BuyThumbnailsCache()
+        internal BuyThumbnailsCache()
         {
             if (File.Exists(buyThumbnailsGameFilePath))
             {

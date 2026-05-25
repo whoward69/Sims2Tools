@@ -6,18 +6,11 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools;
 using Sims2Tools.DBPF;
-using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
-using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DbpfCache;
-using Sims2Tools.Utils.Persistence;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 
 namespace FamilyManager
 {
@@ -65,10 +58,14 @@ namespace FamilyManager
 
         private string packagePath;
 
+        private readonly DBPFKey gzpsKey;
+
         private readonly Idr idr = null;
 
         public string PackagePath => packagePath;
         public Idr ClosetIdr => idr;
+
+        public DBPFKey GzpsKey => gzpsKey;
 
         public static ClosetDbpfData Create(CacheableDbpfFile package, Idr idr)
         {
@@ -79,6 +76,8 @@ namespace FamilyManager
         {
             this.packagePath = package.PackagePath;
             this.idr = idr;
+
+            this.gzpsKey = idr.GetItem(2);
         }
 
         public bool Equals(ClosetDbpfData other)
@@ -89,68 +88,6 @@ namespace FamilyManager
         public override string ToString()
         {
             return idr.ToString();
-        }
-    }
-
-    public class ThumbnailDbpfCache : DBPFFile
-    {
-        public ThumbnailDbpfCache(string packagePath) : base(packagePath)
-        {
-        }
-    }
-
-    public class ThumbnailCache
-    {
-        private readonly List<ThumbnailDbpfCache> thumbCache = new List<ThumbnailDbpfCache>();
-
-        public ThumbnailCache(List<string> reverseLoadOrder)
-        {
-            if (Sims2ToolsLib.IsSims2HomePathSet)
-            {
-                if (File.Exists($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\CASThumbnails.package"))
-                {
-                    thumbCache.Add(new ThumbnailDbpfCache($"{Sims2ToolsLib.Sims2HomePath}\\Thumbnails\\CASThumbnails.package"));
-                }
-
-                foreach (string pathKey in reverseLoadOrder)
-                {
-                    string baseFolder = RegistryTools.GetPath(Sims2ToolsLib.RegistryKey, pathKey);
-                    string packagePath = $"{baseFolder}\\TSData\\Res\\UserData\\Thumbnails\\CASThumbnails.package";
-
-                    if (File.Exists(packagePath))
-                    {
-                        thumbCache.Add(new ThumbnailDbpfCache(packagePath));
-                    }
-                }
-            }
-
-            // TODO - Family Manager - thumbnail cache - what about cigen.package?
-        }
-
-        public void Close()
-        {
-            foreach (ThumbnailDbpfCache package in thumbCache)
-            {
-                package.Close();
-            }
-
-            thumbCache.Clear();
-        }
-
-        public Image GetThumbnail(DBPFKey thumbKey)
-        {
-            foreach (ThumbnailDbpfCache package in thumbCache)
-            {
-                DBPFEntry entry = package.GetEntryByKey(thumbKey);
-
-                if (entry != null)
-                {
-                    // TODO - Family Manager - thumbnail cache - either cache this, or at least which file it's in!
-                    return ((Img)package?.GetResourceByEntry(entry))?.Image;
-                }
-            }
-
-            return null;
         }
     }
 }

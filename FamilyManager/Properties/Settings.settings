@@ -2,8 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FamilyManager.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="SelectedRowHighlight" Type="System.String" Scope="User">
-      <Value Profile="(Default)">LightSteelBlue</Value>
+    <Setting Name="ValidationError" Type="System.String" Scope="User">
+      <Value Profile="(Default)">DarkSalmon</Value>
     </Setting>
     <Setting Name="ThumbnailBackground" Type="System.String" Scope="User">
       <Value Profile="(Default)">WhiteSmoke</Value>

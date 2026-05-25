@@ -8,6 +8,8 @@
 
 using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.SceneGraph.GZPS;
+using Sims2Tools.DBPF.Utils;
 using System.Drawing;
 
 namespace Sims2Tools.Cache
@@ -19,6 +21,20 @@ namespace Sims2Tools.Cache
 
         public ClothingThumbnailsCache()
         {
+        }
+
+        public Image GetThumbnail(DBPFKey ownerKey)
+        {
+            if (ownerKey == null) return null;
+
+            Image thumbnail = cigenCache.GetThumbnail(ownerKey);
+
+            if (thumbnail == null && ownerKey is Gzps gzps)
+            {
+                thumbnail = casCache.GetThumbnail(Hashes.CasThumbnailHash(gzps));
+            }
+
+            return thumbnail;
         }
 
         public Image GetThumbnail(DBPFKey thumbKey, DBPFKey gzpsKey)

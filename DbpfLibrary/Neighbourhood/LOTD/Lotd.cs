@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using static Sims2Tools.DBPF.Neighbourhood.LTXT.Ltxt;
 
 namespace Sims2Tools.DBPF.Neighbourhood.LTXT
 {

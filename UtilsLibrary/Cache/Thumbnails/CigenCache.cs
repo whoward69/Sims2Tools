@@ -42,7 +42,7 @@ namespace Sims2Tools.Cache.Thumbnails
 
         public bool IsAvailable => (cigenGameFile != null) || (cigenCacheFile != null);
 
-        public CigenCache()
+        internal CigenCache()
         {
             if (File.Exists(cigenGameFilePath))
             {

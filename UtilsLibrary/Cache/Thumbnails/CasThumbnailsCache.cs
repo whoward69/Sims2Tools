@@ -44,7 +44,7 @@ namespace Sims2Tools.Cache.Thumbnails
 
         public bool IsAvailable => (casThumbnailsGameFile != null) || (casThumbnailsCacheFile != null);
 
-        public CasThumbnailsCache()
+        internal CasThumbnailsCache()
         {
             if (File.Exists(casThumbnailsGameFilePath))
             {
