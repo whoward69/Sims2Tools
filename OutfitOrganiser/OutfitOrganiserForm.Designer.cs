@@ -58,7 +58,11 @@ namespace OutfitOrganiser
             this.menuItemMode = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemRecurse = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemConfirmDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOutfits = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOutfitClothing = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemOutfitHair = new System.Windows.Forms.ToolStripMenuItem();
@@ -181,8 +185,6 @@ namespace OutfitOrganiser
             this.menuContextResRestore = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuContextResSaveThumb = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuContextResReplaceThumb = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuContextResDeleteThumb = new System.Windows.Forms.ToolStripMenuItem();
             this.grpHairtone = new System.Windows.Forms.GroupBox();
             this.comboHairtone = new System.Windows.Forms.ComboBox();
             this.menuContextFolders = new System.Windows.Forms.ContextMenuStrip();
@@ -194,10 +196,8 @@ namespace OutfitOrganiser
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
             this.lblNoOutfitSelected = new System.Windows.Forms.Label();
-            this.toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemRecurse = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuItemConfirmDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCachingRemoveThumbnails = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
@@ -239,7 +239,8 @@ namespace OutfitOrganiser
             this.menuItemGenetics,
             this.menuItemFolder,
             this.menuItemPackage,
-            this.menuItemOptions});
+            this.menuItemOptions,
+            this.menuCaching});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
@@ -350,21 +351,46 @@ namespace OutfitOrganiser
             // 
             this.menuItemAdvanced.CheckOnClick = true;
             this.menuItemAdvanced.Name = "menuItemAdvanced";
-            this.menuItemAdvanced.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAdvanced.Size = new System.Drawing.Size(179, 22);
             this.menuItemAdvanced.Text = "Advanced";
             this.menuItemAdvanced.Click += new System.EventHandler(this.OnAdvancedModeChanged);
             // 
             // toolStripSeparator6
             // 
             this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator6.Size = new System.Drawing.Size(176, 6);
+            // 
+            // menuItemRecurse
+            // 
+            this.menuItemRecurse.CheckOnClick = true;
+            this.menuItemRecurse.Name = "menuItemRecurse";
+            this.menuItemRecurse.Size = new System.Drawing.Size(179, 22);
+            this.menuItemRecurse.Text = "Include &Sub-Folders";
+            this.menuItemRecurse.Click += new System.EventHandler(this.OnRecurseClicked);
+            // 
+            // toolStripSeparator11
+            // 
+            this.toolStripSeparator11.Name = "toolStripSeparator11";
+            this.toolStripSeparator11.Size = new System.Drawing.Size(176, 6);
             // 
             // menuItemAutoBackup
             // 
             this.menuItemAutoBackup.CheckOnClick = true;
             this.menuItemAutoBackup.Name = "menuItemAutoBackup";
-            this.menuItemAutoBackup.Size = new System.Drawing.Size(180, 22);
+            this.menuItemAutoBackup.Size = new System.Drawing.Size(179, 22);
             this.menuItemAutoBackup.Text = "Auto-Backup";
+            // 
+            // toolStripSeparator12
+            // 
+            this.toolStripSeparator12.Name = "toolStripSeparator12";
+            this.toolStripSeparator12.Size = new System.Drawing.Size(176, 6);
+            // 
+            // menuItemConfirmDelete
+            // 
+            this.menuItemConfirmDelete.CheckOnClick = true;
+            this.menuItemConfirmDelete.Name = "menuItemConfirmDelete";
+            this.menuItemConfirmDelete.Size = new System.Drawing.Size(179, 22);
+            this.menuItemConfirmDelete.Text = "Confirm &Delete";
             // 
             // menuItemOutfits
             // 
@@ -381,7 +407,7 @@ namespace OutfitOrganiser
             // 
             this.menuItemOutfitClothing.Name = "menuItemOutfitClothing";
             this.menuItemOutfitClothing.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.menuItemOutfitClothing.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitClothing.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitClothing.Text = "&Clothing";
             this.menuItemOutfitClothing.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -389,7 +415,7 @@ namespace OutfitOrganiser
             // 
             this.menuItemOutfitHair.Name = "menuItemOutfitHair";
             this.menuItemOutfitHair.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.menuItemOutfitHair.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitHair.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitHair.Text = "&Hair";
             this.menuItemOutfitHair.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -397,7 +423,7 @@ namespace OutfitOrganiser
             // 
             this.menuItemOutfitAccessory.Name = "menuItemOutfitAccessory";
             this.menuItemOutfitAccessory.ShortcutKeys = System.Windows.Forms.Keys.F6;
-            this.menuItemOutfitAccessory.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitAccessory.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitAccessory.Text = "&Accessories";
             this.menuItemOutfitAccessory.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -405,7 +431,7 @@ namespace OutfitOrganiser
             // 
             this.menuItemOutfitMakeUp.Name = "menuItemOutfitMakeUp";
             this.menuItemOutfitMakeUp.ShortcutKeys = System.Windows.Forms.Keys.F7;
-            this.menuItemOutfitMakeUp.Size = new System.Drawing.Size(180, 22);
+            this.menuItemOutfitMakeUp.Size = new System.Drawing.Size(154, 22);
             this.menuItemOutfitMakeUp.Text = "&Make-Up";
             this.menuItemOutfitMakeUp.Click += new System.EventHandler(this.OnOutfitsSelectedChanged);
             // 
@@ -1547,11 +1573,9 @@ namespace OutfitOrganiser
             this.menuContextResRepair,
             this.menuContextResRestore,
             this.toolStripSeparator4,
-            this.menuContextResSaveThumb,
-            this.menuContextResReplaceThumb,
-            this.menuContextResDeleteThumb});
+            this.menuContextResSaveThumb});
             this.menuContextResources.Name = "menuContextResources";
-            this.menuContextResources.Size = new System.Drawing.Size(195, 120);
+            this.menuContextResources.Size = new System.Drawing.Size(195, 76);
             this.menuContextResources.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuResourcesOpening);
             this.menuContextResources.Opened += new System.EventHandler(this.OnContextMenuResourcesOpened);
             // 
@@ -1580,20 +1604,6 @@ namespace OutfitOrganiser
             this.menuContextResSaveThumb.Size = new System.Drawing.Size(194, 22);
             this.menuContextResSaveThumb.Text = "Save Thumbnail...";
             this.menuContextResSaveThumb.Click += new System.EventHandler(this.OnResSaveThumbClicked);
-            // 
-            // menuContextResReplaceThumb
-            // 
-            this.menuContextResReplaceThumb.Name = "menuContextResReplaceThumb";
-            this.menuContextResReplaceThumb.Size = new System.Drawing.Size(194, 22);
-            this.menuContextResReplaceThumb.Text = "Replace Thumbnail...";
-            this.menuContextResReplaceThumb.Click += new System.EventHandler(this.OnResReplaceThumbClicked);
-            // 
-            // menuContextResDeleteThumb
-            // 
-            this.menuContextResDeleteThumb.Name = "menuContextResDeleteThumb";
-            this.menuContextResDeleteThumb.Size = new System.Drawing.Size(194, 22);
-            this.menuContextResDeleteThumb.Text = "Delete Thumbnail";
-            this.menuContextResDeleteThumb.Click += new System.EventHandler(this.OnResDeleteThumbClicked);
             // 
             // grpHairtone
             // 
@@ -1688,30 +1698,20 @@ namespace OutfitOrganiser
             this.lblNoOutfitSelected.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblNoOutfitSelected.Visible = false;
             // 
-            // toolStripSeparator11
+            // menuCaching
             // 
-            this.toolStripSeparator11.Name = "toolStripSeparator11";
-            this.toolStripSeparator11.Size = new System.Drawing.Size(177, 6);
+            this.menuCaching.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemCachingRemoveThumbnails});
+            this.menuCaching.Name = "menuCaching";
+            this.menuCaching.Size = new System.Drawing.Size(63, 20);
+            this.menuCaching.Text = "&Caching";
             // 
-            // menuItemRecurse
+            // menuItemCachingRemoveThumbnails
             // 
-            this.menuItemRecurse.CheckOnClick = true;
-            this.menuItemRecurse.Name = "menuItemRecurse";
-            this.menuItemRecurse.Size = new System.Drawing.Size(180, 22);
-            this.menuItemRecurse.Text = "Include &Sub-Folders";
-            this.menuItemRecurse.Click += new System.EventHandler(this.OnRecurseClicked);
-            // 
-            // toolStripSeparator12
-            // 
-            this.toolStripSeparator12.Name = "toolStripSeparator12";
-            this.toolStripSeparator12.Size = new System.Drawing.Size(177, 6);
-            // 
-            // menuItemConfirmDelete
-            // 
-            this.menuItemConfirmDelete.CheckOnClick = true;
-            this.menuItemConfirmDelete.Name = "menuItemConfirmDelete";
-            this.menuItemConfirmDelete.Size = new System.Drawing.Size(180, 22);
-            this.menuItemConfirmDelete.Text = "Confirm &Delete";
+            this.menuItemCachingRemoveThumbnails.Name = "menuItemCachingRemoveThumbnails";
+            this.menuItemCachingRemoveThumbnails.Size = new System.Drawing.Size(219, 22);
+            this.menuItemCachingRemoveThumbnails.Text = "Remove Thumbnails Cache";
+            this.menuItemCachingRemoveThumbnails.Click += new System.EventHandler(this.OnCachingRemoveThumbnails);
             // 
             // OutfitOrganiserForm
             // 
@@ -1726,7 +1726,6 @@ namespace OutfitOrganiser
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuMain;
-            this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(1000, 600);
             this.Name = "OutfitOrganiserForm";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OnFormClosing);
@@ -1883,8 +1882,6 @@ namespace OutfitOrganiser
         private System.Windows.Forms.ToolStripMenuItem menuItemLoadMeshesNow;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem menuContextResSaveThumb;
-        private System.Windows.Forms.ToolStripMenuItem menuContextResReplaceThumb;
-        private System.Windows.Forms.ToolStripMenuItem menuContextResDeleteThumb;
         private System.Windows.Forms.SaveFileDialog saveThumbnailDialog;
         private System.Windows.Forms.OpenFileDialog openThumbnailDialog;
         private System.Windows.Forms.Button btnTownify;
@@ -1930,6 +1927,8 @@ namespace OutfitOrganiser
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator11;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator12;
         private System.Windows.Forms.ToolStripMenuItem menuItemConfirmDelete;
+        private System.Windows.Forms.ToolStripMenuItem menuCaching;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCachingRemoveThumbnails;
     }
 }
 
