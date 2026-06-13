@@ -109,6 +109,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
 
         public TypeInstanceID LotInstance => (TypeInstanceID)lotinstance;
 
+        public TypeInstanceID BusinessLotInstance => (TypeInstanceID)businesslot;
+
         public TypeInstanceID VacationLotInstance => (TypeInstanceID)vacationlot;
 
         public uint CurrentlyOnLotInstance => businesslot;

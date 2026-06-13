@@ -10,82 +10,38 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.IO;
 using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 {
-    public class SdscDecays : SdscData
+    internal class SdscDecays : SdscData
     {
-        public SdscDecays()
+        internal SdscDecays() : base() { }
+        internal SdscDecays(ushort[] data) : base(data) { }
+
+        private short GetDecay(SdscIndex decay)
         {
-            valid = true;
+            return Math.Min((short)1000, Math.Max((short)-1000, (short)data[(int)decay]));
         }
 
-        private short hunger;
-        public short Hunger
+        private void SetDecay(SdscIndex decay, short value)
         {
-            get { return hunger; }
-            set { hunger = Math.Min((short)1000, Math.Max((short)-1000, value)); }
-        }
-
-        private short comfort;
-        public short Comfort
-        {
-            get { return comfort; }
-            set { comfort = Math.Min((short)1000, Math.Max((short)-1000, value)); }
-        }
-
-        private short bladder;
-        public short Bladder
-        {
-            get { return bladder; }
-            set { bladder = Math.Min((short)1000, Math.Max((short)-1000, value)); }
-        }
-
-        private short energy;
-        public short Energy
-        {
-            get { return energy; }
-            set { energy = Math.Min((short)1000, Math.Max((short)-1000, value)); }
-        }
-
-        private short hygiene;
-        public short Hygiene
-        {
-            get { return hygiene; }
-            set { hygiene = Math.Min((short)1000, Math.Max((short)-1000, value)); }
-        }
-
-        private short social;
-        public short Social
-        {
-            get { return social; }
-            set { social = Math.Min((short)1000, Math.Max((short)-1000, value)); }
-        }
-
-        private short fun;
-        public short Fun
-        {
-            get { return fun; }
-            set { fun = Math.Min((short)1000, Math.Max((short)-1000, value)); }
-        }
-
-        internal override void Unserialize(DbpfReader reader)
-        {
-            throw new NotImplementedException();
+            data[(int)decay] = (ushort)Math.Min((short)1000, Math.Max((short)-1000, value));
         }
 
         protected override void AddXml(XmlElement parent)
         {
-            parent.SetAttribute("hunger", Hunger.ToString());
-            parent.SetAttribute("comfort", Comfort.ToString());
-            parent.SetAttribute("bladder", Bladder.ToString());
-            parent.SetAttribute("energy", Energy.ToString());
-            parent.SetAttribute("hygiene", Hygiene.ToString());
-            parent.SetAttribute("social", Social.ToString());
-            parent.SetAttribute("fun", Fun.ToString());
+            if (valid)
+            {
+                parent.SetAttribute("hunger", GetDecay(SdscIndex.DecayHungerPerDay).ToString());
+                parent.SetAttribute("comfort", GetDecay(SdscIndex.DecayComfortPerDay).ToString());
+                parent.SetAttribute("bladder", GetDecay(SdscIndex.DecayBladderPerDay).ToString());
+                parent.SetAttribute("energy", GetDecay(SdscIndex.DecayEnergyPerDay).ToString());
+                parent.SetAttribute("hygiene", GetDecay(SdscIndex.DecayHygienePerDay).ToString());
+                parent.SetAttribute("social", GetDecay(SdscIndex.DecaySocialPerDay).ToString());
+                parent.SetAttribute("fun", GetDecay(SdscIndex.DecayFunPerDay).ToString());
+            }
         }
     }
 }

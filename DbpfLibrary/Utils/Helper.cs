@@ -34,6 +34,17 @@ namespace Sims2Tools.DBPF.Utils
             return binStr.Substring(binStr.Length - 16, 16);
         }
 
+        public static string Hex16String(ulong input)
+        {
+            string s = input.ToString("X16");
+            return s.Substring(s.Length - 16, 16);
+        }
+
+        public static string Hex16PrefixString(ulong input)
+        {
+            return $"0x{Hex16String(input)}";
+        }
+
         public static string Hex8String(uint input)
         {
             string s = input.ToString("X8");

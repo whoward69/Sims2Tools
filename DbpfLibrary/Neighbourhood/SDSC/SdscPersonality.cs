@@ -10,96 +10,54 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.IO;
 using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 {
-    public class SdscPersonality : SdscData
+    internal class SdscPersonality : SdscData
     {
-        public SdscPersonality()
+        internal SdscPersonality() : base() { }
+        internal SdscPersonality(ushort[] data) : base(data) { }
+
+        protected short GetPersonality(SdscIndex personality)
         {
-            valid = true;
+            return (short)data[(int)personality];
         }
 
-        private ushort neat;
-        public ushort Neat
+        protected void SetPersonality(SdscIndex personality, ushort value)
         {
-            get
-            {
-                return (ushort)Math.Min(1000, (uint)neat);
-            }
-            set
-            {
-                neat = (ushort)Math.Min(1000, (uint)value);
-            }
-        }
-
-        private ushort outgoing;
-        public ushort Outgoing
-        {
-            get
-            {
-                return (ushort)Math.Min(1000, (uint)outgoing);
-            }
-            set
-            {
-                outgoing = (ushort)Math.Min(1000, (uint)value);
-            }
-        }
-
-        private ushort active;
-        public ushort Active
-        {
-            get
-            {
-                return (ushort)Math.Min(1000, (uint)active);
-            }
-            set
-            {
-                active = (ushort)Math.Min(1000, (uint)value);
-            }
-        }
-
-        private ushort playful;
-        public ushort Playful
-        {
-            get
-            {
-                return (ushort)Math.Min(1000, (uint)playful);
-            }
-            set
-            {
-                playful = (ushort)Math.Min(1000, (uint)value);
-            }
-        }
-
-        private ushort nice;
-        public ushort Nice
-        {
-            get
-            {
-                return (ushort)Math.Min(1000, (uint)nice);
-            }
-            set
-            {
-                nice = (ushort)Math.Min(1000, (uint)value);
-            }
-        }
-
-        internal override void Unserialize(DbpfReader reader)
-        {
-            throw new NotImplementedException();
+            data[(int)personality] = (ushort)Math.Min((short)1000, value);
         }
 
         protected override void AddXml(XmlElement parent)
         {
-            parent.SetAttribute("neat", Neat.ToString());
-            parent.SetAttribute("outgoing", Outgoing.ToString());
-            parent.SetAttribute("active", Active.ToString());
-            parent.SetAttribute("playful", Playful.ToString());
-            parent.SetAttribute("nice", Nice.ToString());
+            if (valid)
+            {
+                parent.SetAttribute("neat", GetPersonality(SdscIndex.PersonalityNeat).ToString());
+                parent.SetAttribute("outgoing", GetPersonality(SdscIndex.PersonalityOutgoing).ToString());
+                parent.SetAttribute("active", GetPersonality(SdscIndex.PersonalityActive).ToString());
+                parent.SetAttribute("playful", GetPersonality(SdscIndex.PersonalityPlayful).ToString());
+                parent.SetAttribute("nice", GetPersonality(SdscIndex.PersonalityNice).ToString());
+            }
+        }
+    }
+
+    internal class SdscGeneticPersonality : SdscPersonality
+    {
+        internal SdscGeneticPersonality() : base() { }
+        internal SdscGeneticPersonality(ushort[] data) : base(data) { }
+
+        protected override void AddXml(XmlElement parent)
+        {
+            if (valid)
+            {
+                parent.SetAttribute("neat", GetPersonality(SdscIndex.OriginalNeatPersonality).ToString());
+                parent.SetAttribute("outgoing", GetPersonality(SdscIndex.OriginalOutgoingPersonality).ToString());
+                parent.SetAttribute("active", GetPersonality(SdscIndex.OriginalActivePersonality).ToString());
+                parent.SetAttribute("playful", GetPersonality(SdscIndex.OriginalPlayfulPersonality).ToString());
+                parent.SetAttribute("nice", GetPersonality(SdscIndex.OriginalNicePersonality).ToString());
+            }
         }
     }
 }

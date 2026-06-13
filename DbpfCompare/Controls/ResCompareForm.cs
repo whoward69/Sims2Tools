@@ -15,7 +15,9 @@ using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.GLOB;
+using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.SDNA;
+using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
@@ -197,6 +199,18 @@ namespace DbpfCompare.Controls
                     {
                         ShowLight(leftPackage, rightPackage);
                     }
+                    else if (leftNodeData.TypeID == Fami.TYPE)
+                    {
+                        ShowFami(leftPackage, rightPackage);
+                    }
+                    else if (leftNodeData.TypeID == Sdsc.TYPE)
+                    {
+                        ShowSdsc(leftPackage, rightPackage);
+                    }
+                    else
+                    {
+                        ShowHex(leftPackage, rightPackage);
+                    }
                 }
 
                 leftPackage?.Close();
@@ -352,128 +366,6 @@ namespace DbpfCompare.Controls
             }
 
             ShowDiffs(leftText, rightText);
-        }
-
-        private void ShowDiffs(List<string> leftText, List<string> rightText)
-        {
-            DiffItem[] diffItems = Diff.Diff.DiffText(leftText.ToArray(), rightText.ToArray());
-
-            int leftIndex = 0;
-            int rightIndex = 0;
-
-            foreach (DiffItem diffItem in diffItems)
-            {
-                while (leftIndex < diffItem.startLeft)
-                {
-                    DataRow row = dataResCompare.NewRow();
-                    row["Key"] = "Same";
-
-                    row["LeftValue1"] = leftText[leftIndex++];
-                    row["RightValue1"] = rightText[rightIndex++];
-
-                    dataResCompare.Append(row);
-                }
-
-                Trace.Assert(rightIndex == diffItem.startRight);
-
-                if (diffItem.deletedLeft > 0 && diffItem.insertedRight > 0)
-                {
-                    int rightCount = 0;
-
-                    for (int leftCount = 0; leftCount < diffItem.deletedLeft; ++leftCount)
-                    {
-                        DataRow row = dataResCompare.NewRow();
-
-                        if (rightCount < diffItem.insertedRight)
-                        {
-                            // this is a change
-                            row["Key"] = "Change";
-
-                            row["LeftValue1"] = leftText[leftIndex++];
-                            row["RightValue1"] = rightText[rightIndex++];
-
-                            ++rightCount;
-                        }
-                        else
-                        {
-                            // this is "only on the left"
-                            row["Key"] = "Left Only";
-
-                            row["LeftValue1"] = leftText[leftIndex++];
-                            row["RightValue1"] = "";
-                        }
-
-                        dataResCompare.Append(row);
-                    }
-
-                    for (; rightCount < diffItem.insertedRight; ++rightCount)
-                    {
-                        // this is "only on the right"
-                        DataRow row = dataResCompare.NewRow();
-
-                        row["Key"] = "Right Only";
-
-                        row["LeftValue1"] = "";
-                        row["RightValue1"] = rightText[rightIndex++];
-
-                        dataResCompare.Append(row);
-                    }
-                }
-                else if (diffItem.deletedLeft > 0)
-                {
-                    for (int leftCount = 0; leftCount < diffItem.deletedLeft; ++leftCount)
-                    {
-                        // this is "only on the left"
-                        DataRow row = dataResCompare.NewRow();
-                        row["Key"] = "Left Only";
-
-                        row["LeftValue1"] = leftText[leftIndex++];
-                        row["RightValue1"] = "";
-
-                        dataResCompare.Append(row);
-                    }
-                }
-                else if (diffItem.insertedRight > 0)
-                {
-                    for (int rightCount = 0; rightCount < diffItem.insertedRight; ++rightCount)
-                    {
-                        // this is "only on the right"
-                        DataRow row = dataResCompare.NewRow();
-                        row["Key"] = "Right Only";
-
-                        row["LeftValue1"] = "";
-                        row["RightValue1"] = rightText[rightIndex++];
-
-                        dataResCompare.Append(row);
-                    }
-                }
-                else
-                {
-                    throw new Exception("Bad DiffItem");
-                }
-            }
-
-            while (leftIndex < leftText.Count)
-            {
-                DataRow row = dataResCompare.NewRow();
-                row["Key"] = (rightIndex < rightText.Count) ? "Same" : "Left Only";
-
-                row["LeftValue1"] = leftText[leftIndex++];
-                row["RightValue1"] = (rightIndex < rightText.Count) ? rightText[rightIndex++] : "";
-
-                dataResCompare.Append(row);
-            }
-
-            while (rightIndex < rightText.Count)
-            {
-                DataRow row = dataResCompare.NewRow();
-                row["Key"] = "Right Only";
-
-                row["LeftValue1"] = "";
-                row["RightValue1"] = rightText[rightIndex++];
-
-                dataResCompare.Append(row);
-            }
         }
 
         private void ShowTprp(DBPFFile leftPackage, DBPFFile rightPackage)
@@ -1069,6 +961,507 @@ namespace DbpfCompare.Controls
             row["LeftValue1"] = leftDirLight.ReferentNode.Version;
             row["RightValue1"] = rightDirLight.ReferentNode.Version;
             dataResCompare.Append(row);
+        }
+
+        private void ShowFami(DBPFFile leftPackage, DBPFFile rightPackage)
+        {
+            // FAMI - Table; Index, Left Value, Right Value
+            gridResCompare.Columns["colKey"].HeaderText = "Name";
+            gridResCompare.Columns["colLeftValue1"].HeaderText = "Left Value";
+            gridResCompare.Columns["colLeftValue2"].Visible = false;
+            gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
+            gridResCompare.Columns["colRightValue2"].Visible = false;
+
+            Fami leftFami = (Fami)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Fami rightFami = (Fami)rightPackage.GetResourceByKey(rightNodeData.Key);
+
+            DataRow row;
+
+            if (leftFami.Version != rightFami.Version)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Version";
+                row["LeftValue1"] = leftFami.Version;
+                row["RightValue1"] = rightFami.Version;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.AlbumGUID != rightFami.AlbumGUID)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Album GUID";
+                row["LeftValue1"] = leftFami.AlbumGUID;
+                row["RightValue1"] = rightFami.AlbumGUID;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.SubHoodNumber != rightFami.SubHoodNumber)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "SubHood ID";
+                row["LeftValue1"] = leftFami.SubHoodNumber;
+                row["RightValue1"] = rightFami.SubHoodNumber;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.NameInstance != rightFami.NameInstance)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "String ID";
+                row["LeftValue1"] = leftFami.NameInstance;
+                row["RightValue1"] = rightFami.NameInstance;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.LotInstance != rightFami.LotInstance)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Lot ID";
+                row["LeftValue1"] = leftFami.LotInstance;
+                row["RightValue1"] = rightFami.LotInstance;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.BusinessLotInstance != rightFami.BusinessLotInstance)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Business ID";
+                row["LeftValue1"] = leftFami.BusinessLotInstance;
+                row["RightValue1"] = rightFami.BusinessLotInstance;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.VacationLotInstance != rightFami.VacationLotInstance)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Vacation Lot ID";
+                row["LeftValue1"] = leftFami.VacationLotInstance;
+                row["RightValue1"] = rightFami.VacationLotInstance;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.Money != rightFami.Money)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Money";
+                row["LeftValue1"] = leftFami.Money;
+                row["RightValue1"] = rightFami.Money;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.BusinessMoney != rightFami.BusinessMoney)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Money";
+                row["LeftValue1"] = leftFami.BusinessMoney;
+                row["RightValue1"] = rightFami.BusinessMoney;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.Friends != rightFami.Friends)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Friends";
+                row["LeftValue1"] = leftFami.Friends;
+                row["RightValue1"] = rightFami.Friends;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.Flags.Value != rightFami.Flags.Value)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Flags";
+                row["LeftValue1"] = leftFami.Flags;
+                row["RightValue1"] = rightFami.Flags;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.CastAwayResources != rightFami.CastAwayResources)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Cast Away Resources";
+                row["LeftValue1"] = leftFami.CastAwayResources;
+                row["RightValue1"] = rightFami.CastAwayResources;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.CastAwayFood != rightFami.CastAwayFood)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Cast Away Food";
+                row["LeftValue1"] = leftFami.CastAwayFood;
+                row["RightValue1"] = rightFami.CastAwayFood;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.CastAwayFoodDecay != rightFami.CastAwayFoodDecay)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Cast Away Food Decay";
+                row["LeftValue1"] = leftFami.CastAwayFoodDecay;
+                row["RightValue1"] = rightFami.CastAwayFoodDecay;
+                dataResCompare.Append(row);
+            }
+
+            if (leftFami.Members.Count != rightFami.Members.Count)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Total Members";
+                row["LeftValue1"] = leftFami.Members.Count;
+                row["RightValue1"] = rightFami.Members.Count;
+                dataResCompare.Append(row);
+            }
+
+            for (int i = 0; i < leftFami.Members.Count; ++i)
+            {
+                if (leftFami.Members.Count != rightFami.Members.Count)
+                {
+                    row = dataResCompare.NewRow();
+                    row["Key"] = $"Member {i}";
+                    row["LeftValue1"] = Helper.Hex8PrefixString(leftFami.Members[i]);
+                    if (i < rightFami.Members.Count)
+                    {
+                        row["RightValue1"] = Helper.Hex8PrefixString(rightFami.Members[i]);
+                    }
+                    else
+                    {
+                        row["RightValue1"] = "";
+                    }
+                    dataResCompare.Append(row);
+                }
+            }
+
+            if (rightFami.Members.Count > leftFami.Members.Count)
+            {
+                for (int i = leftFami.Members.Count; i < rightFami.Members.Count; ++i)
+                {
+                    row = dataResCompare.NewRow();
+                    row["Key"] = $"Member {i}";
+                    row["LeftValue1"] = "";
+                    row["RightValue1"] = Helper.Hex8PrefixString(rightFami.Members[i]);
+                    dataResCompare.Append(row);
+                }
+            }
+        }
+
+        private void ShowSdsc(DBPFFile leftPackage, DBPFFile rightPackage)
+        {
+            // SDSC - Table; Index, Left Value, Right Value
+            gridResCompare.Columns["colKey"].HeaderText = "Name";
+            gridResCompare.Columns["colLeftValue1"].HeaderText = "Left Value";
+            gridResCompare.Columns["colLeftValue2"].Visible = false;
+            gridResCompare.Columns["colRightValue1"].HeaderText = "Right Value";
+            gridResCompare.Columns["colRightValue2"].Visible = false;
+
+            Sdsc leftSdsc = (Sdsc)leftPackage.GetResourceByKey(leftNodeData.Key);
+            Sdsc rightSdsc = (Sdsc)rightPackage.GetResourceByKey(rightNodeData.Key);
+
+            DataRow row;
+
+            if (leftSdsc.Version != rightSdsc.Version)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Version";
+                row["LeftValue1"] = leftSdsc.Version;
+                row["RightValue1"] = rightSdsc.Version;
+                dataResCompare.Append(row);
+            }
+
+            if (leftSdsc.SimInstance != rightSdsc.SimInstance)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Sim Instance";
+                row["LeftValue1"] = leftSdsc.SimInstance;
+                row["RightValue1"] = rightSdsc.SimInstance;
+                dataResCompare.Append(row);
+            }
+
+            if (leftSdsc.SimGuid != rightSdsc.SimGuid)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "Sim GUID";
+                row["LeftValue1"] = leftSdsc.SimGuid;
+                row["RightValue1"] = rightSdsc.SimGuid;
+                dataResCompare.Append(row);
+            }
+
+            for (SdscIndex index = SdscIndex.SittingYesNo; index <= SdscIndex.TitlePostname; ++index)
+            {
+                if (leftSdsc.GetRawData(index) != rightSdsc.GetRawData(index))
+                {
+                    row = dataResCompare.NewRow();
+                    row["Key"] = index.ToString();
+
+                    row["LeftValue1"] = leftSdsc.GetRawData(index);
+                    row["RightValue1"] = rightSdsc.GetRawData(index);
+
+                    dataResCompare.Append(row);
+                }
+            }
+
+            if (leftSdsc.BvMemories != rightSdsc.BvMemories)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = "BV Memories";
+                row["LeftValue1"] = Helper.Hex16PrefixString(leftSdsc.BvMemories);
+                row["RightValue1"] = Helper.Hex16PrefixString(rightSdsc.BvMemories);
+                dataResCompare.Append(row);
+            }
+
+            for (int index = 0; index < Math.Max(leftSdsc.RelationshipCount, rightSdsc.RelationshipCount); ++index)
+            {
+                if (leftSdsc.GetRelationship(index) != rightSdsc.GetRelationship(index))
+                {
+                    row = dataResCompare.NewRow();
+                    row["Key"] = $"Rel: {index}";
+
+                    row["LeftValue1"] = leftSdsc.GetRelationship(index);
+                    row["RightValue1"] = rightSdsc.GetRelationship(index);
+
+                    dataResCompare.Append(row);
+                }
+            }
+        }
+
+        private void ShowHex(DBPFFile leftPackage, DBPFFile rightPackage)
+        {
+            gridResCompare.Columns["colKey"].HeaderText = "Offset";
+            gridResCompare.Columns["colLeftValue1"].HeaderText = "Left Hex";
+            gridResCompare.Columns["colLeftValue2"].HeaderText = "Left Text";
+            gridResCompare.Columns["colRightValue1"].HeaderText = "Right Hex";
+            gridResCompare.Columns["colRightValue2"].HeaderText = "Left Text";
+
+            byte[] leftData = leftPackage.GetDataByKey(leftNodeData.Key);
+            byte[] rightData = rightPackage.GetDataByKey(rightNodeData.Key);
+
+            DataRow row;
+
+            int minLength = Math.Min(leftData.Length, rightData.Length);
+
+            int offset = 0;
+
+            while (offset < minLength)
+            {
+                row = dataResCompare.NewRow();
+                row["Key"] = Helper.Hex8PrefixString((uint)offset);
+                row["LeftValue1"] = ToHexSequence(leftData, offset, Math.Min(16, leftData.Length - offset));
+                row["LeftValue2"] = ToTextSequence(leftData, offset, Math.Min(16, leftData.Length - offset));
+                row["RightValue1"] = ToHexSequence(rightData, offset, Math.Min(16, rightData.Length - offset));
+                row["RightValue2"] = ToTextSequence(rightData, offset, Math.Min(16, rightData.Length - offset));
+                dataResCompare.Append(row);
+
+                offset += 16;
+            }
+
+            int leftExtra = leftData.Length - offset;
+
+            if (leftExtra > 0)
+            {
+                while (offset < leftData.Length)
+                {
+                    row = dataResCompare.NewRow();
+                    row["Key"] = Helper.Hex8PrefixString((uint)offset);
+                    row["LeftValue1"] = ToHexSequence(leftData, offset, 16);
+                    row["LeftValue2"] = ToTextSequence(leftData, offset, 16);
+                    row["RightValue1"] = "";
+                    row["RightValue2"] = "";
+                    dataResCompare.Append(row);
+
+                    offset += 16;
+                }
+
+                leftExtra = leftData.Length - offset;
+
+                if (leftExtra > 0)
+                {
+                    row = dataResCompare.NewRow();
+                    row["Key"] = Helper.Hex8PrefixString((uint)offset);
+                    row["LeftValue1"] = ToHexSequence(leftData, offset, leftExtra);
+                    row["LeftValue2"] = ToTextSequence(leftData, offset, leftExtra);
+                    row["RightValue1"] = "";
+                    row["RightValue2"] = "";
+                    dataResCompare.Append(row);
+                }
+            }
+            else
+            {
+                int rightExtra = rightData.Length - offset;
+
+                if (rightExtra > 0)
+                {
+                    while (offset < rightData.Length)
+                    {
+                        row = dataResCompare.NewRow();
+                        row["Key"] = Helper.Hex8PrefixString((uint)offset);
+                        row["LeftValue1"] = "";
+                        row["LeftValue2"] = "";
+                        row["RightValue1"] = ToHexSequence(rightData, offset, 16);
+                        row["RightValue2"] = ToTextSequence(rightData, offset, 16);
+                        dataResCompare.Append(row);
+
+                        offset += 16;
+                    }
+
+                    rightExtra = rightData.Length - offset;
+
+                    if (rightExtra > 0)
+                    {
+                        row = dataResCompare.NewRow();
+                        row["Key"] = Helper.Hex8PrefixString((uint)offset);
+                        row["LeftValue1"] = "";
+                        row["LeftValue2"] = "";
+                        row["RightValue1"] = ToHexSequence(rightData, offset, rightExtra);
+                        row["RightValue2"] = ToTextSequence(rightData, offset, rightExtra);
+                        dataResCompare.Append(row);
+                    }
+                }
+            }
+        }
+
+        private string ToHexSequence(byte[] data, int offset, int length)
+        {
+            string sequ = "";
+
+            for (int i = 0; i < length; ++i)
+            {
+                sequ += " " + Helper.Hex2String(data[offset + i]);
+            }
+
+            return sequ;
+        }
+
+        private string ToTextSequence(byte[] data, int offset, int length)
+        {
+            string sequ = "";
+
+            for (int i = 0; i < length; ++i)
+            {
+                sequ += " " + Convert.ToChar(data[offset + i]);
+            }
+
+            return sequ;
+        }
+
+        private void ShowDiffs(List<string> leftText, List<string> rightText)
+        {
+            DiffItem[] diffItems = Diff.Diff.DiffText(leftText.ToArray(), rightText.ToArray());
+
+            int leftIndex = 0;
+            int rightIndex = 0;
+
+            foreach (DiffItem diffItem in diffItems)
+            {
+                while (leftIndex < diffItem.startLeft)
+                {
+                    DataRow row = dataResCompare.NewRow();
+                    row["Key"] = "Same";
+
+                    row["LeftValue1"] = leftText[leftIndex++];
+                    row["RightValue1"] = rightText[rightIndex++];
+
+                    dataResCompare.Append(row);
+                }
+
+                Trace.Assert(rightIndex == diffItem.startRight);
+
+                if (diffItem.deletedLeft > 0 && diffItem.insertedRight > 0)
+                {
+                    int rightCount = 0;
+
+                    for (int leftCount = 0; leftCount < diffItem.deletedLeft; ++leftCount)
+                    {
+                        DataRow row = dataResCompare.NewRow();
+
+                        if (rightCount < diffItem.insertedRight)
+                        {
+                            // this is a change
+                            row["Key"] = "Change";
+
+                            row["LeftValue1"] = leftText[leftIndex++];
+                            row["RightValue1"] = rightText[rightIndex++];
+
+                            ++rightCount;
+                        }
+                        else
+                        {
+                            // this is "only on the left"
+                            row["Key"] = "Left Only";
+
+                            row["LeftValue1"] = leftText[leftIndex++];
+                            row["RightValue1"] = "";
+                        }
+
+                        dataResCompare.Append(row);
+                    }
+
+                    for (; rightCount < diffItem.insertedRight; ++rightCount)
+                    {
+                        // this is "only on the right"
+                        DataRow row = dataResCompare.NewRow();
+
+                        row["Key"] = "Right Only";
+
+                        row["LeftValue1"] = "";
+                        row["RightValue1"] = rightText[rightIndex++];
+
+                        dataResCompare.Append(row);
+                    }
+                }
+                else if (diffItem.deletedLeft > 0)
+                {
+                    for (int leftCount = 0; leftCount < diffItem.deletedLeft; ++leftCount)
+                    {
+                        // this is "only on the left"
+                        DataRow row = dataResCompare.NewRow();
+                        row["Key"] = "Left Only";
+
+                        row["LeftValue1"] = leftText[leftIndex++];
+                        row["RightValue1"] = "";
+
+                        dataResCompare.Append(row);
+                    }
+                }
+                else if (diffItem.insertedRight > 0)
+                {
+                    for (int rightCount = 0; rightCount < diffItem.insertedRight; ++rightCount)
+                    {
+                        // this is "only on the right"
+                        DataRow row = dataResCompare.NewRow();
+                        row["Key"] = "Right Only";
+
+                        row["LeftValue1"] = "";
+                        row["RightValue1"] = rightText[rightIndex++];
+
+                        dataResCompare.Append(row);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Bad DiffItem");
+                }
+            }
+
+            while (leftIndex < leftText.Count)
+            {
+                DataRow row = dataResCompare.NewRow();
+                row["Key"] = (rightIndex < rightText.Count) ? "Same" : "Left Only";
+
+                row["LeftValue1"] = leftText[leftIndex++];
+                row["RightValue1"] = (rightIndex < rightText.Count) ? rightText[rightIndex++] : "";
+
+                dataResCompare.Append(row);
+            }
+
+            while (rightIndex < rightText.Count)
+            {
+                DataRow row = dataResCompare.NewRow();
+                row["Key"] = "Right Only";
+
+                row["LeftValue1"] = "";
+                row["RightValue1"] = rightText[rightIndex++];
+
+                dataResCompare.Append(row);
+            }
         }
 
         private void PopulateLanguage(MetaData.Languages lang, Str leftStr, Str rightStr)

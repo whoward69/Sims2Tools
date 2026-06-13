@@ -12,55 +12,39 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
-using System.IO;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 {
-    public class SdscVoyage : SdscData
+    internal class SdscVoyage : SdscData
     {
-        internal SdscVoyage()
+        internal SdscVoyage() : base() { }
+        internal SdscVoyage(ushort[] data) : base(data) { }
+
+        private ulong memories = 0;
+
+        public ulong Memories => memories;
+
+        internal void UnserializeMemories(DbpfReader reader)
         {
-            daysleft = 0;
-            collect = 0;
-        }
-
-        ulong collect;
-        ushort daysleft;
-        public ushort DaysLeft
-        {
-            get { return daysleft; }
-            set { daysleft = value; }
-        }
-
-        public ulong CollectiblesPlain
-        {
-            get { return collect; }
-            set { collect = value; }
-        }
-
-
-        internal override void Unserialize(DbpfReader reader)
-        {
-            reader.Seek(SeekOrigin.Begin, 0x19C);
-            this.daysleft = reader.ReadUInt16();
-
-            valid = true;
-        }
-
-        internal void UnserializeMem(DbpfReader reader)
-        {
-            collect = 0;
             if (reader.Position <= reader.Length - 8)
             {
-                collect = reader.ReadUInt64();
+                memories = reader.ReadUInt64();
             }
+        }
+
+        internal void SerializeMemories(DbpfWriter writer)
+        {
+            writer.WriteUInt64(memories);
         }
 
         protected override void AddXml(XmlElement parent)
         {
-            parent.SetAttribute("daysLeft", DaysLeft.ToString());
-            parent.SetAttribute("memories", Helper.Hex8PrefixString((uint)((collect >> 0x20) & 0xFFFFFFFF)) + Helper.Hex8String((uint)(collect & 0xFFFFFFFF)));
+            if (valid)
+            {
+                parent.SetAttribute("daysLeft", data[(int)SdscIndex.TimeLeftOnVacation].ToString());
+                parent.SetAttribute("memories", Helper.Hex8PrefixString((uint)((memories >> 0x20) & 0xFFFFFFFF)) + Helper.Hex8String((uint)(memories & 0xFFFFFFFF)));
+            }
         }
     }
 }

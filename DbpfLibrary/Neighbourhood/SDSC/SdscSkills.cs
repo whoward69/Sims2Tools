@@ -10,99 +10,41 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.IO;
 using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 {
-    public class SdscSkills : SdscData
+    internal class SdscSkills : SdscData
     {
-        public SdscSkills()
+        internal SdscSkills() : base() { }
+        internal SdscSkills(ushort[] data) : base(data) { }
+
+        private short GetSkill(SdscIndex skill)
         {
-            valid = true;
+            return (short)Math.Min((ushort)1000, data[(int)skill]);
         }
 
-        private ushort romance;
-        public ushort Romance
+        private void SetSkill(SdscIndex skill, ushort value)
         {
-            get { return (ushort)Math.Min(1000, (uint)romance); }
-            set { romance = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort fatness;
-        public ushort Fatness
-        {
-            get { return (ushort)Math.Min(1000, (uint)fatness); }
-            set { fatness = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort cooking;
-        public ushort Cooking
-        {
-            get { return (ushort)Math.Min(1000, (uint)cooking); }
-            set { cooking = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort mechanical;
-        public ushort Mechanical
-        {
-            get { return (ushort)Math.Min(1000, (uint)mechanical); }
-            set { mechanical = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort charisma;
-        public ushort Charisma
-        {
-            get { return (ushort)Math.Min(1000, (uint)charisma); }
-            set { charisma = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort body;
-        public ushort Body
-        {
-            get { return (ushort)Math.Min(1000, (uint)body); }
-            set { body = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort logic;
-        public ushort Logic
-        {
-            get { return (ushort)Math.Min(1000, (uint)logic); }
-            set { logic = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort creativity;
-        public ushort Creativity
-        {
-            get { return (ushort)Math.Min(1000, (uint)creativity); }
-            set { creativity = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort cleaning;
-        public ushort Cleaning
-        {
-            get { return (ushort)Math.Min(1000, (uint)cleaning); }
-            set { cleaning = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        internal override void Unserialize(DbpfReader reader)
-        {
-            throw new NotImplementedException();
+            data[(int)skill] = Math.Min((ushort)1000, value);
         }
 
         protected override void AddXml(XmlElement parent)
         {
-            parent.SetAttribute("cooking", Cooking.ToString());
-            parent.SetAttribute("mechanical", Mechanical.ToString());
-            parent.SetAttribute("charisma", Charisma.ToString());
-            parent.SetAttribute("body", Body.ToString());
-            parent.SetAttribute("logic", Logic.ToString());
-            parent.SetAttribute("creativity", Creativity.ToString());
-            parent.SetAttribute("cleaning", Cleaning.ToString());
+            if (valid)
+            {
+                parent.SetAttribute("cooking", GetSkill(SdscIndex.CookingSkill).ToString());
+                parent.SetAttribute("mechanical", GetSkill(SdscIndex.MechanicalSkill).ToString());
+                parent.SetAttribute("charisma", GetSkill(SdscIndex.CharismaSkill).ToString());
+                parent.SetAttribute("body", GetSkill(SdscIndex.BodySkill).ToString());
+                parent.SetAttribute("logic", GetSkill(SdscIndex.LogicSkill).ToString());
+                parent.SetAttribute("creativity", GetSkill(SdscIndex.CreativitySkill).ToString());
+                parent.SetAttribute("cleaning", GetSkill(SdscIndex.CleaningSkill).ToString());
 
-            parent.SetAttribute("romance", Romance.ToString());
-            parent.SetAttribute("fatness", Fatness.ToString());
+                parent.SetAttribute("romance", GetSkill(SdscIndex.RomanceSkill).ToString());
+                parent.SetAttribute("fatness", GetSkill(SdscIndex.Fatness).ToString());
+            }
         }
     }
 }

@@ -124,6 +124,7 @@ namespace Sims2Tools.DBPF
         private static readonly Dictionary<TypeTypeID, string> RcolTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, string> SgTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, string> OtherTypeNames = new Dictionary<TypeTypeID, string>();
+        private static readonly Dictionary<TypeTypeID, string> UncodedTypeNames = new Dictionary<TypeTypeID, string>();
         private static readonly Dictionary<TypeTypeID, string> AllTypeNames = new Dictionary<TypeTypeID, string>();
 
         static DBPFData()
@@ -133,9 +134,9 @@ namespace Sims2Tools.DBPF
             ModTypeNames.Add(Ctss.TYPE, Ctss.NAME);
             ModTypeNames.Add(Fwav.TYPE, Fwav.NAME);
             ModTypeNames.Add(Glob.TYPE, Glob.NAME);
+            ModTypeNames.Add(Matshad.TYPE, Matshad.NAME);
             ModTypeNames.Add(Objd.TYPE, Objd.NAME);
             ModTypeNames.Add(Objf.TYPE, Objf.NAME);
-            ModTypeNames.Add(Matshad.TYPE, Matshad.NAME);
             ModTypeNames.Add(Nref.TYPE, Nref.NAME);
             ModTypeNames.Add(Slot.TYPE, Slot.NAME);
             ModTypeNames.Add(Str.TYPE, Str.NAME);
@@ -184,8 +185,8 @@ namespace Sims2Tools.DBPF
             SgTypeNames.Add(Idr.TYPE, Idr.NAME);
             SgTypeNames.Add(Mmat.TYPE, Mmat.NAME);
             SgTypeNames.Add(Xfch.TYPE, Xfch.NAME);
-            SgTypeNames.Add(Xmol.TYPE, Xmol.NAME);
             SgTypeNames.Add(Xhtn.TYPE, Xhtn.NAME);
+            SgTypeNames.Add(Xmol.TYPE, Xmol.NAME);
             SgTypeNames.Add(Xstn.TYPE, Xstn.NAME);
             SgTypeNames.Add(Xtol.TYPE, Xtol.NAME);
 
@@ -215,11 +216,87 @@ namespace Sims2Tools.DBPF
             OtherTypeNames.Add(Cgn1.TYPE, Cgn1.NAME);
             OtherTypeNames.Add(Grop.TYPE, Grop.NAME);
 
+            UncodedTypeNames.Add((TypeTypeID)0x6B943B43, "2ARY");
+            UncodedTypeNames.Add((TypeTypeID)0x2A51171B, "3ARY");
+            UncodedTypeNames.Add((TypeTypeID)0xEBFEE345, "AUDT");
+            UncodedTypeNames.Add((TypeTypeID)0x424D505F, "BMP");
+            UncodedTypeNames.Add((TypeTypeID)0x43415453, "CATS");
+            UncodedTypeNames.Add((TypeTypeID)0x43524944, "CGN2");
+            UncodedTypeNames.Add((TypeTypeID)0xCDB467B8, "CREG");
+            UncodedTypeNames.Add((TypeTypeID)0x44475250, "DGRP");
+            UncodedTypeNames.Add((TypeTypeID)0x46414D68, "FAMH");
+            UncodedTypeNames.Add((TypeTypeID)0x46434E53, "FCNS");
+            UncodedTypeNames.Add((TypeTypeID)0xAB4BA572, "FPST");
+            UncodedTypeNames.Add((TypeTypeID)0xEA5118B0, "FX");
+            UncodedTypeNames.Add((TypeTypeID)0x8DB5E4C2, "FXSD");
+            UncodedTypeNames.Add((TypeTypeID)0x9012468A, "GLUA");
+            UncodedTypeNames.Add((TypeTypeID)0xB1827A47, "GTIP");
+            UncodedTypeNames.Add((TypeTypeID)0xEC44BDDC, "NHVW");
+            UncodedTypeNames.Add((TypeTypeID)0x484F5553, "HOUS");
+            UncodedTypeNames.Add((TypeTypeID)0x0F9F0C21, "IIDX");
+            UncodedTypeNames.Add((TypeTypeID)0x4F6FD33D, "INIT");
+            UncodedTypeNames.Add((TypeTypeID)0xA2E3D533, "KEYD");
+            UncodedTypeNames.Add((TypeTypeID)0xCCCEF852, "LxNR");
+            UncodedTypeNames.Add((TypeTypeID)0x6F626A74, "MOBJT");
+            UncodedTypeNames.Add((TypeTypeID)0xABCB5DA4, "NHTG");
+            UncodedTypeNames.Add((TypeTypeID)0xABD0DC63, "NHTR");
+            UncodedTypeNames.Add((TypeTypeID)0x2DB5C0F4, "NIDM");
+            UncodedTypeNames.Add((TypeTypeID)0xADEE8D84, "NLO");
+            UncodedTypeNames.Add((TypeTypeID)0x4E6D6150, "NMAP");
+            UncodedTypeNames.Add((TypeTypeID)0x4F626A4D, "OBJM");
+            UncodedTypeNames.Add((TypeTypeID)0xFA1C39F7, "OBJT");
+            UncodedTypeNames.Add((TypeTypeID)0x9012468B, "OLUA");
+            UncodedTypeNames.Add((TypeTypeID)0x50414C54, "PALT");
+            UncodedTypeNames.Add((TypeTypeID)0xD1954460, "PBOP");
+            UncodedTypeNames.Add((TypeTypeID)0x50455253, "PERS");
+            UncodedTypeNames.Add((TypeTypeID)0xAF74F8CD, "PicTXMT");
+            UncodedTypeNames.Add((TypeTypeID)0xAF74F8E0, "PicTXTR");
+            UncodedTypeNames.Add((TypeTypeID)0x0C900FDB, "POOL");
+            UncodedTypeNames.Add((TypeTypeID)0x2C310F46, "POPS");
+            UncodedTypeNames.Add((TypeTypeID)0x504F5349, "POSI");
+            UncodedTypeNames.Add((TypeTypeID)0x50544250, "PTBP");
+            UncodedTypeNames.Add((TypeTypeID)0x7181C501, "PUNK");
+            UncodedTypeNames.Add((TypeTypeID)0xAB9406AA, "ROOF");
+            UncodedTypeNames.Add((TypeTypeID)0xCC2A6A34, "SCID");
+            UncodedTypeNames.Add((TypeTypeID)0x3053CF74, "SCOR");
+            UncodedTypeNames.Add((TypeTypeID)0x53494D49, "SIMI");
+            UncodedTypeNames.Add((TypeTypeID)0xCAC4FC40, "SMAP");
+            UncodedTypeNames.Add((TypeTypeID)0xCDB8BDC4, "SMEM");
+            UncodedTypeNames.Add((TypeTypeID)0x53505232, "SPR2");
+            UncodedTypeNames.Add((TypeTypeID)0xACE46235, "STXR");
+            UncodedTypeNames.Add((TypeTypeID)0x54415454, "TATT");
+            UncodedTypeNames.Add((TypeTypeID)0x4B58975B, "TMAP");
+            UncodedTypeNames.Add((TypeTypeID)0x54524545, "TREE");
+            UncodedTypeNames.Add((TypeTypeID)0xBA353CE1, "TSSG");
+            //UncodedTypeNames.Add((TypeTypeID)0x45585069, "UNK");
+            //UncodedTypeNames.Add((TypeTypeID)0x47746162, "UNK");
+            //UncodedTypeNames.Add((TypeTypeID)0x6DB6F410, "UNK");
+            //UncodedTypeNames.Add((TypeTypeID)0x6E9C59CF, "UNK");
+            //UncodedTypeNames.Add((TypeTypeID)0x8B0C79D6, "UNK");
+            //UncodedTypeNames.Add((TypeTypeID)0x8DB8AD90, "UNK");
+            //UncodedTypeNames.Add((TypeTypeID)0x8DC0278D, "UNK");
+            //UncodedTypeNames.Add((TypeTypeID)0x916DA14D, "UNK");
+            //UncodedTypeNames.Add((TypeTypeID)0x9D796DB4, "UNK");
+            //UncodedTypeNames.Add((TypeTypeID)0xBC66BAEC, "UNK");
+            //UncodedTypeNames.Add((TypeTypeID)0xCD8B6498, "UNK");
+            UncodedTypeNames.Add((TypeTypeID)0xCB4387A1, "VERT");
+            UncodedTypeNames.Add((TypeTypeID)0x0A284D0B, "WGRA");
+            UncodedTypeNames.Add((TypeTypeID)0x8A84D7B0, "WLAY");
+            UncodedTypeNames.Add((TypeTypeID)0x6D814AFE, "WNTT");
+            UncodedTypeNames.Add((TypeTypeID)0x49FF7D76, "WRLD");
+            UncodedTypeNames.Add((TypeTypeID)0xB21BE28B, "WTHR");
+            UncodedTypeNames.Add((TypeTypeID)0x0C93E3DE, "XFMD");
+            UncodedTypeNames.Add((TypeTypeID)0x6C93B566, "XFNU");
+            UncodedTypeNames.Add((TypeTypeID)0x8C93BF6C, "XFRG");
+            UncodedTypeNames.Add((TypeTypeID)0x584D544F, "XMTO");
+            UncodedTypeNames.Add((TypeTypeID)0x584F424A, "XOBJ2");
+
             foreach (KeyValuePair<TypeTypeID, string> kvPair in ModTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, string> kvPair in ImgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, string> kvPair in RcolTypeNames) { SgTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, string> kvPair in SgTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
             foreach (KeyValuePair<TypeTypeID, string> kvPair in OtherTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
+            foreach (KeyValuePair<TypeTypeID, string> kvPair in UncodedTypeNames) { AllTypeNames.Add(kvPair.Key, kvPair.Value); }
         }
 
         public static Dictionary<TypeTypeID, string>.KeyCollection AllTypes

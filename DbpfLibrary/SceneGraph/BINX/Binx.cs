@@ -50,6 +50,7 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
         }
 
         public uint ObjectIdx => GetItem("objectidx").UIntegerValue;
+        public uint IconIdx => GetItem("iconidx").UIntegerValue;
 
         public uint StringSetIdx => GetItem("stringsetidx").UIntegerValue;
         public uint StringIndex => GetItem("stringindex").UIntegerValue;

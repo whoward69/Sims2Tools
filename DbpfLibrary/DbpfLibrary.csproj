@@ -93,6 +93,7 @@
     <Compile Include="Logger\DBPFLogger.cs" />
     <Compile Include="MATSHAD\Matshad.cs" />
     <Compile Include="Neighbourhood\LOTD\Lotd.cs" />
+    <Compile Include="Neighbourhood\SDSC\SdscIndex.cs" />
     <Compile Include="Neighbourhood\XNGB\Xngb.cs" />
     <Compile Include="SceneGraph\AGED\Aged.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\MipMap.cs" />

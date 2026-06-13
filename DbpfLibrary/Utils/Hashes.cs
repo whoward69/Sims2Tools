@@ -105,12 +105,10 @@ namespace Sims2Tools.DBPF.Utils
         public static DBPFKey CasThumbnailHash(DBPFKey ownerKey, uint genderCode, uint ageCode, string hairtone)
         {
             string gender = "";
-
             if ((genderCode & 0x01) == 0x01) gender += "female";
             if ((genderCode & 0x02) == 0x02) gender += "male";
 
             string age = "";
-
             if ((ageCode & 0x20) == 0x20) age += "baby";
             else if ((ageCode & 0x01) == 0x01) age += "toddler";
             else if ((ageCode & 0x02) == 0x02) age += "child";
@@ -119,9 +117,9 @@ namespace Sims2Tools.DBPF.Utils
             else if ((ageCode & 0x08) == 0x08) age += "adult";
             else if ((ageCode & 0x10) == 0x10) age += "elder";
 
-            Int32 t = (Int32)ownerKey.TypeID.AsUInt();
-            Int32 g = (Int32)ownerKey.GroupID.AsUInt();
-            Int32 i = (Int32)ownerKey.InstanceID.AsUInt();
+            int t = (int)ownerKey.TypeID.AsUInt();
+            int g = (int)ownerKey.GroupID.AsUInt();
+            int i = (int)ownerKey.InstanceID.AsUInt();
 
             string hashMagic = $"{age}{gender}_{g}-{t}-{i}";
 

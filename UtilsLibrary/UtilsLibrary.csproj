@@ -114,6 +114,12 @@
     <Compile Include="Dialogs\EpSPConfigDialog.Designer.cs">
       <DependentUpon>EpSPConfigDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\TextAndTextEntryDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\TextAndTextEntryDialog.Designer.cs">
+      <DependentUpon>TextAndTextEntryDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\TreePickerDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -201,6 +207,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\EpSPConfigDialog.resx">
       <DependentUpon>EpSPConfigDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\TextAndTextEntryDialog.resx">
+      <DependentUpon>TextAndTextEntryDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\TreePickerDialog.resx">
       <DependentUpon>TreePickerDialog.cs</DependentUpon>

@@ -10,187 +10,62 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.IO;
 using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 {
-    public class SdscInterests : SdscData
+    internal class SdscInterests : SdscData
     {
-        public SdscInterests()
+        internal SdscInterests() : base() { }
+        internal SdscInterests(ushort[] data) : base(data) { }
+
+        private ushort GetInterest(SdscIndex interest)
         {
-            valid = true;
+            return Math.Min((ushort)1000, data[(int)interest]);
         }
 
-        private ushort politics;
-        public ushort Politics
+        private void SetInterest(SdscIndex interest, ushort value)
         {
-            get { return (ushort)Math.Min(1000, (uint)politics); }
-            set { politics = (ushort)Math.Min(1000, (uint)value); }
+            data[(int)interest] = Math.Min((ushort)1000, value);
         }
 
-        private ushort money;
-        public ushort Money
+        private short GetPreference(SdscIndex preference)
         {
-            get { return (ushort)Math.Min(1000, (uint)money); }
-            set { money = (ushort)Math.Min(1000, (uint)value); }
+            return Math.Min((short)1000, Math.Max((short)-1000, (short)data[(int)preference]));
         }
 
-        private ushort crime;
-        public ushort Crime
+        private void SetPreference(SdscIndex preference, short value)
         {
-            get { return (ushort)Math.Min(1000, (uint)crime); }
-            set { crime = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort environment;
-        public ushort Environment
-        {
-            get { return (ushort)Math.Min(1000, (uint)environment); }
-            set { environment = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort entertainment;
-        public ushort Entertainment
-        {
-            get { return (ushort)Math.Min(1000, (uint)entertainment); }
-            set { entertainment = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort culture;
-        public ushort Culture
-        {
-            get { return (ushort)Math.Min(1000, (uint)culture); }
-            set { culture = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort food;
-        public ushort Food
-        {
-            get { return (ushort)Math.Min(1000, (uint)food); }
-            set { food = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort health;
-        public ushort Health
-        {
-            get { return (ushort)Math.Min(1000, (uint)health); }
-            set { health = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort fashion;
-        public ushort Fashion
-        {
-            get { return (ushort)Math.Min(1000, (uint)fashion); }
-            set { fashion = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort sports;
-        public ushort Sports
-        {
-            get { return (ushort)Math.Min(1000, (uint)sports); }
-            set { sports = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort paranormal;
-        public ushort Paranormal
-        {
-            get { return (ushort)Math.Min(1000, (uint)paranormal); }
-            set { paranormal = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort travel;
-        public ushort Travel
-        {
-            get { return (ushort)Math.Min(1000, (uint)travel); }
-            set { travel = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort work;
-        public ushort Work
-        {
-            get { return (ushort)Math.Min(1000, (uint)work); }
-            set { work = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort weather;
-        public ushort Weather
-        {
-            get { return (ushort)Math.Min(1000, (uint)weather); }
-            set { weather = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort animals;
-        public ushort Animals
-        {
-            get { return (ushort)Math.Min(1000, (uint)animals); }
-            set { animals = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort school;
-        public ushort School
-        {
-            get { return (ushort)Math.Min(1000, (uint)school); }
-            set { school = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort toys;
-        public ushort Toys
-        {
-            get { return (ushort)Math.Min(1000, (uint)toys); }
-            set { toys = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private ushort scifi;
-        public ushort Scifi
-        {
-            get { return (ushort)Math.Min(1000, (uint)scifi); }
-            set { scifi = (ushort)Math.Min(1000, (uint)value); }
-        }
-
-        private short woman;
-        public short FemalePreference
-        {
-            get { return woman; }
-            set { woman = (short)Math.Max(-1000, Math.Min(1000, (int)value)); }
-        }
-
-        private short man;
-        public short MalePreference
-        {
-            get { return man; }
-            set { man = (short)Math.Max(-1000, Math.Min(1000, (int)value)); }
-        }
-
-        internal override void Unserialize(DbpfReader reader)
-        {
-            throw new NotImplementedException();
+            data[(int)preference] = (ushort)Math.Min((short)1000, Math.Max((short)-1000, value));
         }
 
         protected override void AddXml(XmlElement parent)
         {
-            parent.SetAttribute("politics", Politics.ToString());
-            parent.SetAttribute("money", Money.ToString());
-            parent.SetAttribute("crime", Crime.ToString());
-            parent.SetAttribute("environment", Environment.ToString());
-            parent.SetAttribute("entertainment", Entertainment.ToString());
-            parent.SetAttribute("culture", Culture.ToString());
-            parent.SetAttribute("food", Food.ToString());
-            parent.SetAttribute("health", Health.ToString());
-            parent.SetAttribute("fashion", Fashion.ToString());
-            parent.SetAttribute("sports", Sports.ToString());
-            parent.SetAttribute("paranormal", Paranormal.ToString());
-            parent.SetAttribute("travel", Travel.ToString());
-            parent.SetAttribute("work", Work.ToString());
-            parent.SetAttribute("weather", Weather.ToString());
-            parent.SetAttribute("animals", Animals.ToString());
-            parent.SetAttribute("school", School.ToString());
-            parent.SetAttribute("toys", Toys.ToString());
-            parent.SetAttribute("scifi", Scifi.ToString());
+            if (valid)
+            {
+                parent.SetAttribute("politics", GetInterest(SdscIndex.iPolitics).ToString());
+                parent.SetAttribute("money", GetInterest(SdscIndex.iMoney).ToString());
+                parent.SetAttribute("crime", GetInterest(SdscIndex.iCrime).ToString());
+                parent.SetAttribute("environment", GetInterest(SdscIndex.iEnvironment).ToString());
+                parent.SetAttribute("entertainment", GetInterest(SdscIndex.iEntertainment).ToString());
+                parent.SetAttribute("culture", GetInterest(SdscIndex.iCulture).ToString());
+                parent.SetAttribute("food", GetInterest(SdscIndex.iFood).ToString());
+                parent.SetAttribute("health", GetInterest(SdscIndex.iHealth).ToString());
+                parent.SetAttribute("fashion", GetInterest(SdscIndex.iFashion).ToString());
+                parent.SetAttribute("sports", GetInterest(SdscIndex.iSports).ToString());
+                parent.SetAttribute("paranormal", GetInterest(SdscIndex.iParanormal).ToString());
+                parent.SetAttribute("travel", GetInterest(SdscIndex.iTravel).ToString());
+                parent.SetAttribute("work", GetInterest(SdscIndex.iWork).ToString());
+                parent.SetAttribute("weather", GetInterest(SdscIndex.iWeather).ToString());
+                parent.SetAttribute("animals", GetInterest(SdscIndex.iAnimals).ToString());
+                parent.SetAttribute("school", GetInterest(SdscIndex.iSchool).ToString());
+                parent.SetAttribute("toys", GetInterest(SdscIndex.iToys).ToString());
+                parent.SetAttribute("scifi", GetInterest(SdscIndex.iSciFi).ToString());
 
-            parent.SetAttribute("prefFemale", FemalePreference.ToString());
-            parent.SetAttribute("prefMale", MalePreference.ToString());
+                parent.SetAttribute("prefFemale", GetPreference(SdscIndex.GenderPrefFemale).ToString());
+                parent.SetAttribute("prefMale", GetPreference(SdscIndex.GenderPrefMale).ToString());
+            }
         }
     }
 }

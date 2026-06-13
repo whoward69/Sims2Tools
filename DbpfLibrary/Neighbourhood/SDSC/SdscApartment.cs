@@ -10,37 +10,20 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.IO;
-using System.IO;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 {
-    public class SdscApartment : SdscData
+    internal class SdscApartment : SdscData
     {
-        short reputation;
-        short probabilityToAppear;
-        short titlePostName;
-
-        public short Reputation { get { return reputation; } set { reputation = value; } }
-        public short ProbabilityToAppear { get { return probabilityToAppear; } set { probabilityToAppear = value; } }
-        public short TitlePostName { get { return titlePostName; } set { titlePostName = value; } }
-
-        internal override void Unserialize(DbpfReader reader)
-        {
-            reader.Seek(SeekOrigin.Begin, 0x1D4);
-            reputation = reader.ReadInt16();
-            probabilityToAppear = reader.ReadInt16();
-            titlePostName = reader.ReadInt16();
-
-            valid = true;
-        }
+        internal SdscApartment() : base() { }
+        internal SdscApartment(ushort[] data) : base(data) { }
 
         protected override void AddXml(XmlElement parent)
         {
-            parent.SetAttribute("reputation", Reputation.ToString()); ;
-            parent.SetAttribute("probToAppear", ProbabilityToAppear.ToString()); ;
-            parent.SetAttribute("titlePostName", TitlePostName.ToString()); ;
+            parent.SetAttribute("reputation", ((short)data[(int)SdscIndex.Reputation]).ToString()); ;
+            parent.SetAttribute("probToAppear", data[(int)SdscIndex.Probabilitytoappear].ToString()); ;
+            parent.SetAttribute("titlePostName", data[(int)SdscIndex.TitlePostname].ToString()); ;
         }
     }
 }

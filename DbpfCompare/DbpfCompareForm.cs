@@ -8,12 +8,15 @@
 
 using DbpfCompare.Controls;
 using Sims2Tools;
+using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BCON;
 using Sims2Tools.DBPF.BHAV;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.GLOB;
+using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.SDNA;
+using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
@@ -51,6 +54,7 @@ using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -95,7 +99,9 @@ namespace DbpfCompare
             Xflr.TYPE, Xfnc.TYPE, Xrof.TYPE,
             Xobj.TYPE,
             Xwnt.TYPE,
-            Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE
+            Lamb.TYPE, Ldir.TYPE, Lpnt.TYPE, Lspt.TYPE,
+            Fami.TYPE,
+            Sdsc.TYPE
         });
 
         private bool IsDirty
@@ -292,24 +298,73 @@ namespace DbpfCompare
             allTypeData.Clear();
             allResourceData.Clear();
 
-            // Should probably be on a worker thread, but what the heck!
-            using (DBPFFile packageLeft = new DBPFFile(textLeftPath.Text), packageRight = new DBPFFile(textRightPath.Text))
-            {
-                if (packageLeft != null && packageRight != null)
-                {
-                    GetNodeData(packageLeft, packageLeft, packageRight);
-                    GetNodeData(packageRight, packageLeft, packageRight);
-                }
+            ProgressDialog progressDialog = new ProgressDialog();
+            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessNodes);
 
-                packageLeft?.Close();
-                packageRight?.Close();
+            DialogResult result = progressDialog.ShowDialog();
+
+            if (result == DialogResult.Abort)
+            {
+            }
+            else
+            {
+                if (result == DialogResult.Cancel)
+                {
+                }
+                else
+                {
+                }
             }
         }
 
-        private void GetNodeData(DBPFFile package, DBPFFile packageLeft, DBPFFile packageRight)
+        private void DoAsyncWork_ProcessNodes(ProgressDialog sender, DoWorkEventArgs args)
         {
-            foreach (DBPFEntry entry in package.GetAllEntries())
+            sender.VisualMode = ProgressBarDisplayMode.CustomText;
+
+#if !DEBUG
+            try
+#endif
             {
+                sender.SetProgress(0, "Loading Packages");
+
+                using (DBPFFile packageLeft = new DBPFFile(textLeftPath.Text), packageRight = new DBPFFile(textRightPath.Text))
+                {
+                    if (packageLeft != null && packageRight != null)
+                    {
+                        GetNodeData(sender, packageLeft, packageLeft, packageRight, 0);
+                        GetNodeData(sender, packageRight, packageLeft, packageRight, 50);
+                    }
+
+                    packageLeft?.Close();
+                    packageRight?.Close();
+                }
+            }
+#if !DEBUG
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                logger.Info(ex.StackTrace);
+            }
+#endif
+        }
+
+        private void GetNodeData(ProgressDialog sender, DBPFFile package, DBPFFile packageLeft, DBPFFile packageRight, int startPercent)
+        {
+            sender.SetProgress(startPercent, $"Processing {package.PackagePath}");
+
+            List<DBPFEntry> allEntries = package.GetAllEntries();
+            int currentEntry = 0;
+
+            foreach (DBPFEntry entry in allEntries)
+            {
+                if (sender.CancellationPending)
+                {
+                    return;
+                }
+
+                ++currentEntry;
+                sender.SetProgress((int)(startPercent + ((50.0 / allEntries.Count) * currentEntry)), $"Processing {entry.ToString()}");
+
                 if (!allResourceData.ContainsKey(entry))
                 {
                     DbpfCompareNodeResourceData nodeData = new DbpfCompareNodeResourceData(entry, menuContextResource);
@@ -699,7 +754,7 @@ namespace DbpfCompare
         {
             if ((sender as LinkedTreeView)?.SelectedNode?.Tag is DbpfCompareNodeResourceData nodeData && nodeData.IsDifferent)
             {
-                if (comparableTypes.Contains(nodeData.TypeID))
+                // if (comparableTypes.Contains(nodeData.TypeID))
                 {
                     CompareNodes(nodeData, nodeData);
                 }

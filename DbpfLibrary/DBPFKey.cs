@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 namespace Sims2Tools.DBPF
@@ -121,6 +122,16 @@ namespace Sims2Tools.DBPF
 
         public DBPFKey(TypeTypeID typeId, IDBPFKey key) : this(typeId, key.GroupID, key.InstanceID, key.ResourceID)
         {
+        }
+
+        public DBPFKey(string tgriString)
+        {
+            string[] tgri = tgriString.Split(new char[] { '-' });
+
+            this.typeID = DBPFData.TypeID(tgri[0]);
+            this.groupID = (TypeGroupID)UInt32.Parse(tgri[1].Substring(2), NumberStyles.HexNumber);
+            this.resourceID = (TypeResourceID)UInt32.Parse(tgri[2].Substring(2), NumberStyles.HexNumber);
+            this.instanceID = (TypeInstanceID)UInt32.Parse(tgri[3].Substring(2), NumberStyles.HexNumber);
         }
 
         protected void ChangeTypeID(TypeTypeID typeID)

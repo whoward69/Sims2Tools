@@ -122,11 +122,23 @@ namespace Sims2Tools.DBPF.IO
             m_writer.Write(value);
         }
 
+        public void WriteGuid(TypeGUID guid) => WriteUInt32(guid.AsUInt());
+
         public void WriteUInt32(uint value)
         {
             if (m_byteOrder == ByteOrder.BIG_ENDIAN)
             {
                 value = Endian.SwapUInt32(value);
+            }
+
+            m_writer.Write(value);
+        }
+
+        public void WriteUInt64(ulong value)
+        {
+            if (m_byteOrder == ByteOrder.BIG_ENDIAN)
+            {
+                value = Endian.SwapUInt64(value);
             }
 
             m_writer.Write(value);

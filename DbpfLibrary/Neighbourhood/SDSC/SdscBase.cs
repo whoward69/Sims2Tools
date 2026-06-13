@@ -10,42 +10,59 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 {
+    internal abstract class SdscData
+    {
+        protected bool valid = false;
+        protected readonly ushort[] data;
+
+        internal SdscData()
+        {
+            valid = false;
+        }
+
+        internal SdscData(ushort[] data)
+        {
+            this.data = data;
+            valid = true;
+        }
+
+        protected abstract void AddXml(XmlElement parent);
+
+        internal XmlElement AddXml(XmlElement parent, string name)
+        {
+            XmlElement element = parent.OwnerDocument.CreateElement(name);
+            parent.AppendChild(element);
+
+            AddXml(element);
+
+            return element;
+        }
+
+        protected XmlElement CreateElement(XmlElement parent, string name)
+        {
+            XmlElement element = parent.OwnerDocument.CreateElement(name);
+            parent.AppendChild(element);
+
+            return element;
+        }
+    }
+
     public class BodyFlags : FlagBase
     {
         public BodyFlags(ushort flags) : base(flags) { }
         public BodyFlags() : base(0) { }
 
-        public bool Fat
-        {
-            get { return GetBit(0); }
-        }
-
-        public bool PregnantFull
-        {
-            get { return GetBit(1); }
-        }
-
-        public bool PregnantHalf
-        {
-            get { return GetBit(2); }
-        }
-
-        public bool PregnantHidden
-        {
-            get { return GetBit(3); }
-        }
-
-        public bool Fit
-        {
-            get { return GetBit(4); }
-        }
+        public bool Fat => GetBit(0);
+        public bool PregnantFull => GetBit(1);
+        public bool PregnantHalf => GetBit(2);
+        public bool PregnantHidden => GetBit(3);
+        public bool Fit => GetBit(4);
 
         public override string ToString()
         {
@@ -66,240 +83,86 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         public GhostFlags(ushort flags) : base(flags) { }
         public GhostFlags() : base(0) { }
 
-        public bool IsGhost
-        {
-            get { return GetBit(0); }
-        }
-
-        public bool CanPassThroughObjects
-        {
-            get { return GetBit(1); }
-        }
-
-        public bool CanPassThroughWalls
-        {
-            get { return GetBit(2); }
-        }
-
-        public bool CanPassThroughPeople
-        {
-            get { return GetBit(3); }
-        }
-
-        public bool IgnoreTraversalCosts
-        {
-            get { return GetBit(4); }
-        }
+        public bool IsGhost => GetBit(0);
+        public bool CanPassThroughObjects => GetBit(1);
+        public bool CanPassThroughWalls => GetBit(2);
+        public bool CanPassThroughPeople => GetBit(3);
+        public bool IgnoreTraversalCosts => GetBit(4);
     }
 
-    public class SdscBase : SdscData
+    internal class SdscBase : SdscData
     {
-        internal ushort ghostFlags;
-        public GhostFlags GhostFlags
+        private readonly GhostFlags ghostFlags;
+        private readonly BodyFlags bodyFlags;
+
+        private readonly SchoolTypes school;
+        private readonly Careers job;
+        private bool onCampus = false;
+
+        internal SdscBase() : base() { }
+        internal SdscBase(ushort[] data) : base(data)
         {
-            get { return new GhostFlags(ghostFlags); }
+            ghostFlags = new GhostFlags(data[(int)SdscIndex.GhostFlags]);
+            bodyFlags = new BodyFlags(data[(int)SdscIndex.BodyFlags]);
+
+            school = (SchoolTypes)((((uint)data[(int)SdscIndex.SchoolObjectGUID2]) << 16) + data[(int)SdscIndex.SchoolObjectGUID1]);
+            job = (Careers)((((uint)data[(int)SdscIndex.JobObjectGUID2]) << 16) + data[(int)SdscIndex.JobObjectGUID1]);
         }
 
-        internal ushort bodyFlags;
-        public BodyFlags BodyFlags
+        internal bool OnCampus
         {
-            get { return new BodyFlags(bodyFlags); }
+            get => onCampus;
+            set => onCampus = value;
         }
 
-        public SdscBase()
-        {
-            valid = true;
-        }
+        internal Gender Gender => ((Gender)data[(int)SdscIndex.Gender]);
 
-        ushort autonomy;
-        public ushort AutonomyLevel
-        {
-            get { return autonomy; }
-            set { autonomy = value; }
-        }
-
-        ushort npc;
-        public ushort NPCType
-        {
-            get { return npc; }
-            set { npc = value; }
-        }
-
-        ushort mst;
-        public ushort MotivesStatic
-        {
-            get { return mst; }
-            set { mst = value; }
-        }
-
-        ushort voice;
-        public ushort VoiceType
-        {
-            get { return voice; }
-            set { voice = value; }
-        }
-
-        SchoolTypes schooltype;
-        public SchoolTypes SchoolType
-        {
-            get { return schooltype; }
-            set { schooltype = value; }
-        }
-
-        Grades grade;
-        public Grades Grade
-        {
-            get { return grade; }
-            set { grade = value; }
-        }
-
-        short careerperformance;
-        public short CareerPerformance
-        {
-            get { return careerperformance; }
-            set { careerperformance = value; }
-        }
-
-
-        private Careers career;
-        public Careers Career
+        internal LifeSections LifeSection
         {
             get
             {
-                return career;
-            }
-            set
-            {
-                career = value;
-            }
-        }
-
-        private ushort careerlevel;
-        public ushort CareerLevel
-        {
-            get
-            {
-                return careerlevel;
-            }
-            set
-            {
-                //careerlevel = (ushort)Math.Min(10, (int)value); 				
-                careerlevel = value;
+                if (onCampus)
+                {
+                    return LifeSections.YoungAdult;
+                }
+                else
+                {
+                    return ((LifeSections)data[(int)SdscIndex.PersonAge]);
+                }
             }
         }
 
-        private ZodiacSigns zodiac;
-        public ZodiacSigns ZodiacSign
-        {
-            get { return zodiac; }
-            set { zodiac = value; }
-        }
-
-        private uint aspiration;
-        public uint Aspiration
-        {
-            get { return aspiration; }
-            set { aspiration = value; }
-        }
-
-        private Gender gender;
-        public Gender Gender
-        {
-            get { return gender; }
-            set { gender = value; }
-        }
-
-        private LifeSections lifesection;
-        public LifeSections LifeSection
-        {
-            get { return lifesection; }
-            set { lifesection = value; }
-        }
-
-        private LifeStateFlags lifestate;
-        public LifeStateFlags LifeState
-        {
-            get { return lifestate; }
-            set { lifestate = value; }
-        }
-
-
-        private ushort age;
-        public ushort Age
-        {
-            get { return age; }
-            set { age = value; }
-        }
-
-        private ushort prevage;
-        public ushort PrevAgeDays
-        {
-            get { return prevage; }
-            set { prevage = value; }
-        }
-
-        private ushort agedur;
-        public ushort AgeDuration
-        {
-            get { return agedur; }
-            set { agedur = value; }
-        }
-
-        private ushort clifeline;
-        public ushort BlizLifelinePoints
-        {
-            get { return (ushort)Math.Min(1200, (uint)clifeline); }
-            set { clifeline = (ushort)Math.Min(1200, (uint)value); }
-        }
-
-        private short lifeline;
-        public short LifelinePoints
-        {
-            get { return (short)Math.Min(600, (int)(lifeline)); }
-            set { lifeline = (short)Math.Min(600, (int)(value)); }
-        }
-
-        private ushort lifelinescore;
-        public uint LifelineScore
-        {
-            get { return (uint)(lifelinescore * 10); }
-            set { lifelinescore = (ushort)(Math.Min(short.MaxValue, value / 10)); }
-        }
-
-        internal override void Unserialize(DbpfReader reader)
-        {
-            throw new NotImplementedException();
-        }
+        internal int AgeDaysLeft => data[(int)SdscIndex.AgeDaysLeft];
 
         protected override void AddXml(XmlElement parent)
         {
             parent.SetAttribute("gender", Gender.ToString());
             parent.SetAttribute("lifestage", LifeSection.ToString());
-            parent.SetAttribute("lifestate", LifeState.ToString());
-            parent.SetAttribute("age", Age.ToString());
-            parent.SetAttribute("ageDuration", AgeDuration.ToString());
-            parent.SetAttribute("agePrevDays", PrevAgeDays.ToString());
-            parent.SetAttribute("zodiac", ZodiacSign.ToString());
-            parent.SetAttribute("npcType", NPCType.ToString());
+            parent.SetAttribute("lifestate", ((LifeStateFlags)data[(int)SdscIndex.LifeState]).ToString());
+            parent.SetAttribute("age", data[(int)SdscIndex.AgeDaysLeft].ToString());
+            parent.SetAttribute("ageDuration", data[(int)SdscIndex.AgeDuration].ToString());
+            parent.SetAttribute("agePrevDays", data[(int)SdscIndex.DaysinPreviousAge].ToString());
+            parent.SetAttribute("zodiac", ((ZodiacSigns)data[(int)SdscIndex.Zodiac]).ToString());
+            parent.SetAttribute("npcType", data[(int)SdscIndex.NPCType].ToString());
 
-            parent.SetAttribute("ghostFlags", ghostFlags.ToString());
-            parent.SetAttribute("bodyFlags", bodyFlags.ToString());
-            parent.SetAttribute("bodyType", BodyFlags.ToString());
+            parent.SetAttribute("ghostFlags", data[(int)SdscIndex.GhostFlags].ToString());
+            parent.SetAttribute("bodyFlags", data[(int)SdscIndex.BodyFlags].ToString());
+            parent.SetAttribute("bodyType", bodyFlags.ToString());
 
             XmlElement career = parent.OwnerDocument.CreateElement("career");
             parent.AppendChild(career);
-            career.SetAttribute("school", Enum.IsDefined(typeof(SchoolTypes), SchoolType) ? SchoolType.ToString() : Helper.Hex8PrefixString((uint)SchoolType));
-            career.SetAttribute("schoolGrade", Grade.ToString());
-            career.SetAttribute("job", Enum.IsDefined(typeof(Careers), Career) ? Career.ToString() : Helper.Hex8PrefixString((uint)Career));
-            career.SetAttribute("jobLevel", CareerLevel.ToString());
-            career.SetAttribute("jobPerformance", CareerPerformance.ToString());
+            career.SetAttribute("school", Enum.IsDefined(typeof(SchoolTypes), school) ? school.ToString() : Helper.Hex8PrefixString((uint)school));
+            career.SetAttribute("schoolGrade", ((Grades)data[(int)SdscIndex.SchoolGrade]).ToString());
+            career.SetAttribute("job", Enum.IsDefined(typeof(Careers), job) ? job.ToString() : Helper.Hex8PrefixString((uint)job));
+            career.SetAttribute("jobLevel", data[(int)SdscIndex.JobPromotionLevel].ToString());
+            career.SetAttribute("jobPerformance", ((short)data[(int)SdscIndex.JobPerformance]).ToString());
 
             XmlElement aspiration = parent.OwnerDocument.CreateElement("aspiration");
             parent.AppendChild(aspiration);
-            aspiration.SetAttribute("aspiration", Helper.Hex4PrefixString(Aspiration));
-            aspiration.SetAttribute("aspirationScore", LifelineScore.ToString());
-            aspiration.SetAttribute("aspirationPoints", LifelinePoints.ToString());
-            aspiration.SetAttribute("aspirationBlizPoints", BlizLifelinePoints.ToString());
+            aspiration.SetAttribute("aspiration", Helper.Hex4PrefixString(data[(int)SdscIndex.Aspiration]));
+            aspiration.SetAttribute("aspirationScore", (data[(int)SdscIndex.AspirationRewardPointsSpentDiv10] * 10).ToString());
+            aspiration.SetAttribute("aspirationPoints", Math.Min((short)600, ((short)data[(int)SdscIndex.AspirationScore])).ToString());
+            aspiration.SetAttribute("aspirationBlizPoints", Math.Min((ushort)1200, data[(int)SdscIndex.AspirationScoreRawDiv10]).ToString());
         }
     }
 }
