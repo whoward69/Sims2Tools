@@ -19,22 +19,29 @@ namespace FamilyManager.Caching
         private static readonly string cacheBase = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Sims2Tools";
         private static readonly string cacheFamilyManagerBase = $"{cacheBase}/FamilyManager/.cache";
         private static readonly string cacheHoods = $"{cacheFamilyManagerBase}/Hoods";
-        private static readonly string cacheClothes = $"{cacheFamilyManagerBase}/Clothes";
+        public static readonly string CacheClothes = $"{cacheFamilyManagerBase}/Clothes";
+        public static readonly string CacheJewellery = $"{cacheFamilyManagerBase}/Jewellery";
+
+        public static readonly string MaxisClothing = "MaxisClothing";
+        public static readonly string CustomClothing = "CustomClothing";
+        public static readonly string MaxisJewellery = "MaxisJewellery";
+        public static readonly string CustomJewellery = "CustomJewellery";
 
         static DataCache()
         {
             CreateCaches();
         }
 
-        public static bool ClothingCacheExists(string type)
+        public static bool CacheExists(string cachePath, string cacheName)
         {
-            return File.Exists($"{cacheClothes}/{type}.bin");
+            return File.Exists($"{cachePath}/{cacheName}.bin");
         }
 
         private static void CreateCaches()
         {
             CreateHoodsCache();
             CreateClothesCache();
+            CreateJewelleryCache();
         }
 
         private static void CreateHoodsCache()
@@ -47,17 +54,26 @@ namespace FamilyManager.Caching
 
         private static void CreateClothesCache()
         {
-            if (!Directory.Exists(cacheClothes))
+            if (!Directory.Exists(CacheClothes))
             {
-                Directory.CreateDirectory(cacheClothes);
+                Directory.CreateDirectory(CacheClothes);
+            }
+        }
+
+        private static void CreateJewelleryCache()
+        {
+            if (!Directory.Exists(CacheJewellery))
+            {
+                Directory.CreateDirectory(CacheJewellery);
             }
         }
 
         public static void RemoveAll()
         {
-            if (Directory.Exists(cacheBase))
+            if (Directory.Exists(cacheFamilyManagerBase))
             {
-                Directory.Delete(cacheBase, true);
+                Directory.Delete(cacheFamilyManagerBase, true);
+                CreateCaches();
             }
         }
 
@@ -67,9 +83,22 @@ namespace FamilyManager.Caching
             CreateCaches();
         }
 
-        public static void InvalidateClothing(string type)
+        public static void InvalidateOutfits(string type)
         {
-            File.Delete($"{cacheClothes}/{type}.bin");
+            Invalidate($"{CacheClothes}/{type}.bin");
+        }
+
+        public static void InvalidateJewellery(string type)
+        {
+            Invalidate($"{CacheJewellery}/{type}.bin");
+        }
+
+        private static void Invalidate(string cachePath)
+        {
+            if (File.Exists(cachePath))
+            {
+                File.Delete(cachePath);
+            }
         }
 
         public static void InvalidateHoods()
@@ -78,14 +107,6 @@ namespace FamilyManager.Caching
             {
                 Directory.Delete(cacheHoods, true);
                 CreateHoodsCache();
-            }
-        }
-
-        public static void Validate(string fileName)
-        {
-            if (!(File.Exists(fileName) && File.GetLastWriteTime(fileName) < Directory.GetLastWriteTime(cacheBase)))
-            {
-                Invalidate();
             }
         }
 
@@ -136,11 +157,11 @@ namespace FamilyManager.Caching
             }
         }
 
-        internal static bool Serialize(Dictionary<DBPFKey, CasClothingData> data, string cacheName)
+        internal static bool Serialize(Dictionary<DBPFKey, CasOutfitData> data, string cachePath, string cacheName)
         {
             try
             {
-                using (FileStream fs = File.Open($"{cacheClothes}/{cacheName}.bin", FileMode.Create))
+                using (FileStream fs = File.Open($"{cachePath}/{cacheName}.bin", FileMode.Create))
                 {
                     new BinaryFormatter().Serialize(fs, data);
                 }
@@ -151,7 +172,7 @@ namespace FamilyManager.Caching
             {
                 try
                 {
-                    File.Delete($"{cacheClothes}/{cacheName}.bin");
+                    File.Delete($"{cachePath}/{cacheName}.bin");
                 }
                 catch (Exception) { }
 
@@ -159,13 +180,13 @@ namespace FamilyManager.Caching
             }
         }
 
-        internal static bool Deserialize(out Dictionary<DBPFKey, CasClothingData> data, string cacheName)
+        internal static bool Deserialize(out Dictionary<DBPFKey, CasOutfitData> data, string cachePath, string cacheName)
         {
             try
             {
-                using (FileStream fs = File.Open($"{cacheClothes}/{cacheName}.bin", FileMode.Open))
+                using (FileStream fs = File.Open($"{cachePath}/{cacheName}.bin", FileMode.Open))
                 {
-                    data = (Dictionary<DBPFKey, CasClothingData>)new BinaryFormatter().Deserialize(fs);
+                    data = (Dictionary<DBPFKey, CasOutfitData>)new BinaryFormatter().Deserialize(fs);
                 }
 
                 return true;
@@ -174,11 +195,11 @@ namespace FamilyManager.Caching
             {
                 try
                 {
-                    File.Delete($"{cacheClothes}/{cacheName}.bin");
+                    File.Delete($"{cachePath}/{cacheName}.bin");
                 }
                 catch (Exception) { }
 
-                data = new Dictionary<DBPFKey, CasClothingData>();
+                data = new Dictionary<DBPFKey, CasOutfitData>();
                 return false;
             }
         }

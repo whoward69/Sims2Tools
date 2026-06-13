@@ -8,5 +8,8 @@
     <Setting Name="ThumbnailBackground" Type="System.String" Scope="User">
       <Value Profile="(Default)">WhiteSmoke</Value>
     </Setting>
+    <Setting Name="SplitFileHighlight" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PapayaWhip</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

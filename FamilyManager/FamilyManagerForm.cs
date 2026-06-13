@@ -15,13 +15,14 @@ using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
-using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DbpfCache;
@@ -37,16 +38,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Xml;
 #endregion
 
 namespace FamilyManager
 {
-    enum TabPages
-    {
-        TabFamily = 0,
-        TabCloset
-    }
-
     public partial class FamilyManagerForm : Form
     {
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -58,23 +54,31 @@ namespace FamilyManager
 
         private Updater MyUpdater;
 
+        private static readonly Color colourSplitFileHighlight = Color.FromName(Properties.Settings.Default.SplitFileHighlight);
         private static readonly Color colourThumbnailBackground = Color.FromName(Properties.Settings.Default.ThumbnailBackground);
         private static readonly Color colourValidationError = Color.FromName(Properties.Settings.Default.ValidationError);
 
         private bool cachesLoaded = false;
-        private readonly ClothingThumbnailsCache clothingThumbnailsCache= new ClothingThumbnailsCache();
+        private readonly ClothingThumbnailsCache clothingThumbnailsCache = new ClothingThumbnailsCache();
 
         private readonly FamilyGridData dataFamilyMembers = new FamilyGridData();
-        private readonly ClothesGridData dataCloset = new ClothesGridData();
-        private readonly ClothesGridData dataSuitcase = new ClothesGridData();
+
+        private readonly OutfitGridData dataFamilyCloset = new OutfitGridData();
+        private readonly OutfitGridData dataSuitcase = new OutfitGridData();
+
+        private readonly OutfitGridData dataFamilySafe = new OutfitGridData();
+        private readonly OutfitGridData dataJewelbox = new OutfitGridData();
 
         private HoodTreeNode lastHoodNode = null;
         private FamilyTreeNode lastFamilyNode = null;
 
         private FamilyData currentFamily = null;
 
-        private readonly ClothingCache clothingCache = new ClothingCache();
         private readonly CharacterCache characterCache = new CharacterCache();
+        private readonly Dictionary<uint, TypeInstanceID> sdscInstanceBySimGuid = new Dictionary<uint, TypeInstanceID>();
+
+        private readonly OutfitCache clothingCache = new OutfitCache(DataCache.CacheClothes, DataCache.MaxisClothing, DataCache.CustomClothing);
+        private readonly OutfitCache jewelleryCache = new OutfitCache(DataCache.CacheJewellery, DataCache.MaxisJewellery, DataCache.CustomJewellery);
 
         private readonly Filter filters = new Filter();
 
@@ -89,7 +93,8 @@ namespace FamilyManager
             SetTitle();
 
             FamilyDbpfData.SetCache(packageCache);
-            ClosetDbpfData.SetCache(packageCache);
+            CharacterCache.SetCache(packageCache);
+            OutfitDbpfData.SetCache(packageCache);
 
             selectPathDialog = new CommonOpenFileDialog
             {
@@ -97,8 +102,12 @@ namespace FamilyManager
             };
 
             gridFamilyMembers.DataSource = dataFamilyMembers;
-            gridCloset.DataSource = dataCloset;
+
+            gridFamilyCloset.DataSource = dataFamilyCloset;
             gridSuitcase.DataSource = dataSuitcase;
+
+            gridFamilySafe.DataSource = dataFamilySafe;
+            gridJewelbox.DataSource = dataJewelbox;
 
             thumbBox.BackColor = colourThumbnailBackground;
         }
@@ -117,8 +126,11 @@ namespace FamilyManager
             splitTopBottom.SplitterDistance = (int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
             splitTopLeftRight.SplitterDistance = (int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
             splitClosetLeftRight.SplitterDistance = splitTopLeftRight.SplitterDistance;
+            splitSafeLeftRight.SplitterDistance = splitTopLeftRight.SplitterDistance;
 
             menuItemUseCodes.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemUseCodes.Name, 0) != 0); OnUseCodesClicked(menuItemUseCodes, null);
+            menuItemShowSplitFiles.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemShowSplitFiles.Name, 0) != 0); OnShowSplitFilesClicked(menuItemShowSplitFiles, null);
+            menuItemHighlightSplitFiles.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemHighlightSplitFiles.Name, 0) != 0); OnHighlightSplitFilesClicked(menuItemHighlightSplitFiles, null);
 
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
@@ -176,6 +188,8 @@ namespace FamilyManager
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
 
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemUseCodes.Name, menuItemUseCodes.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemShowSplitFiles.Name, menuItemShowSplitFiles.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemHighlightSplitFiles.Name, menuItemHighlightSplitFiles.Checked ? 1 : 0);
 
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
@@ -226,9 +240,14 @@ namespace FamilyManager
         {
             if (Directory.Exists($"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods"))
             {
-                dataSuitcase.Clear();
-                dataCloset.Clear();
                 dataFamilyMembers.Clear();
+
+                dataFamilyCloset.Clear();
+                dataSuitcase.Clear();
+
+                dataFamilySafe.Clear();
+                dataJewelbox.Clear();
+
                 gridFamilyMembers.Enabled = false;
                 treeHoods.Nodes.Clear();
 
@@ -303,7 +322,8 @@ namespace FamilyManager
 
                 if (!cachesLoaded)
                 {
-                    clothingCache.LoadClothing();
+                    clothingCache.LoadOutfits(Gzps.TYPE);
+                    jewelleryCache.LoadOutfits(Xmol.TYPE);
                     cachesLoaded = true;
                 }
             }
@@ -323,12 +343,10 @@ namespace FamilyManager
                     lastFamilyNode = familyNode;
                     lastPackageFile = hoodNode.PackagePath;
 
-                    DoWork_FillFamilyGrid(hoodNode, familyNode);
+                    filters.ShowAll();
 
-                    if (tabPages.SelectedIndex == (int)TabPages.TabCloset)
-                    {
-                        DoWork_FillClosetGrid(hoodNode, familyNode);
-                    }
+                    DoWork_FillFamilyGrid(hoodNode, familyNode);
+                    DoWork_FillClosetOrSafeGrid(hoodNode, familyNode);
                 }
             }
 
@@ -360,63 +378,72 @@ namespace FamilyManager
             textFamilyName.Enabled = textFamilyWriteUp.Enabled = (currentFamily.FamilyName != null);
             textAddressName.Enabled = textAddressDesc.Enabled = (currentFamily.LotAddress != null);
 
-            using (CacheableDbpfFile familyPackage = packageCache.OpenForReadOnly(hoodNode.PackagePath))
+            using (CacheableDbpfFile hoodPackage = packageCache.OpenForReadOnly(hoodNode.PackagePath))
             {
-                foreach (DBPFEntry entry in familyPackage.GetEntriesByType(Sdsc.TYPE))
+                foreach (uint memberGuid in currentFamily.FamilyMembers)
                 {
-                    Sdsc sdsc = (Sdsc)familyPackage.GetResourceByEntry(entry);
+                    Sdsc sdsc = (Sdsc)hoodPackage.GetResourceByKey(new DBPFKey(Sdsc.TYPE, DBPFData.GROUP_LOCAL, sdscInstanceBySimGuid[memberGuid], DBPFData.RESOURCE_NULL));
 
-                    if (currentFamily.IsMember(sdsc.SimGuid.AsUInt()))
+                    if (characterCache.TryGetValue(sdsc.SimGuid, out CharacterData data))
                     {
-                        if (characterCache.TryGetValue(sdsc.SimGuid, out CharacterData data))
+                        data.SetSdscDetails(hoodNode.PackagePath, sdsc.InstanceID);
+
+                        uint genderCode = GenderHelper.CpfGenderCode(sdsc.Gender);
+                        uint ageCode = AgeHelper.CpfAgeCode(sdsc.LifeSection);
+
+                        DataRow memberRow = dataFamilyMembers.NewRow();
+
+                        memberRow["Data"] = data;
+
+                        memberRow["FirstName"] = $"{data.GivenName(prefLid)} {data.FamilyName(prefLid)}";
+                        memberRow["SplitFile"] = data.IsSplit ? "Y" : "N";
+
+                        memberRow["Gender"] = sdsc.Gender.ToString();
+                        memberRow["GenderCode"] = sdsc.Gender.ToString().Substring(0, 1);
+                        memberRow["Age"] = sdsc.LifeSection.ToString();
+                        memberRow["AgeCode"] = BuildAgeCodeString(ageCode);
+
+                        memberRow["GenderHex"] = genderCode;
+                        memberRow["AgeHex"] = ageCode;
+
+                        memberRow["DaysLeft"] = sdsc.AgeDaysLeft;
+
+                        if (ageCode != 0x0000)
                         {
-                            uint genderCode = GenderHelper.CpfGenderCode(sdsc.SimBase.Gender);
-                            uint ageCode = AgeHelper.CpfAgeCode(sdsc.SimBase.LifeSection);
-
-                            DataRow memberRow = dataFamilyMembers.NewRow();
-
-                            memberRow["FirstName"] = data.givenName;
-
-                            memberRow["Gender"] = sdsc.SimBase.Gender.ToString();
-                            memberRow["GenderCode"] = sdsc.SimBase.Gender.ToString().Substring(0, 1);
-                            memberRow["Age"] = sdsc.SimBase.LifeSection.ToString();
-                            memberRow["AgeCode"] = BuildAgeCodeString(ageCode);
-
-                            memberRow["GenderHex"] = genderCode;
-                            memberRow["AgeHex"] = ageCode;
-
-                            memberRow["DaysLeft"] = (int)sdsc.SimBase.AgeDuration;
-
-                            if (ageCode != 0x0000)
-                            {
-                                using (DBPFFile characterPackage = new DBPFFile(data.packagePath))
-                                {
-                                    Img thumbnail = (Img)characterPackage.GetResourceByKey(new DBPFKey(Img.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)ageCode, DBPFData.RESOURCE_NULL));
-
-                                    memberRow["Thumbnail"] = data.thumbnail = thumbnail?.Image;
-
-                                    characterPackage.Close();
-                                }
-                            }
-
-                            dataFamilyMembers.Rows.Add(memberRow);
+                            memberRow["Thumbnail"] = data.Thumbnail(ageCode);
                         }
+
+                        dataFamilyMembers.Rows.Add(memberRow);
                     }
                 }
 
-                familyPackage.Close();
+                hoodPackage.Close();
             }
 
             logger.Info($"Family loaded in {(s.ElapsedMilliseconds / 1000.0)}s");
             s.Stop();
         }
 
-        private void DoWork_FillClosetGrid(HoodTreeNode hoodNode, FamilyTreeNode familyNode)
+        private void DoWork_FillClosetOrSafeGrid(HoodTreeNode hoodNode, FamilyTreeNode familyNode)
+        {
+            if (IsClosetTabActive)
+            {
+                DoWork_FillFamilyClosetGrid(hoodNode, familyNode);
+            }
+            else if (IsSafeTabActive)
+            {
+                DoWork_FillFamilySafeGrid(hoodNode, familyNode);
+            }
+
+            FilterActiveContainer();
+        }
+
+        private void DoWork_FillFamilyClosetGrid(HoodTreeNode hoodNode, FamilyTreeNode familyNode)
         {
             Stopwatch s = new Stopwatch();
             s.Start();
 
-            dataCloset.Clear();
+            dataFamilyCloset.Clear();
 
             using (CacheableDbpfFile package = packageCache.OpenForReadOnly(hoodNode.PackagePath))
             {
@@ -430,37 +457,38 @@ namespace FamilyManager
 
                         if (collKey.TypeID == Coll.TYPE && collKey.InstanceID == familyNode.FamilyId)
                         {
-                            DBPFKey gzpsKey = idr.GetItem(2);
+                            DBPFKey cpfKey = idr.GetItem(2);
 
-                            if (gzpsKey.TypeID == Gzps.TYPE)
+                            if (cpfKey.TypeID == Gzps.TYPE)
                             {
-                                DataRow closetRow = dataCloset.NewRow();
+                                DataRow closetRow = dataFamilyCloset.NewRow();
 
                                 closetRow["Visible"] = "Yes";
-                                closetRow["Data"] = ClosetDbpfData.Create(package, idr);
+                                closetRow["Data"] = OutfitDbpfData.Create(package, idr);
 
-                                if (clothingCache.ContainsKey(gzpsKey))
+                                if (clothingCache.ContainsKey(cpfKey))
                                 {
-                                    CasClothingData data = clothingCache.GetData(gzpsKey);
+                                    CasOutfitData data = clothingCache.GetData(cpfKey);
 
-                                    closetRow["Name"] = data.resName;
-                                    closetRow["Category"] = BuildCategoryString(data.resCategory);
-                                    closetRow["Gender"] = BuildGenderString(data.resGender);
-                                    closetRow["GenderCode"] = BuildGenderCodeString(data.resGender);
-                                    closetRow["Age"] = BuildAgeString(data.resAge);
-                                    closetRow["AgeCode"] = BuildAgeCodeString(data.resAge);
+                                    closetRow["Name"] = data.ResName;
+                                    closetRow["Category"] = BuildCategoryString(data.ResCategory);
+                                    closetRow["Gender"] = BuildGenderString(data.ResGender);
+                                    closetRow["GenderCode"] = BuildGenderCodeString(data.ResGender);
+                                    closetRow["Age"] = BuildAgeString(data.ResAge);
+                                    closetRow["AgeCode"] = BuildAgeCodeString(data.ResAge);
 
-                                    closetRow["GenderHex"] = data.resGender;
-                                    closetRow["AgeHex"] = data.resAge;
+                                    closetRow["GenderHex"] = data.ResGender;
+                                    closetRow["AgeHex"] = data.ResAge;
 
-                                    closetRow["ThumbKey"] = data.thumbKey;
+                                    closetRow["ThumbKey"] = data.ThumbKey;
+                                    closetRow["LocalThumbKey"] = data.LocalThumbKeyZ;
                                 }
                                 else
                                 {
-                                    closetRow["Name"] = gzpsKey.ToString();
+                                    closetRow["Name"] = cpfKey.ToString();
                                 }
 
-                                dataCloset.Rows.Add(closetRow);
+                                dataFamilyCloset.Rows.Add(closetRow);
                             }
                         }
                     }
@@ -470,6 +498,69 @@ namespace FamilyManager
             }
 
             logger.Info($"Closet loaded in {(s.ElapsedMilliseconds / 1000.0)}s");
+            s.Stop();
+        }
+
+        private void DoWork_FillFamilySafeGrid(HoodTreeNode hoodNode, FamilyTreeNode familyNode)
+        {
+            Stopwatch s = new Stopwatch();
+            s.Start();
+
+            dataFamilySafe.Clear();
+
+            using (CacheableDbpfFile package = packageCache.OpenForReadOnly(hoodNode.PackagePath))
+            {
+                foreach (DBPFEntry entry in package.GetEntriesByType(Idr.TYPE))
+                {
+                    Idr idr = (Idr)package.GetResourceByEntry(entry);
+
+                    if (idr.InstanceID.AsUInt() > 0x00007FFF && idr.ItemCount == 3)
+                    {
+                        DBPFKey collKey = idr.GetItem(1);
+
+                        if (collKey.TypeID == Coll.TYPE && collKey.InstanceID == familyNode.FamilyId)
+                        {
+                            DBPFKey cpfKey = idr.GetItem(2);
+
+                            if (cpfKey.TypeID == Xmol.TYPE)
+                            {
+                                DataRow safeRow = dataFamilySafe.NewRow();
+
+                                safeRow["Visible"] = "Yes";
+                                safeRow["Data"] = OutfitDbpfData.Create(package, idr);
+
+                                if (jewelleryCache.ContainsKey(cpfKey))
+                                {
+                                    CasOutfitData data = jewelleryCache.GetData(cpfKey);
+
+                                    safeRow["Name"] = data.ResName;
+                                    safeRow["Category"] = BuildCategoryString(data.ResCategory);
+                                    safeRow["Gender"] = BuildGenderString(data.ResGender);
+                                    safeRow["GenderCode"] = BuildGenderCodeString(data.ResGender);
+                                    safeRow["Age"] = BuildAgeString(data.ResAge);
+                                    safeRow["AgeCode"] = BuildAgeCodeString(data.ResAge);
+
+                                    safeRow["GenderHex"] = data.ResGender;
+                                    safeRow["AgeHex"] = data.ResAge;
+
+                                    safeRow["ThumbKey"] = data.ThumbKey;
+                                    safeRow["LocalThumbKey"] = data.LocalThumbKeyZ;
+                                }
+                                else
+                                {
+                                    safeRow["Name"] = cpfKey.ToString();
+                                }
+
+                                dataFamilySafe.Rows.Add(safeRow);
+                            }
+                        }
+                    }
+                }
+
+                package.Close();
+            }
+
+            logger.Info($"Jewellery loaded in {(s.ElapsedMilliseconds / 1000.0)}s");
             s.Stop();
         }
 
@@ -635,7 +726,9 @@ namespace FamilyManager
                     }
                 }
 
-                dataSuitcase.Clear(); // Do NOT remove this without recoding the suitcase drag/drop and copy/paste code!
+                // Do NOT remove these without recoding the transfer drag/drop and copy/paste code!
+                dataSuitcase.Clear();
+                dataJewelbox.Clear();
             }
         }
 
@@ -643,12 +736,65 @@ namespace FamilyManager
         {
             if (currentFamily != null)
             {
+                if (!currentFamily.FamilyName.Equals(textFamilyName.Text))
+                {
+                    lastFamilyNode.Text = textFamilyName.Text; // Update the hood tree node for this family
+                    lblFamilyName.Text = textFamilyName.Text; // Update the family name above the member list
+
+                    UpdateCurrentFamilyMembers(); // Do this before changing the family name
+                }
+
                 currentFamily.FamilyName = textFamilyName.Text;
                 currentFamily.FamilyWriteUp = textFamilyWriteUp.Text;
+
+                // TODO - Family Manager - family tab - there MAY be other STR# (with the LOTD resource) that need updating with the new name/desc
+                lblLotName.Text = textAddressName.Text;
                 currentFamily.LotAddress = textAddressName.Text;
                 currentFamily.LotDescription = textAddressDesc.Text;
+
+                if (ckbMoneyLock.Checked)
+                {
+                    textBusinessMoney.Text = textFamilyMoney.Text;
+                }
+
                 currentFamily.FamilyMoney = textFamilyMoney.Text;
                 currentFamily.BusinessMoney = textBusinessMoney.Text;
+            }
+        }
+
+        private void UpdateCurrentFamilyMembers()
+        {
+            if (ckbFamilyNameAll.Checked || ckbFamilyNameSame.Checked || ckbFamilyNameSelected.Checked)
+            {
+                if (!currentFamily.FamilyName.Equals(textFamilyName.Text))
+                {
+                    if (ckbFamilyNameSelected.Checked)
+                    {
+                        foreach (DataGridViewRow row in gridFamilyMembers.SelectedRows)
+                        {
+                            ChangeMemberFamilyName(row, textFamilyName.Text);
+                        }
+                    }
+                    else
+                    {
+                        foreach (DataGridViewRow row in gridFamilyMembers.Rows)
+                        {
+                            if (ckbFamilyNameSame.Checked)
+                            {
+                                CharacterData data = (row.Cells["colData"].Value as CharacterData);
+
+                                if (data.FamilyName(prefLid).Equals(currentFamily.FamilyName))
+                                {
+                                    ChangeMemberFamilyName(row, textFamilyName.Text);
+                                }
+                            }
+                            else
+                            {
+                                ChangeMemberFamilyName(row, textFamilyName.Text);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -658,6 +804,21 @@ namespace FamilyManager
             sender.SetProgress(0, "Loading Hood Characters");
 
             characterCache.Load(sender, lastHoodNode);
+
+            sender.SetProgress(0, "Caching SDSC References");
+            sdscInstanceBySimGuid.Clear();
+
+            using (CacheableDbpfFile hoodPackage = packageCache.OpenForReadOnly(lastHoodNode.PackagePath))
+            {
+                foreach (DBPFEntry entry in hoodPackage.GetEntriesByType(Sdsc.TYPE))
+                {
+                    Sdsc sdsc = (Sdsc)hoodPackage.GetResourceByEntry(entry);
+
+                    sdscInstanceBySimGuid.Add(sdsc.SimGuid.AsUInt(), entry.InstanceID);
+                }
+
+                hoodPackage.Close();
+            }
         }
         #endregion
 
@@ -672,29 +833,61 @@ namespace FamilyManager
 
             UpdateSaveState();
 
-            btnClosetCopy.Enabled = btnClosetMove.Enabled = btnClosetDelete.Enabled = (gridCloset.SelectedRows.Count > 0);
+            btnClosetCopy.Enabled = btnClosetMove.Enabled = btnClosetDelete.Enabled = (gridFamilyCloset.SelectedRows.Count > 0);
 
-            btnSuitcaseEmpty.Enabled = (gridSuitcase.Rows.Count > 0);
+            btnSuitcaseEmpty.Enabled = btnSuitcaseSave.Enabled = (gridSuitcase.Rows.Count > 0);
+            btnSuitcaseLoad.Enabled = !btnSuitcaseSave.Enabled;
             btnSuitcaseCopy.Enabled = btnSuitcaseMove.Enabled = (gridSuitcase.SelectedRows.Count > 0);
 
-            btnShowAll.Enabled = !filters.IsAll;
+            btnClosetShowAll.Enabled = !filters.IsAll;
+
+            btnSafeCopy.Enabled = btnSafeMove.Enabled = btnSafeDelete.Enabled = (gridFamilySafe.SelectedRows.Count > 0);
+
+            btnJewelboxEmpty.Enabled = btnJewelboxSave.Enabled = (gridJewelbox.Rows.Count > 0);
+            btnJewelboxLoad.Enabled = !btnJewelboxSave.Enabled;
+            btnJewelboxCopy.Enabled = btnJewelboxMove.Enabled = (gridJewelbox.SelectedRows.Count > 0);
+
+            btnSafeShowAll.Enabled = !filters.IsAll;
 
             panelFamily.Enabled = (currentFamily != null);
 
             if (currentFamily == null)
             {
-                tabPages.SelectedIndex = (int)TabPages.TabFamily;
+                tabPages.SelectedIndex = 0;
+            }
+            else
+            {
+                foreach (DataGridViewRow row in gridFamilyMembers.Rows)
+                {
+                    string splitFile = row.Cells["colSplitFile"].Value as string;
+
+                    if (IsAdvancedMode && menuItemHighlightSplitFiles.Checked && "Y".Equals(splitFile, StringComparison.OrdinalIgnoreCase))
+                    {
+                        row.DefaultCellStyle.BackColor = colourSplitFileHighlight;
+                    }
+                    else
+                    {
+                        row.DefaultCellStyle.BackColor = Color.Empty;
+                    }
+                }
             }
 
             UpdateClosetTabState();
+            UpdateSafeTabState();
 
             updatingFormState = false;
         }
 
         private void UpdateClosetTabState()
         {
-            gridCloset.Enabled = clothingCache.CachesExist();
-            lblClosetCachesNeeded.Visible = !gridCloset.Enabled;
+            gridFamilyCloset.Enabled = clothingCache.CachesExist();
+            lblClosetCachesNeeded.Visible = !gridFamilyCloset.Enabled;
+        }
+
+        private void UpdateSafeTabState()
+        {
+            gridFamilySafe.Enabled = jewelleryCache.CachesExist();
+            lblSafeCachesNeeded.Visible = !gridFamilySafe.Enabled;
         }
 
         private void UpdateSaveState()
@@ -725,11 +918,27 @@ namespace FamilyManager
             gridFamilyMembers.Columns["colAgeCode"].Visible = gridFamilyMembers.Columns["colGenderCode"].Visible = menuItemUseCodes.Checked;
             gridFamilyMembers.Columns["colAge"].Visible = gridFamilyMembers.Columns["colGender"].Visible = !menuItemUseCodes.Checked;
 
-            gridCloset.Columns["colClosetAgeCode"].Visible = gridCloset.Columns["colClosetGenderCode"].Visible = menuItemUseCodes.Checked;
-            gridCloset.Columns["colClosetAge"].Visible = gridCloset.Columns["colClosetGender"].Visible = !menuItemUseCodes.Checked;
+            gridFamilyCloset.Columns["colClosetAgeCode"].Visible = gridFamilyCloset.Columns["colClosetGenderCode"].Visible = menuItemUseCodes.Checked;
+            gridFamilyCloset.Columns["colClosetAge"].Visible = gridFamilyCloset.Columns["colClosetGender"].Visible = !menuItemUseCodes.Checked;
 
             gridSuitcase.Columns["colSuitcaseAgeCode"].Visible = gridSuitcase.Columns["colSuitcaseGenderCode"].Visible = menuItemUseCodes.Checked;
             gridSuitcase.Columns["colSuitcaseAge"].Visible = gridSuitcase.Columns["colSuitcaseGender"].Visible = !menuItemUseCodes.Checked;
+
+            gridFamilySafe.Columns["colSafeAgeCode"].Visible = gridFamilySafe.Columns["colSafeGenderCode"].Visible = menuItemUseCodes.Checked;
+            gridFamilySafe.Columns["colSafeAge"].Visible = gridFamilySafe.Columns["colSafeGender"].Visible = !menuItemUseCodes.Checked;
+
+            gridJewelbox.Columns["colJewelboxAgeCode"].Visible = gridJewelbox.Columns["colJewelboxGenderCode"].Visible = menuItemUseCodes.Checked;
+            gridJewelbox.Columns["colJewelboxAge"].Visible = gridJewelbox.Columns["colJewelboxGender"].Visible = !menuItemUseCodes.Checked;
+        }
+
+        private void OnShowSplitFilesClicked(object sender, EventArgs e)
+        {
+            gridFamilyMembers.Columns["colSplitFile"].Visible = menuItemShowSplitFiles.Checked;
+        }
+
+        private void OnHighlightSplitFilesClicked(object sender, EventArgs e)
+        {
+            UpdateFormState();
         }
         #endregion
 
@@ -833,14 +1042,21 @@ namespace FamilyManager
         #region Cache Menu Actions
         private void OnCachingOpening(object sender, EventArgs e)
         {
-            menuItemCachingUpdateMaxis.Text = DataCache.ClothingCacheExists(ClothingCache.MaxisClothing) ? "Update Maxis Clothing" : "Create Maxis Clothing";
-            menuItemCachingUpdateCustom.Text = DataCache.ClothingCacheExists(ClothingCache.CustomClothing) ? "Update Custom Clothing" : "Create Custom Clothing";
+            menuItemCachingUpdateMaxisClothes.Text = DataCache.CacheExists(DataCache.CacheClothes, DataCache.MaxisClothing) ? "Update Maxis Clothing Cache" : "Create Maxis Clothing Cache";
+            menuItemCachingUpdateCustomClothes.Text = DataCache.CacheExists(DataCache.CacheClothes, DataCache.CustomClothing) ? "Update Custom Clothing Cache" : "Create Custom Clothing Cache";
+
+            menuItemCachingUpdateMaxisJewellery.Text = DataCache.CacheExists(DataCache.CacheJewellery, DataCache.MaxisJewellery) ? "Update Maxis Jewellery Cache" : "Create Maxis Jewellery Cache";
+            menuItemCachingUpdateCustomJewellery.Text = DataCache.CacheExists(DataCache.CacheJewellery, DataCache.CustomJewellery) ? "Update Custom Jewellery Cache" : "Create Custom Jewellery Cache";
+
+            menuItemCachingRemoveLocal.Visible = menuItemCachingRemoveThumbnails.Visible = toolStripSeparatorCaching.Visible = IsAdvancedMode;
         }
 
-        private void OnCachingUpdateMaxis(object sender, EventArgs e)
+        private void OnCachingUpdateMaxisOutfits(object sender, EventArgs e)
         {
-            ProgressDialog progressDialog = new ProgressDialog(new WorkerPackage());
-            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_UpdateMaxisClothes);
+            TypeTypeID typeId = (sender == menuItemCachingUpdateMaxisClothes ? Gzps.TYPE : Xmol.TYPE);
+
+            ProgressDialog progressDialog = new ProgressDialog(typeId);
+            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_UpdateMaxisOutfits);
 
             DialogResult result = progressDialog.ShowDialog();
 
@@ -855,28 +1071,40 @@ namespace FamilyManager
             {
                 if (result == DialogResult.Cancel)
                 {
-                    // Update Maxis Clothes cancelled
+                    // Update Maxis Outfits cancelled
                 }
                 else
                 {
-                    // Update Maxis Clothes completed
+                    // Update Maxis Outfits completed
                     UpdateClosetTabState();
+                    UpdateSafeTabState();
                 }
             }
         }
 
-        private void DoAsyncWork_UpdateMaxisClothes(ProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_UpdateMaxisOutfits(ProgressDialog sender, DoWorkEventArgs args)
         {
-            sender.VisualMode = ProgressBarDisplayMode.CustomText;
-            sender.SetProgress(0, "Loading Maxis Clothes");
+            TypeTypeID typeId = (TypeTypeID)args.Argument;
 
-            clothingCache.ReloadMaxisClothing(sender);
+            sender.VisualMode = ProgressBarDisplayMode.CustomText;
+            sender.SetProgress(0, $"Loading Maxis {(typeId == Gzps.TYPE ? "Clothes" : "Jewellery")}");
+
+            if (typeId == Gzps.TYPE)
+            {
+                clothingCache.ReloadMaxisOutfits(sender, typeId);
+            }
+            else
+            {
+                jewelleryCache.ReloadMaxisOutfits(sender, typeId);
+            }
         }
 
-        private void OnCachingUpdateCustom(object sender, EventArgs e)
+        private void OnCachingUpdateCustomOutfits(object sender, EventArgs e)
         {
-            ProgressDialog progressDialog = new ProgressDialog(new WorkerPackage());
-            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_UpdateCustomClothes);
+            TypeTypeID typeId = (sender == menuItemCachingUpdateCustomClothes ? Gzps.TYPE : Xmol.TYPE);
+
+            ProgressDialog progressDialog = new ProgressDialog(typeId);
+            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_UpdateCustomOutfits);
 
             DialogResult result = progressDialog.ShowDialog();
 
@@ -891,28 +1119,39 @@ namespace FamilyManager
             {
                 if (result == DialogResult.Cancel)
                 {
-                    // Update Custom Clothes cancelled
+                    // Update Custom Outfits cancelled
                 }
                 else
                 {
-                    // Update Custom Clothes completed
+                    // Update Custom Outfits completed
                     UpdateClosetTabState();
+                    UpdateSafeTabState();
                 }
             }
         }
 
-        private void DoAsyncWork_UpdateCustomClothes(ProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_UpdateCustomOutfits(ProgressDialog sender, DoWorkEventArgs args)
         {
-            sender.VisualMode = ProgressBarDisplayMode.CustomText;
-            sender.SetProgress(0, "Loading Custom Clothes");
+            TypeTypeID typeId = (TypeTypeID)args.Argument;
 
-            clothingCache.ReloadCustomClothing(sender);
+            sender.VisualMode = ProgressBarDisplayMode.CustomText;
+            sender.SetProgress(0, $"Loading Custom {(typeId == Gzps.TYPE ? "Clothes" : "Jewellery")}");
+
+            if (typeId == Gzps.TYPE)
+            {
+                clothingCache.ReloadCustomOutfits(sender, typeId);
+            }
+            else
+            {
+                jewelleryCache.ReloadCustomOutfits(sender, typeId);
+            }
         }
 
         private void OnCachingRemoveLocal(object sender, EventArgs e)
         {
             DataCache.RemoveAll();
             UpdateClosetTabState();
+            UpdateSafeTabState();
         }
 
         private void OnCachingRemoveThumbnails(object sender, EventArgs e)
@@ -922,15 +1161,29 @@ namespace FamilyManager
         #endregion
 
         #region Tabs
+        private bool IsFamilyTabActive => (tabPages.SelectedIndex == 0);
+        private bool IsClosetTabActive => (tabPages.SelectedIndex == 1);
+        private bool IsSafeTabActive => (tabPages.SelectedIndex == 2);
+
         private void OnTabPageChanged(object sender, EventArgs e)
         {
-            if (tabPages.SelectedIndex == (int)TabPages.TabCloset)
+            if (IsClosetTabActive)
             {
-                if (dataCloset.Rows.Count == 0)
+                if (gridFamilyCloset.Rows.Count == 0)
                 {
                     if (lastFamilyNode != null)
                     {
-                        DoWork_FillClosetGrid(lastHoodNode, lastFamilyNode);
+                        DoWork_FillFamilyClosetGrid(lastHoodNode, lastFamilyNode);
+                    }
+                }
+            }
+            else if (IsSafeTabActive)
+            {
+                if (gridFamilySafe.Rows.Count == 0)
+                {
+                    if (lastFamilyNode != null)
+                    {
+                        DoWork_FillFamilySafeGrid(lastHoodNode, lastFamilyNode);
                     }
                 }
             }
@@ -975,6 +1228,34 @@ namespace FamilyManager
                 textBusinessMoney.Text = textFamilyMoney.Text;
             }
         }
+
+        private void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                UpdateCurrentFamily();
+                UpdateSaveState();
+            }
+        }
+
+        bool ignoreCkb = false;
+        private void OnFamilyNameChecked(object sender, EventArgs e)
+        {
+            if (ignoreCkb) return;
+
+            if (sender is CheckBox ckb)
+            {
+                ignoreCkb = true;
+
+                bool ticked = ckb.Checked;
+
+                ckbFamilyNameAll.Checked = ckbFamilyNameSame.Checked = ckbFamilyNameSelected.Checked = false;
+
+                ckb.Checked = ticked;
+
+                ignoreCkb = false;
+            }
+        }
         #endregion
 
         #region Validation
@@ -1010,7 +1291,7 @@ namespace FamilyManager
         }
         #endregion
 
-        #region Context Menus
+        #region Member Context Menu
         private void OnContextMembersOpening(object sender, CancelEventArgs e)
         {
             if (gridFamilyMembers.Rows.Count < 1)
@@ -1019,29 +1300,170 @@ namespace FamilyManager
                 return;
             }
 
-            menuContextMemberFilterAll.Enabled = !filters.IsAll;
-
-            menuContextMemberFilterSelected.Visible = false;
-            menuContextMemberFilterThis.Visible = true;
-
-            if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
+            if (IsClosetTabActive || IsSafeTabActive)
             {
-                // Mouse has to be over a selected row
-                foreach (DataGridViewRow selectedRow in gridFamilyMembers.SelectedRows)
+                menuContextMemberChangeSimName.Visible = menuContextMemberChangeFamilyName.Visible = false;
+                menuContextMemberChangeDays.Visible = false;
+
+                menuContextMemberFilterAll.Visible = true;
+                menuContextMemberFilterAll.Enabled = !filters.IsAll;
+
+                menuContextMemberFilterSelected.Visible = false;
+                menuContextMemberFilterThis.Visible = true;
+
+                if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
                 {
-                    if (mouseLocation.RowIndex == selectedRow.Index)
+                    // Mouse has to be over a selected row
+                    foreach (DataGridViewRow selectedRow in gridFamilyMembers.SelectedRows)
                     {
-                        menuContextMemberFilterSelected.Visible = true;
-                        menuContextMemberFilterThis.Visible = false;
-                        break;
+                        if (mouseLocation.RowIndex == selectedRow.Index)
+                        {
+                            menuContextMemberFilterSelected.Visible = true;
+                            menuContextMemberFilterThis.Visible = false;
+                            break;
+                        }
                     }
+                }
+            }
+            else
+            {
+                // Just assume it's the family tab
+                menuContextMemberChangeSimName.Visible = menuContextMemberChangeFamilyName.Visible = true;
+                menuContextMemberChangeDays.Visible = true;
+
+                menuContextMemberFilterAll.Visible = false;
+                menuContextMemberFilterSelected.Visible = false;
+                menuContextMemberFilterThis.Visible = false;
+
+                menuContextMemberChangeFamilyName.Enabled = (gridFamilyMembers.SelectedRows.Count > 0);
+
+                menuContextMemberChangeSimName.Enabled = false;
+
+                if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
+                {
+                    menuContextMemberChangeSimName.Enabled = true;
                 }
             }
         }
 
+        private void OnChangeSimNameClicked(object sender, EventArgs e)
+        {
+            if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
+            {
+                DataGridViewRow row = gridFamilyMembers.Rows[mouseLocation.RowIndex];
+                CharacterData data = (row.Cells["colData"].Value as CharacterData);
+
+                TextAndTextEntryDialog dialog = new TextAndTextEntryDialog("Change Sim's Name", "New Given Name", data.GivenName(prefLid), "New Family Name", data.FamilyName(prefLid));
+
+                if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.TextEntry1) && !string.IsNullOrWhiteSpace(dialog.TextEntry2))
+                {
+                    ChangeMemberName(row, dialog.TextEntry1, dialog.TextEntry2);
+
+                    UpdateFormState();
+                }
+            }
+        }
+
+        private void OnChangeFamilyNameClicked(object sender, EventArgs e)
+        {
+            if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
+            {
+                int rowIndex = mouseLocation.RowIndex;
+
+                foreach (DataGridViewRow selectedRow in gridFamilyMembers.SelectedRows)
+                {
+                    if (mouseLocation.RowIndex == selectedRow.Index)
+                    {
+                        rowIndex = -1;
+                        break;
+                    }
+                }
+
+                TextEntryDialog dialog = new TextEntryDialog("Change Family Name", "New Family Name", textFamilyName.Text);
+
+                if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.TextEntry))
+                {
+                    if (rowIndex == -1)
+                    {
+                        foreach (DataGridViewRow row in gridFamilyMembers.SelectedRows)
+                        {
+                            ChangeMemberFamilyName(row, dialog.TextEntry);
+                        }
+                    }
+                    else
+                    {
+                        ChangeMemberFamilyName(gridFamilyMembers.Rows[rowIndex], dialog.TextEntry);
+                    }
+
+                    UpdateFormState();
+                }
+            }
+        }
+
+        private void ChangeMemberName(DataGridViewRow row, string newGivenName, string newFamilyName)
+        {
+            CharacterData data = (row.Cells["colData"].Value as CharacterData);
+            data?.SetGivenName(prefLid, newGivenName);
+            data?.SetFamilyName(prefLid, newFamilyName);
+            row.Cells["colFirstName"].Value = $"{data.GivenName(prefLid)} {data.FamilyName(prefLid)}";
+        }
+
+        private void ChangeMemberFamilyName(DataGridViewRow row, string newFamilyName)
+        {
+            CharacterData data = (row.Cells["colData"].Value as CharacterData);
+            data?.SetFamilyName(prefLid, newFamilyName);
+            row.Cells["colFirstName"].Value = $"{data.GivenName(prefLid)} {data.FamilyName(prefLid)}";
+        }
+
+        private void OnChangeDaysClicked(object sender, EventArgs e)
+        {
+            if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
+            {
+                int rowIndex = mouseLocation.RowIndex;
+
+                foreach (DataGridViewRow selectedRow in gridFamilyMembers.SelectedRows)
+                {
+                    if (mouseLocation.RowIndex == selectedRow.Index)
+                    {
+                        rowIndex = -1;
+                        break;
+                    }
+                }
+
+                TextEntryDialog dialog = new TextEntryDialog("Change Days Remaining", "Days Adjustment (+/-)", "");
+
+                if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.TextEntry) &&
+                    Int16.TryParse(dialog.TextEntry, out short days) && days != 0)
+                {
+                    if (rowIndex == -1)
+                    {
+                        foreach (DataGridViewRow row in gridFamilyMembers.SelectedRows)
+                        {
+                            ChangeMemberDays(row, days);
+                        }
+                    }
+                    else
+                    {
+                        ChangeMemberDays(gridFamilyMembers.Rows[rowIndex], days);
+                    }
+
+                    UpdateFormState();
+                }
+            }
+        }
+
+        private void ChangeMemberDays(DataGridViewRow row, int days)
+        {
+            CharacterData data = (row.Cells["colData"].Value as CharacterData);
+            data?.ChangeDaysLeft(days);
+            row.Cells["colDaysLeft"].Value = data.DaysLeft;
+        }
+        #endregion
+
+        #region Closet Context Menu
         private void OnContextClosetOpening(object sender, CancelEventArgs e)
         {
-            if (gridCloset.Rows.Count < 1)
+            if (gridFamilyCloset.Rows.Count < 1)
             {
                 e.Cancel = true;
                 return;
@@ -1057,7 +1479,7 @@ namespace FamilyManager
             if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
             {
                 // Mouse has to be over a selected row
-                foreach (DataGridViewRow selectedRow in gridCloset.SelectedRows)
+                foreach (DataGridViewRow selectedRow in gridFamilyCloset.SelectedRows)
                 {
                     if (mouseLocation.RowIndex == selectedRow.Index)
                     {
@@ -1068,7 +1490,9 @@ namespace FamilyManager
                 }
             }
         }
+        #endregion
 
+        #region Suitcase Context Menu
         private void OnContextSuitcaseOpening(object sender, CancelEventArgs e)
         {
             if (gridSuitcase.Rows.Count < 1)
@@ -1096,42 +1520,102 @@ namespace FamilyManager
         }
         #endregion
 
+        #region Safe Context Menu
+        private void OnContextSafeOpening(object sender, CancelEventArgs e)
+        {
+            if (gridFamilySafe.Rows.Count < 1)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            menuContextSafeFilterAll.Enabled = !filters.IsAll;
+            menuContextSafeFilterSelected.Enabled = (gridFamilyMembers.SelectedRows.Count > 0);
+            menuContextSafeFilterUnwearable.Enabled = !filters.IsInverted;
+
+            menuContextSafeCopyToJewelbox.Enabled = menuContextSafeMoveToJewelbox.Enabled = false;
+            menuContextSafeDelete.Enabled = false;
+
+            if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
+            {
+                // Mouse has to be over a selected row
+                foreach (DataGridViewRow selectedRow in gridFamilySafe.SelectedRows)
+                {
+                    if (mouseLocation.RowIndex == selectedRow.Index)
+                    {
+                        menuContextSafeCopyToJewelbox.Enabled = menuContextSafeMoveToJewelbox.Enabled = true;
+                        menuContextSafeDelete.Enabled = true;
+                        break;
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region Jewelbox Context Menu
+        private void OnContextJewelboxOpening(object sender, CancelEventArgs e)
+        {
+            if (gridJewelbox.Rows.Count < 1)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            menuContextJewelboxCopyToSafe.Enabled = menuContextJewelboxMoveToSafe.Enabled = false;
+            menuContextJewelboxDelete.Enabled = false;
+
+            if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
+            {
+                // Mouse has to be over a selected row
+                foreach (DataGridViewRow selectedRow in gridJewelbox.SelectedRows)
+                {
+                    if (mouseLocation.RowIndex == selectedRow.Index)
+                    {
+                        menuContextJewelboxCopyToSafe.Enabled = menuContextJewelboxMoveToSafe.Enabled = true;
+                        menuContextJewelboxDelete.Enabled = true;
+                        break;
+                    }
+                }
+            }
+        }
+        #endregion
+
         #region Closet/Suitcase Buttons/Context Menu Items
-        private void OnCopyToSuitcaseClicked(object sender, EventArgs e)
-        {
-            PasteIntoSuitcase(BuildTransferList(gridCloset, "colCloset"));
-            UpdateFormState();
-        }
-
-        private void OnMoveToSuitcaseClicked(object sender, EventArgs e)
-        {
-            PasteIntoSuitcase(BuildTransferList(gridCloset, "colCloset"));
-            DeleteSelectedFromCloset();
-            UpdateFormState();
-        }
-
-        private void OnDeleteFromClosetClicked(object sender, EventArgs e)
-        {
-            DeleteSelectedFromCloset();
-            UpdateFormState();
-        }
-
         private void OnCopyToClosetClicked(object sender, EventArgs e)
         {
-            PasteIntoCloset(BuildTransferList(gridSuitcase, "colSuitcase"));
+            PasteIntoContainer(gridFamilyCloset, BuildTransferList(gridSuitcase));
             UpdateFormState();
         }
 
         private void OnMoveToClosetClicked(object sender, EventArgs e)
         {
-            PasteIntoCloset(BuildTransferList(gridSuitcase, "colSuitcase"));
-            DeleteSelectedFromSuitcase();
+            PasteIntoContainer(gridFamilyCloset, BuildTransferList(gridSuitcase));
+            DeleteSelectedFromTransfer(gridSuitcase);
+            UpdateFormState();
+        }
+
+        private void OnDeleteFromClosetClicked(object sender, EventArgs e)
+        {
+            DeleteSelectedFromContainer(gridFamilyCloset);
+            UpdateFormState();
+        }
+
+        private void OnCopyToSuitcaseClicked(object sender, EventArgs e)
+        {
+            PasteIntoTransfer(gridSuitcase, BuildTransferList(gridFamilyCloset));
+            UpdateFormState();
+        }
+
+        private void OnMoveToSuitcaseClicked(object sender, EventArgs e)
+        {
+            PasteIntoTransfer(gridSuitcase, BuildTransferList(gridFamilyCloset));
+            DeleteSelectedFromContainer(gridFamilyCloset);
             UpdateFormState();
         }
 
         private void OnDeleteFromSuitcaseClicked(object sender, EventArgs e)
         {
-            DeleteSelectedFromSuitcase();
+            DeleteSelectedFromTransfer(gridSuitcase);
             UpdateFormState();
         }
 
@@ -1140,62 +1624,138 @@ namespace FamilyManager
             dataSuitcase.Clear();
             UpdateFormState();
         }
+        #endregion
 
-        private ClosetTransferData BuildTransferList(DataGridView grid, string colNamePrefix)
+        #region Safe/Jewelbox Buttons/Context Menu Items
+        private void OnCopyToSafeClicked(object sender, EventArgs e)
         {
-            ClosetTransferData transferData = new ClosetTransferData
-            {
-                sender = null
-            };
-
-            foreach (DataGridViewRow selectedRow in grid.SelectedRows)
-            {
-                transferData.items.Add(new ClosetData(colNamePrefix, selectedRow));
-            }
-
-            return transferData;
+            PasteIntoContainer(gridFamilySafe, BuildTransferList(gridJewelbox));
+            UpdateFormState();
         }
 
-        private void DeleteSelectedFromCloset()
+        private void OnMoveToSafeClicked(object sender, EventArgs e)
         {
-            foreach (DataGridViewRow row in gridCloset.SelectedRows)
+            PasteIntoContainer(gridFamilySafe, BuildTransferList(gridJewelbox));
+            DeleteSelectedFromTransfer(gridJewelbox);
+            UpdateFormState();
+        }
+
+        private void OnDeleteFromSafeClicked(object sender, EventArgs e)
+        {
+            DeleteSelectedFromContainer(gridFamilySafe);
+            UpdateFormState();
+        }
+
+        private void OnCopyToJewelboxClicked(object sender, EventArgs e)
+        {
+            PasteIntoTransfer(gridJewelbox, BuildTransferList(gridFamilySafe));
+            UpdateFormState();
+        }
+
+        private void OnMoveToJewelboxClicked(object sender, EventArgs e)
+        {
+            PasteIntoTransfer(gridJewelbox, BuildTransferList(gridFamilySafe));
+            DeleteSelectedFromContainer(gridFamilySafe);
+            UpdateFormState();
+        }
+
+        private void OnDeleteFromJewelboxClicked(object sender, EventArgs e)
+        {
+            DeleteSelectedFromTransfer(gridJewelbox);
+            UpdateFormState();
+        }
+
+        private void OnEmptyJewelboxClicked(object sender, EventArgs e)
+        {
+            dataJewelbox.Clear();
+            UpdateFormState();
+        }
+        #endregion
+
+        #region Actions on the "container" grid (closet and safe)
+        private bool IsContainerGrid(DataGridView grid)
+        {
+            return (grid == gridFamilyCloset || grid == gridFamilySafe);
+        }
+
+        private void DeleteSelectedFromContainer(DataGridView container)
+        {
+            int selectedIndex = -1;
+            string colPrefix = GetColPrefix(container);
+
+            SortedList<int, int> selectedRowIndexes = new SortedList<int, int>();
+
+            foreach (DataGridViewRow row in container.SelectedRows)
             {
-                ClosetDbpfData closetData = row.Cells["colClosetData"].Value as ClosetDbpfData;
+                if (selectedIndex == -1)
+                {
+                    selectedIndex = row.Index + 1;
+                }
+
+                selectedRowIndexes.Add(row.Index, row.Index);
+
+                OutfitDbpfData closetData = row.Cells[$"{colPrefix}Data"].Value as OutfitDbpfData;
 
                 using (CacheableDbpfFile package = packageCache.OpenForUpdate(closetData.PackagePath))
                 {
-                    package.Remove(closetData.ClosetIdr);
+                    package.Remove(closetData.OutfitIdr);
+                    package.Remove(new DBPFKey(Binx.TYPE, closetData.OutfitIdr));
 
                     package.Close();
                 }
             }
 
-            DoWork_FillClosetGrid(lastHoodNode, lastFamilyNode);
+            while (selectedRowIndexes.Keys.Contains(selectedIndex))
+            {
+                ++selectedIndex;
+            }
+
+            selectedIndex -= (selectedRowIndexes.IndexOfKey(selectedIndex - 1) + 1);
+
+            DoWork_FillClosetOrSafeGrid(lastHoodNode, lastFamilyNode);
+
+            container.ClearSelection();
+
+            if (selectedIndex < 0)
+            {
+                selectedIndex = 0;
+            }
+            else if (selectedIndex >= container.Rows.Count)
+            {
+                selectedIndex = container.Rows.Count - 1;
+            }
+
+            // container.Rows[selectedIndex].Selected = true;
+            if (selectedIndex >= 0 && selectedIndex < container.Rows.Count)
+            {
+                container.FirstDisplayedScrollingRowIndex = selectedIndex;
+            }
         }
 
-        private void PasteIntoCloset(ClosetTransferData transferData)
+        private void PasteIntoContainer(DataGridView container, ClosetTransferData transferData)
         {
             if (transferData == null) return;
 
             foreach (ClosetData item in transferData.items)
             {
-                PasteItemIntoCloset(item);
+                PasteItemIntoContainer(container, item);
             }
 
-            DoWork_FillClosetGrid(lastHoodNode, lastFamilyNode);
+            DoWork_FillClosetOrSafeGrid(lastHoodNode, lastFamilyNode);
         }
 
-        private void PasteItemIntoCloset(ClosetData item)
+        private void PasteItemIntoContainer(DataGridView container, ClosetData item)
         {
-            if (IsDuplicateEntry(gridCloset, "colCloset", item)) return;
+            if (IsDuplicateEntry(container, GetColPrefix(container), item)) return;
 
             using (CacheableDbpfFile package = packageCache.OpenForUpdate(item.dbpfData.PackagePath))
             {
                 // If originally from the current family's closet
-                if (item.dbpfData.ClosetIdr.GetItem(1).InstanceID == lastFamilyNode.FamilyId)
+                if (item.dbpfData.OutfitIdr.GetItem(1).InstanceID == lastFamilyNode.FamilyId)
                 {
                     // Just put it back
-                    package.Commit(item.dbpfData.ClosetIdr, true);
+                    package.Commit(item.dbpfData.OutfitIdr, true);
+                    package.Commit(item.dbpfData.OutfitBinx, true);
                 }
                 else
                 {
@@ -1209,76 +1769,116 @@ namespace FamilyManager
                     }
 
                     //   Clone the existing 3IDR and change its instance id
-                    Idr newIdr = item.dbpfData.ClosetIdr.Duplicate(newIdrKey);
+                    Idr newIdr = item.dbpfData.OutfitIdr.Duplicate(newIdrKey);
 
                     //   Change the clone's [1].InstanceId to the familyId
                     DBPFKey collKey = newIdr.GetItem(1);
                     collKey.ChangeIR(lastFamilyNode.FamilyId, collKey.ResourceID);
 
-                    //   Commit the clone
+                    //   Clone the existing BINX for the new 3IDR
+                    Binx newBinx = item.dbpfData.OutfitBinx.Duplicate(new DBPFKey(Binx.TYPE, newIdrKey));
+
+                    //   Commit the clones
                     package.Commit(newIdr, true);
+                    package.Commit(newBinx, true);
                 }
 
                 package.Close();
             }
         }
+        #endregion
 
-        private void DeleteSelectedFromSuitcase()
+        #region Actions on the "transfer" grid (suitcase & jewelbox)
+        private bool IsTransferGrid(DataGridView grid)
         {
+            return (grid == gridSuitcase || grid == gridJewelbox);
+        }
+
+        private ClosetTransferData BuildTransferList(DataGridView grid, bool all = false)
+        {
+            string colPrefix = GetColPrefix(grid);
+
+            ClosetTransferData transferData = new ClosetTransferData(null);
+
+            if (all)
+            {
+                foreach (DataGridViewRow row in grid.Rows)
+                {
+                    transferData.items.Add(new ClosetData(colPrefix, row));
+                }
+            }
+            else
+            {
+                foreach (DataGridViewRow row in grid.SelectedRows)
+                {
+                    transferData.items.Add(new ClosetData(colPrefix, row));
+                }
+            }
+
+            return transferData;
+        }
+
+        private void DeleteSelectedFromTransfer(DataGridView transfer)
+        {
+            OutfitGridData data = GetDataForGrid(transfer);
+
             SortedSet<int> rowsToRemove = new SortedSet<int>();
 
-            foreach (DataGridViewRow row in gridSuitcase.SelectedRows)
+            foreach (DataGridViewRow row in transfer.SelectedRows)
             {
                 rowsToRemove.Add(row.Index);
             }
 
             foreach (int index in rowsToRemove.Reverse())
             {
-                dataSuitcase.Rows.RemoveAt(index);
+                data.Rows.RemoveAt(index);
             }
         }
 
-        private void PasteIntoSuitcase(ClosetTransferData transferData)
+        private void PasteIntoTransfer(DataGridView transfer, ClosetTransferData transferData)
         {
             if (transferData == null) return;
 
             foreach (ClosetData item in transferData.items)
             {
-                PasteItemIntoSuitcase(item);
+                PasteItemIntoTransfer(transfer, item);
             }
         }
 
-        private void PasteItemIntoSuitcase(ClosetData item)
+        private void PasteItemIntoTransfer(DataGridView transfer, ClosetData item)
         {
-            if (IsDuplicateEntry(gridSuitcase, "colSuitcase", item)) return;
+            if (IsDuplicateEntry(transfer, GetColPrefix(transfer), item)) return;
 
-            DataRow suitcaseRow = dataSuitcase.NewRow();
+            OutfitGridData data = GetDataForGrid(transfer);
 
-            suitcaseRow["Visible"] = "Yes";
-            suitcaseRow["Data"] = item.dbpfData;
+            DataRow transferRow = data.NewRow();
 
-            suitcaseRow["Name"] = item.name;
-            suitcaseRow["Category"] = item.category;
-            suitcaseRow["Gender"] = item.gender;
-            suitcaseRow["GenderCode"] = item.genderCode;
-            suitcaseRow["Age"] = item.age;
-            suitcaseRow["AgeCode"] = item.ageCode;
+            transferRow["Visible"] = "Yes";
+            transferRow["Data"] = item.dbpfData;
 
-            suitcaseRow["GenderHex"] = item.genderHex;
-            suitcaseRow["AgeHex"] = item.ageHex;
+            transferRow["Name"] = item.name;
+            transferRow["Category"] = item.category;
+            transferRow["Gender"] = item.gender;
+            transferRow["GenderCode"] = item.genderCode;
+            transferRow["Age"] = item.age;
+            transferRow["AgeCode"] = item.ageCode;
 
-            suitcaseRow["ThumbKey"] = item.thumbKey;
+            transferRow["GenderHex"] = item.genderHex;
+            transferRow["AgeHex"] = item.ageHex;
 
-            dataSuitcase.Rows.Add(suitcaseRow);
+            transferRow["ThumbKey"] = item.thumbKey;
+            transferRow["LocalThumbKey"] = item.localThumbKey;
+
+            data.Rows.Add(transferRow);
         }
 
         private bool IsDuplicateEntry(DataGridView grid, string colNamePrefix, ClosetData item)
         {
-            DBPFKey itemGzpsKey = item.dbpfData.ClosetIdr.GetItem(2);
+            DBPFKey itemCpfKey = item.dbpfData.OutfitIdr.GetItem(2);
 
             foreach (DataGridViewRow row in grid.Rows)
             {
-                if (itemGzpsKey == (row.Cells[$"{colNamePrefix}Data"].Value as ClosetDbpfData).ClosetIdr.GetItem(2))
+                if (itemCpfKey == (row.Cells[$"{colNamePrefix}Data"].Value as OutfitDbpfData).OutfitIdr.GetItem(2))
                 {
                     return true;
                 }
@@ -1288,41 +1888,170 @@ namespace FamilyManager
         }
         #endregion
 
+        #region Save to / Load from XML file
+        private void OnSaveSuitcaseClicked(object sender, EventArgs e)
+        {
+            if (saveSuitcaseFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                XmlWriterSettings settings = new XmlWriterSettings
+                {
+                    Indent = true
+                };
+
+                XmlWriter writer = XmlWriter.Create(saveSuitcaseFileDialog.FileName, settings);
+
+                BuildTransferList(gridSuitcase, true).WriteXml(writer, "suitcase");
+
+                writer.Flush();
+                writer.Close();
+            }
+        }
+
+        private void OnLoadSuitcaseClicked(object sender, EventArgs e)
+        {
+            if (openSuitcaseFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                dataSuitcase.Clear();
+
+                ClosetTransferData transferData = null;
+
+                XmlReaderSettings settings = new XmlReaderSettings
+                {
+                    IgnoreComments = true,
+                    IgnoreProcessingInstructions = true,
+                    IgnoreWhitespace = true
+                };
+
+                XmlReader reader = XmlReader.Create(openSuitcaseFileDialog.FileName, settings);
+                reader.MoveToContent();
+
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    if (reader.Name.Equals("suitcase"))
+                    {
+                        transferData = new ClosetTransferData(null);
+
+                        transferData.ReadXml(reader);
+                    }
+                }
+
+                reader.Close();
+
+                PasteIntoTransfer(gridSuitcase, transferData);
+                UpdateFormState();
+            }
+        }
+
+        private void OnSaveJewelboxClicked(object sender, EventArgs e)
+        {
+            if (saveJewelboxFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                XmlWriterSettings settings = new XmlWriterSettings
+                {
+                    Indent = true
+                };
+
+                XmlWriter writer = XmlWriter.Create(saveJewelboxFileDialog.FileName, settings);
+
+                BuildTransferList(gridJewelbox, true).WriteXml(writer, "jewelbox");
+
+                writer.Flush();
+                writer.Close();
+            }
+        }
+
+        private void OnLoadJewelboxClicked(object sender, EventArgs e)
+        {
+            if (openJewelboxFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                dataJewelbox.Clear();
+
+                ClosetTransferData transferData = null;
+
+                XmlReaderSettings settings = new XmlReaderSettings
+                {
+                    IgnoreComments = true,
+                    IgnoreProcessingInstructions = true,
+                    IgnoreWhitespace = true
+                };
+
+                XmlReader reader = XmlReader.Create(openJewelboxFileDialog.FileName, settings);
+                reader.MoveToContent();
+
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    if (reader.Name.Equals("jewelbox"))
+                    {
+                        transferData = new ClosetTransferData(null);
+
+                        transferData.ReadXml(reader);
+                    }
+                }
+
+                reader.Close();
+
+                PasteIntoTransfer(gridJewelbox, transferData);
+                UpdateFormState();
+            }
+        }
+        #endregion
+
         #region Tooltips and Thumbnails
         private void OnToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
         {
             if (e.RowIndex >= 0)
             {
+                DataGridView grid = sender as DataGridView;
                 int index = e.RowIndex;
 
-                if (index < dataCloset.Rows.Count)
+                if (index < grid.Rows.Count)
                 {
-                    DataGridViewRow row = (sender as DataGridView).Rows[index];
+                    DataGridViewRow row = (grid).Rows[index];
 
-                    if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colClosetName"))
+                    if (row.Cells[e.ColumnIndex].OwningColumn.Name.EndsWith("Name"))
                     {
-                        if (GetThumbnail(row, "colCloset") == null)
-                        {
-                            e.ToolTipText = (row.Cells["colClosetThumbKey"].Value as DBPFKey)?.ToString();
-                        }
-                    }
-                    else if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colSuitcaseName"))
-                    {
-                        if (GetThumbnail(row, "colSuitcase") == null)
-                        {
-                            e.ToolTipText = (row.Cells["colSuitcaseThumbKey"].Value as DBPFKey)?.ToString();
-                        }
+                        e.ToolTipText = GetTooltip(row, GetColPrefix(grid));
                     }
                 }
             }
         }
 
+        private string GetTooltip(DataGridViewRow row, string colNamePrefix)
+        {
+            CasOutfitData casData = null;
+
+            if (row.Cells[$"{colNamePrefix}Data"].Value is OutfitDbpfData data)
+            {
+                DBPFKey cpfKey = data.CpfKey;
+
+                if (clothingCache.ContainsKey(cpfKey))
+                {
+                    casData = clothingCache.GetData(cpfKey);
+                }
+                else if (jewelleryCache.ContainsKey(cpfKey))
+                {
+                    casData = jewelleryCache.GetData(cpfKey);
+                }
+            }
+
+            return casData?.ResPackagePath;
+        }
+
         private Image GetThumbnail(DataGridViewRow row, string colNamePrefix)
         {
-            DBPFKey thumbKey = row.Cells[$"{colNamePrefix}ThumbKey"].Value as DBPFKey;
-            DBPFKey gzpsKey = (row.Cells[$"{colNamePrefix}Data"].Value as ClosetDbpfData).GzpsKey;
+            if (row.Cells[$"{colNamePrefix}LocalThumbKey"]?.Value is DBPFKey localThumbKey)
+            {
+                OutfitDbpfData data = row.Cells[$"{colNamePrefix}Data"]?.Value as OutfitDbpfData;
 
-            return clothingThumbnailsCache.GetThumbnail(thumbKey, gzpsKey);
+                return jewelleryCache.GetData(data.CpfKey).GetLocalThumbnail();
+            }
+            else
+            {
+                DBPFKey thumbKey = row.Cells[$"{colNamePrefix}ThumbKey"]?.Value as DBPFKey;
+                DBPFKey cpfKey = (row.Cells[$"{colNamePrefix}Data"].Value as OutfitDbpfData)?.CpfKey;
+
+                return clothingThumbnailsCache.GetThumbnail(thumbKey, cpfKey);
+            }
         }
 
         #endregion
@@ -1390,9 +2119,10 @@ namespace FamilyManager
             UpdateFormState();
         }
 
-        private bool IsCompleteClothingRow(DataGridViewRow row)
+        private bool IsCompleteOutfitRow(DataGridView grid, DataGridViewRow row)
         {
-            return (row.Cells[$"colClosetName"].Value is string name && !name.StartsWith("GZPS-"));
+            return (row.Cells[$"{GetColPrefix(grid)}Name"].Value is string name &&
+                    !(name.StartsWith("GZPS-") || name.StartsWith("XMOL-")));
         }
         #endregion
 
@@ -1484,25 +2214,18 @@ namespace FamilyManager
                 DataGridViewRow row = grid.Rows[e.RowIndex];
                 string colName = row.Cells[e.ColumnIndex].OwningColumn.Name;
 
-                if (grid == gridCloset)
-                {
-                    if (colName.Equals("colClosetName"))
-                    {
-                        thumbnail = GetThumbnail(row, "colCloset");
-                    }
-                }
-                else if (grid == gridSuitcase)
-                {
-                    if (colName.Equals("colSuitcaseName"))
-                    {
-                        thumbnail = GetThumbnail(row, "colSuitcase");
-                    }
-                }
-                else if (grid == gridFamilyMembers)
+                if (grid == gridFamilyMembers)
                 {
                     if (colName.Equals("colFirstName"))
                     {
                         thumbnail = row.Cells["colThumbnail"].Value as Image;
+                    }
+                }
+                else
+                {
+                    if (colName.EndsWith("Name"))
+                    {
+                        thumbnail = GetThumbnail(row, GetColPrefix(sender as DataGridView));
                     }
                 }
             }
@@ -1533,7 +2256,7 @@ namespace FamilyManager
 
             if (data is ClosetTransferData closetData)
             {
-                e.Effect = (closetData.sender != sender) ? e.AllowedEffect : DragDropEffects.None;
+                e.Effect = (closetData.Grid != sender) ? e.AllowedEffect : DragDropEffects.None;
             }
             else
             {
@@ -1547,45 +2270,50 @@ namespace FamilyManager
 
         private void OnGridDragDrop(object sender, DragEventArgs e)
         {
-            bool reloadFamilyCloset = false;
+            DataGridView grid = sender as DataGridView;
 
-            ClosetTransferData draggedClosetData = (ClosetTransferData)e.Data.GetData(typeof(ClosetTransferData));
+            bool reloadFamilyClosetOrSafe = false;
 
-            if (draggedClosetData != null && draggedClosetData.sender != sender)
+            ClosetTransferData draggedTransferData = (ClosetTransferData)e.Data.GetData(typeof(ClosetTransferData));
+
+            if (draggedTransferData != null && draggedTransferData.Grid != grid)
             {
-                foreach (ClosetData item in draggedClosetData.items)
+                foreach (ClosetData item in draggedTransferData.items)
                 {
-                    if (sender == gridSuitcase)
+                    if (IsTransferGrid(grid))
                     {
-                        PasteItemIntoSuitcase(item);
+                        PasteItemIntoTransfer(grid, item);
                     }
-                    else if (sender == gridCloset)
+                    else if (IsContainerGrid(grid))
                     {
-                        PasteItemIntoCloset(item);
+                        PasteItemIntoContainer(grid, item);
 
-                        reloadFamilyCloset = true;
+                        reloadFamilyClosetOrSafe = true;
                     }
 
                     if (e.Effect == DragDropEffects.Move)
                     {
-                        if (draggedClosetData.sender == gridCloset)
+                        if (IsContainerGrid(draggedTransferData.Grid))
                         {
                             using (CacheableDbpfFile package = packageCache.OpenForUpdate(item.dbpfData.PackagePath))
                             {
-                                package.Remove(item.dbpfData.ClosetIdr);
+                                package.Remove(item.dbpfData.OutfitIdr);
+                                package.Remove(new DBPFKey(Binx.TYPE, item.dbpfData.OutfitIdr));
 
                                 package.Close();
                             }
 
-                            reloadFamilyCloset = true;
+                            reloadFamilyClosetOrSafe = true;
                         }
-                        else if (draggedClosetData.sender == gridSuitcase)
+                        else if (IsTransferGrid(draggedTransferData.Grid))
                         {
-                            foreach (DataGridViewRow row in gridSuitcase.Rows)
+                            string colPrefix = GetColPrefix(draggedTransferData.Grid);
+
+                            foreach (DataGridViewRow row in draggedTransferData.Grid.Rows)
                             {
-                                if ((row.Cells["colSuitcaseData"].Value as ClosetDbpfData).ClosetIdr == item.dbpfData.ClosetIdr)
+                                if ((row.Cells[$"{colPrefix}Data"].Value as OutfitDbpfData).OutfitIdr == item.dbpfData.OutfitIdr)
                                 {
-                                    gridSuitcase.Rows.Remove(row);
+                                    draggedTransferData.Grid.Rows.Remove(row);
                                     break;
                                 }
                             }
@@ -1593,7 +2321,7 @@ namespace FamilyManager
                     }
                 }
 
-                if (reloadFamilyCloset) DoWork_FillClosetGrid(lastHoodNode, lastFamilyNode);
+                if (reloadFamilyClosetOrSafe) DoWork_FillClosetOrSafeGrid(lastHoodNode, lastFamilyNode);
             }
         }
 
@@ -1602,25 +2330,22 @@ namespace FamilyManager
             if (e.Button == MouseButtons.Left && mouseLocation != null && mouseLocation.RowIndex != -1)
             {
                 DataGridView grid = sender as DataGridView;
-                string colNamePrefix = (sender == gridCloset) ? "colCloset" : "colSuitcase";
+                string colNamePrefix = GetColPrefix(sender as DataGridView);
 
                 if (grid.CurrentRow != null)
                 {
-                    ClosetTransferData closetData = new ClosetTransferData
-                    {
-                        sender = sender
-                    };
+                    ClosetTransferData closetData = new ClosetTransferData(sender as DataGridView);
 
                     if (grid.CurrentRow.Selected)
                     {
                         foreach (DataGridViewRow selectedRow in grid.SelectedRows)
                         {
-                            if (IsCompleteClothingRow(selectedRow)) closetData.items.Add(new ClosetData(colNamePrefix, selectedRow));
+                            if (IsCompleteOutfitRow(grid, selectedRow)) closetData.items.Add(new ClosetData(colNamePrefix, selectedRow));
                         }
                     }
                     else
                     {
-                        if (IsCompleteClothingRow(grid.CurrentRow)) closetData.items.Add(new ClosetData(colNamePrefix, grid.CurrentRow));
+                        if (IsCompleteOutfitRow(grid, grid.CurrentRow)) closetData.items.Add(new ClosetData(colNamePrefix, grid.CurrentRow));
                     }
 
                     if (closetData.items.Count > 0)
@@ -1631,6 +2356,26 @@ namespace FamilyManager
                 }
             }
         }
+
+        private string GetColPrefix(DataGridView grid)
+        {
+            if (grid == gridFamilyCloset) return "colCloset";
+            if (grid == gridSuitcase) return "colSuitcase";
+            if (grid == gridFamilySafe) return "colSafe";
+            if (grid == gridJewelbox) return "colJewelbox";
+
+            throw new NotImplementedException();
+        }
+
+        private OutfitGridData GetDataForGrid(DataGridView grid)
+        {
+            if (grid == gridFamilyCloset) return dataFamilyCloset;
+            if (grid == gridSuitcase) return dataSuitcase;
+            if (grid == gridFamilySafe) return dataFamilySafe;
+            if (grid == gridJewelbox) return dataJewelbox;
+
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region Filters
@@ -1638,7 +2383,7 @@ namespace FamilyManager
         {
             filters.ShowAll();
 
-            FilterCloset();
+            FilterActiveContainer();
         }
 
         private void OnShowSelectedSimsClicked(object sender, EventArgs e)
@@ -1650,7 +2395,7 @@ namespace FamilyManager
                 filters.IncludeMember(row);
             }
 
-            FilterCloset();
+            FilterActiveContainer();
         }
 
         private void OnShowThisSimClicked(object sender, EventArgs e)
@@ -1658,18 +2403,9 @@ namespace FamilyManager
             if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
             {
                 filters.Clear();
+                filters.IncludeMember(gridFamilyMembers.Rows[mouseLocation.RowIndex]);
 
-                // Which row is the mouse over?
-                foreach (DataGridViewRow row in gridFamilyMembers.Rows)
-                {
-                    if (mouseLocation.RowIndex == row.Index)
-                    {
-                        filters.IncludeMember(row);
-                        break;
-                    }
-                }
-
-                FilterCloset();
+                FilterActiveContainer();
             }
         }
 
@@ -1684,12 +2420,14 @@ namespace FamilyManager
 
             filters.SetInverted();
 
-            FilterCloset();
+            FilterActiveContainer();
         }
 
-        private void FilterCloset()
+        private void FilterActiveContainer()
         {
-            foreach (DataRow row in dataCloset.Rows)
+            OutfitGridData containerData = (IsSafeTabActive) ? dataFamilySafe : dataFamilyCloset;
+
+            foreach (DataRow row in containerData.Rows)
             {
                 row["Visible"] = filters.Visible(row);
             }

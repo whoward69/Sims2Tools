@@ -10,8 +10,12 @@ using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
+using Sims2Tools.DBPF.Images.IMG;
+using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.STR;
+using Sims2Tools.DbpfCache;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,35 +28,222 @@ namespace FamilyManager.Caching
     [Serializable]
     public class CharacterData : ISerializable
     {
-        public TypeGUID guid;
-        public string packagePath;
+        private readonly TypeGUID guid;
+        private readonly string packagePath;
+        private readonly TypeInstanceID ctssId;
 
-        public string givenName;  // CTSS[0]
-        public string familyName; // CTSS[2]
+        private bool isSplit = false;
 
-        public Image thumbnail = null;
+        private string ctssPackagePath = null;
+        private Ctss ctss = null;
+        private Image thumbnail = null;
 
-        public CharacterData()
+        private string sdscPackagePath = null;
+        private TypeInstanceID sdscId;
+        private Sdsc sdsc = null;
+
+        public bool IsSplit => isSplit;
+
+        public CharacterData(string packagePath, TypeGUID guid, TypeInstanceID ctssId)
         {
+            this.packagePath = packagePath;
+            this.guid = guid;
+            this.ctssId = ctssId;
+
+            DetermineIfSplit();
+        }
+
+        private void DetermineIfSplit()
+        {
+            FileInfo fi = new FileInfo(packagePath);
+            string filename = fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length);
+
+            int pos = filename.LastIndexOf(".");
+            isSplit = (pos != -1 && int.TryParse(filename.Substring(pos + 1), out int index) && index > 0);
+        }
+
+        public void SetSdscDetails(string sdscPackagePath, TypeInstanceID sdscId)
+        {
+            this.sdscPackagePath = sdscPackagePath;
+            this.sdscId = sdscId;
+        }
+
+        public string GivenName(MetaData.Languages lang)
+        {
+            return GetCtss(lang, 0);
+        }
+
+        public void SetGivenName(MetaData.Languages lang, string name)
+        {
+            SetCtss(lang, 0, name);
+        }
+
+        public string FamilyName(MetaData.Languages lang)
+        {
+            return GetCtss(lang, 2);
+        }
+
+        public void SetFamilyName(MetaData.Languages lang, string name)
+        {
+            SetCtss(lang, 2, name);
+        }
+
+        private string GetCtss(MetaData.Languages lang, int index)
+        {
+            string value = null;
+
+            if (ctss == null)
+            {
+                ctss = (Ctss)GetResource(packagePath, new DBPFKey(Ctss.TYPE, DBPFData.GROUP_LOCAL, ctssId, DBPFData.RESOURCE_NULL), out ctssPackagePath);
+            }
+
+            if (ctss != null)
+            {
+                value = ctss.LanguageItems(lang)?[index]?.Title ?? ctss.LanguageItems(MetaData.Languages.Default)?[index]?.Title;
+            }
+
+            return value;
+        }
+
+        private void SetCtss(MetaData.Languages lang, int index, string value)
+        {
+            if (ctss != null && ctssPackagePath != null) // Can't set without doing a GetCtss() first, so this is reasonable
+            {
+                StrItem item = ctss.LanguageItems(lang)?[index];
+
+                if (item != null)
+                {
+                    item.Title = value;
+
+                    using (CacheableDbpfFile package = CharacterCache.cache.OpenForUpdate(ctssPackagePath))
+                    {
+                        package.Commit(ctss);
+
+                        if (lang == MetaData.Languages.Default && index == 0)
+                        {
+                            Objd objd = (Objd)package.GetResourceByKey(new DBPFKey(Objd.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000080, DBPFData.RESOURCE_NULL));
+
+                            if (objd != null)
+                            {
+                                string name = objd.KeyName;
+                                int pos = name.LastIndexOf("-");
+
+                                objd.SetKeyName($"{name.Substring(0, pos)}- {value}");
+
+                                package.Commit(objd);
+                            }
+                        }
+
+                        package.Close();
+                    }
+                }
+            }
+        }
+
+        public int DaysLeft
+        {
+            get
+            {
+                int value = 0;
+
+                if (sdsc == null)
+                {
+                    sdsc = (Sdsc)GetResource(sdscPackagePath, new DBPFKey(Sdsc.TYPE, DBPFData.GROUP_LOCAL, sdscId, DBPFData.RESOURCE_NULL), out _);
+                }
+
+                if (sdsc != null)
+                {
+                    value = sdsc.AgeDaysLeft;
+                }
+
+                return value;
+            }
+        }
+
+        public void ChangeDaysLeft(int delta)
+        {
+            ushort value = (ushort)Math.Max(0, DaysLeft + delta);
+
+            if (sdsc != null && sdscPackagePath != null)
+            {
+                sdsc.SetRawData(SdscIndex.AgeDaysLeft, value);
+
+                using (CacheableDbpfFile package = CharacterCache.cache.OpenForUpdate(sdscPackagePath))
+                {
+                    package.Commit(sdsc);
+
+                    package.Close();
+                }
+            }
+        }
+
+        public Image Thumbnail(uint ageCode)
+        {
+            if (thumbnail == null)
+            {
+                Img thumb = (Img)GetResource(packagePath, new DBPFKey(Img.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)ageCode, DBPFData.RESOURCE_NULL), out string _);
+
+                thumbnail = thumb?.Image;
+            }
+
+            return thumbnail;
+        }
+
+        private DBPFResource GetResource(string splitPackagePath, DBPFKey resKey, out string foundPackagePath)
+        {
+            DBPFResource res = null;
+
+            foundPackagePath = splitPackagePath;
+
+            using (CacheableDbpfFile splitPackage = CharacterCache.cache.OpenForReadOnly(splitPackagePath))
+            {
+                res = splitPackage?.GetResourceByKey(resKey);
+
+                splitPackage.Close();
+            }
+
+            if (res == null)
+            {
+                FileInfo fi = new FileInfo(splitPackagePath);
+                string filename = fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length);
+
+                int pos = filename.LastIndexOf(".");
+                if (pos != -1 && int.TryParse(filename.Substring(pos + 1), out int index) && index > 0)
+                {
+                    if (index > 1)
+                    {
+                        res = GetResource($"{fi.DirectoryName}\\{fi.Name.Substring(0, pos)}.{(index - 1)}{fi.Extension}", resKey, out foundPackagePath);
+                    }
+                    else
+                    {
+                        res = GetResource($"{fi.DirectoryName}\\{fi.Name.Substring(0, pos)}{fi.Extension}", resKey, out foundPackagePath);
+                    }
+                }
+            }
+
+            return res;
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("guid", guid.AsUInt());
-            info.AddValue("packagePath", packagePath);
+            info.AddValue("version", 1);
 
-            info.AddValue("givenName", givenName);
-            info.AddValue("familyName", familyName);
+            info.AddValue("packagePath", packagePath);
+            info.AddValue("guid", guid.AsUInt());
+            info.AddValue("ctssId", ctssId.AsUInt());
         }
 
         protected CharacterData(SerializationInfo info, StreamingContext context)
         {
-            guid = (TypeGUID)info.GetUInt32("guid");
+            // int version = info.GetInt32("version");
+
             packagePath = info.GetString("packagePath");
+            guid = (TypeGUID)info.GetUInt32("guid");
+            ctssId = (TypeInstanceID)info.GetUInt32("ctssId");
 
-            givenName = info.GetString("givenName");
-            familyName = info.GetString("familyName");
+            DetermineIfSplit();
 
+            ctss = null;
             thumbnail = null;
         }
     }
@@ -61,6 +252,12 @@ namespace FamilyManager.Caching
     public class CharacterCache
     {
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        internal static DbpfFileCache cache;
+        public static void SetCache(DbpfFileCache cache)
+        {
+            CharacterCache.cache = cache;
+        }
 
         private Dictionary<TypeGUID, CharacterData> characterCache = null;
 
@@ -129,21 +326,15 @@ namespace FamilyManager.Caching
 
                         if (objd != null)
                         {
-                            Ctss ctss = (Ctss)package.GetResourceByKey(new DBPFKey(Ctss.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
-
-                            CharacterData data = new CharacterData
-                            {
-                                guid = objd.Guid,
-                                packagePath = packagePath,
-                                givenName = ctss.LanguageItems(MetaData.Languages.Default)[0].Title,
-                                familyName = ctss.LanguageItems(MetaData.Languages.Default)[2].Title
-                            };
+                            CharacterData data = new CharacterData(packagePath, objd.Guid, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId));
 
                             characterCache.Add(objd.Guid, data); // GUIDs should be unique. so let this throw an exception on duplicates
                         }
 
                         package.Close();
                     }
+
+                    progress += delta;
                 }
             }
             catch (Exception)

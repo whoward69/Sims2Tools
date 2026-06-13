@@ -8,9 +8,11 @@
 
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
+using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DbpfCache;
 using System;
+using System.Xml;
 
 namespace FamilyManager
 {
@@ -24,8 +26,8 @@ namespace FamilyManager
             FamilyDbpfData.cache = cache;
         }
 
-        private string packagePath;
-        private Fami fami;
+        private readonly string packagePath;
+        private readonly Fami fami;
 
         public string PackagePath => packagePath;
 
@@ -46,41 +48,117 @@ namespace FamilyManager
         }
     }
 
-    public class ClosetDbpfData : IEquatable<ClosetDbpfData>
+    public class OutfitDbpfData : IEquatable<OutfitDbpfData>
     {
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static DbpfFileCache cache;
         public static void SetCache(DbpfFileCache cache)
         {
-            ClosetDbpfData.cache = cache;
+            OutfitDbpfData.cache = cache;
         }
 
         private string packagePath;
 
-        private readonly DBPFKey gzpsKey;
+        private DBPFKey cpfKey; // GZPS (clothing) or XMOL (jewellery)
 
-        private readonly Idr idr = null;
+        private Idr idr = null;
+        private Binx binx = null;
 
         public string PackagePath => packagePath;
-        public Idr ClosetIdr => idr;
+        public Idr OutfitIdr => idr;
+        public Binx OutfitBinx => binx;
 
-        public DBPFKey GzpsKey => gzpsKey;
+        public DBPFKey CpfKey => cpfKey;
 
-        public static ClosetDbpfData Create(CacheableDbpfFile package, Idr idr)
+        public static OutfitDbpfData Create(CacheableDbpfFile package, Idr idr)
         {
-            return new ClosetDbpfData(package, idr);
+            return new OutfitDbpfData(package, idr);
         }
 
-        private ClosetDbpfData(CacheableDbpfFile package, Idr idr)
+        private OutfitDbpfData(CacheableDbpfFile package, Idr idr)
         {
             this.packagePath = package.PackagePath;
             this.idr = idr;
 
-            this.gzpsKey = idr.GetItem(2);
+            this.binx = (Binx)package.GetResourceByKey(new DBPFKey(Binx.TYPE, idr));
+
+            this.cpfKey = idr.GetItem(2);
         }
 
-        public bool Equals(ClosetDbpfData other)
+        public OutfitDbpfData(XmlReader reader)
+        {
+            ReadXml(reader);
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteStartElement("idr");
+            writer.WriteAttributeString("version", "1.0");
+
+            writer.WriteElementString("path", packagePath);
+            writer.WriteElementString("key", idr.TGRIString);
+
+            writer.WriteEndElement();
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            DBPFKey idrKey = null;
+
+            bool wantPath = false;
+            bool wantKey = false;
+
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    if (reader.Name.Equals("path"))
+                    {
+                        wantPath = true;
+                    }
+                    else if (reader.Name.Equals("key"))
+                    {
+                        wantKey = true;
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.Text)
+                {
+                    if (wantPath)
+                    {
+                        packagePath = reader.Value;
+                        wantPath = false;
+                    }
+                    else if (wantKey)
+                    {
+                        idrKey = new DBPFKey(reader.Value);
+                        wantKey = false;
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.EndElement)
+                {
+                    if (reader.Name.Equals("idr"))
+                    {
+                        if (idrKey != null)
+                        {
+                            using (CacheableDbpfFile package = cache.OpenForReadOnly(packagePath))
+                            {
+                                idr = (Idr)package.GetResourceByKey(idrKey);
+                                cpfKey = idr?.GetItem(2);
+
+                                binx = (Binx)package.GetResourceByKey(new DBPFKey(Binx.TYPE, idrKey));
+
+                                package.Close();
+                            }
+                        }
+
+                        return;
+                    }
+                }
+            }
+        }
+
+        public bool Equals(OutfitDbpfData other)
         {
             return this.packagePath.Equals(other.packagePath) && this.idr.Equals(other.idr);
         }

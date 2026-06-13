@@ -46,5 +46,17 @@ namespace FamilyManager.Properties {
                 this["ThumbnailBackground"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PapayaWhip")]
+        public string SplitFileHighlight {
+            get {
+                return ((string)(this["SplitFileHighlight"]));
+            }
+            set {
+                this["SplitFileHighlight"] = value;
+            }
+        }
     }
 }

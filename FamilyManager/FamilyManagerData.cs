@@ -13,13 +13,17 @@ using Sims2Tools.DBPF.Images.JPG;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.LTXT;
 using Sims2Tools.DBPF.STR;
+using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DbpfCache;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace FamilyManager
 {
@@ -30,6 +34,7 @@ namespace FamilyManager
         {
             // Must match the order in the DataGridView control
             this.Columns.Add(new DataColumn("FirstName", typeof(string)));
+            this.Columns.Add(new DataColumn("SplitFile", typeof(string)));
 
             this.Columns.Add(new DataColumn("Gender", typeof(string)));
             this.Columns.Add(new DataColumn("GenderCode", typeof(string)));
@@ -41,13 +46,14 @@ namespace FamilyManager
             this.Columns.Add(new DataColumn("AgeHex", typeof(uint)));
 
             this.Columns.Add(new DataColumn("Thumbnail", typeof(object)));
+            this.Columns.Add(new DataColumn("Data", typeof(object)));
         }
     }
 
     [System.ComponentModel.DesignerCategory("")]
-    class ClothesGridData : DataTable
+    class OutfitGridData : DataTable
     {
-        public ClothesGridData()
+        public OutfitGridData()
         {
             // Must match the order in the DataGridView control
             this.Columns.Add(new DataColumn("Visible", typeof(string)));
@@ -65,6 +71,7 @@ namespace FamilyManager
 
             this.Columns.Add(new DataColumn("Data", typeof(object)));
             this.Columns.Add(new DataColumn("ThumbKey", typeof(object)));
+            this.Columns.Add(new DataColumn("LocalThumbKey", typeof(object)));
 
             this.DefaultView.RowFilter = "Visible = 'Yes'";
         }
@@ -404,12 +411,16 @@ namespace FamilyManager
         {
             return familyMembers.Contains(member);
         }
-    }
 
+        public ReadOnlyCollection<uint> FamilyMembers
+        {
+            get => new List<uint>(familyMembers).AsReadOnly();
+        }
+    }
 
     public class ClosetData
     {
-        public ClosetDbpfData dbpfData;
+        public OutfitDbpfData dbpfData;
 
         public string name;
 
@@ -423,10 +434,11 @@ namespace FamilyManager
         public uint ageHex;
 
         public object thumbKey;
+        public object localThumbKey;
 
         public ClosetData(string colNamePrefix, DataGridViewRow row)
         {
-            dbpfData = row.Cells[$"{colNamePrefix}Data"].Value as ClosetDbpfData;
+            dbpfData = row.Cells[$"{colNamePrefix}Data"].Value as OutfitDbpfData;
 
             name = row.Cells[$"{colNamePrefix}Name"].Value as string;
 
@@ -440,12 +452,158 @@ namespace FamilyManager
             ageHex = (uint)(row.Cells[$"{colNamePrefix}AgeHex"].Value);
 
             thumbKey = row.Cells[$"{colNamePrefix}ThumbKey"].Value;
+            localThumbKey = row.Cells[$"{colNamePrefix}LocalThumbKey"].Value;
+        }
+
+        public ClosetData(XmlReader reader)
+        {
+            ReadXml(reader);
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteStartElement("item");
+            writer.WriteAttributeString("version", "1.0");
+
+            writer.WriteElementString("name", name);
+
+            writer.WriteElementString("category", category);
+
+            writer.WriteStartElement("gender");
+            writer.WriteAttributeString("value", gender);
+            writer.WriteAttributeString("code", genderCode);
+            writer.WriteAttributeString("hex", Helper.Hex2PrefixString(genderHex));
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("age");
+            writer.WriteAttributeString("value", age);
+            writer.WriteAttributeString("code", ageCode);
+            writer.WriteAttributeString("hex", Helper.Hex4PrefixString(ageHex));
+            writer.WriteEndElement();
+
+            writer.WriteElementString("thumbKey", thumbKey.ToString());
+            writer.WriteElementString("localThumbKey", localThumbKey.ToString());
+
+            dbpfData.WriteXml(writer);
+
+            writer.WriteEndElement();
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            bool wantName = false;
+            bool wantCategory = false;
+            bool wantThumbKey = false;
+            bool wantLocalThumbKey = false;
+
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    if (reader.Name.Equals("name"))
+                    {
+                        wantName = true;
+                    }
+                    else if (reader.Name.Equals("category"))
+                    {
+                        wantCategory = true;
+                    }
+                    else if (reader.Name.Equals("gender"))
+                    {
+                        gender = reader.GetAttribute("value");
+                        genderCode = reader.GetAttribute("code");
+                        genderHex = UInt32.Parse(reader.GetAttribute("hex").Substring(2), NumberStyles.HexNumber);
+                    }
+                    else if (reader.Name.Equals("age"))
+                    {
+                        age = reader.GetAttribute("value");
+                        ageCode = reader.GetAttribute("code");
+                        ageHex = UInt32.Parse(reader.GetAttribute("hex").Substring(2), NumberStyles.HexNumber);
+                    }
+                    else if (reader.Name.Equals("thumbKey"))
+                    {
+                        wantThumbKey = true;
+                    }
+                    else if (reader.Name.Equals("localThumbKey"))
+                    {
+                        wantLocalThumbKey = true;
+                    }
+                    else if (reader.Name.Equals("idr"))
+                    {
+                        dbpfData = new OutfitDbpfData(reader);
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.Text)
+                {
+                    if (wantName)
+                    {
+                        name = reader.Value;
+                        wantName = false;
+                    }
+                    else if (wantCategory)
+                    {
+                        category = reader.Value;
+                        wantCategory = false;
+                    }
+                    else if (wantThumbKey)
+                    {
+                        thumbKey = new DBPFKey(reader.Value);
+                        wantThumbKey = false;
+                    }
+                    else if (wantLocalThumbKey)
+                    {
+                        localThumbKey = new DBPFKey(reader.Value);
+                        wantLocalThumbKey = false;
+                    }
+                }
+                else if (reader.NodeType == XmlNodeType.EndElement)
+                {
+                    if (reader.Name.Equals("item"))
+                    {
+                        return;
+                    }
+                }
+            }
         }
     }
 
     public class ClosetTransferData
     {
-        public object sender;
+        private readonly DataGridView grid;
         public List<ClosetData> items = new List<ClosetData>();
+
+        public ClosetTransferData(DataGridView grid)
+        {
+            this.grid = grid;
+        }
+
+        public DataGridView Grid => grid;
+
+        public void WriteXml(XmlWriter writer, string name)
+        {
+            writer.WriteStartElement(name);
+            writer.WriteAttributeString("version", "1.0");
+
+            foreach (ClosetData item in items)
+            {
+                item.WriteXml(writer);
+            }
+
+            writer.WriteEndElement();
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    if (reader.Name.Equals("item"))
+                    {
+                        items.Add(new ClosetData(reader));
+                    }
+                }
+            }
+        }
     }
 }

@@ -80,7 +80,7 @@
     <Compile Include="DataCache\CharacterCache.cs" />
     <Compile Include="DataCache\DataCache.cs" />
     <Compile Include="FamilyManagerApp.cs" />
-    <Compile Include="DataCache\ClothingCache.cs" />
+    <Compile Include="DataCache\OutfitCache.cs" />
     <Compile Include="FamilyManagerFilters.cs" />
     <Compile Include="FamilyManagerData.cs" />
     <Compile Include="FamilyManagerForm.cs">

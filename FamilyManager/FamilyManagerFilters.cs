@@ -96,7 +96,7 @@ namespace FamilyManager
             }
             catch (InvalidCastException)
             {
-                return !isInverted ? "Yes" : "No"; // No GZPS found, so display the row (unless inverted)
+                return !isInverted ? "Yes" : "No"; // No GZPS/XMOL found, so display the row (unless inverted)
             }
 
             return !isInverted ? "No" : "Yes";

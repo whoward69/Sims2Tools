@@ -6,7 +6,6 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using System.Data;
 using System.Windows.Forms;
 
 namespace FamilyManager
@@ -37,23 +36,6 @@ namespace FamilyManager
         public void DoTask()
         {
             nodes.Add(child);
-        }
-    }
-
-    public class WorkerGridTask : IWorkerTask
-    {
-        private readonly DataTable table;
-        private readonly DataRow row;
-
-        public WorkerGridTask(DataTable table, DataRow row)
-        {
-            this.table = table;
-            this.row = row;
-        }
-
-        public void DoTask()
-        {
-            table.Rows.Add(row);
         }
     }
 }
