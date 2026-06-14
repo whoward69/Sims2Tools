@@ -88,6 +88,11 @@ namespace Sims2Tools
         {
             Color badColour = Color.LightCoral;
 
+            if (textSims2ExePath.Text.Length > 6 && textSims2ExePath.Text.EndsWith("TSBin"))
+            {
+                textSims2ExePath.Text = textSims2ExePath.Text.Substring(0, textSims2ExePath.Text.Length - 6);
+            }
+
             bool sims2ExePathOk = File.Exists($"{textSims2ExePath.Text}\\TSData\\Res\\Objects\\objects.package");
             this.textSims2ExePath.BackColor = sims2ExePathOk ? System.Drawing.SystemColors.Window : badColour;
 
