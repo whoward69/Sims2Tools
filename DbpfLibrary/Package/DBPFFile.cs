@@ -319,7 +319,7 @@ namespace Sims2Tools.DBPF.Package
             return ok;
         }
 
-        private string NextBackupName()
+        public string NextBackupName()
         {
             int lastVersion = 0;
 

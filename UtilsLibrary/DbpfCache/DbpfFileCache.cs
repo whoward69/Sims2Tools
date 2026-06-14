@@ -35,10 +35,14 @@ namespace Sims2Tools.DbpfCache
         public string PackageNameNoExtn => package.PackageNameNoExtn;
         public string PackageDir => throw new NotImplementedException();
 
+        public List<DBPFEntry> GetAllEntries() => package.GetAllEntries();
+
         public List<DBPFEntry> GetEntriesByType(TypeTypeID type) => package.GetEntriesByType(type);
 
         public DBPFEntry GetEntryByKey(DBPFKey key) => package.GetEntryByKey(key);
         public DBPFEntry GetEntryByName(TypeTypeID typeId, string sgName) => package.GetEntryByName(typeId, sgName);
+
+        public byte[] GetDataByKey(DBPFKey key) => package.GetDataByKey(key);
 
         public DBPFResource GetResourceByTGIR(int tgir) => package.GetResourceByTGIR(tgir);
         public DBPFResource GetResourceByKey(DBPFKey key) => package.GetResourceByKey(key);
@@ -50,10 +54,13 @@ namespace Sims2Tools.DbpfCache
 
 
         public void Commit(DBPFResource resource, bool ignoreDirty = false) => package.Commit(resource, ignoreDirty);
+        public void Commit(DBPFKey key, byte[] item) => package.Commit(key, item);
         public void UnCommit(DBPFKey key) => package.UnCommit(key);
 
         public void Remove(DBPFKey key) => package.Remove(key);
 
+        public string NextBackupName() => package.NextBackupName();
+        public string SaveAs(string newPackageName) => package.SaveAs(newPackageName);
         public string Update(bool autoBackup) => package.Update(autoBackup);
         public bool RetryUpdateFromTemp() => package.RetryUpdateFromTemp();
 

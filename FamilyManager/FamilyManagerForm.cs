@@ -368,15 +368,17 @@ namespace FamilyManager
             textBusinessMoney.Text = currentFamily.BusinessMoney;
             imageFamily.Image = currentFamily.FamilyImage;
 
-            lblLotName.Text = textAddressName.Text = currentFamily.LotAddress;
+            textFamilyName.Enabled = textFamilyWriteUp.Enabled = (currentFamily.FamilyName != null);
+            textAddressName.Enabled = textAddressDesc.Enabled = (currentFamily.LotAddress != null);
+
+            lblLotName.Text = (currentFamily.LotAddress != null) ? currentFamily.LotAddress : "The Sim Bin";
+            textAddressName.Text = currentFamily.LotAddress;
             textAddressDesc.Text = currentFamily.LotDescription;
             imageHouse.Image = currentFamily.LotImage;
 
             dataFamilyMembers.Clear();
             gridFamilyMembers.Enabled = true;
 
-            textFamilyName.Enabled = textFamilyWriteUp.Enabled = (currentFamily.FamilyName != null);
-            textAddressName.Enabled = textAddressDesc.Enabled = (currentFamily.LotAddress != null);
 
             using (CacheableDbpfFile hoodPackage = packageCache.OpenForReadOnly(hoodNode.PackagePath))
             {
@@ -734,6 +736,9 @@ namespace FamilyManager
 
         private void UpdateCurrentFamily()
         {
+            bool cacheState = packageCache.IsDirty;
+            string oldFamilyName = currentFamily?.FamilyName;
+
             if (currentFamily != null)
             {
                 if (!currentFamily.FamilyName.Equals(textFamilyName.Text))
@@ -748,17 +753,25 @@ namespace FamilyManager
                 currentFamily.FamilyWriteUp = textFamilyWriteUp.Text;
 
                 // TODO - Family Manager - family tab - there MAY be other STR# (with the LOTD resource) that need updating with the new name/desc
-                lblLotName.Text = textAddressName.Text;
-                currentFamily.LotAddress = textAddressName.Text;
-                currentFamily.LotDescription = textAddressDesc.Text;
+                if (currentFamily.LotAddress != null)
+                {
+                    lblLotName.Text = textAddressName.Text;
+                    currentFamily.LotAddress = textAddressName.Text;
+                    currentFamily.LotDescription = textAddressDesc.Text;
+                }
 
-                if (ckbMoneyLock.Checked)
+                if (ckbMoneyLock.Checked && !currentFamily.FamilyMoney.Equals(textFamilyMoney.Text))
                 {
                     textBusinessMoney.Text = textFamilyMoney.Text;
                 }
 
                 currentFamily.FamilyMoney = textFamilyMoney.Text;
                 currentFamily.BusinessMoney = textBusinessMoney.Text;
+            }
+
+            if (packageCache.IsDirty && !cacheState)
+            {
+                logger.Debug($"Package cache state changed to dirty for family {oldFamilyName}");
             }
         }
 
@@ -1305,6 +1318,8 @@ namespace FamilyManager
                 menuContextMemberChangeSimName.Visible = menuContextMemberChangeFamilyName.Visible = false;
                 menuContextMemberChangeDays.Visible = false;
 
+                menuContextMemberSeparator1.Visible = menuContextMemberMergeSplitFiles.Visible = false;
+
                 menuContextMemberFilterAll.Visible = true;
                 menuContextMemberFilterAll.Enabled = !filters.IsAll;
 
@@ -1331,6 +1346,8 @@ namespace FamilyManager
                 menuContextMemberChangeSimName.Visible = menuContextMemberChangeFamilyName.Visible = true;
                 menuContextMemberChangeDays.Visible = true;
 
+                menuContextMemberSeparator1.Visible = menuContextMemberMergeSplitFiles.Visible = false;
+
                 menuContextMemberFilterAll.Visible = false;
                 menuContextMemberFilterSelected.Visible = false;
                 menuContextMemberFilterThis.Visible = false;
@@ -1342,6 +1359,21 @@ namespace FamilyManager
                 if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
                 {
                     menuContextMemberChangeSimName.Enabled = true;
+
+#if DEBUG
+                    if (IsAdvancedMode)
+                    {
+                        if (!packageCache.IsDirty) // Doing this after doing some edits is not the best idea the user had!
+                        {
+                            string splitFile = gridFamilyMembers.Rows[mouseLocation.RowIndex].Cells["colSplitFile"].Value as string;
+
+                            if ("Y".Equals(splitFile, StringComparison.OrdinalIgnoreCase))
+                            {
+                                menuContextMemberSeparator1.Visible = menuContextMemberMergeSplitFiles.Visible = true;
+                            }
+                        }
+                    }
+#endif
                 }
             }
         }
@@ -1457,6 +1489,90 @@ namespace FamilyManager
             CharacterData data = (row.Cells["colData"].Value as CharacterData);
             data?.ChangeDaysLeft(days);
             row.Cells["colDaysLeft"].Value = data.DaysLeft;
+        }
+
+        private void OnMergeSplitFilesClicked(object sender, EventArgs e)
+        {
+            if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
+            {
+                int rowIndex = mouseLocation.RowIndex;
+                DataGridViewRow row = gridFamilyMembers.Rows[mouseLocation.RowIndex];
+
+                Trace.Assert("Y".Equals(row.Cells["colSplitFile"].Value as string, StringComparison.OrdinalIgnoreCase));
+
+                CharacterData characterData = (row.Cells["colData"].Value as CharacterData);
+                Trace.Assert(characterData.IsSplit);
+
+                List<string> splitPaths = characterData.GetSplitPaths();
+
+                HashSet<TypeTypeID> allSplitTypes = new HashSet<TypeTypeID>();
+                HashSet<DBPFKey> allSplitKeys = new HashSet<DBPFKey>();
+                HashSet<DBPFKey> allSplitConflictKeys = new HashSet<DBPFKey>();
+
+                for (int i = 1; i < splitPaths.Count; ++i)
+                {
+                    using (CacheableDbpfFile package = packageCache.OpenForReadOnly(splitPaths[i]))
+                    {
+                        foreach (DBPFEntry entry in package.GetAllEntries())
+                        {
+                            allSplitTypes.Add(entry.TypeID);
+                            allSplitKeys.Add(entry);
+                        }
+
+                        package.Close();
+                    }
+                }
+
+                using (CacheableDbpfFile package = packageCache.OpenForReadOnly(splitPaths[0]))
+                {
+                    foreach (DBPFKey splitKey in allSplitKeys)
+                    {
+                        if (package.GetEntryByKey(splitKey) != null)
+                        {
+                            allSplitConflictKeys.Add(splitKey);
+                        }
+                    }
+
+                    package.Close();
+                }
+
+                using (CacheableDbpfFile mainPackage = packageCache.OpenForReadOnly(splitPaths[0]))
+                {
+                    string nextBackupName;
+
+                    for (int i = 1; i < splitPaths.Count; ++i)
+                    {
+                        using (CacheableDbpfFile package = packageCache.OpenForReadOnly(splitPaths[i]))
+                        {
+                            foreach (DBPFEntry entry in package.GetAllEntries())
+                            {
+                                logger.Debug($"Split: Merging {entry} from {splitPaths[i]} into {splitPaths[0]}");
+                                byte[] data = package.GetDataByKey(entry);
+                                mainPackage.Commit(entry, data);
+                            }
+
+                            nextBackupName = package.NextBackupName();
+                            package.Close();
+                        }
+
+                        // We need to move the splitPaths[i] package out of the way
+                        File.Move(splitPaths[i], nextBackupName);
+                    }
+
+                    mainPackage.SaveAs(splitPaths[splitPaths.Count - 1]);
+
+                    nextBackupName = mainPackage.NextBackupName();
+                    mainPackage.Close();
+
+                    // We need to move the splitPaths[0] package out of the way
+                    File.Move(splitPaths[0], nextBackupName);
+
+                    // We may have totally destroyed the cache by doing this!
+                    Trace.Assert(!packageCache.IsDirty);
+                }
+            }
+
+            DoWork_FillFamilyGrid(lastHoodNode, lastFamilyNode);
         }
         #endregion
 
@@ -1804,14 +1920,28 @@ namespace FamilyManager
             {
                 foreach (DataGridViewRow row in grid.Rows)
                 {
-                    transferData.items.Add(new ClosetData(colPrefix, row));
+                    if (IsCompleteOutfitRow(grid, row)) transferData.items.Add(new ClosetData(colPrefix, row));
                 }
             }
             else
             {
+                List<DataGridViewRow> rows = new List<DataGridViewRow>();
+
                 foreach (DataGridViewRow row in grid.SelectedRows)
                 {
-                    transferData.items.Add(new ClosetData(colPrefix, row));
+                    rows.Add(row);
+                }
+
+                foreach (DataGridViewRow row in rows)
+                {
+                    if (IsCompleteOutfitRow(grid, row))
+                    {
+                        transferData.items.Add(new ClosetData(colPrefix, row));
+                    }
+                    else
+                    {
+                        row.Selected = false;
+                    }
                 }
             }
 
@@ -2334,24 +2464,24 @@ namespace FamilyManager
 
                 if (grid.CurrentRow != null)
                 {
-                    ClosetTransferData closetData = new ClosetTransferData(sender as DataGridView);
+                    ClosetTransferData transferData = new ClosetTransferData(sender as DataGridView);
 
                     if (grid.CurrentRow.Selected)
                     {
                         foreach (DataGridViewRow selectedRow in grid.SelectedRows)
                         {
-                            if (IsCompleteOutfitRow(grid, selectedRow)) closetData.items.Add(new ClosetData(colNamePrefix, selectedRow));
+                            if (IsCompleteOutfitRow(grid, selectedRow)) transferData.items.Add(new ClosetData(colNamePrefix, selectedRow));
                         }
                     }
                     else
                     {
-                        if (IsCompleteOutfitRow(grid, grid.CurrentRow)) closetData.items.Add(new ClosetData(colNamePrefix, grid.CurrentRow));
+                        if (IsCompleteOutfitRow(grid, grid.CurrentRow)) transferData.items.Add(new ClosetData(colNamePrefix, grid.CurrentRow));
                     }
 
-                    if (closetData.items.Count > 0)
+                    if (transferData.items.Count > 0)
                     {
                         thumbBox.Visible = false;
-                        grid.DoDragDrop(closetData, (Form.ModifierKeys == Keys.Control) ? DragDropEffects.Copy : DragDropEffects.Move);
+                        grid.DoDragDrop(transferData, (Form.ModifierKeys == Keys.Control) ? DragDropEffects.Copy : DragDropEffects.Move);
                     }
                 }
             }

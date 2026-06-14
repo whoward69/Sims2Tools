@@ -189,6 +189,44 @@ namespace FamilyManager.Caching
             return thumbnail;
         }
 
+        public List<string> GetSplitPaths()
+        {
+            List<string> splitPaths = new List<string>();
+
+            if (isSplit)
+            {
+                FileInfo fi = new FileInfo(packagePath);
+                string filename = fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length);
+
+                int pos = filename.LastIndexOf(".");
+                if (pos != -1 && int.TryParse(filename.Substring(pos + 1), out int index) && index > 0)
+                {
+                    for (int i = index; i > 0; --i)
+                    {
+                        splitPaths.Add($"{fi.DirectoryName}\\{fi.Name.Substring(0, pos)}.{i}{fi.Extension}");
+                    }
+
+                    splitPaths.Add($"{fi.DirectoryName}\\{fi.Name.Substring(0, pos)}{fi.Extension}");
+                }
+
+                string[] matchFiles = Directory.GetFiles(fi.DirectoryName, $"{fi.Name.Substring(0, pos)}*{fi.Extension}", SearchOption.TopDirectoryOnly);
+                if (matchFiles.Length == splitPaths.Count)
+                {
+                    foreach (string matchFile in matchFiles)
+                    {
+                        if (!splitPaths.Contains(matchFile))
+                        {
+                            return null;
+                        }
+                    }
+
+                    return splitPaths;
+                }
+            }
+
+            return null;
+        }
+
         private DBPFResource GetResource(string splitPackagePath, DBPFKey resKey, out string foundPackagePath)
         {
             DBPFResource res = null;

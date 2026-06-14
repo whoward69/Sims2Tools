@@ -240,9 +240,9 @@ namespace FamilyManager
             get => lotAddress;
             set
             {
-                if (lotAddress == null || !lotAddress.Equals(value))
+                if (ltxtPackagePath != null && (lotAddress == null || !lotAddress.Equals(value)))
                 {
-                    if (FamilyManagerForm.IsDefLang)
+                    if (lotdPackagePath != null && FamilyManagerForm.IsDefLang)
                     {
                         ltxt.LotName = value;
 
@@ -276,9 +276,11 @@ namespace FamilyManager
             get => lotDescription;
             set
             {
-                if (lotDescription == null || !lotDescription.Equals(value))
+                if (ltxtPackagePath != null && (lotDescription == null || !lotDescription.Equals(value)))
                 {
-                    if (FamilyManagerForm.IsDefLang)
+                    if (lotDescription == null && string.IsNullOrWhiteSpace(value)) return; // Don't set null to ""
+
+                    if (lotdPackagePath != null && FamilyManagerForm.IsDefLang)
                     {
                         ltxt.LotDesc = value;
 
@@ -352,7 +354,7 @@ namespace FamilyManager
                                     subhoodPackage = package;
                                     ltxtPackagePath = subhood;
 
-                                    // Leave the package open, we'll close it later
+                                    // Leave the subhoodPackage open, we'll close it later
                                     break;
                                 }
 
@@ -368,18 +370,29 @@ namespace FamilyManager
                         lotDescription = FamilyManagerForm.GetString(ltxtStr, 1);
 
                         lotdPackagePath = $"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods\\{hoodNode.HoodSubFolder}\\Lots\\{hoodNode.HoodSubFolder}_Lot{ltxt.InstanceID.AsUInt()}.package";
-                        using (CacheableDbpfFile lotPackage = packageCache.OpenForReadOnly(lotdPackagePath))
+                        if (File.Exists(lotdPackagePath))
                         {
-                            lotd = (Lotd)lotPackage.GetResourceByKey(new DBPFKey(Lotd.TYPE, DBPFData.GROUP_LOCAL, DBPFData.INSTANCE_NULL, DBPFData.RESOURCE_NULL));
-                            Img img = (Img)lotPackage.GetResourceByKey(new DBPFKey(Img.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x35CA0002, DBPFData.RESOURCE_NULL));
-
-                            if (img != null)
+                            using (CacheableDbpfFile lotPackage = packageCache.OpenForReadOnly(lotdPackagePath))
                             {
-                                lotImage = img.Image;
-                            }
+                                lotd = (Lotd)lotPackage.GetResourceByKey(new DBPFKey(Lotd.TYPE, DBPFData.GROUP_LOCAL, DBPFData.INSTANCE_NULL, DBPFData.RESOURCE_NULL));
+                                Img img = (Img)lotPackage.GetResourceByKey(new DBPFKey(Img.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x35CA0002, DBPFData.RESOURCE_NULL));
 
-                            lotPackage.Close();
+                                if (img != null)
+                                {
+                                    lotImage = img.Image;
+                                }
+
+                                lotPackage.Close();
+                            }
                         }
+                        else
+                        {
+                            lotdPackagePath = null;
+                        }
+                    }
+                    else
+                    {
+                        ltxtPackagePath = null;
                     }
 
                     familyMoney = fami.Money;

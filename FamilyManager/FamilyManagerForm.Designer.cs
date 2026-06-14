@@ -227,6 +227,8 @@ namespace FamilyManager
             this.saveJewelboxFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openJewelboxFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.menuContextMemberSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuContextMemberMergeSplitFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
             this.splitTopBottom.Panel1.SuspendLayout();
@@ -721,50 +723,52 @@ namespace FamilyManager
             this.menuContextMemberChangeDays,
             this.menuContextMemberFilterAll,
             this.menuContextMemberFilterSelected,
-            this.menuContextMemberFilterThis});
+            this.menuContextMemberFilterThis,
+            this.menuContextMemberSeparator1,
+            this.menuContextMemberMergeSplitFiles});
             this.menuContextMembers.Name = "menuContextMembers";
-            this.menuContextMembers.Size = new System.Drawing.Size(223, 136);
+            this.menuContextMembers.Size = new System.Drawing.Size(251, 186);
             this.menuContextMembers.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMembersOpening);
             // 
             // menuContextMemberChangeSimName
             // 
             this.menuContextMemberChangeSimName.Name = "menuContextMemberChangeSimName";
-            this.menuContextMemberChangeSimName.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberChangeSimName.Size = new System.Drawing.Size(250, 22);
             this.menuContextMemberChangeSimName.Text = "Change This Sim\'s &Name";
             this.menuContextMemberChangeSimName.Click += new System.EventHandler(this.OnChangeSimNameClicked);
             // 
             // menuContextMemberChangeFamilyName
             // 
             this.menuContextMemberChangeFamilyName.Name = "menuContextMemberChangeFamilyName";
-            this.menuContextMemberChangeFamilyName.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberChangeFamilyName.Size = new System.Drawing.Size(250, 22);
             this.menuContextMemberChangeFamilyName.Text = "Change &Family Name";
             this.menuContextMemberChangeFamilyName.Click += new System.EventHandler(this.OnChangeFamilyNameClicked);
             // 
             // menuContextMemberChangeDays
             // 
             this.menuContextMemberChangeDays.Name = "menuContextMemberChangeDays";
-            this.menuContextMemberChangeDays.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberChangeDays.Size = new System.Drawing.Size(250, 22);
             this.menuContextMemberChangeDays.Text = "Add/Remove &Days";
             this.menuContextMemberChangeDays.Click += new System.EventHandler(this.OnChangeDaysClicked);
             // 
             // menuContextMemberFilterAll
             // 
             this.menuContextMemberFilterAll.Name = "menuContextMemberFilterAll";
-            this.menuContextMemberFilterAll.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberFilterAll.Size = new System.Drawing.Size(250, 22);
             this.menuContextMemberFilterAll.Text = "Show &All";
             this.menuContextMemberFilterAll.Click += new System.EventHandler(this.OnShowAllClicked);
             // 
             // menuContextMemberFilterSelected
             // 
             this.menuContextMemberFilterSelected.Name = "menuContextMemberFilterSelected";
-            this.menuContextMemberFilterSelected.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberFilterSelected.Size = new System.Drawing.Size(250, 22);
             this.menuContextMemberFilterSelected.Text = "Show only for &Selected Sims";
             this.menuContextMemberFilterSelected.Click += new System.EventHandler(this.OnShowSelectedSimsClicked);
             // 
             // menuContextMemberFilterThis
             // 
             this.menuContextMemberFilterThis.Name = "menuContextMemberFilterThis";
-            this.menuContextMemberFilterThis.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberFilterThis.Size = new System.Drawing.Size(250, 22);
             this.menuContextMemberFilterThis.Text = "Show only for &This Sim";
             this.menuContextMemberFilterThis.Click += new System.EventHandler(this.OnShowThisSimClicked);
             // 
@@ -1033,7 +1037,7 @@ namespace FamilyManager
             this.splitClosetLeftRight.Panel2.Controls.Add(this.btnClosetDelete);
             this.splitClosetLeftRight.Panel2.Controls.Add(this.btnClosetShowAll);
             this.splitClosetLeftRight.Panel2MinSize = 300;
-            this.splitClosetLeftRight.Size = new System.Drawing.Size(982, 204);
+            this.splitClosetLeftRight.Size = new System.Drawing.Size(982, 202);
             this.splitClosetLeftRight.SplitterDistance = 399;
             this.splitClosetLeftRight.TabIndex = 0;
             this.splitClosetLeftRight.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.OnSplitterMoved);
@@ -1077,7 +1081,7 @@ namespace FamilyManager
             this.gridSuitcase.ReadOnly = true;
             this.gridSuitcase.RowHeadersVisible = false;
             this.gridSuitcase.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridSuitcase.Size = new System.Drawing.Size(396, 169);
+            this.gridSuitcase.Size = new System.Drawing.Size(396, 167);
             this.gridSuitcase.TabIndex = 2;
             this.gridSuitcase.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridSuitcase.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -1232,7 +1236,7 @@ namespace FamilyManager
             // btnSuitcaseEmpty
             // 
             this.btnSuitcaseEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseEmpty.Location = new System.Drawing.Point(3, 175);
+            this.btnSuitcaseEmpty.Location = new System.Drawing.Point(3, 173);
             this.btnSuitcaseEmpty.Name = "btnSuitcaseEmpty";
             this.btnSuitcaseEmpty.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseEmpty.TabIndex = 29;
@@ -1243,7 +1247,7 @@ namespace FamilyManager
             // btnSuitcaseSave
             // 
             this.btnSuitcaseSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseSave.Location = new System.Drawing.Point(79, 175);
+            this.btnSuitcaseSave.Location = new System.Drawing.Point(79, 173);
             this.btnSuitcaseSave.Name = "btnSuitcaseSave";
             this.btnSuitcaseSave.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseSave.TabIndex = 32;
@@ -1254,7 +1258,7 @@ namespace FamilyManager
             // btnSuitcaseLoad
             // 
             this.btnSuitcaseLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseLoad.Location = new System.Drawing.Point(155, 175);
+            this.btnSuitcaseLoad.Location = new System.Drawing.Point(155, 173);
             this.btnSuitcaseLoad.Name = "btnSuitcaseLoad";
             this.btnSuitcaseLoad.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseLoad.TabIndex = 33;
@@ -1265,7 +1269,7 @@ namespace FamilyManager
             // btnSuitcaseCopy
             // 
             this.btnSuitcaseCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseCopy.Location = new System.Drawing.Point(231, 175);
+            this.btnSuitcaseCopy.Location = new System.Drawing.Point(231, 173);
             this.btnSuitcaseCopy.Name = "btnSuitcaseCopy";
             this.btnSuitcaseCopy.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseCopy.TabIndex = 30;
@@ -1276,7 +1280,7 @@ namespace FamilyManager
             // btnSuitcaseMove
             // 
             this.btnSuitcaseMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseMove.Location = new System.Drawing.Point(307, 175);
+            this.btnSuitcaseMove.Location = new System.Drawing.Point(307, 173);
             this.btnSuitcaseMove.Name = "btnSuitcaseMove";
             this.btnSuitcaseMove.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseMove.TabIndex = 31;
@@ -1328,7 +1332,7 @@ namespace FamilyManager
             this.gridFamilyCloset.ReadOnly = true;
             this.gridFamilyCloset.RowHeadersVisible = false;
             this.gridFamilyCloset.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridFamilyCloset.Size = new System.Drawing.Size(576, 171);
+            this.gridFamilyCloset.Size = new System.Drawing.Size(576, 169);
             this.gridFamilyCloset.TabIndex = 1;
             this.gridFamilyCloset.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridFamilyCloset.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -1513,7 +1517,7 @@ namespace FamilyManager
             // btnClosetCopy
             // 
             this.btnClosetCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetCopy.Location = new System.Drawing.Point(0, 177);
+            this.btnClosetCopy.Location = new System.Drawing.Point(0, 175);
             this.btnClosetCopy.Name = "btnClosetCopy";
             this.btnClosetCopy.Size = new System.Drawing.Size(88, 26);
             this.btnClosetCopy.TabIndex = 26;
@@ -1524,7 +1528,7 @@ namespace FamilyManager
             // btnClosetMove
             // 
             this.btnClosetMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetMove.Location = new System.Drawing.Point(94, 177);
+            this.btnClosetMove.Location = new System.Drawing.Point(94, 175);
             this.btnClosetMove.Name = "btnClosetMove";
             this.btnClosetMove.Size = new System.Drawing.Size(88, 26);
             this.btnClosetMove.TabIndex = 27;
@@ -1535,7 +1539,7 @@ namespace FamilyManager
             // btnClosetDelete
             // 
             this.btnClosetDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetDelete.Location = new System.Drawing.Point(188, 177);
+            this.btnClosetDelete.Location = new System.Drawing.Point(188, 175);
             this.btnClosetDelete.Name = "btnClosetDelete";
             this.btnClosetDelete.Size = new System.Drawing.Size(88, 26);
             this.btnClosetDelete.TabIndex = 28;
@@ -1546,7 +1550,7 @@ namespace FamilyManager
             // btnClosetShowAll
             // 
             this.btnClosetShowAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetShowAll.Location = new System.Drawing.Point(292, 177);
+            this.btnClosetShowAll.Location = new System.Drawing.Point(292, 175);
             this.btnClosetShowAll.Name = "btnClosetShowAll";
             this.btnClosetShowAll.Size = new System.Drawing.Size(88, 25);
             this.btnClosetShowAll.TabIndex = 29;
@@ -2165,6 +2169,18 @@ namespace FamilyManager
             this.openJewelboxFileDialog.Filter = "Family Manager Jewel Box files|*.fmj|All files|*.*";
             this.openJewelboxFileDialog.Title = "Load Jewellery Items";
             // 
+            // menuContextMemberSeparator1
+            // 
+            this.menuContextMemberSeparator1.Name = "menuContextMemberSeparator1";
+            this.menuContextMemberSeparator1.Size = new System.Drawing.Size(247, 6);
+            // 
+            // menuContextMemberMergeSplitFiles
+            // 
+            this.menuContextMemberMergeSplitFiles.Name = "menuContextMemberMergeSplitFiles";
+            this.menuContextMemberMergeSplitFiles.Size = new System.Drawing.Size(250, 22);
+            this.menuContextMemberMergeSplitFiles.Text = "Merge split files - EXPERIMENTAL";
+            this.menuContextMemberMergeSplitFiles.Click += new System.EventHandler(this.OnMergeSplitFilesClicked);
+            // 
             // FamilyManagerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -2415,5 +2431,7 @@ namespace FamilyManager
         private System.Windows.Forms.ToolStripMenuItem menuContextJewelboxDelete;
         private System.Windows.Forms.ToolStripMenuItem menuContextMemberChangeSimName;
         private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.ToolStripSeparator menuContextMemberSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem menuContextMemberMergeSplitFiles;
     }
 }
