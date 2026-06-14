@@ -12,7 +12,6 @@
 using CsvHelper;
 using Sims2Tools.Cache;
 using Sims2Tools.DBPF;
-using Sims2Tools.DBPF.Cigen;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;

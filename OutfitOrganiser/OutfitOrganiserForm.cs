@@ -13,10 +13,8 @@
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.Cache;
-using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
-using Sims2Tools.DBPF.Cigen;
 using Sims2Tools.DBPF.CLST;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.Images.IMG;
@@ -189,7 +187,12 @@ namespace OutfitOrganiser
             logger.Info(OutfitOrganiserApp.AppProduct);
 
             InitializeComponent();
-            this.Text = OutfitOrganiserApp.AppTitle;
+            SetTitle(lastFolder);
+
+            if (Sims2ToolsLib.IsRunningOnWindows)
+            {
+                gridPackageFiles.MouseDown += new MouseEventHandler(this.OnPkgGrid_MouseDown);
+            }
 
             OutfitDbpfData.SetCache(packageCache);
 
@@ -3842,6 +3845,10 @@ namespace OutfitOrganiser
 
         private void OnPkgGrid_MouseDown(object sender, MouseEventArgs e)
         {
+            // Something weird is happening in here when running under Linux
+
+            if (sender != gridPackageFiles) return; // Should never happen, but I'm feeling paranoid!
+
             if (e.Button == MouseButtons.Left && mouseLocation.RowIndex != -1)
             {
                 if (gridPackageFiles.CurrentRow != null)

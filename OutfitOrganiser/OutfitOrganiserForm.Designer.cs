@@ -10,6 +10,7 @@
  */
  
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Sims2Tools;
 
 namespace OutfitOrganiser
 {
@@ -746,7 +747,6 @@ namespace OutfitOrganiser
             this.gridPackageFiles.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridPackageFiles.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
             this.gridPackageFiles.SelectionChanged += new System.EventHandler(this.OnPackageSelectionChanged);
-            this.gridPackageFiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnPkgGrid_MouseDown);
             // 
             // colPackageFile
             // 
