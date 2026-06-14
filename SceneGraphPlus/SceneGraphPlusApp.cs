@@ -14,13 +14,13 @@ namespace SceneGraphPlus
 {
     static class SceneGraphPlusApp
     {
-        public static string AppName = "SceneGraph PLUS";
+        public static readonly string AppName = "SceneGraph PLUS";
 
-        public static int AppVersionMajor = 2;
-        public static int AppVersionMinor = 7;
+        public static readonly int AppVersionMajor = 2;
+        public static readonly int AppVersionMinor = 8;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 2;
+        private static readonly int AppVersionDebug = 0;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release
@@ -32,12 +32,12 @@ namespace SceneGraphPlus
 #endif
 
 #if DEBUG
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
 #else
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static string RegistryKey = Sims2ToolsLib.RegistryKey + @"\SceneGraphPlus";
+        public static readonly string RegistryKey = Sims2ToolsLib.RegistryKey + @"\SceneGraphPlus";
 
         [STAThread]
         static void Main()
