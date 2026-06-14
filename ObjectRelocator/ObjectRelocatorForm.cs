@@ -188,6 +188,11 @@ namespace ObjectRelocator
             InitializeComponent();
             SetTitle(lastFolder);
 
+            if (Sims2ToolsLib.IsRunningOnWindows)
+            {
+                gridPackageFiles.MouseDown += new MouseEventHandler(OnPkgGrid_MouseDown);
+            }
+
             ObjectDbpfData.SetCache(packageCache);
 
             selectPathDialog = new CommonOpenFileDialog
@@ -4276,6 +4281,10 @@ namespace ObjectRelocator
 
         private void OnPkgGrid_MouseDown(object sender, MouseEventArgs e)
         {
+            // Something weird is happening in here when running under Linux
+
+            if (sender != gridPackageFiles) return; // Should never happen, but I'm feeling paranoid!
+
             if (e.Button == MouseButtons.Left && mouseLocation.RowIndex != -1)
             {
                 if (gridPackageFiles.CurrentRow != null)
