@@ -16,13 +16,13 @@ namespace HoodExporter
 {
     static class HoodExporterApp
     {
-        public static string AppName = "Hood Exporter";
+        public static readonly string AppName = "Hood Exporter";
 
-        public static int AppVersionMajor = 2;
-        public static int AppVersionMinor = 4;
+        public static readonly int AppVersionMajor = 2;
+        public static readonly int AppVersionMinor = 4;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 0;
+        private static readonly int AppVersionDebug = 1;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release
@@ -34,12 +34,12 @@ namespace HoodExporter
 #endif
 
 #if DEBUG
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
 #else
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\HoodExporter";
+        public static readonly string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\HoodExporter";
 
         [STAThread]
         static void Main()

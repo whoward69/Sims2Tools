@@ -347,7 +347,7 @@ namespace HoodExporter
                     doc.InsertBefore(xmlDeclaration, root);
 
                     DateTime now = DateTime.Now;
-                    doc.AppendChild(doc.CreateComment($"{now.ToShortDateString()} {now.ToShortTimeString()}"));
+                    doc.AppendChild(doc.CreateComment($"{now:d} {now:t}"));
 
                     XmlElement eleHood = doc.CreateElement(string.Empty, "hood", string.Empty);
                     doc.AppendChild(eleHood);
@@ -502,7 +502,9 @@ namespace HoodExporter
 
                                 if (isMainHood && str.TypeID == Str.TYPE)
                                 {
-                                    strTitleById.Add(str.InstanceID, str.LanguageItems(MetaData.Languages.Default)[0].Title);
+                                    string title = str.LanguageItems(MetaData.Languages.Default)?[0]?.Title;
+
+                                    if (title != null) strTitleById.Add(str.InstanceID, title);
                                 }
                             }
 
@@ -638,7 +640,7 @@ namespace HoodExporter
                                         string lifeStage = fi.Name.Substring(fi.Name.IndexOf("_") + 1);
                                         lifeStage = lifeStage.Substring(0, lifeStage.Length - 4);
 
-                                        string suffix = lifeStage.Equals(sdsc.SimBase.LifeSection.ToString()) ? "" : $"_{lifeStage}";
+                                        string suffix = lifeStage.Equals(sdsc.LifeSection.ToString()) ? "" : $"_{lifeStage}";
                                         string newName = Path.Combine(fi.DirectoryName, $"{hoodCode}_{sdsc.InstanceID.AsUInt()}{suffix}{fi.Extension}");
 
                                         if (File.Exists(newName))
