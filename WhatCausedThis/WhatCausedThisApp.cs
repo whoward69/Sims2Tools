@@ -16,10 +16,10 @@ namespace WhatCausedThis
 {
     static class WhatCausedThisApp
     {
-        public static string AppName = "What Caused This";
+        public static readonly string AppName = "What Caused This";
 
-        public static int AppVersionMajor = 2;
-        public static int AppVersionMinor = 3;
+        public static readonly int AppVersionMajor = 2;
+        public static readonly int AppVersionMinor = 3;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;
@@ -34,12 +34,12 @@ namespace WhatCausedThis
 #endif
 
 #if DEBUG
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
 #else
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\WhatCausedThis";
+        public static readonly string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\WhatCausedThis";
 
         [STAThread]
         static void Main()
