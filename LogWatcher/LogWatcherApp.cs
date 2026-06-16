@@ -14,10 +14,10 @@ namespace LogWatcher
 {
     static class LogWatcherApp
     {
-        public static string AppName = "Log Watcher";
+        public static readonly string AppName = "Log Watcher";
 
-        public static int AppVersionMajor = 2;
-        public static int AppVersionMinor = 5;
+        public static readonly int AppVersionMajor = 2;
+        public static readonly int AppVersionMinor = 5;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;
@@ -32,12 +32,12 @@ namespace LogWatcher
 #endif
 
 #if DEBUG
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
 #else
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static string RegistryKey = Sims2ToolsLib.RegistryKey + @"\LogWatcher";
+        public static readonly string RegistryKey = Sims2ToolsLib.RegistryKey + @"\LogWatcher";
 
         [STAThread]
         static void Main()
