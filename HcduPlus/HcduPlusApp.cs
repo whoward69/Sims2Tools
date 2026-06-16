@@ -16,13 +16,13 @@ namespace HcduPlus
 {
     static class HcduPlusApp
     {
-        public static string AppName = "HCDU Plus";
+        public static readonly string AppName = "HCDU Plus";
 
-        public static int AppVersionMajor = 4;
-        public static int AppVersionMinor = 5;
+        public static readonly int AppVersionMajor = 4;
+        public static readonly int AppVersionMinor = 6;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 3;
+        private static readonly int AppVersionDebug = 0;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release
@@ -34,12 +34,12 @@ namespace HcduPlus
 #endif
 
 #if DEBUG
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
 #else
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\HcduPlus";
+        public static readonly string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\HcduPlus";
 
         [STAThread]
         static void Main()
