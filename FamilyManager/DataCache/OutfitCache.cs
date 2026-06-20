@@ -164,6 +164,9 @@ namespace FamilyManager.Caching
 
         private string errorPackagePath = null;
 
+        public int MaxisItems => maxisOutfitCache.Count;
+        public int CustomItems => customOutfitCache.Count;
+
         public string ErrorPackagePath => errorPackagePath;
 
         public OutfitCache(string cachePath, string maxisOutfit, string customOutfit)
@@ -271,6 +274,7 @@ namespace FamilyManager.Caching
                 foreach (string pathKey in Sims2ToolsLib.Sims2PathsInReverseLoadOrder)
                 {
                     string baseFolder = RegistryTools.GetPath(Sims2ToolsLib.RegistryKey, pathKey);
+                    logger.Debug($"Maxis Outfit: Looking for {baseFolder}");
 
                     if (Directory.Exists(baseFolder))
                     {
@@ -284,6 +288,7 @@ namespace FamilyManager.Caching
                             }
 
                             sender.SetProgress((int)progress, $"{pathKey}: {packagePath.Substring(baseFolder.Length + 1)}");
+                            logger.Debug($"Maxis Outfit: Processing {packagePath}");
 
                             using (DBPFFile package = new DBPFFile(packagePath))
                             {
@@ -331,8 +336,17 @@ namespace FamilyManager.Caching
             string downloadPath = Sims2ToolsLib.Sims2DownloadsPath;
             string savedsimsPath = Sims2ToolsLib.Sims2SavedSimsPath;
 
-            string[] downloadPaths = Directory.GetFiles(downloadPath, "*.package", SearchOption.AllDirectories);
-            string[] savedsimsPaths = Directory.GetFiles(savedsimsPath, "*.package", SearchOption.AllDirectories);
+            string[] downloadPaths = new string[0];
+            if (Directory.Exists(downloadPath))
+            {
+                downloadPaths = Directory.GetFiles(downloadPath, "*.package", SearchOption.AllDirectories);
+            }
+
+            string[] savedsimsPaths = new string[0];
+            if (Directory.Exists(savedsimsPath))
+            {
+                savedsimsPaths = Directory.GetFiles(savedsimsPath, "*.package", SearchOption.AllDirectories);
+            }
 
             long totalPaths = downloadPaths.Length + savedsimsPaths.Length;
 

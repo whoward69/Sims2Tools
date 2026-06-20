@@ -58,9 +58,12 @@ namespace FamilyManager
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemUseCodes = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparatorSplitFiles = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemShowSplitFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemHighlightSplitFiles = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemIncludeNPCs = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOnlyNPCs = new System.Windows.Forms.ToolStripMenuItem();
             this.menuLanguage = new System.Windows.Forms.ToolStripMenuItem();
             this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCachingUpdateMaxisClothes = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,17 +81,6 @@ namespace FamilyManager
             this.lblFamilyName = new System.Windows.Forms.Label();
             this.imageFamily = new System.Windows.Forms.PictureBox();
             this.gridFamilyMembers = new System.Windows.Forms.DataGridView();
-            this.colFirstName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colSplitFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colGender = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colGenderCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAgeCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colDaysLeft = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colGenderHex = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colAgeHex = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colThumbnail = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextMembers = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuContextMemberChangeSimName = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextMemberChangeFamilyName = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,6 +88,8 @@ namespace FamilyManager
             this.menuContextMemberFilterAll = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextMemberFilterSelected = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextMemberFilterThis = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextMemberSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuContextMemberMergeSplitFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPages = new System.Windows.Forms.TabControl();
             this.tabFamily = new System.Windows.Forms.TabPage();
             this.panelFamily = new System.Windows.Forms.Panel();
@@ -227,8 +221,17 @@ namespace FamilyManager
             this.saveJewelboxFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openJewelboxFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.menuContextMemberSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuContextMemberMergeSplitFiles = new System.Windows.Forms.ToolStripMenuItem();
+            this.colFirstName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colSplitFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colGender = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colGenderCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAgeCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDaysLeft = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colGenderHex = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colAgeHex = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colThumbnail = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colData = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
             this.splitTopBottom.Panel1.SuspendLayout();
@@ -385,9 +388,12 @@ namespace FamilyManager
             // 
             this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemUseCodes,
-            this.toolStripSeparator6,
+            this.toolStripSeparatorSplitFiles,
             this.menuItemShowSplitFiles,
-            this.menuItemHighlightSplitFiles});
+            this.menuItemHighlightSplitFiles,
+            this.toolStripSeparator1,
+            this.menuItemIncludeNPCs,
+            this.menuItemOnlyNPCs});
             this.menuOptions.Name = "menuOptions";
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
@@ -401,10 +407,10 @@ namespace FamilyManager
             this.menuItemUseCodes.Text = "Use Gender/Age Codes";
             this.menuItemUseCodes.Click += new System.EventHandler(this.OnUseCodesClicked);
             // 
-            // toolStripSeparator6
+            // toolStripSeparatorSplitFiles
             // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(227, 6);
+            this.toolStripSeparatorSplitFiles.Name = "toolStripSeparatorSplitFiles";
+            this.toolStripSeparatorSplitFiles.Size = new System.Drawing.Size(227, 6);
             // 
             // menuItemShowSplitFiles
             // 
@@ -421,6 +427,27 @@ namespace FamilyManager
             this.menuItemHighlightSplitFiles.Size = new System.Drawing.Size(230, 22);
             this.menuItemHighlightSplitFiles.Text = "Highlight Split Character Files";
             this.menuItemHighlightSplitFiles.Click += new System.EventHandler(this.OnHighlightSplitFilesClicked);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(227, 6);
+            // 
+            // menuItemIncludeNPCs
+            // 
+            this.menuItemIncludeNPCs.CheckOnClick = true;
+            this.menuItemIncludeNPCs.Name = "menuItemIncludeNPCs";
+            this.menuItemIncludeNPCs.Size = new System.Drawing.Size(230, 22);
+            this.menuItemIncludeNPCs.Text = "Include NPCs";
+            this.menuItemIncludeNPCs.Click += new System.EventHandler(this.OnIncludeNPCsClicked);
+            // 
+            // menuItemOnlyNPCs
+            // 
+            this.menuItemOnlyNPCs.CheckOnClick = true;
+            this.menuItemOnlyNPCs.Name = "menuItemOnlyNPCs";
+            this.menuItemOnlyNPCs.Size = new System.Drawing.Size(230, 22);
+            this.menuItemOnlyNPCs.Text = "Only NPCs";
+            this.menuItemOnlyNPCs.Click += new System.EventHandler(this.OnIncludeNPCsClicked);
             // 
             // menuLanguage
             // 
@@ -616,104 +643,8 @@ namespace FamilyManager
             this.gridFamilyMembers.TabIndex = 0;
             this.gridFamilyMembers.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridFamilyMembers.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
-            // 
-            // colFirstName
-            // 
-            this.colFirstName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colFirstName.DataPropertyName = "FirstName";
-            this.colFirstName.HeaderText = "Name";
-            this.colFirstName.Name = "colFirstName";
-            this.colFirstName.ReadOnly = true;
-            // 
-            // colSplitFile
-            // 
-            this.colSplitFile.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colSplitFile.DataPropertyName = "SplitFile";
-            this.colSplitFile.HeaderText = "Split";
-            this.colSplitFile.Name = "colSplitFile";
-            this.colSplitFile.ReadOnly = true;
-            this.colSplitFile.ToolTipText = "Character file is split";
-            this.colSplitFile.Width = 56;
-            // 
-            // colGender
-            // 
-            this.colGender.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colGender.DataPropertyName = "Gender";
-            this.colGender.FillWeight = 75F;
-            this.colGender.HeaderText = "Gender";
-            this.colGender.Name = "colGender";
-            this.colGender.ReadOnly = true;
-            this.colGender.Width = 73;
-            // 
-            // colGenderCode
-            // 
-            this.colGenderCode.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colGenderCode.DataPropertyName = "GenderCode";
-            this.colGenderCode.HeaderText = "⚥";
-            this.colGenderCode.Name = "colGenderCode";
-            this.colGenderCode.ReadOnly = true;
-            this.colGenderCode.Visible = false;
-            // 
-            // colAge
-            // 
-            this.colAge.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colAge.DataPropertyName = "Age";
-            this.colAge.FillWeight = 55F;
-            this.colAge.HeaderText = "Age";
-            this.colAge.Name = "colAge";
-            this.colAge.ReadOnly = true;
-            this.colAge.Width = 53;
-            // 
-            // colAgeCode
-            // 
-            this.colAgeCode.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colAgeCode.DataPropertyName = "AgeCode";
-            this.colAgeCode.HeaderText = "Age";
-            this.colAgeCode.Name = "colAgeCode";
-            this.colAgeCode.ReadOnly = true;
-            this.colAgeCode.Visible = false;
-            // 
-            // colDaysLeft
-            // 
-            this.colDaysLeft.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.colDaysLeft.DataPropertyName = "DaysLeft";
-            this.colDaysLeft.FillWeight = 75F;
-            this.colDaysLeft.HeaderText = "Left";
-            this.colDaysLeft.Name = "colDaysLeft";
-            this.colDaysLeft.ReadOnly = true;
-            this.colDaysLeft.Width = 52;
-            // 
-            // colGenderHex
-            // 
-            this.colGenderHex.DataPropertyName = "GenderHex";
-            this.colGenderHex.HeaderText = "Gender Hex";
-            this.colGenderHex.Name = "colGenderHex";
-            this.colGenderHex.ReadOnly = true;
-            this.colGenderHex.Visible = false;
-            // 
-            // colAgeHex
-            // 
-            this.colAgeHex.DataPropertyName = "AgeHex";
-            this.colAgeHex.HeaderText = "Age Hex";
-            this.colAgeHex.Name = "colAgeHex";
-            this.colAgeHex.ReadOnly = true;
-            this.colAgeHex.Visible = false;
-            // 
-            // colThumbnail
-            // 
-            this.colThumbnail.DataPropertyName = "Thumbnail";
-            this.colThumbnail.HeaderText = "Thumbnail";
-            this.colThumbnail.Name = "colThumbnail";
-            this.colThumbnail.ReadOnly = true;
-            this.colThumbnail.Visible = false;
-            // 
-            // colData
-            // 
-            this.colData.DataPropertyName = "Data";
-            this.colData.HeaderText = "Data";
-            this.colData.Name = "colData";
-            this.colData.ReadOnly = true;
-            this.colData.Visible = false;
+            this.gridFamilyMembers.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
+            this.gridFamilyMembers.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnDataBindingComplete);
             // 
             // menuContextMembers
             // 
@@ -727,50 +658,62 @@ namespace FamilyManager
             this.menuContextMemberSeparator1,
             this.menuContextMemberMergeSplitFiles});
             this.menuContextMembers.Name = "menuContextMembers";
-            this.menuContextMembers.Size = new System.Drawing.Size(251, 186);
+            this.menuContextMembers.Size = new System.Drawing.Size(223, 164);
             this.menuContextMembers.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMembersOpening);
             // 
             // menuContextMemberChangeSimName
             // 
             this.menuContextMemberChangeSimName.Name = "menuContextMemberChangeSimName";
-            this.menuContextMemberChangeSimName.Size = new System.Drawing.Size(250, 22);
+            this.menuContextMemberChangeSimName.Size = new System.Drawing.Size(222, 22);
             this.menuContextMemberChangeSimName.Text = "Change This Sim\'s &Name";
             this.menuContextMemberChangeSimName.Click += new System.EventHandler(this.OnChangeSimNameClicked);
             // 
             // menuContextMemberChangeFamilyName
             // 
             this.menuContextMemberChangeFamilyName.Name = "menuContextMemberChangeFamilyName";
-            this.menuContextMemberChangeFamilyName.Size = new System.Drawing.Size(250, 22);
+            this.menuContextMemberChangeFamilyName.Size = new System.Drawing.Size(222, 22);
             this.menuContextMemberChangeFamilyName.Text = "Change &Family Name";
             this.menuContextMemberChangeFamilyName.Click += new System.EventHandler(this.OnChangeFamilyNameClicked);
             // 
             // menuContextMemberChangeDays
             // 
             this.menuContextMemberChangeDays.Name = "menuContextMemberChangeDays";
-            this.menuContextMemberChangeDays.Size = new System.Drawing.Size(250, 22);
+            this.menuContextMemberChangeDays.Size = new System.Drawing.Size(222, 22);
             this.menuContextMemberChangeDays.Text = "Add/Remove &Days";
             this.menuContextMemberChangeDays.Click += new System.EventHandler(this.OnChangeDaysClicked);
             // 
             // menuContextMemberFilterAll
             // 
             this.menuContextMemberFilterAll.Name = "menuContextMemberFilterAll";
-            this.menuContextMemberFilterAll.Size = new System.Drawing.Size(250, 22);
+            this.menuContextMemberFilterAll.Size = new System.Drawing.Size(222, 22);
             this.menuContextMemberFilterAll.Text = "Show &All";
             this.menuContextMemberFilterAll.Click += new System.EventHandler(this.OnShowAllClicked);
             // 
             // menuContextMemberFilterSelected
             // 
             this.menuContextMemberFilterSelected.Name = "menuContextMemberFilterSelected";
-            this.menuContextMemberFilterSelected.Size = new System.Drawing.Size(250, 22);
+            this.menuContextMemberFilterSelected.Size = new System.Drawing.Size(222, 22);
             this.menuContextMemberFilterSelected.Text = "Show only for &Selected Sims";
             this.menuContextMemberFilterSelected.Click += new System.EventHandler(this.OnShowSelectedSimsClicked);
             // 
             // menuContextMemberFilterThis
             // 
             this.menuContextMemberFilterThis.Name = "menuContextMemberFilterThis";
-            this.menuContextMemberFilterThis.Size = new System.Drawing.Size(250, 22);
+            this.menuContextMemberFilterThis.Size = new System.Drawing.Size(222, 22);
             this.menuContextMemberFilterThis.Text = "Show only for &This Sim";
             this.menuContextMemberFilterThis.Click += new System.EventHandler(this.OnShowThisSimClicked);
+            // 
+            // menuContextMemberSeparator1
+            // 
+            this.menuContextMemberSeparator1.Name = "menuContextMemberSeparator1";
+            this.menuContextMemberSeparator1.Size = new System.Drawing.Size(219, 6);
+            // 
+            // menuContextMemberMergeSplitFiles
+            // 
+            this.menuContextMemberMergeSplitFiles.Name = "menuContextMemberMergeSplitFiles";
+            this.menuContextMemberMergeSplitFiles.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberMergeSplitFiles.Text = "Merge Split Files";
+            this.menuContextMemberMergeSplitFiles.Click += new System.EventHandler(this.OnMergeSplitFilesClicked);
             // 
             // tabPages
             // 
@@ -801,6 +744,9 @@ namespace FamilyManager
             // 
             // panelFamily
             // 
+            this.panelFamily.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelFamily.Controls.Add(this.ckbFamilyNameSelected);
             this.panelFamily.Controls.Add(this.ckbFamilyNameSame);
             this.panelFamily.Controls.Add(this.ckbFamilyNameAll);
@@ -1037,7 +983,7 @@ namespace FamilyManager
             this.splitClosetLeftRight.Panel2.Controls.Add(this.btnClosetDelete);
             this.splitClosetLeftRight.Panel2.Controls.Add(this.btnClosetShowAll);
             this.splitClosetLeftRight.Panel2MinSize = 300;
-            this.splitClosetLeftRight.Size = new System.Drawing.Size(982, 202);
+            this.splitClosetLeftRight.Size = new System.Drawing.Size(982, 200);
             this.splitClosetLeftRight.SplitterDistance = 399;
             this.splitClosetLeftRight.TabIndex = 0;
             this.splitClosetLeftRight.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.OnSplitterMoved);
@@ -1081,13 +1027,13 @@ namespace FamilyManager
             this.gridSuitcase.ReadOnly = true;
             this.gridSuitcase.RowHeadersVisible = false;
             this.gridSuitcase.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridSuitcase.Size = new System.Drawing.Size(396, 167);
+            this.gridSuitcase.Size = new System.Drawing.Size(396, 165);
             this.gridSuitcase.TabIndex = 2;
             this.gridSuitcase.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridSuitcase.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridSuitcase.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
             this.gridSuitcase.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
-            this.gridSuitcase.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
+            this.gridSuitcase.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnDataBindingComplete);
             this.gridSuitcase.SelectionChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridSuitcase.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnGridDragDrop);
             this.gridSuitcase.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnGridDragEnter);
@@ -1236,7 +1182,7 @@ namespace FamilyManager
             // btnSuitcaseEmpty
             // 
             this.btnSuitcaseEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseEmpty.Location = new System.Drawing.Point(3, 173);
+            this.btnSuitcaseEmpty.Location = new System.Drawing.Point(3, 171);
             this.btnSuitcaseEmpty.Name = "btnSuitcaseEmpty";
             this.btnSuitcaseEmpty.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseEmpty.TabIndex = 29;
@@ -1247,7 +1193,7 @@ namespace FamilyManager
             // btnSuitcaseSave
             // 
             this.btnSuitcaseSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseSave.Location = new System.Drawing.Point(79, 173);
+            this.btnSuitcaseSave.Location = new System.Drawing.Point(79, 171);
             this.btnSuitcaseSave.Name = "btnSuitcaseSave";
             this.btnSuitcaseSave.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseSave.TabIndex = 32;
@@ -1258,7 +1204,7 @@ namespace FamilyManager
             // btnSuitcaseLoad
             // 
             this.btnSuitcaseLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseLoad.Location = new System.Drawing.Point(155, 173);
+            this.btnSuitcaseLoad.Location = new System.Drawing.Point(155, 171);
             this.btnSuitcaseLoad.Name = "btnSuitcaseLoad";
             this.btnSuitcaseLoad.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseLoad.TabIndex = 33;
@@ -1269,7 +1215,7 @@ namespace FamilyManager
             // btnSuitcaseCopy
             // 
             this.btnSuitcaseCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseCopy.Location = new System.Drawing.Point(231, 173);
+            this.btnSuitcaseCopy.Location = new System.Drawing.Point(231, 171);
             this.btnSuitcaseCopy.Name = "btnSuitcaseCopy";
             this.btnSuitcaseCopy.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseCopy.TabIndex = 30;
@@ -1280,7 +1226,7 @@ namespace FamilyManager
             // btnSuitcaseMove
             // 
             this.btnSuitcaseMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseMove.Location = new System.Drawing.Point(307, 173);
+            this.btnSuitcaseMove.Location = new System.Drawing.Point(307, 171);
             this.btnSuitcaseMove.Name = "btnSuitcaseMove";
             this.btnSuitcaseMove.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseMove.TabIndex = 31;
@@ -1332,13 +1278,13 @@ namespace FamilyManager
             this.gridFamilyCloset.ReadOnly = true;
             this.gridFamilyCloset.RowHeadersVisible = false;
             this.gridFamilyCloset.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridFamilyCloset.Size = new System.Drawing.Size(576, 169);
+            this.gridFamilyCloset.Size = new System.Drawing.Size(576, 167);
             this.gridFamilyCloset.TabIndex = 1;
             this.gridFamilyCloset.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridFamilyCloset.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridFamilyCloset.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
             this.gridFamilyCloset.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
-            this.gridFamilyCloset.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
+            this.gridFamilyCloset.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnDataBindingComplete);
             this.gridFamilyCloset.SelectionChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridFamilyCloset.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnGridDragDrop);
             this.gridFamilyCloset.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnGridDragEnter);
@@ -1517,7 +1463,7 @@ namespace FamilyManager
             // btnClosetCopy
             // 
             this.btnClosetCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetCopy.Location = new System.Drawing.Point(0, 175);
+            this.btnClosetCopy.Location = new System.Drawing.Point(0, 173);
             this.btnClosetCopy.Name = "btnClosetCopy";
             this.btnClosetCopy.Size = new System.Drawing.Size(88, 26);
             this.btnClosetCopy.TabIndex = 26;
@@ -1528,7 +1474,7 @@ namespace FamilyManager
             // btnClosetMove
             // 
             this.btnClosetMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetMove.Location = new System.Drawing.Point(94, 175);
+            this.btnClosetMove.Location = new System.Drawing.Point(94, 173);
             this.btnClosetMove.Name = "btnClosetMove";
             this.btnClosetMove.Size = new System.Drawing.Size(88, 26);
             this.btnClosetMove.TabIndex = 27;
@@ -1539,7 +1485,7 @@ namespace FamilyManager
             // btnClosetDelete
             // 
             this.btnClosetDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetDelete.Location = new System.Drawing.Point(188, 175);
+            this.btnClosetDelete.Location = new System.Drawing.Point(188, 173);
             this.btnClosetDelete.Name = "btnClosetDelete";
             this.btnClosetDelete.Size = new System.Drawing.Size(88, 26);
             this.btnClosetDelete.TabIndex = 28;
@@ -1550,7 +1496,7 @@ namespace FamilyManager
             // btnClosetShowAll
             // 
             this.btnClosetShowAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetShowAll.Location = new System.Drawing.Point(292, 175);
+            this.btnClosetShowAll.Location = new System.Drawing.Point(292, 173);
             this.btnClosetShowAll.Name = "btnClosetShowAll";
             this.btnClosetShowAll.Size = new System.Drawing.Size(88, 25);
             this.btnClosetShowAll.TabIndex = 29;
@@ -1596,9 +1542,10 @@ namespace FamilyManager
             this.splitSafeLeftRight.Panel2.Controls.Add(this.btnSafeDelete);
             this.splitSafeLeftRight.Panel2.Controls.Add(this.btnSafeShowAll);
             this.splitSafeLeftRight.Panel2MinSize = 300;
-            this.splitSafeLeftRight.Size = new System.Drawing.Size(982, 204);
+            this.splitSafeLeftRight.Size = new System.Drawing.Size(982, 200);
             this.splitSafeLeftRight.SplitterDistance = 399;
             this.splitSafeLeftRight.TabIndex = 1;
+            this.splitSafeLeftRight.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.OnSplitterMoved);
             // 
             // gridJewelbox
             // 
@@ -1639,13 +1586,13 @@ namespace FamilyManager
             this.gridJewelbox.ReadOnly = true;
             this.gridJewelbox.RowHeadersVisible = false;
             this.gridJewelbox.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridJewelbox.Size = new System.Drawing.Size(396, 169);
+            this.gridJewelbox.Size = new System.Drawing.Size(396, 165);
             this.gridJewelbox.TabIndex = 2;
             this.gridJewelbox.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridJewelbox.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridJewelbox.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
             this.gridJewelbox.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
-            this.gridJewelbox.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
+            this.gridJewelbox.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnDataBindingComplete);
             this.gridJewelbox.SelectionChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridJewelbox.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnGridDragDrop);
             this.gridJewelbox.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnGridDragEnter);
@@ -1794,7 +1741,7 @@ namespace FamilyManager
             // btnJewelboxEmpty
             // 
             this.btnJewelboxEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxEmpty.Location = new System.Drawing.Point(3, 175);
+            this.btnJewelboxEmpty.Location = new System.Drawing.Point(3, 171);
             this.btnJewelboxEmpty.Name = "btnJewelboxEmpty";
             this.btnJewelboxEmpty.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxEmpty.TabIndex = 29;
@@ -1805,7 +1752,7 @@ namespace FamilyManager
             // btnJewelboxSave
             // 
             this.btnJewelboxSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxSave.Location = new System.Drawing.Point(79, 175);
+            this.btnJewelboxSave.Location = new System.Drawing.Point(79, 171);
             this.btnJewelboxSave.Name = "btnJewelboxSave";
             this.btnJewelboxSave.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxSave.TabIndex = 32;
@@ -1816,7 +1763,7 @@ namespace FamilyManager
             // btnJewelboxLoad
             // 
             this.btnJewelboxLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxLoad.Location = new System.Drawing.Point(155, 175);
+            this.btnJewelboxLoad.Location = new System.Drawing.Point(155, 171);
             this.btnJewelboxLoad.Name = "btnJewelboxLoad";
             this.btnJewelboxLoad.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxLoad.TabIndex = 33;
@@ -1827,7 +1774,7 @@ namespace FamilyManager
             // btnJewelboxCopy
             // 
             this.btnJewelboxCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxCopy.Location = new System.Drawing.Point(231, 175);
+            this.btnJewelboxCopy.Location = new System.Drawing.Point(231, 171);
             this.btnJewelboxCopy.Name = "btnJewelboxCopy";
             this.btnJewelboxCopy.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxCopy.TabIndex = 30;
@@ -1838,7 +1785,7 @@ namespace FamilyManager
             // btnJewelboxMove
             // 
             this.btnJewelboxMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxMove.Location = new System.Drawing.Point(307, 175);
+            this.btnJewelboxMove.Location = new System.Drawing.Point(307, 171);
             this.btnJewelboxMove.Name = "btnJewelboxMove";
             this.btnJewelboxMove.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxMove.TabIndex = 31;
@@ -1890,13 +1837,13 @@ namespace FamilyManager
             this.gridFamilySafe.ReadOnly = true;
             this.gridFamilySafe.RowHeadersVisible = false;
             this.gridFamilySafe.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridFamilySafe.Size = new System.Drawing.Size(576, 169);
+            this.gridFamilySafe.Size = new System.Drawing.Size(576, 165);
             this.gridFamilySafe.TabIndex = 1;
             this.gridFamilySafe.MultiSelectChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridFamilySafe.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridFamilySafe.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
             this.gridFamilySafe.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
-            this.gridFamilySafe.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
+            this.gridFamilySafe.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnDataBindingComplete);
             this.gridFamilySafe.SelectionChanged += new System.EventHandler(this.OnGridSelectionChanged);
             this.gridFamilySafe.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnGridDragDrop);
             this.gridFamilySafe.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnGridDragEnter);
@@ -2075,7 +2022,7 @@ namespace FamilyManager
             // btnSafeCopy
             // 
             this.btnSafeCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeCopy.Location = new System.Drawing.Point(0, 175);
+            this.btnSafeCopy.Location = new System.Drawing.Point(0, 171);
             this.btnSafeCopy.Name = "btnSafeCopy";
             this.btnSafeCopy.Size = new System.Drawing.Size(88, 26);
             this.btnSafeCopy.TabIndex = 26;
@@ -2086,7 +2033,7 @@ namespace FamilyManager
             // btnSafeMove
             // 
             this.btnSafeMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeMove.Location = new System.Drawing.Point(94, 175);
+            this.btnSafeMove.Location = new System.Drawing.Point(94, 171);
             this.btnSafeMove.Name = "btnSafeMove";
             this.btnSafeMove.Size = new System.Drawing.Size(88, 26);
             this.btnSafeMove.TabIndex = 27;
@@ -2097,7 +2044,7 @@ namespace FamilyManager
             // btnSafeDelete
             // 
             this.btnSafeDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeDelete.Location = new System.Drawing.Point(188, 175);
+            this.btnSafeDelete.Location = new System.Drawing.Point(188, 171);
             this.btnSafeDelete.Name = "btnSafeDelete";
             this.btnSafeDelete.Size = new System.Drawing.Size(88, 26);
             this.btnSafeDelete.TabIndex = 28;
@@ -2108,7 +2055,7 @@ namespace FamilyManager
             // btnSafeShowAll
             // 
             this.btnSafeShowAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeShowAll.Location = new System.Drawing.Point(292, 175);
+            this.btnSafeShowAll.Location = new System.Drawing.Point(292, 171);
             this.btnSafeShowAll.Name = "btnSafeShowAll";
             this.btnSafeShowAll.Size = new System.Drawing.Size(88, 26);
             this.btnSafeShowAll.TabIndex = 29;
@@ -2169,17 +2116,104 @@ namespace FamilyManager
             this.openJewelboxFileDialog.Filter = "Family Manager Jewel Box files|*.fmj|All files|*.*";
             this.openJewelboxFileDialog.Title = "Load Jewellery Items";
             // 
-            // menuContextMemberSeparator1
+            // colFirstName
             // 
-            this.menuContextMemberSeparator1.Name = "menuContextMemberSeparator1";
-            this.menuContextMemberSeparator1.Size = new System.Drawing.Size(247, 6);
+            this.colFirstName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colFirstName.DataPropertyName = "FirstName";
+            this.colFirstName.HeaderText = "Name";
+            this.colFirstName.Name = "colFirstName";
+            this.colFirstName.ReadOnly = true;
             // 
-            // menuContextMemberMergeSplitFiles
+            // colSplitFile
             // 
-            this.menuContextMemberMergeSplitFiles.Name = "menuContextMemberMergeSplitFiles";
-            this.menuContextMemberMergeSplitFiles.Size = new System.Drawing.Size(250, 22);
-            this.menuContextMemberMergeSplitFiles.Text = "Merge split files - EXPERIMENTAL";
-            this.menuContextMemberMergeSplitFiles.Click += new System.EventHandler(this.OnMergeSplitFilesClicked);
+            this.colSplitFile.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colSplitFile.DataPropertyName = "SplitFile";
+            this.colSplitFile.HeaderText = "Split";
+            this.colSplitFile.Name = "colSplitFile";
+            this.colSplitFile.ReadOnly = true;
+            this.colSplitFile.ToolTipText = "Character file is split";
+            this.colSplitFile.Width = 56;
+            // 
+            // colGender
+            // 
+            this.colGender.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colGender.DataPropertyName = "Gender";
+            this.colGender.FillWeight = 75F;
+            this.colGender.HeaderText = "Gender";
+            this.colGender.Name = "colGender";
+            this.colGender.ReadOnly = true;
+            this.colGender.Width = 73;
+            // 
+            // colGenderCode
+            // 
+            this.colGenderCode.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colGenderCode.DataPropertyName = "GenderCode";
+            this.colGenderCode.HeaderText = "⚥";
+            this.colGenderCode.Name = "colGenderCode";
+            this.colGenderCode.ReadOnly = true;
+            this.colGenderCode.Visible = false;
+            this.colGenderCode.Width = 40;
+            // 
+            // colAge
+            // 
+            this.colAge.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colAge.DataPropertyName = "Age";
+            this.colAge.FillWeight = 55F;
+            this.colAge.HeaderText = "Age";
+            this.colAge.Name = "colAge";
+            this.colAge.ReadOnly = true;
+            this.colAge.Width = 53;
+            // 
+            // colAgeCode
+            // 
+            this.colAgeCode.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colAgeCode.DataPropertyName = "AgeCode";
+            this.colAgeCode.HeaderText = "Age";
+            this.colAgeCode.Name = "colAgeCode";
+            this.colAgeCode.ReadOnly = true;
+            this.colAgeCode.Visible = false;
+            this.colAgeCode.Width = 53;
+            // 
+            // colDaysLeft
+            // 
+            this.colDaysLeft.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colDaysLeft.DataPropertyName = "DaysLeft";
+            this.colDaysLeft.FillWeight = 75F;
+            this.colDaysLeft.HeaderText = "Left";
+            this.colDaysLeft.Name = "colDaysLeft";
+            this.colDaysLeft.ReadOnly = true;
+            // 
+            // colGenderHex
+            // 
+            this.colGenderHex.DataPropertyName = "GenderHex";
+            this.colGenderHex.HeaderText = "Gender Hex";
+            this.colGenderHex.Name = "colGenderHex";
+            this.colGenderHex.ReadOnly = true;
+            this.colGenderHex.Visible = false;
+            // 
+            // colAgeHex
+            // 
+            this.colAgeHex.DataPropertyName = "AgeHex";
+            this.colAgeHex.HeaderText = "Age Hex";
+            this.colAgeHex.Name = "colAgeHex";
+            this.colAgeHex.ReadOnly = true;
+            this.colAgeHex.Visible = false;
+            // 
+            // colThumbnail
+            // 
+            this.colThumbnail.DataPropertyName = "Thumbnail";
+            this.colThumbnail.HeaderText = "Thumbnail";
+            this.colThumbnail.Name = "colThumbnail";
+            this.colThumbnail.ReadOnly = true;
+            this.colThumbnail.Visible = false;
+            // 
+            // colData
+            // 
+            this.colData.DataPropertyName = "Data";
+            this.colData.HeaderText = "Data";
+            this.colData.Name = "colData";
+            this.colData.ReadOnly = true;
+            this.colData.Visible = false;
             // 
             // FamilyManagerForm
             // 
@@ -2359,18 +2393,7 @@ namespace FamilyManager
         private System.Windows.Forms.Button btnSuitcaseLoad;
         private System.Windows.Forms.Button btnSuitcaseSave;
         private System.Windows.Forms.OpenFileDialog openSuitcaseFileDialog;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colFirstName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colSplitFile;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colGender;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colGenderCode;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAge;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAgeCode;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colDaysLeft;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colGenderHex;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAgeHex;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colThumbnail;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colData;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorSplitFiles;
         private System.Windows.Forms.ToolStripMenuItem menuItemShowSplitFiles;
         private System.Windows.Forms.ToolStripMenuItem menuItemHighlightSplitFiles;
         private System.Windows.Forms.TabPage tabSafe;
@@ -2433,5 +2456,19 @@ namespace FamilyManager
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.ToolStripSeparator menuContextMemberSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuContextMemberMergeSplitFiles;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem menuItemIncludeNPCs;
+        private System.Windows.Forms.ToolStripMenuItem menuItemOnlyNPCs;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colFirstName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colSplitFile;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colGender;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colGenderCode;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAge;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAgeCode;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colDaysLeft;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colGenderHex;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAgeHex;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colThumbnail;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colData;
     }
 }

@@ -125,12 +125,16 @@ namespace FamilyManager
             RegistryTools.LoadFormSettings(FamilyManagerApp.RegistryKey, this);
             splitTopBottom.SplitterDistance = (int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey, "splitterTB", splitTopBottom.SplitterDistance);
             splitTopLeftRight.SplitterDistance = (int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
+
+            // See also OnSplitterMoved
             splitClosetLeftRight.SplitterDistance = splitTopLeftRight.SplitterDistance;
             splitSafeLeftRight.SplitterDistance = splitTopLeftRight.SplitterDistance;
 
             menuItemUseCodes.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemUseCodes.Name, 0) != 0); OnUseCodesClicked(menuItemUseCodes, null);
             menuItemShowSplitFiles.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemShowSplitFiles.Name, 0) != 0); OnShowSplitFilesClicked(menuItemShowSplitFiles, null);
             menuItemHighlightSplitFiles.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemHighlightSplitFiles.Name, 0) != 0); OnHighlightSplitFilesClicked(menuItemHighlightSplitFiles, null);
+            menuItemIncludeNPCs.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemIncludeNPCs.Name, 0) != 0);
+            menuItemOnlyNPCs.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemOnlyNPCs.Name, 0) != 0);
 
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
@@ -190,6 +194,8 @@ namespace FamilyManager
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemUseCodes.Name, menuItemUseCodes.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemShowSplitFiles.Name, menuItemShowSplitFiles.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemHighlightSplitFiles.Name, menuItemHighlightSplitFiles.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemIncludeNPCs.Name, menuItemIncludeNPCs.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemOnlyNPCs.Name, menuItemOnlyNPCs.Checked ? 1 : 0);
 
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
@@ -225,10 +231,17 @@ namespace FamilyManager
             if (sender == splitTopLeftRight)
             {
                 splitClosetLeftRight.SplitterDistance = splitTopLeftRight.SplitterDistance;
+                splitSafeLeftRight.SplitterDistance = splitTopLeftRight.SplitterDistance;
             }
             else if (sender == splitClosetLeftRight)
             {
                 splitTopLeftRight.SplitterDistance = splitClosetLeftRight.SplitterDistance;
+                splitSafeLeftRight.SplitterDistance = splitClosetLeftRight.SplitterDistance;
+            }
+            else if (sender == splitSafeLeftRight)
+            {
+                splitTopLeftRight.SplitterDistance = splitSafeLeftRight.SplitterDistance;
+                splitClosetLeftRight.SplitterDistance = splitSafeLeftRight.SplitterDistance;
             }
         }
         #endregion
@@ -371,7 +384,7 @@ namespace FamilyManager
             textFamilyName.Enabled = textFamilyWriteUp.Enabled = (currentFamily.FamilyName != null);
             textAddressName.Enabled = textAddressDesc.Enabled = (currentFamily.LotAddress != null);
 
-            lblLotName.Text = (currentFamily.LotAddress != null) ? currentFamily.LotAddress : "The Sim Bin";
+            lblLotName.Text = currentFamily.LotAddress ?? "The Sim Bin";
             textAddressName.Text = currentFamily.LotAddress;
             textAddressDesc.Text = currentFamily.LotDescription;
             imageHouse.Image = currentFamily.LotImage;
@@ -662,23 +675,36 @@ namespace FamilyManager
 
                         foreach (DBPFEntry entry in package.GetEntriesByType(Fami.TYPE))
                         {
-                            if (entry.InstanceID.AsUInt() > 0x00000000 && entry.InstanceID.AsUInt() < 0x00007F00)
+                            uint inst = entry.InstanceID.AsUInt();
+
+                            if (menuItemOnlyNPCs.Checked)
                             {
-                                Fami fami = (Fami)package.GetResourceByEntry(entry);
-                                Str str = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, fami));
-
-                                string familyName = GetString(str, 0);
-
-                                if (!string.IsNullOrWhiteSpace(familyName))
-                                {
-                                    if (!hoodFamilies.ContainsKey(familyName))
-                                    {
-                                        hoodFamilies.Add(familyName, new List<TypeInstanceID>());
-                                    }
-
-                                    hoodFamilies[familyName].Add(fami.InstanceID);
-                                }
+                                if (inst > 0x0000 && inst < (uint)FamiCodes.Lowest) continue;
                             }
+                            else if (!menuItemIncludeNPCs.Checked)
+                            {
+                                if (inst == 0x0000 || inst >= (uint)FamiCodes.Lowest) continue;
+                            }
+
+                            Fami fami = (Fami)package.GetResourceByEntry(entry);
+                            Str str = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, fami));
+                            string familyName;
+
+                            if (inst == 0x0000 || inst >= (uint)FamiCodes.Lowest)
+                            {
+                                familyName = $"{(FamiCodes)inst} (NPCs)";
+                            }
+                            else
+                            {
+                                familyName = GetString(str, 0);
+                            }
+
+                            if (!hoodFamilies.ContainsKey(familyName))
+                            {
+                                hoodFamilies.Add(familyName, new List<TypeInstanceID>());
+                            }
+
+                            hoodFamilies[familyName].Add(fami.InstanceID);
                         }
 
                         foreach (string familyName in hoodFamilies.Keys)
@@ -870,6 +896,27 @@ namespace FamilyManager
             }
             else
             {
+                if (currentFamily.IsNPCFamily)
+                {
+                    tabPages.SelectedIndex = 0;
+
+                    if (tabPages.TabPages.Count == 3)
+                    {
+                        tabPages.TabPages.Remove(tabCloset);
+                        tabPages.TabPages.Remove(tabSafe);
+                    }
+                }
+                else
+                {
+                    if (tabPages.TabPages.Count == 1)
+                    {
+                        tabPages.TabPages.Add(tabCloset);
+                        tabPages.TabPages.Add(tabSafe);
+                    }
+                }
+
+                panelFamily.Enabled = !currentFamily.IsNPCFamily;
+
                 foreach (DataGridViewRow row in gridFamilyMembers.Rows)
                 {
                     string splitFile = row.Cells["colSplitFile"].Value as string;
@@ -884,6 +931,8 @@ namespace FamilyManager
                     }
                 }
             }
+
+            gridFamilyMembers.Columns["colSplitFile"].Visible = (IsAdvancedMode && menuItemShowSplitFiles.Checked);
 
             UpdateClosetTabState();
             UpdateSafeTabState();
@@ -924,6 +973,7 @@ namespace FamilyManager
         #region Options Menu Actions
         private void OnOptionsOpening(object sender, EventArgs e)
         {
+            menuItemShowSplitFiles.Visible = menuItemHighlightSplitFiles.Visible = toolStripSeparatorSplitFiles.Visible = IsAdvancedMode;
         }
 
         private void OnUseCodesClicked(object sender, EventArgs e)
@@ -946,12 +996,26 @@ namespace FamilyManager
 
         private void OnShowSplitFilesClicked(object sender, EventArgs e)
         {
-            gridFamilyMembers.Columns["colSplitFile"].Visible = menuItemShowSplitFiles.Checked;
+            gridFamilyMembers.Columns["colSplitFile"].Visible = (IsAdvancedMode && menuItemShowSplitFiles.Checked);
         }
 
         private void OnHighlightSplitFilesClicked(object sender, EventArgs e)
         {
             UpdateFormState();
+        }
+
+        private void OnIncludeNPCsClicked(object sender, EventArgs e)
+        {
+            if (sender == menuItemIncludeNPCs)
+            {
+                if (menuItemIncludeNPCs.Checked) menuItemOnlyNPCs.Checked = false;
+            }
+            else if (sender == menuItemOnlyNPCs)
+            {
+                if (menuItemOnlyNPCs.Checked) menuItemIncludeNPCs.Checked = false;
+            }
+
+            DoWork_FillHoodTree(null, DBPFData.INSTANCE_NULL);
         }
         #endregion
 
@@ -963,12 +1027,7 @@ namespace FamilyManager
 
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
-            if (IsAdvancedMode)
-            {
-            }
-            else
-            {
-            }
+            UpdateFormState();
         }
         #endregion
 
@@ -1078,7 +1137,7 @@ namespace FamilyManager
                 logger.Error(progressDialog.Result.Error.Message);
                 logger.Info(progressDialog.Result.Error.StackTrace);
 
-                MsgBox.Show($"An error occured while processing\n{clothingCache.ErrorPackagePath}", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show($"An error occured while processing\n{((typeId == Gzps.TYPE) ? clothingCache : jewelleryCache).ErrorPackagePath}", "Error!", MessageBoxButtons.OK);
             }
             else
             {
@@ -1126,7 +1185,7 @@ namespace FamilyManager
                 logger.Error(progressDialog.Result.Error.Message);
                 logger.Info(progressDialog.Result.Error.StackTrace);
 
-                MsgBox.Show($"An error occured while processing\n{clothingCache.ErrorPackagePath}", "Error!", MessageBoxButtons.OK);
+                MsgBox.Show($"An error occured while processing\n{((typeId == Gzps.TYPE) ? clothingCache : jewelleryCache).ErrorPackagePath}", "Error!", MessageBoxButtons.OK);
             }
             else
             {
@@ -1346,21 +1405,19 @@ namespace FamilyManager
                 menuContextMemberChangeSimName.Visible = menuContextMemberChangeFamilyName.Visible = true;
                 menuContextMemberChangeDays.Visible = true;
 
-                menuContextMemberSeparator1.Visible = menuContextMemberMergeSplitFiles.Visible = false;
-
                 menuContextMemberFilterAll.Visible = false;
                 menuContextMemberFilterSelected.Visible = false;
                 menuContextMemberFilterThis.Visible = false;
 
                 menuContextMemberChangeFamilyName.Enabled = (gridFamilyMembers.SelectedRows.Count > 0);
-
                 menuContextMemberChangeSimName.Enabled = false;
+
+                menuContextMemberSeparator1.Visible = menuContextMemberMergeSplitFiles.Visible = false;
 
                 if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
                 {
                     menuContextMemberChangeSimName.Enabled = true;
 
-#if DEBUG
                     if (IsAdvancedMode)
                     {
                         if (!packageCache.IsDirty) // Doing this after doing some edits is not the best idea the user had!
@@ -1373,7 +1430,6 @@ namespace FamilyManager
                             }
                         }
                     }
-#endif
                 }
             }
         }
@@ -1491,88 +1547,40 @@ namespace FamilyManager
             row.Cells["colDaysLeft"].Value = data.DaysLeft;
         }
 
+        private bool confirmBackupBeforeSplit = true;
         private void OnMergeSplitFilesClicked(object sender, EventArgs e)
         {
             if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
             {
-                int rowIndex = mouseLocation.RowIndex;
                 DataGridViewRow row = gridFamilyMembers.Rows[mouseLocation.RowIndex];
-
-                Trace.Assert("Y".Equals(row.Cells["colSplitFile"].Value as string, StringComparison.OrdinalIgnoreCase));
-
                 CharacterData characterData = (row.Cells["colData"].Value as CharacterData);
-                Trace.Assert(characterData.IsSplit);
 
-                List<string> splitPaths = characterData.GetSplitPaths();
-
-                HashSet<TypeTypeID> allSplitTypes = new HashSet<TypeTypeID>();
-                HashSet<DBPFKey> allSplitKeys = new HashSet<DBPFKey>();
-                HashSet<DBPFKey> allSplitConflictKeys = new HashSet<DBPFKey>();
-
-                for (int i = 1; i < splitPaths.Count; ++i)
+                if (characterData.IsSplit && "Y".Equals(row.Cells["colSplitFile"].Value as string, StringComparison.OrdinalIgnoreCase))
                 {
-                    using (CacheableDbpfFile package = packageCache.OpenForReadOnly(splitPaths[i]))
-                    {
-                        foreach (DBPFEntry entry in package.GetAllEntries())
-                        {
-                            allSplitTypes.Add(entry.TypeID);
-                            allSplitKeys.Add(entry);
-                        }
+                    thumbBox.Visible = false;
 
-                        package.Close();
+                    if (confirmBackupBeforeSplit)
+                    {
+                        if (MsgBox.Show("Please confirm that you have a recent backup of your hood(s)\nAnd understand the split character file merging process", "Confirm Recent Hood Backups", MessageBoxButtons.YesNo, MessageBoxIcon.Stop) == DialogResult.Yes)
+                        {
+                            confirmBackupBeforeSplit = false;
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
+
+                    characterData.FixSplit(packageCache);
                 }
-
-                using (CacheableDbpfFile package = packageCache.OpenForReadOnly(splitPaths[0]))
+                else
                 {
-                    foreach (DBPFKey splitKey in allSplitKeys)
-                    {
-                        if (package.GetEntryByKey(splitKey) != null)
-                        {
-                            allSplitConflictKeys.Add(splitKey);
-                        }
-                    }
-
-                    package.Close();
-                }
-
-                using (CacheableDbpfFile mainPackage = packageCache.OpenForReadOnly(splitPaths[0]))
-                {
-                    string nextBackupName;
-
-                    for (int i = 1; i < splitPaths.Count; ++i)
-                    {
-                        using (CacheableDbpfFile package = packageCache.OpenForReadOnly(splitPaths[i]))
-                        {
-                            foreach (DBPFEntry entry in package.GetAllEntries())
-                            {
-                                logger.Debug($"Split: Merging {entry} from {splitPaths[i]} into {splitPaths[0]}");
-                                byte[] data = package.GetDataByKey(entry);
-                                mainPackage.Commit(entry, data);
-                            }
-
-                            nextBackupName = package.NextBackupName();
-                            package.Close();
-                        }
-
-                        // We need to move the splitPaths[i] package out of the way
-                        File.Move(splitPaths[i], nextBackupName);
-                    }
-
-                    mainPackage.SaveAs(splitPaths[splitPaths.Count - 1]);
-
-                    nextBackupName = mainPackage.NextBackupName();
-                    mainPackage.Close();
-
-                    // We need to move the splitPaths[0] package out of the way
-                    File.Move(splitPaths[0], nextBackupName);
-
-                    // We may have totally destroyed the cache by doing this!
-                    Trace.Assert(!packageCache.IsDirty);
+                    logger.Warn($"{characterData.PackageName} does not appear to be split!");
                 }
             }
 
             DoWork_FillFamilyGrid(lastHoodNode, lastFamilyNode);
+            UpdateFormState();
         }
         #endregion
 
@@ -2127,6 +2135,11 @@ namespace FamilyManager
         #endregion
 
         #region Tooltips and Thumbnails
+        private bool IsMemberGrid(DataGridView grid)
+        {
+            return (grid == gridFamilyMembers);
+        }
+
         private void OnToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -2138,9 +2151,22 @@ namespace FamilyManager
                 {
                     DataGridViewRow row = (grid).Rows[index];
 
-                    if (row.Cells[e.ColumnIndex].OwningColumn.Name.EndsWith("Name"))
+                    if (IsContainerGrid(grid))
                     {
-                        e.ToolTipText = GetTooltip(row, GetColPrefix(grid));
+                        if (row.Cells[e.ColumnIndex].OwningColumn.Name.EndsWith("Name"))
+                        {
+                            e.ToolTipText = GetTooltip(row, GetColPrefix(grid));
+                        }
+                    }
+                    else if (IsMemberGrid(grid))
+                    {
+                        if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colFirstName"))
+                        {
+                            if (row.Cells["colData"].Value is CharacterData data)
+                            {
+                                e.ToolTipText = data.PackageName;
+                            }
+                        }
                     }
                 }
             }
@@ -2169,7 +2195,7 @@ namespace FamilyManager
 
         private Image GetThumbnail(DataGridViewRow row, string colNamePrefix)
         {
-            if (row.Cells[$"{colNamePrefix}LocalThumbKey"]?.Value is DBPFKey localThumbKey)
+            if (row.Cells[$"{colNamePrefix}LocalThumbKey"]?.Value is DBPFKey)
             {
                 OutfitDbpfData data = row.Cells[$"{colNamePrefix}Data"]?.Value as OutfitDbpfData;
 
@@ -2235,8 +2261,8 @@ namespace FamilyManager
         }
         #endregion
 
-        #region Resource Grid Management
-        private void OnResourceBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        #region Grid Management
+        private void OnDataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
             if ((sender as DataGridView).SortedColumn != null)
             {

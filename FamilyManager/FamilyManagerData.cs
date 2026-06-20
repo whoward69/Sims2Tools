@@ -143,6 +143,8 @@ namespace FamilyManager
         private string lotDescription = null; // Only seems to be used for community lot descriptions
         private readonly Image lotImage = null;
 
+        public bool IsNPCFamily => (fami.InstanceID.AsUInt() == 0x0000 || fami.InstanceID.AsUInt() >= (uint)FamiCodes.Lowest);
+
         public string FamilyName
         {
             get => familyName;

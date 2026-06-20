@@ -28,8 +28,11 @@ namespace FamilyManager.Caching
     [Serializable]
     public class CharacterData : ISerializable
     {
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly TypeGUID guid;
-        private readonly string packagePath;
+        private string packagePath;
+        private string packageName;
         private readonly TypeInstanceID ctssId;
 
         private bool isSplit = false;
@@ -46,12 +49,21 @@ namespace FamilyManager.Caching
 
         public CharacterData(string packagePath, TypeGUID guid, TypeInstanceID ctssId)
         {
-            this.packagePath = packagePath;
+            SetPackagePath(packagePath);
             this.guid = guid;
             this.ctssId = ctssId;
 
             DetermineIfSplit();
         }
+
+        public String PackageName => packageName;
+
+        private void SetPackagePath(string packagePath)
+        {
+            this.packagePath = packagePath;
+            this.packageName = (new FileInfo(packagePath)).Name;
+        }
+
 
         private void DetermineIfSplit()
         {
@@ -189,7 +201,97 @@ namespace FamilyManager.Caching
             return thumbnail;
         }
 
-        public List<string> GetSplitPaths()
+        public bool FixSplit(DbpfFileCache packageCache)
+        {
+            Trace.Assert(isSplit, "Why are you trying to merge when this isn't split?");
+
+            // There should be no outstanding edits before doing this!
+            Trace.Assert(!packageCache.IsDirty, "Unsaved edits!");
+
+            List<string> splitPaths = GetSplitPaths();
+
+            /*
+             * Unused resource analyse in the split files
+             * 
+            HashSet<TypeTypeID> allSplitTypes = new HashSet<TypeTypeID>();
+            HashSet<DBPFKey> allSplitKeys = new HashSet<DBPFKey>();
+            HashSet<DBPFKey> allSplitConflictKeys = new HashSet<DBPFKey>();
+
+            for (int i = 1; i < splitPaths.Count; ++i)
+            {
+                using (CacheableDbpfFile package = packageCache.OpenForReadOnly(splitPaths[i]))
+                {
+                    foreach (DBPFEntry entry in package.GetAllEntries())
+                    {
+                        allSplitTypes.Add(entry.TypeID);
+                        allSplitKeys.Add(entry);
+                    }
+
+                    package.Close();
+                }
+            }
+
+            using (CacheableDbpfFile package = packageCache.OpenForReadOnly(splitPaths[0]))
+            {
+                foreach (DBPFKey splitKey in allSplitKeys)
+                {
+                    if (package.GetEntryByKey(splitKey) != null)
+                    {
+                        allSplitConflictKeys.Add(splitKey);
+                    }
+                }
+
+                package.Close();
+            }
+            */
+
+            using (CacheableDbpfFile mainPackage = packageCache.OpenForReadOnly(splitPaths[0]))
+            {
+                string nextBackupName;
+
+                for (int i = 1; i < splitPaths.Count; ++i)
+                {
+                    using (CacheableDbpfFile package = packageCache.OpenForReadOnly(splitPaths[i]))
+                    {
+                        foreach (DBPFEntry entry in package.GetAllEntries())
+                        {
+                            logger.Debug($"Split: Merging {entry} from {splitPaths[i]} into {splitPaths[0]}");
+                            byte[] data = package.GetDataByKey(entry);
+                            mainPackage.Commit(entry, data);
+                        }
+
+                        nextBackupName = package.NextBackupName();
+                        package.Close();
+                    }
+
+                    // We need to move the splitPaths[i] package out of the way
+                    File.Move(splitPaths[i], nextBackupName);
+                }
+
+                SetPackagePath(splitPaths[splitPaths.Count - 1]);
+                mainPackage.SaveAs(packagePath);
+
+                // Find the strings again, as we may have moved them during the merge
+                ctss = null;
+                GivenName(MetaData.Languages.Default);
+
+                nextBackupName = mainPackage.NextBackupName();
+                mainPackage.Close();
+
+                // We need to move the splitPaths[0] package out of the way
+                File.Move(splitPaths[0], nextBackupName);
+
+                // We shouldn't have left anything in the cache
+                Trace.Assert(!packageCache.IsDirty, "Cache should be empty!");
+            }
+
+            DetermineIfSplit();
+            Trace.Assert(!isSplit, "Why is this still split?");
+
+            return true;
+        }
+
+        private List<string> GetSplitPaths()
         {
             List<string> splitPaths = new List<string>();
 
@@ -203,10 +305,14 @@ namespace FamilyManager.Caching
                 {
                     for (int i = index; i > 0; --i)
                     {
-                        splitPaths.Add($"{fi.DirectoryName}\\{fi.Name.Substring(0, pos)}.{i}{fi.Extension}");
+                        string dotPath = $"{fi.DirectoryName}\\{fi.Name.Substring(0, pos)}.{i}{fi.Extension}";
+                        logger.Debug($"Adding {dotPath}");
+                        splitPaths.Add(dotPath);
                     }
 
-                    splitPaths.Add($"{fi.DirectoryName}\\{fi.Name.Substring(0, pos)}{fi.Extension}");
+                    string nonDotPath = $"{fi.DirectoryName}\\{fi.Name.Substring(0, pos)}{fi.Extension}";
+                    logger.Debug($"Adding {nonDotPath}");
+                    splitPaths.Add(nonDotPath);
                 }
 
                 string[] matchFiles = Directory.GetFiles(fi.DirectoryName, $"{fi.Name.Substring(0, pos)}*{fi.Extension}", SearchOption.TopDirectoryOnly);
@@ -214,14 +320,25 @@ namespace FamilyManager.Caching
                 {
                     foreach (string matchFile in matchFiles)
                     {
+                        logger.Debug($"Expecting {matchFile}");
+
                         if (!splitPaths.Contains(matchFile))
                         {
+                            logger.Warn($"Expected to find {matchFile} within the split files list.");
                             return null;
                         }
                     }
 
                     return splitPaths;
                 }
+                else
+                {
+                    logger.Warn("Incorrect number of split-files");
+                }
+            }
+            else
+            {
+                logger.Warn("Attempting to fix a Sim that isn't marked as split!");
             }
 
             return null;
@@ -297,6 +414,7 @@ namespace FamilyManager.Caching
             CharacterCache.cache = cache;
         }
 
+        private HoodTreeNode lastHoodNode = null;
         private Dictionary<TypeGUID, CharacterData> characterCache = null;
 
         private string errorPackagePath = null;
@@ -317,6 +435,12 @@ namespace FamilyManager.Caching
             Stopwatch s = new Stopwatch();
             s.Start();
 
+            if (lastHoodNode != null)
+            {
+                logger.Info($"Updating cached characters for {lastHoodNode.HoodSubFolder}");
+                DataCache.Serialize(characterCache, $"{lastHoodNode.HoodSubFolder}_Characters");
+            }
+
             if (DataCache.Deserialize(out characterCache, $"{hoodNode.HoodSubFolder}_Characters"))
             {
                 logger.Info($"Loaded {characterCache.Count} characters for {hoodNode.HoodSubFolder} from cache in {(s.ElapsedMilliseconds / 1000.0)}s");
@@ -326,7 +450,10 @@ namespace FamilyManager.Caching
                 characterCache = BuildCharacterCache(sender, hoodNode);
                 DataCache.Serialize(characterCache, $"{hoodNode.HoodSubFolder}_Characters");
                 logger.Info($"Loaded {characterCache.Count} characters for {hoodNode.HoodSubFolder} from files in {(s.ElapsedMilliseconds / 1000.0)}s");
+                logger.Info($"Updating cached characters for {hoodNode.HoodSubFolder}");
             }
+
+            lastHoodNode = hoodNode;
 
             s.Stop();
         }

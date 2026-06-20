@@ -19,6 +19,44 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.FAMI
 {
+    public enum FamiCodes : uint
+    {
+        Default = 0x0000,
+        Lowest = 0X7FDF,
+        Socialites = 0X7FDF,
+        Techies,
+        Jocks,
+        Bohemians,
+        Gearheads,
+        HobbyMavens,
+        Tourists_Family12,
+        Tourists_Family11,
+        Tourists_Family10,
+        Tourists_Family9,
+        Tourists_Family8,
+        Tourists_Family7,
+        Tourists_Family6,
+        Tourists_Family5,
+        Tourists_Family4,
+        Tourists_Family3,
+        Tourists_Family2,
+        Tourists_Family1,
+        Tourists_Tropics,
+        Tourists_Mountains,
+        Tourists_FarEast,
+        Tourists_General,
+        Goopy,
+        GardenClub,
+        DisplayPets_InUse,
+        DisplayPets_Available,
+        Pets_Orphans,
+        Pets_Strays,
+        BobTheBuilder,
+        Downtownies,
+        AdoptionPool,
+        TowniesAndDormies,
+        ServiceNPCs
+    }
     public class FamiFlags : FlagBase
     {
         public FamiFlags(ushort flags) : base(flags) { }
