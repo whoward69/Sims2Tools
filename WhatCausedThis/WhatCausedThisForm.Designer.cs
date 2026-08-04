@@ -461,6 +461,7 @@ namespace WhatCausedThis
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(933, 561);
+            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.comboFrame);
             this.Controls.Add(this.btnSelectLog);
             this.Controls.Add(this.gridByPackage);
@@ -480,7 +481,6 @@ namespace WhatCausedThis
             this.Controls.Add(this.lblModsPath);
             this.Controls.Add(this.menuMain);
             this.Controls.Add(this.lblProgress);
-            this.Controls.Add(this.progressBar);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuMain;

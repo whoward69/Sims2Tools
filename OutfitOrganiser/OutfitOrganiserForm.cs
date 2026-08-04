@@ -312,7 +312,7 @@ namespace OutfitOrganiser
                                                     }
                                                     else if (s.Contains("."))
                                                     {
-                                                        comboBox.Items.Add(new FloatNamedValue(name, (float)Convert.ToDecimal(s)));
+                                                        comboBox.Items.Add(new DoubleNamedValue(name, (double)Convert.ToDecimal(s)));
                                                     }
                                                     else
                                                     {
@@ -1553,6 +1553,7 @@ namespace OutfitOrganiser
         private void OnModeOpening(object sender, EventArgs e)
         {
             menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+            if (Sims2ToolsLib.AllAdvancedMode) menuItemAdvanced.Checked = true;
         }
 
         private void OnAdvancedModeChanged(object sender, EventArgs e)
@@ -1642,9 +1643,9 @@ namespace OutfitOrganiser
 
                         foreach (object o in comboGenetics.Items)
                         {
-                            if ((o as FloatNamedValue).Value == value)
+                            if ((o as DoubleNamedValue).Value == value)
                             {
-                                e.ToolTipText = (o as FloatNamedValue).Name;
+                                e.ToolTipText = (o as DoubleNamedValue).Name;
                                 break;
                             }
                         }
@@ -2897,7 +2898,7 @@ namespace OutfitOrganiser
 
                 foreach (object o in comboGenetics.Items)
                 {
-                    if ((o as FloatNamedValue).Value == cachedGeneticValue)
+                    if ((o as DoubleNamedValue).Value == cachedGeneticValue)
                     {
                         comboGenetics.SelectedItem = o;
                         comboGenetics.Text = o.ToString();
@@ -3016,7 +3017,7 @@ namespace OutfitOrganiser
 
             if (comboGenetics.SelectedIndex != -1)
             {
-                if (IsAutoUpdate) UpdateSelectedRows((comboGenetics.SelectedItem as FloatNamedValue).Value, "genetic");
+                if (IsAutoUpdate) UpdateSelectedRows((float)(comboGenetics.SelectedItem as DoubleNamedValue).Value, "genetic");
             }
         }
 

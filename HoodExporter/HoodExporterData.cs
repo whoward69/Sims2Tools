@@ -81,17 +81,17 @@ namespace HoodExporter
 
         public void AddTokens(Ngbh ngbh, List<TokenData> tokenDataList)
         {
-            foreach (NgbhInstanceSlot slot in ngbh.SimSlots)
+            foreach (NgbhSimInventory simInventory in ngbh.SimInventories)
             {
-                SimData simData = new SimData((TypeInstanceID)slot.OwnerId);
+                SimData simData = new SimData((TypeInstanceID)simInventory.OwnerId);
 
-                ReadOnlyCollection<NgbhItem> items = slot.FindTokensByGuid((TypeGUID)0x53D08989);
+                ReadOnlyCollection<NgbhInventoryToken> items = simInventory.FindTokensByGuid((TypeGUID)0x53D08989);
                 if (items.Count == 1)
                 {
-                    simData.SecondaryAspiration = items[0].Data[0];
+                    simData.SecondaryAspiration = items[0].GetValue(0);
                 }
 
-                simData.TokenCache.AddTokens(slot, tokenDataList);
+                simData.TokenCache.AddTokens(simInventory, tokenDataList);
 
                 cacheByInst.Add(simData.SimId, simData);
             }
@@ -160,17 +160,17 @@ namespace HoodExporter
             cache = new Dictionary<TokenData, uint>();
         }
 
-        public void AddTokens(NgbhInstanceSlot slot, List<TokenData> tokenDataList)
+        public void AddTokens(NgbhSimInventory simInventory, List<TokenData> tokenDataList)
         {
             foreach (TokenData data in tokenDataList)
             {
-                ReadOnlyCollection<NgbhItem> items = slot.FindTokensByGuid(data.Key.Guid);
+                ReadOnlyCollection<NgbhInventoryToken> invTokens = simInventory.FindTokensByGuid(data.Key.Guid);
 
-                if (items.Count == 1)
+                if (invTokens.Count == 1)
                 {
-                    if (items[0].Data.Length > data.Key.DataIndex)
+                    if (invTokens[0].PropertyCount > data.Key.DataIndex)
                     {
-                        cache.Add(data, items[0].Data[data.Key.DataIndex]);
+                        cache.Add(data, invTokens[0].GetValue(data.Key.DataIndex));
                     }
                 }
             }

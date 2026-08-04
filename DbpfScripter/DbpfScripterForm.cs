@@ -11,6 +11,7 @@
 
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
+using Sims2Tools.DBPF.Images.DdsBuilder;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
@@ -48,6 +49,8 @@ namespace DbpfScripter
         public DbpfScripterForm()
         {
             logger.Info(DbpfScripterApp.AppProduct);
+
+            DdsBuilder.DdsUtilsPath = Sims2ToolsLib.Sims2DdsUtilsPath;
 
             InitializeComponent();
             this.Text = DbpfScripterApp.AppTitle;
@@ -242,6 +245,7 @@ namespace DbpfScripter
         private void OnModeOpening(object sender, EventArgs e)
         {
             menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+            if (Sims2ToolsLib.AllAdvancedMode) menuItemAdvanced.Checked = true;
 
             toolStripSeparator3.Visible = IsAdvancedMode;
             menuItemDeveloper.Visible = IsAdvancedMode;

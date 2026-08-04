@@ -1330,6 +1330,7 @@ namespace RepositoryWizard
         private void OnModeOpening(object sender, EventArgs e)
         {
             menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+            if (Sims2ToolsLib.AllAdvancedMode) menuItemAdvanced.Checked = true;
         }
 
         private bool inModeUpdate = false;
