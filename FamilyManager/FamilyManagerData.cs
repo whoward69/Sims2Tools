@@ -10,8 +10,11 @@ using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.JPG;
+using Sims2Tools.DBPF.Neighbourhood;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
+using Sims2Tools.DBPF.Neighbourhood.IDNO;
 using Sims2Tools.DBPF.Neighbourhood.LTXT;
+using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DbpfCache;
@@ -107,12 +110,26 @@ namespace FamilyManager
     public class FamilyTreeNode : TreeNode
     {
         private readonly TypeInstanceID familyId;
+        private readonly NeighborhoodType lotLocation;
 
         public TypeInstanceID FamilyId => familyId;
 
-        public FamilyTreeNode(TypeInstanceID familyId, string familyName) : base(familyName)
+        public FamilyTreeNode(TypeInstanceID familyId, string familyName, NeighborhoodType lotLocation) : base(familyName)
         {
             this.familyId = familyId;
+            this.lotLocation = lotLocation;
+
+            if (lotLocation == NeighborhoodType.Unknown)
+            {
+                if (familyId.AsUInt() != 0x0000 && familyId.AsUInt() < (uint)FamiCodes.Lowest)
+                {
+                    base.Text = $"{base.Text} (Sim Bin)";
+                }
+            }
+            else if (lotLocation != NeighborhoodType.Normal)
+            {
+                base.Text = $"{base.Text} ({lotLocation})";
+            }
         }
     }
 
@@ -311,6 +328,60 @@ namespace FamilyManager
         }
 
         public Image LotImage => lotImage;
+
+        public static NeighborhoodType FamilyLocation(DbpfFileCache packageCache, HoodTreeNode hoodNode, TypeInstanceID familyInstance)
+        {
+            // TODO - Family Manager - lot location - this is horribly inefficient! Need to read all the subhoods once and cache which lot is where
+            NeighborhoodType hoodType = NeighborhoodType.Unknown;
+
+            using (CacheableDbpfFile familyPackage = packageCache.OpenForReadOnly(hoodNode.PackagePath))
+            {
+                Fami fami = (Fami)familyPackage.GetResourceByKey(new DBPFKey(Fami.TYPE, DBPFData.GROUP_LOCAL, familyInstance, DBPFData.RESOURCE_NULL));
+
+                if (fami != null)
+                {
+                    DBPFKey ltxtKey = new DBPFKey(Ltxt.TYPE, DBPFData.GROUP_LOCAL, fami.LotInstance, DBPFData.RESOURCE_NULL);
+                    DBPFEntry ltxtEntry = familyPackage.GetEntryByKey(ltxtKey);
+
+                    if (ltxtEntry == null)
+                    {
+                        string mainHoodPackagePath = $"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods\\{hoodNode.HoodSubFolder}_Neighborhood.package";
+
+                        foreach (string subHoodPackagePath in Directory.GetFiles($"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods\\{hoodNode.HoodSubFolder}", $"{hoodNode.HoodSubFolder}_*.package", SearchOption.TopDirectoryOnly))
+                        {
+                            if (!mainHoodPackagePath.Equals(subHoodPackagePath))
+                            {
+                                using (CacheableDbpfFile package = packageCache.OpenForReadOnly(subHoodPackagePath))
+                                {
+                                    ltxtEntry = package.GetEntryByKey(ltxtKey);
+
+                                    if (ltxtEntry != null)
+                                    {
+                                        Idno idno = (Idno)package.GetResourceByKey(new DBPFKey(Idno.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000001, DBPFData.RESOURCE_NULL));
+
+                                        hoodType = idno.HoodType;
+                                    }
+
+                                    package.Close();
+
+                                    if (ltxtEntry != null) break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Idno idno = (Idno)familyPackage.GetResourceByKey(new DBPFKey(Idno.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000001, DBPFData.RESOURCE_NULL));
+
+                        hoodType = idno.HoodType;
+                    }
+                }
+
+                familyPackage.Close();
+            }
+
+            return hoodType;
+        }
 
         public FamilyData(DbpfFileCache packageCache, HoodTreeNode hoodNode, FamilyTreeNode familyNode)
         {

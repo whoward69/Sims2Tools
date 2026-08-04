@@ -11,5 +11,38 @@
     <Setting Name="SplitFileHighlight" Type="System.String" Scope="User">
       <Value Profile="(Default)">PapayaWhip</Value>
     </Setting>
+    <Setting Name="MaxSkillDance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">750</Value>
+    </Setting>
+    <Setting Name="MaxSkillPool" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="MaxSkillStudy" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="MaxSkillMeditate" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
+    <Setting Name="MaxSkillTaiChi" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">72</Value>
+    </Setting>
+    <Setting Name="MaxSkillTalk" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">600</Value>
+    </Setting>
+    <Setting Name="MaxSkillWalk" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="MaxSkillRhyming" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">600</Value>
+    </Setting>
+    <Setting Name="MaxSkillPotty" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">150</Value>
+    </Setting>
+    <Setting Name="MaxSkillBreakDance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">300</Value>
+    </Setting>
+    <Setting Name="MaxSkillFireDance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">300</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -28,6 +28,8 @@ namespace FamilyManager.Caching
     [Serializable]
     public class CasOutfitData : ISerializable
     {
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly DBPFKey resKey;
         private readonly string resPackagePath;
 
@@ -74,6 +76,7 @@ namespace FamilyManager.Caching
             {
                 this.localThumbKey = null;
                 this.casThumbKey = Hashes.CasThumbnailHash(resKey, resGender, resAge, "");
+                logger.Debug($"CAS Thumbnail: {resKey},{resName},{resGender},{resAge},{casThumbKey}");
             }
         }
 
@@ -198,13 +201,13 @@ namespace FamilyManager.Caching
 
         public void ReloadMaxisOutfits(ProgressDialog sender, TypeTypeID typeId)
         {
-            DataCache.InvalidateOutfits(maxisOutfit);
+            DataCache.InvalidateOutfits(maxisOutfit, typeId);
             LoadMaxisOutfits(sender, typeId);
         }
 
         public void ReloadCustomOutfits(ProgressDialog sender, TypeTypeID typeId)
         {
-            DataCache.InvalidateOutfits(customOutfit);
+            DataCache.InvalidateOutfits(customOutfit, typeId);
             LoadCustomOutfits(sender, typeId);
         }
 
@@ -274,7 +277,6 @@ namespace FamilyManager.Caching
                 foreach (string pathKey in Sims2ToolsLib.Sims2PathsInReverseLoadOrder)
                 {
                     string baseFolder = RegistryTools.GetPath(Sims2ToolsLib.RegistryKey, pathKey);
-                    logger.Debug($"Maxis Outfit: Looking for {baseFolder}");
 
                     if (Directory.Exists(baseFolder))
                     {
@@ -288,7 +290,6 @@ namespace FamilyManager.Caching
                             }
 
                             sender.SetProgress((int)progress, $"{pathKey}: {packagePath.Substring(baseFolder.Length + 1)}");
-                            logger.Debug($"Maxis Outfit: Processing {packagePath}");
 
                             using (DBPFFile package = new DBPFFile(packagePath))
                             {

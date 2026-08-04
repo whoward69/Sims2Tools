@@ -12,7 +12,7 @@ namespace FamilyManager.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.9.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -56,6 +56,138 @@ namespace FamilyManager.Properties {
             }
             set {
                 this["SplitFileHighlight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("750")]
+        public int MaxSkillDance {
+            get {
+                return ((int)(this["MaxSkillDance"]));
+            }
+            set {
+                this["MaxSkillDance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int MaxSkillPool {
+            get {
+                return ((int)(this["MaxSkillPool"]));
+            }
+            set {
+                this["MaxSkillPool"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int MaxSkillStudy {
+            get {
+                return ((int)(this["MaxSkillStudy"]));
+            }
+            set {
+                this["MaxSkillStudy"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int MaxSkillMeditate {
+            get {
+                return ((int)(this["MaxSkillMeditate"]));
+            }
+            set {
+                this["MaxSkillMeditate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("72")]
+        public int MaxSkillTaiChi {
+            get {
+                return ((int)(this["MaxSkillTaiChi"]));
+            }
+            set {
+                this["MaxSkillTaiChi"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        public int MaxSkillTalk {
+            get {
+                return ((int)(this["MaxSkillTalk"]));
+            }
+            set {
+                this["MaxSkillTalk"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int MaxSkillWalk {
+            get {
+                return ((int)(this["MaxSkillWalk"]));
+            }
+            set {
+                this["MaxSkillWalk"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        public int MaxSkillRhyming {
+            get {
+                return ((int)(this["MaxSkillRhyming"]));
+            }
+            set {
+                this["MaxSkillRhyming"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("150")]
+        public int MaxSkillPotty {
+            get {
+                return ((int)(this["MaxSkillPotty"]));
+            }
+            set {
+                this["MaxSkillPotty"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public int MaxSkillBreakDance {
+            get {
+                return ((int)(this["MaxSkillBreakDance"]));
+            }
+            set {
+                this["MaxSkillBreakDance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public int MaxSkillFireDance {
+            get {
+                return ((int)(this["MaxSkillFireDance"]));
+            }
+            set {
+                this["MaxSkillFireDance"] = value;
             }
         }
     }

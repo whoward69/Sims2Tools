@@ -15,6 +15,7 @@ using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
+using Sims2Tools.DBPF.Neighbourhood;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.Package;
@@ -29,6 +30,7 @@ using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Helpers;
 using Sims2Tools.Updates;
+using Sims2Tools.Utils.NamedValue;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
@@ -77,10 +79,15 @@ namespace FamilyManager
         private readonly CharacterCache characterCache = new CharacterCache();
         private readonly Dictionary<uint, TypeInstanceID> sdscInstanceBySimGuid = new Dictionary<uint, TypeInstanceID>();
 
-        private readonly OutfitCache clothingCache = new OutfitCache(DataCache.CacheClothes, DataCache.MaxisClothing, DataCache.CustomClothing);
-        private readonly OutfitCache jewelleryCache = new OutfitCache(DataCache.CacheJewellery, DataCache.MaxisJewellery, DataCache.CustomJewellery);
+        private readonly CareerCache careerCache;
+
+        private readonly OutfitCache clothingCache;
+        private readonly OutfitCache jewelleryCache;
 
         private readonly Filter filters = new Filter();
+
+        InterestTrackerStyle interestsTrackersStyle = InterestTrackerStyle.BarAndBox;
+
 
         public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
@@ -92,9 +99,29 @@ namespace FamilyManager
             InitializeComponent();
             SetTitle();
 
+            trackSkillToddlerWalk.Maximum = Properties.Settings.Default.MaxSkillWalk;
+            trackSkillToddlerTalk.Maximum = Properties.Settings.Default.MaxSkillTalk;
+            trackSkillToddlerRhyming.Maximum = Properties.Settings.Default.MaxSkillRhyming;
+            trackSkillToddlerPotty.Maximum = Properties.Settings.Default.MaxSkillPotty;
+
+            trackSkillHiddenBreakDance.Maximum = Properties.Settings.Default.MaxSkillBreakDance;
+            trackSkillHiddenDance.Maximum = Properties.Settings.Default.MaxSkillDance;
+            trackSkillHiddenFireDance.Maximum = Properties.Settings.Default.MaxSkillFireDance;
+            trackSkillHiddenMeditate.Maximum = Properties.Settings.Default.MaxSkillMeditate;
+            trackSkillHiddenPool.Maximum = Properties.Settings.Default.MaxSkillPool;
+            trackSkillHiddenStudy.Maximum = Properties.Settings.Default.MaxSkillStudy;
+            trackSkillHiddenTaiChi.Maximum = Properties.Settings.Default.MaxSkillTaiChi;
+
             FamilyDbpfData.SetCache(packageCache);
             CharacterCache.SetCache(packageCache);
             OutfitDbpfData.SetCache(packageCache);
+
+            clothingCache = new OutfitCache(DataCache.CacheClothesPath, DataCache.MaxisClothingFilename, DataCache.CustomClothingFilename);
+            jewelleryCache = new OutfitCache(DataCache.CacheJewelleryPath, DataCache.MaxisJewelleryFilename, DataCache.CustomJewelleryFilename);
+
+            careerCache = new CareerCache(DataCache.CacheCareersPath, DataCache.CustomCareerFilename, DataCache.CustomCareerOverrideFilename);
+            textUniTimeLeft.Maximum = careerCache.SemesterLength;
+            trackUniTimeLeft.Maximum = (int)textUniTimeLeft.Maximum;
 
             selectPathDialog = new CommonOpenFileDialog
             {
@@ -118,6 +145,362 @@ namespace FamilyManager
         }
         #endregion
 
+        #region Career (Schools/Majors/Jobs) Combo Box Loading
+        private void LoadCareers()
+        {
+            if (InvokeRequired)
+            {
+                Invoke((MethodInvoker)delegate { LoadCareers(); });
+                return;
+            }
+
+            // This will be run on the main (UI) thread 
+            LoadSchools();
+            LoadMajors();
+
+            CareerTypes wantedJobs = lastJobs;
+            lastJobs = CareerTypes.Unknown;
+            switch (wantedJobs)
+            {
+                case CareerTypes.TeenJob:
+                    LoadTeenJobs();
+                    break;
+                case CareerTypes.AdultJob:
+                    LoadAdultJobs();
+                    break;
+                case CareerTypes.ElderJob:
+                    LoadElderJobs();
+                    break;
+                case CareerTypes.PetJob:
+                    LoadPetJobs();
+                    break;
+            }
+
+            LoadRetiredJobs();
+        }
+
+        private void LoadSchools()
+        {
+            SortedDictionary<string, uint> schools = new SortedDictionary<string, uint>(new CareerNameComparer())
+            {
+                { "Public", (uint)SchoolTypes.PublicSchool },
+                { "Private", (uint)SchoolTypes.PrivateSchool }
+            };
+
+            LoadCustomCareers(schools, CareerTypes.School);
+
+            comboSchoolType.Items.Clear();
+            comboSchoolType.Items.Add(new UintNamedValue("Unknown", (uint)SchoolTypes.NoSchool));
+
+            foreach (string school in schools.Keys)
+            {
+                comboSchoolType.Items.Add(new UintNamedValue(school, schools[school]));
+            }
+
+            ControlHelper.SetDropDownWidth(comboSchoolType);
+        }
+
+        private void LoadSchoolGrades()
+        {
+            comboSchoolGrade.Items.Clear();
+            comboSchoolGrade.Items.Add(new UintNamedValue("Unknown", (uint)Grades.Unknown));
+            comboSchoolGrade.Items.Add(new UintNamedValue("A+", (uint)Grades.APlus));
+            comboSchoolGrade.Items.Add(new UintNamedValue("A", (uint)Grades.A));
+            comboSchoolGrade.Items.Add(new UintNamedValue("A-", (uint)Grades.AMinus));
+            comboSchoolGrade.Items.Add(new UintNamedValue("B+", (uint)Grades.BPlus));
+            comboSchoolGrade.Items.Add(new UintNamedValue("B", (uint)Grades.B));
+            comboSchoolGrade.Items.Add(new UintNamedValue("B-", (uint)Grades.BMinus));
+            comboSchoolGrade.Items.Add(new UintNamedValue("C+", (uint)Grades.CPlus));
+            comboSchoolGrade.Items.Add(new UintNamedValue("C", (uint)Grades.C));
+            comboSchoolGrade.Items.Add(new UintNamedValue("C-", (uint)Grades.CMinus));
+            comboSchoolGrade.Items.Add(new UintNamedValue("D+", (uint)Grades.DPlus));
+            comboSchoolGrade.Items.Add(new UintNamedValue("D", (uint)Grades.D));
+            comboSchoolGrade.Items.Add(new UintNamedValue("D-", (uint)Grades.DMinus));
+            comboSchoolGrade.Items.Add(new UintNamedValue("F", (uint)Grades.F));
+        }
+
+        private void LoadMajors()
+        {
+            SortedDictionary<string, uint> majors = new SortedDictionary<string, uint>(new CareerNameComparer())
+            {
+                { "Art", (uint)Majors.Art },
+                { "Biology", (uint)Majors.Biology },
+                { "Drama", (uint)Majors.Drama },
+                { "Economics", (uint)Majors.Economics },
+                { "History", (uint)Majors.History },
+                { "Literature", (uint)Majors.Literature },
+                { "Mathematics", (uint)Majors.Mathematics },
+                { "Philosophy", (uint)Majors.Philosophy },
+                { "Physics", (uint)Majors.Physics },
+                { "Political Science", (uint)Majors.PoliticalScience },
+                { "Psychology", (uint)Majors.Psychology }
+            };
+
+            LoadCustomCareers(majors, CareerTypes.Major);
+
+            comboUniMajor.Items.Clear();
+            comboUniMajor.Items.Add(new UintNamedValue("Unknown", (uint)Majors.Unknown));
+            comboUniMajor.Items.Add(new UintNamedValue("Undeclared", (uint)Majors.Undeclared));
+
+            foreach (string major in majors.Keys)
+            {
+                comboUniMajor.Items.Add(new UintNamedValue(major, majors[major]));
+            }
+
+            ControlHelper.SetDropDownWidth(comboUniMajor);
+        }
+
+        private void LoadSemesters()
+        {
+            comboUniSemester.Items.Clear();
+            comboUniSemester.Items.Add(new UintNamedValue("Unknown", 0));
+            comboUniSemester.Items.Add(new UintNamedValue("1 - Freshman 1", 1));
+            comboUniSemester.Items.Add(new UintNamedValue("2 - Freshman 2", 2));
+            comboUniSemester.Items.Add(new UintNamedValue("3 - Sophomore 1", 3));
+            comboUniSemester.Items.Add(new UintNamedValue("4 - Sophomore 2", 4));
+            comboUniSemester.Items.Add(new UintNamedValue("5 - Junior 1", 5));
+            comboUniSemester.Items.Add(new UintNamedValue("6 - Junior 2", 6));
+            comboUniSemester.Items.Add(new UintNamedValue("7 - Senior 1", 7));
+            comboUniSemester.Items.Add(new UintNamedValue("8 - Senior 2", 8));
+
+            ControlHelper.SetDropDownWidth(comboUniSemester);
+        }
+
+        private CareerTypes lastJobs = CareerTypes.Unknown;
+
+        private void LoadTeenJobs()
+        {
+            if (lastJobs == CareerTypes.TeenJob) return;
+            lastJobs = CareerTypes.TeenJob;
+
+            SortedDictionary<string, uint> jobs = new SortedDictionary<string, uint>(new CareerNameComparer());
+
+            LoadMaxisCareers(jobs, CareerTypes.TeenOrElderJob);
+            LoadCustomCareers(jobs, CareerTypes.TeenOrElderJob);
+
+            // Teens (for example, with InTeen) can have adult jobs
+            if (menuItemTeensHaveAdultJobs.Checked)
+            {
+                LoadMaxisCareers(jobs, CareerTypes.AdultJob);
+                LoadCustomCareers(jobs, CareerTypes.AdultJob);
+            }
+
+            comboJobType.Items.Clear();
+            comboJobType.Items.Add(new UintNamedValue("Unemployed", (uint)Careers.Unemployed));
+            comboJobType.Items.Add(new UintNamedValue("Unknown", (uint)Careers.Unknown));
+
+            foreach (string job in jobs.Keys)
+            {
+                comboJobType.Items.Add(new UintNamedValue(job, jobs[job]));
+            }
+
+            ControlHelper.SetDropDownWidth(comboJobType);
+        }
+
+        private void LoadAdultJobs()
+        {
+            if (lastJobs == CareerTypes.AdultJob) return;
+            lastJobs = CareerTypes.AdultJob;
+
+            SortedDictionary<string, uint> jobs = new SortedDictionary<string, uint>(new CareerNameComparer());
+
+            LoadMaxisCareers(jobs, CareerTypes.AdultJob);
+            LoadCustomCareers(jobs, CareerTypes.AdultJob);
+
+            comboJobType.Items.Clear();
+            comboJobType.Items.Add(new UintNamedValue("Unemployed", (uint)Careers.Unemployed));
+            comboJobType.Items.Add(new UintNamedValue("Unknown", (uint)Careers.Unknown));
+
+            foreach (string job in jobs.Keys)
+            {
+                comboJobType.Items.Add(new UintNamedValue(job, jobs[job]));
+            }
+
+            ControlHelper.SetDropDownWidth(comboJobType);
+        }
+
+        private void LoadElderJobs()
+        {
+            if (lastJobs == CareerTypes.ElderJob) return;
+            lastJobs = CareerTypes.ElderJob;
+
+            SortedDictionary<string, uint> jobs = new SortedDictionary<string, uint>(new CareerNameComparer());
+
+            LoadMaxisCareers(jobs, CareerTypes.TeenOrElderJob);
+            LoadCustomCareers(jobs, CareerTypes.TeenOrElderJob);
+
+            // Elders that haven't retired can still have adult jobs
+            LoadMaxisCareers(jobs, CareerTypes.AdultJob);
+            LoadCustomCareers(jobs, CareerTypes.AdultJob);
+
+            comboJobType.Items.Clear();
+            comboJobType.Items.Add(new UintNamedValue("Unemployed", (uint)Careers.Unemployed));
+            comboJobType.Items.Add(new UintNamedValue("Unknown", (uint)Careers.Unknown));
+
+            foreach (string job in jobs.Keys)
+            {
+                comboJobType.Items.Add(new UintNamedValue(job, jobs[job]));
+            }
+
+            ControlHelper.SetDropDownWidth(comboJobType);
+        }
+
+        private void LoadRetiredJobs()
+        {
+            SortedDictionary<string, uint> jobs = new SortedDictionary<string, uint>(new CareerNameComparer());
+
+            LoadMaxisCareers(jobs, CareerTypes.AdultJob);
+            LoadCustomCareers(jobs, CareerTypes.AdultJob);
+
+            comboJobRetiredType.Items.Clear();
+            comboJobRetiredType.Items.Add(new UintNamedValue("Unemployed", (uint)Careers.Unemployed));
+
+            foreach (string job in jobs.Keys)
+            {
+                comboJobRetiredType.Items.Add(new UintNamedValue(job, jobs[job]));
+            }
+
+            ControlHelper.SetDropDownWidth(comboJobRetiredType);
+        }
+
+        private void LoadPetJobs()
+        {
+            if (lastJobs == CareerTypes.PetJob) return;
+            lastJobs = CareerTypes.PetJob;
+
+            SortedDictionary<string, uint> jobs = new SortedDictionary<string, uint>(new CareerNameComparer())
+            {
+                { "Security", (uint)Careers.PetSecurity },
+                { "Service", (uint)Careers.PetService },
+                { "Show Biz", (uint)Careers.PetShowBiz },
+            };
+
+            LoadCustomCareers(jobs, CareerTypes.PetJob);
+
+            comboJobType.Items.Clear();
+            comboJobType.Items.Add(new UintNamedValue("Unemployed", (uint)Careers.Unemployed));
+            comboJobType.Items.Add(new UintNamedValue("Unknown", (uint)Careers.Unknown));
+
+            foreach (string job in jobs.Keys)
+            {
+                comboJobType.Items.Add(new UintNamedValue(job, jobs[job]));
+            }
+
+            ControlHelper.SetDropDownWidth(comboJobType);
+        }
+
+        private readonly Dictionary<string, uint> adultJobs = new Dictionary<string, uint>()
+        {
+            { "Adventurer", (uint)Careers.Adventurer },
+            { "Architecture", (uint)Careers.Architecture },
+            { "Athletic", (uint)Careers.Athletic },
+            { "Artist", (uint)Careers.Artist },
+            { "Business", (uint)Careers.Business },
+            { "Criminal", (uint)Careers.Criminal },
+            { "Culinary", (uint)Careers.Culinary },
+            { "Dance", (uint)Careers.Dance },
+            { "Education", (uint)Careers.Education },
+            { "Entertainment", (uint)Careers.Entertainment },
+            { "Gamer", (uint)Careers.Gamer },
+            { "Intelligence", (uint)Careers.Intelligence },
+            { "Journalism", (uint)Careers.Journalism },
+            { "Law", (uint)Careers.Law },
+            { "Law Enforcement", (uint) Careers.LawEnforcement },
+            { "Medicine", (uint) Careers.Medicine },
+            { "Military", (uint)Careers.Military },
+            { "Music", (uint)Careers.Music },
+            { "Natural Scientist", (uint)Careers.NaturalScientist },
+            { "Ocenography", (uint)Careers.Ocenography },
+            { "Paranormal", (uint)Careers.Paranormal },
+            { "Politics", (uint)Careers.Politics },
+            { "Science", (uint)Careers.Science },
+            { "Show Biz", (uint)Careers.ShowBiz },
+            { "Slacker", (uint)Careers.Slacker }
+        };
+
+        private readonly Dictionary<string, uint> teenElderJobs = new Dictionary<string, uint>()
+        {
+            { "Adventurer", (uint)Careers.TeenElderAdventurer },
+            { "Architecture", (uint)Careers.TeenElderArchitecture },
+            { "Athletic", (uint)Careers.TeenElderAthletic },
+            { "Business", (uint)Careers.TeenElderBusiness },
+            { "Criminal", (uint)Careers.TeenElderCriminal },
+            { "Culinary", (uint)Careers.TeenElderCulinary },
+            { "Dance", (uint)Careers.TeenElderDance },
+            { "Education", (uint)Careers.TeenElderEducation },
+            { "Entertainment", (uint)Careers.TeenElderEntertainment },
+            { "Gamer", (uint)Careers.TeenElderGamer },
+            { "Intelligence", (uint)Careers.TeenElderIntelligence },
+            { "Journalism", (uint)Careers.TeenElderJournalism },
+            { "Law", (uint) Careers.TeenElderLaw },
+            { "Law Enforcement", (uint) Careers.TeenElderLawEnforcement },
+            { "Medicine", (uint) Careers.TeenElderMedicine },
+            { "Military", (uint)Careers.TeenElderMilitary },
+            { "Music", (uint)Careers.TeenElderMusic },
+            { "Ocenography", (uint)Careers.TeenElderOcenography },
+            { "Politics", (uint)Careers.TeenElderPolitics },
+            { "Science", (uint)Careers.TeenElderScience },
+            { "Slacker", (uint)Careers.TeenElderSlacker }
+        };
+
+        private void LoadMaxisCareers(SortedDictionary<string, uint> careers, CareerTypes type)
+        {
+            Dictionary<string, uint> jobs = ((type == CareerTypes.AdultJob) ? adultJobs : teenElderJobs);
+
+            string suffix = (type == CareerTypes.AdultJob) ? "" : " (T/E)";
+
+            foreach (string key in jobs.Keys)
+            {
+                string name = $"{key}{suffix}";
+                careers.Remove(name);
+                careers.Add(name, jobs[key]);
+            }
+        }
+
+        private void LoadCustomCareers(SortedDictionary<string, uint> careers, CareerTypes type)
+        {
+            string suffix = (type == CareerTypes.TeenJob || type == CareerTypes.ElderJob || type == CareerTypes.TeenOrElderJob) ? " (T/E)" : "";
+
+            foreach (CareerData career in careerCache)
+            {
+                if (career.CareerType == type)
+                {
+                    careers.Remove($"{career.Name}{suffix}");
+                    careers.Add($"*{career.Name}{suffix}", career.Guid.AsUInt());
+                }
+            }
+        }
+        #endregion
+
+        #region Interests (Interests/Hobbies/Badges) Combo Box Loading
+        private void LoadOneTrueHobbies()
+        {
+            SortedDictionary<string, uint> hobbies = new SortedDictionary<string, uint>(new CareerNameComparer())
+            {
+                { "Cuisine", 0x00CC },
+                { "Arts & Crafts", 0x00CD },
+                { "Film", 0x00CE },
+                { "Sport", 0x00CF },
+                { "Games", 0x00D0 },
+                { "Nature", 0x00D1 },
+                { "Tinkering", 0x00D2 },
+                { "Fitness", 0x00D3 },
+                { "Science", 0x00D4 },
+                { "Music", 0x00D5 },
+                { "Secret", 0x00D6 }
+            };
+
+            comboHobbyOneTrue.Items.Clear();
+
+            foreach (string hobby in hobbies.Keys)
+            {
+                comboHobbyOneTrue.Items.Add(new UintNamedValue(hobby, hobbies[hobby]));
+            }
+
+            ControlHelper.SetDropDownWidth(comboHobbyOneTrue);
+        }
+        #endregion
+
         #region Form Management
         private void OnLoad(object sender, EventArgs e)
         {
@@ -135,6 +518,10 @@ namespace FamilyManager
             menuItemHighlightSplitFiles.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemHighlightSplitFiles.Name, 0) != 0); OnHighlightSplitFilesClicked(menuItemHighlightSplitFiles, null);
             menuItemIncludeNPCs.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemIncludeNPCs.Name, 0) != 0);
             menuItemOnlyNPCs.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemOnlyNPCs.Name, 0) != 0);
+            menuItemTeensHaveAdultJobs.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemTeensHaveAdultJobs.Name, 0) != 0);
+            menuItemYAsHaveAdultJobs.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemYAsHaveAdultJobs.Name, 0) != 0);
+
+            UpdateInterestTrackers((InterestTrackerStyle)(int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemIntDisplay.Name, (int)InterestTrackerStyle.BarAndBox));
 
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
@@ -164,6 +551,16 @@ namespace FamilyManager
             DataCache.InvalidateHoods();
 
             DoWork_FillHoodTree(null, DBPFData.INSTANCE_NULL);
+
+            LoadSchools();
+            LoadSchoolGrades();
+
+            LoadMajors();
+            LoadSemesters();
+
+            LoadAdultJobs();
+
+            LoadOneTrueHobbies();
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
@@ -196,6 +593,9 @@ namespace FamilyManager
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemHighlightSplitFiles.Name, menuItemHighlightSplitFiles.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemIncludeNPCs.Name, menuItemIncludeNPCs.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemOnlyNPCs.Name, menuItemOnlyNPCs.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemTeensHaveAdultJobs.Name, menuItemTeensHaveAdultJobs.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemYAsHaveAdultJobs.Name, menuItemYAsHaveAdultJobs.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemIntDisplay.Name, (int)interestsTrackersStyle);
 
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
@@ -293,7 +693,7 @@ namespace FamilyManager
                         if (familyId == DBPFData.INSTANCE_NULL)
                         {
                             OnTreeHoodsClicked(treeHoods, new TreeNodeMouseClickEventArgs(treeHoods.Nodes[0], MouseButtons.Left, 1, 0, 0));
-                            treeHoods.Nodes[0]?.Nodes[0]?.Expand();
+                            // treeHoods.Nodes[0]?.Nodes[0]?.Expand();
                             treeHoods.Nodes[0]?.Expand();
                         }
                         else
@@ -335,18 +735,29 @@ namespace FamilyManager
 
                 if (!cachesLoaded)
                 {
+                    careerCache.LoadCareers();
                     clothingCache.LoadOutfits(Gzps.TYPE);
                     jewelleryCache.LoadOutfits(Xmol.TYPE);
                     cachesLoaded = true;
+
+                    LoadCareers();
                 }
+
+                UpdateCurrentFamily();
+                ClearFamily();
+
+                ClearHood();
             }
-            else if (selectedNode is HoodTreeNode hoodNode)
+            else if (selectedNode is HoodTreeNode)
             {
-                SelectHood(hoodNode);
+                // SelectHood(selectedNode as HoodTreeNode);
+
+                UpdateCurrentFamily();
+                ClearFamily();
             }
             else if (selectedNode is FamilyTreeNode familyNode)
             {
-                hoodNode = familyNode.Parent as HoodTreeNode;
+                HoodTreeNode hoodNode = familyNode.Parent as HoodTreeNode;
                 SelectHood(hoodNode);
 
                 logger.Info($"Selected Family: {familyNode.Text}");
@@ -589,7 +1000,7 @@ namespace FamilyManager
             try
 #endif
             {
-                sender.SetProgress(0, "Loading Hood Tree");
+                //sender.SetProgress(0, "Loading Hood Tree");
 
                 WorkerAddTreeNodeTask task = new WorkerAddTreeNodeTask(treeHoods.Nodes, new TopTreeNode("Hoods"));
                 sender.SetData(task);
@@ -626,101 +1037,173 @@ namespace FamilyManager
             IWorkerTask task = e.Argument as IWorkerTask;
             task.DoTask();
         }
+
+        private void DoAsyncWork_ProcessFamilies(ProgressDialog sender, DoWorkEventArgs args)
+        {
+            HoodTreeNode hoodNode = args.Argument as HoodTreeNode; // As passed to the Sims2ToolsProgressDialog constructor
+
+            sender.VisualMode = ProgressBarDisplayMode.CustomText;
+
+#if !DEBUG
+            try
+#endif
+            {
+                if (!PopulateHoodFamilies(sender, hoodNode))
+                {
+                    args.Cancel = true;
+                    return;
+                }
+            }
+#if !DEBUG
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                logger.Info(ex.StackTrace);
+
+                if (MsgBox.Show($"An error occured while processing\n{lastPackageFile}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                {
+                    throw ex;
+                }
+            }
+#endif
+        }
+
+        private void DoAsyncData_ProcessFamilies(ProgressDialog sender, DoWorkEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke((MethodInvoker)delegate { DoAsyncData_ProcessFamilies(sender, e); });
+                return;
+            }
+
+            // This will be run on the main (UI) thread 
+            IWorkerTask task = e.Argument as IWorkerTask;
+            task.DoTask();
+        }
         #endregion
 
-        #region Worker Helpers
+        #region Hood Worker Helpers
         private bool PopulateHoods(ProgressDialog sender, TreeNode parent)
         {
-            foreach (string subDir in Directory.GetDirectories($"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods", "*", SearchOption.TopDirectoryOnly))
+            string[] subHoodDirs = Directory.GetDirectories($"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods", "*", SearchOption.TopDirectoryOnly);
+
+            double percent = 0.0f;
+            double delta = 100.0f / subHoodDirs.Length;
+
+            foreach (string subHoodDir in subHoodDirs)
             {
                 if (sender.CancellationPending)
                 {
                     return false;
                 }
 
-                DirectoryInfo di = new DirectoryInfo(subDir);
+                DirectoryInfo di = new DirectoryInfo(subHoodDir);
 
-                if (di.Name.Equals("Tutorial")) continue;
+                if (!di.Name.Equals("Tutorial"))
+                {
+                    foreach (string packagePath in Directory.GetFiles(subHoodDir, $"{di.Name}_Neighborhood.package", SearchOption.TopDirectoryOnly))
+                    {
+                        if (sender.CancellationPending)
+                        {
+                            return false;
+                        }
 
-                bool keepGoing = PopulateHoodFamilies(sender, parent, subDir, $"{di.Name}_Neighborhood.package");
+                        using (CacheableDbpfFile package = packageCache.OpenForReadOnly(packagePath))
+                        {
+                            Ctss ctss = (Ctss)package.GetResourceByKey(new DBPFKey(Ctss.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000001, DBPFData.RESOURCE_NULL));
 
-                if (!keepGoing) return false;
+                            if (ctss != null)
+                            {
+                                string hoodName = GetString(ctss, 0);
+                                HoodTreeNode hoodNode = new HoodTreeNode(packagePath, di.Name, hoodName);
+                                WorkerAddTreeNodeTask task = new WorkerAddTreeNodeTask(parent.Nodes, hoodNode);
+                                sender.SetProgress((int)percent, $"Loading {hoodName} ({di.Name})");
+                                sender.SetData(task);
+                                sender.SetData(new WorkerAddTreeNodeTask(hoodNode.Nodes, new TreeNode("Placeholder"))); // Force the + by the side of the hood node
+                            }
+
+                            package.Close();
+                        }
+                    }
+                }
+
+                percent += delta;
             }
 
             return true;
         }
 
-        private bool PopulateHoodFamilies(ProgressDialog sender, TreeNode parent, string folder, string packagePattern)
+        private bool PopulateHoodFamilies(ProgressDialog sender, HoodTreeNode hoodNode)
         {
-            DirectoryInfo di = new DirectoryInfo(folder);
-
-            foreach (string packagePath in Directory.GetFiles(folder, packagePattern, SearchOption.TopDirectoryOnly))
+            using (CacheableDbpfFile package = packageCache.OpenForReadOnly(hoodNode.PackagePath))
             {
-                if (sender.CancellationPending)
-                {
-                    return false;
-                }
+                SortedDictionary<string, List<TypeInstanceID>> hoodFamilies = new SortedDictionary<string, List<TypeInstanceID>>();
 
-                using (CacheableDbpfFile package = packageCache.OpenForReadOnly(packagePath))
-                {
-                    Ctss ctss = (Ctss)package.GetResourceByKey(new DBPFKey(Ctss.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000001, DBPFData.RESOURCE_NULL));
+                List<DBPFEntry> famiEntries = package.GetEntriesByType(Fami.TYPE);
 
-                    if (ctss != null)
+                double percent = 0.0f;
+                double delta = 100.0f / famiEntries.Count;
+
+                foreach (DBPFEntry famiEntry in famiEntries)
+                {
+                    if (sender.CancellationPending)
                     {
-                        string hoodName = GetString(ctss, 0);
-                        WorkerAddTreeNodeTask task = new WorkerAddTreeNodeTask(parent.Nodes, new HoodTreeNode(packagePath, di.Name, hoodName));
-                        sender.SetData(task);
-
-                        SortedDictionary<string, List<TypeInstanceID>> hoodFamilies = new SortedDictionary<string, List<TypeInstanceID>>();
-
-                        foreach (DBPFEntry entry in package.GetEntriesByType(Fami.TYPE))
-                        {
-                            uint inst = entry.InstanceID.AsUInt();
-
-                            if (menuItemOnlyNPCs.Checked)
-                            {
-                                if (inst > 0x0000 && inst < (uint)FamiCodes.Lowest) continue;
-                            }
-                            else if (!menuItemIncludeNPCs.Checked)
-                            {
-                                if (inst == 0x0000 || inst >= (uint)FamiCodes.Lowest) continue;
-                            }
-
-                            Fami fami = (Fami)package.GetResourceByEntry(entry);
-                            Str str = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, fami));
-                            string familyName;
-
-                            if (inst == 0x0000 || inst >= (uint)FamiCodes.Lowest)
-                            {
-                                familyName = $"{(FamiCodes)inst} (NPCs)";
-                            }
-                            else
-                            {
-                                familyName = GetString(str, 0);
-                            }
-
-                            if (!hoodFamilies.ContainsKey(familyName))
-                            {
-                                hoodFamilies.Add(familyName, new List<TypeInstanceID>());
-                            }
-
-                            hoodFamilies[familyName].Add(fami.InstanceID);
-                        }
-
-                        foreach (string familyName in hoodFamilies.Keys)
-                        {
-                            foreach (TypeInstanceID familyInstance in hoodFamilies[familyName])
-                            {
-                                sender.SetData(new WorkerAddTreeNodeTask(task.ChildNode.Nodes, new FamilyTreeNode(familyInstance, familyName)));
-                            }
-                        }
+                        return false;
                     }
 
-                    package.Close();
+                    uint inst = famiEntry.InstanceID.AsUInt();
+
+                    if (menuItemOnlyNPCs.Checked)
+                    {
+                        if (inst > 0x0000 && inst < (uint)FamiCodes.Lowest) continue;
+                    }
+                    else if (!menuItemIncludeNPCs.Checked)
+                    {
+                        if (inst == 0x0000 || inst >= (uint)FamiCodes.Lowest) continue;
+                    }
+
+                    Fami fami = (Fami)package.GetResourceByEntry(famiEntry);
+                    Str str = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, fami));
+                    string familyName;
+
+                    if (inst == 0x0000 || inst >= (uint)FamiCodes.Lowest)
+                    {
+                        familyName = $"{(FamiCodes)inst} (NPCs)";
+                    }
+                    else
+                    {
+                        familyName = GetString(str, 0);
+                    }
+
+                    if (!hoodFamilies.ContainsKey(familyName))
+                    {
+                        hoodFamilies.Add(familyName, new List<TypeInstanceID>());
+                        sender.SetProgress((int)percent, $"Loading {familyName}");
+                    }
+
+                    hoodFamilies[familyName].Add(fami.InstanceID);
+
+                    percent += delta;
                 }
+
+                foreach (string familyName in hoodFamilies.Keys)
+                {
+                    foreach (TypeInstanceID familyInstance in hoodFamilies[familyName])
+                    {
+                        FamilyTreeNode familyNode = new FamilyTreeNode(familyInstance, familyName, FamilyData.FamilyLocation(packageCache, hoodNode, familyInstance));
+                        sender.SetData(new WorkerAddTreeNodeTask(hoodNode.Nodes, familyNode));
+                    }
+                }
+
+                package.Close();
             }
 
             return true;
+        }
+
+        private void ClearHood()
+        {
+            lastHoodNode = null;
         }
 
         private void SelectHood(HoodTreeNode hoodNode)
@@ -758,6 +1241,23 @@ namespace FamilyManager
                 dataSuitcase.Clear();
                 dataJewelbox.Clear();
             }
+        }
+
+        #endregion
+
+        #region Family Worker Helpers
+        private void ClearFamily()
+        {
+            ClearFamilyTabValues();
+
+            lblFamilyName.Text = "";
+            lblLotName.Text = "";
+            dataFamilyMembers.Clear();
+            imageFamily.Image = null;
+
+            lastHoodNode = null;
+
+            lastFamilyNode = null;
         }
 
         private void UpdateCurrentFamily()
@@ -861,6 +1361,586 @@ namespace FamilyManager
         }
         #endregion
 
+        #region Member Worker Helpers
+        private CharacterData currentMemberData;
+        private bool ignoreCareerChanges = false;
+        private bool ignoreInterestsChanges = false;
+        private bool ignoreSkillsChanges = false;
+
+        private void ClearCareerTab()
+        {
+            currentMemberData = null;
+
+            imageSim.Image = null;
+
+            ignoreCareerChanges = true;
+
+            grpSchool.Enabled = false;
+            comboSchoolType.SelectedIndex = -1;
+            textSchoolGUID.Value = GuidTextBox.NO_VALUE;
+            comboSchoolGrade.SelectedIndex = -1;
+
+            grpUniversity.Enabled = false;
+            grpUniversity.Text = "University";
+
+            lblUniSemester.Visible = comboUniSemester.Visible = false;
+            lblUniGrade.Visible = trackUniGrade.Visible = textUniGrade.Visible = false;
+            lblUniEffort.Visible = trackUniEffort.Visible = textUniEffort.Visible = false;
+            lblUniTimeLeft.Visible = trackUniTimeLeft.Visible = textUniTimeLeft.Visible = false;
+            lblUniInfluence.Visible = textUniInfluence.Visible = false;
+            lblUniProbation.Visible = ckbUniProbation.Visible = false;
+            lblUniStudying.Visible = ckbUniStudying.Visible = false;
+
+            comboUniMajor.SelectedIndex = -1;
+            comboUniSemester.SelectedIndex = -1;
+            trackUniGrade.Value = 0;
+            textUniGrade.Value = UIntTextBox.NO_VALUE;
+            trackUniEffort.Value = 0;
+            textUniEffort.Value = UIntTextBox.NO_VALUE;
+            trackUniTimeLeft.Value = 0;
+            textUniTimeLeft.Value = UIntTextBox.NO_VALUE;
+            textUniInfluence.Value = UIntTextBox.NO_VALUE;
+
+            grpJob.Enabled = false;
+            comboJobType.SelectedIndex = -1;
+            textJobGUID.Value = GuidTextBox.NO_VALUE;
+            trackJobLevel.Value = 0;
+            textJobLevel.Value = UIntTextBox.NO_VALUE;
+            trackJobPerformance.Value = 0;
+            textJobPerformance.Value = IntTextBox.NO_VALUE;
+            textJobPTO.Value = UIntTextBox.NO_VALUE;
+            lblJobPTOSummary.Visible = false;
+            textJobPension.Value = UIntTextBox.NO_VALUE;
+            comboJobRetiredType.SelectedIndex = -1;
+            textJobRetiredGUID.Value = GuidTextBox.NO_VALUE;
+            trackJobRetiredLevel.Value = 0;
+            textJobRetiredLevel.Value = UIntTextBox.NO_VALUE;
+
+            ignoreCareerChanges = false;
+        }
+
+        private void DoWork_FillCareerTab()
+        {
+            if (gridFamilyMembers.SelectedRows.Count == 1)
+            {
+                currentMemberData = (gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+
+                imageSim.Image = currentMemberData.Thumbnail(currentMemberData.AgeCode);
+
+                ignoreCareerChanges = true;
+
+                { // School
+                    grpSchool.Enabled = currentMemberData.IsChildOrOlder;
+
+                    if (grpSchool.Enabled)
+                    {
+                        SetCombo(comboSchoolType, currentMemberData.SchoolGuid.AsUInt());
+                        textSchoolGUID.Value = currentMemberData.SchoolGuid.AsUInt();
+
+                        lblSchoolGrade.Visible = comboSchoolGrade.Visible = true;
+                        SetCombo(comboSchoolGrade, currentMemberData.SchoolGrade);
+                    }
+                    else
+                    {
+                        comboSchoolType.SelectedIndex = -1;
+                        textSchoolGUID.Value = GuidTextBox.NO_VALUE;
+
+                        lblSchoolGrade.Visible = comboSchoolGrade.Visible = false;
+                    }
+                }
+
+                { // University
+                    grpUniversity.Enabled = currentMemberData.IsYoungAdultOrOlder;
+
+                    if (!grpUniversity.Enabled)
+                    {
+                        comboUniMajor.SelectedIndex = 0;
+                        textMajorGUID.Value = GuidTextBox.NO_VALUE;
+                    }
+                    else
+                    {
+                        SetCombo(comboUniMajor, currentMemberData.UniMajorGuid.AsUInt());
+                        textMajorGUID.Value = currentMemberData.UniMajorGuid.AsUInt();
+                    }
+
+                    lblUniResult.Visible = comboUniResult.Visible = false;
+                    lblUniSemester.Visible = comboUniSemester.Visible = false;
+                    lblUniGrade.Visible = trackUniGrade.Visible = textUniGrade.Visible = false;
+                    lblUniEffort.Visible = trackUniEffort.Visible = textUniEffort.Visible = false;
+                    lblUniTimeLeft.Visible = trackUniTimeLeft.Visible = textUniTimeLeft.Visible = false;
+                    lblUniInfluence.Visible = textUniInfluence.Visible = false;
+                    lblUniProbation.Visible = ckbUniProbation.Visible = false;
+                    lblUniStudying.Visible = ckbUniStudying.Visible = false;
+
+                    if (currentMemberData.OnCampus)
+                    {
+                        grpUniversity.Text = "University (On Campus)";
+                        lblUniResult.Visible = comboUniResult.Visible = false;
+
+                        lblUniSemester.Visible = comboUniSemester.Visible = true;
+                        SetCombo(comboUniSemester, currentMemberData.UniSemester);
+
+                        lblUniGrade.Visible = trackUniGrade.Visible = textUniGrade.Visible = true;
+                        trackUniGrade.Value = currentMemberData.UniCurrentGPA;
+                        textUniGrade.Value = (currentMemberData.UniCurrentGPA / 10.0f);
+
+                        lblUniEffort.Visible = trackUniEffort.Visible = textUniEffort.Visible = true;
+                        trackUniEffort.Value = currentMemberData.UniEffort;
+                        textUniEffort.Value = currentMemberData.UniEffort;
+
+                        lblUniTimeLeft.Visible = trackUniTimeLeft.Visible = textUniTimeLeft.Visible = true;
+                        trackUniTimeLeft.Value = (int)Math.Min(careerCache.SemesterLength, currentMemberData.UniTimeLeft);
+                        textUniTimeLeft.Value = Math.Min(careerCache.SemesterLength, currentMemberData.UniTimeLeft);
+
+                        lblUniInfluence.Visible = textUniInfluence.Visible = true;
+                        textUniInfluence.Value = currentMemberData.UniInfluence;
+
+                        lblUniProbation.Visible = ckbUniProbation.Visible = true;
+                        ckbUniProbation.Checked = currentMemberData.UniProbation;
+
+                        lblUniStudying.Visible = ckbUniStudying.Visible = true;
+                        ckbUniStudying.Checked = currentMemberData.UniStudying;
+                    }
+                    else
+                    {
+                        grpUniversity.Text = "University";
+
+                        lblUniResult.Visible = comboUniResult.Visible = currentMemberData.IsAdultOrOlder;
+
+                        if (currentMemberData.Graduated)
+                        {
+                            comboUniResult.SelectedIndex = 1;
+                        }
+                        else if (currentMemberData.DroppedOut)
+                        {
+                            comboUniResult.SelectedIndex = 2;
+                        }
+                        else if (currentMemberData.Expelled)
+                        {
+                            comboUniResult.SelectedIndex = 3;
+                        }
+                        else
+                        {
+                            comboUniResult.SelectedIndex = 0;
+                        }
+
+                        lblUniMajor.Enabled = comboUniMajor.Enabled = textMajorGUID.Enabled = (comboUniResult.SelectedIndex != 0);
+                    }
+                }
+
+                { // Job
+                    EnableJobGroup(currentMemberData.IsTeen || currentMemberData.IsAdultOrOlder || (currentMemberData.IsYoungAdult && menuItemYAsHaveAdultJobs.Checked));
+                }
+
+                ignoreCareerChanges = false;
+            }
+            else
+            {
+                ClearCareerTab();
+            }
+        }
+
+        private void ClearSkillsTab()
+        {
+            currentMemberData = null;
+
+            ignoreSkillsChanges = true;
+
+            foreach (Control control in grpSkillsGeneral.Controls)
+            {
+                if (control is SkillTracker tracker)
+                {
+                    tracker.Value = SkillTracker.NO_VALUE;
+                }
+            }
+
+            foreach (Control control in grpSkillsToddler.Controls)
+            {
+                if (control is SkillTracker tracker)
+                {
+                    tracker.Value = SkillTracker.NO_VALUE;
+                }
+            }
+
+            foreach (Control control in grpSkillsHidden.Controls)
+            {
+                if (control is SkillTracker tracker)
+                {
+                    tracker.Value = SkillTracker.NO_VALUE;
+                }
+            }
+
+            foreach (Control control in grpSkillsLife.Controls)
+            {
+                if (control is SkillTracker tracker)
+                {
+                    tracker.Value = SkillTracker.NO_VALUE;
+                }
+            }
+
+            foreach (Control control in grpSkillsPet.Controls)
+            {
+                if (control is SkillTracker tracker)
+                {
+                    tracker.Value = SkillTracker.NO_VALUE;
+                }
+            }
+
+            ignoreSkillsChanges = false;
+        }
+
+        private void DoWork_FillSkillsTab()
+        {
+            if (gridFamilyMembers.SelectedRows.Count == 1)
+            {
+                currentMemberData = (gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+
+                ignoreSkillsChanges = true;
+
+                { // General Skills
+                    grpSkillsGeneral.Enabled = currentMemberData.IsToddlerOrOlder;
+
+                    if (grpSkillsGeneral.Enabled)
+                    {
+                        foreach (Control control in grpSkillsGeneral.Controls)
+                        {
+                            if (control is SkillTracker tracker)
+                            {
+                                tracker.Value = currentMemberData.GetSkillValue(tracker.SdscIndex, tracker.Maximum);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (Control control in grpSkillsGeneral.Controls)
+                        {
+                            if (control is SkillTracker tracker)
+                            {
+                                tracker.Value = SkillTracker.NO_VALUE;
+                            }
+                        }
+                    }
+                }
+
+                { // Toddler Skills
+                    grpSkillsToddler.Enabled = currentMemberData.IsToddlerOrOlder;
+
+                    if (grpSkillsToddler.Enabled)
+                    {
+                        foreach (Control control in grpSkillsToddler.Controls)
+                        {
+                            if (control is SkillTracker tracker)
+                            {
+                                tracker.Value = currentMemberData.GetToddlerSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Maximum);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (Control control in grpSkillsToddler.Controls)
+                        {
+                            if (control is SkillTracker tracker)
+                            {
+                                tracker.Value = SkillTracker.NO_VALUE;
+                            }
+                        }
+                    }
+                }
+
+                { // Hidden Skills
+                    grpSkillsHidden.Enabled = currentMemberData.IsChildOrOlder;
+
+                    if (grpSkillsHidden.Enabled)
+                    {
+                        foreach (Control control in grpSkillsHidden.Controls)
+                        {
+                            if (control is SkillTracker tracker)
+                            {
+                                tracker.Value = currentMemberData.GetHiddenSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Maximum);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (Control control in grpSkillsHidden.Controls)
+                        {
+                            if (control is SkillTracker tracker)
+                            {
+                                tracker.Value = SkillTracker.NO_VALUE;
+                            }
+                        }
+                    }
+                }
+
+                { // Life Skills
+                    grpSkillsLife.Enabled = currentMemberData.IsChildOrOlder;
+
+                    if (grpSkillsLife.Enabled)
+                    {
+                        foreach (Control control in grpSkillsLife.Controls)
+                        {
+                            if (control is SkillTracker tracker)
+                            {
+                                tracker.Value = currentMemberData.GetLifeSkillValue((TypeGUID)tracker.TokenGuid, tracker.Maximum);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (Control control in grpSkillsLife.Controls)
+                        {
+                            if (control is SkillTracker tracker)
+                            {
+                                tracker.Value = SkillTracker.NO_VALUE;
+                            }
+                        }
+                    }
+                }
+
+                { // Pet Skills
+                    grpSkillsPet.Enabled = currentMemberData.IsPet;
+
+                    if (grpSkillsPet.Enabled)
+                    {
+                        foreach (Control control in grpSkillsPet.Controls)
+                        {
+                            if (control is SkillTracker tracker)
+                            {
+                                tracker.Value = (ushort)currentMemberData.GetPetSkillValue((TypeGUID)tracker.TokenGuid);
+                            }
+                        }
+
+                        trackSkillPetUseToilet.Enabled = currentMemberData.IsCat;
+                        if (!trackSkillPetUseToilet.Enabled)
+                        {
+                            trackSkillPetUseToilet.Value = SkillTracker.NO_VALUE;
+                        }
+                    }
+                    else
+                    {
+                        foreach (Control control in grpSkillsPet.Controls)
+                        {
+                            if (control is SkillTracker tracker)
+                            {
+                                tracker.Value = SkillTracker.NO_VALUE;
+                            }
+                        }
+                    }
+                }
+
+                ignoreSkillsChanges = false;
+            }
+            else
+            {
+                ClearSkillsTab();
+            }
+        }
+
+        private void ClearInterestsTab()
+        {
+            currentMemberData = null;
+
+            ignoreInterestsChanges = true;
+
+            foreach (Control control in grpInterests.Controls)
+            {
+                if (control is InterestTracker tracker)
+                {
+                    tracker.Value = InterestTracker.NO_VALUE;
+                }
+            }
+
+            foreach (Control control in grpHobbies.Controls)
+            {
+                if (control is InterestTracker tracker)
+                {
+                    tracker.Value = InterestTracker.NO_VALUE;
+                }
+            }
+
+            comboHobbyOneTrue.SelectedIndex = -1;
+
+            foreach (Control control in grpBadges.Controls)
+            {
+                if (control is InterestTracker tracker)
+                {
+                    tracker.Value = InterestTracker.NO_VALUE;
+                }
+            }
+
+            ignoreInterestsChanges = false;
+        }
+
+        private void DoWork_FillInterestsTab()
+        {
+            if (gridFamilyMembers.SelectedRows.Count == 1)
+            {
+                currentMemberData = (gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+
+                ignoreInterestsChanges = true;
+
+                { // Interests
+                    foreach (Control control in grpInterests.Controls)
+                    {
+                        if (control is InterestTracker tracker)
+                        {
+                            tracker.Value = currentMemberData.GetInterestValue(tracker.SdscIndex);
+                        }
+                    }
+                }
+
+                { // Hobbies - Requires FreeTime
+                    grpHobbies.Enabled = currentMemberData.HasHobbies;
+
+                    if (currentMemberData.HasHobbies)
+                    {
+                        foreach (Control control in grpHobbies.Controls)
+                        {
+                            if (control is InterestTracker tracker)
+                            {
+                                tracker.Value = currentMemberData.GetHobbyValue(tracker.SdscIndex);
+                            }
+                        }
+
+                        SetCombo(comboHobbyOneTrue, currentMemberData.OneTrueHobby);
+                    }
+                    else
+                    {
+                        foreach (Control control in grpHobbies.Controls)
+                        {
+                            if (control is InterestTracker tracker)
+                            {
+                                tracker.Value = InterestTracker.NO_VALUE;
+                            }
+                        }
+
+                        comboHobbyOneTrue.SelectedIndex = -1;
+                    }
+                }
+
+                { // Badges - Requires OfB (Seasons and FreeTime)
+                    grpBadges.Enabled = currentMemberData.HasBadges;
+
+                    foreach (InterestTracker tracker in new InterestTracker[] { trackBadgeCashier, trackBadgeCosmetics, trackBadgeFlorist, trackBadgeRobotery, trackBadgeSales, trackBadgeStocking, trackBadgeToyMaking })
+                    {
+                        tracker.Value = currentMemberData.GetBadgeValue(tracker.TokenGuid);
+                    }
+
+                    foreach (InterestTracker tracker in new InterestTracker[] { trackBadgeFishing, trackBadgeGardening })
+                    {
+                        if (currentMemberData.HasSeasonsBadges)
+                        {
+                            tracker.Enabled = true;
+                            tracker.Value = currentMemberData.GetBadgeValue(tracker.TokenGuid);
+                        }
+                        else
+                        {
+                            tracker.Enabled = false;
+                            tracker.Value = InterestTracker.NO_VALUE;
+                        }
+                    }
+
+                    foreach (InterestTracker tracker in new InterestTracker[] { trackBadgePottery, trackBadgeSewing })
+                    {
+                        if (currentMemberData.HasFreeTimeBadges)
+                        {
+                            tracker.Enabled = true;
+                            tracker.Value = currentMemberData.GetBadgeValue(tracker.TokenGuid);
+                        }
+                        else
+                        {
+                            tracker.Enabled = false;
+                            tracker.Value = InterestTracker.NO_VALUE;
+                        }
+                    }
+                }
+
+                ignoreInterestsChanges = false;
+            }
+            else
+            {
+                ClearInterestsTab();
+            }
+        }
+
+        private void EnableJobGroup(bool enabled)
+        {
+            grpJob.Enabled = enabled;
+
+            if (!enabled)
+            {
+                comboJobType.SelectedIndex = -1;
+                textJobGUID.Value = GuidTextBox.NO_VALUE;
+
+                lblJobLevel.Visible = trackJobLevel.Visible = textJobLevel.Visible = false;
+                lblJobPerformance.Visible = trackJobPerformance.Visible = textJobPerformance.Visible = false;
+                lblJobPTO.Visible = textJobPTO.Visible = lblJobPTOSummary.Visible = false;
+
+                lblJobPension.Visible = textJobPension.Visible = false;
+                lblJobRetiredType.Visible = comboJobRetiredType.Visible = textJobRetiredGUID.Visible = false;
+                lblJobRetiredLevel.Visible = trackJobRetiredLevel.Visible = textJobRetiredLevel.Visible = false;
+            }
+            else
+            {
+                lblJobLevel.Visible = trackJobLevel.Visible = textJobLevel.Visible = true;
+                lblJobPerformance.Visible = trackJobPerformance.Visible = textJobPerformance.Visible = true;
+                lblJobPTO.Visible = textJobPTO.Visible = lblJobPTOSummary.Visible = true;
+
+                lblJobPension.Visible = textJobPension.Visible = currentMemberData.IsElder;
+                lblJobRetiredType.Visible = comboJobRetiredType.Visible = textJobRetiredGUID.Visible = currentMemberData.IsElder;
+                lblJobRetiredLevel.Visible = trackJobRetiredLevel.Visible = textJobRetiredLevel.Visible = currentMemberData.IsElder;
+
+                if (currentMemberData.IsTeen)
+                {
+                    LoadTeenJobs();
+                }
+                else if (currentMemberData.IsElder)
+                {
+                    LoadElderJobs();
+                }
+                else if (currentMemberData.IsPet)
+                {
+                    LoadPetJobs();
+                }
+                else
+                {
+                    LoadAdultJobs();
+                }
+
+                SetCombo(comboJobType, currentMemberData.JobGuid.AsUInt());
+                textJobGUID.Value = currentMemberData.JobGuid.AsUInt();
+                trackJobLevel.Value = currentMemberData.JobLevel;
+                textJobLevel.Value = currentMemberData.JobLevel;
+                trackJobPerformance.Value = currentMemberData.JobPerformance;
+                textJobPerformance.Value = currentMemberData.JobPerformance;
+                textJobPTO.Value = currentMemberData.JobPTO;
+                lblJobPTOSummary.Text = $"({(textJobPTO.Value == 0 ? 0 : Math.Max(0, (textJobPTO.Value - 1) / 100))} days)";
+                textJobPension.Value = currentMemberData.JobPension;
+                SetCombo(comboJobRetiredType, currentMemberData.JobRetiredGuid.AsUInt());
+                textJobRetiredGUID.Value = currentMemberData.JobRetiredGuid.AsUInt();
+                trackJobRetiredLevel.Value = currentMemberData.JobRetiredLevel;
+                textJobRetiredLevel.Value = currentMemberData.JobRetiredLevel;
+            }
+        }
+
+        private void SetCombo(ComboBox combo, uint value)
+        {
+            bool found = false;
+
+            for (int i = 1; i < combo.Items.Count; ++i)
+            {
+                if ((combo.Items[i] as UintNamedValue).Value == value)
+                {
+                    combo.SelectedIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) combo.SelectedIndex = 0;
+        }
+        #endregion
+
         #region Form State
         private bool updatingFormState = false;
 
@@ -893,6 +1973,13 @@ namespace FamilyManager
             if (currentFamily == null)
             {
                 tabPages.SelectedIndex = 0;
+
+                tabPages.TabPages.Remove(tabCloset);
+                tabPages.TabPages.Remove(tabSafe);
+
+                tabPages.TabPages.Remove(tabCareer);
+                tabPages.TabPages.Remove(tabSkills);
+                tabPages.TabPages.Remove(tabInterests);
             }
             else
             {
@@ -900,20 +1987,18 @@ namespace FamilyManager
                 {
                     tabPages.SelectedIndex = 0;
 
-                    if (tabPages.TabPages.Count == 3)
-                    {
-                        tabPages.TabPages.Remove(tabCloset);
-                        tabPages.TabPages.Remove(tabSafe);
-                    }
+                    tabPages.TabPages.Remove(tabCloset);
+                    tabPages.TabPages.Remove(tabSafe);
                 }
                 else
                 {
-                    if (tabPages.TabPages.Count == 1)
-                    {
-                        tabPages.TabPages.Add(tabCloset);
-                        tabPages.TabPages.Add(tabSafe);
-                    }
+                    if (!tabPages.TabPages.Contains(tabCloset)) tabPages.TabPages.Insert(1, tabCloset);
+                    if (!tabPages.TabPages.Contains(tabSafe)) tabPages.TabPages.Insert(2, tabSafe);
                 }
+
+                if (!tabPages.TabPages.Contains(tabCareer)) tabPages.TabPages.Add(tabCareer);
+                if (!tabPages.TabPages.Contains(tabSkills)) tabPages.TabPages.Add(tabSkills);
+                if (!tabPages.TabPages.Contains(tabInterests)) tabPages.TabPages.Add(tabInterests);
 
                 panelFamily.Enabled = !currentFamily.IsNPCFamily;
 
@@ -952,6 +2037,14 @@ namespace FamilyManager
             lblSafeCachesNeeded.Visible = !gridFamilySafe.Enabled;
         }
 
+        private void UpdateCareerTabState()
+        {
+            LoadCareers();
+
+            textUniTimeLeft.Maximum = careerCache.SemesterLength;
+            trackUniTimeLeft.Maximum = (int)textUniTimeLeft.Maximum;
+        }
+
         private void UpdateSaveState()
         {
             menuItemSaveAll.Enabled = btnSave.Enabled = packageCache.IsDirty;
@@ -967,6 +2060,19 @@ namespace FamilyManager
             {
                 // Perform any reload necessary after changing the objects.package location
             }
+        }
+        #endregion
+
+        #region Mode Menu Actions
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+            if (Sims2ToolsLib.AllAdvancedMode) menuItemAdvanced.Checked = true;
+        }
+
+        private void OnAdvancedModeChanged(object sender, EventArgs e)
+        {
+            UpdateFormState();
         }
         #endregion
 
@@ -1017,17 +2123,81 @@ namespace FamilyManager
 
             DoWork_FillHoodTree(null, DBPFData.INSTANCE_NULL);
         }
-        #endregion
 
-        #region Mode Menu Actions
-        private void OnModeOpening(object sender, EventArgs e)
+        private void OnTeensHaveAdultJobsClicked(object sender, EventArgs e)
         {
-            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+            if (IsCareerTabActive && (lastJobs == CareerTypes.TeenJob))
+            {
+                ignoreCareerChanges = true;
+                lastJobs = CareerTypes.Unknown;
+                LoadTeenJobs();
+                SetCombo(comboJobType, textJobGUID.Value);
+                ignoreCareerChanges = false;
+            }
         }
 
-        private void OnAdvancedModeChanged(object sender, EventArgs e)
+        private void OnYAsHaveAdultJobsClicked(object sender, EventArgs e)
         {
-            UpdateFormState();
+            if (IsCareerTabActive && currentMemberData.IsYoungAdult)
+            {
+                ignoreCareerChanges = true;
+                EnableJobGroup(menuItemYAsHaveAdultJobs.Checked);
+                ignoreCareerChanges = false;
+            }
+        }
+        private void OnInterestsDisplayOpening(object sender, EventArgs e)
+        {
+            menuItemIntDisplayBarAndBox.Checked = (interestsTrackersStyle == InterestTrackerStyle.BarAndBox);
+            menuItemIntDisplayBarOnly.Checked = (interestsTrackersStyle == InterestTrackerStyle.BarOnly);
+            menuItemIntDisplayBoxOnly.Checked = (interestsTrackersStyle == InterestTrackerStyle.BoxOnly);
+        }
+
+        private void OnInterestsDisplayClicked(object sender, EventArgs e)
+        {
+            if (sender == menuItemIntDisplayBarAndBox)
+            {
+                UpdateInterestTrackers(InterestTrackerStyle.BarAndBox);
+            }
+            else if (sender == menuItemIntDisplayBarOnly)
+            {
+                UpdateInterestTrackers(InterestTrackerStyle.BarOnly);
+            }
+            else if (sender == menuItemIntDisplayBoxOnly)
+            {
+                UpdateInterestTrackers(InterestTrackerStyle.BoxOnly);
+            }
+        }
+
+        private void UpdateInterestTrackers(InterestTrackerStyle newTrackerStyle)
+        {
+            if (newTrackerStyle != interestsTrackersStyle)
+            {
+                interestsTrackersStyle = newTrackerStyle;
+
+                foreach (Control control in grpInterests.Controls)
+                {
+                    if (control is InterestTracker tracker)
+                    {
+                        tracker.Style = interestsTrackersStyle;
+                    }
+                }
+
+                foreach (Control control in grpHobbies.Controls)
+                {
+                    if (control is InterestTracker tracker)
+                    {
+                        tracker.Style = interestsTrackersStyle;
+                    }
+                }
+
+                foreach (Control control in grpBadges.Controls)
+                {
+                    if (control is InterestTracker tracker)
+                    {
+                        tracker.Style = interestsTrackersStyle;
+                    }
+                }
+            }
         }
         #endregion
 
@@ -1114,11 +2284,13 @@ namespace FamilyManager
         #region Cache Menu Actions
         private void OnCachingOpening(object sender, EventArgs e)
         {
-            menuItemCachingUpdateMaxisClothes.Text = DataCache.CacheExists(DataCache.CacheClothes, DataCache.MaxisClothing) ? "Update Maxis Clothing Cache" : "Create Maxis Clothing Cache";
-            menuItemCachingUpdateCustomClothes.Text = DataCache.CacheExists(DataCache.CacheClothes, DataCache.CustomClothing) ? "Update Custom Clothing Cache" : "Create Custom Clothing Cache";
+            menuItemCachingUpdateCustomCareers.Text = DataCache.CacheExists(DataCache.CacheCareersPath, DataCache.CustomCareerFilename) ? "Update Custom Careers Cache" : "Create Custom Careers Cache";
 
-            menuItemCachingUpdateMaxisJewellery.Text = DataCache.CacheExists(DataCache.CacheJewellery, DataCache.MaxisJewellery) ? "Update Maxis Jewellery Cache" : "Create Maxis Jewellery Cache";
-            menuItemCachingUpdateCustomJewellery.Text = DataCache.CacheExists(DataCache.CacheJewellery, DataCache.CustomJewellery) ? "Update Custom Jewellery Cache" : "Create Custom Jewellery Cache";
+            menuItemCachingUpdateMaxisClothes.Text = DataCache.CacheExists(DataCache.CacheClothesPath, DataCache.MaxisClothingFilename) ? "Update Maxis Clothing Cache" : "Create Maxis Clothing Cache";
+            menuItemCachingUpdateCustomClothes.Text = DataCache.CacheExists(DataCache.CacheClothesPath, DataCache.CustomClothingFilename) ? "Update Custom Clothing Cache" : "Create Custom Clothing Cache";
+
+            menuItemCachingUpdateMaxisJewellery.Text = DataCache.CacheExists(DataCache.CacheJewelleryPath, DataCache.MaxisJewelleryFilename) ? "Update Maxis Jewellery Cache" : "Create Maxis Jewellery Cache";
+            menuItemCachingUpdateCustomJewellery.Text = DataCache.CacheExists(DataCache.CacheJewelleryPath, DataCache.CustomJewelleryFilename) ? "Update Custom Jewellery Cache" : "Create Custom Jewellery Cache";
 
             menuItemCachingRemoveLocal.Visible = menuItemCachingRemoveThumbnails.Visible = toolStripSeparatorCaching.Visible = IsAdvancedMode;
         }
@@ -1219,11 +2391,50 @@ namespace FamilyManager
             }
         }
 
+
+        private void OnCachingUpdateCustomCareers(object sender, EventArgs e)
+        {
+            ProgressDialog progressDialog = new ProgressDialog();
+            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_UpdateCustomCareers);
+
+            DialogResult result = progressDialog.ShowDialog();
+
+            if (result == DialogResult.Abort)
+            {
+                logger.Error(progressDialog.Result.Error.Message);
+                logger.Info(progressDialog.Result.Error.StackTrace);
+
+                MsgBox.Show($"An error occured while processing\n{careerCache.ErrorPackagePath}", "Error!", MessageBoxButtons.OK);
+            }
+            else
+            {
+                if (result == DialogResult.Cancel)
+                {
+                    // Update Custom Careers cancelled
+                }
+                else
+                {
+                    // Update Custom Careers completed
+                    if (currentMemberData != null) UpdateCareerTabState();
+                }
+            }
+        }
+
+        private void DoAsyncWork_UpdateCustomCareers(ProgressDialog sender, DoWorkEventArgs args)
+        {
+            sender.VisualMode = ProgressBarDisplayMode.CustomText;
+            sender.SetProgress(0, $"Loading Custom Careers");
+
+            careerCache.ReloadCustomCareers(sender);
+            LoadCareers();
+        }
+
         private void OnCachingRemoveLocal(object sender, EventArgs e)
         {
             DataCache.RemoveAll();
             UpdateClosetTabState();
             UpdateSafeTabState();
+            UpdateCareerTabState();
         }
 
         private void OnCachingRemoveThumbnails(object sender, EventArgs e)
@@ -1233,9 +2444,30 @@ namespace FamilyManager
         #endregion
 
         #region Tabs
-        private bool IsFamilyTabActive => (tabPages.SelectedIndex == 0);
-        private bool IsClosetTabActive => (tabPages.SelectedIndex == 1);
-        private bool IsSafeTabActive => (tabPages.SelectedIndex == 2);
+        private bool IsFamilyTabActive => IsTabActive(0);
+        private bool IsClosetTabActive => IsTabActive(1);
+        private bool IsSafeTabActive => IsTabActive(2);
+        private bool IsCareerTabActive => IsTabActive(3);
+        private bool IsSkillsTabActive => IsTabActive(4);
+        private bool IsInterestsTabActive => IsTabActive(5);
+
+        private bool IsTabActive(int index)
+        {
+            if (index == 0)
+            {
+                return (tabPages.SelectedIndex == index);
+            }
+            else if (index == 1 || index == 2)
+            {
+                return tabPages.Contains(tabCloset) && (tabPages.SelectedIndex == index);
+            }
+            else
+            {
+                if (!tabPages.Contains(tabCloset)) index -= 2;
+
+                return (tabPages.SelectedIndex == index);
+            }
+        }
 
         private void OnTabPageChanged(object sender, EventArgs e)
         {
@@ -1259,10 +2491,22 @@ namespace FamilyManager
                     }
                 }
             }
+            else if (IsCareerTabActive)
+            {
+                DoWork_FillCareerTab();
+            }
+            else if (IsSkillsTabActive)
+            {
+                DoWork_FillSkillsTab();
+            }
+            else if (IsInterestsTabActive)
+            {
+                DoWork_FillInterestsTab();
+            }
         }
         #endregion
 
-        #region Family Tab
+        #region Family Tab Changes
         bool ignoreFamilyChanges = false;
 
         private void ClearFamilyTabValues()
@@ -1272,6 +2516,8 @@ namespace FamilyManager
             textFamilyName.Text = textFamilyWriteUp.Text = null;
             textFamilyMoney.Text = textBusinessMoney.Text = null;
             textAddressName.Text = textAddressDesc.Text = null;
+
+            imageHouse.Image = null;
 
             currentFamily = null;
 
@@ -1326,6 +2572,457 @@ namespace FamilyManager
                 ckb.Checked = ticked;
 
                 ignoreCkb = false;
+            }
+        }
+        #endregion
+
+        #region Career Tab Changes
+        private void OnSchoolTypeChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (textSchoolGUID.Value != (comboSchoolType.SelectedItem as UintNamedValue).Value)
+            {
+                ignoreCareerChanges = true;
+                textSchoolGUID.Value = (comboSchoolType.SelectedItem as UintNamedValue).Value;
+                currentMemberData.SchoolGuid = (TypeGUID)(comboSchoolType.SelectedItem as UintNamedValue).Value;
+                ignoreCareerChanges = false;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnSchoolGuidChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.SchoolGuid.AsUInt() != textSchoolGUID.Value)
+            {
+                ignoreCareerChanges = true;
+                SetCombo(comboSchoolType, textSchoolGUID.Value);
+                currentMemberData.SchoolGuid = (TypeGUID)(comboSchoolType.SelectedItem as UintNamedValue).Value;
+                ignoreCareerChanges = false;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnSchoolGradeChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.SchoolGrade != (comboSchoolGrade.SelectedItem as UintNamedValue).Value)
+            {
+                currentMemberData.SchoolGrade = (comboSchoolGrade.SelectedItem as UintNamedValue).Value;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnUniMajorTypeChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (textMajorGUID.Value != (comboUniMajor.SelectedItem as UintNamedValue).Value)
+            {
+                ignoreCareerChanges = true;
+                textMajorGUID.Value = (comboUniMajor.SelectedItem as UintNamedValue).Value;
+                currentMemberData.UniMajorGuid = (TypeGUID)(comboUniMajor.SelectedItem as UintNamedValue).Value;
+                ignoreCareerChanges = false;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnUniMajorGuidChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.UniMajorGuid.AsUInt() != textMajorGUID.Value)
+            {
+                ignoreCareerChanges = true;
+                SetCombo(comboUniMajor, textMajorGUID.Value);
+                currentMemberData.UniMajorGuid = (TypeGUID)(comboUniMajor.SelectedItem as UintNamedValue).Value;
+                ignoreCareerChanges = false;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnUniOutcomeChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            lblUniMajor.Enabled = comboUniMajor.Enabled = textMajorGUID.Enabled = (comboUniResult.SelectedIndex != 0);
+
+            ushort flags = (ushort)(currentMemberData.UniInfoFlags & 0xCFBF);
+
+            if (comboUniResult.SelectedIndex == 0)
+            {
+                // Didn't Go
+                comboUniMajor.SelectedIndex = 1; // Undeclared
+            }
+            else if (comboUniResult.SelectedIndex == 1)
+            {
+                // Graduated
+                flags |= 0x0040;
+            }
+            else if (comboUniResult.SelectedIndex == 2)
+            {
+                // Dropped Out
+                flags |= 0x1000;
+            }
+            else if (comboUniResult.SelectedIndex == 3)
+            {
+                // Expelled
+                flags |= 0x2000;
+            }
+
+            currentMemberData.UniInfoFlags = flags;
+
+            UpdateSaveState();
+        }
+
+        private void OnUniSemesterChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.UniSemester != (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value)
+            {
+                currentMemberData.UniSemester = (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value;
+                currentMemberData.UniInfoFlags &= 0xFFF0;
+
+                switch (currentMemberData.UniSemester)
+                {
+                    case 1:
+                    case 2:
+                        currentMemberData.UniInfoFlags |= 0x0001;
+                        break;
+                    case 3:
+                    case 4:
+                        currentMemberData.UniInfoFlags |= 0x0002;
+                        break;
+                    case 5:
+                    case 6:
+                        currentMemberData.UniInfoFlags |= 0x0004;
+                        break;
+                    case 7:
+                    case 8:
+                        currentMemberData.UniInfoFlags |= 0x0008;
+                        break;
+                }
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnUniGpaSliderChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            textUniGrade.Value = trackUniGrade.Value / 10.0f;
+        }
+
+        private void OnUniGpaValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            ushort newGPA = (ushort)(textUniGrade.Value * 10.0f);
+
+            if (currentMemberData.UniCurrentGPA != newGPA)
+            {
+                ignoreCareerChanges = true;
+                currentMemberData.UniCurrentGPA = newGPA;
+                trackUniGrade.Value = newGPA;
+                ignoreCareerChanges = false;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnUniEffortSliderChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            textUniEffort.Value = (uint)trackUniEffort.Value;
+        }
+
+        private void OnUniEffortValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.UniEffort != (ushort)textUniEffort.Value)
+            {
+                ignoreCareerChanges = true;
+                currentMemberData.UniEffort = (ushort)textUniEffort.Value;
+                trackUniEffort.Value = (int)textUniEffort.Value;
+                ignoreCareerChanges = false;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnUniProbationChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            currentMemberData.UniInfoFlags &= 0xFFDF;
+
+            if (ckbUniProbation.Checked) currentMemberData.UniInfoFlags |= 0x0020;
+
+            UpdateSaveState();
+        }
+
+        private void OnUniGoodCompletedChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            currentMemberData.UniInfoFlags &= 0xFFEF;
+
+            if (ckbUniProbation.Checked) currentMemberData.UniInfoFlags |= 0x0010;
+
+            UpdateSaveState();
+        }
+
+        private void OnUniTimeLeftSliderChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            textUniTimeLeft.Value = (uint)trackUniTimeLeft.Value;
+        }
+
+        private void OnUniTimeLeftValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.UniTimeLeft != (ushort)textUniTimeLeft.Value)
+            {
+                ignoreCareerChanges = true;
+                currentMemberData.UniTimeLeft = (ushort)textUniTimeLeft.Value;
+                trackUniTimeLeft.Value = (int)textUniTimeLeft.Value;
+                ignoreCareerChanges = false;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnUniInfluenceValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.UniInfluence != (ushort)textUniInfluence.Value)
+            {
+                currentMemberData.UniInfluence = (ushort)textUniInfluence.Value;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnJobTypeChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.JobGuid != (TypeGUID)(comboJobType.SelectedItem as UintNamedValue).Value)
+            {
+                ignoreCareerChanges = true;
+
+                textJobGUID.Value = (comboJobType.SelectedItem as UintNamedValue).Value;
+                currentMemberData.JobGuid = (TypeGUID)(comboJobType.SelectedItem as UintNamedValue).Value;
+
+                ignoreCareerChanges = false;
+
+                if (!currentMemberData.IsUnemployed)
+                {
+                    if (trackJobLevel.Value == 0)
+                    {
+                        trackJobLevel.Value = 1;
+                    }
+                }
+                else
+                {
+                    trackJobLevel.Value = 0;
+                }
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnJobGuidChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.JobGuid.AsUInt() != textJobGUID.Value)
+            {
+                ignoreCareerChanges = true;
+
+                SetCombo(comboJobType, textJobGUID.Value);
+                currentMemberData.JobGuid = (TypeGUID)(comboJobType.SelectedItem as UintNamedValue).Value;
+
+                ignoreCareerChanges = false;
+
+                if (!currentMemberData.IsUnemployed)
+                {
+                    if (trackJobLevel.Value == 0)
+                    {
+                        trackJobLevel.Value = 1;
+                    }
+                }
+                else
+                {
+                    trackJobLevel.Value = 0;
+                }
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnJobLevelSliderChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            textJobLevel.Value = (uint)trackJobLevel.Value;
+        }
+
+        private void OnJobLevelValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.JobLevel != (ushort)textJobLevel.Value)
+            {
+                ignoreCareerChanges = true;
+                currentMemberData.JobLevel = (ushort)textJobLevel.Value;
+                trackJobLevel.Value = (int)textJobLevel.Value;
+                ignoreCareerChanges = false;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnJobPerformanceSliderChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            textJobPerformance.Value = trackJobPerformance.Value;
+        }
+
+        private void OnJobPerformanceValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.JobPerformance != (ushort)textJobPerformance.Value)
+            {
+                ignoreCareerChanges = true;
+                currentMemberData.JobPerformance = (ushort)textJobPerformance.Value;
+                trackJobPerformance.Value = (int)textJobPerformance.Value;
+                ignoreCareerChanges = false;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnJobPtoValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.JobPTO != (ushort)textJobPTO.Value)
+            {
+                currentMemberData.JobPTO = (ushort)textJobPTO.Value;
+                lblJobPTOSummary.Text = $"({(textJobPTO.Value == 0 ? 0 : Math.Max(0, (textJobPTO.Value - 1) / 100))} days)";
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnJobPensionValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.JobPension != (ushort)textJobPension.Value)
+            {
+                currentMemberData.JobPension = (ushort)textJobPension.Value;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnJobRetiredTypeChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.JobRetiredGuid != (TypeGUID)(comboJobRetiredType.SelectedItem as UintNamedValue).Value)
+            {
+                ignoreCareerChanges = true;
+
+                textJobRetiredGUID.Value = (comboJobRetiredType.SelectedItem as UintNamedValue).Value;
+                currentMemberData.JobRetiredGuid = (TypeGUID)(comboJobRetiredType.SelectedItem as UintNamedValue).Value;
+
+                ignoreCareerChanges = false;
+
+                FixRetiredValues();
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnJobRetiredGuidChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.JobRetiredGuid.AsUInt() != textJobRetiredGUID.Value)
+            {
+                ignoreCareerChanges = true;
+
+                SetCombo(comboJobRetiredType, textJobRetiredGUID.Value);
+                currentMemberData.JobRetiredGuid = (TypeGUID)(comboJobRetiredType.SelectedItem as UintNamedValue).Value;
+
+                ignoreCareerChanges = false;
+
+                FixRetiredValues();
+
+                UpdateSaveState();
+            }
+        }
+
+        private void FixRetiredValues()
+        {
+            if (currentMemberData.IsRetiredUnemployed)
+            {
+                trackJobRetiredLevel.Value = 0;
+                textJobPension.Value = 0;
+            }
+            else
+            {
+                if (trackJobRetiredLevel.Value == 0)
+                {
+                    trackJobRetiredLevel.Value = 1;
+                }
+
+                if (textJobPension.Value == 0)
+                {
+                    textJobPension.Value = 1;
+                }
+            }
+        }
+
+        private void OnJobRetiredLevelSliderChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            textJobRetiredLevel.Value = (uint)trackJobRetiredLevel.Value;
+        }
+
+        private void OnJobRetiredLevelValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            if (currentMemberData.JobRetiredLevel != (ushort)textJobRetiredLevel.Value)
+            {
+                ignoreCareerChanges = true;
+                currentMemberData.JobRetiredLevel = (ushort)textJobRetiredLevel.Value;
+                trackJobRetiredLevel.Value = (int)textJobRetiredLevel.Value;
+                ignoreCareerChanges = false;
+
+                UpdateSaveState();
             }
         }
         #endregion
@@ -1520,28 +3217,67 @@ namespace FamilyManager
 
                 TextEntryDialog dialog = new TextEntryDialog("Change Days Remaining", "Days Adjustment (+/-)", "");
 
-                if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.TextEntry) &&
-                    Int16.TryParse(dialog.TextEntry, out short days) && days != 0)
+                if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.TextEntry))
                 {
-                    if (rowIndex == -1)
+                    bool valid = false;
+                    string dayAdjust = dialog.TextEntry;
+                    int pos = dayAdjust.IndexOf(":");
+
+                    short daysLow;
+                    short daysHigh = 0;
+
+                    if (pos == -1)
                     {
-                        foreach (DataGridViewRow row in gridFamilyMembers.SelectedRows)
+                        if (Int16.TryParse(dayAdjust, out daysLow))
                         {
-                            ChangeMemberDays(row, days);
+                            daysHigh = daysLow;
+                            valid = (daysLow != 0);
                         }
                     }
                     else
                     {
-                        ChangeMemberDays(gridFamilyMembers.Rows[rowIndex], days);
+                        if (Int16.TryParse(dayAdjust.Substring(0, pos), out daysLow) && Int16.TryParse(dayAdjust.Substring(pos + 1), out daysHigh))
+                        {
+                            valid = (daysLow != daysHigh || daysLow != 0);
+                        }
                     }
 
-                    UpdateFormState();
+                    if (valid)
+                    {
+                        if (rowIndex == -1)
+                        {
+                            foreach (DataGridViewRow row in gridFamilyMembers.SelectedRows)
+                            {
+                                ChangeMemberDays(row, daysLow, daysHigh);
+                            }
+                        }
+                        else
+                        {
+                            ChangeMemberDays(gridFamilyMembers.Rows[rowIndex], daysLow, daysHigh);
+                        }
+
+                        UpdateFormState();
+                    }
                 }
             }
         }
 
-        private void ChangeMemberDays(DataGridViewRow row, int days)
+        private void ChangeMemberDays(DataGridViewRow row, int daysLow, int daysHigh)
         {
+            int days = daysLow;
+
+            if (daysLow != daysHigh)
+            {
+                if (daysLow > daysHigh)
+                {
+                    days = daysLow;
+                    daysLow = daysHigh;
+                    daysHigh = days;
+                }
+
+                days = (new Random()).Next(daysLow, daysHigh + 1);
+            }
+
             CharacterData data = (row.Cells["colData"].Value as CharacterData);
             data?.ChangeDaysLeft(days);
             row.Cells["colDaysLeft"].Value = data.DaysLeft;
@@ -2212,7 +3948,7 @@ namespace FamilyManager
 
         #endregion
 
-        #region Folder Tree Management
+        #region Hood Tree Management
         private void OnTreeHoods_DrawNode(object sender, DrawTreeNodeEventArgs e)
         {
             if (e.Node == null) return;
@@ -2233,6 +3969,38 @@ namespace FamilyManager
             else
             {
                 e.DrawDefault = true;
+            }
+        }
+
+        private void OnTreeHoodsBeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            if (e.Node.Nodes.Count == 1 && e.Node.Nodes[0].Text.Equals("Placeholder"))
+            {
+                e.Node.Nodes.Clear();
+
+                ProgressDialog progressDialog = new ProgressDialog(e.Node);
+                progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessFamilies);
+                progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncData_ProcessFamilies);
+
+                DialogResult result = progressDialog.ShowDialog();
+
+                if (result == DialogResult.Abort)
+                {
+                    logger.Error(progressDialog.Result.Error.Message);
+                    logger.Info(progressDialog.Result.Error.StackTrace);
+
+                    MsgBox.Show($"An error occured while processing\n{lastPackageFile}", "Error!", MessageBoxButtons.OK);
+                }
+                else
+                {
+                    if (result == DialogResult.Cancel)
+                    {
+                        e.Cancel = true;
+                    }
+                    else
+                    {
+                    }
+                }
             }
         }
 
@@ -2270,7 +4038,25 @@ namespace FamilyManager
             }
         }
 
-        private void OnGridSelectionChanged(object sender, EventArgs e)
+        private void OnMemberGridSelectionChanged(object sender, EventArgs e)
+        {
+            if (IsCareerTabActive)
+            {
+                DoWork_FillCareerTab();
+            }
+            else if (IsSkillsTabActive)
+            {
+                DoWork_FillSkillsTab();
+            }
+            else if (IsInterestsTabActive)
+            {
+                DoWork_FillInterestsTab();
+            }
+
+            UpdateFormState();
+        }
+
+        private void OnOutfitGridSelectionChanged(object sender, EventArgs e)
         {
             UpdateFormState();
         }
@@ -2619,5 +4405,124 @@ namespace FamilyManager
             packageCache.Clear();
         }
         #endregion
+
+        private void OnSimTrackingBarChanged(object sender, EventArgs e)
+        {
+            SimTrackingBar trackBar = sender as SimTrackingBar;
+
+            toolTip.SetToolTip(trackBar, $"{trackBar.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+        }
+
+        private void OnInterestChanged(object sender, EventArgs e)
+        {
+            SimTrackingBar trackBar = sender as SimTrackingBar;
+            InterestTracker tracker = trackBar.Parent as InterestTracker;
+
+            toolTip.SetToolTip(trackBar, $"{trackBar.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+
+            if (ignoreInterestsChanges) return;
+
+            currentMemberData.SetInterestValue(tracker.SdscIndex, tracker.Value);
+            UpdateSaveState();
+        }
+
+        private void OnHobbyChanged(object sender, EventArgs e)
+        {
+            SimTrackingBar trackBar = sender as SimTrackingBar;
+            InterestTracker tracker = trackBar.Parent as InterestTracker;
+
+            toolTip.SetToolTip(trackBar, $"{trackBar.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+
+            if (ignoreInterestsChanges) return;
+
+            currentMemberData.SetHobbyValue(tracker.SdscIndex, tracker.Value);
+            UpdateSaveState();
+        }
+
+        private void OnOneTrueHobbyChanged(object sender, EventArgs e)
+        {
+            if (ignoreInterestsChanges) return;
+
+            currentMemberData.OneTrueHobby = (ushort)((comboHobbyOneTrue.SelectedItem as UintNamedValue).Value);
+            UpdateSaveState();
+        }
+
+        private void OnBadgeChanged(object sender, EventArgs e)
+        {
+            SimTrackingBar trackBar = sender as SimTrackingBar;
+            InterestTracker tracker = trackBar.Parent as InterestTracker;
+
+            toolTip.SetToolTip(trackBar, $"{tracker.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+
+            if (ignoreInterestsChanges) return;
+
+            currentMemberData.SetBadgeValue((TypeGUID)tracker.TokenGuid, tracker.Value);
+            UpdateSaveState();
+        }
+
+        private void OnGeneralSkillChanged(object sender, EventArgs e)
+        {
+            SimTrackingBar trackBar = sender as SimTrackingBar;
+            SkillTracker tracker = trackBar.Parent as SkillTracker;
+
+            toolTip.SetToolTip(trackBar, $"{tracker.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+
+            if (ignoreSkillsChanges) return;
+
+            currentMemberData.SetSkillValue(tracker.SdscIndex, tracker.Value);
+            UpdateSaveState();
+        }
+
+        private void OnToddlerSkillChanged(object sender, EventArgs e)
+        {
+            SimTrackingBar trackBar = sender as SimTrackingBar;
+            SkillTracker tracker = trackBar.Parent as SkillTracker;
+
+            toolTip.SetToolTip(trackBar, $"{tracker.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+
+            if (ignoreSkillsChanges) return;
+
+            currentMemberData.SetToddlerSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Value, (tracker.Value == tracker.Maximum));
+            UpdateSaveState();
+        }
+
+        private void OnHiddenSkillChanged(object sender, EventArgs e)
+        {
+            SimTrackingBar trackBar = sender as SimTrackingBar;
+            SkillTracker tracker = trackBar.Parent as SkillTracker;
+
+            toolTip.SetToolTip(trackBar, $"{tracker.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+
+            if (ignoreSkillsChanges) return;
+
+            currentMemberData.SetHiddenSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Value);
+            UpdateSaveState();
+        }
+
+        private void OnLifeSkillChanged(object sender, EventArgs e)
+        {
+            SimTrackingBar trackBar = sender as SimTrackingBar;
+            SkillTracker tracker = trackBar.Parent as SkillTracker;
+
+            toolTip.SetToolTip(trackBar, $"{tracker.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+
+            if (ignoreSkillsChanges) return;
+
+            currentMemberData.SetLifeSkillValue((TypeGUID)tracker.TokenGuid, tracker.Value);
+            UpdateSaveState();
+        }
+
+        private void OnPetSkillChanged(object sender, EventArgs e)
+        {
+            SimTrackingBar trackBar = sender as SimTrackingBar;
+            SkillTracker tracker = trackBar.Parent as SkillTracker;
+
+            toolTip.SetToolTip(trackBar, $"{tracker.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+
+            if (ignoreSkillsChanges) return;
+
+            currentMemberData.SetPetSkillValue((TypeGUID)tracker.TokenGuid, tracker.Value);
+            UpdateSaveState();
+        }
     }
 }
