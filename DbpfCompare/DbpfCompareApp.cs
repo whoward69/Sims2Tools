@@ -17,7 +17,7 @@ namespace DbpfCompare
         public static readonly string AppName = "DBPF Compare";
 
         public static readonly int AppVersionMajor = 2;
-        public static readonly int AppVersionMinor = 0;
+        public static readonly int AppVersionMinor = 1;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;

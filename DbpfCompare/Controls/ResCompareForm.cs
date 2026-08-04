@@ -1257,7 +1257,7 @@ namespace DbpfCompare.Controls
 
             if (leftExtra > 0)
             {
-                while (offset < leftData.Length)
+                while (leftExtra >= 16)
                 {
                     row = dataResCompare.NewRow();
                     row["Key"] = Helper.Hex8PrefixString((uint)offset);
@@ -1268,9 +1268,8 @@ namespace DbpfCompare.Controls
                     dataResCompare.Append(row);
 
                     offset += 16;
+                    leftExtra -= 16;
                 }
-
-                leftExtra = leftData.Length - offset;
 
                 if (leftExtra > 0)
                 {
@@ -1289,7 +1288,7 @@ namespace DbpfCompare.Controls
 
                 if (rightExtra > 0)
                 {
-                    while (offset < rightData.Length)
+                    while (rightExtra >= 16)
                     {
                         row = dataResCompare.NewRow();
                         row["Key"] = Helper.Hex8PrefixString((uint)offset);
@@ -1300,9 +1299,8 @@ namespace DbpfCompare.Controls
                         dataResCompare.Append(row);
 
                         offset += 16;
+                        rightExtra -= 16;
                     }
-
-                    rightExtra = rightData.Length - offset;
 
                     if (rightExtra > 0)
                     {
