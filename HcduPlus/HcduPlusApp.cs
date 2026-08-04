@@ -19,10 +19,10 @@ namespace HcduPlus
         public static readonly string AppName = "HCDU Plus";
 
         public static readonly int AppVersionMajor = 4;
-        public static readonly int AppVersionMinor = 6;
+        public static readonly int AppVersionMinor = 7;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 0;
+        private static readonly int AppVersionDebug = 3;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release

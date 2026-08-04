@@ -26,10 +26,11 @@ namespace HcduPlus.Conflict
     {
         public Regex RegexA { get; }
         public Regex RegexB { get; }
+        public string Notes { get; }
 
         public bool IsValid { get; }
 
-        public ConflictRegexPair(string regexA, string regexB)
+        public ConflictRegexPair(string regexA, string regexB, string notes)
         {
             this.IsValid = !(string.IsNullOrWhiteSpace(regexA) || string.IsNullOrWhiteSpace(regexB));
 
@@ -37,6 +38,7 @@ namespace HcduPlus.Conflict
             {
                 this.RegexA = new Regex(regexA);
                 this.RegexB = new Regex(regexB);
+                this.Notes = notes;
             }
         }
     }
@@ -50,6 +52,7 @@ namespace HcduPlus.Conflict
 
         private readonly DataColumn colRegexEarlier = new DataColumn("Loads Earlier", typeof(string));
         private readonly DataColumn colRegexLater = new DataColumn("Loads Later", typeof(string));
+        private readonly DataColumn colNotes = new DataColumn("Notes", typeof(string));
 
         readonly List<ConflictRegexPair> reKnownConflicts = new List<ConflictRegexPair>();
 
@@ -57,36 +60,65 @@ namespace HcduPlus.Conflict
         {
             this.Columns.Add(colRegexEarlier);
             this.Columns.Add(colRegexLater);
+            this.Columns.Add(colNotes);
         }
 
-        public void Add(string reA, string reB)
+        public void Add(string reA, string reB, string notes)
         {
-            this.Rows.Add(reA, reB);
-            reKnownConflicts.Add(new ConflictRegexPair(reA, reB));
+            this.Rows.Add(reA, reB, notes);
+            reKnownConflicts.Add(new ConflictRegexPair(reA, reB, notes));
         }
 
-        public void AddFromGrid(string packageA, string packageB)
+        public void AddFromGrid(string packageA, string packageB, bool withPath)
         {
             string reA = packageA;
             string reB = packageB;
 
-            int pos = packageA.LastIndexOf('\\');
-            if (pos >= 0)
+            if (!withPath)
             {
-                reA = packageA.Substring(pos + 1);
+                int pos = packageA.LastIndexOf('\\');
+                if (pos >= 0)
+                {
+                    reA = packageA.Substring(pos + 1);
+                }
+
+                pos = packageB.LastIndexOf('\\');
+                if (pos >= 0)
+                {
+                    reB = packageB.Substring(pos + 1);
+                }
+            }
+            else
+            {
+                if (reA.StartsWith("~\\"))
+                {
+                    reA = reA.Substring(2);
+                }
+
+                if (reB.StartsWith("~"))
+                {
+                    reB = reB.Substring(2);
+                }
             }
 
-            pos = packageB.LastIndexOf('\\');
-            if (pos >= 0)
-            {
-                reB = packageB.Substring(pos + 1);
-            }
+            // Escape any \ path separators
+            reA = reA.Replace("\\", @"\\");
+            reB = reB.Replace("\\", @"\\");
 
-            reA = reA.Replace("(", @"\(").Replace(")", @"\)").Replace("[", @"\[").Replace("]", @"\]").Replace("{", @"\{").Replace("}", @"\}").Replace(".", @"\.").Replace("*", @"\*").Replace("+", @"\+").Replace("?", @"\?");
-            reB = reB.Replace("(", @"\(").Replace(")", @"\)").Replace("[", @"\[").Replace("]", @"\]").Replace("{", @"\{").Replace("}", @"\}").Replace(".", @"\.").Replace("*", @"\*").Replace("+", @"\+").Replace("?", @"\?");
+            // Escape any braket characters
+            reA = reA.Replace("(", @"\(").Replace(")", @"\)")
+                     .Replace("[", @"\[").Replace("]", @"\]")
+                     .Replace("{", @"\{").Replace("}", @"\}");
+            reB = reB.Replace("(", @"\(").Replace(")", @"\)")
+                     .Replace("[", @"\[").Replace("]", @"\]")
+                     .Replace("{", @"\{").Replace("}", @"\}");
 
-            this.Rows.Add(reA, reB);
-            reKnownConflicts.Add(new ConflictRegexPair(reA, reB));
+            // Replace any wildcards characters
+            reA = reA.Replace(".", @"\.").Replace("*", @"\*").Replace("+", @"\+").Replace("?", @"\?");
+            reB = reB.Replace(".", @"\.").Replace("*", @"\*").Replace("+", @"\+").Replace("?", @"\?");
+
+            this.Rows.Add(reA, reB, "");
+            reKnownConflicts.Add(new ConflictRegexPair(reA, reB, ""));
         }
 
         public void Paste()
@@ -103,7 +135,7 @@ namespace HcduPlus.Conflict
 
                     if (m.Success)
                     {
-                        Add(m.Groups[1].Value, m.Groups[2].Value);
+                        Add(m.Groups[1].Value, m.Groups[2].Value, "");
                     }
                 }
             }
@@ -131,7 +163,7 @@ namespace HcduPlus.Conflict
 
             for (int i = 0; i < this.Rows.Count; ++i)
             {
-                reKnownConflicts.Add(new ConflictRegexPair(this.Rows[i].ItemArray[0].ToString(), this.Rows[i].ItemArray[1].ToString()));
+                reKnownConflicts.Add(new ConflictRegexPair(this.Rows[i].ItemArray[0].ToString(), this.Rows[i].ItemArray[1].ToString(), this.Rows[i].ItemArray[2].ToString()));
             }
         }
 
@@ -159,9 +191,10 @@ namespace HcduPlus.Conflict
                 for (int i = 0; i < count; i++)
                 {
                     if (RegistryTools.GetSetting(KnownRegistryKey, $"Earlier{i}", null) is string reA &&
-                        RegistryTools.GetSetting(KnownRegistryKey, $"Later{i}", null) is string reB)
+                        RegistryTools.GetSetting(KnownRegistryKey, $"Later{i}", null) is string reB &&
+                        RegistryTools.GetSetting(KnownRegistryKey, $"Notes{i}", "") is string notes)
                     {
-                        Add(reA, reB);
+                        Add(reA, reB, notes);
                     }
                 }
             }
@@ -176,6 +209,7 @@ namespace HcduPlus.Conflict
             {
                 RegistryTools.DeleteSetting(KnownRegistryKey, $"Earlier{i}");
                 RegistryTools.DeleteSetting(KnownRegistryKey, $"Later{i}");
+                RegistryTools.DeleteSetting(KnownRegistryKey, $"Notes{i}");
             }
 
             // Save the current entries.
@@ -188,6 +222,7 @@ namespace HcduPlus.Conflict
                 {
                     RegistryTools.SaveSetting(KnownRegistryKey, $"Earlier{count}", reKnown.RegexA.ToString());
                     RegistryTools.SaveSetting(KnownRegistryKey, $"Later{count}", reKnown.RegexB.ToString());
+                    RegistryTools.SaveSetting(KnownRegistryKey, $"Notes{count}", reKnown.Notes);
 
                     ++count;
                 }
@@ -210,6 +245,7 @@ namespace HcduPlus.Conflict
 
                 string earlier = null;
                 string later = null;
+                string notes = null;
 
                 reader.MoveToContent();
                 while (reader.Read())
@@ -226,10 +262,20 @@ namespace HcduPlus.Conflict
                             reader.Read();
                             later = reader.Value;
                         }
+                        else if (reader.Name.Equals("notes"))
+                        {
+                            reader.Read();
+                            notes = reader.Value;
+                        }
                     }
                     else if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Equals("conflict"))
                     {
-                        Add(earlier, later);
+                        if (!(string.IsNullOrWhiteSpace(earlier) || string.IsNullOrWhiteSpace(later)))
+                        {
+                            Add(earlier, later, notes);
+                        }
+
+                        earlier = later = notes = "";
                     }
                 }
             }
@@ -274,6 +320,11 @@ namespace HcduPlus.Conflict
                         XmlText eleLaterText = doc.CreateTextNode(reKnown.RegexB.ToString());
                         eleLater.AppendChild(eleLaterText);
                         eleConflict.AppendChild(eleLater);
+
+                        XmlElement eleNotes = doc.CreateElement(string.Empty, "notes", string.Empty);
+                        XmlText eleNotesText = doc.CreateTextNode(reKnown.Notes);
+                        eleNotes.AppendChild(eleNotesText);
+                        eleConflict.AppendChild(eleNotes);
                     }
                 }
 

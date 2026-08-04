@@ -67,6 +67,8 @@ namespace HcduPlus
 
         internal static readonly Color colourAddKnownHighlight = Color.FromName(Properties.Settings.Default.AddKnownHighlight);
 
+        public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
+
         private readonly SortedSet<ConflictPair> allCurrentConflicts = new SortedSet<ConflictPair>();
         private readonly KnownConflicts knownConflicts = new KnownConflicts();
 
@@ -627,7 +629,7 @@ namespace HcduPlus
             }
 
             btnGO.Text = "S&CAN";
-            menuFile.Enabled = menuResources.Enabled = menuConflicts.Enabled = menuOptions.Enabled = true;
+            menuFile.Enabled = menuMode.Enabled = menuResources.Enabled = menuConflicts.Enabled = menuOptions.Enabled = true;
             MyUpdater.Enabled = true;
             textModsPath.Enabled = checkModsSavedSims.Enabled = btnSelectModsPath.Enabled = true;
             textScanPath.Enabled = checkScanSavedSims.Enabled = btnSelectScanPath.Enabled = true;
@@ -657,7 +659,7 @@ namespace HcduPlus
                 dataByPackage.Clear();
                 dataByResource.Clear();
                 btnGO.Text = "Cancel";
-                menuFile.Enabled = menuResources.Enabled = menuConflicts.Enabled = menuOptions.Enabled = false;
+                menuFile.Enabled = menuMode.Enabled = menuResources.Enabled = menuConflicts.Enabled = menuOptions.Enabled = false;
                 MyUpdater.Enabled = false;
                 textModsPath.Enabled = checkModsSavedSims.Enabled = btnSelectModsPath.Enabled = false;
                 textScanPath.Enabled = checkScanSavedSims.Enabled = btnSelectScanPath.Enabled = false;
@@ -706,6 +708,8 @@ namespace HcduPlus
 
                 MyMruList = new MruList(HcduPlusApp.RegistryKey, menuItemRecentFolders, Properties.Settings.Default.MruSize, false, true);
                 MyMruList.FileSelected += MyMruList_FileSelected;
+
+                menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
 
                 menuItemBcon.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Bcon.NAME, 1) != 0); OnBconClicked(menuItemBcon, null);
                 menuItemBhav.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Resources", Bhav.NAME, 1) != 0); OnBhavClicked(menuItemBhav, null);
@@ -782,6 +786,8 @@ namespace HcduPlus
 
                 RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemIncludeKnownConflicts.Name, menuItemIncludeKnownConflicts.Checked ? 1 : 0);
                 knownConflicts.SaveRegexs();
+
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
 
                 RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, menuItemGuidConflicts.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemMaxisGuidConflicts.Name, menuItemMaxisGuidConflicts.Checked ? 1 : 0);
@@ -861,6 +867,18 @@ namespace HcduPlus
             }
         }
 
+        #region Mode Menu Actions
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+            if (Sims2ToolsLib.AllAdvancedMode) menuItemAdvanced.Checked = true;
+        }
+
+        private void OnAdvancedModeChanged(object sender, EventArgs e)
+        {
+        }
+        #endregion
+
         private void OnIncludeKnownConflictsClicked(object sender, EventArgs e)
         {
             menuItemKnownConflicts.Enabled = !menuItemIncludeKnownConflicts.Checked;
@@ -890,6 +908,8 @@ namespace HcduPlus
             }
 
             menuItemAddAsKnownConflict.Enabled = !menuItemIncludeKnownConflicts.Checked;
+            menuItemAddAsKnownConflictWithPath.Visible = IsAdvancedMode;
+            menuItemAddAsKnownConflictWithPath.Enabled = menuItemAddAsKnownConflictWithPath.Enabled;
 
             if (mouseLocation.RowIndex != gridByPackage.SelectedRows[0].Index)
             {
@@ -914,7 +934,14 @@ namespace HcduPlus
         {
             if (mouseLocation.RowIndex >= 0)
             {
-                knownConflicts.AddFromGrid(gridByPackage.Rows[mouseLocation.RowIndex].Cells[0].Value.ToString(), gridByPackage.Rows[mouseLocation.RowIndex].Cells[1].Value.ToString());
+                if (sender == menuItemAddAsKnownConflict)
+                {
+                    knownConflicts.AddFromGrid(gridByPackage.Rows[mouseLocation.RowIndex].Cells[0].Value.ToString(), gridByPackage.Rows[mouseLocation.RowIndex].Cells[1].Value.ToString(), false);
+                }
+                else
+                {
+                    knownConflicts.AddFromGrid(gridByPackage.Rows[mouseLocation.RowIndex].Cells[0].Value.ToString(), gridByPackage.Rows[mouseLocation.RowIndex].Cells[1].Value.ToString(), true);
+                }
             }
         }
 

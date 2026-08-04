@@ -42,10 +42,10 @@ namespace HcduPlus
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HcduPlusForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,6 +62,8 @@ namespace HcduPlus
             this.menuItemExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuMode = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAdvanced = new System.Windows.Forms.ToolStripMenuItem();
             this.menuResources = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemAll = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemNone = new System.Windows.Forms.ToolStripMenuItem();
@@ -119,6 +121,7 @@ namespace HcduPlus
             this.colHcduPackageB = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemAddAsKnownConflict = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemAddAsKnownConflictWithPath = new System.Windows.Forms.ToolStripMenuItem();
             this.tabByResource = new System.Windows.Forms.TabPage();
             this.gridByResource = new System.Windows.Forms.DataGridView();
             this.colHcduType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -149,13 +152,14 @@ namespace HcduPlus
             this.menuMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuFile,
             this.menuHelp,
+            this.menuMode,
             this.menuResources,
             this.menuConflicts,
             this.menuOptions});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
-            this.menuMain.Size = new System.Drawing.Size(933, 24);
+            this.menuMain.Size = new System.Drawing.Size(984, 24);
             this.menuMain.TabIndex = 0;
             this.menuMain.Text = "menuStrip";
             // 
@@ -268,6 +272,22 @@ namespace HcduPlus
             this.menuItemAbout.Size = new System.Drawing.Size(135, 22);
             this.menuItemAbout.Text = "About...";
             this.menuItemAbout.Click += new System.EventHandler(this.OnHelpClicked);
+            // 
+            // menuMode
+            // 
+            this.menuMode.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemAdvanced});
+            this.menuMode.Name = "menuMode";
+            this.menuMode.Size = new System.Drawing.Size(50, 20);
+            this.menuMode.Text = "&Mode";
+            this.menuMode.DropDownOpening += new System.EventHandler(this.OnModeOpening);
+            // 
+            // menuItemAdvanced
+            // 
+            this.menuItemAdvanced.CheckOnClick = true;
+            this.menuItemAdvanced.Name = "menuItemAdvanced";
+            this.menuItemAdvanced.Size = new System.Drawing.Size(127, 22);
+            this.menuItemAdvanced.Text = "Advanced";
             // 
             // menuResources
             // 
@@ -654,7 +674,7 @@ namespace HcduPlus
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textModsPath.Location = new System.Drawing.Point(126, 38);
             this.textModsPath.Name = "textModsPath";
-            this.textModsPath.Size = new System.Drawing.Size(534, 21);
+            this.textModsPath.Size = new System.Drawing.Size(585, 21);
             this.textModsPath.TabIndex = 2;
             this.textModsPath.TabStop = false;
             this.textModsPath.WordWrap = false;
@@ -663,7 +683,7 @@ namespace HcduPlus
             // btnSelectModsPath
             // 
             this.btnSelectModsPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectModsPath.Location = new System.Drawing.Point(775, 33);
+            this.btnSelectModsPath.Location = new System.Drawing.Point(826, 33);
             this.btnSelectModsPath.Name = "btnSelectModsPath";
             this.btnSelectModsPath.Size = new System.Drawing.Size(143, 30);
             this.btnSelectModsPath.TabIndex = 3;
@@ -687,7 +707,7 @@ namespace HcduPlus
             | System.Windows.Forms.AnchorStyles.Right)));
             this.progressBar.Location = new System.Drawing.Point(75, 117);
             this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(694, 23);
+            this.progressBar.Size = new System.Drawing.Size(745, 23);
             this.progressBar.TabIndex = 5;
             this.progressBar.Visible = false;
             // 
@@ -696,7 +716,7 @@ namespace HcduPlus
             this.btnGO.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnGO.Enabled = false;
             this.btnGO.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnGO.Location = new System.Drawing.Point(775, 113);
+            this.btnGO.Location = new System.Drawing.Point(826, 113);
             this.btnGO.Name = "btnGO";
             this.btnGO.Size = new System.Drawing.Size(143, 30);
             this.btnGO.TabIndex = 6;
@@ -716,7 +736,7 @@ namespace HcduPlus
             this.tabConflicts.Location = new System.Drawing.Point(12, 149);
             this.tabConflicts.Name = "tabConflicts";
             this.tabConflicts.SelectedIndex = 0;
-            this.tabConflicts.Size = new System.Drawing.Size(910, 411);
+            this.tabConflicts.Size = new System.Drawing.Size(961, 400);
             this.tabConflicts.TabIndex = 7;
             // 
             // tabByPackage
@@ -725,7 +745,7 @@ namespace HcduPlus
             this.tabByPackage.Location = new System.Drawing.Point(4, 4);
             this.tabByPackage.Name = "tabByPackage";
             this.tabByPackage.Padding = new System.Windows.Forms.Padding(3);
-            this.tabByPackage.Size = new System.Drawing.Size(902, 383);
+            this.tabByPackage.Size = new System.Drawing.Size(953, 372);
             this.tabByPackage.TabIndex = 0;
             this.tabByPackage.Text = "By Package";
             this.tabByPackage.UseVisualStyleBackColor = true;
@@ -739,14 +759,14 @@ namespace HcduPlus
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gridByPackage.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByPackage.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByPackage.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.gridByPackage.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridByPackage.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colHcduPackageA,
@@ -757,13 +777,13 @@ namespace HcduPlus
             this.gridByPackage.Name = "gridByPackage";
             this.gridByPackage.ReadOnly = true;
             this.gridByPackage.RowHeadersVisible = false;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByPackage.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByPackage.RowsDefaultCellStyle = dataGridViewCellStyle6;
             this.gridByPackage.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridByPackage.ShowCellErrors = false;
             this.gridByPackage.ShowEditingIcon = false;
-            this.gridByPackage.Size = new System.Drawing.Size(898, 377);
+            this.gridByPackage.Size = new System.Drawing.Size(949, 366);
             this.gridByPackage.TabIndex = 0;
             this.gridByPackage.TabStop = false;
             this.gridByPackage.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -788,18 +808,26 @@ namespace HcduPlus
             // menuContextGrid
             // 
             this.menuContextGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemAddAsKnownConflict});
+            this.menuItemAddAsKnownConflict,
+            this.menuItemAddAsKnownConflictWithPath});
             this.menuContextGrid.Name = "menuContextGrid";
-            this.menuContextGrid.Size = new System.Drawing.Size(198, 26);
+            this.menuContextGrid.Size = new System.Drawing.Size(253, 48);
             this.menuContextGrid.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextGrid.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             // 
             // menuItemAddAsKnownConflict
             // 
             this.menuItemAddAsKnownConflict.Name = "menuItemAddAsKnownConflict";
-            this.menuItemAddAsKnownConflict.Size = new System.Drawing.Size(197, 22);
+            this.menuItemAddAsKnownConflict.Size = new System.Drawing.Size(252, 22);
             this.menuItemAddAsKnownConflict.Text = "Add As Known Conflict";
             this.menuItemAddAsKnownConflict.Click += new System.EventHandler(this.OnAddAsKnownConflictClicked);
+            // 
+            // menuItemAddAsKnownConflictWithPath
+            // 
+            this.menuItemAddAsKnownConflictWithPath.Name = "menuItemAddAsKnownConflictWithPath";
+            this.menuItemAddAsKnownConflictWithPath.Size = new System.Drawing.Size(252, 22);
+            this.menuItemAddAsKnownConflictWithPath.Text = "Add As Known Conflict With Path";
+            this.menuItemAddAsKnownConflictWithPath.Click += new System.EventHandler(this.OnAddAsKnownConflictClicked);
             // 
             // tabByResource
             // 
@@ -807,7 +835,7 @@ namespace HcduPlus
             this.tabByResource.Location = new System.Drawing.Point(4, 4);
             this.tabByResource.Name = "tabByResource";
             this.tabByResource.Padding = new System.Windows.Forms.Padding(3);
-            this.tabByResource.Size = new System.Drawing.Size(902, 383);
+            this.tabByResource.Size = new System.Drawing.Size(953, 372);
             this.tabByResource.TabIndex = 1;
             this.tabByResource.Text = "By Resource";
             this.tabByResource.UseVisualStyleBackColor = true;
@@ -822,14 +850,14 @@ namespace HcduPlus
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gridByResource.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByResource.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByResource.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.gridByResource.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridByResource.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colHcduType,
@@ -842,9 +870,9 @@ namespace HcduPlus
             this.gridByResource.Name = "gridByResource";
             this.gridByResource.ReadOnly = true;
             this.gridByResource.RowHeadersVisible = false;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByResource.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByResource.RowsDefaultCellStyle = dataGridViewCellStyle8;
             this.gridByResource.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridByResource.ShowCellErrors = false;
             this.gridByResource.ShowEditingIcon = false;
@@ -899,7 +927,7 @@ namespace HcduPlus
             this.tabInfo.Location = new System.Drawing.Point(4, 4);
             this.tabInfo.Name = "tabInfo";
             this.tabInfo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabInfo.Size = new System.Drawing.Size(902, 383);
+            this.tabInfo.Size = new System.Drawing.Size(953, 372);
             this.tabInfo.TabIndex = 2;
             this.tabInfo.Text = "Info";
             this.tabInfo.UseVisualStyleBackColor = true;
@@ -925,7 +953,7 @@ namespace HcduPlus
             // btnSelectScanPath
             // 
             this.btnSelectScanPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectScanPath.Location = new System.Drawing.Point(775, 68);
+            this.btnSelectScanPath.Location = new System.Drawing.Point(826, 68);
             this.btnSelectScanPath.Name = "btnSelectScanPath";
             this.btnSelectScanPath.Size = new System.Drawing.Size(143, 30);
             this.btnSelectScanPath.TabIndex = 10;
@@ -939,7 +967,7 @@ namespace HcduPlus
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textScanPath.Location = new System.Drawing.Point(126, 73);
             this.textScanPath.Name = "textScanPath";
-            this.textScanPath.Size = new System.Drawing.Size(534, 21);
+            this.textScanPath.Size = new System.Drawing.Size(585, 21);
             this.textScanPath.TabIndex = 9;
             this.textScanPath.TabStop = false;
             this.textScanPath.WordWrap = false;
@@ -958,7 +986,7 @@ namespace HcduPlus
             // 
             this.checkModsSavedSims.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.checkModsSavedSims.AutoSize = true;
-            this.checkModsSavedSims.Location = new System.Drawing.Point(666, 40);
+            this.checkModsSavedSims.Location = new System.Drawing.Point(717, 40);
             this.checkModsSavedSims.Name = "checkModsSavedSims";
             this.checkModsSavedSims.Size = new System.Drawing.Size(107, 19);
             this.checkModsSavedSims.TabIndex = 11;
@@ -970,7 +998,7 @@ namespace HcduPlus
             // 
             this.checkScanSavedSims.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.checkScanSavedSims.AutoSize = true;
-            this.checkScanSavedSims.Location = new System.Drawing.Point(666, 75);
+            this.checkScanSavedSims.Location = new System.Drawing.Point(717, 75);
             this.checkScanSavedSims.Name = "checkScanSavedSims";
             this.checkScanSavedSims.Size = new System.Drawing.Size(107, 19);
             this.checkScanSavedSims.TabIndex = 12;
@@ -982,7 +1010,7 @@ namespace HcduPlus
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(933, 572);
+            this.ClientSize = new System.Drawing.Size(984, 561);
             this.Controls.Add(this.checkScanSavedSims);
             this.Controls.Add(this.checkModsSavedSims);
             this.Controls.Add(this.btnSelectScanPath);
@@ -1046,6 +1074,7 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemAbout;
         private System.Windows.Forms.ContextMenuStrip menuContextGrid;
         private System.Windows.Forms.ToolStripMenuItem menuItemAddAsKnownConflict;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAddAsKnownConflictWithPath;
         private System.Windows.Forms.ToolTip toolTipGridByPackage;
         private CommonOpenFileDialog selectPathDialog;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
@@ -1108,6 +1137,8 @@ namespace HcduPlus
         private System.Windows.Forms.TextBox textInfo;
         private System.Windows.Forms.ToolStripMenuItem menuItemMaxisGuidConflicts;
         private System.Windows.Forms.ToolStripMenuItem menuItemMesh;
+        private System.Windows.Forms.ToolStripMenuItem menuMode;
+        private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
     }
 }
 

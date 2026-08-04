@@ -4,6 +4,7 @@
   <conflict>
     <earlier>-[Ss][Tt][Oo][Rr][Ee]\.package</earlier>
     <later>-[Ss][Tt][Oo][Rr][Ee]\.package</later>
+    <notes>Store content</notes>
   </conflict>
 
   <!-- Ignore InTeen flavor paks overriding the base behaviour -->

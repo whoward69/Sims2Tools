@@ -44,6 +44,7 @@ namespace HcduPlus
             this.gridKnownConflicts = new System.Windows.Forms.DataGridView();
             this.colLoadsEarlier = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colLoadsLater = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colNotes = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuConflictGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemRemove = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -69,13 +70,14 @@ namespace HcduPlus
             this.gridKnownConflicts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridKnownConflicts.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colLoadsEarlier,
-            this.colLoadsLater});
+            this.colLoadsLater,
+            this.colNotes});
             this.gridKnownConflicts.ContextMenuStrip = this.menuConflictGrid;
             this.gridKnownConflicts.Location = new System.Drawing.Point(12, 12);
             this.gridKnownConflicts.Name = "gridKnownConflicts";
             this.gridKnownConflicts.RowHeadersVisible = false;
             this.gridKnownConflicts.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridKnownConflicts.Size = new System.Drawing.Size(651, 291);
+            this.gridKnownConflicts.Size = new System.Drawing.Size(760, 305);
             this.gridKnownConflicts.TabIndex = 0;
             this.gridKnownConflicts.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridKnownConflicts.RowValidating += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.OnRowValidating);
@@ -86,15 +88,25 @@ namespace HcduPlus
             this.colLoadsEarlier.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.colLoadsEarlier.DataPropertyName = "Loads Earlier";
             this.colLoadsEarlier.HeaderText = "Loads Earlier";
+            this.colLoadsEarlier.MinimumWidth = 100;
             this.colLoadsEarlier.Name = "colLoadsEarlier";
             this.colLoadsEarlier.Width = 105;
             // 
             // colLoadsLater
             // 
-            this.colLoadsLater.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colLoadsLater.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
             this.colLoadsLater.DataPropertyName = "Loads Later";
             this.colLoadsLater.HeaderText = "Loads Later";
+            this.colLoadsLater.MinimumWidth = 100;
             this.colLoadsLater.Name = "colLoadsLater";
+            // 
+            // colNotes
+            // 
+            this.colNotes.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colNotes.DataPropertyName = "Notes";
+            this.colNotes.HeaderText = "Notes";
+            this.colNotes.MinimumWidth = 100;
+            this.colNotes.Name = "colNotes";
             // 
             // menuConflictGrid
             // 
@@ -132,7 +144,7 @@ namespace HcduPlus
             this.btnKnownCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnKnownCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnKnownCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnKnownCancel.Location = new System.Drawing.Point(371, 309);
+            this.btnKnownCancel.Location = new System.Drawing.Point(480, 323);
             this.btnKnownCancel.Name = "btnKnownCancel";
             this.btnKnownCancel.Size = new System.Drawing.Size(143, 30);
             this.btnKnownCancel.TabIndex = 1;
@@ -145,7 +157,7 @@ namespace HcduPlus
             this.btnKnownOk.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnKnownOk.Enabled = false;
             this.btnKnownOk.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnKnownOk.Location = new System.Drawing.Point(520, 309);
+            this.btnKnownOk.Location = new System.Drawing.Point(629, 323);
             this.btnKnownOk.Name = "btnKnownOk";
             this.btnKnownOk.Size = new System.Drawing.Size(143, 30);
             this.btnKnownOk.TabIndex = 2;
@@ -157,7 +169,7 @@ namespace HcduPlus
             // 
             this.btnReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnReset.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnReset.Location = new System.Drawing.Point(12, 309);
+            this.btnReset.Location = new System.Drawing.Point(12, 323);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(80, 30);
             this.btnReset.TabIndex = 3;
@@ -169,7 +181,7 @@ namespace HcduPlus
             // 
             this.btnImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnImport.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnImport.Location = new System.Drawing.Point(98, 309);
+            this.btnImport.Location = new System.Drawing.Point(98, 323);
             this.btnImport.Name = "btnImport";
             this.btnImport.Size = new System.Drawing.Size(80, 30);
             this.btnImport.TabIndex = 4;
@@ -181,7 +193,7 @@ namespace HcduPlus
             // 
             this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnExport.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExport.Location = new System.Drawing.Point(184, 309);
+            this.btnExport.Location = new System.Drawing.Point(184, 323);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(80, 30);
             this.btnExport.TabIndex = 5;
@@ -206,7 +218,7 @@ namespace HcduPlus
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnKnownCancel;
-            this.ClientSize = new System.Drawing.Size(675, 347);
+            this.ClientSize = new System.Drawing.Size(784, 361);
             this.Controls.Add(this.btnExport);
             this.Controls.Add(this.btnImport);
             this.Controls.Add(this.btnReset);
@@ -232,13 +244,14 @@ namespace HcduPlus
         private System.Windows.Forms.Button btnReset;
         private System.Windows.Forms.ContextMenuStrip menuConflictGrid;
         private System.Windows.Forms.ToolStripMenuItem menuItemRemove;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsEarlier;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsLater;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemPaste;
         private System.Windows.Forms.Button btnImport;
         private System.Windows.Forms.Button btnExport;
         private System.Windows.Forms.OpenFileDialog importFileDialog;
         private System.Windows.Forms.SaveFileDialog exportFileDialog;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsEarlier;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colLoadsLater;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colNotes;
     }
 }
