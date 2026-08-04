@@ -28,6 +28,7 @@ using Sims2Tools.DBPF.Neighbourhood.FAMT;
 using Sims2Tools.DBPF.Neighbourhood.IDNO;
 using Sims2Tools.DBPF.Neighbourhood.LTXT;
 using Sims2Tools.DBPF.Neighbourhood.NGBH;
+using Sims2Tools.DBPF.Neighbourhood.SCOR;
 using Sims2Tools.DBPF.Neighbourhood.SDNA;
 using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.Neighbourhood.SREL;
@@ -198,6 +199,7 @@ namespace Sims2Tools.DBPF
             OtherTypeNames.Add(Lotd.TYPE, Lotd.NAME);
             OtherTypeNames.Add(Ltxt.TYPE, Ltxt.NAME);
             OtherTypeNames.Add(Ngbh.TYPE, Ngbh.NAME);
+            OtherTypeNames.Add(Scor.TYPE, Scor.NAME);
             OtherTypeNames.Add(Sdna.TYPE, Sdna.NAME);
             OtherTypeNames.Add(Sdsc.TYPE, Sdsc.NAME);
             OtherTypeNames.Add(Srel.TYPE, Srel.NAME);
@@ -258,7 +260,6 @@ namespace Sims2Tools.DBPF
             UncodedTypeNames.Add((TypeTypeID)0x7181C501, "PUNK");
             UncodedTypeNames.Add((TypeTypeID)0xAB9406AA, "ROOF");
             UncodedTypeNames.Add((TypeTypeID)0xCC2A6A34, "SCID");
-            UncodedTypeNames.Add((TypeTypeID)0x3053CF74, "SCOR");
             UncodedTypeNames.Add((TypeTypeID)0x53494D49, "SIMI");
             UncodedTypeNames.Add((TypeTypeID)0xCAC4FC40, "SMAP");
             UncodedTypeNames.Add((TypeTypeID)0xCDB8BDC4, "SMEM");

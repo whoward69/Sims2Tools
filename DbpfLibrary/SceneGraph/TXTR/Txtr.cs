@@ -11,6 +11,7 @@
  */
 
 using Sims2Tools.DBPF.Images;
+using Sims2Tools.DBPF.Images.DdsBuilder;
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
@@ -28,9 +29,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x1C4A276C;
         public const string NAME = "TXTR";
 
-#if !DEBUG
         private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-#endif
 
         private CImageData cImageData = null;
         public CImageData ImageData => cImageData;
@@ -114,7 +113,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
                     {
                         string extraParameters = $"-sharpenMethod None";
 
-                        ddsData = (new NvidiaDdsBuilder(sv.ScriptConstant("ddsutils"), null)).BuildDDS(imageName, levels, format, extraParameters);
+                        ddsData = DdsBuilder.GetDdsBuilder(logger).BuildDDS(imageName, levels, format, extraParameters);
                     }
                 }
                 else if (format == DdsFormats.Raw8Bit || format == DdsFormats.ExtRaw8Bit || format == DdsFormats.Raw24Bit || format == DdsFormats.ExtRaw24Bit || format == DdsFormats.Raw32Bit)
@@ -125,7 +124,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
                     }
                     else
                     {
-                        ddsData = (new NvidiaDdsBuilder(sv.ScriptConstant("ddsutils"), null)).BuildDDS(imageName, levels, format, "");
+                        ddsData = DdsBuilder.GetDdsBuilder(logger).BuildDDS(imageName, levels, format, "");
                     }
                 }
                 else

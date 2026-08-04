@@ -32,6 +32,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
         static Rcol()
         {
             BlockClasses.Add(CAmbientLight.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CAmbientLight", true));
+            BlockClasses.Add(CAnimResourceConst.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CAnimResourceConst", true));
             BlockClasses.Add(CBoneDataExtension.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CBoneDataExtension", true));
             BlockClasses.Add(CDataListExtension.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CDataListExtension", true));
             BlockClasses.Add(CDirectionalLight.NAME, Type.GetType("Sims2Tools.DBPF.SceneGraph.RcolBlocks.CDirectionalLight", true));
@@ -159,17 +160,17 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
         {
             get
             {
-                if (duff)
-                {
-                    return "Invalid Rcol";
-                }
-
                 if (blocks.Count > 0)
                 {
                     if (blocks[0].NameResource != null)
                     {
                         return blocks[0].NameResource.FileName;
                     }
+                }
+
+                if (duff)
+                {
+                    return "Invalid Rcol";
                 }
 
                 return "";
@@ -302,46 +303,50 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
             count = reader.ReadUInt32();
 
+#if !DEBUG
             try
             {
-                uint refFilesCount = ((count == 0xffff0001) ? reader.ReadUInt32() : count);
+#endif
+            uint refFilesCount = ((count == 0xffff0001) ? reader.ReadUInt32() : count);
 
-                for (int i = 0; i < refFilesCount; i++)
-                {
-                    TypeGroupID groupId = reader.ReadGroupId();
-                    TypeInstanceID instanceId = reader.ReadInstanceId();
-                    TypeResourceID resourceId = (count == 0xffff0001) ? reader.ReadResourceId() : DBPFData.RESOURCE_NULL;
-                    TypeTypeID typeId = reader.ReadTypeId();
+            for (int i = 0; i < refFilesCount; i++)
+            {
+                TypeGroupID groupId = reader.ReadGroupId();
+                TypeInstanceID instanceId = reader.ReadInstanceId();
+                TypeResourceID resourceId = (count == 0xffff0001) ? reader.ReadResourceId() : DBPFData.RESOURCE_NULL;
+                TypeTypeID typeId = reader.ReadTypeId();
 
-                    reffiles.Add(new DBPFScriptableKey(typeId, groupId, instanceId, resourceId));
-                }
+                reffiles.Add(new DBPFScriptableKey(typeId, groupId, instanceId, resourceId));
+            }
 
-                index = new uint[reader.ReadUInt32()];
-                for (int i = 0; i < index.Length; i++) index[i] = reader.ReadUInt32();
+            index = new uint[reader.ReadUInt32()];
+            for (int i = 0; i < index.Length; i++) index[i] = reader.ReadUInt32();
 
-                for (int i = 0; i < index.Length; i++)
-                {
-                    IRcolBlock blk = ReadBlock((TypeBlockID)index[i], reader);
-                    if (blk == null) break;
-                    blocks.Add(blk);
-                }
+            for (int i = 0; i < index.Length; i++)
+            {
+                IRcolBlock blk = ReadBlock((TypeBlockID)index[i], reader);
+                if (blk == null) break;
+                blocks.Add(blk);
+            }
 
-                long size = dataSize - (reader.Position - startPos);
-                if (size > 0)
-                {
-                    oversize = reader.ReadBytes(size);
-                    logger.Debug($"Reading 'oversize' bytes in RCol '{KeyName}' part of {ToString()}");
-                }
-                else
-                {
-                    oversize = new byte[0];
-                }
+            long size = dataSize - (reader.Position - startPos);
+            if (size > 0)
+            {
+                oversize = reader.ReadBytes(size);
+                logger.Debug($"Reading 'oversize' bytes in RCol '{KeyName}' part of {ToString()}");
+            }
+            else
+            {
+                oversize = new byte[0];
+            }
+#if !DEBUG
             }
             catch (Exception ex)
             {
                 logger.Warn("RCol error:", ex);
                 duff = true;
             }
+#endif
 
 #if DEBUG
             readEnd = reader.Position;
@@ -352,6 +357,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
         {
             get
             {
+                Debug.Assert(!duff, $"RCOL {KeyName} is duff!");
                 if (duff) return 0;
 
                 long size = 4;
@@ -370,6 +376,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 
         public override void Serialize(DbpfWriter writer)
         {
+            Debug.Assert(!duff, $"RCOL {KeyName} is duff!");
             if (duff) return;
 
 #if DEBUG

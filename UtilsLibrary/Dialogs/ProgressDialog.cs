@@ -53,7 +53,7 @@ namespace Sims2Tools
 
         public void SetProgress(int percent, string status = null)
         {
-            backgroundWorker.ReportProgress(percent, status);
+            backgroundWorker.ReportProgress(Math.Min(100, Math.Max(0, percent)), status);
         }
 
         private void OnLoad(object sender, EventArgs e)

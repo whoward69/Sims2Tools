@@ -31,7 +31,7 @@ namespace Sims2Tools.DBPF.TPRP
         protected void Unserialize(DbpfReader reader) => this.label = Helper.ToString(reader.ReadBytes(reader.ReadByte()));
 
         // TODO - DBPF Library - TPRP - _TEST - Serialize TprpItem
-        public uint FileSize => (uint)(1 + Helper.ToBytes(label, 0).Length);
+        public uint FileSize => (uint)(1 + Helper.ToBytes(label).Length);
 
         // TODO - DBPF Library - TPRP - _TEST - Serialize TprpItem
         public void Serialize(DbpfWriter writer)
@@ -40,7 +40,7 @@ namespace Sims2Tools.DBPF.TPRP
             long writeStart = writer.Position;
 #endif
 
-            byte[] b = Helper.ToBytes(label, 0);
+            byte[] b = Helper.ToBytes(label);
             writer.WriteByte((byte)b.Length);
             writer.WriteBytes(b);
 

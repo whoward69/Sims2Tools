@@ -108,7 +108,7 @@ namespace Sims2Tools.Controls
 
         private string PercentageStr
         {
-            get => $"{(int)((float)Value - Minimum) / ((float)Maximum - Minimum) * 100} %";
+            get => $"{(int)((double)Value - Minimum) / ((double)Maximum - Minimum) * 100} %";
         }
 
         private string CurrProgressStr
@@ -140,7 +140,7 @@ namespace Sims2Tools.Controls
 
             if (Value > 0)
             {
-                Rectangle clip = new Rectangle(rect.X, rect.Y, (int)Math.Round(((float)Value / Maximum) * rect.Width), rect.Height);
+                Rectangle clip = new Rectangle(rect.X, rect.Y, (int)Math.Round(((double)Value / Maximum) * rect.Width), rect.Height);
 
                 g.FillRectangle(_progressColourBrush, clip);
             }

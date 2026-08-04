@@ -102,7 +102,7 @@ namespace Sims2Tools.DBPF.CPF
             {
                 if (DataType != MetaData.DataTypes.dtString) throw new ArgumentException("Different data types");
 
-                val = Helper.ToBytes(value, 0);
+                val = Helper.ToBytes(value);
 
                 _isDirty = true;
             }
@@ -434,14 +434,14 @@ namespace Sims2Tools.DBPF.CPF
             val = reader.ReadBytes(valuelength);
         }
 
-        internal uint FileSize => (uint)(4 + 4 + Helper.ToBytes(name, 0).Length + ((datatype == MetaData.DataTypes.dtString) ? 4 : 0) + val.Length);
+        internal uint FileSize => (uint)(4 + 4 + Helper.ToBytes(name).Length + ((datatype == MetaData.DataTypes.dtString) ? 4 : 0) + val.Length);
 
         internal void Serialize(DbpfWriter writer)
         {
             long bytesBefore = writer.Position;
             writer.WriteUInt32((uint)datatype);
 
-            byte[] bname = Helper.ToBytes(name, 0);
+            byte[] bname = Helper.ToBytes(name);
             writer.WriteInt32(bname.Length);
             writer.WriteBytes(bname);
 

@@ -82,11 +82,11 @@ namespace Sims2Tools.DBPF.TRCN
             {
                 uint size = 4 + 4;
 
-                size += (uint)(1 + Helper.ToBytes(constName, 0).Length);
+                size += (uint)(1 + Helper.ToBytes(constName).Length);
 
                 if (version > 83U)
                 {
-                    size += (uint)(1 + Helper.ToBytes(constDesc, 0).Length + 1);
+                    size += (uint)(1 + Helper.ToBytes(constDesc).Length + 1);
                 }
                 else
                 {
@@ -108,13 +108,13 @@ namespace Sims2Tools.DBPF.TRCN
             writer.WriteUInt32(used);
             writer.WriteUInt32(constId);
 
-            byte[] b = Helper.ToBytes(constName, 0);
+            byte[] b = Helper.ToBytes(constName);
             writer.WriteByte((byte)b.Length);
             writer.WriteBytes(b);
 
             if (version > 83U)
             {
-                b = Helper.ToBytes(constDesc, 0);
+                b = Helper.ToBytes(constDesc);
                 writer.WriteByte((byte)b.Length);
                 writer.WriteBytes(b);
                 writer.WriteByte((byte)defValue);

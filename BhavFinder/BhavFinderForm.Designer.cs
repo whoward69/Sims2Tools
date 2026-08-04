@@ -40,8 +40,8 @@ namespace BhavFinder
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BhavFinderForm));
             this.lblFilePath = new System.Windows.Forms.Label();
             this.textFilePath = new System.Windows.Forms.TextBox();
@@ -138,6 +138,15 @@ namespace BhavFinder
             this.bhavFinderWorker = new System.ComponentModel.BackgroundWorker();
             this.lblUsingIgnoreCase = new System.Windows.Forms.Label();
             this.checkUsingIgnoreCase = new System.Windows.Forms.CheckBox();
+            this.lblNameRegex = new System.Windows.Forms.Label();
+            this.textNameRegex = new System.Windows.Forms.TextBox();
+            this.btnClearBhavDetails = new System.Windows.Forms.Button();
+            this.lblParams = new System.Windows.Forms.Label();
+            this.textParams = new System.Windows.Forms.TextBox();
+            this.textLocals = new System.Windows.Forms.TextBox();
+            this.lblLocals = new System.Windows.Forms.Label();
+            this.checkNameIgnoreCase = new System.Windows.Forms.CheckBox();
+            this.lblNameIgnoreCase = new System.Windows.Forms.Label();
             this.menuContextOperands.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridFoundBhavs)).BeginInit();
             this.menuContextFoundBhavs.SuspendLayout();
@@ -179,7 +188,7 @@ namespace BhavFinder
             // lblOpCode
             // 
             this.lblOpCode.AutoSize = true;
-            this.lblOpCode.Location = new System.Drawing.Point(10, 76);
+            this.lblOpCode.Location = new System.Drawing.Point(10, 111);
             this.lblOpCode.Name = "lblOpCode";
             this.lblOpCode.Size = new System.Drawing.Size(55, 15);
             this.lblOpCode.TabIndex = 0;
@@ -188,7 +197,7 @@ namespace BhavFinder
             // comboOpCode
             // 
             this.comboOpCode.FormattingEnabled = true;
-            this.comboOpCode.Location = new System.Drawing.Point(111, 72);
+            this.comboOpCode.Location = new System.Drawing.Point(111, 107);
             this.comboOpCode.Name = "comboOpCode";
             this.comboOpCode.Size = new System.Drawing.Size(245, 23);
             this.comboOpCode.TabIndex = 3;
@@ -199,7 +208,7 @@ namespace BhavFinder
             // lblVersion
             // 
             this.lblVersion.AutoSize = true;
-            this.lblVersion.Location = new System.Drawing.Point(369, 75);
+            this.lblVersion.Location = new System.Drawing.Point(369, 110);
             this.lblVersion.Name = "lblVersion";
             this.lblVersion.Size = new System.Drawing.Size(51, 15);
             this.lblVersion.TabIndex = 0;
@@ -220,7 +229,7 @@ namespace BhavFinder
             "0x07",
             "0x08",
             "0x09"});
-            this.comboVersion.Location = new System.Drawing.Point(426, 73);
+            this.comboVersion.Location = new System.Drawing.Point(426, 108);
             this.comboVersion.Name = "comboVersion";
             this.comboVersion.Size = new System.Drawing.Size(81, 23);
             this.comboVersion.TabIndex = 4;
@@ -228,7 +237,7 @@ namespace BhavFinder
             // 
             // btnClearOpCode
             // 
-            this.btnClearOpCode.Location = new System.Drawing.Point(934, 68);
+            this.btnClearOpCode.Location = new System.Drawing.Point(934, 103);
             this.btnClearOpCode.Name = "btnClearOpCode";
             this.btnClearOpCode.Size = new System.Drawing.Size(143, 30);
             this.btnClearOpCode.TabIndex = 5;
@@ -239,7 +248,7 @@ namespace BhavFinder
             // lblOperands
             // 
             this.lblOperands.AutoSize = true;
-            this.lblOperands.Location = new System.Drawing.Point(10, 110);
+            this.lblOperands.Location = new System.Drawing.Point(10, 145);
             this.lblOperands.Name = "lblOperands";
             this.lblOperands.Size = new System.Drawing.Size(64, 15);
             this.lblOperands.TabIndex = 0;
@@ -249,7 +258,7 @@ namespace BhavFinder
             // 
             this.textOperand0.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand0.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand0.Location = new System.Drawing.Point(111, 107);
+            this.textOperand0.Location = new System.Drawing.Point(111, 142);
             this.textOperand0.MaxLength = 2;
             this.textOperand0.Name = "textOperand0";
             this.textOperand0.Size = new System.Drawing.Size(35, 21);
@@ -277,7 +286,7 @@ namespace BhavFinder
             // 
             this.textOperand1.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand1.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand1.Location = new System.Drawing.Point(157, 107);
+            this.textOperand1.Location = new System.Drawing.Point(157, 142);
             this.textOperand1.MaxLength = 2;
             this.textOperand1.Name = "textOperand1";
             this.textOperand1.Size = new System.Drawing.Size(35, 21);
@@ -290,7 +299,7 @@ namespace BhavFinder
             // 
             this.textOperand2.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand2.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand2.Location = new System.Drawing.Point(216, 107);
+            this.textOperand2.Location = new System.Drawing.Point(216, 142);
             this.textOperand2.MaxLength = 2;
             this.textOperand2.Name = "textOperand2";
             this.textOperand2.Size = new System.Drawing.Size(35, 21);
@@ -303,7 +312,7 @@ namespace BhavFinder
             // 
             this.textOperand3.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand3.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand3.Location = new System.Drawing.Point(262, 107);
+            this.textOperand3.Location = new System.Drawing.Point(262, 142);
             this.textOperand3.MaxLength = 2;
             this.textOperand3.Name = "textOperand3";
             this.textOperand3.Size = new System.Drawing.Size(35, 21);
@@ -316,7 +325,7 @@ namespace BhavFinder
             // 
             this.textOperand4.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand4.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand4.Location = new System.Drawing.Point(321, 107);
+            this.textOperand4.Location = new System.Drawing.Point(321, 142);
             this.textOperand4.MaxLength = 2;
             this.textOperand4.Name = "textOperand4";
             this.textOperand4.Size = new System.Drawing.Size(35, 21);
@@ -329,7 +338,7 @@ namespace BhavFinder
             // 
             this.textOperand5.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand5.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand5.Location = new System.Drawing.Point(367, 107);
+            this.textOperand5.Location = new System.Drawing.Point(367, 142);
             this.textOperand5.MaxLength = 2;
             this.textOperand5.Name = "textOperand5";
             this.textOperand5.Size = new System.Drawing.Size(35, 21);
@@ -342,7 +351,7 @@ namespace BhavFinder
             // 
             this.textOperand6.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand6.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand6.Location = new System.Drawing.Point(426, 107);
+            this.textOperand6.Location = new System.Drawing.Point(426, 142);
             this.textOperand6.MaxLength = 2;
             this.textOperand6.Name = "textOperand6";
             this.textOperand6.Size = new System.Drawing.Size(35, 21);
@@ -355,7 +364,7 @@ namespace BhavFinder
             // 
             this.textOperand7.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand7.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand7.Location = new System.Drawing.Point(472, 107);
+            this.textOperand7.Location = new System.Drawing.Point(472, 142);
             this.textOperand7.MaxLength = 2;
             this.textOperand7.Name = "textOperand7";
             this.textOperand7.Size = new System.Drawing.Size(35, 21);
@@ -368,7 +377,7 @@ namespace BhavFinder
             // 
             this.textOperand8.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand8.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand8.Location = new System.Drawing.Point(531, 107);
+            this.textOperand8.Location = new System.Drawing.Point(531, 142);
             this.textOperand8.MaxLength = 2;
             this.textOperand8.Name = "textOperand8";
             this.textOperand8.Size = new System.Drawing.Size(35, 21);
@@ -381,7 +390,7 @@ namespace BhavFinder
             // 
             this.textOperand9.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand9.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand9.Location = new System.Drawing.Point(577, 107);
+            this.textOperand9.Location = new System.Drawing.Point(577, 142);
             this.textOperand9.MaxLength = 2;
             this.textOperand9.Name = "textOperand9";
             this.textOperand9.Size = new System.Drawing.Size(35, 21);
@@ -394,7 +403,7 @@ namespace BhavFinder
             // 
             this.textOperand10.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand10.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand10.Location = new System.Drawing.Point(636, 107);
+            this.textOperand10.Location = new System.Drawing.Point(636, 142);
             this.textOperand10.MaxLength = 2;
             this.textOperand10.Name = "textOperand10";
             this.textOperand10.Size = new System.Drawing.Size(35, 21);
@@ -407,7 +416,7 @@ namespace BhavFinder
             // 
             this.textOperand11.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand11.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand11.Location = new System.Drawing.Point(682, 107);
+            this.textOperand11.Location = new System.Drawing.Point(682, 142);
             this.textOperand11.MaxLength = 2;
             this.textOperand11.Name = "textOperand11";
             this.textOperand11.Size = new System.Drawing.Size(35, 21);
@@ -420,7 +429,7 @@ namespace BhavFinder
             // 
             this.textOperand12.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textOperand12.ContextMenuStrip = this.menuContextOperands;
-            this.textOperand12.Location = new System.Drawing.Point(741, 107);
+            this.textOperand12.Location = new System.Drawing.Point(741, 142);
             this.textOperand12.MaxLength = 2;
             this.textOperand12.Name = "textOperand12";
             this.textOperand12.Size = new System.Drawing.Size(35, 21);
@@ -432,7 +441,7 @@ namespace BhavFinder
             // textOperand13
             // 
             this.textOperand13.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textOperand13.Location = new System.Drawing.Point(787, 107);
+            this.textOperand13.Location = new System.Drawing.Point(787, 142);
             this.textOperand13.MaxLength = 2;
             this.textOperand13.Name = "textOperand13";
             this.textOperand13.Size = new System.Drawing.Size(35, 21);
@@ -444,7 +453,7 @@ namespace BhavFinder
             // textOperand14
             // 
             this.textOperand14.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textOperand14.Location = new System.Drawing.Point(846, 107);
+            this.textOperand14.Location = new System.Drawing.Point(846, 142);
             this.textOperand14.MaxLength = 2;
             this.textOperand14.Name = "textOperand14";
             this.textOperand14.Size = new System.Drawing.Size(35, 21);
@@ -456,7 +465,7 @@ namespace BhavFinder
             // textOperand15
             // 
             this.textOperand15.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textOperand15.Location = new System.Drawing.Point(892, 107);
+            this.textOperand15.Location = new System.Drawing.Point(892, 142);
             this.textOperand15.MaxLength = 2;
             this.textOperand15.Name = "textOperand15";
             this.textOperand15.Size = new System.Drawing.Size(35, 21);
@@ -467,7 +476,7 @@ namespace BhavFinder
             // 
             // btnClearOperands
             // 
-            this.btnClearOperands.Location = new System.Drawing.Point(934, 102);
+            this.btnClearOperands.Location = new System.Drawing.Point(934, 137);
             this.btnClearOperands.Name = "btnClearOperands";
             this.btnClearOperands.Size = new System.Drawing.Size(143, 30);
             this.btnClearOperands.TabIndex = 22;
@@ -478,7 +487,7 @@ namespace BhavFinder
             // lblMasks
             // 
             this.lblMasks.AutoSize = true;
-            this.lblMasks.Location = new System.Drawing.Point(10, 145);
+            this.lblMasks.Location = new System.Drawing.Point(10, 180);
             this.lblMasks.Name = "lblMasks";
             this.lblMasks.Size = new System.Drawing.Size(46, 15);
             this.lblMasks.TabIndex = 0;
@@ -487,7 +496,7 @@ namespace BhavFinder
             // textMask0
             // 
             this.textMask0.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask0.Location = new System.Drawing.Point(111, 142);
+            this.textMask0.Location = new System.Drawing.Point(111, 177);
             this.textMask0.MaxLength = 2;
             this.textMask0.Name = "textMask0";
             this.textMask0.Size = new System.Drawing.Size(35, 21);
@@ -500,7 +509,7 @@ namespace BhavFinder
             // textMask1
             // 
             this.textMask1.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask1.Location = new System.Drawing.Point(157, 142);
+            this.textMask1.Location = new System.Drawing.Point(157, 177);
             this.textMask1.MaxLength = 2;
             this.textMask1.Name = "textMask1";
             this.textMask1.Size = new System.Drawing.Size(35, 21);
@@ -513,7 +522,7 @@ namespace BhavFinder
             // textMask2
             // 
             this.textMask2.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask2.Location = new System.Drawing.Point(216, 142);
+            this.textMask2.Location = new System.Drawing.Point(216, 177);
             this.textMask2.MaxLength = 2;
             this.textMask2.Name = "textMask2";
             this.textMask2.Size = new System.Drawing.Size(35, 21);
@@ -526,7 +535,7 @@ namespace BhavFinder
             // textMask3
             // 
             this.textMask3.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask3.Location = new System.Drawing.Point(262, 142);
+            this.textMask3.Location = new System.Drawing.Point(262, 177);
             this.textMask3.MaxLength = 2;
             this.textMask3.Name = "textMask3";
             this.textMask3.Size = new System.Drawing.Size(35, 21);
@@ -539,7 +548,7 @@ namespace BhavFinder
             // textMask4
             // 
             this.textMask4.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask4.Location = new System.Drawing.Point(321, 142);
+            this.textMask4.Location = new System.Drawing.Point(321, 177);
             this.textMask4.MaxLength = 2;
             this.textMask4.Name = "textMask4";
             this.textMask4.Size = new System.Drawing.Size(35, 21);
@@ -552,7 +561,7 @@ namespace BhavFinder
             // textMask5
             // 
             this.textMask5.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask5.Location = new System.Drawing.Point(367, 142);
+            this.textMask5.Location = new System.Drawing.Point(367, 177);
             this.textMask5.MaxLength = 2;
             this.textMask5.Name = "textMask5";
             this.textMask5.Size = new System.Drawing.Size(35, 21);
@@ -565,7 +574,7 @@ namespace BhavFinder
             // textMask6
             // 
             this.textMask6.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask6.Location = new System.Drawing.Point(426, 142);
+            this.textMask6.Location = new System.Drawing.Point(426, 177);
             this.textMask6.MaxLength = 2;
             this.textMask6.Name = "textMask6";
             this.textMask6.Size = new System.Drawing.Size(35, 21);
@@ -578,7 +587,7 @@ namespace BhavFinder
             // textMask7
             // 
             this.textMask7.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask7.Location = new System.Drawing.Point(472, 142);
+            this.textMask7.Location = new System.Drawing.Point(472, 177);
             this.textMask7.MaxLength = 2;
             this.textMask7.Name = "textMask7";
             this.textMask7.Size = new System.Drawing.Size(35, 21);
@@ -591,7 +600,7 @@ namespace BhavFinder
             // textMask8
             // 
             this.textMask8.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask8.Location = new System.Drawing.Point(531, 142);
+            this.textMask8.Location = new System.Drawing.Point(531, 177);
             this.textMask8.MaxLength = 2;
             this.textMask8.Name = "textMask8";
             this.textMask8.Size = new System.Drawing.Size(35, 21);
@@ -604,7 +613,7 @@ namespace BhavFinder
             // textMask9
             // 
             this.textMask9.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask9.Location = new System.Drawing.Point(577, 142);
+            this.textMask9.Location = new System.Drawing.Point(577, 177);
             this.textMask9.MaxLength = 2;
             this.textMask9.Name = "textMask9";
             this.textMask9.Size = new System.Drawing.Size(35, 21);
@@ -617,7 +626,7 @@ namespace BhavFinder
             // textMask10
             // 
             this.textMask10.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask10.Location = new System.Drawing.Point(636, 142);
+            this.textMask10.Location = new System.Drawing.Point(636, 177);
             this.textMask10.MaxLength = 2;
             this.textMask10.Name = "textMask10";
             this.textMask10.Size = new System.Drawing.Size(35, 21);
@@ -630,7 +639,7 @@ namespace BhavFinder
             // textMask11
             // 
             this.textMask11.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask11.Location = new System.Drawing.Point(682, 142);
+            this.textMask11.Location = new System.Drawing.Point(682, 177);
             this.textMask11.MaxLength = 2;
             this.textMask11.Name = "textMask11";
             this.textMask11.Size = new System.Drawing.Size(35, 21);
@@ -643,7 +652,7 @@ namespace BhavFinder
             // textMask12
             // 
             this.textMask12.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask12.Location = new System.Drawing.Point(741, 142);
+            this.textMask12.Location = new System.Drawing.Point(741, 177);
             this.textMask12.MaxLength = 2;
             this.textMask12.Name = "textMask12";
             this.textMask12.Size = new System.Drawing.Size(35, 21);
@@ -656,7 +665,7 @@ namespace BhavFinder
             // textMask13
             // 
             this.textMask13.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask13.Location = new System.Drawing.Point(787, 142);
+            this.textMask13.Location = new System.Drawing.Point(787, 177);
             this.textMask13.MaxLength = 2;
             this.textMask13.Name = "textMask13";
             this.textMask13.Size = new System.Drawing.Size(35, 21);
@@ -669,7 +678,7 @@ namespace BhavFinder
             // textMask14
             // 
             this.textMask14.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask14.Location = new System.Drawing.Point(846, 142);
+            this.textMask14.Location = new System.Drawing.Point(846, 177);
             this.textMask14.MaxLength = 2;
             this.textMask14.Name = "textMask14";
             this.textMask14.Size = new System.Drawing.Size(35, 21);
@@ -682,7 +691,7 @@ namespace BhavFinder
             // textMask15
             // 
             this.textMask15.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.textMask15.Location = new System.Drawing.Point(892, 142);
+            this.textMask15.Location = new System.Drawing.Point(892, 177);
             this.textMask15.MaxLength = 2;
             this.textMask15.Name = "textMask15";
             this.textMask15.Size = new System.Drawing.Size(35, 21);
@@ -694,7 +703,7 @@ namespace BhavFinder
             // 
             // btnResetMasks
             // 
-            this.btnResetMasks.Location = new System.Drawing.Point(934, 137);
+            this.btnResetMasks.Location = new System.Drawing.Point(934, 172);
             this.btnResetMasks.Name = "btnResetMasks";
             this.btnResetMasks.Size = new System.Drawing.Size(143, 30);
             this.btnResetMasks.TabIndex = 39;
@@ -705,7 +714,7 @@ namespace BhavFinder
             // lblBhavInGroup
             // 
             this.lblBhavInGroup.AutoSize = true;
-            this.lblBhavInGroup.Location = new System.Drawing.Point(10, 180);
+            this.lblBhavInGroup.Location = new System.Drawing.Point(10, 215);
             this.lblBhavInGroup.Name = "lblBhavInGroup";
             this.lblBhavInGroup.Size = new System.Drawing.Size(57, 15);
             this.lblBhavInGroup.TabIndex = 0;
@@ -714,7 +723,7 @@ namespace BhavFinder
             // comboBhavInGroup
             // 
             this.comboBhavInGroup.FormattingEnabled = true;
-            this.comboBhavInGroup.Location = new System.Drawing.Point(111, 176);
+            this.comboBhavInGroup.Location = new System.Drawing.Point(111, 211);
             this.comboBhavInGroup.Name = "comboBhavInGroup";
             this.comboBhavInGroup.Size = new System.Drawing.Size(369, 23);
             this.comboBhavInGroup.TabIndex = 40;
@@ -724,7 +733,7 @@ namespace BhavFinder
             // lblOpCodeInGroup
             // 
             this.lblOpCodeInGroup.AutoSize = true;
-            this.lblOpCodeInGroup.Location = new System.Drawing.Point(484, 179);
+            this.lblOpCodeInGroup.Location = new System.Drawing.Point(484, 214);
             this.lblOpCodeInGroup.Name = "lblOpCodeInGroup";
             this.lblOpCodeInGroup.Size = new System.Drawing.Size(68, 15);
             this.lblOpCodeInGroup.TabIndex = 0;
@@ -734,7 +743,7 @@ namespace BhavFinder
             // comboOpCodeInGroup
             // 
             this.comboOpCodeInGroup.FormattingEnabled = true;
-            this.comboOpCodeInGroup.Location = new System.Drawing.Point(553, 176);
+            this.comboOpCodeInGroup.Location = new System.Drawing.Point(553, 211);
             this.comboOpCodeInGroup.Name = "comboOpCodeInGroup";
             this.comboOpCodeInGroup.Size = new System.Drawing.Size(373, 23);
             this.comboOpCodeInGroup.TabIndex = 41;
@@ -744,7 +753,7 @@ namespace BhavFinder
             // 
             // btnClearGroups
             // 
-            this.btnClearGroups.Location = new System.Drawing.Point(934, 172);
+            this.btnClearGroups.Location = new System.Drawing.Point(934, 207);
             this.btnClearGroups.Name = "btnClearGroups";
             this.btnClearGroups.Size = new System.Drawing.Size(143, 30);
             this.btnClearGroups.TabIndex = 42;
@@ -755,7 +764,7 @@ namespace BhavFinder
             // lblUsingOperand
             // 
             this.lblUsingOperand.AutoSize = true;
-            this.lblUsingOperand.Location = new System.Drawing.Point(10, 214);
+            this.lblUsingOperand.Location = new System.Drawing.Point(10, 249);
             this.lblUsingOperand.Name = "lblUsingOperand";
             this.lblUsingOperand.Size = new System.Drawing.Size(93, 15);
             this.lblUsingOperand.TabIndex = 0;
@@ -782,7 +791,7 @@ namespace BhavFinder
             "13",
             "14",
             "15"});
-            this.comboUsingOperand.Location = new System.Drawing.Point(111, 211);
+            this.comboUsingOperand.Location = new System.Drawing.Point(111, 246);
             this.comboUsingOperand.Name = "comboUsingOperand";
             this.comboUsingOperand.Size = new System.Drawing.Size(81, 23);
             this.comboUsingOperand.TabIndex = 43;
@@ -791,7 +800,7 @@ namespace BhavFinder
             // lblUsingIndex
             // 
             this.lblUsingIndex.AutoSize = true;
-            this.lblUsingIndex.Location = new System.Drawing.Point(199, 214);
+            this.lblUsingIndex.Location = new System.Drawing.Point(199, 249);
             this.lblUsingIndex.Name = "lblUsingIndex";
             this.lblUsingIndex.Size = new System.Drawing.Size(113, 15);
             this.lblUsingIndex.TabIndex = 0;
@@ -800,7 +809,7 @@ namespace BhavFinder
             // comboUsingSTR
             // 
             this.comboUsingSTR.FormattingEnabled = true;
-            this.comboUsingSTR.Location = new System.Drawing.Point(321, 211);
+            this.comboUsingSTR.Location = new System.Drawing.Point(321, 246);
             this.comboUsingSTR.Name = "comboUsingSTR";
             this.comboUsingSTR.Size = new System.Drawing.Size(159, 23);
             this.comboUsingSTR.TabIndex = 44;
@@ -810,7 +819,7 @@ namespace BhavFinder
             // lblUsingMatches
             // 
             this.lblUsingMatches.AutoSize = true;
-            this.lblUsingMatches.Location = new System.Drawing.Point(495, 214);
+            this.lblUsingMatches.Location = new System.Drawing.Point(495, 249);
             this.lblUsingMatches.Name = "lblUsingMatches";
             this.lblUsingMatches.Size = new System.Drawing.Size(57, 15);
             this.lblUsingMatches.TabIndex = 0;
@@ -818,14 +827,14 @@ namespace BhavFinder
             // 
             // textUsingRegex
             // 
-            this.textUsingRegex.Location = new System.Drawing.Point(553, 211);
+            this.textUsingRegex.Location = new System.Drawing.Point(553, 246);
             this.textUsingRegex.Name = "textUsingRegex";
             this.textUsingRegex.Size = new System.Drawing.Size(269, 21);
             this.textUsingRegex.TabIndex = 45;
             // 
             // btnUsingClear
             // 
-            this.btnUsingClear.Location = new System.Drawing.Point(934, 206);
+            this.btnUsingClear.Location = new System.Drawing.Point(934, 241);
             this.btnUsingClear.Name = "btnUsingClear";
             this.btnUsingClear.Size = new System.Drawing.Size(143, 30);
             this.btnUsingClear.TabIndex = 46;
@@ -836,7 +845,7 @@ namespace BhavFinder
             // lblProgress
             // 
             this.lblProgress.AutoSize = true;
-            this.lblProgress.Location = new System.Drawing.Point(10, 260);
+            this.lblProgress.Location = new System.Drawing.Point(10, 295);
             this.lblProgress.Name = "lblProgress";
             this.lblProgress.Size = new System.Drawing.Size(59, 15);
             this.lblProgress.TabIndex = 0;
@@ -845,7 +854,7 @@ namespace BhavFinder
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(111, 257);
+            this.progressBar.Location = new System.Drawing.Point(111, 292);
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(605, 23);
             this.progressBar.TabIndex = 0;
@@ -854,7 +863,7 @@ namespace BhavFinder
             // lblShowNames
             // 
             this.lblShowNames.AutoSize = true;
-            this.lblShowNames.Location = new System.Drawing.Point(745, 259);
+            this.lblShowNames.Location = new System.Drawing.Point(745, 294);
             this.lblShowNames.Name = "lblShowNames";
             this.lblShowNames.Size = new System.Drawing.Size(159, 15);
             this.lblShowNames.TabIndex = 0;
@@ -863,7 +872,7 @@ namespace BhavFinder
             // checkShowNames
             // 
             this.checkShowNames.AutoSize = true;
-            this.checkShowNames.Location = new System.Drawing.Point(910, 260);
+            this.checkShowNames.Location = new System.Drawing.Point(910, 295);
             this.checkShowNames.Name = "checkShowNames";
             this.checkShowNames.Size = new System.Drawing.Size(15, 14);
             this.checkShowNames.TabIndex = 47;
@@ -874,7 +883,7 @@ namespace BhavFinder
             // 
             this.btnGO.Enabled = false;
             this.btnGO.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnGO.Location = new System.Drawing.Point(934, 252);
+            this.btnGO.Location = new System.Drawing.Point(934, 287);
             this.btnGO.Name = "btnGO";
             this.btnGO.Size = new System.Drawing.Size(143, 30);
             this.btnGO.TabIndex = 48;
@@ -888,14 +897,14 @@ namespace BhavFinder
             this.gridFoundBhavs.AllowUserToDeleteRows = false;
             this.gridFoundBhavs.AllowUserToResizeRows = false;
             this.gridFoundBhavs.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridFoundBhavs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridFoundBhavs.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.gridFoundBhavs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridFoundBhavs.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colBhavPackage,
@@ -906,13 +915,13 @@ namespace BhavFinder
             this.colBhavGroupInstance,
             this.colBhavGroupName});
             this.gridFoundBhavs.ContextMenuStrip = this.menuContextFoundBhavs;
-            this.gridFoundBhavs.Location = new System.Drawing.Point(14, 292);
+            this.gridFoundBhavs.Location = new System.Drawing.Point(14, 327);
             this.gridFoundBhavs.Name = "gridFoundBhavs";
             this.gridFoundBhavs.ReadOnly = true;
             this.gridFoundBhavs.RowHeadersVisible = false;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridFoundBhavs.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridFoundBhavs.RowsDefaultCellStyle = dataGridViewCellStyle4;
             this.gridFoundBhavs.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridFoundBhavs.ShowCellErrors = false;
             this.gridFoundBhavs.ShowEditingIcon = false;
@@ -1169,7 +1178,7 @@ namespace BhavFinder
             // lblUsingIgnoreCase
             // 
             this.lblUsingIgnoreCase.AutoSize = true;
-            this.lblUsingIgnoreCase.Location = new System.Drawing.Point(828, 214);
+            this.lblUsingIgnoreCase.Location = new System.Drawing.Point(828, 249);
             this.lblUsingIgnoreCase.Name = "lblUsingIgnoreCase";
             this.lblUsingIgnoreCase.Size = new System.Drawing.Size(76, 15);
             this.lblUsingIgnoreCase.TabIndex = 49;
@@ -1178,18 +1187,116 @@ namespace BhavFinder
             // checkUsingIgnoreCase
             // 
             this.checkUsingIgnoreCase.AutoSize = true;
-            this.checkUsingIgnoreCase.Location = new System.Drawing.Point(910, 215);
+            this.checkUsingIgnoreCase.Location = new System.Drawing.Point(910, 250);
             this.checkUsingIgnoreCase.Name = "checkUsingIgnoreCase";
             this.checkUsingIgnoreCase.Size = new System.Drawing.Size(15, 14);
             this.checkUsingIgnoreCase.TabIndex = 50;
             this.checkUsingIgnoreCase.UseVisualStyleBackColor = true;
             this.checkUsingIgnoreCase.CheckedChanged += new System.EventHandler(this.OnUsingIgnoreCaseChanged);
             // 
+            // lblNameRegex
+            // 
+            this.lblNameRegex.AutoSize = true;
+            this.lblNameRegex.Location = new System.Drawing.Point(10, 77);
+            this.lblNameRegex.Name = "lblNameRegex";
+            this.lblNameRegex.Size = new System.Drawing.Size(86, 15);
+            this.lblNameRegex.TabIndex = 53;
+            this.lblNameRegex.Text = "Name (regex):";
+            // 
+            // textNameRegex
+            // 
+            this.textNameRegex.ContextMenuStrip = this.menuContextOperands;
+            this.textNameRegex.Location = new System.Drawing.Point(111, 74);
+            this.textNameRegex.Name = "textNameRegex";
+            this.textNameRegex.Size = new System.Drawing.Size(245, 21);
+            this.textNameRegex.TabIndex = 54;
+            this.textNameRegex.WordWrap = false;
+            this.textNameRegex.TextChanged += new System.EventHandler(this.OnBhavDetailsChanged);
+            // 
+            // btnClearBhavDetails
+            // 
+            this.btnClearBhavDetails.Location = new System.Drawing.Point(934, 69);
+            this.btnClearBhavDetails.Name = "btnClearBhavDetails";
+            this.btnClearBhavDetails.Size = new System.Drawing.Size(143, 30);
+            this.btnClearBhavDetails.TabIndex = 55;
+            this.btnClearBhavDetails.Text = "Clear &BHAV Details";
+            this.btnClearBhavDetails.UseVisualStyleBackColor = true;
+            this.btnClearBhavDetails.Click += new System.EventHandler(this.OnClearBhavDetailsClicked);
+            // 
+            // lblParams
+            // 
+            this.lblParams.AutoSize = true;
+            this.lblParams.Location = new System.Drawing.Point(533, 77);
+            this.lblParams.Name = "lblParams";
+            this.lblParams.Size = new System.Drawing.Size(53, 15);
+            this.lblParams.TabIndex = 56;
+            this.lblParams.Text = "Params:";
+            // 
+            // textParams
+            // 
+            this.textParams.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.textParams.ContextMenuStrip = this.menuContextOperands;
+            this.textParams.Location = new System.Drawing.Point(590, 74);
+            this.textParams.MaxLength = 2;
+            this.textParams.Name = "textParams";
+            this.textParams.Size = new System.Drawing.Size(81, 21);
+            this.textParams.TabIndex = 57;
+            this.textParams.WordWrap = false;
+            this.textParams.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress_DecimalOnly);
+            // 
+            // textLocals
+            // 
+            this.textLocals.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
+            this.textLocals.ContextMenuStrip = this.menuContextOperands;
+            this.textLocals.Location = new System.Drawing.Point(741, 74);
+            this.textLocals.MaxLength = 2;
+            this.textLocals.Name = "textLocals";
+            this.textLocals.Size = new System.Drawing.Size(81, 21);
+            this.textLocals.TabIndex = 59;
+            this.textLocals.WordWrap = false;
+            this.textLocals.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.OnKeyPress_DecimalOnly);
+            // 
+            // lblLocals
+            // 
+            this.lblLocals.AutoSize = true;
+            this.lblLocals.Location = new System.Drawing.Point(684, 77);
+            this.lblLocals.Name = "lblLocals";
+            this.lblLocals.Size = new System.Drawing.Size(46, 15);
+            this.lblLocals.TabIndex = 58;
+            this.lblLocals.Text = "Locals:";
+            // 
+            // checkNameIgnoreCase
+            // 
+            this.checkNameIgnoreCase.AutoSize = true;
+            this.checkNameIgnoreCase.Location = new System.Drawing.Point(444, 78);
+            this.checkNameIgnoreCase.Name = "checkNameIgnoreCase";
+            this.checkNameIgnoreCase.Size = new System.Drawing.Size(15, 14);
+            this.checkNameIgnoreCase.TabIndex = 61;
+            this.checkNameIgnoreCase.UseVisualStyleBackColor = true;
+            // 
+            // lblNameIgnoreCase
+            // 
+            this.lblNameIgnoreCase.AutoSize = true;
+            this.lblNameIgnoreCase.Location = new System.Drawing.Point(362, 77);
+            this.lblNameIgnoreCase.Name = "lblNameIgnoreCase";
+            this.lblNameIgnoreCase.Size = new System.Drawing.Size(76, 15);
+            this.lblNameIgnoreCase.TabIndex = 60;
+            this.lblNameIgnoreCase.Text = "Ignore Case:";
+            // 
             // BhavFinderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1091, 691);
+            this.ClientSize = new System.Drawing.Size(1091, 726);
+            this.Controls.Add(this.checkNameIgnoreCase);
+            this.Controls.Add(this.lblNameIgnoreCase);
+            this.Controls.Add(this.textLocals);
+            this.Controls.Add(this.lblLocals);
+            this.Controls.Add(this.textParams);
+            this.Controls.Add(this.lblParams);
+            this.Controls.Add(this.lblNameRegex);
+            this.Controls.Add(this.textNameRegex);
+            this.Controls.Add(this.btnClearBhavDetails);
             this.Controls.Add(this.checkUsingIgnoreCase);
             this.Controls.Add(this.lblUsingIgnoreCase);
             this.Controls.Add(this.lblProgress);
@@ -1371,6 +1478,15 @@ namespace BhavFinder
         private System.Windows.Forms.CheckBox checkUsingIgnoreCase;
         private System.Windows.Forms.ToolStripMenuItem menuOptions;
         private System.Windows.Forms.ToolStripMenuItem menuItemRestoreFilters;
+        private System.Windows.Forms.Label lblNameRegex;
+        private System.Windows.Forms.TextBox textNameRegex;
+        private System.Windows.Forms.Button btnClearBhavDetails;
+        private System.Windows.Forms.Label lblParams;
+        private System.Windows.Forms.TextBox textParams;
+        private System.Windows.Forms.TextBox textLocals;
+        private System.Windows.Forms.Label lblLocals;
+        private System.Windows.Forms.CheckBox checkNameIgnoreCase;
+        private System.Windows.Forms.Label lblNameIgnoreCase;
     }
 }
 

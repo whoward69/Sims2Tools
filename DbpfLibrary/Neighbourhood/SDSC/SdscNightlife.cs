@@ -20,7 +20,10 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 
         private readonly SpeciesType species;
 
-        internal SdscNightlife() : base() { }
+        internal SdscNightlife() : base()
+        {
+            species = SpeciesType.Human;
+        }
         internal SdscNightlife(ushort[] data, SDescVersions version) : base(data)
         {
             this.version = version;
@@ -30,6 +33,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 
         internal bool IsHuman => (species == SpeciesType.Human);
         internal bool IsPet => !IsHuman;
+        internal bool IsCat => (species == SpeciesType.Cat);
+        internal bool IsDog => (species == SpeciesType.LargeDog || species == SpeciesType.SmallDog);
 
         protected override void AddXml(XmlElement parent)
         {

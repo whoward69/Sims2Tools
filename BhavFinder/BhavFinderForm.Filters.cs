@@ -27,7 +27,13 @@ namespace BhavFinder
 
         private BhavFilter GetFilters()
         {
-            BhavFilter filter = new TrueFilter();
+            int paramCount = -1;
+            Int32.TryParse(textParams.Text, out paramCount);
+
+            int localCount = -1;
+            Int32.TryParse(textLocals.Text, out paramCount);
+
+            BhavFilter filter = new DetailsFilter(textNameRegex.Text, checkNameIgnoreCase.Checked, paramCount, localCount);
 
             if (comboBhavInGroup.Text.Length > 0)
             {
@@ -179,6 +185,38 @@ namespace BhavFinder
         {
             public override bool Wanted(Bhav bhav)
             {
+                return true;
+            }
+        }
+
+        private class DetailsFilter : BhavFilter
+        {
+            readonly Regex regex = null;
+            readonly int paramCount = -1;
+            readonly int localCount = -1;
+
+            public DetailsFilter(string regex, bool ignoreCase, int paramCount, int localCount)
+            {
+                if (!string.IsNullOrWhiteSpace(regex))
+                {
+                    this.regex = new Regex(regex, ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
+                }
+
+                this.paramCount = paramCount;
+                this.localCount = localCount;
+            }
+
+            public override bool Wanted(Bhav bhav)
+            {
+                if (paramCount != -1 && paramCount != bhav.Header.ArgCount) return false;
+
+                if (localCount != -1 && localCount != bhav.Header.LocalVarCount) return false;
+
+                if (regex != null)
+                {
+                    return regex.IsMatch(bhav.KeyName);
+                }
+
                 return true;
             }
         }

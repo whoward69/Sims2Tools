@@ -34,6 +34,11 @@ namespace Sims2Tools.Utils.NamedValue
             return (this.value == other.value);
         }
 
+        public bool Equals(uint value)
+        {
+            return (this.value == value);
+        }
+
         public override string ToString()
         {
             return name;
@@ -64,21 +69,21 @@ namespace Sims2Tools.Utils.NamedValue
         }
     }
 
-    public class FloatNamedValue : IEquatable<FloatNamedValue>
+    public class DoubleNamedValue : IEquatable<DoubleNamedValue>
     {
-        private readonly float value;
+        private readonly double value;
         private readonly string name;
 
-        public FloatNamedValue(string name, float value)
+        public DoubleNamedValue(string name, double value)
         {
             this.name = name;
             this.value = value;
         }
 
         public string Name => name;
-        public float Value => value;
+        public double Value => value;
 
-        public bool Equals(FloatNamedValue other)
+        public bool Equals(DoubleNamedValue other)
         {
             return (this.value == other.value);
         }

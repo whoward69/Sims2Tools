@@ -264,8 +264,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
 
                 size += 1 + 1 + 4;
 
-                size += 4 + Helper.ToBytes(lotName, 0).Length;
-                size += 4 + Helper.ToBytes(lotDesc, 0).Length;
+                size += 4 + Helper.ToBytes(lotName).Length;
+                size += 4 + Helper.ToBytes(lotDesc).Length;
 
                 size += 4 + (unknown_1.Count * 4);
 
@@ -288,7 +288,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
 
                 size += 4 + 4 + 1;
 
-                size += 4 + Helper.ToBytes(texture, 0).Length;
+                size += 4 + Helper.ToBytes(texture).Length;
 
                 size += 1;
 
@@ -327,11 +327,11 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
             writer.WriteByte((byte)rotation);
             writer.WriteUInt32(unknown_0);
 
-            byte[] b = Helper.ToBytes(lotName, 0);
+            byte[] b = Helper.ToBytes(lotName);
             writer.WriteInt32((byte)b.Length);
             writer.WriteBytes(b);
 
-            b = Helper.ToBytes(lotDesc, 0);
+            b = Helper.ToBytes(lotDesc);
             writer.WriteInt32((byte)b.Length);
             writer.WriteBytes(b);
 
@@ -364,7 +364,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.LTXT
             writer.WriteUInt32(lotInstance);
             writer.WriteByte((byte)orient);
 
-            b = Helper.ToBytes(texture, 0);
+            b = Helper.ToBytes(texture);
             writer.WriteInt32((byte)b.Length);
             writer.WriteBytes(b);
 

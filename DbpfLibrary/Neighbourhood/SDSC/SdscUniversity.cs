@@ -23,20 +23,20 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         internal SdscUniversity() : base() { }
         internal SdscUniversity(ushort[] data) : base(data)
         {
-            major = (Majors)((((uint)data[(int)SdscIndex.uniCollegeMajorGUID2]) << 16) + data[(int)SdscIndex.uniCollegeMajorGUID1]);
+            major = (Majors)((((uint)data[(int)SdscIndex.UniCollegeMajorGUID2]) << 16) + data[(int)SdscIndex.UniCollegeMajorGUID1]);
         }
 
-        internal bool OnCampus => (data[(int)SdscIndex.uniYoungAdultYesNo] != 0);
+        internal bool OnCampus => (data[(int)SdscIndex.UniOnCampus] != 0);
 
         protected override void AddXml(XmlElement parent)
         {
             parent.SetAttribute("major", Enum.IsDefined(typeof(Majors), major) ? major.ToString() : Helper.Hex8PrefixString((uint)major));
-            parent.SetAttribute("effort", data[(int)SdscIndex.uniEffort].ToString());
-            parent.SetAttribute("grade", data[(int)SdscIndex.uniCurrentGPA].ToString());
-            parent.SetAttribute("time", data[(int)SdscIndex.uniTimeLeftInGradingPeriod].ToString());
-            parent.SetAttribute("semester", data[(int)SdscIndex.uniCollegeSemester].ToString());
-            parent.SetAttribute("onCampus", data[(int)SdscIndex.uniYoungAdultYesNo].ToString());
-            parent.SetAttribute("influence", data[(int)SdscIndex.uniInfluenceScore].ToString());
+            parent.SetAttribute("effort", data[(int)SdscIndex.UniEffort].ToString());
+            parent.SetAttribute("grade", data[(int)SdscIndex.UniCurrentGPA].ToString());
+            parent.SetAttribute("time", data[(int)SdscIndex.UniTimeLeftInGradingPeriod].ToString());
+            parent.SetAttribute("semester", data[(int)SdscIndex.UniCollegeSemester].ToString());
+            parent.SetAttribute("onCampus", data[(int)SdscIndex.UniOnCampus].ToString());
+            parent.SetAttribute("influence", data[(int)SdscIndex.UniInfluenceScore].ToString());
         }
     }
 }

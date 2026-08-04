@@ -82,17 +82,57 @@
     <Compile Include="Cache\SceneGraphCache.cs" />
     <Compile Include="Cache\ClothingThumbnailsCache.cs" />
     <Compile Include="Controls\ControlHelper.cs" />
+    <Compile Include="Controls\GraphicHelper.cs" />
+    <Compile Include="Controls\InterestTracker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\InterestTracker.Designer.cs">
+      <DependentUpon>InterestTracker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SkillTracker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SkillTracker.Designer.cs">
+      <DependentUpon>SkillTracker.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\PickerDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Controls\PickerDialog.Designer.cs">
       <DependentUpon>PickerDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SimTrackingBar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Controls\TextProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\TextProgressBar.Designer.cs">
       <DependentUpon>TextProgressBar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\IntTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\IntTextBox.Designer.cs">
+      <DependentUpon>IntTextBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\UIntTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UIntTextBox.Designer.cs">
+      <DependentUpon>UIntTextBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\GuidTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\GuidTextBox.Designer.cs">
+      <DependentUpon>GuidTextBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\FloatTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\FloatTextBox.Designer.cs">
+      <DependentUpon>FloatTextBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\DdsConfigDialog.cs">
       <SubType>Form</SubType>
@@ -196,6 +236,24 @@
     <Compile Include="Win32\Win32API.cs" />
     <Compile Include="Win32\WindowsHook.cs" />
     <Compile Include="Win32\WndProcRetHook.cs" />
+    <EmbeddedResource Include="Controls\InterestTracker.resx">
+      <DependentUpon>InterestTracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SkillTracker.resx">
+      <DependentUpon>SkillTracker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\IntTextBox.resx">
+      <DependentUpon>IntTextBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\UIntTextBox.resx">
+      <DependentUpon>UIntTextBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\GuidTextBox.resx">
+      <DependentUpon>GuidTextBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\FloatTextBox.resx">
+      <DependentUpon>FloatTextBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\DdsConfigDialog.resx">
       <DependentUpon>DdsConfigDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -278,6 +336,10 @@
     <ProjectReference Include="..\DbpfLibrary\DbpfLibrary.csproj">
       <Project>{fbecabcd-0403-4b7e-9992-01562a62db83}</Project>
       <Name>DbpfLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UtilsGraphicsLibrary\UtilsGraphicsLibrary.csproj">
+      <Project>{3c083fc2-13a8-48e6-8559-4ff69067a4db}</Project>
+      <Name>UtilsGraphicsLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

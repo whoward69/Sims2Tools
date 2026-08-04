@@ -66,7 +66,7 @@ namespace Sims2Tools.DBPF.Utils
         public static TypeGroupID GroupIDHash(string name)
         {
             name = name.Trim().ToLower();
-            byte[] rt = crc24.ComputeHash(Helper.ToBytes(name, 0));
+            byte[] rt = crc24.ComputeHash(Helper.ToBytes(name));
 
             return (TypeGroupID)(ToUInt(rt) | 0x7F000000);
         }
@@ -74,7 +74,7 @@ namespace Sims2Tools.DBPF.Utils
         public static TypeInstanceID InstanceIDHash(string filename)
         {
             filename = filename.Trim().ToLower();
-            byte[] rt = crc24.ComputeHash(Helper.ToBytes(filename, 0));
+            byte[] rt = crc24.ComputeHash(Helper.ToBytes(filename));
 
             return (TypeInstanceID)(ToUInt(rt) | 0xff000000);
         }
@@ -82,9 +82,16 @@ namespace Sims2Tools.DBPF.Utils
         public static TypeResourceID ResourceIDHash(string filename)
         {
             filename = filename.Trim().ToLower();
-            byte[] rt = crc32.ComputeHash(Helper.ToBytes(filename, 0));
+            byte[] rt = crc32.ComputeHash(Helper.ToBytes(filename));
 
             return (TypeResourceID)ToUInt(rt);
+        }
+
+        public static uint AnimationHash(string filename)
+        {
+            byte[] rt = crc32.ComputeHash(Helper.ToBytes(filename));
+
+            return ToUInt(rt);
         }
 
         public static uint ThumbnailHash(TypeGroupID groupId, string cresname)
@@ -128,7 +135,7 @@ namespace Sims2Tools.DBPF.Utils
                 hashMagic += $"_{hairtone}";
             }
 
-            uint hashInstance = ToUInt(crc32.ComputeHash(Helper.ToBytes(hashMagic.Trim().ToLower(), 0)));
+            uint hashInstance = ToUInt(crc32.ComputeHash(Helper.ToBytes(hashMagic.Trim().ToLower())));
 
             return new DBPFKey(Jpg.TYPES[(int)Jpg.JpgTypeIndex.CasThumbnail], DBPFData.GROUP_LOCAL, (TypeInstanceID)hashInstance, (TypeResourceID)ownerKey.InstanceID.AsUInt());
         }

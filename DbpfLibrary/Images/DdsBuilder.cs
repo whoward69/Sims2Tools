@@ -17,7 +17,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
-namespace Sims2Tools.DBPF.Images
+namespace Sims2Tools.DBPF.Images.DdsBuilder
 {
     public interface IDdsBuilder
     {
@@ -25,94 +25,143 @@ namespace Sims2Tools.DBPF.Images
         DDSData[] BuildDDS(string imageInputFullName, uint levels, DdsFormats dxtFormat, string extraParameters);
     }
 
-    public class NvidiaDdsBuilder : IDdsBuilder
+    public abstract class DdsBuilder : IDdsBuilder
     {
-        private readonly string ddsUtilsPath;
-        private readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger;
+        private static IDdsBuilder ddsBuilder = null;
+        private static string ddsUtilsPath = null;
 
-
-        public NvidiaDdsBuilder(string ddsUtilsPath, Sims2Tools.DBPF.Logger.IDBPFLogger logger)
+        public static string DdsUtilsPath
         {
-            this.ddsUtilsPath = ddsUtilsPath;
-            this.logger = logger;
+            get => ddsUtilsPath;
+            set => ddsUtilsPath = value;
         }
 
-        public DDSData[] BuildDDS(Image img, uint levels, DdsFormats dxtFormat, string extraParameters)
+        public static IDdsBuilder GetDdsBuilder(Sims2Tools.DBPF.Logger.IDBPFLogger logger)
         {
-            string imageInputFullName = TempFile.GetTempFileName(".png");
-
-            img.Save(imageInputFullName, ImageFormat.Png);
-
-            try
+            if (ddsBuilder == null)
             {
-                return BuildDDS(imageInputFullName, levels, dxtFormat, extraParameters);
+                if (ddsUtilsPath != null)
+                {
+                    ddsBuilder = new NvidiaDdsBuilder(logger);
+                }
             }
-            finally
+
+            return ddsBuilder;
+        }
+
+        public abstract DDSData[] BuildDDS(string imageInputFullName, uint levels, DdsFormats dxtFormat, string extraParameters);
+
+        public abstract DDSData[] BuildDDS(Image img, uint levels, DdsFormats dxtFormat, string extraParameters);
+
+
+        private class NvidiaDdsBuilder : DdsBuilder
+        {
+            private readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger;
+
+            internal NvidiaDdsBuilder(Sims2Tools.DBPF.Logger.IDBPFLogger logger)
             {
-                File.Delete(imageInputFullName);
+                this.logger = logger;
+            }
+
+            public override DDSData[] BuildDDS(Image img, uint levels, DdsFormats dxtFormat, string extraParameters)
+            {
+                string imageInputFullName = TempFile.GetTempFileName(".png");
+
+                img.Save(imageInputFullName, ImageFormat.Png);
+
+                try
+                {
+                    return BuildDDS(imageInputFullName, levels, dxtFormat, extraParameters);
+                }
+                finally
+                {
+                    File.Delete(imageInputFullName);
+                }
+            }
+
+            public override DDSData[] BuildDDS(string imageInputFullName, uint levels, DdsFormats ddsFormat, string extraParameters)
+            {
+                string exePath = $"{ddsUtilsPath}\\nvdxt.exe";
+
+                if (!File.Exists(exePath))
+                {
+                    return new DDSData[0];
+                }
+
+                string ddsOutputFullName = TempFile.GetTempFileName(".dds");
+
+                string arguments = $"-file \"{imageInputFullName}\" -output \"{ddsOutputFullName}\"";
+
+                if (ddsFormat == DdsFormats.DXT1Format)
+                    arguments += " -dxt1c";
+                else if (ddsFormat == DdsFormats.DXT3Format)
+                    arguments += " -dxt3";
+                else if (ddsFormat == DdsFormats.DXT5Format)
+                    arguments += " -dxt5";
+                else if (ddsFormat == DdsFormats.Raw8Bit || ddsFormat == DdsFormats.ExtRaw8Bit)
+                    arguments += " -a8";
+                else if (ddsFormat == DdsFormats.Raw24Bit || ddsFormat == DdsFormats.ExtRaw24Bit)
+                    arguments += " -u888";
+                else if (ddsFormat == DdsFormats.Raw32Bit)
+                    arguments += " -u8888";
+                else
+                    throw new ArgumentException("Unsupported format");
+
+                arguments += $" -nmips {levels}";
+
+                if (!string.IsNullOrWhiteSpace(extraParameters))
+                {
+                    arguments += $" {extraParameters.Trim()}";
+                }
+
+                logger?.Info($"nvdxt {arguments}");
+
+                try
+                {
+                    Process p = new Process();
+                    p.StartInfo.FileName = exePath;
+                    p.StartInfo.Arguments = arguments;
+
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.CreateNoWindow = true;
+
+                    p.Start();
+
+                    p.WaitForExit();
+                    p.Close();
+
+                    return DdsLoader.ParseDDS(ddsOutputFullName);
+                }
+                catch (Exception ex)
+                {
+                    throw (ex);
+                }
+                finally
+                {
+                    File.Delete(ddsOutputFullName);
+                }
             }
         }
 
-        public DDSData[] BuildDDS(string imageInputFullName, uint levels, DdsFormats ddsFormat, string extraParameters)
+
+        private class BCnEncoderDdsBuilder : DdsBuilder
         {
-            string exePath = $"{ddsUtilsPath}\\nvdxt.exe";
+            private readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger;
 
-            if (!File.Exists(exePath))
+            // BCnEncoder kinda requires ImageSharp, and that requires .Net8
+            internal BCnEncoderDdsBuilder(Sims2Tools.DBPF.Logger.IDBPFLogger logger)
             {
-                return new DDSData[0];
+                this.logger = logger;
             }
 
-            string ddsOutputFullName = TempFile.GetTempFileName(".dds");
-
-            string arguments = $"-file \"{imageInputFullName}\" -output \"{ddsOutputFullName}\"";
-
-            if (ddsFormat == DdsFormats.DXT1Format)
-                arguments += " -dxt1c";
-            else if (ddsFormat == DdsFormats.DXT3Format)
-                arguments += " -dxt3";
-            else if (ddsFormat == DdsFormats.DXT5Format)
-                arguments += " -dxt5";
-            else if (ddsFormat == DdsFormats.Raw8Bit || ddsFormat == DdsFormats.ExtRaw8Bit)
-                arguments += " -a8";
-            else if (ddsFormat == DdsFormats.Raw24Bit || ddsFormat == DdsFormats.ExtRaw24Bit)
-                arguments += " -u888";
-            else if (ddsFormat == DdsFormats.Raw32Bit)
-                arguments += " -u8888";
-            else
-                throw new ArgumentException("Unsupported format");
-
-            arguments += $" -nmips {levels}";
-
-            if (!string.IsNullOrWhiteSpace(extraParameters))
+            public override DDSData[] BuildDDS(Image img, uint levels, DdsFormats dxtFormat, string extraParameters)
             {
-                arguments += $" {extraParameters.Trim()}";
+                throw new NotImplementedException();
             }
 
-            if (logger != null) logger.Info($"nvdxt {arguments}");
-
-            try
+            public override DDSData[] BuildDDS(string imageInputFullName, uint levels, DdsFormats ddsFormat, string extraParameters)
             {
-                Process p = new Process();
-                p.StartInfo.FileName = exePath;
-                p.StartInfo.Arguments = arguments;
-
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.CreateNoWindow = true;
-
-                p.Start();
-
-                p.WaitForExit();
-                p.Close();
-
-                return DdsLoader.ParseDDS(ddsOutputFullName);
-            }
-            catch (Exception ex)
-            {
-                throw (ex);
-            }
-            finally
-            {
-                File.Delete(ddsOutputFullName);
+                throw new NotImplementedException();
             }
         }
     }

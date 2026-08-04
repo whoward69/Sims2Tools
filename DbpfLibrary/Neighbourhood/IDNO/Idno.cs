@@ -26,8 +26,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.IDNO
         uint version;
         public NeighborhoodVersion Version => (NeighborhoodVersion)version;
 
-        NeighborhoodType type;
-        public NeighborhoodType Type => type;
+        NeighborhoodType hoodType;
+        public NeighborhoodType HoodType => hoodType;
 
         string name;
         public string OwnerName => name;
@@ -67,7 +67,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.IDNO
 
             if (version >= (int)NeighborhoodVersion.Sims2_University)
             {
-                type = (NeighborhoodType)reader.ReadUInt32();
+                hoodType = (NeighborhoodType)reader.ReadUInt32();
                 // if ((int)type >= (int)NeighborhoodType.University)
                 {
                     int sublen = reader.ReadInt32();
@@ -76,7 +76,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.IDNO
             }
             else
             {
-                type = NeighborhoodType.Normal;
+                hoodType = NeighborhoodType.Normal;
             }
 
             if (version >= (int)NeighborhoodVersion.Sims2_Seasons)
@@ -96,7 +96,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.IDNO
 
             element.SetAttribute("uid", Uid.ToString());
             // element.SetAttribute("version", Version.ToString());
-            element.SetAttribute("type", Type.ToString());
+            element.SetAttribute("type", HoodType.ToString());
             element.SetAttribute("flags", Helper.Hex8PrefixString(flags));
             element.SetAttribute("ownerName", OwnerName);
             element.SetAttribute("subName", SubName);

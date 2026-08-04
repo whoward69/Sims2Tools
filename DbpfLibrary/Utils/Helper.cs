@@ -22,6 +22,7 @@ namespace Sims2Tools.DBPF.Utils
             return input.ToString("D");
         }
 
+        #region Convert input to specified string format
         public static string Binary8String(uint input)
         {
             string binStr = $"0000000{Convert.ToString(input, 2)}";
@@ -91,6 +92,7 @@ namespace Sims2Tools.DBPF.Utils
         {
             return $"0x{Hex2String(input)}";
         }
+        #endregion
 
         public static string ToString(byte[] data)
         {
@@ -112,17 +114,9 @@ namespace Sims2Tools.DBPF.Utils
             return text;
         }
 
-        public static byte[] ToBytes(string str, int len)
+        public static byte[] ToBytes(string str)
         {
-            byte[] ret;
-            if (len != 0)
-            {
-                ret = new byte[len];
-                System.Text.Encoding.ASCII.GetBytes(str, 0, Math.Min(len, str.Length), ret, 0);
-            }
-            else ret = System.Text.Encoding.ASCII.GetBytes(str);
-
-            return ret;
+            return System.Text.Encoding.ASCII.GetBytes(str);
         }
     }
 }

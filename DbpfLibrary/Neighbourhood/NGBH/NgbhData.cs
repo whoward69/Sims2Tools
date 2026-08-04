@@ -15,14 +15,14 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
     public enum NgbhVersion : uint
     {
         University = 0x70,
-        Nightlife = 0xbe,
-        Business = 0xc2,
-        Seasons = 0xcb,
-        Castaway = 0xce,
+        Nightlife = 0xBE,
+        Business = 0xC2,
+        Seasons = 0xCB,
+        Castaway = 0xCE,
         CastawayItem = 0x100
     }
 
-    public enum NeighborhoodSlots
+    public enum NgbhInventoryTypes
     {
         LotsIntern = 0,
         Lots = 1,

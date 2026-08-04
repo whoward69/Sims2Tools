@@ -29,6 +29,7 @@ using Sims2Tools.DBPF.Neighbourhood.FAMT;
 using Sims2Tools.DBPF.Neighbourhood.IDNO;
 using Sims2Tools.DBPF.Neighbourhood.LTXT;
 using Sims2Tools.DBPF.Neighbourhood.NGBH;
+using Sims2Tools.DBPF.Neighbourhood.SCOR;
 using Sims2Tools.DBPF.Neighbourhood.SDNA;
 using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.Neighbourhood.SREL;
@@ -39,6 +40,7 @@ using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.SceneGraph;
 using Sims2Tools.DBPF.SceneGraph.AGED;
+using Sims2Tools.DBPF.SceneGraph.ANIM;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.CRES;
@@ -703,6 +705,10 @@ namespace Sims2Tools.DBPF.Package
             {
                 res = new Ngbh(entry, reader);
             }
+            else if (entry.TypeID == Scor.TYPE)
+            {
+                res = new Scor(entry, reader);
+            }
             else if (entry.TypeID == Sdna.TYPE)
             {
                 res = new Sdna(entry, reader);
@@ -729,6 +735,10 @@ namespace Sims2Tools.DBPF.Package
             else if (entry.TypeID == Aged.TYPE)
             {
                 res = new Aged(entry, reader);
+            }
+            else if (entry.TypeID == Anim.TYPE)
+            {
+                res = new Anim(entry, reader);
             }
             else if (entry.TypeID == Binx.TYPE)
             {

@@ -80,12 +80,32 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         public LifeSections LifeSection => description.LifeSection;
         public int AgeDaysLeft => description.AgeDaysLeft;
 
+        public bool IsHuman => nightlife.IsHuman;
+        public bool IsPet => nightlife.IsPet;
+        public bool IsCat => nightlife.IsCat;
+        public bool IsDog => nightlife.IsDog;
+
+
         public ulong BvMemories => voyage.Memories;
 
 
         public Sdsc(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
+        }
+
+        public ushort GetRawData(SdscIndex index, ushort min, ushort max, ushort def)
+        {
+            ushort data = GetRawData(index);
+
+            return (data >= min && data <= max) ? data : def;
+        }
+
+        public ushort GetRawData(SdscIndex index, ushort min, ushort max)
+        {
+            ushort data = GetRawData(index);
+
+            return Math.Max(min, Math.Min(max, data));
         }
 
         public ushort GetRawData(SdscIndex index)

@@ -165,6 +165,8 @@ namespace BhavFinder
 
         private void UpdateForm()
         {
+            bool detailsOK = !string.IsNullOrWhiteSpace(textNameRegex.Text);
+
             bool opCodeOK = false;
 
             if (comboOpCode.Text.Length > 0)
@@ -193,12 +195,12 @@ namespace BhavFinder
 
             bool filePathOk = false;
 
-            if (opCodeOK && textFilePath.Text.Length > 0)
+            if (textFilePath.Text.Length > 0)
             {
                 filePathOk = (Directory.Exists(textFilePath.Text) || File.Exists(textFilePath.Text));
             }
 
-            btnGO.Enabled = (filePathOk && opCodeOK);
+            btnGO.Enabled = (filePathOk && (detailsOK || opCodeOK));
             bhavFoundData.Clear();
             lblProgress.Visible = false;
         }
@@ -264,6 +266,17 @@ namespace BhavFinder
             else
             {
                 toolTipOperands.SetToolTip(tb, "");
+            }
+        }
+
+        private void OnKeyPress_DecimalOnly(object sender, KeyPressEventArgs e)
+        {
+            if (!(
+                    char.IsControl(e.KeyChar) ||
+                    (e.KeyChar >= '0' && e.KeyChar <= '9')
+                ))
+            {
+                e.Handled = true;
             }
         }
 
@@ -371,6 +384,18 @@ namespace BhavFinder
         {
             comboBhavInGroup.SelectedIndex = 0;
             comboOpCodeInGroup.SelectedIndex = 0;
+            UpdateForm();
+        }
+
+        private void OnBhavDetailsChanged(object sender, EventArgs e)
+        {
+            UpdateForm();
+        }
+
+        private void OnClearBhavDetailsClicked(object sender, EventArgs e)
+        {
+            textNameRegex.Text = textParams.Text = textLocals.Text = "";
+            checkNameIgnoreCase.Checked = false;
             UpdateForm();
         }
 
@@ -552,9 +577,17 @@ namespace BhavFinder
             }
         }
 
+        private void VersionChange(int prevVersionMajor, int prevVersionMinor)
+        {
+            if ((prevVersionMajor <= 1) || (prevVersionMajor == 2 && prevVersionMinor < 7))
+            {
+                RegistryTools.DeleteSetting(BhavFinderApp.RegistryKey, "FormHeight");
+            }
+        }
+
         private void OnLoad(object sender, EventArgs e)
         {
-            RegistryTools.LoadAppSettings(BhavFinderApp.RegistryKey, BhavFinderApp.AppVersionMajor, BhavFinderApp.AppVersionMinor);
+            RegistryTools.LoadAppSettings(BhavFinderApp.RegistryKey, BhavFinderApp.AppVersionMajor, BhavFinderApp.AppVersionMinor, VersionChange);
             RegistryTools.LoadFormSettings(BhavFinderApp.RegistryKey, this);
 
             textFilePath.Text = RegistryTools.GetSetting(BhavFinderApp.RegistryKey, textFilePath.Name, "").ToString();
@@ -634,6 +667,11 @@ namespace BhavFinder
         {
             string regKey = BhavFinderApp.RegistryKey + @"\Filters";
 
+            textNameRegex.Text = (string)RegistryTools.GetSetting(regKey, textNameRegex.Name, "");
+            checkNameIgnoreCase.Checked = ((int)RegistryTools.GetSetting(regKey, checkNameIgnoreCase.Name, 0) != 0);
+            textParams.Text = (string)RegistryTools.GetSetting(regKey, textParams.Name, "");
+            textLocals.Text = (string)RegistryTools.GetSetting(regKey, textLocals.Name, "");
+
             comboOpCode.SelectedIndex = (int)RegistryTools.GetSetting(regKey, comboOpCode.Name, -1);
             comboVersion.SelectedIndex = (int)RegistryTools.GetSetting(regKey, comboVersion.Name, -1);
 
@@ -655,6 +693,11 @@ namespace BhavFinder
         private void SaveFilters()
         {
             string regKey = BhavFinderApp.RegistryKey + @"\Filters";
+
+            RegistryTools.SaveSetting(regKey, textNameRegex.Name, textNameRegex.Text);
+            RegistryTools.SaveSetting(regKey, checkNameIgnoreCase.Name, checkNameIgnoreCase.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(regKey, textParams.Name, textParams.Text);
+            RegistryTools.SaveSetting(regKey, textLocals.Name, textLocals.Text);
 
             RegistryTools.SaveSetting(regKey, comboOpCode.Name, comboOpCode.SelectedIndex);
             RegistryTools.SaveSetting(regKey, comboVersion.Name, comboVersion.SelectedIndex);

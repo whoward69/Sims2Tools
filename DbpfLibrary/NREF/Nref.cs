@@ -35,7 +35,7 @@ namespace Sims2Tools.DBPF.NREF
             this._keyName = Helper.ToString(reader.ReadBytes(len));
         }
 
-        public override uint FileSize => (uint)Helper.ToBytes(KeyName, 0).Length;
+        public override uint FileSize => (uint)Helper.ToBytes(KeyName).Length;
 
         public override void Serialize(DbpfWriter writer)
         {
@@ -43,7 +43,7 @@ namespace Sims2Tools.DBPF.NREF
             long writeStart = writer.Position;
 #endif
 
-            writer.WriteBytes(Helper.ToBytes(KeyName, 0));
+            writer.WriteBytes(Helper.ToBytes(KeyName));
 
 #if DEBUG
             Debug.Assert((writer.Position - writeStart) == FileSize);

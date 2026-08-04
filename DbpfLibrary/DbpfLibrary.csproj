@@ -50,6 +50,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime" />
     <Reference Include="System.Runtime.InteropServices" />
     <Reference Include="System.Web" />
@@ -93,9 +94,13 @@
     <Compile Include="Logger\DBPFLogger.cs" />
     <Compile Include="MATSHAD\Matshad.cs" />
     <Compile Include="Neighbourhood\LOTD\Lotd.cs" />
+    <Compile Include="Neighbourhood\SCOR\ScorDataTable.cs" />
+    <Compile Include="Neighbourhood\SCOR\Scor.cs" />
     <Compile Include="Neighbourhood\SDSC\SdscIndex.cs" />
     <Compile Include="Neighbourhood\XNGB\Xngb.cs" />
     <Compile Include="SceneGraph\AGED\Aged.cs" />
+    <Compile Include="SceneGraph\RcolBlocks\CAnimResourceConst.cs" />
+    <Compile Include="SceneGraph\RcolBlocks\CAnimResourceConst_Blocks.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\MipMap.cs" />
     <Compile Include="Images\THUB\Thub.cs" />
     <Compile Include="OBJF\ObjfIndex.cs" />
@@ -138,8 +143,8 @@
     <Compile Include="Neighbourhood\LTXT\Ltxt.cs" />
     <Compile Include="Neighbourhood\NGBH\Ngbh.cs" />
     <Compile Include="Neighbourhood\NGBH\NgbhData.cs" />
-    <Compile Include="Neighbourhood\NGBH\NgbhItem.cs" />
-    <Compile Include="Neighbourhood\NGBH\NgbhSlot.cs" />
+    <Compile Include="Neighbourhood\NGBH\NgbhInventoryToken.cs" />
+    <Compile Include="Neighbourhood\NGBH\NgbhInventories.cs" />
     <Compile Include="Neighbourhood\SDNA\Sdna.cs" />
     <Compile Include="Neighbourhood\SDNA\SdnaGene.cs" />
     <Compile Include="Neighbourhood\SDSC\Sdsc.cs" />
