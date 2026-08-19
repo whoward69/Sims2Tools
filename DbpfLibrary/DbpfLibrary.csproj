@@ -93,12 +93,14 @@
     <Compile Include="IO\TempFiles.cs" />
     <Compile Include="Logger\DBPFLogger.cs" />
     <Compile Include="MATSHAD\Matshad.cs" />
+    <Compile Include="Neighbourhood\InventoryTokens.cs" />
     <Compile Include="Neighbourhood\LOTD\Lotd.cs" />
     <Compile Include="Neighbourhood\SCOR\ScorDataTable.cs" />
     <Compile Include="Neighbourhood\SCOR\Scor.cs" />
     <Compile Include="Neighbourhood\SDSC\SdscIndex.cs" />
     <Compile Include="Neighbourhood\XNGB\Xngb.cs" />
     <Compile Include="SceneGraph\AGED\Aged.cs" />
+    <Compile Include="SceneGraph\BINX\BinxHelper.cs" />
     <Compile Include="SceneGraph\RcolBlocks\CAnimResourceConst.cs" />
     <Compile Include="SceneGraph\RcolBlocks\CAnimResourceConst_Blocks.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\MipMap.cs" />

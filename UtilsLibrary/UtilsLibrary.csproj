@@ -81,6 +81,12 @@
     <Compile Include="Cache\PackageCache.cs" />
     <Compile Include="Cache\SceneGraphCache.cs" />
     <Compile Include="Cache\ClothingThumbnailsCache.cs" />
+    <Compile Include="Controls\BenefitButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\BenefitButton.Designer.cs">
+      <DependentUpon>BenefitButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ControlHelper.cs" />
     <Compile Include="Controls\GraphicHelper.cs" />
     <Compile Include="Controls\InterestTracker.cs">
@@ -236,6 +242,9 @@
     <Compile Include="Win32\Win32API.cs" />
     <Compile Include="Win32\WindowsHook.cs" />
     <Compile Include="Win32\WndProcRetHook.cs" />
+    <EmbeddedResource Include="Controls\BenefitButton.resx">
+      <DependentUpon>BenefitButton.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\InterestTracker.resx">
       <DependentUpon>InterestTracker.cs</DependentUpon>
     </EmbeddedResource>

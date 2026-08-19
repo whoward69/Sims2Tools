@@ -395,7 +395,7 @@ namespace BhavFinder
         private void OnClearBhavDetailsClicked(object sender, EventArgs e)
         {
             textNameRegex.Text = textParams.Text = textLocals.Text = "";
-            checkNameIgnoreCase.Checked = false;
+            checkNameCaseSensitive.Checked = false;
             UpdateForm();
         }
 
@@ -668,7 +668,7 @@ namespace BhavFinder
             string regKey = BhavFinderApp.RegistryKey + @"\Filters";
 
             textNameRegex.Text = (string)RegistryTools.GetSetting(regKey, textNameRegex.Name, "");
-            checkNameIgnoreCase.Checked = ((int)RegistryTools.GetSetting(regKey, checkNameIgnoreCase.Name, 0) != 0);
+            checkNameCaseSensitive.Checked = ((int)RegistryTools.GetSetting(regKey, checkNameCaseSensitive.Name, 0) != 0);
             textParams.Text = (string)RegistryTools.GetSetting(regKey, textParams.Name, "");
             textLocals.Text = (string)RegistryTools.GetSetting(regKey, textLocals.Name, "");
 
@@ -695,7 +695,7 @@ namespace BhavFinder
             string regKey = BhavFinderApp.RegistryKey + @"\Filters";
 
             RegistryTools.SaveSetting(regKey, textNameRegex.Name, textNameRegex.Text);
-            RegistryTools.SaveSetting(regKey, checkNameIgnoreCase.Name, checkNameIgnoreCase.Checked ? 1 : 0);
+            RegistryTools.SaveSetting(regKey, checkNameCaseSensitive.Name, checkNameCaseSensitive.Checked ? 1 : 0);
             RegistryTools.SaveSetting(regKey, textParams.Name, textParams.Text);
             RegistryTools.SaveSetting(regKey, textLocals.Name, textLocals.Text);
 

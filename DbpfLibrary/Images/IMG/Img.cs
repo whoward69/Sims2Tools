@@ -11,7 +11,7 @@
  */
 
 #if DEBUG
-#define ALFA_TESTING
+// #define ALFA_TESTING
 #endif
 
 using Sims2Tools.DBPF.IO;

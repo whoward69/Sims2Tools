@@ -39,13 +39,13 @@ namespace Sims2Tools.DBPF.Utils
             internal set { flags = value; }
         }
 
-        protected bool GetBit(byte nr)
+        public bool GetBit(byte nr)
         {
             ushort mask = (ushort)(1 << nr);
             return ((flags & mask) != 0);
         }
 
-        protected void SetBit(byte nr, bool val)
+        public void SetBit(byte nr, bool val)
         {
             ushort mask = (ushort)(1 << nr);
             flags = (ushort)(flags | mask);

@@ -30,10 +30,14 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
         private NgbhVersion version;
         public NgbhVersion Version => version;
 
+        private bool _isDirty = false;
+
         public bool IsDirty
         {
             get
             {
+                if (_isDirty) return true;
+
                 foreach (NgbhInventoryToken item in specialTokens)
                 {
                     if (item.IsDirty) return true;
@@ -59,6 +63,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             {
                 item.SetClean();
             }
+
+            _isDirty = false;
         }
 
         private readonly List<NgbhInventoryToken> specialTokens = new List<NgbhInventoryToken>();
@@ -77,9 +83,13 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             Unserialize(reader);
         }
 
-        public void AddToken(TypeGUID guid, bool isSpecial, ushort flags, ushort[] values)
+        public NgbhInventoryToken AddToken(TypeGUID guid, bool isSpecial, ushort flags, ushort[] values)
         {
-            ((isSpecial) ? specialTokens : standardTokens).Add(new NgbhInventoryToken(parent, guid, flags, values));
+            NgbhInventoryToken token = new NgbhInventoryToken(parent, guid, flags, values);
+
+            (isSpecial ? specialTokens : standardTokens).Add(token);
+
+            return token;
         }
 
         internal virtual void Unserialize(DbpfReader reader)
@@ -183,6 +193,56 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             }
 
             return items.AsReadOnly();
+        }
+
+        public void RemoveTokensByGuid(TypeGUID guid)
+        {
+            RemoveTokensByGuid(guid, 0, 0);
+        }
+
+        public void RemoveTokensByGuid(TypeGUID guid, int prop, ushort value)
+        {
+            List<NgbhInventoryToken>.Enumerator enumerator = specialTokens.GetEnumerator();
+
+            foreach (NgbhInventoryToken item in specialTokens.ToArray()) // Using .ToArray() so we don't try to remove from what we're iterating over!
+            {
+                if (item.Guid == guid)
+                {
+                    if (prop != 0)
+                    {
+                        if (item.GetValue(prop - 1) == value)
+                        {
+                            specialTokens.Remove(item);
+                            _isDirty = true;
+                        }
+                    }
+                    else
+                    {
+                        specialTokens.Remove(item);
+                        _isDirty = true;
+                    }
+                }
+            }
+
+            foreach (NgbhInventoryToken item in standardTokens.ToArray()) // Using .ToArray() so we don't try to remove from what we're iterating over!
+            {
+                if (item.Guid == guid)
+                {
+                    if (prop != 0)
+                    {
+                        if (item.GetValue(prop - 1) == value)
+                        {
+                            standardTokens.Remove(item);
+                            _isDirty = true;
+                        }
+                    }
+                    else
+                    {
+                        standardTokens.Remove(item);
+                        _isDirty = true;
+                    }
+                }
+            }
         }
 
         public XmlElement AddXml(XmlElement parent)

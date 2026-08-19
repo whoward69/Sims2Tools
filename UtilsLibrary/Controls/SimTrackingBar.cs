@@ -267,7 +267,8 @@ namespace Sims2Tools.Controls
                 if (value != selectedColour)
                 {
                     selectedColour = value;
-                    this.Invalidate();
+                    CompleteRedraw();
+                    Invalidate();
                 }
             }
         }

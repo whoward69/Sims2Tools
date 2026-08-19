@@ -106,6 +106,7 @@
     </Compile>
     <Compile Include="BhavFinderForm.Filters.cs">
       <DependentUpon>BhavFinderForm.cs</DependentUpon>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="BhavFinderForm.resx">

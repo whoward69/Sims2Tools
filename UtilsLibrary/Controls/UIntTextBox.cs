@@ -62,6 +62,14 @@ namespace Sims2Tools.Controls
             set => textBox.Text = (value == NO_VALUE) ? "" : value.ToString();
         }
 
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool Editable
+        {
+            get => textBox.Enabled;
+            set => textBox.Enabled = value;
+        }
+
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public override string Text

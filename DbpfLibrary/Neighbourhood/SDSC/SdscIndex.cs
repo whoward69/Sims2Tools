@@ -99,9 +99,9 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         BodyFlags,
         Fatness,
         UniCurrentGPA,
-        LifeState,
-        PersonalityAmorous,
-        NaughtyOutfit,
+        LifeState, // aka Flags 1
+        Unused85, // PersonalityAmorous,
+        Unused86, // NaughtyOutfit,
         Unused87,
         VoiceType,
         JobObjectGUID1,
@@ -170,14 +170,14 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         ReligionNumber,
         ReligionFlags,
         UnselectableSim,
-        NPCType,
+        NPCType,                           // SimPe read offset 0x0142
         AgeDuration,
         ciSubQueueInteractionObjectID,
         SelectionFlags,
         PersonDataFlags2,
-        AspirationScore,
-        AspirationRewardPointsSpentDiv10,
-        AspirationScoreRawDiv10,
+        AspirationScore,                    // SimPe read offset 0x014C - LifelinePoints
+        AspirationRewardPointsSpentDiv10,   // SimPe - LifelineScore
+        AspirationScoreRawDiv10,            // SimPe - BlizLifelinePoints
         MoodBooster,
         CurrentInteractionJoinable,
         UnlinkedYesNo,

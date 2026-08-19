@@ -145,8 +145,8 @@ namespace BhavFinder
             this.textParams = new System.Windows.Forms.TextBox();
             this.textLocals = new System.Windows.Forms.TextBox();
             this.lblLocals = new System.Windows.Forms.Label();
-            this.checkNameIgnoreCase = new System.Windows.Forms.CheckBox();
-            this.lblNameIgnoreCase = new System.Windows.Forms.Label();
+            this.checkNameCaseSensitive = new System.Windows.Forms.CheckBox();
+            this.lblNameCaseSensitive = new System.Windows.Forms.Label();
             this.menuContextOperands.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridFoundBhavs)).BeginInit();
             this.menuContextFoundBhavs.SuspendLayout();
@@ -1265,31 +1265,31 @@ namespace BhavFinder
             this.lblLocals.TabIndex = 58;
             this.lblLocals.Text = "Locals:";
             // 
-            // checkNameIgnoreCase
+            // checkNameCaseSensitive
             // 
-            this.checkNameIgnoreCase.AutoSize = true;
-            this.checkNameIgnoreCase.Location = new System.Drawing.Point(444, 78);
-            this.checkNameIgnoreCase.Name = "checkNameIgnoreCase";
-            this.checkNameIgnoreCase.Size = new System.Drawing.Size(15, 14);
-            this.checkNameIgnoreCase.TabIndex = 61;
-            this.checkNameIgnoreCase.UseVisualStyleBackColor = true;
+            this.checkNameCaseSensitive.AutoSize = true;
+            this.checkNameCaseSensitive.Location = new System.Drawing.Point(492, 78);
+            this.checkNameCaseSensitive.Name = "checkNameCaseSensitive";
+            this.checkNameCaseSensitive.Size = new System.Drawing.Size(15, 14);
+            this.checkNameCaseSensitive.TabIndex = 61;
+            this.checkNameCaseSensitive.UseVisualStyleBackColor = true;
             // 
-            // lblNameIgnoreCase
+            // lblNameCaseSensitive
             // 
-            this.lblNameIgnoreCase.AutoSize = true;
-            this.lblNameIgnoreCase.Location = new System.Drawing.Point(362, 77);
-            this.lblNameIgnoreCase.Name = "lblNameIgnoreCase";
-            this.lblNameIgnoreCase.Size = new System.Drawing.Size(76, 15);
-            this.lblNameIgnoreCase.TabIndex = 60;
-            this.lblNameIgnoreCase.Text = "Ignore Case:";
+            this.lblNameCaseSensitive.AutoSize = true;
+            this.lblNameCaseSensitive.Location = new System.Drawing.Point(396, 77);
+            this.lblNameCaseSensitive.Name = "lblNameCaseSensitive";
+            this.lblNameCaseSensitive.Size = new System.Drawing.Size(90, 15);
+            this.lblNameCaseSensitive.TabIndex = 60;
+            this.lblNameCaseSensitive.Text = "Case Sensitive:";
             // 
             // BhavFinderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1091, 726);
-            this.Controls.Add(this.checkNameIgnoreCase);
-            this.Controls.Add(this.lblNameIgnoreCase);
+            this.Controls.Add(this.checkNameCaseSensitive);
+            this.Controls.Add(this.lblNameCaseSensitive);
             this.Controls.Add(this.textLocals);
             this.Controls.Add(this.lblLocals);
             this.Controls.Add(this.textParams);
@@ -1485,8 +1485,8 @@ namespace BhavFinder
         private System.Windows.Forms.TextBox textParams;
         private System.Windows.Forms.TextBox textLocals;
         private System.Windows.Forms.Label lblLocals;
-        private System.Windows.Forms.CheckBox checkNameIgnoreCase;
-        private System.Windows.Forms.Label lblNameIgnoreCase;
+        private System.Windows.Forms.CheckBox checkNameCaseSensitive;
+        private System.Windows.Forms.Label lblNameCaseSensitive;
     }
 }
 

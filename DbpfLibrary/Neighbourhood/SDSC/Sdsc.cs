@@ -138,6 +138,21 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             }
         }
 
+        public void IncRawData(SdscIndex index, short delta)
+        {
+            IncRawData((int)index, delta);
+        }
+
+        public void IncRawData(int index, short delta)
+        {
+            if (index < data.Length && delta != 0)
+            {
+                data[index] = (ushort)(((short)data[index]) + delta);
+
+                _isDirty = true;
+            }
+        }
+
         public int RelationshipCount => relationships.RelationshipCount;
 
         public uint GetRelationship(int index) => relationships.GetRelationship(index);

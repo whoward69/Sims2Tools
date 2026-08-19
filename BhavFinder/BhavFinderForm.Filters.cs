@@ -28,12 +28,12 @@ namespace BhavFinder
         private BhavFilter GetFilters()
         {
             int paramCount = -1;
-            Int32.TryParse(textParams.Text, out paramCount);
+            if (!string.IsNullOrWhiteSpace(textParams.Text)) Int32.TryParse(textParams.Text, out paramCount);
 
             int localCount = -1;
-            Int32.TryParse(textLocals.Text, out paramCount);
+            if (!string.IsNullOrWhiteSpace(textParams.Text)) Int32.TryParse(textLocals.Text, out localCount);
 
-            BhavFilter filter = new DetailsFilter(textNameRegex.Text, checkNameIgnoreCase.Checked, paramCount, localCount);
+            BhavFilter filter = new DetailsFilter(textNameRegex.Text, !checkNameCaseSensitive.Checked, paramCount, localCount);
 
             if (comboBhavInGroup.Text.Length > 0)
             {

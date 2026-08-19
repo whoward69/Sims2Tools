@@ -81,13 +81,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.SCOR
         internal static IScorDataTableType GetScorDataTableType(string name)
         {
             if (name.Equals(BusinessRewards)) return new ScorDataTableBusinessRewards();
-            // if (name.Equals(NeighbourTokens)) return ;
+            if (name.Equals(NeighbourTokens)) return new ScorDataTableNeighbourTokensList();
             if (name.Equals(LearnedBehaviors)) return new ScorDataTableLearnedBehaviors();
             // if (name.Equals(LycanthropySavedTraits)) return ;
             if (name.Equals(BestFriendForeverList)) return new ScorDataTableBestFriendForeverList();
             if (name.Equals(ModularSynthSong)) return new ScorDataTableModularSynthSong();
             if (name.Equals(WitchNames)) return new ScorDataTableWitchNames();
-
 
             throw new NotImplementedException($"Cannot create data table for {name}");
         }
@@ -216,6 +215,11 @@ namespace Sims2Tools.DBPF.Neighbourhood.SCOR
                 entriesByGuid.Add(entry.Guid, entry);
             }
         }
+    }
+
+    class ScorDataTableNeighbourTokensList : AbstractScorDataTable
+    {
+        public ScorDataTableNeighbourTokensList() : base() { }
     }
 
     class ScorDataTableBestFriendForeverList : AbstractScorDataTable
