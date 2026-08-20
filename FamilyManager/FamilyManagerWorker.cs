@@ -6,12 +6,25 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using System.Data;
 using System.Windows.Forms;
 
 namespace FamilyManager
 {
     public class WorkerPackage
     {
+    }
+
+    public class HoodLoaderPackage
+    {
+        private readonly string hoodBaseFolder;
+
+        public string HoodBaseFolder => hoodBaseFolder;
+
+        public HoodLoaderPackage(string hoodBaseFolder)
+        {
+            this.hoodBaseFolder = hoodBaseFolder;
+        }
     }
 
     public interface IWorkerTask
@@ -36,6 +49,23 @@ namespace FamilyManager
         public void DoTask()
         {
             nodes.Add(child);
+        }
+    }
+
+    public class WorkerCensusTask : IWorkerTask
+    {
+        private readonly CensusGridData gridData;
+        private readonly DataRow row;
+
+        public WorkerCensusTask(CensusGridData gridData, DataRow row)
+        {
+            this.gridData = gridData;
+            this.row = row;
+        }
+
+        public void DoTask()
+        {
+            gridData.Rows.Add(row);
         }
     }
 }

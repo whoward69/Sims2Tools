@@ -45,6 +45,18 @@ using System.Xml;
 
 namespace FamilyManager
 {
+    internal enum TabPageIndex : int
+    {
+        TabCensus = 0,
+        TabFamily,
+        TabCloset,          // Must be the first family tab (or will need to recode stuff)
+        TabSafe,
+        TabAspiration,      // Must be the first member tab (or will need to recode stuff)
+        TabCareer,
+        TabSkills,
+        TabInterests
+    }
+
     public partial class FamilyManagerForm : Form
     {
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -63,6 +75,7 @@ namespace FamilyManager
         private bool cachesLoaded = false;
         private readonly ClothingThumbnailsCache clothingThumbnailsCache = new ClothingThumbnailsCache();
 
+        private readonly CensusGridData dataCensus = new CensusGridData();
         private readonly FamilyGridData dataFamilyMembers = new FamilyGridData();
 
         private readonly OutfitGridData dataFamilyCloset = new OutfitGridData();
@@ -71,8 +84,12 @@ namespace FamilyManager
         private readonly OutfitGridData dataFamilySafe = new OutfitGridData();
         private readonly OutfitGridData dataJewelbox = new OutfitGridData();
 
+        private HoodTreeNode hoodForCensus = null;
         private HoodTreeNode lastHoodNode = null;
         private FamilyTreeNode lastFamilyNode = null;
+        private HoodTreeNode lastCensusNode = null;
+
+        private int lastActiveTab = -1;
 
         private FamilyData currentFamily = null;
 
@@ -86,8 +103,10 @@ namespace FamilyManager
 
         private readonly Filter filters = new Filter();
 
-        InterestTrackerStyle interestsTrackersStyle = InterestTrackerStyle.BarAndBox;
+        private InterestTrackerStyle interestsTrackersStyle = InterestTrackerStyle.BarAndBox;
 
+        private readonly List<BenefitButton> needsAndWorkBenefitButtons;
+        private readonly List<BenefitButton> aspirationsBenefitButtons;
 
         public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
@@ -98,6 +117,8 @@ namespace FamilyManager
 
             InitializeComponent();
             SetTitle();
+
+            tabPages.SelectedIndex = (int)TabPageIndex.TabFamily;
 
             trackSkillToddlerWalk.Maximum = Properties.Settings.Default.MaxSkillWalk;
             trackSkillToddlerTalk.Maximum = Properties.Settings.Default.MaxSkillTalk;
@@ -128,6 +149,7 @@ namespace FamilyManager
                 IsFolderPicker = true
             };
 
+            gridCensus.DataSource = dataCensus;
             gridFamilyMembers.DataSource = dataFamilyMembers;
 
             gridFamilyCloset.DataSource = dataFamilyCloset;
@@ -137,6 +159,19 @@ namespace FamilyManager
             gridJewelbox.DataSource = dataJewelbox;
 
             thumbBox.BackColor = colourThumbnailBackground;
+
+            needsAndWorkBenefitButtons = new List<BenefitButton>() { btnAspNeeds1, btnAspNeeds2, btnAspNeeds3, btnAspNeeds4, btnAspWork1, btnAspWork2, btnAspWork3, btnAspWork4 };
+            aspirationsBenefitButtons = new List<BenefitButton>() { btnAspPrimary1, btnAspPrimary2, btnAspPrimary3, btnAspPrimary4, btnAspSecondary1, btnAspSecondary2, btnAspSecondary3, btnAspSecondary4 };
+
+            toolTip.SetToolTip(btnAspNeeds1.InnerButton, superpowerTooltips[8][1]);
+            toolTip.SetToolTip(btnAspNeeds2.InnerButton, superpowerTooltips[8][2]);
+            toolTip.SetToolTip(btnAspNeeds3.InnerButton, superpowerTooltips[8][3]);
+            toolTip.SetToolTip(btnAspNeeds4.InnerButton, superpowerTooltips[8][4]);
+
+            toolTip.SetToolTip(btnAspWork1.InnerButton, superpowerTooltips[9][1]);
+            toolTip.SetToolTip(btnAspWork2.InnerButton, superpowerTooltips[9][2]);
+            toolTip.SetToolTip(btnAspWork3.InnerButton, superpowerTooltips[9][3]);
+            toolTip.SetToolTip(btnAspWork4.InnerButton, superpowerTooltips[9][4]);
         }
 
         public void TidyUp()
@@ -264,6 +299,40 @@ namespace FamilyManager
             comboUniSemester.Items.Add(new UintNamedValue("8 - Senior 2", 8));
 
             ControlHelper.SetDropDownWidth(comboUniSemester);
+        }
+
+        private readonly Dictionary<uint, List<Image>> aspirationButtonImages = new Dictionary<uint, List<Image>>();
+
+        private void LoadAspirations()
+        {
+            comboAspirationPrimary.Items.Clear();
+            comboAspirationPrimary.Items.Add(new UintNamedValue("Grow Up", 0));
+            comboAspirationPrimary.Items.Add(new UintNamedValue("Family", 1));
+            comboAspirationPrimary.Items.Add(new UintNamedValue("Fortune (Wealth)", 2));
+            comboAspirationPrimary.Items.Add(new UintNamedValue("Grilled Cheese", 3));
+            comboAspirationPrimary.Items.Add(new UintNamedValue("Knowledge", 4));
+            comboAspirationPrimary.Items.Add(new UintNamedValue("Pleasure (Fun)", 5));
+            comboAspirationPrimary.Items.Add(new UintNamedValue("Popularity (Reputation)", 6));
+            comboAspirationPrimary.Items.Add(new UintNamedValue("Romance", 7));
+
+            comboAspirationSecondary.Items.Clear();
+            comboAspirationSecondary.Items.Add(new UintNamedValue("None", 0));
+            comboAspirationSecondary.Items.Add(new UintNamedValue("Family", 1));
+            comboAspirationSecondary.Items.Add(new UintNamedValue("Fortune (Wealth)", 2));
+            comboAspirationSecondary.Items.Add(new UintNamedValue("Grilled Cheese", 3));
+            comboAspirationSecondary.Items.Add(new UintNamedValue("Knowledge", 4));
+            comboAspirationSecondary.Items.Add(new UintNamedValue("Pleasure (Fun)", 5));
+            comboAspirationSecondary.Items.Add(new UintNamedValue("Popularity (Reputation)", 6));
+            comboAspirationSecondary.Items.Add(new UintNamedValue("Romance", 7));
+
+            aspirationButtonImages.Add(0, new List<Image>() { Properties.Resources.Asp_None, null, null, null, null });
+            aspirationButtonImages.Add(1, new List<Image>() { Properties.Resources.Asp_Family, Properties.Resources.Asp_Family_1, Properties.Resources.Asp_Family_2, Properties.Resources.Asp_Family_3, Properties.Resources.Asp_Family_4 });
+            aspirationButtonImages.Add(2, new List<Image>() { Properties.Resources.Asp_Fortune, Properties.Resources.Asp_Fortune_1, Properties.Resources.Asp_Fortune_2, Properties.Resources.Asp_Fortune_3, Properties.Resources.Asp_Fortune_4 });
+            aspirationButtonImages.Add(3, new List<Image>() { Properties.Resources.Asp_Cheese, Properties.Resources.Asp_Cheese_1, Properties.Resources.Asp_Cheese_2, Properties.Resources.Asp_Cheese_3, Properties.Resources.Asp_Cheese_4 });
+            aspirationButtonImages.Add(4, new List<Image>() { Properties.Resources.Asp_Knowledge, Properties.Resources.Asp_Knowledge_1, Properties.Resources.Asp_Knowledge_2, Properties.Resources.Asp_Knowledge_3, Properties.Resources.Asp_Knowledge_4 });
+            aspirationButtonImages.Add(5, new List<Image>() { Properties.Resources.Asp_Pleasure, Properties.Resources.Asp_Pleasure_1, Properties.Resources.Asp_Pleasure_2, Properties.Resources.Asp_Pleasure_3, Properties.Resources.Asp_Pleasure_4 });
+            aspirationButtonImages.Add(6, new List<Image>() { Properties.Resources.Asp_Popularity, Properties.Resources.Asp_Popularity_1, Properties.Resources.Asp_Popularity_2, Properties.Resources.Asp_Popularity_3, Properties.Resources.Asp_Popularity_4 });
+            aspirationButtonImages.Add(7, new List<Image>() { Properties.Resources.Asp_Romance, Properties.Resources.Asp_Romance_1, Properties.Resources.Asp_Romance_2, Properties.Resources.Asp_Romance_3, Properties.Resources.Asp_Romance_4 });
         }
 
         private CareerTypes lastJobs = CareerTypes.Unknown;
@@ -550,8 +619,6 @@ namespace FamilyManager
 
             DataCache.InvalidateHoods();
 
-            DoWork_FillHoodTree(null, DBPFData.INSTANCE_NULL);
-
             LoadSchools();
             LoadSchoolGrades();
 
@@ -561,13 +628,18 @@ namespace FamilyManager
             LoadAdultJobs();
 
             LoadOneTrueHobbies();
+
+            LoadAspirations();
+
+            // Should be the last line!
+            DoWork_FillHoodTree(null, DBPFData.INSTANCE_NULL);
         }
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
             UpdateCurrentFamily();
 
-            if (packageCache.IsDirty)
+            if (btnSave.Enabled)
             {
                 if (MsgBox.Show($"There are unsaved changes, do you really want to exit?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
@@ -651,8 +723,13 @@ namespace FamilyManager
 
         private void DoWork_FillHoodTree(string hood, TypeInstanceID familyId)
         {
-            if (Directory.Exists($"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods"))
+            string hoodBaseFolder = $"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods";
+
+            if (Directory.Exists(hoodBaseFolder))
             {
+                dataCensus.Clear();
+                lastCensusNode = null;
+
                 dataFamilyMembers.Clear();
 
                 dataFamilyCloset.Clear();
@@ -669,7 +746,11 @@ namespace FamilyManager
                 lastHoodNode = null;
                 lastFamilyNode = null;
 
-                ProgressDialog progressDialog = new ProgressDialog(new WorkerPackage());
+                ProgressDialog progressDialog = new ProgressDialog(new HoodLoaderPackage(hoodBaseFolder))
+                {
+                    Text = "Loading Hoods",
+                    VisualMode = ProgressBarDisplayMode.CustomText
+                };
                 progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessHoods);
                 progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncData_ProcessHoods);
 
@@ -693,7 +774,6 @@ namespace FamilyManager
                         if (familyId == DBPFData.INSTANCE_NULL)
                         {
                             OnTreeHoodsClicked(treeHoods, new TreeNodeMouseClickEventArgs(treeHoods.Nodes[0], MouseButtons.Left, 1, 0, 0));
-                            // treeHoods.Nodes[0]?.Nodes[0]?.Expand();
                             treeHoods.Nodes[0]?.Expand();
                         }
                         else
@@ -750,10 +830,10 @@ namespace FamilyManager
             }
             else if (selectedNode is HoodTreeNode)
             {
-                // SelectHood(selectedNode as HoodTreeNode);
-
                 UpdateCurrentFamily();
                 ClearFamily();
+
+                SelectHood(selectedNode as HoodTreeNode);
             }
             else if (selectedNode is FamilyTreeNode familyNode)
             {
@@ -777,6 +857,47 @@ namespace FamilyManager
             UpdateFormState();
         }
 
+        private void DoWork_FillCensusGrid(HoodTreeNode hoodNode)
+        {
+            if (lastCensusNode == hoodNode) return;
+
+            Stopwatch s = new Stopwatch();
+            s.Start();
+
+            dataCensus.Clear(); // Must do this on the main thread
+
+            ProgressDialog progressDialog = new ProgressDialog(hoodNode)
+            {
+                Text = $"Generating Census Data",
+                VisualMode = ProgressBarDisplayMode.CustomText
+            };
+            progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessCensus);
+            progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncData_ProcessCensus);
+
+            DialogResult result = progressDialog.ShowDialog();
+
+            if (result == DialogResult.Abort)
+            {
+                logger.Error(progressDialog.Result.Error.Message);
+                logger.Info(progressDialog.Result.Error.StackTrace);
+
+                MsgBox.Show($"An error occured while processing\n{lastPackageFile}", "Error!", MessageBoxButtons.OK);
+            }
+            else
+            {
+                if (result == DialogResult.Cancel)
+                {
+                }
+                else
+                {
+                    lastCensusNode = hoodNode;
+                }
+            }
+
+            logger.Info($"Census loaded in {(s.ElapsedMilliseconds / 1000.0)}s");
+            s.Stop();
+        }
+
         private void DoWork_FillFamilyGrid(HoodTreeNode hoodNode, FamilyTreeNode familyNode)
         {
             Stopwatch s = new Stopwatch();
@@ -784,7 +905,7 @@ namespace FamilyManager
 
             UpdateCurrentFamily();
 
-            currentFamily = new FamilyData(packageCache, hoodNode, familyNode);
+            currentFamily = new FamilyData(packageCache, hoodNode, familyNode.Text, familyNode.FamilyId);
 
             lblFamilyName.Text = textFamilyName.Text = currentFamily.FamilyName;
             textFamilyWriteUp.Text = currentFamily.FamilyWriteUp;
@@ -803,43 +924,53 @@ namespace FamilyManager
             dataFamilyMembers.Clear();
             gridFamilyMembers.Enabled = true;
 
-
             using (CacheableDbpfFile hoodPackage = packageCache.OpenForReadOnly(hoodNode.PackagePath))
             {
                 foreach (uint memberGuid in currentFamily.FamilyMembers)
                 {
-                    Sdsc sdsc = (Sdsc)hoodPackage.GetResourceByKey(new DBPFKey(Sdsc.TYPE, DBPFData.GROUP_LOCAL, sdscInstanceBySimGuid[memberGuid], DBPFData.RESOURCE_NULL));
-
-                    if (characterCache.TryGetValue(sdsc.SimGuid, out CharacterData data))
+                    if (sdscInstanceBySimGuid.TryGetValue(memberGuid, out TypeInstanceID memberId))
                     {
-                        data.SetSdscDetails(hoodNode.PackagePath, sdsc.InstanceID);
+                        Sdsc sdsc = (Sdsc)hoodPackage.GetResourceByKey(new DBPFKey(Sdsc.TYPE, DBPFData.GROUP_LOCAL, memberId, DBPFData.RESOURCE_NULL));
 
-                        uint genderCode = GenderHelper.CpfGenderCode(sdsc.Gender);
-                        uint ageCode = AgeHelper.CpfAgeCode(sdsc.LifeSection);
-
-                        DataRow memberRow = dataFamilyMembers.NewRow();
-
-                        memberRow["Data"] = data;
-
-                        memberRow["FirstName"] = $"{data.GivenName(prefLid)} {data.FamilyName(prefLid)}";
-                        memberRow["SplitFile"] = data.IsSplit ? "Y" : "N";
-
-                        memberRow["Gender"] = sdsc.Gender.ToString();
-                        memberRow["GenderCode"] = sdsc.Gender.ToString().Substring(0, 1);
-                        memberRow["Age"] = sdsc.LifeSection.ToString();
-                        memberRow["AgeCode"] = BuildAgeCodeString(ageCode);
-
-                        memberRow["GenderHex"] = genderCode;
-                        memberRow["AgeHex"] = ageCode;
-
-                        memberRow["DaysLeft"] = sdsc.AgeDaysLeft;
-
-                        if (ageCode != 0x0000)
+                        if (sdsc != null && characterCache.TryGetValue(sdsc.SimGuid, out CharacterData data))
                         {
-                            memberRow["Thumbnail"] = data.Thumbnail(ageCode);
-                        }
+                            data.SetSdscDetails(hoodNode.PackagePath, sdsc.InstanceID);
 
-                        dataFamilyMembers.Rows.Add(memberRow);
+                            uint genderCode = GenderHelper.CpfGenderCode(sdsc.Gender);
+                            uint ageCode = AgeHelper.CpfAgeCode(sdsc.LifeSection);
+
+                            DataRow memberRow = dataFamilyMembers.NewRow();
+
+                            memberRow["Data"] = data;
+
+                            memberRow["FirstName"] = $"{data.GivenName(prefLid)} {data.FamilyName(prefLid)}";
+                            memberRow["SplitFile"] = data.IsSplit ? "Y" : "N";
+
+                            memberRow["Gender"] = sdsc.Gender.ToString();
+                            memberRow["GenderCode"] = sdsc.Gender.ToString().Substring(0, 1);
+                            memberRow["Age"] = sdsc.LifeSection.ToString();
+                            memberRow["AgeCode"] = BuildAgeCodeString(ageCode);
+
+                            memberRow["GenderHex"] = genderCode;
+                            memberRow["AgeHex"] = ageCode;
+
+                            memberRow["DaysLeft"] = sdsc.AgeDaysLeft;
+
+                            if (ageCode != 0x0000)
+                            {
+                                memberRow["Thumbnail"] = data.Thumbnail(ageCode);
+                            }
+
+                            dataFamilyMembers.Rows.Add(memberRow);
+                        }
+                        else
+                        {
+                            logger.Warn($"In family '{currentFamily.FamilyName}', member with ID {memberId} (GUID {Helper.Hex8PrefixString(memberGuid)}) does NOT have an associated SDSC resource");
+                        }
+                    }
+                    else
+                    {
+                        logger.Warn($"In family '{currentFamily.FamilyName}', member with GUID {Helper.Hex8PrefixString(memberGuid)} does NOT have an associated SDSC resource");
                     }
                 }
 
@@ -992,9 +1123,7 @@ namespace FamilyManager
 
         private void DoAsyncWork_ProcessHoods(ProgressDialog sender, DoWorkEventArgs args)
         {
-            WorkerPackage workPackage = args.Argument as WorkerPackage; // As passed to the Sims2ToolsProgressDialog constructor
-
-            sender.VisualMode = ProgressBarDisplayMode.CustomText;
+            HoodLoaderPackage hoodLoaderPackage = args.Argument as HoodLoaderPackage; // As passed to the Sims2ToolsProgressDialog constructor
 
 #if !DEBUG
             try
@@ -1005,7 +1134,7 @@ namespace FamilyManager
                 WorkerAddTreeNodeTask task = new WorkerAddTreeNodeTask(treeHoods.Nodes, new TopTreeNode("Hoods"));
                 sender.SetData(task);
 
-                if (!PopulateHoods(sender, task.ChildNode))
+                if (!PopulateHoods(sender, task.ChildNode, hoodLoaderPackage.HoodBaseFolder))
                 {
                     args.Cancel = true;
                     return;
@@ -1038,11 +1167,50 @@ namespace FamilyManager
             task.DoTask();
         }
 
-        private void DoAsyncWork_ProcessFamilies(ProgressDialog sender, DoWorkEventArgs args)
+        private void DoAsyncWork_ProcessCensus(ProgressDialog sender, DoWorkEventArgs args)
         {
             HoodTreeNode hoodNode = args.Argument as HoodTreeNode; // As passed to the Sims2ToolsProgressDialog constructor
 
-            sender.VisualMode = ProgressBarDisplayMode.CustomText;
+#if !DEBUG
+            try
+#endif
+            {
+                if (!PopulateCensusData(sender, hoodNode))
+                {
+                    args.Cancel = true;
+                    return;
+                }
+            }
+#if !DEBUG
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                logger.Info(ex.StackTrace);
+
+                if (MsgBox.Show($"An error occured while processing\n{lastPackageFile}\n\nReason: {ex.Message}", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1) == DialogResult.OK)
+                {
+                    throw ex;
+                }
+            }
+#endif
+        }
+
+        private void DoAsyncData_ProcessCensus(ProgressDialog sender, DoWorkEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                Invoke((MethodInvoker)delegate { DoAsyncData_ProcessCensus(sender, e); });
+                return;
+            }
+
+            // This will be run on the main (UI) thread 
+            IWorkerTask task = e.Argument as IWorkerTask;
+            task.DoTask();
+        }
+
+        private void DoAsyncWork_ProcessFamilies(ProgressDialog sender, DoWorkEventArgs args)
+        {
+            HoodTreeNode hoodNode = args.Argument as HoodTreeNode; // As passed to the Sims2ToolsProgressDialog constructor
 
 #if !DEBUG
             try
@@ -1083,9 +1251,9 @@ namespace FamilyManager
         #endregion
 
         #region Hood Worker Helpers
-        private bool PopulateHoods(ProgressDialog sender, TreeNode parent)
+        private bool PopulateHoods(ProgressDialog sender, TreeNode parent, string hoodBaseFolder)
         {
-            string[] subHoodDirs = Directory.GetDirectories($"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods", "*", SearchOption.TopDirectoryOnly);
+            string[] subHoodDirs = Directory.GetDirectories(hoodBaseFolder, "*", SearchOption.TopDirectoryOnly);
 
             double percent = 0.0f;
             double delta = 100.0f / subHoodDirs.Length;
@@ -1115,7 +1283,7 @@ namespace FamilyManager
                             if (ctss != null)
                             {
                                 string hoodName = GetString(ctss, 0);
-                                HoodTreeNode hoodNode = new HoodTreeNode(packagePath, di.Name, hoodName);
+                                HoodTreeNode hoodNode = new HoodTreeNode(packagePath, hoodBaseFolder, di.Name, hoodName);
                                 WorkerAddTreeNodeTask task = new WorkerAddTreeNodeTask(parent.Nodes, hoodNode);
                                 sender.SetProgress((int)percent, $"Loading {hoodName} ({di.Name})");
                                 sender.SetData(task);
@@ -1133,16 +1301,14 @@ namespace FamilyManager
             return true;
         }
 
-        private bool PopulateHoodFamilies(ProgressDialog sender, HoodTreeNode hoodNode)
+        private bool PopulateCensusData(ProgressDialog sender, HoodTreeNode hoodNode)
         {
             using (CacheableDbpfFile package = packageCache.OpenForReadOnly(hoodNode.PackagePath))
             {
                 SortedDictionary<string, List<TypeInstanceID>> hoodFamilies = new SortedDictionary<string, List<TypeInstanceID>>();
+                int familiesToShow = 0;
 
                 List<DBPFEntry> famiEntries = package.GetEntriesByType(Fami.TYPE);
-
-                double percent = 0.0f;
-                double delta = 100.0f / famiEntries.Count;
 
                 foreach (DBPFEntry famiEntry in famiEntries)
                 {
@@ -1178,20 +1344,176 @@ namespace FamilyManager
                     if (!hoodFamilies.ContainsKey(familyName))
                     {
                         hoodFamilies.Add(familyName, new List<TypeInstanceID>());
-                        sender.SetProgress((int)percent, $"Loading {familyName}");
                     }
 
                     hoodFamilies[familyName].Add(fami.InstanceID);
-
-                    percent += delta;
+                    ++familiesToShow;
                 }
+
+                double percent = 0.0f;
+                double delta = 100.0f / familiesToShow;
+
+                foreach (string familyName in hoodFamilies.Keys)
+                {
+                    foreach (TypeInstanceID familyId in hoodFamilies[familyName])
+                    {
+                        FamilyData familyData = new FamilyData(packageCache, hoodNode, familyName, familyId);
+
+                        DataRow censusRow = dataCensus.NewRow();
+                        censusRow["Visible"] = "Yes";
+
+                        censusRow["FamilyID"] = familyId;
+
+                        censusRow["Name"] = familyName;
+                        censusRow["Address"] = familyData.LotAddress;
+                        censusRow["Subhood"] = "";
+
+                        NeighborhoodType lotLocation = FamilyData.FamilyLocation(packageCache, hoodNode, familyId);
+
+                        if (lotLocation == NeighborhoodType.Unknown)
+                        {
+                            if (familyId.AsUInt() != 0x0000 && familyId.AsUInt() < (uint)FamiCodes.Lowest)
+                            {
+                                censusRow["Subhood"] = "(Sim Bin)";
+                            }
+                        }
+                        else if (lotLocation != NeighborhoodType.Normal)
+                        {
+                            censusRow["Subhood"] = $"{lotLocation}";
+                        }
+
+                        Dictionary<string, int> counts = new Dictionary<string, int>()
+                        {
+                            {"EM", 0 },
+                            {"EF", 0 },
+                            {"AM", 0 },
+                            {"AF", 0 },
+                            {"YAM", 0 },
+                            {"YAF", 0 },
+                            {"TM", 0 },
+                            {"TF", 0 },
+                            {"CM", 0 },
+                            {"CF", 0 },
+                            {"PM", 0 },
+                            {"PF", 0 },
+                            {"BM", 0 },
+                            {"BF", 0 }
+                        };
+
+                        using (CacheableDbpfFile hoodPackage = packageCache.OpenForReadOnly(hoodNode.PackagePath))
+                        {
+                            foreach (uint memberGuid in familyData.FamilyMembers)
+                            {
+                                if (sdscInstanceBySimGuid.TryGetValue(memberGuid, out TypeInstanceID memberId))
+                                {
+                                    Sdsc sdsc = (Sdsc)hoodPackage.GetResourceByKey(new DBPFKey(Sdsc.TYPE, DBPFData.GROUP_LOCAL, memberId, DBPFData.RESOURCE_NULL));
+
+                                    if (sdsc != null && characterCache.TryGetValue(sdsc.SimGuid, out CharacterData data))
+                                    {
+                                        string code = $"{BuildAgeCodeString(AgeHelper.CpfAgeCode(sdsc.LifeSection))}{sdsc.Gender.ToString().Substring(0, 1).ToUpper()}";
+
+                                        counts[code] += 1;
+                                    }
+                                    else
+                                    {
+                                        logger.Warn($"In family '{currentFamily.FamilyName}', member with ID {memberId} (GUID {Helper.Hex8PrefixString(memberGuid)}) does NOT have an associated SDSC resource");
+                                    }
+                                }
+                                else
+                                {
+                                    logger.Warn($"In family '{currentFamily.FamilyName}', member with GUID {Helper.Hex8PrefixString(memberGuid)} does NOT have an associated SDSC resource");
+                                }
+                            }
+
+                            hoodPackage.Close();
+                        }
+
+                        foreach (string ageCode in counts.Keys)
+                        {
+                            if (counts[ageCode] > 0)
+                            {
+                                censusRow[ageCode] = counts[ageCode].ToString();
+                            }
+                            else
+                            {
+                                censusRow[ageCode] = "";
+                            }
+                        }
+
+                        sender.SetProgress((int)percent, $"Polling {familyName}");
+                        sender.SetData(new WorkerCensusTask(dataCensus, censusRow));
+
+                        percent += delta;
+                    }
+                }
+
+                package.Close();
+            }
+
+            return true;
+        }
+
+        private bool PopulateHoodFamilies(ProgressDialog sender, HoodTreeNode hoodNode)
+        {
+            using (CacheableDbpfFile package = packageCache.OpenForReadOnly(hoodNode.PackagePath))
+            {
+                SortedDictionary<string, List<TypeInstanceID>> hoodFamilies = new SortedDictionary<string, List<TypeInstanceID>>();
+                int familiesToShow = 0;
+
+                List<DBPFEntry> famiEntries = package.GetEntriesByType(Fami.TYPE);
+
+                foreach (DBPFEntry famiEntry in famiEntries)
+                {
+                    if (sender.CancellationPending)
+                    {
+                        return false;
+                    }
+
+                    uint inst = famiEntry.InstanceID.AsUInt();
+
+                    if (menuItemOnlyNPCs.Checked)
+                    {
+                        if (inst > 0x0000 && inst < (uint)FamiCodes.Lowest) continue;
+                    }
+                    else if (!menuItemIncludeNPCs.Checked)
+                    {
+                        if (inst == 0x0000 || inst >= (uint)FamiCodes.Lowest) continue;
+                    }
+
+                    Fami fami = (Fami)package.GetResourceByEntry(famiEntry);
+                    Str str = (Str)package.GetResourceByKey(new DBPFKey(Str.TYPE, fami));
+                    string familyName;
+
+                    if (inst == 0x0000 || inst >= (uint)FamiCodes.Lowest)
+                    {
+                        familyName = $"{(FamiCodes)inst} (NPCs)";
+                    }
+                    else
+                    {
+                        familyName = GetString(str, 0);
+                    }
+
+                    if (!hoodFamilies.ContainsKey(familyName))
+                    {
+                        hoodFamilies.Add(familyName, new List<TypeInstanceID>());
+                    }
+
+                    hoodFamilies[familyName].Add(fami.InstanceID);
+                    ++familiesToShow;
+                }
+
+                double percent = 0.0f;
+                double delta = 100.0f / familiesToShow;
 
                 foreach (string familyName in hoodFamilies.Keys)
                 {
                     foreach (TypeInstanceID familyInstance in hoodFamilies[familyName])
                     {
                         FamilyTreeNode familyNode = new FamilyTreeNode(familyInstance, familyName, FamilyData.FamilyLocation(packageCache, hoodNode, familyInstance));
+                        sender.SetProgress((int)percent, $"Loading {familyName}");
                         sender.SetData(new WorkerAddTreeNodeTask(hoodNode.Nodes, familyNode));
+
+                        percent += delta;
                     }
                 }
 
@@ -1213,7 +1535,11 @@ namespace FamilyManager
                 logger.Info($"Selected Hood: {hoodNode.Text}");
                 lastHoodNode = hoodNode;
 
-                ProgressDialog progressDialog = new ProgressDialog(new WorkerPackage());
+                ProgressDialog progressDialog = new ProgressDialog(new WorkerPackage())
+                {
+                    Text = "Loading Sims",
+                    VisualMode = ProgressBarDisplayMode.CustomText
+                };
                 progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_LoadCharacterCache);
 
                 DialogResult result = progressDialog.ShowDialog();
@@ -1240,6 +1566,11 @@ namespace FamilyManager
                 // Do NOT remove these without recoding the transfer drag/drop and copy/paste code!
                 dataSuitcase.Clear();
                 dataJewelbox.Clear();
+
+                if (IsCensusTabActive)
+                {
+                    DoWork_FillCensusGrid(lastHoodNode);
+                }
             }
         }
 
@@ -1278,9 +1609,9 @@ namespace FamilyManager
                 currentFamily.FamilyName = textFamilyName.Text;
                 currentFamily.FamilyWriteUp = textFamilyWriteUp.Text;
 
-                // TODO - Family Manager - family tab - there MAY be other STR# (with the LOTD resource) that need updating with the new name/desc
                 if (currentFamily.LotAddress != null)
                 {
+                    // There MAY be other STR# (with the LOTD resource) that need updating with the new name/desc
                     lblLotName.Text = textAddressName.Text;
                     currentFamily.LotAddress = textAddressName.Text;
                     currentFamily.LotDescription = textAddressDesc.Text;
@@ -1339,9 +1670,6 @@ namespace FamilyManager
 
         private void DoAsyncWork_LoadCharacterCache(ProgressDialog sender, DoWorkEventArgs args)
         {
-            sender.VisualMode = ProgressBarDisplayMode.CustomText;
-            sender.SetProgress(0, "Loading Hood Characters");
-
             characterCache.Load(sender, lastHoodNode);
 
             sender.SetProgress(0, "Caching SDSC References");
@@ -1362,16 +1690,258 @@ namespace FamilyManager
         #endregion
 
         #region Member Worker Helpers
-        private CharacterData currentMemberData;
+        private CharacterData currentMemberData = null;
+
+        private void UpdateCurrentMember()
+        {
+            if (currentMemberData != null && currentMemberData.HasChanges)
+            {
+                if (currentMemberData.HasAspirationChanges)
+                {
+                    currentMemberData.AspirationPrimary = (int)(comboAspirationPrimary.SelectedItem as UintNamedValue).Value;
+                    currentMemberData.AspirationSecondary = (int)(comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
+                }
+
+                if (currentMemberData.HasBenefitChanges)
+                {
+                    UpdateSuperpowerToken();
+                    UpdateMotiveDecayTokens();
+                }
+
+                if (currentMemberData.HasUniversityChanges)
+                {
+                    if (currentMemberData.UniSemester != (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value)
+                    {
+                        currentMemberData.UniSemester = (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value;
+                        currentMemberData.UniInfoFlags &= 0xFFF0;
+
+                        switch (currentMemberData.UniSemester)
+                        {
+                            case 1:
+                            case 2:
+                                currentMemberData.UniInfoFlags |= 0x0001;
+                                break;
+                            case 3:
+                            case 4:
+                                currentMemberData.UniInfoFlags |= 0x0002;
+                                break;
+                            case 5:
+                            case 6:
+                                currentMemberData.UniInfoFlags |= 0x0004;
+                                break;
+                            case 7:
+                            case 8:
+                                currentMemberData.UniInfoFlags |= 0x0008;
+                                break;
+                        }
+
+                        currentMemberData.UniSyncGpaToken();
+                    }
+                }
+
+                currentMemberData.HasChanges = false;
+            }
+        }
+
+        private void SetCurrentMember(CharacterData data)
+        {
+            UpdateCurrentMember();
+
+            currentMemberData = data;
+        }
+
+        bool ignoreAspirationChanges = false;
+        private void ClearAspirationTab()
+        {
+            SetCurrentMember(null);
+
+            imageAspirationsSim.Image = null;
+
+            ignoreAspirationChanges = true;
+
+            ClearAspirations();
+            ClearAllBenefits();
+            ClearAspirationModifiers();
+
+            ignoreAspirationChanges = false;
+        }
+
+        private void ClearAspirations()
+        {
+            comboAspirationPrimary.SelectedIndex = -1;
+            comboAspirationSecondary.SelectedIndex = -1;
+            trackAspirationMeter.Value = trackAspirationMeter.Minimum;
+            textAspirationMeter.Value = UIntTextBox.NO_VALUE;
+
+            textAspirationPoints.Value = UIntTextBox.NO_VALUE;
+            textAspirationScore.Value = IntTextBox.NO_VALUE;
+            textAspirationLongTerm.Value = UIntTextBox.NO_VALUE;
+            ckbAspirationPermaPlat.Checked = false;
+
+            textAspirationScore.Enabled = !ckbAspirationLock.Checked;
+        }
+
+        private void ClearAllBenefits()
+        {
+            ClearNeedsAndWorkBenefits();
+            ClearPriAndSecBenefits();
+        }
+
+        private void ClearNeedsAndWorkBenefits()
+        {
+            foreach (BenefitButton button in needsAndWorkBenefitButtons)
+            {
+                button.Selected = false;
+            }
+
+            textBenefitsUnused.Value = UIntTextBox.NO_VALUE;
+        }
+
+        private void EnablePriAndSecBenefits()
+        {
+            foreach (BenefitButton button in aspirationsBenefitButtons)
+            {
+                button.Enabled = true;
+            }
+        }
+
+        private void ClearPriAndSecBenefits()
+        {
+            lblBenefitsPrimary.Text = "";
+            lblBenefitsSecondary.Text = "";
+
+            foreach (BenefitButton button in aspirationsBenefitButtons)
+            {
+                button.Enabled = false;
+                button.Image = null;
+                button.Selected = false;
+                toolTip.SetToolTip(button.InnerButton, "");
+            }
+        }
+
+        private void ClearAspirationModifiers()
+        {
+            foreach (Control control in grpModifiers.Controls)
+            {
+                if (control is UIntTextBox box)
+                {
+                    box.Value = UIntTextBox.NO_VALUE;
+                }
+            }
+        }
+
+        private void DoWork_FillAspirationTab()
+        {
+            if (gridFamilyMembers.SelectedRows.Count == 1)
+            {
+                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+
+                imageAspirationsSim.Image = currentMemberData.Thumbnail(currentMemberData.AgeCode);
+
+                ignoreAspirationChanges = true;
+
+                { // Aspiration
+                    grpAspiration.Enabled = currentMemberData.IsToddlerOrOlder;
+
+                    if (grpAspiration.Enabled)
+                    {
+                        comboAspirationPrimary.SelectedIndex = currentMemberData.AspirationPrimary;
+                        comboAspirationSecondary.SelectedIndex = currentMemberData.AspirationSecondary;
+
+                        if (currentMemberData.IsToddler)
+                        {
+                            textAspirationMeter.Maximum = (uint)(trackAspirationMeter.Maximum = 300);
+                        }
+                        else if (currentMemberData.IsChild)
+                        {
+                            textAspirationMeter.Maximum = (uint)(trackAspirationMeter.Maximum = 600);
+                        }
+                        else if (currentMemberData.IsTeen)
+                        {
+                            textAspirationMeter.Maximum = (uint)(trackAspirationMeter.Maximum = 900);
+                        }
+                        else if (currentMemberData.IsElder)
+                        {
+                            textAspirationMeter.Maximum = (uint)(trackAspirationMeter.Maximum = 1500);
+                        }
+                        else
+                        {
+                            textAspirationMeter.Maximum = (uint)(trackAspirationMeter.Maximum = 1200);
+                        }
+
+                        trackAspirationMeter.Value = (int)(textAspirationMeter.Value = currentMemberData.AspirationScoreRawDiv10);
+                        UpdateAspirationMeterColour();
+                        textAspirationScore.Value = currentMemberData.AspirationScore;
+                        textAspirationScore.Enabled = !ckbAspirationLock.Checked;
+
+                        textAspirationPoints.Value = currentMemberData.AspirationPoints;
+
+                        textAspirationLongTerm.Value = currentMemberData.AspirationLongTerm;
+                        ckbAspirationPermaPlat.Checked = currentMemberData.IsPermanentPlatinum;
+                    }
+                    else
+                    {
+                        ClearAspirations();
+                    }
+                }
+
+                { // Benefits
+                    grpBenefits.Enabled = currentMemberData.IsChildOrOlder;
+
+                    if (grpBenefits.Enabled)
+                    {
+                        textBenefitsUnused.Value = (uint)currentMemberData.SuperpowerPointsUnused;
+
+                        UpdateNeedsBenefits();
+                        UpdateWorkBenefits();
+
+                        if (currentMemberData.IsChild)
+                        {
+                            ClearPriAndSecBenefits();
+                        }
+                        else
+                        {
+                            EnablePriAndSecBenefits();
+                            UpdatePrimaryBenefits();
+                            UpdateSecondaryBenefits();
+                        }
+                    }
+                    else
+                    {
+                        ClearAllBenefits();
+                    }
+                }
+
+                { // Motive Decay Modifiers
+                    grpModifiers.Enabled = currentMemberData.IsChildOrOlder;
+
+                    if (grpModifiers.Enabled)
+                    {
+                        UpdateMotiveDecayControls();
+                    }
+                    else
+                    {
+                        ClearAspirationModifiers();
+                    }
+                }
+
+                ignoreAspirationChanges = false;
+            }
+            else
+            {
+                ClearAspirationTab();
+            }
+        }
+
         private bool ignoreCareerChanges = false;
         private bool ignoreInterestsChanges = false;
         private bool ignoreSkillsChanges = false;
 
         private void ClearCareerTab()
         {
-            currentMemberData = null;
+            SetCurrentMember(null);
 
-            imageSim.Image = null;
+            imageCareerSim.Image = null;
 
             ignoreCareerChanges = true;
 
@@ -1390,6 +1960,7 @@ namespace FamilyManager
             lblUniInfluence.Visible = textUniInfluence.Visible = false;
             lblUniProbation.Visible = ckbUniProbation.Visible = false;
             lblUniStudying.Visible = ckbUniStudying.Visible = false;
+            lblUniSecretSoc.Visible = ckbUniSecretSoc.Visible = false;
 
             comboUniMajor.SelectedIndex = -1;
             comboUniSemester.SelectedIndex = -1;
@@ -1423,9 +1994,9 @@ namespace FamilyManager
         {
             if (gridFamilyMembers.SelectedRows.Count == 1)
             {
-                currentMemberData = (gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
 
-                imageSim.Image = currentMemberData.Thumbnail(currentMemberData.AgeCode);
+                imageCareerSim.Image = currentMemberData.Thumbnail(currentMemberData.AgeCode);
 
                 ignoreCareerChanges = true;
 
@@ -1471,6 +2042,7 @@ namespace FamilyManager
                     lblUniInfluence.Visible = textUniInfluence.Visible = false;
                     lblUniProbation.Visible = ckbUniProbation.Visible = false;
                     lblUniStudying.Visible = ckbUniStudying.Visible = false;
+                    lblUniSecretSoc.Visible = ckbUniSecretSoc.Visible = false;
 
                     if (currentMemberData.OnCampus)
                     {
@@ -1500,6 +2072,9 @@ namespace FamilyManager
 
                         lblUniStudying.Visible = ckbUniStudying.Visible = true;
                         ckbUniStudying.Checked = currentMemberData.UniStudying;
+
+                        lblUniSecretSoc.Visible = ckbUniSecretSoc.Visible = true;
+                        ckbUniSecretSoc.Checked = currentMemberData.UniSecretSociety;
                     }
                     else
                     {
@@ -1542,7 +2117,7 @@ namespace FamilyManager
 
         private void ClearSkillsTab()
         {
-            currentMemberData = null;
+            SetCurrentMember(null);
 
             ignoreSkillsChanges = true;
 
@@ -1593,7 +2168,7 @@ namespace FamilyManager
         {
             if (gridFamilyMembers.SelectedRows.Count == 1)
             {
-                currentMemberData = (gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
 
                 ignoreSkillsChanges = true;
 
@@ -1738,7 +2313,7 @@ namespace FamilyManager
 
         private void ClearInterestsTab()
         {
-            currentMemberData = null;
+            SetCurrentMember(null);
 
             ignoreInterestsChanges = true;
 
@@ -1775,7 +2350,7 @@ namespace FamilyManager
         {
             if (gridFamilyMembers.SelectedRows.Count == 1)
             {
-                currentMemberData = (gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
 
                 ignoreInterestsChanges = true;
 
@@ -1972,10 +2547,15 @@ namespace FamilyManager
 
             if (currentFamily == null)
             {
-                tabPages.SelectedIndex = 0;
+                if (!IsCensusTabActive)
+                {
+                    tabPages.SelectedIndex = (int)TabPageIndex.TabFamily;
+                }
 
                 tabPages.TabPages.Remove(tabCloset);
                 tabPages.TabPages.Remove(tabSafe);
+
+                tabPages.TabPages.Remove(tabAspiration);
 
                 tabPages.TabPages.Remove(tabCareer);
                 tabPages.TabPages.Remove(tabSkills);
@@ -1985,16 +2565,18 @@ namespace FamilyManager
             {
                 if (currentFamily.IsNPCFamily)
                 {
-                    tabPages.SelectedIndex = 0;
+                    tabPages.SelectedIndex = (int)TabPageIndex.TabFamily;
 
                     tabPages.TabPages.Remove(tabCloset);
                     tabPages.TabPages.Remove(tabSafe);
                 }
                 else
                 {
-                    if (!tabPages.TabPages.Contains(tabCloset)) tabPages.TabPages.Insert(1, tabCloset);
-                    if (!tabPages.TabPages.Contains(tabSafe)) tabPages.TabPages.Insert(2, tabSafe);
+                    if (!tabPages.TabPages.Contains(tabCloset)) tabPages.TabPages.Insert((int)TabPageIndex.TabCloset, tabCloset);
+                    if (!tabPages.TabPages.Contains(tabSafe)) tabPages.TabPages.Insert((int)TabPageIndex.TabSafe, tabSafe);
                 }
+
+                if (!tabPages.TabPages.Contains(tabAspiration)) tabPages.TabPages.Add(tabAspiration);
 
                 if (!tabPages.TabPages.Contains(tabCareer)) tabPages.TabPages.Add(tabCareer);
                 if (!tabPages.TabPages.Contains(tabSkills)) tabPages.TabPages.Add(tabSkills);
@@ -2047,7 +2629,14 @@ namespace FamilyManager
 
         private void UpdateSaveState()
         {
-            menuItemSaveAll.Enabled = btnSave.Enabled = packageCache.IsDirty;
+            bool state = packageCache.IsDirty;
+
+            if (currentMemberData != null)
+            {
+                state |= currentMemberData.HasChanges;
+            }
+
+            menuItemSaveAll.Enabled = btnSave.Enabled = state; ;
         }
         #endregion
 
@@ -2299,7 +2888,11 @@ namespace FamilyManager
         {
             TypeTypeID typeId = (sender == menuItemCachingUpdateMaxisClothes ? Gzps.TYPE : Xmol.TYPE);
 
-            ProgressDialog progressDialog = new ProgressDialog(typeId);
+            ProgressDialog progressDialog = new ProgressDialog(typeId)
+            {
+                Text = $"Loading Maxis {(typeId == Gzps.TYPE ? "Clothes" : "Jewellery")}",
+                VisualMode = ProgressBarDisplayMode.CustomText
+            };
             progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_UpdateMaxisOutfits);
 
             DialogResult result = progressDialog.ShowDialog();
@@ -2330,9 +2923,6 @@ namespace FamilyManager
         {
             TypeTypeID typeId = (TypeTypeID)args.Argument;
 
-            sender.VisualMode = ProgressBarDisplayMode.CustomText;
-            sender.SetProgress(0, $"Loading Maxis {(typeId == Gzps.TYPE ? "Clothes" : "Jewellery")}");
-
             if (typeId == Gzps.TYPE)
             {
                 clothingCache.ReloadMaxisOutfits(sender, typeId);
@@ -2347,7 +2937,11 @@ namespace FamilyManager
         {
             TypeTypeID typeId = (sender == menuItemCachingUpdateCustomClothes ? Gzps.TYPE : Xmol.TYPE);
 
-            ProgressDialog progressDialog = new ProgressDialog(typeId);
+            ProgressDialog progressDialog = new ProgressDialog(typeId)
+            {
+                Text = $"Loading Custom {(typeId == Gzps.TYPE ? "Clothes" : "Jewellery")}",
+                VisualMode = ProgressBarDisplayMode.CustomText
+            };
             progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_UpdateCustomOutfits);
 
             DialogResult result = progressDialog.ShowDialog();
@@ -2378,9 +2972,6 @@ namespace FamilyManager
         {
             TypeTypeID typeId = (TypeTypeID)args.Argument;
 
-            sender.VisualMode = ProgressBarDisplayMode.CustomText;
-            sender.SetProgress(0, $"Loading Custom {(typeId == Gzps.TYPE ? "Clothes" : "Jewellery")}");
-
             if (typeId == Gzps.TYPE)
             {
                 clothingCache.ReloadCustomOutfits(sender, typeId);
@@ -2394,7 +2985,11 @@ namespace FamilyManager
 
         private void OnCachingUpdateCustomCareers(object sender, EventArgs e)
         {
-            ProgressDialog progressDialog = new ProgressDialog();
+            ProgressDialog progressDialog = new ProgressDialog()
+            {
+                Text = $"Loading Custom Careers",
+                VisualMode = ProgressBarDisplayMode.CustomText
+            };
             progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_UpdateCustomCareers);
 
             DialogResult result = progressDialog.ShowDialog();
@@ -2422,9 +3017,6 @@ namespace FamilyManager
 
         private void DoAsyncWork_UpdateCustomCareers(ProgressDialog sender, DoWorkEventArgs args)
         {
-            sender.VisualMode = ProgressBarDisplayMode.CustomText;
-            sender.SetProgress(0, $"Loading Custom Careers");
-
             careerCache.ReloadCustomCareers(sender);
             LoadCareers();
         }
@@ -2444,64 +3036,87 @@ namespace FamilyManager
         #endregion
 
         #region Tabs
-        private bool IsFamilyTabActive => IsTabActive(0);
-        private bool IsClosetTabActive => IsTabActive(1);
-        private bool IsSafeTabActive => IsTabActive(2);
-        private bool IsCareerTabActive => IsTabActive(3);
-        private bool IsSkillsTabActive => IsTabActive(4);
-        private bool IsInterestsTabActive => IsTabActive(5);
+        private bool IsCensusTabActive => IsTabActive(TabPageIndex.TabCensus);
+        private bool IsFamilyTabActive => IsTabActive(TabPageIndex.TabFamily);
+        private bool IsClosetTabActive => IsTabActive(TabPageIndex.TabCloset);
+        private bool IsSafeTabActive => IsTabActive(TabPageIndex.TabSafe);
+        private bool IsAspirationTabActive => IsTabActive(TabPageIndex.TabAspiration);
+        private bool IsCareerTabActive => IsTabActive(TabPageIndex.TabCareer);
+        private bool IsSkillsTabActive => IsTabActive(TabPageIndex.TabSkills);
+        private bool IsInterestsTabActive => IsTabActive(TabPageIndex.TabInterests);
 
-        private bool IsTabActive(int index)
+        private bool IsTabActive(TabPageIndex index)
         {
-            if (index == 0)
+            // We need to allow for removing the closet and safe tab for NPC families
+            if (index == TabPageIndex.TabCensus || index == TabPageIndex.TabFamily)
             {
-                return (tabPages.SelectedIndex == index);
+                return (tabPages.SelectedIndex == (int)index);
             }
-            else if (index == 1 || index == 2)
+            else if (index == TabPageIndex.TabCloset || index == TabPageIndex.TabSafe)
             {
-                return tabPages.Contains(tabCloset) && (tabPages.SelectedIndex == index);
+                return tabPages.Contains(tabCloset) && (tabPages.SelectedIndex == (int)index);
             }
             else
             {
-                if (!tabPages.Contains(tabCloset)) index -= 2;
+                if (!tabPages.Contains(tabCloset)) index -= (TabPageIndex.TabAspiration - TabPageIndex.TabCloset);
 
-                return (tabPages.SelectedIndex == index);
+                return (tabPages.SelectedIndex == (int)index);
             }
         }
 
         private void OnTabPageChanged(object sender, EventArgs e)
         {
-            if (IsClosetTabActive)
+            if (IsCensusTabActive)
             {
-                if (gridFamilyCloset.Rows.Count == 0)
+                if (lastHoodNode == null && hoodForCensus != null)
                 {
-                    if (lastFamilyNode != null)
-                    {
-                        DoWork_FillFamilyClosetGrid(lastHoodNode, lastFamilyNode);
-                    }
+                    SelectHood(hoodForCensus);
+                }
+                else if (lastHoodNode != null)
+                {
+                    DoWork_FillCensusGrid(lastHoodNode);
                 }
             }
-            else if (IsSafeTabActive)
+            else
             {
-                if (gridFamilySafe.Rows.Count == 0)
+                if (IsClosetTabActive)
                 {
-                    if (lastFamilyNode != null)
+                    if (gridFamilyCloset.Rows.Count == 0)
                     {
-                        DoWork_FillFamilySafeGrid(lastHoodNode, lastFamilyNode);
+                        if (lastFamilyNode != null)
+                        {
+                            DoWork_FillFamilyClosetGrid(lastHoodNode, lastFamilyNode);
+                        }
                     }
                 }
-            }
-            else if (IsCareerTabActive)
-            {
-                DoWork_FillCareerTab();
-            }
-            else if (IsSkillsTabActive)
-            {
-                DoWork_FillSkillsTab();
-            }
-            else if (IsInterestsTabActive)
-            {
-                DoWork_FillInterestsTab();
+                else if (IsSafeTabActive)
+                {
+                    if (gridFamilySafe.Rows.Count == 0)
+                    {
+                        if (lastFamilyNode != null)
+                        {
+                            DoWork_FillFamilySafeGrid(lastHoodNode, lastFamilyNode);
+                        }
+                    }
+                }
+                else if (IsAspirationTabActive)
+                {
+                    DoWork_FillAspirationTab();
+                }
+                else if (IsCareerTabActive)
+                {
+                    DoWork_FillCareerTab();
+                }
+                else if (IsSkillsTabActive)
+                {
+                    DoWork_FillSkillsTab();
+                }
+                else if (IsInterestsTabActive)
+                {
+                    DoWork_FillInterestsTab();
+                }
+
+                lastActiveTab = tabPages.SelectedIndex;
             }
         }
         #endregion
@@ -2689,28 +3304,8 @@ namespace FamilyManager
 
             if (currentMemberData.UniSemester != (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value)
             {
-                currentMemberData.UniSemester = (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value;
-                currentMemberData.UniInfoFlags &= 0xFFF0;
-
-                switch (currentMemberData.UniSemester)
-                {
-                    case 1:
-                    case 2:
-                        currentMemberData.UniInfoFlags |= 0x0001;
-                        break;
-                    case 3:
-                    case 4:
-                        currentMemberData.UniInfoFlags |= 0x0002;
-                        break;
-                    case 5:
-                    case 6:
-                        currentMemberData.UniInfoFlags |= 0x0004;
-                        break;
-                    case 7:
-                    case 8:
-                        currentMemberData.UniInfoFlags |= 0x0008;
-                        break;
-                }
+                // Delay this update until the user changes Sim (or exits), as we need the current GPA value to update the GPA token
+                currentMemberData.HasUniversityChanges = true;
 
                 UpdateSaveState();
             }
@@ -2779,7 +3374,7 @@ namespace FamilyManager
 
             currentMemberData.UniInfoFlags &= 0xFFEF;
 
-            if (ckbUniProbation.Checked) currentMemberData.UniInfoFlags |= 0x0010;
+            if (ckbUniStudying.Checked) currentMemberData.UniInfoFlags |= 0x0010;
 
             UpdateSaveState();
         }
@@ -2816,6 +3411,15 @@ namespace FamilyManager
 
                 UpdateSaveState();
             }
+        }
+
+        private void OnUniSecretSocietyChanged(object sender, EventArgs e)
+        {
+            if (ignoreCareerChanges) return;
+
+            currentMemberData.UniSecretSociety = ckbUniSecretSoc.Checked;
+
+            UpdateSaveState();
         }
 
         private void OnJobTypeChanged(object sender, EventArgs e)
@@ -3978,7 +4582,11 @@ namespace FamilyManager
             {
                 e.Node.Nodes.Clear();
 
-                ProgressDialog progressDialog = new ProgressDialog(e.Node);
+                ProgressDialog progressDialog = new ProgressDialog(e.Node)
+                {
+                    Text = $"Loading Families",
+                    VisualMode = ProgressBarDisplayMode.CustomText
+                };
                 progressDialog.DoWork += new ProgressDialog.DoWorkEventHandler(DoAsyncWork_ProcessFamilies);
                 progressDialog.DoData += new ProgressDialog.DoWorkEventHandler(DoAsyncData_ProcessFamilies);
 
@@ -3999,6 +4607,12 @@ namespace FamilyManager
                     }
                     else
                     {
+                        hoodForCensus = e.Node as HoodTreeNode;
+
+                        if (IsCensusTabActive)
+                        {
+                            SelectHood(hoodForCensus);
+                        }
                     }
                 }
             }
@@ -4040,7 +4654,11 @@ namespace FamilyManager
 
         private void OnMemberGridSelectionChanged(object sender, EventArgs e)
         {
-            if (IsCareerTabActive)
+            if (IsAspirationTabActive)
+            {
+                DoWork_FillAspirationTab();
+            }
+            else if (IsCareerTabActive)
             {
                 DoWork_FillCareerTab();
             }
@@ -4386,6 +5004,7 @@ namespace FamilyManager
 
         private void Save()
         {
+            UpdateCurrentMember();
             UpdateCurrentFamily();
 
             foreach (CacheableDbpfFile dbpfPackage in packageCache)
@@ -4523,6 +5142,835 @@ namespace FamilyManager
 
             currentMemberData.SetPetSkillValue((TypeGUID)tracker.TokenGuid, tracker.Value);
             UpdateSaveState();
+        }
+
+        private void OnAspirationPrimaryChanged(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            currentMemberData.HasAspirationChanges = true;
+
+            UpdatePrimaryBenefits();
+            UpdateMotiveDecayControls();
+            RecalcUnusedBenefits();
+            UpdateSaveState();
+        }
+
+        private void OnAspirationSecondaryChanged(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            uint aspPrimaryIndex = (comboAspirationPrimary.SelectedItem as UintNamedValue).Value;
+            uint aspSecondaryIndex = (comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
+
+            if (aspSecondaryIndex != 0 && aspSecondaryIndex == aspPrimaryIndex)
+            {
+                comboAspirationSecondary.SelectedIndex = 0;
+            }
+
+            currentMemberData.HasAspirationChanges = true;
+
+            UpdateSecondaryBenefits();
+            UpdateMotiveDecayControls();
+            RecalcUnusedBenefits();
+            UpdateSaveState();
+        }
+
+        private void OnBenefitsClicked(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            if ((sender as Control).Parent is BenefitButton button)
+            {
+                if (button.Image == null || button == btnAspSecondary1) return;
+
+                string buttonBaseName = button.Name.Substring(0, button.Name.Length - 1);
+                int buttonIndex = int.Parse(button.Name.Substring(buttonBaseName.Length));
+
+                if (!button.Selected)
+                {
+                    // Select this button, and all before it
+                    for (int index = buttonIndex; index >= 1; --index)
+                    {
+                        (grpBenefits.Controls[$"{buttonBaseName}{index}"] as BenefitButton).Selected = true;
+                    }
+                }
+                else
+                {
+                    // Deselect this button, and all after it
+                    for (int index = buttonIndex; index <= 4; ++index)
+                    {
+                        (grpBenefits.Controls[$"{buttonBaseName}{index}"] as BenefitButton).Selected = false;
+                    }
+                }
+
+                currentMemberData.HasBenefitChanges = true;
+
+                UpdateMotiveDecayControls();
+                RecalcUnusedBenefits();
+                UpdateSaveState();
+            }
+        }
+
+        private void OnBenefitsUnusedChanged(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            if (currentMemberData.SuperpowerPointsUnused != textBenefitsUnused.Value)
+            {
+                currentMemberData.HasBenefitChanges = true;
+            }
+
+            UpdateSaveState();
+        }
+
+        private void OnBenefitsClear(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            foreach (Control control in grpBenefits.Controls)
+            {
+                if ((control is BenefitButton button) && button.Selected) button.Selected = false;
+            }
+
+            if (comboAspirationSecondary.SelectedIndex != 0)
+            {
+                btnAspSecondary1.Selected = true; ;
+            }
+
+            UpdateMotiveDecayControls();
+            RecalcUnusedBenefits();
+        }
+
+        private readonly List<List<string>> superpowerTooltips = new List<List<string>> {
+            new List<string>(),
+            new List<string>() { "", "Grandma's Comfort Soup", "Slower Motive Decay - Fun and Comfort", "Plead with the Social Worker", "Super Fertility" },
+            new List<string>() { "", "Skilled Negotiator", "Slower Motive Decay - Fun and Comfort", "Financial Advice for Cash", "Investing" },
+            new List<string>() { "", "Bottomless Stomach", "Slower Motive Decay - Bladder", "Paint Grilled Cheese", "Conjure Grilled Cheese" },
+            new List<string>() { "", "Slower Motive Decay - Social and Fun", "Impart Knowledge", "Eureka!", "Summon Aliens" },
+            new List<string>() { "", "Fast Metabolism", "Slower Motive Decay - Bladder and Energy", "Write Restaurant Guide", "Rowdy Folk Song" },
+            new List<string>() { "", "Hospitality", "Slower Motive Decay - Bladder and Energy", "3-Way Calling", "Fast Friends" },
+            new List<string>() { "", "Massive Attraction", "Slower Motive Decay - Hygiene and Energy", "Local Legend", "Smooth Talk" },
+            new List<string>() { "", "Slower Motive Decay - Social and Comfort", "Slower Motive Decay - Bladder and Hygiene", "Slower Motive Decay - Fun and Hunger", "Slower Motive Decay - Energy" },
+            new List<string>() { "", "Life of Luxury", "Business Instinct", "Friends in High Places", "Plead for Job" }
+        };
+
+        private void UpdatePrimaryBenefits()
+        {
+            uint aspPrimaryIndex = (comboAspirationPrimary.SelectedItem as UintNamedValue).Value;
+            string aspName = (comboAspirationPrimary.SelectedItem as UintNamedValue).Name;
+
+            int pos = aspName.IndexOf("(");
+            if (pos > 0) aspName = aspName.Substring(0, pos);
+
+            if (aspPrimaryIndex != 0)
+            {
+                lblBenefitsPrimary.Text = aspName;
+                lblBenefitsPrimary.Location = new Point(95 - lblBenefitsPrimary.Size.Width, lblBenefitsPrimary.Location.Y);
+
+                btnAspPrimary1.Image = aspirationButtonImages[aspPrimaryIndex][1];
+                btnAspPrimary2.Image = aspirationButtonImages[aspPrimaryIndex][2];
+                btnAspPrimary3.Image = aspirationButtonImages[aspPrimaryIndex][3];
+                btnAspPrimary4.Image = aspirationButtonImages[aspPrimaryIndex][4];
+
+                toolTip.SetToolTip(btnAspPrimary1.InnerButton, superpowerTooltips[(int)aspPrimaryIndex][1]);
+                toolTip.SetToolTip(btnAspPrimary2.InnerButton, superpowerTooltips[(int)aspPrimaryIndex][2]);
+                toolTip.SetToolTip(btnAspPrimary3.InnerButton, superpowerTooltips[(int)aspPrimaryIndex][3]);
+                toolTip.SetToolTip(btnAspPrimary4.InnerButton, superpowerTooltips[(int)aspPrimaryIndex][4]);
+
+                btnAspPrimary1.Selected = currentMemberData.HasSuperpower(aspPrimaryIndex, 1);
+                btnAspPrimary2.Selected = currentMemberData.HasSuperpower(aspPrimaryIndex, 2);
+                btnAspPrimary3.Selected = currentMemberData.HasSuperpower(aspPrimaryIndex, 3);
+                btnAspPrimary4.Selected = currentMemberData.HasSuperpower(aspPrimaryIndex, 4);
+
+                uint aspSecondaryIndex = (comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
+
+                if (aspSecondaryIndex == aspPrimaryIndex)
+                {
+                    comboAspirationSecondary.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                // 0 is Grow Up
+                lblBenefitsPrimary.Text = "Grow Up";
+                lblBenefitsPrimary.Location = new Point(95 - lblBenefitsPrimary.Size.Width, lblBenefitsPrimary.Location.Y);
+
+                btnAspPrimary1.Image = null;
+                btnAspPrimary2.Image = null;
+                btnAspPrimary3.Image = null;
+                btnAspPrimary4.Image = null;
+
+                toolTip.SetToolTip(btnAspPrimary1.InnerButton, "");
+                toolTip.SetToolTip(btnAspPrimary2.InnerButton, "");
+                toolTip.SetToolTip(btnAspPrimary3.InnerButton, "");
+                toolTip.SetToolTip(btnAspPrimary4.InnerButton, "");
+
+                btnAspPrimary1.Selected = false;
+                btnAspPrimary2.Selected = false;
+                btnAspPrimary3.Selected = false;
+                btnAspPrimary4.Selected = false;
+
+                comboAspirationSecondary.SelectedIndex = 0;
+                comboAspirationSecondary.Enabled = false;
+            }
+
+            grpBenefits.Enabled = grpModifiers.Enabled = comboAspirationSecondary.Enabled = (aspPrimaryIndex != 0);
+        }
+
+        private void UpdateSecondaryBenefits()
+        {
+            uint aspSecondaryIndex = (comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
+            string aspName = (comboAspirationSecondary.SelectedItem as UintNamedValue).Name;
+
+            int pos = aspName.IndexOf("(");
+            if (pos > 0) aspName = aspName.Substring(0, pos);
+
+            lblBenefitsSecondary.Text = aspName;
+            lblBenefitsSecondary.Location = new Point(95 - lblBenefitsSecondary.Size.Width, lblBenefitsSecondary.Location.Y);
+
+            btnAspSecondary1.Image = aspirationButtonImages[aspSecondaryIndex][0];
+            btnAspSecondary2.Image = aspirationButtonImages[aspSecondaryIndex][1];
+            btnAspSecondary3.Image = aspirationButtonImages[aspSecondaryIndex][2];
+            btnAspSecondary4.Image = aspirationButtonImages[aspSecondaryIndex][3];
+
+            if (aspSecondaryIndex == 0)
+            {
+                toolTip.SetToolTip(btnAspSecondary1.InnerButton, "");
+                toolTip.SetToolTip(btnAspSecondary2.InnerButton, "");
+                toolTip.SetToolTip(btnAspSecondary3.InnerButton, "");
+                toolTip.SetToolTip(btnAspSecondary4.InnerButton, "");
+
+                btnAspSecondary1.Selected = false;
+                btnAspSecondary2.Selected = false;
+                btnAspSecondary3.Selected = false;
+                btnAspSecondary4.Selected = false;
+            }
+            else
+            {
+                toolTip.SetToolTip(btnAspSecondary1.InnerButton, comboAspirationSecondary.SelectedItem.ToString());
+                toolTip.SetToolTip(btnAspSecondary2.InnerButton, superpowerTooltips[(int)aspSecondaryIndex][1]);
+                toolTip.SetToolTip(btnAspSecondary3.InnerButton, superpowerTooltips[(int)aspSecondaryIndex][2]);
+                toolTip.SetToolTip(btnAspSecondary4.InnerButton, superpowerTooltips[(int)aspSecondaryIndex][3]);
+
+                btnAspSecondary1.Selected = true;
+                btnAspSecondary2.Selected = currentMemberData.HasSuperpower(aspSecondaryIndex, 1);
+                btnAspSecondary3.Selected = currentMemberData.HasSuperpower(aspSecondaryIndex, 2);
+                btnAspSecondary4.Selected = currentMemberData.HasSuperpower(aspSecondaryIndex, 3);
+            }
+        }
+
+        private void UpdateNeedsBenefits()
+        {
+            btnAspNeeds1.Selected = currentMemberData.HasSuperpower(8, 1);
+            btnAspNeeds2.Selected = currentMemberData.HasSuperpower(8, 2);
+            btnAspNeeds3.Selected = currentMemberData.HasSuperpower(8, 3);
+            btnAspNeeds4.Selected = currentMemberData.HasSuperpower(8, 4);
+        }
+
+        private void UpdateWorkBenefits()
+        {
+            btnAspWork1.Selected = currentMemberData.HasSuperpower(9, 1);
+            btnAspWork2.Selected = currentMemberData.HasSuperpower(9, 2);
+            btnAspWork3.Selected = currentMemberData.HasSuperpower(9, 3);
+            btnAspWork4.Selected = currentMemberData.HasSuperpower(9, 4);
+        }
+
+        private void RecalcUnusedBenefits()
+        {
+            int benefitsCount = 0;
+
+            foreach (Control control in grpBenefits.Controls)
+            {
+                if (control is BenefitButton button)
+                {
+                    if (button.Selected) ++benefitsCount;
+                }
+            }
+
+            textBenefitsUnused.Value = (uint)Math.Max(0, (currentMemberData.SuperpowerPointsAvailable - benefitsCount));
+        }
+
+        private void UpdateMotiveDecayControls()
+        {
+            textMotiveDecayBladder.Value = 0;
+            textMotiveDecayComfort.Value = 0;
+            textMotiveDecayEnergy.Value = 0;
+            textMotiveDecayFun.Value = 0;
+            textMotiveDecayHunger.Value = 0;
+            textMotiveDecayHygiene.Value = 0;
+            textMotiveDecaySocial.Value = 0;
+
+            uint aspPrimaryIndex = (comboAspirationPrimary.SelectedItem as UintNamedValue).Value;
+            switch (aspPrimaryIndex)
+            {
+                case 1: // Family
+                    if (btnAspPrimary2.Selected)
+                    {
+                        textMotiveDecayComfort.Value += 12;
+                        textMotiveDecayFun.Value += 12;
+                    }
+                    break;
+                case 2: // Fortune
+                    if (btnAspPrimary2.Selected)
+                    {
+                        textMotiveDecayComfort.Value += 12;
+                        textMotiveDecayFun.Value += 12;
+                    }
+                    break;
+                case 3: // Grilled Cheese
+                    if (btnAspPrimary3.Selected)
+                    {
+                        textMotiveDecayBladder.Value += 12;
+                    }
+                    break;
+                case 4: // Knowledge
+                    if (btnAspPrimary1.Selected)
+                    {
+                        textMotiveDecayFun.Value += 12;
+                        textMotiveDecaySocial.Value += 12;
+                    }
+                    break;
+                case 5: // Pleasure
+                    if (btnAspPrimary2.Selected)
+                    {
+                        textMotiveDecayBladder.Value += 12;
+                        textMotiveDecayEnergy.Value += 12;
+                    }
+                    break;
+                case 6: // Popularity
+                    if (btnAspPrimary2.Selected)
+                    {
+                        textMotiveDecayBladder.Value += 12;
+                        textMotiveDecayEnergy.Value += 12;
+                    }
+                    break;
+                case 7: // Romance
+                    if (btnAspPrimary2.Selected)
+                    {
+                        textMotiveDecayEnergy.Value += 12;
+                        textMotiveDecayHygiene.Value += 12;
+                    }
+                    break;
+            }
+
+            uint aspSecondaryIndex = (comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
+            switch (aspSecondaryIndex)
+            {
+                case 1: // Family
+                    if (btnAspSecondary3.Selected)
+                    {
+                        textMotiveDecayComfort.Value += 12;
+                        textMotiveDecayFun.Value += 12;
+                    }
+                    break;
+                case 2: // Fortune
+                    if (btnAspSecondary3.Selected)
+                    {
+                        textMotiveDecayComfort.Value += 12;
+                        textMotiveDecayFun.Value += 12;
+                    }
+                    break;
+                case 4: // Knowledge
+                    if (btnAspSecondary2.Selected)
+                    {
+                        textMotiveDecayFun.Value += 12;
+                        textMotiveDecaySocial.Value += 12;
+                    }
+                    break;
+                case 5: // Pleasure
+                    if (btnAspSecondary3.Selected)
+                    {
+                        textMotiveDecayBladder.Value += 12;
+                        textMotiveDecayEnergy.Value += 12;
+                    }
+                    break;
+                case 6: // Popularity
+                    if (btnAspSecondary3.Selected)
+                    {
+                        textMotiveDecayBladder.Value += 12;
+                        textMotiveDecayEnergy.Value += 12;
+                    }
+                    break;
+                case 7: // Romance
+                    if (btnAspSecondary3.Selected)
+                    {
+                        textMotiveDecayEnergy.Value += 12;
+                        textMotiveDecayHygiene.Value += 12;
+                    }
+                    break;
+            }
+
+            // Needs
+            if (btnAspNeeds1.Selected)
+            {
+                textMotiveDecayComfort.Value += 12;
+                textMotiveDecaySocial.Value += 12;
+            }
+            if (btnAspNeeds2.Selected)
+            {
+                textMotiveDecayBladder.Value += 12;
+                textMotiveDecayHygiene.Value += 12;
+            }
+            if (btnAspNeeds3.Selected)
+            {
+                textMotiveDecayFun.Value += 12;
+                textMotiveDecayHunger.Value += 12;
+            }
+            if (btnAspNeeds4.Selected)
+            {
+                textMotiveDecayEnergy.Value += 12;
+            }
+        }
+
+
+        private void UpdateSuperpowerToken()
+        {
+            // Pretty sure prop 8 on "Token - LTA Superpowers" is always 0
+
+            ushort pointsSpent = 0;
+
+            uint aspPrimaryIndex = (comboAspirationPrimary.SelectedItem as UintNamedValue).Value;
+            ushort aspPrimaryMax = 0;
+            if (btnAspPrimary1.Selected)
+            {
+                currentMemberData.GiveSuperpower(aspPrimaryIndex, 1);
+                aspPrimaryMax = 1;
+                ++pointsSpent;
+            }
+            if (btnAspPrimary2.Selected)
+            {
+                currentMemberData.GiveSuperpower(aspPrimaryIndex, 2);
+                aspPrimaryMax = 2;
+                ++pointsSpent;
+            }
+            if (btnAspPrimary3.Selected)
+            {
+                currentMemberData.GiveSuperpower(aspPrimaryIndex, 3);
+                aspPrimaryMax = 3;
+                ++pointsSpent;
+            }
+            if (btnAspPrimary4.Selected)
+            {
+                currentMemberData.GiveSuperpower(aspPrimaryIndex, 4);
+                aspPrimaryMax = 4;
+                ++pointsSpent;
+            }
+            currentMemberData.SetSuperpowerCount(6, aspPrimaryMax);
+
+            uint aspSecondaryIndex = (comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
+            ushort aspSecondaryMax = 0;
+            if (btnAspSecondary1.Selected)
+            {
+                aspSecondaryMax = 1;
+                ++pointsSpent;
+            }
+            if (btnAspSecondary2.Selected)
+            {
+                currentMemberData.GiveSuperpower(aspSecondaryIndex, 1);
+                aspSecondaryMax = 2;
+                ++pointsSpent;
+            }
+            if (btnAspSecondary3.Selected)
+            {
+                currentMemberData.GiveSuperpower(aspSecondaryIndex, 2);
+                aspSecondaryMax = 3;
+                ++pointsSpent;
+            }
+            if (btnAspSecondary4.Selected)
+            {
+                currentMemberData.GiveSuperpower(aspSecondaryIndex, 3);
+                aspSecondaryMax = 4;
+                ++pointsSpent;
+            }
+            currentMemberData.SetSuperpowerCount(7, aspSecondaryMax);
+
+            ushort aspNeedsMax = 0;
+            if (btnAspNeeds1.Selected)
+            {
+                currentMemberData.GiveSuperpower(8, 1);
+                aspNeedsMax = 1;
+                ++pointsSpent;
+            }
+            if (btnAspNeeds2.Selected)
+            {
+                currentMemberData.GiveSuperpower(8, 2);
+                aspNeedsMax = 2;
+                ++pointsSpent;
+            }
+            if (btnAspNeeds3.Selected)
+            {
+                currentMemberData.GiveSuperpower(8, 3);
+                aspNeedsMax = 3;
+                ++pointsSpent;
+            }
+            if (btnAspNeeds4.Selected)
+            {
+                currentMemberData.GiveSuperpower(8, 4);
+                aspNeedsMax = 4;
+                ++pointsSpent;
+            }
+            currentMemberData.SetSuperpowerCount(4, aspNeedsMax);
+
+            ushort aspWorkMax = 0;
+            if (btnAspWork1.Selected)
+            {
+                currentMemberData.GiveSuperpower(9, 1);
+                aspWorkMax = 1;
+                ++pointsSpent;
+            }
+            if (btnAspWork2.Selected)
+            {
+                currentMemberData.GiveSuperpower(9, 2);
+                aspWorkMax = 2;
+                ++pointsSpent;
+            }
+            if (btnAspWork3.Selected)
+            {
+                currentMemberData.GiveSuperpower(9, 3);
+                aspWorkMax = 3;
+                ++pointsSpent;
+            }
+            if (btnAspWork4.Selected)
+            {
+                currentMemberData.GiveSuperpower(9, 4);
+                aspWorkMax = 4;
+                ++pointsSpent;
+            }
+            currentMemberData.SetSuperpowerCount(5, aspWorkMax);
+
+            currentMemberData.SuperpowerPointsSpent = pointsSpent;
+            currentMemberData.SuperpowerPointsAvailable = (ushort)(pointsSpent + textBenefitsUnused.Value);
+        }
+
+        private void UpdateMotiveDecayTokens()
+        {
+            currentMemberData.RemoveAllMotiveDecayTokens();
+
+            uint aspPrimaryIndex = (comboAspirationPrimary.SelectedItem as UintNamedValue).Value;
+            switch (aspPrimaryIndex)
+            {
+                case 1: // Family
+                    if (btnAspPrimary2.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(21, 0, 12, 0, 12, 0, 0, 0);
+                    }
+                    break;
+                case 2: // Fortune
+                    if (btnAspPrimary2.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(9, 0, 12, 0, 12, 0, 0, 0);
+                    }
+                    break;
+                case 3: // Grilled Cheese
+                    if (btnAspPrimary2.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(25, 12, 0, 0, 0, 0, 0, 0);
+                    }
+                    break;
+                case 4: // Knowledge
+                    if (btnAspPrimary1.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(12, 0, 0, 0, 12, 0, 0, 12);
+                    }
+                    break;
+                case 5: // Pleasure
+                    if (btnAspPrimary2.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(17, 12, 0, 12, 0, 0, 0, 0);
+                    }
+                    break;
+                case 6: // Popularity
+                    if (btnAspPrimary2.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(1, 12, 0, 12, 0, 0, 0, 0);
+                    }
+                    break;
+                case 7: // Romance
+                    if (btnAspPrimary2.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(5, 0, 0, 12, 0, 0, 12, 0);
+                    }
+                    break;
+            }
+
+            uint aspSecondaryIndex = (comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
+            switch (aspSecondaryIndex)
+            {
+                case 1: // Family
+                    if (btnAspSecondary3.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(21, 0, 12, 0, 12, 0, 0, 0);
+                    }
+                    break;
+                case 2: // Fortune
+                    if (btnAspSecondary3.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(9, 0, 12, 0, 12, 0, 0, 0);
+                    }
+                    break;
+                case 3: // Grilled Cheese
+                    if (btnAspPrimary3.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(25, 12, 0, 0, 0, 0, 0, 0);
+                    }
+                    break;
+                case 4: // Knowledge
+                    if (btnAspSecondary2.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(12, 0, 0, 0, 12, 0, 0, 12);
+                    }
+                    break;
+                case 5: // Pleasure
+                    if (btnAspSecondary3.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(17, 12, 0, 12, 0, 0, 0, 0);
+                    }
+                    break;
+                case 6: // Popularity
+                    if (btnAspSecondary3.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(1, 12, 0, 12, 0, 0, 0, 0);
+                    }
+                    break;
+                case 7: // Romance
+                    if (btnAspSecondary3.Selected)
+                    {
+                        currentMemberData.CreateMotiveDecayToken(5, 0, 0, 12, 0, 0, 12, 0);
+                    }
+                    break;
+            }
+
+            // Needs
+            if (btnAspNeeds1.Selected)
+            {
+                currentMemberData.CreateMotiveDecayToken(28, 0, 12, 0, 0, 0, 0, 12);
+            }
+            if (btnAspNeeds2.Selected)
+            {
+                currentMemberData.CreateMotiveDecayToken(29, 12, 0, 0, 0, 0, 12, 0);
+            }
+            if (btnAspNeeds3.Selected)
+            {
+                currentMemberData.CreateMotiveDecayToken(30, 0, 0, 0, 12, 12, 0, 0);
+            }
+            if (btnAspNeeds4.Selected)
+            {
+                currentMemberData.CreateMotiveDecayToken(31, 0, 0, 12, 0, 0, 0, 0);
+            }
+        }
+
+        private void OnAspirationMeterSliderChanged(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            textAspirationMeter.Value = (uint)trackAspirationMeter.Value;
+        }
+
+        private void OnAspirationMeterValueChanged(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            if (currentMemberData.AspirationScoreRawDiv10 != (ushort)textAspirationMeter.Value)
+            {
+                ignoreAspirationChanges = true;
+                currentMemberData.AspirationScoreRawDiv10 = (ushort)textAspirationMeter.Value;
+                trackAspirationMeter.Value = (int)textAspirationMeter.Value;
+                UpdateAspirationMeterColour();
+                ignoreAspirationChanges = false;
+
+                if (ckbAspirationLock.Checked)
+                {
+                    textAspirationScore.Value = EstimateCurrentFromRaw();
+                }
+
+                UpdateSaveState();
+            }
+        }
+
+        private void UpdateAspirationMeterColour()
+        {
+            int value = trackAspirationMeter.Value;
+            Color barColour = Color.YellowGreen;
+
+            if (value < (120 * trackAspirationMeter.Maximum / 1200))
+            {
+                barColour = Color.Crimson;
+            }
+            else if (value > (774 * trackAspirationMeter.Maximum / 1200))
+            {
+                barColour = Color.Silver;
+            }
+            else if (value > (475 * trackAspirationMeter.Maximum / 1200))
+            {
+                barColour = Color.DarkOrange;
+            }
+
+            trackAspirationMeter.SelectedColor = barColour;
+        }
+
+        private void OnAspirationPointsChanged(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            if (currentMemberData.AspirationPoints != (ushort)textAspirationPoints.Value)
+            {
+                currentMemberData.AspirationPoints = (ushort)textAspirationPoints.Value;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnAspirationScoreChanged(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            if (currentMemberData.AspirationScore != (ushort)textAspirationScore.Value)
+            {
+                currentMemberData.AspirationScore = (ushort)textAspirationScore.Value;
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnAspirationLockChanged(object sender, EventArgs e)
+        {
+            textAspirationScore.Enabled = !ckbAspirationLock.Checked;
+
+            if (ignoreAspirationChanges) return;
+
+            if (!textAspirationScore.Enabled)
+            {
+                textAspirationScore.Value = EstimateCurrentFromRaw();
+            }
+        }
+
+        private void OnAspirationLongTermChanged(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            if (currentMemberData.AspirationLongTerm != (ushort)textAspirationLongTerm.Value)
+            {
+                currentMemberData.AspirationLongTerm = (ushort)textAspirationLongTerm.Value;
+
+                UpdateSaveState();
+            }
+        }
+        private void OnAspirationPermaPlatChanged(object sender, EventArgs e)
+        {
+            if (ignoreAspirationChanges) return;
+
+            if (ckbAspirationPermaPlat.Checked != currentMemberData.IsPermanentPlatinum)
+            {
+                currentMemberData.IsPermanentPlatinum = ckbAspirationPermaPlat.Checked;
+
+                if (ckbAspirationPermaPlat.Checked)
+                {
+                    textAspirationLongTerm.Value = textAspirationLongTerm.Maximum;
+                }
+            }
+        }
+
+
+        private uint GetAspirationLimit()
+        {
+            if (currentMemberData.IsToddler)
+            {
+                return 300;
+            }
+            else if (currentMemberData.IsChild)
+            {
+                return 600;
+            }
+            else if (currentMemberData.IsTeen)
+            {
+                return 900;
+            }
+            else if (currentMemberData.IsElder)
+            {
+                return 1500;
+            }
+            else if (!currentMemberData.IsYoungAdultOrOlder)
+            {
+                throw new Exception("Can't get aspiration limit");
+            }
+
+            return 1200;
+        }
+
+        private int EstimateCurrentFromRaw()
+        {
+            double adultBiasRawScore = ((double)currentMemberData.AspirationScoreRawDiv10) / GetAspirationLimit() * 1200.0;
+
+            int estimate;
+
+            if (adultBiasRawScore <= 120)
+            {
+                // Red
+                // =IF($J2<=120,TRUNC(($J2-120)/120*100),"")
+                estimate = (int)((adultBiasRawScore - 120) / 120 * 100);
+            }
+            else if (adultBiasRawScore <= 475)
+            {
+                // Green
+                // =IF(J2>=120,IF(J2<=475,ROUND(($J2 - 120) / 355 * 50,0)+IF($J2<=240,ROUND(($J2-120)/120*8,0),8-ROUND(($J2-240)/235*8,0)),""),"")
+                estimate = (int)Math.Round((adultBiasRawScore - 120) / 355 * 50, MidpointRounding.AwayFromZero);
+
+                if (adultBiasRawScore <= 240)
+                {
+                    estimate += (int)Math.Round((adultBiasRawScore - 120) / 120 * 8, MidpointRounding.AwayFromZero);
+                }
+                else
+                {
+                    estimate += (int)(8 - Math.Round((adultBiasRawScore - 240) / 235 * 8, MidpointRounding.AwayFromZero));
+                }
+            }
+            else if (adultBiasRawScore < 775)
+            {
+                // Orange
+                // =IF($J2>475,IF(J2<775,ROUNDUP($J2/10,0)+(2-ROUND(($J2-475)/60,0)),""),"")
+                estimate = (int)(Math.Ceiling(adultBiasRawScore / 10.0) + (2 - Math.Round((adultBiasRawScore - 475) / 60, MidpointRounding.AwayFromZero)));
+            }
+            else
+            {
+                // Platinum
+                // =IF($J2>=775,ROUNDUP($J2/12,0)+ROUND((1200-$J2)/47.5,0),"")
+                estimate = (int)(Math.Ceiling(adultBiasRawScore / 12.0) + Math.Round((1200 - adultBiasRawScore) / 47.5, MidpointRounding.AwayFromZero));
+            }
+
+            return estimate;
+        }
+
+        private void OnCensusGridDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                int index = e.RowIndex;
+
+                if (index < gridCensus.Rows.Count)
+                {
+                    DataGridViewRow row = gridCensus.Rows[index];
+                    TypeInstanceID familyId = (TypeInstanceID)row.Cells["colCensusFamilyID"].Value;
+
+                    lastHoodNode.Expand();
+
+                    foreach (TreeNode node in lastHoodNode.Nodes)
+                    {
+                        if (node is FamilyTreeNode familyNode)
+                        {
+                            if (familyNode.FamilyId == familyId)
+                            {
+                                tabPages.SelectedIndex = (lastActiveTab != -1) ? lastActiveTab : (int)TabPageIndex.TabFamily;
+
+                                treeHoods.SelectedNode = familyNode;
+                                DoWork_FillHoodOrFamilyGrid(familyNode);
+
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

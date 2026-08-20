@@ -6,7 +6,6 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.JPG;
@@ -31,7 +30,40 @@ using System.Xml;
 namespace FamilyManager
 {
     [System.ComponentModel.DesignerCategory("")]
-    class FamilyGridData : DataTable
+    public class CensusGridData : DataTable
+    {
+        public CensusGridData()
+        {
+            // Must match the order in the DataGridView control
+            this.Columns.Add(new DataColumn("Visible", typeof(string)));
+
+            this.Columns.Add(new DataColumn("Name", typeof(string)));
+            this.Columns.Add(new DataColumn("Address", typeof(string)));
+            this.Columns.Add(new DataColumn("Subhood", typeof(string)));
+
+            this.Columns.Add(new DataColumn("EM", typeof(string)));
+            this.Columns.Add(new DataColumn("EF", typeof(string)));
+            this.Columns.Add(new DataColumn("AM", typeof(string)));
+            this.Columns.Add(new DataColumn("AF", typeof(string)));
+            this.Columns.Add(new DataColumn("YAM", typeof(string)));
+            this.Columns.Add(new DataColumn("YAF", typeof(string)));
+            this.Columns.Add(new DataColumn("TM", typeof(string)));
+            this.Columns.Add(new DataColumn("TF", typeof(string)));
+            this.Columns.Add(new DataColumn("CM", typeof(string)));
+            this.Columns.Add(new DataColumn("CF", typeof(string)));
+            this.Columns.Add(new DataColumn("PM", typeof(string)));
+            this.Columns.Add(new DataColumn("PF", typeof(string)));
+            this.Columns.Add(new DataColumn("BM", typeof(string)));
+            this.Columns.Add(new DataColumn("BF", typeof(string)));
+
+            this.Columns.Add(new DataColumn("FamilyID", typeof(TypeInstanceID)));
+
+            this.DefaultView.RowFilter = "Visible = 'Yes'";
+        }
+    }
+
+    [System.ComponentModel.DesignerCategory("")]
+    public class FamilyGridData : DataTable
     {
         public FamilyGridData()
         {
@@ -54,7 +86,7 @@ namespace FamilyManager
     }
 
     [System.ComponentModel.DesignerCategory("")]
-    class OutfitGridData : DataTable
+    public class OutfitGridData : DataTable
     {
         public OutfitGridData()
         {
@@ -95,14 +127,17 @@ namespace FamilyManager
     public class HoodTreeNode : TreeNode
     {
         private readonly string packagePath;
+        private readonly string hoodBaseFolder;
         private readonly string hoodSubFolder;
 
         public string PackagePath => packagePath;
+        public string HoodBaseFolder => hoodBaseFolder;
         public string HoodSubFolder => hoodSubFolder;
 
-        public HoodTreeNode(string packagePath, string hoodSubFolder, string hoodName) : base(hoodName)
+        public HoodTreeNode(string packagePath, string hoodBaseFolder, string hoodSubFolder, string hoodName) : base(hoodName)
         {
             this.packagePath = packagePath;
+            this.hoodBaseFolder = hoodBaseFolder;
             this.hoodSubFolder = hoodSubFolder;
         }
     }
@@ -345,9 +380,9 @@ namespace FamilyManager
 
                     if (ltxtEntry == null)
                     {
-                        string mainHoodPackagePath = $"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods\\{hoodNode.HoodSubFolder}_Neighborhood.package";
+                        string mainHoodPackagePath = $"{hoodNode.HoodBaseFolder}\\{hoodNode.HoodSubFolder}_Neighborhood.package";
 
-                        foreach (string subHoodPackagePath in Directory.GetFiles($"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods\\{hoodNode.HoodSubFolder}", $"{hoodNode.HoodSubFolder}_*.package", SearchOption.TopDirectoryOnly))
+                        foreach (string subHoodPackagePath in Directory.GetFiles($"{hoodNode.HoodBaseFolder}\\{hoodNode.HoodSubFolder}", $"{hoodNode.HoodSubFolder}_*.package", SearchOption.TopDirectoryOnly))
                         {
                             if (!mainHoodPackagePath.Equals(subHoodPackagePath))
                             {
@@ -383,7 +418,7 @@ namespace FamilyManager
             return hoodType;
         }
 
-        public FamilyData(DbpfFileCache packageCache, HoodTreeNode hoodNode, FamilyTreeNode familyNode)
+        public FamilyData(DbpfFileCache packageCache, HoodTreeNode hoodNode, string familyName, TypeInstanceID familyId)
         {
             this.packageCache = packageCache;
             famiPackagePath = hoodNode.PackagePath;
@@ -393,17 +428,17 @@ namespace FamilyManager
             {
                 CacheableDbpfFile subhoodPackage = familyPackage;
 
-                fami = (Fami)familyPackage.GetResourceByKey(new DBPFKey(Fami.TYPE, DBPFData.GROUP_LOCAL, familyNode.FamilyId, DBPFData.RESOURCE_NULL));
+                fami = (Fami)familyPackage.GetResourceByKey(new DBPFKey(Fami.TYPE, DBPFData.GROUP_LOCAL, familyId, DBPFData.RESOURCE_NULL));
 
                 if (fami != null)
                 {
-                    familyName = familyNode.Text;
+                    this.familyName = familyName;
 
                     famiStr = (Str)familyPackage.GetResourceByKey(new DBPFKey(Str.TYPE, fami));
 
                     if (famiStr != null)
                     {
-                        familyName = FamilyManagerForm.GetString(famiStr, 0);
+                        this.familyName = FamilyManagerForm.GetString(famiStr, 0);
                         familyWriteUp = FamilyManagerForm.GetString(famiStr, 1);
                     }
 
@@ -412,9 +447,9 @@ namespace FamilyManager
 
                     if (ltxt == null)
                     {
-                        string mainHoodPackage = $"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods\\{hoodNode.HoodSubFolder}_Neighborhood.package";
+                        string mainHoodPackage = $"{hoodNode.HoodBaseFolder}\\{hoodNode.HoodSubFolder}_Neighborhood.package";
 
-                        foreach (string subhood in Directory.GetFiles($"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods\\{hoodNode.HoodSubFolder}", $"{hoodNode.HoodSubFolder}_*.package", SearchOption.TopDirectoryOnly))
+                        foreach (string subhood in Directory.GetFiles($"{hoodNode.HoodBaseFolder}\\{hoodNode.HoodSubFolder}", $"{hoodNode.HoodSubFolder}_*.package", SearchOption.TopDirectoryOnly))
                         {
                             if (!mainHoodPackage.Equals(subhood))
                             {
@@ -442,7 +477,7 @@ namespace FamilyManager
                         lotAddress = FamilyManagerForm.GetString(ltxtStr, 0);
                         lotDescription = FamilyManagerForm.GetString(ltxtStr, 1);
 
-                        lotdPackagePath = $"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods\\{hoodNode.HoodSubFolder}\\Lots\\{hoodNode.HoodSubFolder}_Lot{ltxt.InstanceID.AsUInt()}.package";
+                        lotdPackagePath = $"{hoodNode.HoodBaseFolder}\\{hoodNode.HoodSubFolder}\\Lots\\{hoodNode.HoodSubFolder}_Lot{ltxt.InstanceID.AsUInt()}.package";
                         if (File.Exists(lotdPackagePath))
                         {
                             using (CacheableDbpfFile lotPackage = packageCache.OpenForReadOnly(lotdPackagePath))
@@ -478,11 +513,11 @@ namespace FamilyManager
                 familyPackage.Close();
             }
 
-            string thumbnailPath = $"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods\\{hoodNode.HoodSubFolder}\\Thumbnails\\{hoodNode.HoodSubFolder}_FamilyThumbnails.package";
+            string thumbnailPath = $"{hoodNode.HoodBaseFolder}\\{hoodNode.HoodSubFolder}\\Thumbnails\\{hoodNode.HoodSubFolder}_FamilyThumbnails.package";
 
             using (CacheableDbpfFile thumbnailPackage = packageCache.OpenForReadOnly(thumbnailPath))
             {
-                Jpg jpg = (Jpg)thumbnailPackage.GetResourceByKey(new DBPFKey(Jpg.TYPE, DBPFData.GROUP_LOCAL, familyNode.FamilyId, DBPFData.RESOURCE_NULL));
+                Jpg jpg = (Jpg)thumbnailPackage.GetResourceByKey(new DBPFKey(Jpg.TYPE, DBPFData.GROUP_LOCAL, familyId, DBPFData.RESOURCE_NULL));
 
                 if (jpg != null)
                 {

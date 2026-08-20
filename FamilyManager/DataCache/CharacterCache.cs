@@ -11,6 +11,7 @@ using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.Data;
 using Sims2Tools.DBPF.Images.IMG;
+using Sims2Tools.DBPF.InventoryTokens;
 using Sims2Tools.DBPF.Neighbourhood;
 using Sims2Tools.DBPF.Neighbourhood.NGBH;
 using Sims2Tools.DBPF.Neighbourhood.SCOR;
@@ -18,6 +19,7 @@ using Sims2Tools.DBPF.Neighbourhood.SDSC;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
+using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DbpfCache;
 using Sims2Tools.Helpers;
 using System;
@@ -52,6 +54,12 @@ namespace FamilyManager.Caching
         private Scor scor = null;
 
         public bool IsDirty => (ctss != null && ctss.IsDirty) || (sdsc != null && sdsc.IsDirty) || (scor != null && scor.IsDirty);
+
+        public bool HasChanges
+        {
+            get => HasAspirationChanges || HasBenefitChanges || HasUniversityChanges;
+            set => HasAspirationChanges = HasBenefitChanges = HasUniversityChanges = false;
+        }
 
         #region Constructor
         public CharacterData(string packagePath, TypeGUID guid, TypeInstanceID ctssId)
@@ -172,8 +180,11 @@ namespace FamilyManager.Caching
 
         public bool IsToddlerOrOlder => (GetSdscValue(SdscIndex.PersonAge) >= (int)LifeSections.Toddler) && IsHuman;
         public bool IsChildOrOlder => (GetSdscValue(SdscIndex.PersonAge) >= (int)LifeSections.Child) && IsHuman;
+        public bool IsTeenOrOlder => (GetSdscValue(SdscIndex.PersonAge) >= (int)LifeSections.Teen) && IsHuman;
         public bool IsYoungAdultOrOlder => (GetSdscValue(SdscIndex.PersonAge) >= (int)LifeSections.Adult) && IsHuman;
         public bool IsAdultOrOlder => (GetSdscValue(SdscIndex.PersonAge) >= (int)LifeSections.Adult) && !IsYoungAdult;
+        public bool IsToddler => (GetSdscValue(SdscIndex.PersonAge) == (int)LifeSections.Toddler) && IsHuman;
+        public bool IsChild => (GetSdscValue(SdscIndex.PersonAge) == (int)LifeSections.Child) && IsHuman;
         public bool IsTeen => (GetSdscValue(SdscIndex.PersonAge) == (int)LifeSections.Teen) && IsHuman;
         public bool IsElder => (GetSdscValue(SdscIndex.PersonAge) == (int)LifeSections.Elder) && IsHuman;
         public bool IsYoungAdult
@@ -198,6 +209,328 @@ namespace FamilyManager.Caching
             ushort value = (ushort)Math.Max(0, DaysLeft + delta);
 
             SetSdscValue(SdscIndex.AgeDaysLeft, value);
+        }
+        #endregion
+
+        #region Info (Aspirations)
+        private readonly Dictionary<ushort, int> aspirationMappingsGameToApp = new Dictionary<ushort, int>() {
+            { 0x0000, -1 }, // None
+            { 0x0040, 0 }, // Grow Up
+            { 0x0002, 1 }, // Family
+            { 0x0004, 2 }, // Fortune
+            { 0x0100, 3 }, // Grilled Cheese
+            { 0x0020, 4 }, // Knowledge
+            { 0x0080, 5 }, // Pleasure
+            { 0x0010, 6 }, // Popularity
+            { 0x0001, 7 }, // Romance
+        };
+
+        private readonly Dictionary<int, ushort> aspirationMappingsAppToGame = new Dictionary<int, ushort>() {
+            { -1, 0x0000 }, // None
+            { 0, 0x0040 }, // Grow Up
+            { 1, 0x0002 }, // Family
+            { 2, 0x0004 }, // Fortune
+            { 3, 0x0100 }, // Grilled Cheese
+            { 4, 0x0020 }, // Knowledge
+            { 5, 0x0080 }, // Pleasure
+            { 6, 0x0010 }, // Popularity
+            { 7, 0x0001 }, // Romance
+        };
+
+        private bool hasAspirationChanges = false;
+        private bool hasBenefitChanges = false;
+
+        public bool HasAspirationChanges
+        {
+            get => hasAspirationChanges;
+            set => hasAspirationChanges = value;
+        }
+
+        public bool HasBenefitChanges
+        {
+            get => hasBenefitChanges;
+            set => hasBenefitChanges = value;
+        }
+
+        public ushort AspirationPrimaryRaw
+        {
+            get
+            {
+                ushort aspPri = GetSdscValue(SdscIndex.Aspiration);
+                ushort aspSec = AspirationSecondaryRaw;
+
+                return (aspSec == 0x0000) ? aspPri : (ushort)(aspPri ^ aspSec);
+            }
+        }
+
+        public int AspirationPrimary
+        {
+            get
+            {
+                ushort aspPri = GetSdscValue(SdscIndex.Aspiration);
+                ushort aspSec = AspirationSecondaryRaw;
+
+                ushort asp = (aspSec == 0x0000) ? aspPri : (ushort)(aspPri ^ aspSec);
+
+                if (aspirationMappingsGameToApp.ContainsKey(asp))
+                {
+                    return aspirationMappingsGameToApp[asp];
+                }
+
+                throw new Exception("Can't decode primary aspiration");
+            }
+            set
+            {
+                if (AspirationPrimary != value)
+                {
+                    // Remove primary aspiration token(s)
+                    {
+                        // No token for Grow Up
+                        CharacterCache.RemoveSimInvToken(sdsc, Personal.TOKEN_ASP_FAMILY);
+                        CharacterCache.RemoveSimInvToken(sdsc, Personal.TOKEN_ASP_FORTUNE);
+                        // No token for Grilled Cheese
+                        CharacterCache.RemoveSimInvToken(sdsc, Personal.TOKEN_ASP_KNOWLEDGE);
+                        // No token for Pleasure (Fun)
+                        CharacterCache.RemoveSimInvToken(sdsc, Personal.TOKEN_ASP_POPULARITY);
+                        CharacterCache.RemoveSimInvToken(sdsc, Personal.TOKEN_ASP_ROMANCE);
+                    }
+
+                    // Add new primary aspiration token
+                    {
+                        TypeGUID tokenGuid = DBPFData.GUID_NULL;
+
+                        switch (value)
+                        {
+                            case 1:
+                                tokenGuid = Personal.TOKEN_ASP_FAMILY;
+                                break;
+                            case 2:
+                                tokenGuid = Personal.TOKEN_ASP_FORTUNE;
+                                break;
+                            case 4:
+                                tokenGuid = Personal.TOKEN_ASP_KNOWLEDGE;
+                                break;
+                            case 6:
+                                tokenGuid = Personal.TOKEN_ASP_POPULARITY;
+                                break;
+                            case 7:
+                                tokenGuid = Personal.TOKEN_ASP_ROMANCE;
+                                break;
+                        }
+
+                        if (tokenGuid != DBPFData.GUID_NULL)
+                        {
+                            CharacterCache.AddSimInvTokenValue(sdsc, tokenGuid, false, 0, new ushort[] { 0 });
+                        }
+                    }
+
+                    { // Set the primary aspiration flag
+                        ushort aspFlags = (ushort)(aspirationMappingsAppToGame[value] | AspirationSecondaryRaw);
+
+                        SetSdscValue(SdscIndex.Aspiration, aspFlags);
+                    }
+                }
+            }
+        }
+
+        private NgbhInventoryToken GetSecondaryAspirationToken(bool createIfMissing)
+        {
+            NgbhInventoryToken token = CharacterCache.GetSimInvToken(sdsc, Personal.TOKEN_ASP_SECONDARY);
+
+            if (token == null && createIfMissing)
+            {
+                token = CharacterCache.AddSimInvTokenValue(sdsc, Personal.TOKEN_ASP_SECONDARY, false, 0, new ushort[] { 0 });
+            }
+
+            return token;
+        }
+
+        private ushort AspirationSecondaryRaw
+        {
+            get
+            {
+                NgbhInventoryToken token = GetSecondaryAspirationToken(false);
+
+                if (token != null)
+                {
+                    return token.GetValue(0);
+                }
+
+                return 0x0000;
+            }
+        }
+
+        public int AspirationSecondary
+        {
+            get
+            {
+                int asp = aspirationMappingsGameToApp[AspirationSecondaryRaw];
+
+                if (asp == -1) asp = 0; //For secondary, -1 (none) is mapped to 0 (as Grow Up is not valid)
+
+                return asp;
+            }
+            set
+            {
+                ushort aspFlags;
+                ushort aspPriRaw = AspirationPrimaryRaw; // Get this before setting the new secondary aspiration as we need the old secondary value to calculate it!
+
+                if (value == 0)
+                {
+                    aspFlags = 0x0000;
+
+                    // Remove secondary aspiration token
+                    CharacterCache.RemoveSimInvToken(sdsc, Personal.TOKEN_ASP_SECONDARY);
+                }
+                else
+                {
+                    aspFlags = aspirationMappingsAppToGame[value];
+
+                    //   Update/Create secondary aspiration token
+                    if (!CharacterCache.SetSimInvTokenValue(sdsc, Personal.TOKEN_ASP_SECONDARY, 0, aspFlags))
+                    {
+                        CharacterCache.AddSimInvTokenValue(sdsc, Personal.TOKEN_ASP_SECONDARY, false, 0, new ushort[] { aspFlags });
+                    }
+                }
+
+                SetSdscValue(SdscIndex.Aspiration, (ushort)(aspPriRaw | aspFlags));
+            }
+        }
+
+        public uint AspirationPoints
+        {
+            get => (uint)(GetSdscValue(SdscIndex.AspirationRewardPointsSpentDiv10, 0, 32767) * 10);
+            set => SetSdscValue(SdscIndex.AspirationRewardPointsSpentDiv10, (ushort)(value / 10));
+        }
+
+        public uint AspirationScoreRawDiv10
+        {
+            get => GetSdscValue(SdscIndex.AspirationScoreRawDiv10, 0, 1500);
+            set => SetSdscValue(SdscIndex.AspirationScoreRawDiv10, (ushort)value);
+        }
+
+        public int AspirationScore
+        {
+            get => (short)GetSdscValue(SdscIndex.AspirationScore);
+            set => SetSdscValue(SdscIndex.AspirationScore, (ushort)value);
+        }
+
+        public uint AspirationLongTerm
+        {
+            get => GetSdscValue(SdscIndex.LongTermAspiration, 0, 32000);
+            set => SetSdscValue(SdscIndex.LongTermAspiration, (short)value, 0, 32000);
+        }
+
+        public bool IsPermanentPlatinum
+        {
+            get => ((GetSdscValue(SdscIndex.LifeState) & 0x0002) == 0x0002);
+            set
+            {
+                ushort flags = GetSdscValue(SdscIndex.LifeState);
+                flags &= 0xFFFD;
+                if (value) flags |= 0x0002;
+
+                if (flags != GetSdscValue(SdscIndex.LifeState)) SetSdscValue(SdscIndex.LifeState, flags);
+            }
+        }
+
+        private readonly List<int> superpowerProps = new List<int>() { 0, 2, 1, 2, 1, 2, 1, 1, 2, 3 };
+        private readonly List<int> superpowerOffset = new List<int>() { 0, 4, 8, 8, 12, 0, 0, 4, 12, 0 };
+        private NgbhInventoryToken GetSuperpowerToken(bool createIfMissing)
+        {
+            NgbhInventoryToken token = CharacterCache.GetSimInvToken(sdsc, Personal.TOKEN_ASP_SUPERPOWERS);
+
+            if (token == null && createIfMissing)
+            {
+                token = CharacterCache.AddSimInvTokenValue(sdsc, Personal.TOKEN_ASP_SUPERPOWERS, false, 0, new ushort[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+            }
+
+            return token;
+        }
+
+        public bool HasSuperpower(uint aspiration, int index)
+        {
+            NgbhInventoryToken token = GetSuperpowerToken(false);
+
+            if (token != null)
+            {
+                int prop = superpowerProps[(int)aspiration];
+                int flag = superpowerOffset[(int)aspiration] + (index - 1);
+
+                FlagBase flags = new FlagBase(token.GetValue(prop - 1));
+                return flags.GetBit((byte)flag);
+            }
+
+            return false;
+        }
+
+        public void ClearSuperpowers()
+        {
+            NgbhInventoryToken token = GetSuperpowerToken(false);
+
+            if (token != null)
+            {
+                token.SetValue(0, 0x0000);
+                token.SetValue(1, 0x0000);
+                token.SetValue(2, 0x0000);
+            }
+        }
+
+        public void GiveSuperpower(uint aspiration, int index)
+        {
+            NgbhInventoryToken token = GetSuperpowerToken(true);
+
+            if (token != null)
+            {
+                int prop = superpowerProps[(int)aspiration];
+                int flag = superpowerOffset[(int)aspiration] + (index - 1);
+
+                FlagBase flags = new FlagBase(token.GetValue(prop - 1));
+                flags.SetBit((byte)flag, true);
+                token.SetValue(prop - 1, flags.Value);
+            }
+        }
+
+        public void SetSuperpowerCount(int prop, ushort value)
+        {
+            GetSuperpowerToken(true)?.SetValue(prop - 1, value);
+        }
+
+        public int SuperpowerPointsAvailable
+        {
+            get => (short)GetSdscValue(SdscIndex.LTAUnlockPoints, 0, 16);
+            set => SetSdscValue(SdscIndex.LTAUnlockPoints, (short)value, 0, 16);
+        }
+
+        public int SuperpowerPointsSpent
+        {
+            get => (short)GetSdscValue(SdscIndex.LTAUnlocksSpent, 0, 16);
+            set => SetSdscValue(SdscIndex.LTAUnlocksSpent, (short)value, 0, 16);
+        }
+
+        public int SuperpowerPointsUnused
+        {
+            get => (SuperpowerPointsAvailable - SuperpowerPointsSpent);
+        }
+
+        public void RemoveAllMotiveDecayTokens()
+        {
+            CharacterCache.RemoveSimMotiveDecayTokens(sdsc);
+        }
+
+        public void CreateMotiveDecayToken(ushort owner, ushort bladder, ushort comfort, ushort energy, ushort fun, ushort hunger, ushort hygiene, ushort social)
+        {
+            ushort[] data = new ushort[] { 1, owner, 0, 0, 0, hunger, comfort, bladder, energy, hygiene, fun, social, 0 };
+
+            sdsc.IncRawData(SdscIndex.BladderDecayModifier, (short)bladder);
+            sdsc.IncRawData(SdscIndex.ComfortDecayModifier, (short)comfort);
+            sdsc.IncRawData(SdscIndex.EnergyDecayModifier, (short)energy);
+            sdsc.IncRawData(SdscIndex.FunDecayModifier, (short)fun);
+            sdsc.IncRawData(SdscIndex.HungerDecayModifier, (short)hunger);
+            sdsc.IncRawData(SdscIndex.HygieneDecayModifier, (short)hygiene);
+            sdsc.IncRawData(SdscIndex.SocialDecayModifier, (short)social);
+
+            CharacterCache.AddSimInvTokenValue(sdsc, Personal.TOKEN_ASP_MOTIVE_DECAY, false, 0, data);
         }
         #endregion
 
@@ -229,6 +562,14 @@ namespace FamilyManager.Caching
         #endregion
 
         #region Info (University)
+        private bool hasUniversityChanges = false;
+
+        public bool HasUniversityChanges
+        {
+            get => hasUniversityChanges;
+            set => hasUniversityChanges = value;
+        }
+
         public bool OnCampus => IsYoungAdult;
         public bool Graduated => IsAdultOrOlder && ((UniInfoFlags & 0x0040) == 0x0040);
         public bool DroppedOut => IsAdultOrOlder && ((UniInfoFlags & 0x1000) == 0x1000);
@@ -286,6 +627,55 @@ namespace FamilyManager.Caching
         }
         public bool UniProbation => ((GetSdscValue(SdscIndex.UniSemesterInfoFlags) & 0x0020) == 0x0020);
         public bool UniStudying => ((GetSdscValue(SdscIndex.UniSemesterInfoFlags) & 0x0010) == 0x0010);
+        public bool UniSecretSociety
+        {
+            get
+            {
+                return (CharacterCache.GetSimInvToken(sdsc, Personal.TOKEN_UNI_SECRET_SOCIETY) != null);
+            }
+            set
+            {
+                if (value != UniSecretSociety)
+                {
+                    if (value)
+                    {
+                        CharacterCache.AddSimInvTokenValue(sdsc, Personal.TOKEN_UNI_SECRET_SOCIETY, false, 0, new ushort[] { });
+                    }
+                    else
+                    {
+                        CharacterCache.RemoveSimInvToken(sdsc, Personal.TOKEN_UNI_SECRET_SOCIETY);
+                    }
+                }
+            }
+        }
+
+        public void UniSyncGpaToken()
+        {
+            NgbhInventoryToken token = CharacterCache.GetSimInvToken(sdsc, Personal.TOKEN_UNI_GPA);
+
+            int oldValueCount = (token == null) ? 0 : token.PropertyCount;
+            int newValueCount = UniSemester - 1;
+
+            if (oldValueCount != newValueCount)
+            {
+                ushort[] gpaValues = new ushort[newValueCount];
+                ushort newGpaValue = GetSdscValue(SdscIndex.UniCurrentGPA, 0, 1000);
+
+                int newIndex = 0;
+                for (int oldIndex = 0; oldIndex < Math.Min(oldValueCount, newValueCount); ++oldIndex)
+                {
+                    gpaValues[newIndex++] = token.GetValue(oldIndex);
+                }
+
+                while (newIndex < newValueCount)
+                {
+                    gpaValues[newIndex++] = newGpaValue;
+                }
+
+                CharacterCache.RemoveSimInvToken(sdsc, Personal.TOKEN_UNI_GPA);
+                CharacterCache.AddSimInvTokenValue(sdsc, Personal.TOKEN_UNI_GPA, false, 0, gpaValues);
+            }
+        }
         #endregion
 
         #region Info (Job)
@@ -466,7 +856,7 @@ namespace FamilyManager.Caching
 
             if (!CharacterCache.SetSimInvTokenValue(sdsc, guid, prop - 1, value))
             {
-                if (guid == (TypeGUID)0x4D8B0CC3)
+                if (guid == Personal.TOKEN_MISC_SKILL)
                 {
                     // "Token - Misc Skill" is a normal token
                     ushort[] data = new ushort[] { 0, 0, 0, 0, 0, 0 };
@@ -481,7 +871,7 @@ namespace FamilyManager.Caching
                 }
             }
 
-            if (guid == (TypeGUID)0x6FE7E453)
+            if (guid == Personal.TOKEN_DANCE_EXP)
             {
                 ushort skill = 0;
 
@@ -527,9 +917,9 @@ namespace FamilyManager.Caching
                     skill = 1;
                 }
 
-                if (!CharacterCache.SetSimInvTokenValue(sdsc, (TypeGUID)0x0DA265F4, 0, skill))
+                if (!CharacterCache.SetSimInvTokenValue(sdsc, Personal.TOKEN_DANCE_SKILL, 0, skill))
                 {
-                    CharacterCache.AddSimInvTokenValue(sdsc, (TypeGUID)0x0DA265F4, true, 0, new ushort[] { skill, 0 });
+                    CharacterCache.AddSimInvTokenValue(sdsc, Personal.TOKEN_DANCE_SKILL, true, 0, new ushort[] { skill, 0 });
                 }
             }
         }
@@ -554,7 +944,7 @@ namespace FamilyManager.Caching
 
             if (!CharacterCache.SetSimInvTokenValue(sdsc, guid, 0, value))
             {
-                if (guid == (TypeGUID)0xB3F2D735)
+                if (guid == Personal.TOKEN_PSYCHIC_PARENT)
                 {
                     // "Token - Psychic Parent" (0xB3F2D735) is a normal token
                     CharacterCache.AddSimInvTokenValue(sdsc, guid, false, 0, new ushort[] { value });
@@ -679,6 +1069,11 @@ namespace FamilyManager.Caching
             }
 
             return value;
+        }
+
+        private void SetSdscValue(SdscIndex index, short value, short min, short max)
+        {
+            SetSdscValue(index, (ushort)Math.Min(max, Math.Max(min, value)));
         }
 
         private void SetSdscValue(SdscIndex index, ushort value)
@@ -1049,6 +1444,55 @@ namespace FamilyManager.Caching
             return token;
         }
 
+        internal static void RemoveSimMotiveDecayTokens(Sdsc sdsc)
+        {
+            if (sdsc != null)
+            {
+                Ngbh ngbh = GetNgbh();
+
+                if (ngbh != null)
+                {
+                    NgbhSimInventory simInv = ngbh.SimInventory(sdsc.SimInstance);
+
+                    foreach (NgbhInventoryToken token in simInv.FindTokensByGuid(Personal.TOKEN_ASP_MOTIVE_DECAY))
+                    {
+                        if (token.GetValue(0) == 1) // Is this a "LTA Superpowers" token?
+                        {
+                            sdsc.IncRawData(SdscIndex.HungerDecayModifier, (short)(-1 * ((short)token.GetValue(5))));
+                            sdsc.IncRawData(SdscIndex.ComfortDecayModifier, (short)(-1 * ((short)token.GetValue(6))));
+                            sdsc.IncRawData(SdscIndex.BladderDecayModifier, (short)(-1 * ((short)token.GetValue(7))));
+                            sdsc.IncRawData(SdscIndex.EnergyDecayModifier, (short)(-1 * ((short)token.GetValue(8))));
+                            sdsc.IncRawData(SdscIndex.HygieneDecayModifier, (short)(-1 * ((short)token.GetValue(9))));
+                            sdsc.IncRawData(SdscIndex.FunDecayModifier, (short)(-1 * ((short)token.GetValue(10))));
+                            sdsc.IncRawData(SdscIndex.SocialDecayModifier, (short)(-1 * ((short)token.GetValue(11))));
+                        }
+                    }
+                }
+            }
+
+            RemoveSimInvToken(sdsc, Personal.TOKEN_ASP_MOTIVE_DECAY, 1, 1);
+        }
+
+        internal static void RemoveSimInvToken(Sdsc sdsc, TypeGUID guid)
+        {
+            RemoveSimInvToken(sdsc, guid, 0, 0);
+        }
+
+        internal static void RemoveSimInvToken(Sdsc sdsc, TypeGUID guid, int prop, ushort value)
+        {
+            if (sdsc != null)
+            {
+                Ngbh ngbh = GetNgbh();
+
+                if (ngbh != null)
+                {
+                    NgbhSimInventory simInv = ngbh.SimInventory(sdsc.SimInstance);
+
+                    simInv.RemoveTokensByGuid(guid, prop, value);
+                }
+            }
+        }
+
         internal static ushort GetSimInvTokenValue(Sdsc sdsc, TypeGUID guid, int index)
         {
             NgbhInventoryToken token = GetSimInvToken(sdsc, guid);
@@ -1058,8 +1502,11 @@ namespace FamilyManager.Caching
 
         internal static bool SetSimInvTokenValue(Sdsc sdsc, TypeGUID guid, int index, ushort value)
         {
-            NgbhInventoryToken token = GetSimInvToken(sdsc, guid);
+            return SetSimInvTokenValue(GetSimInvToken(sdsc, guid), index, value);
+        }
 
+        internal static bool SetSimInvTokenValue(NgbhInventoryToken token, int index, ushort value)
+        {
             if (token != null && token.GetValue(index) != value)
             {
                 token.SetValue(index, value);
@@ -1075,15 +1522,17 @@ namespace FamilyManager.Caching
             return (token != null);
         }
 
-        internal static void AddSimInvTokenValue(Sdsc sdsc, TypeGUID guid, bool isCounted, ushort flags, ushort[] values)
+        internal static NgbhInventoryToken AddSimInvTokenValue(Sdsc sdsc, TypeGUID guid, bool isCounted, ushort flags, ushort[] values)
         {
+            NgbhInventoryToken token = null;
+
             if (sdsc != null)
             {
                 Ngbh ngbh = GetNgbh();
 
                 if (ngbh != null)
                 {
-                    ngbh.SimInventory(sdsc.SimInstance)?.AddToken(guid, isCounted, flags, values);
+                    token = ngbh.SimInventory(sdsc.SimInstance)?.AddToken(guid, isCounted, flags, values);
 
                     using (CacheableDbpfFile hoodPackage = CharacterCache.cache.OpenForUpdate(currentHoodNode.PackagePath))
                     {
@@ -1093,6 +1542,8 @@ namespace FamilyManager.Caching
                     }
                 }
             }
+
+            return token;
         }
         #endregion
 
@@ -1130,7 +1581,7 @@ namespace FamilyManager.Caching
         {
             Dictionary<TypeGUID, CharacterData> characterCache = new Dictionary<TypeGUID, CharacterData>();
 
-            string baseFolder = $"{Sims2ToolsLib.Sims2HomePath}\\Neighborhoods\\{hoodNode.HoodSubFolder}\\Characters";
+            string baseFolder = $"{hoodNode.HoodBaseFolder}\\{hoodNode.HoodSubFolder}\\Characters";
             string[] characterFiles = Directory.GetFiles(baseFolder, "*.package", SearchOption.TopDirectoryOnly);
 
             if (characterFiles.Length < 1) return characterCache;

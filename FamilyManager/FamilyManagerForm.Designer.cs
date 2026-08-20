@@ -41,6 +41,7 @@ namespace FamilyManager
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FamilyManagerForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -111,6 +112,32 @@ namespace FamilyManager
             this.menuContextMemberSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuContextMemberMergeSplitFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPages = new System.Windows.Forms.TabControl();
+            this.tabCensus = new System.Windows.Forms.TabPage();
+            this.gridCensus = new System.Windows.Forms.DataGridView();
+            this.colCensusVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusSubhood = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusEM = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusEF = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusAM = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusAF = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusYAM = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusYAF = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusTM = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusTF = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusCM = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusCF = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusPM = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusPF = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusBM = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusBF = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusAddress = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colCensusFamilyID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.menuContextJewelbox = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuContextJewelboxCopyToSafe = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextJewelboxMoveToSafe = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuContextJewelboxDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.tabFamily = new System.Windows.Forms.TabPage();
             this.panelFamily = new System.Windows.Forms.Panel();
             this.ckbFamilyNameSelected = new System.Windows.Forms.CheckBox();
@@ -196,11 +223,6 @@ namespace FamilyManager
             this.colJewelboxAgeHex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colJewelboxThumbKey = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colJewelboxLocalThumbKey = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextJewelbox = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.menuContextJewelboxCopyToSafe = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuContextJewelboxMoveToSafe = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
-            this.menuContextJewelboxDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.btnJewelboxEmpty = new System.Windows.Forms.Button();
             this.btnJewelboxSave = new System.Windows.Forms.Button();
             this.btnJewelboxLoad = new System.Windows.Forms.Button();
@@ -233,8 +255,65 @@ namespace FamilyManager
             this.btnSafeMove = new System.Windows.Forms.Button();
             this.btnSafeDelete = new System.Windows.Forms.Button();
             this.btnSafeShowAll = new System.Windows.Forms.Button();
+            this.tabAspiration = new System.Windows.Forms.TabPage();
+            this.grpModifiers = new System.Windows.Forms.GroupBox();
+            this.textMotiveDecaySocial = new Sims2Tools.Controls.UIntTextBox();
+            this.textMotiveDecayHygiene = new Sims2Tools.Controls.UIntTextBox();
+            this.textMotiveDecayHunger = new Sims2Tools.Controls.UIntTextBox();
+            this.textMotiveDecayFun = new Sims2Tools.Controls.UIntTextBox();
+            this.textMotiveDecayEnergy = new Sims2Tools.Controls.UIntTextBox();
+            this.textMotiveDecayComfort = new Sims2Tools.Controls.UIntTextBox();
+            this.textMotiveDecayBladder = new Sims2Tools.Controls.UIntTextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.lblDecayBladder = new System.Windows.Forms.Label();
+            this.grpBenefits = new System.Windows.Forms.GroupBox();
+            this.btnAspNeeds1 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspNeeds2 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspNeeds3 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspNeeds4 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspWork1 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspWork2 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspWork3 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspWork4 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspPrimary1 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspPrimary2 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspPrimary3 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspPrimary4 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspSecondary1 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspSecondary2 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspSecondary3 = new Sims2Tools.Controls.BenefitButton();
+            this.btnAspSecondary4 = new Sims2Tools.Controls.BenefitButton();
+            this.btnBenefitsClear = new System.Windows.Forms.Button();
+            this.lblBenefitsUnused = new System.Windows.Forms.Label();
+            this.textBenefitsUnused = new Sims2Tools.Controls.UIntTextBox();
+            this.lblBenefitsSecondary = new System.Windows.Forms.Label();
+            this.lblBenefitsPrimary = new System.Windows.Forms.Label();
+            this.lblBenefitsWork = new System.Windows.Forms.Label();
+            this.lblBenefitsNeeds = new System.Windows.Forms.Label();
+            this.imageAspirationsSim = new System.Windows.Forms.PictureBox();
+            this.grpAspiration = new System.Windows.Forms.GroupBox();
+            this.ckbAspirationPermaPlat = new System.Windows.Forms.CheckBox();
+            this.ckbAspirationLock = new System.Windows.Forms.CheckBox();
+            this.textAspirationLongTerm = new Sims2Tools.Controls.UIntTextBox();
+            this.textAspirationMeter = new Sims2Tools.Controls.UIntTextBox();
+            this.trackAspirationMeter = new Sims2Tools.Controls.SimTrackingBar();
+            this.label4 = new System.Windows.Forms.Label();
+            this.lblAspirationMeter = new System.Windows.Forms.Label();
+            this.textAspirationScore = new Sims2Tools.Controls.IntTextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.textAspirationPoints = new Sims2Tools.Controls.UIntTextBox();
+            this.lblAspirationPoints = new System.Windows.Forms.Label();
+            this.comboAspirationSecondary = new System.Windows.Forms.ComboBox();
+            this.lblAspirationSecondary = new System.Windows.Forms.Label();
+            this.lblAspirationPrimary = new System.Windows.Forms.Label();
+            this.comboAspirationPrimary = new System.Windows.Forms.ComboBox();
             this.tabCareer = new System.Windows.Forms.TabPage();
-            this.imageSim = new System.Windows.Forms.PictureBox();
+            this.imageCareerSim = new System.Windows.Forms.PictureBox();
             this.grpJob = new System.Windows.Forms.GroupBox();
             this.lblJobPTOSummary = new System.Windows.Forms.Label();
             this.textJobRetiredGUID = new Sims2Tools.Controls.GuidTextBox();
@@ -257,6 +336,8 @@ namespace FamilyManager
             this.lblJobType = new System.Windows.Forms.Label();
             this.comboJobType = new System.Windows.Forms.ComboBox();
             this.grpUniversity = new System.Windows.Forms.GroupBox();
+            this.ckbUniSecretSoc = new System.Windows.Forms.CheckBox();
+            this.lblUniSecretSoc = new System.Windows.Forms.Label();
             this.textUniGrade = new Sims2Tools.Controls.DoubleTextBox();
             this.textUniTimeLeft = new Sims2Tools.Controls.UIntTextBox();
             this.textUniInfluence = new Sims2Tools.Controls.UIntTextBox();
@@ -326,6 +407,10 @@ namespace FamilyManager
             this.trackSkillToddlerPotty = new Sims2Tools.Controls.SkillTracker();
             this.lblSkillToddlerPotty = new System.Windows.Forms.Label();
             this.grpSkillsHidden = new System.Windows.Forms.GroupBox();
+            this.trackSkillHiddenFireDance = new Sims2Tools.Controls.SkillTracker();
+            this.lblSkillHiddenFireDance = new System.Windows.Forms.Label();
+            this.trackSkillHiddenBreakDance = new Sims2Tools.Controls.SkillTracker();
+            this.lblSkillHiddenBreakDance = new System.Windows.Forms.Label();
             this.trackSkillHiddenTaiChi = new Sims2Tools.Controls.SkillTracker();
             this.trackSkillHiddenStudy = new Sims2Tools.Controls.SkillTracker();
             this.trackSkillHiddenPool = new Sims2Tools.Controls.SkillTracker();
@@ -447,10 +532,6 @@ namespace FamilyManager
             this.saveJewelboxFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openJewelboxFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.trackSkillHiddenBreakDance = new Sims2Tools.Controls.SkillTracker();
-            this.lblSkillHiddenBreakDance = new System.Windows.Forms.Label();
-            this.trackSkillHiddenFireDance = new Sims2Tools.Controls.SkillTracker();
-            this.lblSkillHiddenFireDance = new System.Windows.Forms.Label();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
             this.splitTopBottom.Panel1.SuspendLayout();
@@ -464,6 +545,9 @@ namespace FamilyManager
             ((System.ComponentModel.ISupportInitialize)(this.gridFamilyMembers)).BeginInit();
             this.menuContextMembers.SuspendLayout();
             this.tabPages.SuspendLayout();
+            this.tabCensus.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.gridCensus)).BeginInit();
+            this.menuContextJewelbox.SuspendLayout();
             this.tabFamily.SuspendLayout();
             this.panelFamily.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imageHouse)).BeginInit();
@@ -482,11 +566,15 @@ namespace FamilyManager
             this.splitSafeLeftRight.Panel2.SuspendLayout();
             this.splitSafeLeftRight.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridJewelbox)).BeginInit();
-            this.menuContextJewelbox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridFamilySafe)).BeginInit();
             this.menuContextSafe.SuspendLayout();
+            this.tabAspiration.SuspendLayout();
+            this.grpModifiers.SuspendLayout();
+            this.grpBenefits.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imageAspirationsSim)).BeginInit();
+            this.grpAspiration.SuspendLayout();
             this.tabCareer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.imageSim)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imageCareerSim)).BeginInit();
             this.grpJob.SuspendLayout();
             this.grpUniversity.SuspendLayout();
             this.grpSchool.SuspendLayout();
@@ -1124,9 +1212,11 @@ namespace FamilyManager
             // tabPages
             // 
             this.tabPages.Alignment = System.Windows.Forms.TabAlignment.Bottom;
+            this.tabPages.Controls.Add(this.tabCensus);
             this.tabPages.Controls.Add(this.tabFamily);
             this.tabPages.Controls.Add(this.tabCloset);
             this.tabPages.Controls.Add(this.tabSafe);
+            this.tabPages.Controls.Add(this.tabAspiration);
             this.tabPages.Controls.Add(this.tabCareer);
             this.tabPages.Controls.Add(this.tabSkills);
             this.tabPages.Controls.Add(this.tabInterests);
@@ -1140,13 +1230,293 @@ namespace FamilyManager
             this.tabPages.TabIndex = 4;
             this.tabPages.SelectedIndexChanged += new System.EventHandler(this.OnTabPageChanged);
             // 
+            // tabCensus
+            // 
+            this.tabCensus.Controls.Add(this.gridCensus);
+            this.tabCensus.Location = new System.Drawing.Point(4, 4);
+            this.tabCensus.Margin = new System.Windows.Forms.Padding(0);
+            this.tabCensus.Name = "tabCensus";
+            this.tabCensus.Size = new System.Drawing.Size(1276, 281);
+            this.tabCensus.TabIndex = 7;
+            this.tabCensus.Text = "Census";
+            this.tabCensus.UseVisualStyleBackColor = true;
+            // 
+            // gridCensus
+            // 
+            this.gridCensus.AllowDrop = true;
+            this.gridCensus.AllowUserToAddRows = false;
+            this.gridCensus.AllowUserToDeleteRows = false;
+            this.gridCensus.AllowUserToOrderColumns = true;
+            this.gridCensus.AllowUserToResizeRows = false;
+            this.gridCensus.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gridCensus.BackgroundColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridCensus.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.gridCensus.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.gridCensus.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colCensusVisible,
+            this.colCensusName,
+            this.colCensusSubhood,
+            this.colCensusEM,
+            this.colCensusEF,
+            this.colCensusAM,
+            this.colCensusAF,
+            this.colCensusYAM,
+            this.colCensusYAF,
+            this.colCensusTM,
+            this.colCensusTF,
+            this.colCensusCM,
+            this.colCensusCF,
+            this.colCensusPM,
+            this.colCensusPF,
+            this.colCensusBM,
+            this.colCensusBF,
+            this.colCensusAddress,
+            this.colCensusFamilyID});
+            this.gridCensus.ContextMenuStrip = this.menuContextJewelbox;
+            this.gridCensus.Location = new System.Drawing.Point(3, 3);
+            this.gridCensus.Name = "gridCensus";
+            this.gridCensus.ReadOnly = true;
+            this.gridCensus.RowHeadersVisible = false;
+            this.gridCensus.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.gridCensus.Size = new System.Drawing.Size(1273, 273);
+            this.gridCensus.TabIndex = 3;
+            this.gridCensus.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCensusGridDoubleClick);
+            // 
+            // colCensusVisible
+            // 
+            this.colCensusVisible.DataPropertyName = "Visible";
+            this.colCensusVisible.HeaderText = "Visible";
+            this.colCensusVisible.Name = "colCensusVisible";
+            this.colCensusVisible.ReadOnly = true;
+            this.colCensusVisible.Visible = false;
+            // 
+            // colCensusName
+            // 
+            this.colCensusName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusName.DataPropertyName = "Name";
+            this.colCensusName.HeaderText = "Household";
+            this.colCensusName.Name = "colCensusName";
+            this.colCensusName.ReadOnly = true;
+            this.colCensusName.Width = 92;
+            // 
+            // colCensusSubhood
+            // 
+            this.colCensusSubhood.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusSubhood.DataPropertyName = "Subhood";
+            this.colCensusSubhood.HeaderText = "Subhood";
+            this.colCensusSubhood.Name = "colCensusSubhood";
+            this.colCensusSubhood.ReadOnly = true;
+            this.colCensusSubhood.Width = 82;
+            // 
+            // colCensusEM
+            // 
+            this.colCensusEM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusEM.DataPropertyName = "EM";
+            this.colCensusEM.HeaderText = "EM";
+            this.colCensusEM.Name = "colCensusEM";
+            this.colCensusEM.ReadOnly = true;
+            this.colCensusEM.ToolTipText = "Elder Male";
+            this.colCensusEM.Width = 51;
+            // 
+            // colCensusEF
+            // 
+            this.colCensusEF.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusEF.DataPropertyName = "EF";
+            this.colCensusEF.HeaderText = "EF";
+            this.colCensusEF.Name = "colCensusEF";
+            this.colCensusEF.ReadOnly = true;
+            this.colCensusEF.ToolTipText = "Elder Female";
+            this.colCensusEF.Width = 47;
+            // 
+            // colCensusAM
+            // 
+            this.colCensusAM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusAM.DataPropertyName = "AM";
+            this.colCensusAM.HeaderText = "AM";
+            this.colCensusAM.Name = "colCensusAM";
+            this.colCensusAM.ReadOnly = true;
+            this.colCensusAM.ToolTipText = "Adult Male";
+            this.colCensusAM.Width = 50;
+            // 
+            // colCensusAF
+            // 
+            this.colCensusAF.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusAF.DataPropertyName = "AF";
+            this.colCensusAF.HeaderText = "AF";
+            this.colCensusAF.Name = "colCensusAF";
+            this.colCensusAF.ReadOnly = true;
+            this.colCensusAF.ToolTipText = "Adult Female";
+            this.colCensusAF.Width = 46;
+            // 
+            // colCensusYAM
+            // 
+            this.colCensusYAM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusYAM.DataPropertyName = "YAM";
+            this.colCensusYAM.HeaderText = "YAM";
+            this.colCensusYAM.Name = "colCensusYAM";
+            this.colCensusYAM.ReadOnly = true;
+            this.colCensusYAM.ToolTipText = "Young Adult Male";
+            this.colCensusYAM.Width = 57;
+            // 
+            // colCensusYAF
+            // 
+            this.colCensusYAF.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusYAF.DataPropertyName = "YAF";
+            this.colCensusYAF.HeaderText = "YAF";
+            this.colCensusYAF.Name = "colCensusYAF";
+            this.colCensusYAF.ReadOnly = true;
+            this.colCensusYAF.ToolTipText = "Young Adult Female";
+            this.colCensusYAF.Width = 53;
+            // 
+            // colCensusTM
+            // 
+            this.colCensusTM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusTM.DataPropertyName = "TM";
+            this.colCensusTM.HeaderText = "TM";
+            this.colCensusTM.Name = "colCensusTM";
+            this.colCensusTM.ReadOnly = true;
+            this.colCensusTM.ToolTipText = "Teen Male";
+            this.colCensusTM.Width = 50;
+            // 
+            // colCensusTF
+            // 
+            this.colCensusTF.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusTF.DataPropertyName = "TF";
+            this.colCensusTF.HeaderText = "TF";
+            this.colCensusTF.Name = "colCensusTF";
+            this.colCensusTF.ReadOnly = true;
+            this.colCensusTF.ToolTipText = "Teen Female";
+            this.colCensusTF.Width = 46;
+            // 
+            // colCensusCM
+            // 
+            this.colCensusCM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusCM.DataPropertyName = "CM";
+            this.colCensusCM.HeaderText = "CM";
+            this.colCensusCM.Name = "colCensusCM";
+            this.colCensusCM.ReadOnly = true;
+            this.colCensusCM.ToolTipText = "Child Male";
+            this.colCensusCM.Width = 51;
+            // 
+            // colCensusCF
+            // 
+            this.colCensusCF.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusCF.DataPropertyName = "CF";
+            this.colCensusCF.HeaderText = "CF";
+            this.colCensusCF.Name = "colCensusCF";
+            this.colCensusCF.ReadOnly = true;
+            this.colCensusCF.ToolTipText = "Child Female";
+            this.colCensusCF.Width = 47;
+            // 
+            // colCensusPM
+            // 
+            this.colCensusPM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusPM.DataPropertyName = "PM";
+            this.colCensusPM.HeaderText = "PM";
+            this.colCensusPM.Name = "colCensusPM";
+            this.colCensusPM.ReadOnly = true;
+            this.colCensusPM.ToolTipText = "Toddler Male";
+            this.colCensusPM.Width = 51;
+            // 
+            // colCensusPF
+            // 
+            this.colCensusPF.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusPF.DataPropertyName = "PF";
+            this.colCensusPF.HeaderText = "PF";
+            this.colCensusPF.Name = "colCensusPF";
+            this.colCensusPF.ReadOnly = true;
+            this.colCensusPF.ToolTipText = "Toddler Female";
+            this.colCensusPF.Width = 47;
+            // 
+            // colCensusBM
+            // 
+            this.colCensusBM.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusBM.DataPropertyName = "BM";
+            this.colCensusBM.HeaderText = "BM";
+            this.colCensusBM.Name = "colCensusBM";
+            this.colCensusBM.ReadOnly = true;
+            this.colCensusBM.ToolTipText = "Baby Male";
+            this.colCensusBM.Width = 51;
+            // 
+            // colCensusBF
+            // 
+            this.colCensusBF.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colCensusBF.DataPropertyName = "BF";
+            this.colCensusBF.HeaderText = "BF";
+            this.colCensusBF.Name = "colCensusBF";
+            this.colCensusBF.ReadOnly = true;
+            this.colCensusBF.ToolTipText = "Baby Female";
+            this.colCensusBF.Width = 47;
+            // 
+            // colCensusAddress
+            // 
+            this.colCensusAddress.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colCensusAddress.DataPropertyName = "Address";
+            this.colCensusAddress.HeaderText = "Address";
+            this.colCensusAddress.Name = "colCensusAddress";
+            this.colCensusAddress.ReadOnly = true;
+            // 
+            // colCensusFamilyID
+            // 
+            this.colCensusFamilyID.DataPropertyName = "FamilyID";
+            this.colCensusFamilyID.HeaderText = "Family ID";
+            this.colCensusFamilyID.Name = "colCensusFamilyID";
+            this.colCensusFamilyID.ReadOnly = true;
+            this.colCensusFamilyID.Visible = false;
+            // 
+            // menuContextJewelbox
+            // 
+            this.menuContextJewelbox.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuContextJewelboxCopyToSafe,
+            this.menuContextJewelboxMoveToSafe,
+            this.toolStripSeparator12,
+            this.menuContextJewelboxDelete});
+            this.menuContextJewelbox.Name = "menuContextJewelbox";
+            this.menuContextJewelbox.Size = new System.Drawing.Size(155, 76);
+            this.menuContextJewelbox.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextJewelboxOpening);
+            // 
+            // menuContextJewelboxCopyToSafe
+            // 
+            this.menuContextJewelboxCopyToSafe.Name = "menuContextJewelboxCopyToSafe";
+            this.menuContextJewelboxCopyToSafe.Size = new System.Drawing.Size(154, 22);
+            this.menuContextJewelboxCopyToSafe.Text = "&Copy to Safe";
+            this.menuContextJewelboxCopyToSafe.Click += new System.EventHandler(this.OnCopyToSafeClicked);
+            // 
+            // menuContextJewelboxMoveToSafe
+            // 
+            this.menuContextJewelboxMoveToSafe.Name = "menuContextJewelboxMoveToSafe";
+            this.menuContextJewelboxMoveToSafe.Size = new System.Drawing.Size(154, 22);
+            this.menuContextJewelboxMoveToSafe.Text = "&Move to Safe";
+            this.menuContextJewelboxMoveToSafe.Click += new System.EventHandler(this.OnMoveToSafeClicked);
+            // 
+            // toolStripSeparator12
+            // 
+            this.toolStripSeparator12.Name = "toolStripSeparator12";
+            this.toolStripSeparator12.Size = new System.Drawing.Size(151, 6);
+            // 
+            // menuContextJewelboxDelete
+            // 
+            this.menuContextJewelboxDelete.Name = "menuContextJewelboxDelete";
+            this.menuContextJewelboxDelete.Size = new System.Drawing.Size(154, 22);
+            this.menuContextJewelboxDelete.Text = "Delete Selected";
+            this.menuContextJewelboxDelete.Click += new System.EventHandler(this.OnDeleteFromJewelboxClicked);
+            // 
             // tabFamily
             // 
             this.tabFamily.Controls.Add(this.panelFamily);
             this.tabFamily.Location = new System.Drawing.Point(4, 4);
             this.tabFamily.Margin = new System.Windows.Forms.Padding(0);
             this.tabFamily.Name = "tabFamily";
-            this.tabFamily.Size = new System.Drawing.Size(1276, 281);
+            this.tabFamily.Size = new System.Drawing.Size(1276, 283);
             this.tabFamily.TabIndex = 1;
             this.tabFamily.Text = "Household";
             this.tabFamily.UseVisualStyleBackColor = true;
@@ -1174,7 +1544,7 @@ namespace FamilyManager
             this.panelFamily.Controls.Add(this.lblMoney);
             this.panelFamily.Location = new System.Drawing.Point(-1, 0);
             this.panelFamily.Name = "panelFamily";
-            this.panelFamily.Size = new System.Drawing.Size(1277, 243);
+            this.panelFamily.Size = new System.Drawing.Size(1277, 235);
             this.panelFamily.TabIndex = 13;
             // 
             // ckbFamilyNameSelected
@@ -1387,7 +1757,7 @@ namespace FamilyManager
             this.splitClosetLeftRight.Panel2.Controls.Add(this.btnClosetDelete);
             this.splitClosetLeftRight.Panel2.Controls.Add(this.btnClosetShowAll);
             this.splitClosetLeftRight.Panel2MinSize = 300;
-            this.splitClosetLeftRight.Size = new System.Drawing.Size(1280, 280);
+            this.splitClosetLeftRight.Size = new System.Drawing.Size(1280, 274);
             this.splitClosetLeftRight.SplitterDistance = 500;
             this.splitClosetLeftRight.TabIndex = 0;
             this.splitClosetLeftRight.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.OnSplitterMoved);
@@ -1403,14 +1773,14 @@ namespace FamilyManager
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gridSuitcase.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridSuitcase.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridSuitcase.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.gridSuitcase.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridSuitcase.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colSuitcaseVisible,
@@ -1431,7 +1801,7 @@ namespace FamilyManager
             this.gridSuitcase.ReadOnly = true;
             this.gridSuitcase.RowHeadersVisible = false;
             this.gridSuitcase.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridSuitcase.Size = new System.Drawing.Size(497, 245);
+            this.gridSuitcase.Size = new System.Drawing.Size(497, 239);
             this.gridSuitcase.TabIndex = 2;
             this.gridSuitcase.MultiSelectChanged += new System.EventHandler(this.OnOutfitGridSelectionChanged);
             this.gridSuitcase.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -1586,7 +1956,7 @@ namespace FamilyManager
             // btnSuitcaseEmpty
             // 
             this.btnSuitcaseEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseEmpty.Location = new System.Drawing.Point(3, 251);
+            this.btnSuitcaseEmpty.Location = new System.Drawing.Point(3, 245);
             this.btnSuitcaseEmpty.Name = "btnSuitcaseEmpty";
             this.btnSuitcaseEmpty.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseEmpty.TabIndex = 29;
@@ -1597,7 +1967,7 @@ namespace FamilyManager
             // btnSuitcaseSave
             // 
             this.btnSuitcaseSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseSave.Location = new System.Drawing.Point(79, 251);
+            this.btnSuitcaseSave.Location = new System.Drawing.Point(79, 245);
             this.btnSuitcaseSave.Name = "btnSuitcaseSave";
             this.btnSuitcaseSave.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseSave.TabIndex = 32;
@@ -1608,7 +1978,7 @@ namespace FamilyManager
             // btnSuitcaseLoad
             // 
             this.btnSuitcaseLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseLoad.Location = new System.Drawing.Point(155, 251);
+            this.btnSuitcaseLoad.Location = new System.Drawing.Point(155, 245);
             this.btnSuitcaseLoad.Name = "btnSuitcaseLoad";
             this.btnSuitcaseLoad.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseLoad.TabIndex = 33;
@@ -1619,7 +1989,7 @@ namespace FamilyManager
             // btnSuitcaseCopy
             // 
             this.btnSuitcaseCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseCopy.Location = new System.Drawing.Point(231, 251);
+            this.btnSuitcaseCopy.Location = new System.Drawing.Point(231, 245);
             this.btnSuitcaseCopy.Name = "btnSuitcaseCopy";
             this.btnSuitcaseCopy.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseCopy.TabIndex = 30;
@@ -1630,7 +2000,7 @@ namespace FamilyManager
             // btnSuitcaseMove
             // 
             this.btnSuitcaseMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseMove.Location = new System.Drawing.Point(307, 251);
+            this.btnSuitcaseMove.Location = new System.Drawing.Point(307, 245);
             this.btnSuitcaseMove.Name = "btnSuitcaseMove";
             this.btnSuitcaseMove.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseMove.TabIndex = 31;
@@ -1661,7 +2031,7 @@ namespace FamilyManager
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gridFamilyCloset.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.gridFamilyCloset.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.gridFamilyCloset.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.gridFamilyCloset.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridFamilyCloset.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colClosetVisible,
@@ -1682,7 +2052,7 @@ namespace FamilyManager
             this.gridFamilyCloset.ReadOnly = true;
             this.gridFamilyCloset.RowHeadersVisible = false;
             this.gridFamilyCloset.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridFamilyCloset.Size = new System.Drawing.Size(773, 247);
+            this.gridFamilyCloset.Size = new System.Drawing.Size(773, 241);
             this.gridFamilyCloset.TabIndex = 1;
             this.gridFamilyCloset.MultiSelectChanged += new System.EventHandler(this.OnOutfitGridSelectionChanged);
             this.gridFamilyCloset.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -1867,7 +2237,7 @@ namespace FamilyManager
             // btnClosetCopy
             // 
             this.btnClosetCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetCopy.Location = new System.Drawing.Point(0, 253);
+            this.btnClosetCopy.Location = new System.Drawing.Point(0, 247);
             this.btnClosetCopy.Name = "btnClosetCopy";
             this.btnClosetCopy.Size = new System.Drawing.Size(88, 26);
             this.btnClosetCopy.TabIndex = 26;
@@ -1878,7 +2248,7 @@ namespace FamilyManager
             // btnClosetMove
             // 
             this.btnClosetMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetMove.Location = new System.Drawing.Point(94, 253);
+            this.btnClosetMove.Location = new System.Drawing.Point(94, 247);
             this.btnClosetMove.Name = "btnClosetMove";
             this.btnClosetMove.Size = new System.Drawing.Size(88, 26);
             this.btnClosetMove.TabIndex = 27;
@@ -1889,7 +2259,7 @@ namespace FamilyManager
             // btnClosetDelete
             // 
             this.btnClosetDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetDelete.Location = new System.Drawing.Point(188, 253);
+            this.btnClosetDelete.Location = new System.Drawing.Point(188, 247);
             this.btnClosetDelete.Name = "btnClosetDelete";
             this.btnClosetDelete.Size = new System.Drawing.Size(88, 26);
             this.btnClosetDelete.TabIndex = 28;
@@ -1900,7 +2270,7 @@ namespace FamilyManager
             // btnClosetShowAll
             // 
             this.btnClosetShowAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetShowAll.Location = new System.Drawing.Point(292, 253);
+            this.btnClosetShowAll.Location = new System.Drawing.Point(292, 247);
             this.btnClosetShowAll.Name = "btnClosetShowAll";
             this.btnClosetShowAll.Size = new System.Drawing.Size(88, 25);
             this.btnClosetShowAll.TabIndex = 29;
@@ -1946,7 +2316,7 @@ namespace FamilyManager
             this.splitSafeLeftRight.Panel2.Controls.Add(this.btnSafeDelete);
             this.splitSafeLeftRight.Panel2.Controls.Add(this.btnSafeShowAll);
             this.splitSafeLeftRight.Panel2MinSize = 300;
-            this.splitSafeLeftRight.Size = new System.Drawing.Size(1280, 280);
+            this.splitSafeLeftRight.Size = new System.Drawing.Size(1280, 274);
             this.splitSafeLeftRight.SplitterDistance = 500;
             this.splitSafeLeftRight.TabIndex = 1;
             this.splitSafeLeftRight.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.OnSplitterMoved);
@@ -1962,14 +2332,14 @@ namespace FamilyManager
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gridJewelbox.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridJewelbox.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridJewelbox.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.gridJewelbox.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridJewelbox.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colJewelboxVisible,
@@ -1990,7 +2360,7 @@ namespace FamilyManager
             this.gridJewelbox.ReadOnly = true;
             this.gridJewelbox.RowHeadersVisible = false;
             this.gridJewelbox.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridJewelbox.Size = new System.Drawing.Size(497, 245);
+            this.gridJewelbox.Size = new System.Drawing.Size(497, 239);
             this.gridJewelbox.TabIndex = 2;
             this.gridJewelbox.MultiSelectChanged += new System.EventHandler(this.OnOutfitGridSelectionChanged);
             this.gridJewelbox.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -2105,47 +2475,10 @@ namespace FamilyManager
             this.colJewelboxLocalThumbKey.ReadOnly = true;
             this.colJewelboxLocalThumbKey.Visible = false;
             // 
-            // menuContextJewelbox
-            // 
-            this.menuContextJewelbox.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuContextJewelboxCopyToSafe,
-            this.menuContextJewelboxMoveToSafe,
-            this.toolStripSeparator12,
-            this.menuContextJewelboxDelete});
-            this.menuContextJewelbox.Name = "menuContextJewelbox";
-            this.menuContextJewelbox.Size = new System.Drawing.Size(155, 76);
-            this.menuContextJewelbox.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextJewelboxOpening);
-            // 
-            // menuContextJewelboxCopyToSafe
-            // 
-            this.menuContextJewelboxCopyToSafe.Name = "menuContextJewelboxCopyToSafe";
-            this.menuContextJewelboxCopyToSafe.Size = new System.Drawing.Size(154, 22);
-            this.menuContextJewelboxCopyToSafe.Text = "&Copy to Safe";
-            this.menuContextJewelboxCopyToSafe.Click += new System.EventHandler(this.OnCopyToSafeClicked);
-            // 
-            // menuContextJewelboxMoveToSafe
-            // 
-            this.menuContextJewelboxMoveToSafe.Name = "menuContextJewelboxMoveToSafe";
-            this.menuContextJewelboxMoveToSafe.Size = new System.Drawing.Size(154, 22);
-            this.menuContextJewelboxMoveToSafe.Text = "&Move to Safe";
-            this.menuContextJewelboxMoveToSafe.Click += new System.EventHandler(this.OnMoveToSafeClicked);
-            // 
-            // toolStripSeparator12
-            // 
-            this.toolStripSeparator12.Name = "toolStripSeparator12";
-            this.toolStripSeparator12.Size = new System.Drawing.Size(151, 6);
-            // 
-            // menuContextJewelboxDelete
-            // 
-            this.menuContextJewelboxDelete.Name = "menuContextJewelboxDelete";
-            this.menuContextJewelboxDelete.Size = new System.Drawing.Size(154, 22);
-            this.menuContextJewelboxDelete.Text = "Delete Selected";
-            this.menuContextJewelboxDelete.Click += new System.EventHandler(this.OnDeleteFromJewelboxClicked);
-            // 
             // btnJewelboxEmpty
             // 
             this.btnJewelboxEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxEmpty.Location = new System.Drawing.Point(3, 251);
+            this.btnJewelboxEmpty.Location = new System.Drawing.Point(3, 245);
             this.btnJewelboxEmpty.Name = "btnJewelboxEmpty";
             this.btnJewelboxEmpty.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxEmpty.TabIndex = 29;
@@ -2156,7 +2489,7 @@ namespace FamilyManager
             // btnJewelboxSave
             // 
             this.btnJewelboxSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxSave.Location = new System.Drawing.Point(79, 251);
+            this.btnJewelboxSave.Location = new System.Drawing.Point(79, 245);
             this.btnJewelboxSave.Name = "btnJewelboxSave";
             this.btnJewelboxSave.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxSave.TabIndex = 32;
@@ -2167,7 +2500,7 @@ namespace FamilyManager
             // btnJewelboxLoad
             // 
             this.btnJewelboxLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxLoad.Location = new System.Drawing.Point(155, 251);
+            this.btnJewelboxLoad.Location = new System.Drawing.Point(155, 245);
             this.btnJewelboxLoad.Name = "btnJewelboxLoad";
             this.btnJewelboxLoad.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxLoad.TabIndex = 33;
@@ -2178,7 +2511,7 @@ namespace FamilyManager
             // btnJewelboxCopy
             // 
             this.btnJewelboxCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxCopy.Location = new System.Drawing.Point(231, 251);
+            this.btnJewelboxCopy.Location = new System.Drawing.Point(231, 245);
             this.btnJewelboxCopy.Name = "btnJewelboxCopy";
             this.btnJewelboxCopy.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxCopy.TabIndex = 30;
@@ -2189,7 +2522,7 @@ namespace FamilyManager
             // btnJewelboxMove
             // 
             this.btnJewelboxMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxMove.Location = new System.Drawing.Point(307, 251);
+            this.btnJewelboxMove.Location = new System.Drawing.Point(307, 245);
             this.btnJewelboxMove.Name = "btnJewelboxMove";
             this.btnJewelboxMove.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxMove.TabIndex = 31;
@@ -2220,7 +2553,7 @@ namespace FamilyManager
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gridFamilySafe.BackgroundColor = System.Drawing.SystemColors.Window;
-            this.gridFamilySafe.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            this.gridFamilySafe.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.gridFamilySafe.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridFamilySafe.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colSafeVisible,
@@ -2241,7 +2574,7 @@ namespace FamilyManager
             this.gridFamilySafe.ReadOnly = true;
             this.gridFamilySafe.RowHeadersVisible = false;
             this.gridFamilySafe.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridFamilySafe.Size = new System.Drawing.Size(773, 245);
+            this.gridFamilySafe.Size = new System.Drawing.Size(773, 239);
             this.gridFamilySafe.TabIndex = 1;
             this.gridFamilySafe.MultiSelectChanged += new System.EventHandler(this.OnOutfitGridSelectionChanged);
             this.gridFamilySafe.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -2426,7 +2759,7 @@ namespace FamilyManager
             // btnSafeCopy
             // 
             this.btnSafeCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeCopy.Location = new System.Drawing.Point(0, 251);
+            this.btnSafeCopy.Location = new System.Drawing.Point(0, 245);
             this.btnSafeCopy.Name = "btnSafeCopy";
             this.btnSafeCopy.Size = new System.Drawing.Size(88, 26);
             this.btnSafeCopy.TabIndex = 26;
@@ -2437,7 +2770,7 @@ namespace FamilyManager
             // btnSafeMove
             // 
             this.btnSafeMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeMove.Location = new System.Drawing.Point(94, 251);
+            this.btnSafeMove.Location = new System.Drawing.Point(94, 245);
             this.btnSafeMove.Name = "btnSafeMove";
             this.btnSafeMove.Size = new System.Drawing.Size(88, 26);
             this.btnSafeMove.TabIndex = 27;
@@ -2448,7 +2781,7 @@ namespace FamilyManager
             // btnSafeDelete
             // 
             this.btnSafeDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeDelete.Location = new System.Drawing.Point(188, 251);
+            this.btnSafeDelete.Location = new System.Drawing.Point(188, 245);
             this.btnSafeDelete.Name = "btnSafeDelete";
             this.btnSafeDelete.Size = new System.Drawing.Size(88, 26);
             this.btnSafeDelete.TabIndex = 28;
@@ -2459,7 +2792,7 @@ namespace FamilyManager
             // btnSafeShowAll
             // 
             this.btnSafeShowAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeShowAll.Location = new System.Drawing.Point(292, 251);
+            this.btnSafeShowAll.Location = new System.Drawing.Point(292, 245);
             this.btnSafeShowAll.Name = "btnSafeShowAll";
             this.btnSafeShowAll.Size = new System.Drawing.Size(88, 26);
             this.btnSafeShowAll.TabIndex = 29;
@@ -2467,29 +2800,726 @@ namespace FamilyManager
             this.btnSafeShowAll.UseVisualStyleBackColor = true;
             this.btnSafeShowAll.Click += new System.EventHandler(this.OnShowAllClicked);
             // 
+            // tabAspiration
+            // 
+            this.tabAspiration.Controls.Add(this.grpModifiers);
+            this.tabAspiration.Controls.Add(this.grpBenefits);
+            this.tabAspiration.Controls.Add(this.imageAspirationsSim);
+            this.tabAspiration.Controls.Add(this.grpAspiration);
+            this.tabAspiration.Location = new System.Drawing.Point(4, 4);
+            this.tabAspiration.Margin = new System.Windows.Forms.Padding(0);
+            this.tabAspiration.Name = "tabAspiration";
+            this.tabAspiration.Size = new System.Drawing.Size(1276, 283);
+            this.tabAspiration.TabIndex = 6;
+            this.tabAspiration.Text = "Aspiration";
+            this.tabAspiration.UseVisualStyleBackColor = true;
+            // 
+            // grpModifiers
+            // 
+            this.grpModifiers.Controls.Add(this.textMotiveDecaySocial);
+            this.grpModifiers.Controls.Add(this.textMotiveDecayHygiene);
+            this.grpModifiers.Controls.Add(this.textMotiveDecayHunger);
+            this.grpModifiers.Controls.Add(this.textMotiveDecayFun);
+            this.grpModifiers.Controls.Add(this.textMotiveDecayEnergy);
+            this.grpModifiers.Controls.Add(this.textMotiveDecayComfort);
+            this.grpModifiers.Controls.Add(this.textMotiveDecayBladder);
+            this.grpModifiers.Controls.Add(this.label8);
+            this.grpModifiers.Controls.Add(this.label7);
+            this.grpModifiers.Controls.Add(this.label6);
+            this.grpModifiers.Controls.Add(this.label5);
+            this.grpModifiers.Controls.Add(this.label3);
+            this.grpModifiers.Controls.Add(this.label2);
+            this.grpModifiers.Controls.Add(this.lblDecayBladder);
+            this.grpModifiers.Location = new System.Drawing.Point(755, 8);
+            this.grpModifiers.Name = "grpModifiers";
+            this.grpModifiers.Size = new System.Drawing.Size(150, 265);
+            this.grpModifiers.TabIndex = 7;
+            this.grpModifiers.TabStop = false;
+            this.grpModifiers.Text = "Motive Decay Modifiers";
+            // 
+            // textMotiveDecaySocial
+            // 
+            this.textMotiveDecaySocial.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textMotiveDecaySocial.Editable = false;
+            this.textMotiveDecaySocial.Location = new System.Drawing.Point(65, 235);
+            this.textMotiveDecaySocial.Margin = new System.Windows.Forms.Padding(0);
+            this.textMotiveDecaySocial.Maximum = ((uint)(100u));
+            this.textMotiveDecaySocial.Minimum = ((uint)(0u));
+            this.textMotiveDecaySocial.Name = "textMotiveDecaySocial";
+            this.textMotiveDecaySocial.Size = new System.Drawing.Size(40, 21);
+            this.textMotiveDecaySocial.TabIndex = 64;
+            this.textMotiveDecaySocial.Value = ((uint)(0u));
+            // 
+            // textMotiveDecayHygiene
+            // 
+            this.textMotiveDecayHygiene.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textMotiveDecayHygiene.Editable = false;
+            this.textMotiveDecayHygiene.Location = new System.Drawing.Point(65, 200);
+            this.textMotiveDecayHygiene.Margin = new System.Windows.Forms.Padding(0);
+            this.textMotiveDecayHygiene.Maximum = ((uint)(100u));
+            this.textMotiveDecayHygiene.Minimum = ((uint)(0u));
+            this.textMotiveDecayHygiene.Name = "textMotiveDecayHygiene";
+            this.textMotiveDecayHygiene.Size = new System.Drawing.Size(40, 21);
+            this.textMotiveDecayHygiene.TabIndex = 63;
+            this.textMotiveDecayHygiene.Value = ((uint)(0u));
+            // 
+            // textMotiveDecayHunger
+            // 
+            this.textMotiveDecayHunger.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textMotiveDecayHunger.Editable = false;
+            this.textMotiveDecayHunger.Location = new System.Drawing.Point(65, 165);
+            this.textMotiveDecayHunger.Margin = new System.Windows.Forms.Padding(0);
+            this.textMotiveDecayHunger.Maximum = ((uint)(100u));
+            this.textMotiveDecayHunger.Minimum = ((uint)(0u));
+            this.textMotiveDecayHunger.Name = "textMotiveDecayHunger";
+            this.textMotiveDecayHunger.Size = new System.Drawing.Size(40, 21);
+            this.textMotiveDecayHunger.TabIndex = 62;
+            this.textMotiveDecayHunger.Value = ((uint)(0u));
+            // 
+            // textMotiveDecayFun
+            // 
+            this.textMotiveDecayFun.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textMotiveDecayFun.Editable = false;
+            this.textMotiveDecayFun.Location = new System.Drawing.Point(65, 130);
+            this.textMotiveDecayFun.Margin = new System.Windows.Forms.Padding(0);
+            this.textMotiveDecayFun.Maximum = ((uint)(100u));
+            this.textMotiveDecayFun.Minimum = ((uint)(0u));
+            this.textMotiveDecayFun.Name = "textMotiveDecayFun";
+            this.textMotiveDecayFun.Size = new System.Drawing.Size(40, 21);
+            this.textMotiveDecayFun.TabIndex = 61;
+            this.textMotiveDecayFun.Value = ((uint)(0u));
+            // 
+            // textMotiveDecayEnergy
+            // 
+            this.textMotiveDecayEnergy.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textMotiveDecayEnergy.Editable = false;
+            this.textMotiveDecayEnergy.Location = new System.Drawing.Point(65, 95);
+            this.textMotiveDecayEnergy.Margin = new System.Windows.Forms.Padding(0);
+            this.textMotiveDecayEnergy.Maximum = ((uint)(100u));
+            this.textMotiveDecayEnergy.Minimum = ((uint)(0u));
+            this.textMotiveDecayEnergy.Name = "textMotiveDecayEnergy";
+            this.textMotiveDecayEnergy.Size = new System.Drawing.Size(40, 21);
+            this.textMotiveDecayEnergy.TabIndex = 60;
+            this.textMotiveDecayEnergy.Value = ((uint)(0u));
+            // 
+            // textMotiveDecayComfort
+            // 
+            this.textMotiveDecayComfort.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textMotiveDecayComfort.Editable = false;
+            this.textMotiveDecayComfort.Location = new System.Drawing.Point(65, 60);
+            this.textMotiveDecayComfort.Margin = new System.Windows.Forms.Padding(0);
+            this.textMotiveDecayComfort.Maximum = ((uint)(100u));
+            this.textMotiveDecayComfort.Minimum = ((uint)(0u));
+            this.textMotiveDecayComfort.Name = "textMotiveDecayComfort";
+            this.textMotiveDecayComfort.Size = new System.Drawing.Size(40, 21);
+            this.textMotiveDecayComfort.TabIndex = 59;
+            this.textMotiveDecayComfort.Value = ((uint)(0u));
+            // 
+            // textMotiveDecayBladder
+            // 
+            this.textMotiveDecayBladder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textMotiveDecayBladder.Editable = false;
+            this.textMotiveDecayBladder.Location = new System.Drawing.Point(65, 25);
+            this.textMotiveDecayBladder.Margin = new System.Windows.Forms.Padding(0);
+            this.textMotiveDecayBladder.Maximum = ((uint)(100u));
+            this.textMotiveDecayBladder.Minimum = ((uint)(0u));
+            this.textMotiveDecayBladder.Name = "textMotiveDecayBladder";
+            this.textMotiveDecayBladder.Size = new System.Drawing.Size(40, 21);
+            this.textMotiveDecayBladder.TabIndex = 58;
+            this.textMotiveDecayBladder.Value = ((uint)(0u));
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(16, 238);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(44, 15);
+            this.label8.TabIndex = 57;
+            this.label8.Text = "Social:";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(5, 203);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(55, 15);
+            this.label7.TabIndex = 56;
+            this.label7.Text = "Hygiene:";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(9, 168);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(51, 15);
+            this.label6.TabIndex = 55;
+            this.label6.Text = "Hunger:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(29, 133);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(31, 15);
+            this.label5.TabIndex = 54;
+            this.label5.Text = "Fun:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(12, 98);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(48, 15);
+            this.label3.TabIndex = 53;
+            this.label3.Text = "Energy:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(7, 63);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(53, 15);
+            this.label2.TabIndex = 52;
+            this.label2.Text = "Comfort:";
+            // 
+            // lblDecayBladder
+            // 
+            this.lblDecayBladder.AutoSize = true;
+            this.lblDecayBladder.Location = new System.Drawing.Point(7, 28);
+            this.lblDecayBladder.Name = "lblDecayBladder";
+            this.lblDecayBladder.Size = new System.Drawing.Size(53, 15);
+            this.lblDecayBladder.TabIndex = 51;
+            this.lblDecayBladder.Text = "Bladder:";
+            // 
+            // grpBenefits
+            // 
+            this.grpBenefits.Controls.Add(this.btnAspNeeds1);
+            this.grpBenefits.Controls.Add(this.btnAspNeeds2);
+            this.grpBenefits.Controls.Add(this.btnAspNeeds3);
+            this.grpBenefits.Controls.Add(this.btnAspNeeds4);
+            this.grpBenefits.Controls.Add(this.btnAspWork1);
+            this.grpBenefits.Controls.Add(this.btnAspWork2);
+            this.grpBenefits.Controls.Add(this.btnAspWork3);
+            this.grpBenefits.Controls.Add(this.btnAspWork4);
+            this.grpBenefits.Controls.Add(this.btnAspPrimary1);
+            this.grpBenefits.Controls.Add(this.btnAspPrimary2);
+            this.grpBenefits.Controls.Add(this.btnAspPrimary3);
+            this.grpBenefits.Controls.Add(this.btnAspPrimary4);
+            this.grpBenefits.Controls.Add(this.btnAspSecondary1);
+            this.grpBenefits.Controls.Add(this.btnAspSecondary2);
+            this.grpBenefits.Controls.Add(this.btnAspSecondary3);
+            this.grpBenefits.Controls.Add(this.btnAspSecondary4);
+            this.grpBenefits.Controls.Add(this.btnBenefitsClear);
+            this.grpBenefits.Controls.Add(this.lblBenefitsUnused);
+            this.grpBenefits.Controls.Add(this.textBenefitsUnused);
+            this.grpBenefits.Controls.Add(this.lblBenefitsSecondary);
+            this.grpBenefits.Controls.Add(this.lblBenefitsPrimary);
+            this.grpBenefits.Controls.Add(this.lblBenefitsWork);
+            this.grpBenefits.Controls.Add(this.lblBenefitsNeeds);
+            this.grpBenefits.Location = new System.Drawing.Point(285, 8);
+            this.grpBenefits.Name = "grpBenefits";
+            this.grpBenefits.Size = new System.Drawing.Size(460, 265);
+            this.grpBenefits.TabIndex = 6;
+            this.grpBenefits.TabStop = false;
+            this.grpBenefits.Text = "Benefits";
+            // 
+            // btnAspNeeds1
+            // 
+            this.btnAspNeeds1.Image = global::FamilyManager.Properties.Resources.Asp_Needs_1;
+            this.btnAspNeeds1.Location = new System.Drawing.Point(97, 10);
+            this.btnAspNeeds1.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspNeeds1.Name = "btnAspNeeds1";
+            this.btnAspNeeds1.Selected = false;
+            this.btnAspNeeds1.Size = new System.Drawing.Size(59, 60);
+            this.btnAspNeeds1.TabIndex = 8;
+            this.btnAspNeeds1.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspNeeds2
+            // 
+            this.btnAspNeeds2.Image = global::FamilyManager.Properties.Resources.Asp_Needs_2;
+            this.btnAspNeeds2.Location = new System.Drawing.Point(161, 10);
+            this.btnAspNeeds2.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspNeeds2.Name = "btnAspNeeds2";
+            this.btnAspNeeds2.Selected = false;
+            this.btnAspNeeds2.Size = new System.Drawing.Size(60, 60);
+            this.btnAspNeeds2.TabIndex = 35;
+            this.btnAspNeeds2.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspNeeds3
+            // 
+            this.btnAspNeeds3.Image = global::FamilyManager.Properties.Resources.Asp_Needs_3;
+            this.btnAspNeeds3.Location = new System.Drawing.Point(225, 10);
+            this.btnAspNeeds3.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspNeeds3.Name = "btnAspNeeds3";
+            this.btnAspNeeds3.Selected = false;
+            this.btnAspNeeds3.Size = new System.Drawing.Size(60, 60);
+            this.btnAspNeeds3.TabIndex = 36;
+            this.btnAspNeeds3.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspNeeds4
+            // 
+            this.btnAspNeeds4.Image = global::FamilyManager.Properties.Resources.Asp_Needs_4;
+            this.btnAspNeeds4.Location = new System.Drawing.Point(289, 10);
+            this.btnAspNeeds4.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspNeeds4.Name = "btnAspNeeds4";
+            this.btnAspNeeds4.Selected = false;
+            this.btnAspNeeds4.Size = new System.Drawing.Size(60, 60);
+            this.btnAspNeeds4.TabIndex = 37;
+            this.btnAspNeeds4.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspWork1
+            // 
+            this.btnAspWork1.Image = global::FamilyManager.Properties.Resources.Asp_Work_1;
+            this.btnAspWork1.Location = new System.Drawing.Point(97, 74);
+            this.btnAspWork1.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspWork1.Name = "btnAspWork1";
+            this.btnAspWork1.Selected = false;
+            this.btnAspWork1.Size = new System.Drawing.Size(60, 60);
+            this.btnAspWork1.TabIndex = 38;
+            this.btnAspWork1.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspWork2
+            // 
+            this.btnAspWork2.Image = global::FamilyManager.Properties.Resources.Asp_Work_2;
+            this.btnAspWork2.Location = new System.Drawing.Point(161, 74);
+            this.btnAspWork2.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspWork2.Name = "btnAspWork2";
+            this.btnAspWork2.Selected = false;
+            this.btnAspWork2.Size = new System.Drawing.Size(60, 60);
+            this.btnAspWork2.TabIndex = 39;
+            this.btnAspWork2.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspWork3
+            // 
+            this.btnAspWork3.Image = global::FamilyManager.Properties.Resources.Asp_Work_3;
+            this.btnAspWork3.Location = new System.Drawing.Point(225, 74);
+            this.btnAspWork3.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspWork3.Name = "btnAspWork3";
+            this.btnAspWork3.Selected = false;
+            this.btnAspWork3.Size = new System.Drawing.Size(60, 60);
+            this.btnAspWork3.TabIndex = 40;
+            this.btnAspWork3.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspWork4
+            // 
+            this.btnAspWork4.Image = global::FamilyManager.Properties.Resources.Asp_Work_4;
+            this.btnAspWork4.Location = new System.Drawing.Point(289, 74);
+            this.btnAspWork4.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspWork4.Name = "btnAspWork4";
+            this.btnAspWork4.Selected = false;
+            this.btnAspWork4.Size = new System.Drawing.Size(60, 60);
+            this.btnAspWork4.TabIndex = 41;
+            this.btnAspWork4.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspPrimary1
+            // 
+            this.btnAspPrimary1.Image = global::FamilyManager.Properties.Resources.Asp_Family_1;
+            this.btnAspPrimary1.Location = new System.Drawing.Point(97, 138);
+            this.btnAspPrimary1.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspPrimary1.Name = "btnAspPrimary1";
+            this.btnAspPrimary1.Selected = false;
+            this.btnAspPrimary1.Size = new System.Drawing.Size(60, 60);
+            this.btnAspPrimary1.TabIndex = 42;
+            this.btnAspPrimary1.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspPrimary2
+            // 
+            this.btnAspPrimary2.Image = global::FamilyManager.Properties.Resources.Asp_Family_2;
+            this.btnAspPrimary2.Location = new System.Drawing.Point(161, 138);
+            this.btnAspPrimary2.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspPrimary2.Name = "btnAspPrimary2";
+            this.btnAspPrimary2.Selected = false;
+            this.btnAspPrimary2.Size = new System.Drawing.Size(60, 60);
+            this.btnAspPrimary2.TabIndex = 43;
+            this.btnAspPrimary2.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspPrimary3
+            // 
+            this.btnAspPrimary3.Image = global::FamilyManager.Properties.Resources.Asp_Family_3;
+            this.btnAspPrimary3.Location = new System.Drawing.Point(225, 138);
+            this.btnAspPrimary3.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspPrimary3.Name = "btnAspPrimary3";
+            this.btnAspPrimary3.Selected = false;
+            this.btnAspPrimary3.Size = new System.Drawing.Size(60, 60);
+            this.btnAspPrimary3.TabIndex = 44;
+            this.btnAspPrimary3.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspPrimary4
+            // 
+            this.btnAspPrimary4.Image = global::FamilyManager.Properties.Resources.Asp_Family_4;
+            this.btnAspPrimary4.Location = new System.Drawing.Point(289, 138);
+            this.btnAspPrimary4.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspPrimary4.Name = "btnAspPrimary4";
+            this.btnAspPrimary4.Selected = false;
+            this.btnAspPrimary4.Size = new System.Drawing.Size(60, 60);
+            this.btnAspPrimary4.TabIndex = 45;
+            this.btnAspPrimary4.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspSecondary1
+            // 
+            this.btnAspSecondary1.Image = global::FamilyManager.Properties.Resources.Asp_Cheese;
+            this.btnAspSecondary1.Location = new System.Drawing.Point(97, 202);
+            this.btnAspSecondary1.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspSecondary1.Name = "btnAspSecondary1";
+            this.btnAspSecondary1.Selected = false;
+            this.btnAspSecondary1.Size = new System.Drawing.Size(60, 60);
+            this.btnAspSecondary1.TabIndex = 46;
+            this.btnAspSecondary1.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspSecondary2
+            // 
+            this.btnAspSecondary2.Image = global::FamilyManager.Properties.Resources.Asp_Cheese_1;
+            this.btnAspSecondary2.Location = new System.Drawing.Point(161, 202);
+            this.btnAspSecondary2.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspSecondary2.Name = "btnAspSecondary2";
+            this.btnAspSecondary2.Selected = false;
+            this.btnAspSecondary2.Size = new System.Drawing.Size(60, 60);
+            this.btnAspSecondary2.TabIndex = 47;
+            this.btnAspSecondary2.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspSecondary3
+            // 
+            this.btnAspSecondary3.Image = global::FamilyManager.Properties.Resources.Asp_Cheese_2;
+            this.btnAspSecondary3.Location = new System.Drawing.Point(225, 202);
+            this.btnAspSecondary3.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspSecondary3.Name = "btnAspSecondary3";
+            this.btnAspSecondary3.Selected = false;
+            this.btnAspSecondary3.Size = new System.Drawing.Size(60, 60);
+            this.btnAspSecondary3.TabIndex = 48;
+            this.btnAspSecondary3.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnAspSecondary4
+            // 
+            this.btnAspSecondary4.Image = global::FamilyManager.Properties.Resources.Asp_Cheese_3;
+            this.btnAspSecondary4.Location = new System.Drawing.Point(289, 202);
+            this.btnAspSecondary4.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAspSecondary4.Name = "btnAspSecondary4";
+            this.btnAspSecondary4.Selected = false;
+            this.btnAspSecondary4.Size = new System.Drawing.Size(60, 60);
+            this.btnAspSecondary4.TabIndex = 49;
+            this.btnAspSecondary4.Click += new System.EventHandler(this.OnBenefitsClicked);
+            // 
+            // btnBenefitsClear
+            // 
+            this.btnBenefitsClear.Location = new System.Drawing.Point(410, 236);
+            this.btnBenefitsClear.Name = "btnBenefitsClear";
+            this.btnBenefitsClear.Size = new System.Drawing.Size(44, 23);
+            this.btnBenefitsClear.TabIndex = 50;
+            this.btnBenefitsClear.Text = "Clear";
+            this.btnBenefitsClear.UseVisualStyleBackColor = true;
+            this.btnBenefitsClear.Click += new System.EventHandler(this.OnBenefitsClear);
+            // 
+            // lblBenefitsUnused
+            // 
+            this.lblBenefitsUnused.AutoSize = true;
+            this.lblBenefitsUnused.Location = new System.Drawing.Point(355, 33);
+            this.lblBenefitsUnused.Name = "lblBenefitsUnused";
+            this.lblBenefitsUnused.Size = new System.Drawing.Size(53, 15);
+            this.lblBenefitsUnused.TabIndex = 31;
+            this.lblBenefitsUnused.Text = "Unused:";
+            // 
+            // textBenefitsUnused
+            // 
+            this.textBenefitsUnused.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBenefitsUnused.Editable = true;
+            this.textBenefitsUnused.Location = new System.Drawing.Point(410, 30);
+            this.textBenefitsUnused.Margin = new System.Windows.Forms.Padding(7, 3, 7, 3);
+            this.textBenefitsUnused.Maximum = ((uint)(16u));
+            this.textBenefitsUnused.Minimum = ((uint)(0u));
+            this.textBenefitsUnused.Name = "textBenefitsUnused";
+            this.textBenefitsUnused.Size = new System.Drawing.Size(40, 21);
+            this.textBenefitsUnused.TabIndex = 30;
+            this.textBenefitsUnused.Value = ((uint)(0u));
+            this.textBenefitsUnused.TextChanged += new System.EventHandler(this.OnBenefitsUnusedChanged);
+            // 
+            // lblBenefitsSecondary
+            // 
+            this.lblBenefitsSecondary.AutoSize = true;
+            this.lblBenefitsSecondary.Location = new System.Drawing.Point(4, 225);
+            this.lblBenefitsSecondary.Name = "lblBenefitsSecondary";
+            this.lblBenefitsSecondary.Size = new System.Drawing.Size(91, 15);
+            this.lblBenefitsSecondary.TabIndex = 33;
+            this.lblBenefitsSecondary.Text = "Grilled Cheese:";
+            // 
+            // lblBenefitsPrimary
+            // 
+            this.lblBenefitsPrimary.AutoSize = true;
+            this.lblBenefitsPrimary.Location = new System.Drawing.Point(49, 161);
+            this.lblBenefitsPrimary.Name = "lblBenefitsPrimary";
+            this.lblBenefitsPrimary.Size = new System.Drawing.Size(46, 15);
+            this.lblBenefitsPrimary.TabIndex = 32;
+            this.lblBenefitsPrimary.Text = "Family:";
+            this.lblBenefitsPrimary.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            // 
+            // lblBenefitsWork
+            // 
+            this.lblBenefitsWork.AutoSize = true;
+            this.lblBenefitsWork.Location = new System.Drawing.Point(57, 97);
+            this.lblBenefitsWork.Name = "lblBenefitsWork";
+            this.lblBenefitsWork.Size = new System.Drawing.Size(38, 15);
+            this.lblBenefitsWork.TabIndex = 31;
+            this.lblBenefitsWork.Text = "Work:";
+            // 
+            // lblBenefitsNeeds
+            // 
+            this.lblBenefitsNeeds.AutoSize = true;
+            this.lblBenefitsNeeds.Location = new System.Drawing.Point(49, 33);
+            this.lblBenefitsNeeds.Name = "lblBenefitsNeeds";
+            this.lblBenefitsNeeds.Size = new System.Drawing.Size(46, 15);
+            this.lblBenefitsNeeds.TabIndex = 30;
+            this.lblBenefitsNeeds.Text = "Needs:";
+            // 
+            // imageAspirationsSim
+            // 
+            this.imageAspirationsSim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.imageAspirationsSim.Location = new System.Drawing.Point(1085, 15);
+            this.imageAspirationsSim.Name = "imageAspirationsSim";
+            this.imageAspirationsSim.Size = new System.Drawing.Size(192, 192);
+            this.imageAspirationsSim.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.imageAspirationsSim.TabIndex = 5;
+            this.imageAspirationsSim.TabStop = false;
+            // 
+            // grpAspiration
+            // 
+            this.grpAspiration.Controls.Add(this.ckbAspirationPermaPlat);
+            this.grpAspiration.Controls.Add(this.ckbAspirationLock);
+            this.grpAspiration.Controls.Add(this.textAspirationLongTerm);
+            this.grpAspiration.Controls.Add(this.textAspirationMeter);
+            this.grpAspiration.Controls.Add(this.trackAspirationMeter);
+            this.grpAspiration.Controls.Add(this.label4);
+            this.grpAspiration.Controls.Add(this.lblAspirationMeter);
+            this.grpAspiration.Controls.Add(this.textAspirationScore);
+            this.grpAspiration.Controls.Add(this.label1);
+            this.grpAspiration.Controls.Add(this.textAspirationPoints);
+            this.grpAspiration.Controls.Add(this.lblAspirationPoints);
+            this.grpAspiration.Controls.Add(this.comboAspirationSecondary);
+            this.grpAspiration.Controls.Add(this.lblAspirationSecondary);
+            this.grpAspiration.Controls.Add(this.lblAspirationPrimary);
+            this.grpAspiration.Controls.Add(this.comboAspirationPrimary);
+            this.grpAspiration.Location = new System.Drawing.Point(5, 8);
+            this.grpAspiration.Name = "grpAspiration";
+            this.grpAspiration.Size = new System.Drawing.Size(265, 265);
+            this.grpAspiration.TabIndex = 4;
+            this.grpAspiration.TabStop = false;
+            this.grpAspiration.Text = "Aspiration";
+            // 
+            // ckbAspirationPermaPlat
+            // 
+            this.ckbAspirationPermaPlat.AutoSize = true;
+            this.ckbAspirationPermaPlat.Location = new System.Drawing.Point(163, 202);
+            this.ckbAspirationPermaPlat.Name = "ckbAspirationPermaPlat";
+            this.ckbAspirationPermaPlat.Size = new System.Drawing.Size(80, 19);
+            this.ckbAspirationPermaPlat.TabIndex = 37;
+            this.ckbAspirationPermaPlat.Text = "Perm Plat";
+            this.ckbAspirationPermaPlat.UseVisualStyleBackColor = true;
+            this.ckbAspirationPermaPlat.CheckedChanged += new System.EventHandler(this.OnAspirationPermaPlatChanged);
+            // 
+            // ckbAspirationLock
+            // 
+            this.ckbAspirationLock.AutoSize = true;
+            this.ckbAspirationLock.Checked = true;
+            this.ckbAspirationLock.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ckbAspirationLock.Location = new System.Drawing.Point(163, 132);
+            this.ckbAspirationLock.Name = "ckbAspirationLock";
+            this.ckbAspirationLock.Size = new System.Drawing.Size(52, 19);
+            this.ckbAspirationLock.TabIndex = 36;
+            this.ckbAspirationLock.Text = "Lock";
+            this.ckbAspirationLock.UseVisualStyleBackColor = true;
+            this.ckbAspirationLock.CheckedChanged += new System.EventHandler(this.OnAspirationLockChanged);
+            // 
+            // textAspirationLongTerm
+            // 
+            this.textAspirationLongTerm.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textAspirationLongTerm.Editable = true;
+            this.textAspirationLongTerm.Location = new System.Drawing.Point(75, 200);
+            this.textAspirationLongTerm.Margin = new System.Windows.Forms.Padding(0);
+            this.textAspirationLongTerm.Maximum = ((uint)(32000u));
+            this.textAspirationLongTerm.Minimum = ((uint)(0u));
+            this.textAspirationLongTerm.Name = "textAspirationLongTerm";
+            this.textAspirationLongTerm.Size = new System.Drawing.Size(75, 21);
+            this.textAspirationLongTerm.TabIndex = 35;
+            this.textAspirationLongTerm.Value = ((uint)(0u));
+            this.textAspirationLongTerm.TextChanged += new System.EventHandler(this.OnAspirationLongTermChanged);
+            // 
+            // textAspirationMeter
+            // 
+            this.textAspirationMeter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textAspirationMeter.Editable = true;
+            this.textAspirationMeter.Location = new System.Drawing.Point(220, 95);
+            this.textAspirationMeter.Margin = new System.Windows.Forms.Padding(0);
+            this.textAspirationMeter.Maximum = ((uint)(1200u));
+            this.textAspirationMeter.Minimum = ((uint)(0u));
+            this.textAspirationMeter.Name = "textAspirationMeter";
+            this.textAspirationMeter.Size = new System.Drawing.Size(35, 21);
+            this.textAspirationMeter.TabIndex = 32;
+            this.textAspirationMeter.Value = ((uint)(0u));
+            this.textAspirationMeter.TextChanged += new System.EventHandler(this.OnAspirationMeterValueChanged);
+            // 
+            // trackAspirationMeter
+            // 
+            this.trackAspirationMeter.BackColor = System.Drawing.Color.Transparent;
+            this.trackAspirationMeter.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.trackAspirationMeter.Gradient = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            this.trackAspirationMeter.GradientEndColor = System.Drawing.Color.White;
+            this.trackAspirationMeter.GradientStartColor = System.Drawing.Color.White;
+            this.trackAspirationMeter.Location = new System.Drawing.Point(75, 95);
+            this.trackAspirationMeter.Maximum = 1200;
+            this.trackAspirationMeter.Minimum = 0;
+            this.trackAspirationMeter.Name = "trackAspirationMeter";
+            this.trackAspirationMeter.NegativeBalanceColour = System.Drawing.Color.Crimson;
+            this.trackAspirationMeter.PositiveBalanceColour = System.Drawing.Color.YellowGreen;
+            this.trackAspirationMeter.ProgressBackColor = System.Drawing.SystemColors.Window;
+            this.trackAspirationMeter.Quality = true;
+            this.trackAspirationMeter.SelectedColor = System.Drawing.Color.YellowGreen;
+            this.trackAspirationMeter.Size = new System.Drawing.Size(140, 20);
+            this.trackAspirationMeter.Style = Sims2Tools.Controls.SimsTrackingBarStyle.Flat;
+            this.trackAspirationMeter.TabIndex = 31;
+            this.trackAspirationMeter.TokenCount = 20;
+            this.trackAspirationMeter.UnselectedColor = System.Drawing.Color.Black;
+            this.trackAspirationMeter.UseTokenBuffer = true;
+            this.trackAspirationMeter.Value = 0;
+            this.trackAspirationMeter.Changed += new System.EventHandler(this.OnAspirationMeterSliderChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(3, 203);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(70, 15);
+            this.label4.TabIndex = 30;
+            this.label4.Text = "Long Term:";
+            // 
+            // lblAspirationMeter
+            // 
+            this.lblAspirationMeter.AutoSize = true;
+            this.lblAspirationMeter.Location = new System.Drawing.Point(31, 98);
+            this.lblAspirationMeter.Name = "lblAspirationMeter";
+            this.lblAspirationMeter.Size = new System.Drawing.Size(42, 15);
+            this.lblAspirationMeter.TabIndex = 29;
+            this.lblAspirationMeter.Text = "Meter:";
+            // 
+            // textAspirationScore
+            // 
+            this.textAspirationScore.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textAspirationScore.Location = new System.Drawing.Point(75, 130);
+            this.textAspirationScore.Margin = new System.Windows.Forms.Padding(0);
+            this.textAspirationScore.Maximum = 32767;
+            this.textAspirationScore.Minimum = 0;
+            this.textAspirationScore.Name = "textAspirationScore";
+            this.textAspirationScore.Size = new System.Drawing.Size(75, 21);
+            this.textAspirationScore.TabIndex = 27;
+            this.textAspirationScore.Value = 0;
+            this.textAspirationScore.TextChanged += new System.EventHandler(this.OnAspirationScoreChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(31, 133);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(42, 15);
+            this.label1.TabIndex = 26;
+            this.label1.Text = "Score:";
+            // 
+            // textAspirationPoints
+            // 
+            this.textAspirationPoints.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textAspirationPoints.Editable = true;
+            this.textAspirationPoints.Location = new System.Drawing.Point(75, 165);
+            this.textAspirationPoints.Margin = new System.Windows.Forms.Padding(0);
+            this.textAspirationPoints.Maximum = ((uint)(327670u));
+            this.textAspirationPoints.Minimum = ((uint)(0u));
+            this.textAspirationPoints.Name = "textAspirationPoints";
+            this.textAspirationPoints.Size = new System.Drawing.Size(75, 21);
+            this.textAspirationPoints.TabIndex = 25;
+            this.textAspirationPoints.Value = ((uint)(0u));
+            this.textAspirationPoints.TextChanged += new System.EventHandler(this.OnAspirationPointsChanged);
+            // 
+            // lblAspirationPoints
+            // 
+            this.lblAspirationPoints.AutoSize = true;
+            this.lblAspirationPoints.Location = new System.Drawing.Point(29, 168);
+            this.lblAspirationPoints.Name = "lblAspirationPoints";
+            this.lblAspirationPoints.Size = new System.Drawing.Size(44, 15);
+            this.lblAspirationPoints.TabIndex = 24;
+            this.lblAspirationPoints.Text = "Points:";
+            // 
+            // comboAspirationSecondary
+            // 
+            this.comboAspirationSecondary.FormattingEnabled = true;
+            this.comboAspirationSecondary.Items.AddRange(new object[] {
+            "None",
+            "Family",
+            "Fortune (Wealth)",
+            "Grilled Cheese",
+            "Knowledge",
+            "Pleasure (Fun)",
+            "Popularity (Reputation)",
+            "Romance"});
+            this.comboAspirationSecondary.Location = new System.Drawing.Point(75, 60);
+            this.comboAspirationSecondary.Name = "comboAspirationSecondary";
+            this.comboAspirationSecondary.Size = new System.Drawing.Size(180, 23);
+            this.comboAspirationSecondary.TabIndex = 3;
+            this.comboAspirationSecondary.SelectedIndexChanged += new System.EventHandler(this.OnAspirationSecondaryChanged);
+            // 
+            // lblAspirationSecondary
+            // 
+            this.lblAspirationSecondary.AutoSize = true;
+            this.lblAspirationSecondary.Location = new System.Drawing.Point(5, 63);
+            this.lblAspirationSecondary.Name = "lblAspirationSecondary";
+            this.lblAspirationSecondary.Size = new System.Drawing.Size(68, 15);
+            this.lblAspirationSecondary.TabIndex = 2;
+            this.lblAspirationSecondary.Text = "Secondary:";
+            // 
+            // lblAspirationPrimary
+            // 
+            this.lblAspirationPrimary.AutoSize = true;
+            this.lblAspirationPrimary.Location = new System.Drawing.Point(21, 28);
+            this.lblAspirationPrimary.Name = "lblAspirationPrimary";
+            this.lblAspirationPrimary.Size = new System.Drawing.Size(52, 15);
+            this.lblAspirationPrimary.TabIndex = 1;
+            this.lblAspirationPrimary.Text = "Primary:";
+            // 
+            // comboAspirationPrimary
+            // 
+            this.comboAspirationPrimary.FormattingEnabled = true;
+            this.comboAspirationPrimary.Items.AddRange(new object[] {
+            "Grow Up",
+            "Family",
+            "Fortune (Wealth)",
+            "Grilled Cheese",
+            "Knowledge",
+            "Pleasure (Fun)",
+            "Popularity (Reputation)",
+            "Romance"});
+            this.comboAspirationPrimary.Location = new System.Drawing.Point(75, 25);
+            this.comboAspirationPrimary.Name = "comboAspirationPrimary";
+            this.comboAspirationPrimary.Size = new System.Drawing.Size(180, 23);
+            this.comboAspirationPrimary.TabIndex = 0;
+            this.comboAspirationPrimary.SelectedIndexChanged += new System.EventHandler(this.OnAspirationPrimaryChanged);
+            // 
             // tabCareer
             // 
-            this.tabCareer.Controls.Add(this.imageSim);
+            this.tabCareer.Controls.Add(this.imageCareerSim);
             this.tabCareer.Controls.Add(this.grpJob);
             this.tabCareer.Controls.Add(this.grpUniversity);
             this.tabCareer.Controls.Add(this.grpSchool);
             this.tabCareer.Location = new System.Drawing.Point(4, 4);
             this.tabCareer.Margin = new System.Windows.Forms.Padding(0);
             this.tabCareer.Name = "tabCareer";
-            this.tabCareer.Size = new System.Drawing.Size(1276, 283);
+            this.tabCareer.Size = new System.Drawing.Size(1276, 281);
             this.tabCareer.TabIndex = 3;
             this.tabCareer.Text = "Career";
             this.tabCareer.UseVisualStyleBackColor = true;
             // 
-            // imageSim
+            // imageCareerSim
             // 
-            this.imageSim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.imageSim.Location = new System.Drawing.Point(1085, 15);
-            this.imageSim.Name = "imageSim";
-            this.imageSim.Size = new System.Drawing.Size(192, 192);
-            this.imageSim.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.imageSim.TabIndex = 3;
-            this.imageSim.TabStop = false;
+            this.imageCareerSim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.imageCareerSim.Location = new System.Drawing.Point(1085, 15);
+            this.imageCareerSim.Name = "imageCareerSim";
+            this.imageCareerSim.Size = new System.Drawing.Size(192, 192);
+            this.imageCareerSim.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.imageCareerSim.TabIndex = 3;
+            this.imageCareerSim.TabStop = false;
             // 
             // grpJob
             // 
@@ -2543,6 +3573,7 @@ namespace FamilyManager
             // textJobRetiredLevel
             // 
             this.textJobRetiredLevel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textJobRetiredLevel.Editable = true;
             this.textJobRetiredLevel.Location = new System.Drawing.Point(266, 224);
             this.textJobRetiredLevel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.textJobRetiredLevel.Maximum = ((uint)(10u));
@@ -2619,6 +3650,7 @@ namespace FamilyManager
             // textJobLevel
             // 
             this.textJobLevel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textJobLevel.Editable = true;
             this.textJobLevel.Location = new System.Drawing.Point(266, 59);
             this.textJobLevel.Maximum = ((uint)(10u));
             this.textJobLevel.Minimum = ((uint)(0u));
@@ -2643,6 +3675,7 @@ namespace FamilyManager
             // textJobPTO
             // 
             this.textJobPTO.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textJobPTO.Editable = true;
             this.textJobPTO.Location = new System.Drawing.Point(90, 124);
             this.textJobPTO.Maximum = ((uint)(32767u));
             this.textJobPTO.Minimum = ((uint)(0u));
@@ -2655,6 +3688,7 @@ namespace FamilyManager
             // textJobPension
             // 
             this.textJobPension.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textJobPension.Editable = true;
             this.textJobPension.Location = new System.Drawing.Point(90, 157);
             this.textJobPension.Maximum = ((uint)(32000u));
             this.textJobPension.Minimum = ((uint)(0u));
@@ -2771,6 +3805,8 @@ namespace FamilyManager
             // 
             // grpUniversity
             // 
+            this.grpUniversity.Controls.Add(this.ckbUniSecretSoc);
+            this.grpUniversity.Controls.Add(this.lblUniSecretSoc);
             this.grpUniversity.Controls.Add(this.textUniGrade);
             this.grpUniversity.Controls.Add(this.textUniTimeLeft);
             this.grpUniversity.Controls.Add(this.textUniInfluence);
@@ -2800,6 +3836,25 @@ namespace FamilyManager
             this.grpUniversity.TabStop = false;
             this.grpUniversity.Text = "University";
             // 
+            // ckbUniSecretSoc
+            // 
+            this.ckbUniSecretSoc.AutoSize = true;
+            this.ckbUniSecretSoc.Location = new System.Drawing.Point(235, 227);
+            this.ckbUniSecretSoc.Name = "ckbUniSecretSoc";
+            this.ckbUniSecretSoc.Size = new System.Drawing.Size(15, 14);
+            this.ckbUniSecretSoc.TabIndex = 39;
+            this.ckbUniSecretSoc.UseVisualStyleBackColor = true;
+            this.ckbUniSecretSoc.Click += new System.EventHandler(this.OnUniSecretSocietyChanged);
+            // 
+            // lblUniSecretSoc
+            // 
+            this.lblUniSecretSoc.AutoSize = true;
+            this.lblUniSecretSoc.Location = new System.Drawing.Point(142, 227);
+            this.lblUniSecretSoc.Name = "lblUniSecretSoc";
+            this.lblUniSecretSoc.Size = new System.Drawing.Size(87, 15);
+            this.lblUniSecretSoc.TabIndex = 38;
+            this.lblUniSecretSoc.Text = "Secret Society:";
+            // 
             // textUniGrade
             // 
             this.textUniGrade.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -2816,6 +3871,7 @@ namespace FamilyManager
             // textUniTimeLeft
             // 
             this.textUniTimeLeft.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textUniTimeLeft.Editable = true;
             this.textUniTimeLeft.Location = new System.Drawing.Point(256, 186);
             this.textUniTimeLeft.Maximum = ((uint)(72u));
             this.textUniTimeLeft.Minimum = ((uint)(0u));
@@ -2828,19 +3884,21 @@ namespace FamilyManager
             // textUniInfluence
             // 
             this.textUniInfluence.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textUniInfluence.Editable = true;
             this.textUniInfluence.Location = new System.Drawing.Point(80, 224);
             this.textUniInfluence.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.textUniInfluence.Maximum = ((uint)(32000u));
             this.textUniInfluence.Minimum = ((uint)(0u));
             this.textUniInfluence.Name = "textUniInfluence";
-            this.textUniInfluence.Size = new System.Drawing.Size(80, 21);
+            this.textUniInfluence.Size = new System.Drawing.Size(50, 21);
             this.textUniInfluence.TabIndex = 23;
-            this.textUniInfluence.Value = ((uint)(3782u));
+            this.textUniInfluence.Value = ((uint)(32000u));
             this.textUniInfluence.TextChanged += new System.EventHandler(this.OnUniInfluenceValueChanged);
             // 
             // textUniEffort
             // 
             this.textUniEffort.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textUniEffort.Editable = true;
             this.textUniEffort.Location = new System.Drawing.Point(256, 126);
             this.textUniEffort.Maximum = ((uint)(1000u));
             this.textUniEffort.Minimum = ((uint)(0u));
@@ -3142,7 +4200,7 @@ namespace FamilyManager
             this.tabSkills.Location = new System.Drawing.Point(4, 4);
             this.tabSkills.Margin = new System.Windows.Forms.Padding(0);
             this.tabSkills.Name = "tabSkills";
-            this.tabSkills.Size = new System.Drawing.Size(1276, 281);
+            this.tabSkills.Size = new System.Drawing.Size(1276, 283);
             this.tabSkills.TabIndex = 4;
             this.tabSkills.Text = "Skills";
             this.tabSkills.UseVisualStyleBackColor = true;
@@ -3666,6 +4724,54 @@ namespace FamilyManager
             this.grpSkillsHidden.TabIndex = 82;
             this.grpSkillsHidden.TabStop = false;
             this.grpSkillsHidden.Text = "Hidden Skills";
+            // 
+            // trackSkillHiddenFireDance
+            // 
+            this.trackSkillHiddenFireDance.Location = new System.Drawing.Point(87, 80);
+            this.trackSkillHiddenFireDance.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillHiddenFireDance.Maximum = 300;
+            this.trackSkillHiddenFireDance.Name = "trackSkillHiddenFireDance";
+            this.trackSkillHiddenFireDance.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillHiddenFireDance.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillHiddenFireDance.TabIndex = 108;
+            this.trackSkillHiddenFireDance.Tag = "Fire Dance";
+            this.trackSkillHiddenFireDance.TokenGuid = ((uint)(860225760u));
+            this.trackSkillHiddenFireDance.TokenProp = ((uint)(1u));
+            this.trackSkillHiddenFireDance.Value = ((ushort)(0));
+            this.trackSkillHiddenFireDance.Changed += new System.EventHandler(this.OnHiddenSkillChanged);
+            // 
+            // lblSkillHiddenFireDance
+            // 
+            this.lblSkillHiddenFireDance.AutoSize = true;
+            this.lblSkillHiddenFireDance.Location = new System.Drawing.Point(15, 85);
+            this.lblSkillHiddenFireDance.Name = "lblSkillHiddenFireDance";
+            this.lblSkillHiddenFireDance.Size = new System.Drawing.Size(70, 15);
+            this.lblSkillHiddenFireDance.TabIndex = 107;
+            this.lblSkillHiddenFireDance.Text = "Fire Dance:";
+            // 
+            // trackSkillHiddenBreakDance
+            // 
+            this.trackSkillHiddenBreakDance.Location = new System.Drawing.Point(87, 20);
+            this.trackSkillHiddenBreakDance.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillHiddenBreakDance.Maximum = 300;
+            this.trackSkillHiddenBreakDance.Name = "trackSkillHiddenBreakDance";
+            this.trackSkillHiddenBreakDance.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillHiddenBreakDance.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillHiddenBreakDance.TabIndex = 106;
+            this.trackSkillHiddenBreakDance.Tag = "Break Dance";
+            this.trackSkillHiddenBreakDance.TokenGuid = ((uint)(1424141221u));
+            this.trackSkillHiddenBreakDance.TokenProp = ((uint)(1u));
+            this.trackSkillHiddenBreakDance.Value = ((ushort)(0));
+            this.trackSkillHiddenBreakDance.Changed += new System.EventHandler(this.OnHiddenSkillChanged);
+            // 
+            // lblSkillHiddenBreakDance
+            // 
+            this.lblSkillHiddenBreakDance.AutoSize = true;
+            this.lblSkillHiddenBreakDance.Location = new System.Drawing.Point(4, 25);
+            this.lblSkillHiddenBreakDance.Name = "lblSkillHiddenBreakDance";
+            this.lblSkillHiddenBreakDance.Size = new System.Drawing.Size(81, 15);
+            this.lblSkillHiddenBreakDance.TabIndex = 105;
+            this.lblSkillHiddenBreakDance.Text = "Break Dance:";
             // 
             // trackSkillHiddenTaiChi
             // 
@@ -5085,54 +6191,6 @@ namespace FamilyManager
             this.openJewelboxFileDialog.Filter = "Family Manager Jewel Box files|*.fmj|All files|*.*";
             this.openJewelboxFileDialog.Title = "Load Jewellery Items";
             // 
-            // trackSkillHiddenBreakDance
-            // 
-            this.trackSkillHiddenBreakDance.Location = new System.Drawing.Point(87, 20);
-            this.trackSkillHiddenBreakDance.Margin = new System.Windows.Forms.Padding(0);
-            this.trackSkillHiddenBreakDance.Maximum = 300;
-            this.trackSkillHiddenBreakDance.Name = "trackSkillHiddenBreakDance";
-            this.trackSkillHiddenBreakDance.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
-            this.trackSkillHiddenBreakDance.Size = new System.Drawing.Size(138, 21);
-            this.trackSkillHiddenBreakDance.TabIndex = 106;
-            this.trackSkillHiddenBreakDance.Tag = "Break Dance";
-            this.trackSkillHiddenBreakDance.TokenGuid = ((uint)(1424141221u));
-            this.trackSkillHiddenBreakDance.TokenProp = ((uint)(1u));
-            this.trackSkillHiddenBreakDance.Value = ((ushort)(0));
-            this.trackSkillHiddenBreakDance.Changed += new System.EventHandler(this.OnHiddenSkillChanged);
-            // 
-            // lblSkillHiddenBreakDance
-            // 
-            this.lblSkillHiddenBreakDance.AutoSize = true;
-            this.lblSkillHiddenBreakDance.Location = new System.Drawing.Point(4, 25);
-            this.lblSkillHiddenBreakDance.Name = "lblSkillHiddenBreakDance";
-            this.lblSkillHiddenBreakDance.Size = new System.Drawing.Size(81, 15);
-            this.lblSkillHiddenBreakDance.TabIndex = 105;
-            this.lblSkillHiddenBreakDance.Text = "Break Dance:";
-            // 
-            // trackSkillHiddenFireDance
-            // 
-            this.trackSkillHiddenFireDance.Location = new System.Drawing.Point(87, 80);
-            this.trackSkillHiddenFireDance.Margin = new System.Windows.Forms.Padding(0);
-            this.trackSkillHiddenFireDance.Maximum = 300;
-            this.trackSkillHiddenFireDance.Name = "trackSkillHiddenFireDance";
-            this.trackSkillHiddenFireDance.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
-            this.trackSkillHiddenFireDance.Size = new System.Drawing.Size(138, 21);
-            this.trackSkillHiddenFireDance.TabIndex = 108;
-            this.trackSkillHiddenFireDance.Tag = "Fire Dance";
-            this.trackSkillHiddenFireDance.TokenGuid = ((uint)(860225760u));
-            this.trackSkillHiddenFireDance.TokenProp = ((uint)(1u));
-            this.trackSkillHiddenFireDance.Value = ((ushort)(0));
-            this.trackSkillHiddenFireDance.Changed += new System.EventHandler(this.OnHiddenSkillChanged);
-            // 
-            // lblSkillHiddenFireDance
-            // 
-            this.lblSkillHiddenFireDance.AutoSize = true;
-            this.lblSkillHiddenFireDance.Location = new System.Drawing.Point(15, 85);
-            this.lblSkillHiddenFireDance.Name = "lblSkillHiddenFireDance";
-            this.lblSkillHiddenFireDance.Size = new System.Drawing.Size(70, 15);
-            this.lblSkillHiddenFireDance.TabIndex = 107;
-            this.lblSkillHiddenFireDance.Text = "Fire Dance:";
-            // 
             // FamilyManagerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -5165,6 +6223,9 @@ namespace FamilyManager
             ((System.ComponentModel.ISupportInitialize)(this.gridFamilyMembers)).EndInit();
             this.menuContextMembers.ResumeLayout(false);
             this.tabPages.ResumeLayout(false);
+            this.tabCensus.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.gridCensus)).EndInit();
+            this.menuContextJewelbox.ResumeLayout(false);
             this.tabFamily.ResumeLayout(false);
             this.panelFamily.ResumeLayout(false);
             this.panelFamily.PerformLayout();
@@ -5186,11 +6247,18 @@ namespace FamilyManager
             ((System.ComponentModel.ISupportInitialize)(this.splitSafeLeftRight)).EndInit();
             this.splitSafeLeftRight.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridJewelbox)).EndInit();
-            this.menuContextJewelbox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridFamilySafe)).EndInit();
             this.menuContextSafe.ResumeLayout(false);
+            this.tabAspiration.ResumeLayout(false);
+            this.grpModifiers.ResumeLayout(false);
+            this.grpModifiers.PerformLayout();
+            this.grpBenefits.ResumeLayout(false);
+            this.grpBenefits.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imageAspirationsSim)).EndInit();
+            this.grpAspiration.ResumeLayout(false);
+            this.grpAspiration.PerformLayout();
             this.tabCareer.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.imageSim)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imageCareerSim)).EndInit();
             this.grpJob.ResumeLayout(false);
             this.grpJob.PerformLayout();
             this.grpUniversity.ResumeLayout(false);
@@ -5512,7 +6580,7 @@ namespace FamilyManager
         private System.Windows.Forms.Label lblBadgeSewing;
         private System.Windows.Forms.Label lblBadgeStocking;
         private System.Windows.Forms.Label lblBadgeToyMaking;
-        private System.Windows.Forms.PictureBox imageSim;
+        private System.Windows.Forms.PictureBox imageCareerSim;
         private System.Windows.Forms.ToolStripMenuItem menuItemCachingUpdateCustomCareers;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ComboBox comboUniResult;
@@ -5633,5 +6701,85 @@ namespace FamilyManager
         private System.Windows.Forms.Label lblSkillHiddenFireDance;
         private Sims2Tools.Controls.SkillTracker trackSkillHiddenBreakDance;
         private System.Windows.Forms.Label lblSkillHiddenBreakDance;
+        private System.Windows.Forms.TabPage tabAspiration;
+        private System.Windows.Forms.PictureBox imageAspirationsSim;
+        private System.Windows.Forms.GroupBox grpAspiration;
+        private System.Windows.Forms.ComboBox comboAspirationSecondary;
+        private System.Windows.Forms.Label lblAspirationSecondary;
+        private System.Windows.Forms.Label lblAspirationPrimary;
+        private System.Windows.Forms.ComboBox comboAspirationPrimary;
+        private Sims2Tools.Controls.UIntTextBox textAspirationPoints;
+        private System.Windows.Forms.Label lblAspirationPoints;
+        private System.Windows.Forms.Label lblAspirationMeter;
+        private Sims2Tools.Controls.IntTextBox textAspirationScore;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.GroupBox grpBenefits;
+        private System.Windows.Forms.Label lblBenefitsSecondary;
+        private System.Windows.Forms.Label lblBenefitsPrimary;
+        private System.Windows.Forms.Label lblBenefitsWork;
+        private System.Windows.Forms.Label lblBenefitsNeeds;
+        private Sims2Tools.Controls.BenefitButton btnAspNeeds1;
+        private Sims2Tools.Controls.BenefitButton btnAspNeeds2;
+        private Sims2Tools.Controls.BenefitButton btnAspNeeds3;
+        private Sims2Tools.Controls.BenefitButton btnAspNeeds4;
+        private Sims2Tools.Controls.BenefitButton btnAspWork1;
+        private Sims2Tools.Controls.BenefitButton btnAspWork2;
+        private Sims2Tools.Controls.BenefitButton btnAspWork3;
+        private Sims2Tools.Controls.BenefitButton btnAspWork4;
+        private Sims2Tools.Controls.BenefitButton btnAspPrimary1;
+        private Sims2Tools.Controls.BenefitButton btnAspPrimary2;
+        private Sims2Tools.Controls.BenefitButton btnAspPrimary3;
+        private Sims2Tools.Controls.BenefitButton btnAspPrimary4;
+        private Sims2Tools.Controls.BenefitButton btnAspSecondary1;
+        private Sims2Tools.Controls.BenefitButton btnAspSecondary2;
+        private Sims2Tools.Controls.BenefitButton btnAspSecondary3;
+        private Sims2Tools.Controls.BenefitButton btnAspSecondary4;
+        private System.Windows.Forms.Label lblBenefitsUnused;
+        private Sims2Tools.Controls.UIntTextBox textBenefitsUnused;
+        private System.Windows.Forms.GroupBox grpModifiers;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button btnBenefitsClear;
+        private Sims2Tools.Controls.UIntTextBox textAspirationMeter;
+        private Sims2Tools.Controls.SimTrackingBar trackAspirationMeter;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lblDecayBladder;
+        private Sims2Tools.Controls.UIntTextBox textMotiveDecayHygiene;
+        private Sims2Tools.Controls.UIntTextBox textMotiveDecayHunger;
+        private Sims2Tools.Controls.UIntTextBox textMotiveDecayFun;
+        private Sims2Tools.Controls.UIntTextBox textMotiveDecayEnergy;
+        private Sims2Tools.Controls.UIntTextBox textMotiveDecayComfort;
+        private Sims2Tools.Controls.UIntTextBox textMotiveDecayBladder;
+        private Sims2Tools.Controls.UIntTextBox textMotiveDecaySocial;
+        private Sims2Tools.Controls.UIntTextBox textAspirationLongTerm;
+        private System.Windows.Forms.CheckBox ckbAspirationLock;
+        private System.Windows.Forms.CheckBox ckbAspirationPermaPlat;
+        private System.Windows.Forms.TabPage tabCensus;
+        private System.Windows.Forms.DataGridView gridCensus;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusVisible;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusSubhood;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusEM;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusEF;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusAM;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusAF;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusYAM;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusYAF;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusTM;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusTF;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusCM;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusCF;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusPM;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusPF;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusBM;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusBF;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusAddress;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colCensusFamilyID;
+        private System.Windows.Forms.CheckBox ckbUniSecretSoc;
+        private System.Windows.Forms.Label lblUniSecretSoc;
     }
 }
