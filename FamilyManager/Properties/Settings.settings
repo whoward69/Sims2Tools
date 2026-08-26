@@ -44,5 +44,17 @@
     <Setting Name="MaxSkillFireDance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">300</Value>
     </Setting>
+    <Setting Name="MaxSkillHulaDance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="MaxSkillSlapDance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="MinSkillForGreeting" Type="System.UInt16" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="MinSkillForSeaShanty" Type="System.UInt16" Scope="User">
+      <Value Profile="(Default)">7</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

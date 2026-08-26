@@ -295,7 +295,6 @@ namespace FamilyManager
             this.lblBenefitsPrimary = new System.Windows.Forms.Label();
             this.lblBenefitsWork = new System.Windows.Forms.Label();
             this.lblBenefitsNeeds = new System.Windows.Forms.Label();
-            this.imageAspirationsSim = new System.Windows.Forms.PictureBox();
             this.grpAspiration = new System.Windows.Forms.GroupBox();
             this.ckbAspirationPermaPlat = new System.Windows.Forms.CheckBox();
             this.ckbAspirationLock = new System.Windows.Forms.CheckBox();
@@ -312,6 +311,7 @@ namespace FamilyManager
             this.lblAspirationSecondary = new System.Windows.Forms.Label();
             this.lblAspirationPrimary = new System.Windows.Forms.Label();
             this.comboAspirationPrimary = new System.Windows.Forms.ComboBox();
+            this.imageAspirationsSim = new System.Windows.Forms.PictureBox();
             this.tabCareer = new System.Windows.Forms.TabPage();
             this.imageCareerSim = new System.Windows.Forms.PictureBox();
             this.grpJob = new System.Windows.Forms.GroupBox();
@@ -367,23 +367,6 @@ namespace FamilyManager
             this.lblSchoolType = new System.Windows.Forms.Label();
             this.comboSchoolType = new System.Windows.Forms.ComboBox();
             this.tabSkills = new System.Windows.Forms.TabPage();
-            this.grpSkillsPet = new System.Windows.Forms.GroupBox();
-            this.trackSkillPetUseToilet = new Sims2Tools.Controls.SkillTracker();
-            this.trackSkillPetStay = new Sims2Tools.Controls.SkillTracker();
-            this.trackSkillPetSpeak = new Sims2Tools.Controls.SkillTracker();
-            this.trackSkillPetSitUp = new Sims2Tools.Controls.SkillTracker();
-            this.trackSkillPetShake = new Sims2Tools.Controls.SkillTracker();
-            this.trackSkillPetRollOver = new Sims2Tools.Controls.SkillTracker();
-            this.trackSkillPetPlayDead = new Sims2Tools.Controls.SkillTracker();
-            this.trackSkillPetComeHere = new Sims2Tools.Controls.SkillTracker();
-            this.lblSkillPetUseToilet = new System.Windows.Forms.Label();
-            this.lblSkillPetStay = new System.Windows.Forms.Label();
-            this.lblSkillPetSpeak = new System.Windows.Forms.Label();
-            this.lblSkillPetSitUp = new System.Windows.Forms.Label();
-            this.lblSkillPetShake = new System.Windows.Forms.Label();
-            this.lblSkillPetRollOver = new System.Windows.Forms.Label();
-            this.lblSkillPetPlayDead = new System.Windows.Forms.Label();
-            this.lblSkillPetComeHere = new System.Windows.Forms.Label();
             this.grpSkillsLife = new System.Windows.Forms.GroupBox();
             this.trackSkillLifePhysiology = new Sims2Tools.Controls.SkillTracker();
             this.trackSkillLifeParenting = new Sims2Tools.Controls.SkillTracker();
@@ -407,6 +390,10 @@ namespace FamilyManager
             this.trackSkillToddlerPotty = new Sims2Tools.Controls.SkillTracker();
             this.lblSkillToddlerPotty = new System.Windows.Forms.Label();
             this.grpSkillsHidden = new System.Windows.Forms.GroupBox();
+            this.trackSkillHiddenHulaDance = new Sims2Tools.Controls.SkillTracker();
+            this.trackSkillHiddenSlapDance = new Sims2Tools.Controls.SkillTracker();
+            this.lblSkillHiddenHulaDance = new System.Windows.Forms.Label();
+            this.lblSkillHiddenSlapDance = new System.Windows.Forms.Label();
             this.trackSkillHiddenFireDance = new Sims2Tools.Controls.SkillTracker();
             this.lblSkillHiddenFireDance = new System.Windows.Forms.Label();
             this.trackSkillHiddenBreakDance = new Sims2Tools.Controls.SkillTracker();
@@ -438,6 +425,23 @@ namespace FamilyManager
             this.lblSkillCleaning = new System.Windows.Forms.Label();
             this.lblSkillCharisma = new System.Windows.Forms.Label();
             this.lblSkillBody = new System.Windows.Forms.Label();
+            this.grpSkillsPet = new System.Windows.Forms.GroupBox();
+            this.trackSkillPetUseToilet = new Sims2Tools.Controls.SkillTracker();
+            this.trackSkillPetStay = new Sims2Tools.Controls.SkillTracker();
+            this.trackSkillPetSpeak = new Sims2Tools.Controls.SkillTracker();
+            this.trackSkillPetSitUp = new Sims2Tools.Controls.SkillTracker();
+            this.trackSkillPetShake = new Sims2Tools.Controls.SkillTracker();
+            this.trackSkillPetRollOver = new Sims2Tools.Controls.SkillTracker();
+            this.trackSkillPetPlayDead = new Sims2Tools.Controls.SkillTracker();
+            this.trackSkillPetComeHere = new Sims2Tools.Controls.SkillTracker();
+            this.lblSkillPetUseToilet = new System.Windows.Forms.Label();
+            this.lblSkillPetStay = new System.Windows.Forms.Label();
+            this.lblSkillPetSpeak = new System.Windows.Forms.Label();
+            this.lblSkillPetSitUp = new System.Windows.Forms.Label();
+            this.lblSkillPetShake = new System.Windows.Forms.Label();
+            this.lblSkillPetRollOver = new System.Windows.Forms.Label();
+            this.lblSkillPetPlayDead = new System.Windows.Forms.Label();
+            this.lblSkillPetComeHere = new System.Windows.Forms.Label();
             this.tabInterests = new System.Windows.Forms.TabPage();
             this.grpBadges = new System.Windows.Forms.GroupBox();
             this.trackBadgeStocking = new Sims2Tools.Controls.InterestTracker();
@@ -524,7 +528,73 @@ namespace FamilyManager
             this.lblIntEntertainment = new System.Windows.Forms.Label();
             this.lblIntCulture = new System.Windows.Forms.Label();
             this.lblIntCrime = new System.Windows.Forms.Label();
-            this.thumbBox = new System.Windows.Forms.PictureBox();
+            this.tabVacations = new System.Windows.Forms.TabPage();
+            this.imageVacationsSim = new System.Windows.Forms.PictureBox();
+            this.grpVacationsTours = new System.Windows.Forms.GroupBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.btnTourIsland3 = new Sims2Tools.Controls.TourButton();
+            this.btnTourIsland1 = new Sims2Tools.Controls.TourButton();
+            this.btnTourIsland2 = new Sims2Tools.Controls.TourButton();
+            this.btnTourFarEast3 = new Sims2Tools.Controls.TourButton();
+            this.btnTourFarEast1 = new Sims2Tools.Controls.TourButton();
+            this.btnTourFarEast2 = new Sims2Tools.Controls.TourButton();
+            this.btnTourMountain3 = new Sims2Tools.Controls.TourButton();
+            this.btnTourMountain1 = new Sims2Tools.Controls.TourButton();
+            this.btnTourMountain2 = new Sims2Tools.Controls.TourButton();
+            this.grpVacationsMountain = new System.Windows.Forms.GroupBox();
+            this.btnVacMountSecretLot = new Sims2Tools.Controls.SecretLotButton();
+            this.btnVacMountHoliday = new Sims2Tools.Controls.VacationButton();
+            this.btnVacMountGesture = new Sims2Tools.Controls.VacationButton();
+            this.btnVacMountFood = new Sims2Tools.Controls.VacationButton();
+            this.btnVacMountDeepTissueMassage = new Sims2Tools.Controls.VacationButton();
+            this.btnVacMountSlapDance = new Sims2Tools.Controls.VacationButton();
+            this.btnVacMountMetBigfoot = new Sims2Tools.Controls.VacationButton();
+            this.btnVacMountSleptTent = new Sims2Tools.Controls.VacationButton();
+            this.btnVacMountTreeRings = new Sims2Tools.Controls.VacationButton();
+            this.btnVacMountAxeThrow = new Sims2Tools.Controls.VacationButton();
+            this.btnVacMountWonLogRolling = new Sims2Tools.Controls.VacationButton();
+            this.grpVacationsFarEast = new System.Windows.Forms.GroupBox();
+            this.btnVacEastSecretLot = new Sims2Tools.Controls.SecretLotButton();
+            this.btnVacEastHoliday = new Sims2Tools.Controls.VacationButton();
+            this.btnVacEastGesture = new Sims2Tools.Controls.VacationButton();
+            this.btnVacEastFood = new Sims2Tools.Controls.VacationButton();
+            this.btnVacEastAccupressureMassage = new Sims2Tools.Controls.VacationButton();
+            this.btnVacEastTaiChi = new Sims2Tools.Controls.VacationButton();
+            this.btnVacEastDragonLegend = new Sims2Tools.Controls.VacationButton();
+            this.btnVacEastDrankTea = new Sims2Tools.Controls.VacationButton();
+            this.btnVacEastMahjong = new Sims2Tools.Controls.VacationButton();
+            this.btnVacEastLuckyShrine = new Sims2Tools.Controls.VacationButton();
+            this.btnVacEastZenGarden = new Sims2Tools.Controls.VacationButton();
+            this.btnVacEastTeleport = new Sims2Tools.Controls.VacationButton();
+            this.grpVacationsIsland = new System.Windows.Forms.GroupBox();
+            this.btnVacIsleSecretLot = new Sims2Tools.Controls.SecretLotButton();
+            this.btnVacIsleHoliday = new Sims2Tools.Controls.VacationButton();
+            this.btnVacIsleGesture = new Sims2Tools.Controls.VacationButton();
+            this.btnVacIsleFood = new Sims2Tools.Controls.VacationButton();
+            this.btnVacIsleStoneMassage = new Sims2Tools.Controls.VacationButton();
+            this.btnVacIsleHulaDance = new Sims2Tools.Controls.VacationButton();
+            this.btnVacIsleVoodooDoll = new Sims2Tools.Controls.VacationButton();
+            this.btnVacIslePirateShip = new Sims2Tools.Controls.VacationButton();
+            this.btnVacIsleSeaShanty = new Sims2Tools.Controls.VacationButton();
+            this.btnVacIsleMonkeyRuins = new Sims2Tools.Controls.VacationButton();
+            this.btnVacIsleBeachTreasure = new Sims2Tools.Controls.VacationButton();
+            this.btnVacIsleFireDance = new Sims2Tools.Controls.VacationButton();
+            this.grpVacationsGeneral = new System.Windows.Forms.GroupBox();
+            this.imgVacTourAll = new System.Windows.Forms.PictureBox();
+            this.imgVacTourFive = new System.Windows.Forms.PictureBox();
+            this.imgVacTour = new System.Windows.Forms.PictureBox();
+            this.imgVacSecretLotAll = new System.Windows.Forms.PictureBox();
+            this.imgVacSecretLot = new System.Windows.Forms.PictureBox();
+            this.imgVacAllGestures = new System.Windows.Forms.PictureBox();
+            this.btnVacGenPlane = new Sims2Tools.Controls.VacationButton();
+            this.btnVacGenPlaneThree = new Sims2Tools.Controls.VacationButton();
+            this.btnVacGenPlaneFive = new Sims2Tools.Controls.VacationButton();
+            this.btnVacGenSecretMap = new Sims2Tools.Controls.VacationButton();
+            this.btnVacGenRoomService = new Sims2Tools.Controls.VacationButton();
+            this.btnVacGenTreasureChest = new Sims2Tools.Controls.VacationButton();
+            this.btnVacGenPhotoAlbum = new Sims2Tools.Controls.VacationButton();
             this.btnSave = new System.Windows.Forms.Button();
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openSuitcaseFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -532,6 +602,7 @@ namespace FamilyManager
             this.saveJewelboxFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.openJewelboxFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.thumbBox = new System.Windows.Forms.PictureBox();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
             this.splitTopBottom.Panel1.SuspendLayout();
@@ -571,23 +642,36 @@ namespace FamilyManager
             this.tabAspiration.SuspendLayout();
             this.grpModifiers.SuspendLayout();
             this.grpBenefits.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.imageAspirationsSim)).BeginInit();
             this.grpAspiration.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imageAspirationsSim)).BeginInit();
             this.tabCareer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imageCareerSim)).BeginInit();
             this.grpJob.SuspendLayout();
             this.grpUniversity.SuspendLayout();
             this.grpSchool.SuspendLayout();
             this.tabSkills.SuspendLayout();
-            this.grpSkillsPet.SuspendLayout();
             this.grpSkillsLife.SuspendLayout();
             this.grpSkillsToddler.SuspendLayout();
             this.grpSkillsHidden.SuspendLayout();
             this.grpSkillsGeneral.SuspendLayout();
+            this.grpSkillsPet.SuspendLayout();
             this.tabInterests.SuspendLayout();
             this.grpBadges.SuspendLayout();
             this.grpHobbies.SuspendLayout();
             this.grpInterests.SuspendLayout();
+            this.tabVacations.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imageVacationsSim)).BeginInit();
+            this.grpVacationsTours.SuspendLayout();
+            this.grpVacationsMountain.SuspendLayout();
+            this.grpVacationsFarEast.SuspendLayout();
+            this.grpVacationsIsland.SuspendLayout();
+            this.grpVacationsGeneral.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacTourAll)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacTourFive)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacTour)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacSecretLotAll)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacSecretLot)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacAllGestures)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -1220,6 +1304,7 @@ namespace FamilyManager
             this.tabPages.Controls.Add(this.tabCareer);
             this.tabPages.Controls.Add(this.tabSkills);
             this.tabPages.Controls.Add(this.tabInterests);
+            this.tabPages.Controls.Add(this.tabVacations);
             this.tabPages.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabPages.Location = new System.Drawing.Point(0, 0);
             this.tabPages.Margin = new System.Windows.Forms.Padding(0);
@@ -1287,7 +1372,7 @@ namespace FamilyManager
             this.gridCensus.ReadOnly = true;
             this.gridCensus.RowHeadersVisible = false;
             this.gridCensus.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridCensus.Size = new System.Drawing.Size(1273, 273);
+            this.gridCensus.Size = new System.Drawing.Size(1273, 175);
             this.gridCensus.TabIndex = 3;
             this.gridCensus.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCensusGridDoubleClick);
             // 
@@ -1544,7 +1629,7 @@ namespace FamilyManager
             this.panelFamily.Controls.Add(this.lblMoney);
             this.panelFamily.Location = new System.Drawing.Point(-1, 0);
             this.panelFamily.Name = "panelFamily";
-            this.panelFamily.Size = new System.Drawing.Size(1277, 235);
+            this.panelFamily.Size = new System.Drawing.Size(1277, 233);
             this.panelFamily.TabIndex = 13;
             // 
             // ckbFamilyNameSelected
@@ -1757,7 +1842,7 @@ namespace FamilyManager
             this.splitClosetLeftRight.Panel2.Controls.Add(this.btnClosetDelete);
             this.splitClosetLeftRight.Panel2.Controls.Add(this.btnClosetShowAll);
             this.splitClosetLeftRight.Panel2MinSize = 300;
-            this.splitClosetLeftRight.Size = new System.Drawing.Size(1280, 274);
+            this.splitClosetLeftRight.Size = new System.Drawing.Size(1280, 272);
             this.splitClosetLeftRight.SplitterDistance = 500;
             this.splitClosetLeftRight.TabIndex = 0;
             this.splitClosetLeftRight.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.OnSplitterMoved);
@@ -1801,7 +1886,7 @@ namespace FamilyManager
             this.gridSuitcase.ReadOnly = true;
             this.gridSuitcase.RowHeadersVisible = false;
             this.gridSuitcase.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridSuitcase.Size = new System.Drawing.Size(497, 239);
+            this.gridSuitcase.Size = new System.Drawing.Size(497, 237);
             this.gridSuitcase.TabIndex = 2;
             this.gridSuitcase.MultiSelectChanged += new System.EventHandler(this.OnOutfitGridSelectionChanged);
             this.gridSuitcase.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -1956,7 +2041,7 @@ namespace FamilyManager
             // btnSuitcaseEmpty
             // 
             this.btnSuitcaseEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseEmpty.Location = new System.Drawing.Point(3, 245);
+            this.btnSuitcaseEmpty.Location = new System.Drawing.Point(3, 243);
             this.btnSuitcaseEmpty.Name = "btnSuitcaseEmpty";
             this.btnSuitcaseEmpty.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseEmpty.TabIndex = 29;
@@ -1967,7 +2052,7 @@ namespace FamilyManager
             // btnSuitcaseSave
             // 
             this.btnSuitcaseSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseSave.Location = new System.Drawing.Point(79, 245);
+            this.btnSuitcaseSave.Location = new System.Drawing.Point(79, 243);
             this.btnSuitcaseSave.Name = "btnSuitcaseSave";
             this.btnSuitcaseSave.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseSave.TabIndex = 32;
@@ -1978,7 +2063,7 @@ namespace FamilyManager
             // btnSuitcaseLoad
             // 
             this.btnSuitcaseLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseLoad.Location = new System.Drawing.Point(155, 245);
+            this.btnSuitcaseLoad.Location = new System.Drawing.Point(155, 243);
             this.btnSuitcaseLoad.Name = "btnSuitcaseLoad";
             this.btnSuitcaseLoad.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseLoad.TabIndex = 33;
@@ -1989,7 +2074,7 @@ namespace FamilyManager
             // btnSuitcaseCopy
             // 
             this.btnSuitcaseCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseCopy.Location = new System.Drawing.Point(231, 245);
+            this.btnSuitcaseCopy.Location = new System.Drawing.Point(231, 243);
             this.btnSuitcaseCopy.Name = "btnSuitcaseCopy";
             this.btnSuitcaseCopy.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseCopy.TabIndex = 30;
@@ -2000,7 +2085,7 @@ namespace FamilyManager
             // btnSuitcaseMove
             // 
             this.btnSuitcaseMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseMove.Location = new System.Drawing.Point(307, 245);
+            this.btnSuitcaseMove.Location = new System.Drawing.Point(307, 243);
             this.btnSuitcaseMove.Name = "btnSuitcaseMove";
             this.btnSuitcaseMove.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseMove.TabIndex = 31;
@@ -2052,7 +2137,7 @@ namespace FamilyManager
             this.gridFamilyCloset.ReadOnly = true;
             this.gridFamilyCloset.RowHeadersVisible = false;
             this.gridFamilyCloset.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridFamilyCloset.Size = new System.Drawing.Size(773, 241);
+            this.gridFamilyCloset.Size = new System.Drawing.Size(773, 239);
             this.gridFamilyCloset.TabIndex = 1;
             this.gridFamilyCloset.MultiSelectChanged += new System.EventHandler(this.OnOutfitGridSelectionChanged);
             this.gridFamilyCloset.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -2237,7 +2322,7 @@ namespace FamilyManager
             // btnClosetCopy
             // 
             this.btnClosetCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetCopy.Location = new System.Drawing.Point(0, 247);
+            this.btnClosetCopy.Location = new System.Drawing.Point(0, 245);
             this.btnClosetCopy.Name = "btnClosetCopy";
             this.btnClosetCopy.Size = new System.Drawing.Size(88, 26);
             this.btnClosetCopy.TabIndex = 26;
@@ -2248,7 +2333,7 @@ namespace FamilyManager
             // btnClosetMove
             // 
             this.btnClosetMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetMove.Location = new System.Drawing.Point(94, 247);
+            this.btnClosetMove.Location = new System.Drawing.Point(94, 245);
             this.btnClosetMove.Name = "btnClosetMove";
             this.btnClosetMove.Size = new System.Drawing.Size(88, 26);
             this.btnClosetMove.TabIndex = 27;
@@ -2259,7 +2344,7 @@ namespace FamilyManager
             // btnClosetDelete
             // 
             this.btnClosetDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetDelete.Location = new System.Drawing.Point(188, 247);
+            this.btnClosetDelete.Location = new System.Drawing.Point(188, 245);
             this.btnClosetDelete.Name = "btnClosetDelete";
             this.btnClosetDelete.Size = new System.Drawing.Size(88, 26);
             this.btnClosetDelete.TabIndex = 28;
@@ -2270,7 +2355,7 @@ namespace FamilyManager
             // btnClosetShowAll
             // 
             this.btnClosetShowAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetShowAll.Location = new System.Drawing.Point(292, 247);
+            this.btnClosetShowAll.Location = new System.Drawing.Point(292, 245);
             this.btnClosetShowAll.Name = "btnClosetShowAll";
             this.btnClosetShowAll.Size = new System.Drawing.Size(88, 25);
             this.btnClosetShowAll.TabIndex = 29;
@@ -2316,7 +2401,7 @@ namespace FamilyManager
             this.splitSafeLeftRight.Panel2.Controls.Add(this.btnSafeDelete);
             this.splitSafeLeftRight.Panel2.Controls.Add(this.btnSafeShowAll);
             this.splitSafeLeftRight.Panel2MinSize = 300;
-            this.splitSafeLeftRight.Size = new System.Drawing.Size(1280, 274);
+            this.splitSafeLeftRight.Size = new System.Drawing.Size(1280, 272);
             this.splitSafeLeftRight.SplitterDistance = 500;
             this.splitSafeLeftRight.TabIndex = 1;
             this.splitSafeLeftRight.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.OnSplitterMoved);
@@ -2360,7 +2445,7 @@ namespace FamilyManager
             this.gridJewelbox.ReadOnly = true;
             this.gridJewelbox.RowHeadersVisible = false;
             this.gridJewelbox.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridJewelbox.Size = new System.Drawing.Size(497, 239);
+            this.gridJewelbox.Size = new System.Drawing.Size(497, 237);
             this.gridJewelbox.TabIndex = 2;
             this.gridJewelbox.MultiSelectChanged += new System.EventHandler(this.OnOutfitGridSelectionChanged);
             this.gridJewelbox.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -2478,7 +2563,7 @@ namespace FamilyManager
             // btnJewelboxEmpty
             // 
             this.btnJewelboxEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxEmpty.Location = new System.Drawing.Point(3, 245);
+            this.btnJewelboxEmpty.Location = new System.Drawing.Point(3, 243);
             this.btnJewelboxEmpty.Name = "btnJewelboxEmpty";
             this.btnJewelboxEmpty.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxEmpty.TabIndex = 29;
@@ -2489,7 +2574,7 @@ namespace FamilyManager
             // btnJewelboxSave
             // 
             this.btnJewelboxSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxSave.Location = new System.Drawing.Point(79, 245);
+            this.btnJewelboxSave.Location = new System.Drawing.Point(79, 243);
             this.btnJewelboxSave.Name = "btnJewelboxSave";
             this.btnJewelboxSave.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxSave.TabIndex = 32;
@@ -2500,7 +2585,7 @@ namespace FamilyManager
             // btnJewelboxLoad
             // 
             this.btnJewelboxLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxLoad.Location = new System.Drawing.Point(155, 245);
+            this.btnJewelboxLoad.Location = new System.Drawing.Point(155, 243);
             this.btnJewelboxLoad.Name = "btnJewelboxLoad";
             this.btnJewelboxLoad.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxLoad.TabIndex = 33;
@@ -2511,7 +2596,7 @@ namespace FamilyManager
             // btnJewelboxCopy
             // 
             this.btnJewelboxCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxCopy.Location = new System.Drawing.Point(231, 245);
+            this.btnJewelboxCopy.Location = new System.Drawing.Point(231, 243);
             this.btnJewelboxCopy.Name = "btnJewelboxCopy";
             this.btnJewelboxCopy.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxCopy.TabIndex = 30;
@@ -2522,7 +2607,7 @@ namespace FamilyManager
             // btnJewelboxMove
             // 
             this.btnJewelboxMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnJewelboxMove.Location = new System.Drawing.Point(307, 245);
+            this.btnJewelboxMove.Location = new System.Drawing.Point(307, 243);
             this.btnJewelboxMove.Name = "btnJewelboxMove";
             this.btnJewelboxMove.Size = new System.Drawing.Size(70, 26);
             this.btnJewelboxMove.TabIndex = 31;
@@ -2574,7 +2659,7 @@ namespace FamilyManager
             this.gridFamilySafe.ReadOnly = true;
             this.gridFamilySafe.RowHeadersVisible = false;
             this.gridFamilySafe.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridFamilySafe.Size = new System.Drawing.Size(773, 239);
+            this.gridFamilySafe.Size = new System.Drawing.Size(773, 237);
             this.gridFamilySafe.TabIndex = 1;
             this.gridFamilySafe.MultiSelectChanged += new System.EventHandler(this.OnOutfitGridSelectionChanged);
             this.gridFamilySafe.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -2759,7 +2844,7 @@ namespace FamilyManager
             // btnSafeCopy
             // 
             this.btnSafeCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeCopy.Location = new System.Drawing.Point(0, 245);
+            this.btnSafeCopy.Location = new System.Drawing.Point(0, 243);
             this.btnSafeCopy.Name = "btnSafeCopy";
             this.btnSafeCopy.Size = new System.Drawing.Size(88, 26);
             this.btnSafeCopy.TabIndex = 26;
@@ -2770,7 +2855,7 @@ namespace FamilyManager
             // btnSafeMove
             // 
             this.btnSafeMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeMove.Location = new System.Drawing.Point(94, 245);
+            this.btnSafeMove.Location = new System.Drawing.Point(94, 243);
             this.btnSafeMove.Name = "btnSafeMove";
             this.btnSafeMove.Size = new System.Drawing.Size(88, 26);
             this.btnSafeMove.TabIndex = 27;
@@ -2781,7 +2866,7 @@ namespace FamilyManager
             // btnSafeDelete
             // 
             this.btnSafeDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeDelete.Location = new System.Drawing.Point(188, 245);
+            this.btnSafeDelete.Location = new System.Drawing.Point(188, 243);
             this.btnSafeDelete.Name = "btnSafeDelete";
             this.btnSafeDelete.Size = new System.Drawing.Size(88, 26);
             this.btnSafeDelete.TabIndex = 28;
@@ -2792,7 +2877,7 @@ namespace FamilyManager
             // btnSafeShowAll
             // 
             this.btnSafeShowAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSafeShowAll.Location = new System.Drawing.Point(292, 245);
+            this.btnSafeShowAll.Location = new System.Drawing.Point(292, 243);
             this.btnSafeShowAll.Name = "btnSafeShowAll";
             this.btnSafeShowAll.Size = new System.Drawing.Size(88, 26);
             this.btnSafeShowAll.TabIndex = 29;
@@ -2804,8 +2889,8 @@ namespace FamilyManager
             // 
             this.tabAspiration.Controls.Add(this.grpModifiers);
             this.tabAspiration.Controls.Add(this.grpBenefits);
-            this.tabAspiration.Controls.Add(this.imageAspirationsSim);
             this.tabAspiration.Controls.Add(this.grpAspiration);
+            this.tabAspiration.Controls.Add(this.imageAspirationsSim);
             this.tabAspiration.Location = new System.Drawing.Point(4, 4);
             this.tabAspiration.Margin = new System.Windows.Forms.Padding(0);
             this.tabAspiration.Name = "tabAspiration";
@@ -3269,16 +3354,6 @@ namespace FamilyManager
             this.lblBenefitsNeeds.TabIndex = 30;
             this.lblBenefitsNeeds.Text = "Needs:";
             // 
-            // imageAspirationsSim
-            // 
-            this.imageAspirationsSim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.imageAspirationsSim.Location = new System.Drawing.Point(1085, 15);
-            this.imageAspirationsSim.Name = "imageAspirationsSim";
-            this.imageAspirationsSim.Size = new System.Drawing.Size(192, 192);
-            this.imageAspirationsSim.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.imageAspirationsSim.TabIndex = 5;
-            this.imageAspirationsSim.TabStop = false;
-            // 
             // grpAspiration
             // 
             this.grpAspiration.Controls.Add(this.ckbAspirationPermaPlat);
@@ -3497,6 +3572,16 @@ namespace FamilyManager
             this.comboAspirationPrimary.TabIndex = 0;
             this.comboAspirationPrimary.SelectedIndexChanged += new System.EventHandler(this.OnAspirationPrimaryChanged);
             // 
+            // imageAspirationsSim
+            // 
+            this.imageAspirationsSim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.imageAspirationsSim.Location = new System.Drawing.Point(1085, 15);
+            this.imageAspirationsSim.Name = "imageAspirationsSim";
+            this.imageAspirationsSim.Size = new System.Drawing.Size(192, 192);
+            this.imageAspirationsSim.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.imageAspirationsSim.TabIndex = 5;
+            this.imageAspirationsSim.TabStop = false;
+            // 
             // tabCareer
             // 
             this.tabCareer.Controls.Add(this.imageCareerSim);
@@ -3506,7 +3591,7 @@ namespace FamilyManager
             this.tabCareer.Location = new System.Drawing.Point(4, 4);
             this.tabCareer.Margin = new System.Windows.Forms.Padding(0);
             this.tabCareer.Name = "tabCareer";
-            this.tabCareer.Size = new System.Drawing.Size(1276, 281);
+            this.tabCareer.Size = new System.Drawing.Size(1276, 283);
             this.tabCareer.TabIndex = 3;
             this.tabCareer.Text = "Career";
             this.tabCareer.UseVisualStyleBackColor = true;
@@ -4192,11 +4277,11 @@ namespace FamilyManager
             // 
             // tabSkills
             // 
-            this.tabSkills.Controls.Add(this.grpSkillsPet);
             this.tabSkills.Controls.Add(this.grpSkillsLife);
             this.tabSkills.Controls.Add(this.grpSkillsToddler);
             this.tabSkills.Controls.Add(this.grpSkillsHidden);
             this.tabSkills.Controls.Add(this.grpSkillsGeneral);
+            this.tabSkills.Controls.Add(this.grpSkillsPet);
             this.tabSkills.Location = new System.Drawing.Point(4, 4);
             this.tabSkills.Margin = new System.Windows.Forms.Padding(0);
             this.tabSkills.Name = "tabSkills";
@@ -4204,225 +4289,6 @@ namespace FamilyManager
             this.tabSkills.TabIndex = 4;
             this.tabSkills.Text = "Skills";
             this.tabSkills.UseVisualStyleBackColor = true;
-            // 
-            // grpSkillsPet
-            // 
-            this.grpSkillsPet.Controls.Add(this.trackSkillPetUseToilet);
-            this.grpSkillsPet.Controls.Add(this.trackSkillPetStay);
-            this.grpSkillsPet.Controls.Add(this.trackSkillPetSpeak);
-            this.grpSkillsPet.Controls.Add(this.trackSkillPetSitUp);
-            this.grpSkillsPet.Controls.Add(this.trackSkillPetShake);
-            this.grpSkillsPet.Controls.Add(this.trackSkillPetRollOver);
-            this.grpSkillsPet.Controls.Add(this.trackSkillPetPlayDead);
-            this.grpSkillsPet.Controls.Add(this.trackSkillPetComeHere);
-            this.grpSkillsPet.Controls.Add(this.lblSkillPetUseToilet);
-            this.grpSkillsPet.Controls.Add(this.lblSkillPetStay);
-            this.grpSkillsPet.Controls.Add(this.lblSkillPetSpeak);
-            this.grpSkillsPet.Controls.Add(this.lblSkillPetSitUp);
-            this.grpSkillsPet.Controls.Add(this.lblSkillPetShake);
-            this.grpSkillsPet.Controls.Add(this.lblSkillPetRollOver);
-            this.grpSkillsPet.Controls.Add(this.lblSkillPetPlayDead);
-            this.grpSkillsPet.Controls.Add(this.lblSkillPetComeHere);
-            this.grpSkillsPet.Location = new System.Drawing.Point(960, 8);
-            this.grpSkillsPet.Name = "grpSkillsPet";
-            this.grpSkillsPet.Size = new System.Drawing.Size(230, 265);
-            this.grpSkillsPet.TabIndex = 103;
-            this.grpSkillsPet.TabStop = false;
-            this.grpSkillsPet.Text = "Pet Skills";
-            // 
-            // trackSkillPetUseToilet
-            // 
-            this.trackSkillPetUseToilet.Location = new System.Drawing.Point(82, 230);
-            this.trackSkillPetUseToilet.Margin = new System.Windows.Forms.Padding(0);
-            this.trackSkillPetUseToilet.Maximum = 1000;
-            this.trackSkillPetUseToilet.Name = "trackSkillPetUseToilet";
-            this.trackSkillPetUseToilet.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
-            this.trackSkillPetUseToilet.Size = new System.Drawing.Size(138, 21);
-            this.trackSkillPetUseToilet.TabIndex = 102;
-            this.trackSkillPetUseToilet.Tag = "Romance";
-            this.trackSkillPetUseToilet.TokenGuid = ((uint)(1907296382u));
-            this.trackSkillPetUseToilet.TokenProp = ((uint)(0u));
-            this.trackSkillPetUseToilet.Value = ((ushort)(0));
-            this.trackSkillPetUseToilet.Changed += new System.EventHandler(this.OnPetSkillChanged);
-            // 
-            // trackSkillPetStay
-            // 
-            this.trackSkillPetStay.Location = new System.Drawing.Point(82, 200);
-            this.trackSkillPetStay.Margin = new System.Windows.Forms.Padding(0);
-            this.trackSkillPetStay.Maximum = 1000;
-            this.trackSkillPetStay.Name = "trackSkillPetStay";
-            this.trackSkillPetStay.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
-            this.trackSkillPetStay.Size = new System.Drawing.Size(138, 21);
-            this.trackSkillPetStay.TabIndex = 101;
-            this.trackSkillPetStay.Tag = "Mechanical";
-            this.trackSkillPetStay.TokenGuid = ((uint)(2974183285u));
-            this.trackSkillPetStay.TokenProp = ((uint)(0u));
-            this.trackSkillPetStay.Value = ((ushort)(0));
-            this.trackSkillPetStay.Changed += new System.EventHandler(this.OnPetSkillChanged);
-            // 
-            // trackSkillPetSpeak
-            // 
-            this.trackSkillPetSpeak.Location = new System.Drawing.Point(82, 170);
-            this.trackSkillPetSpeak.Margin = new System.Windows.Forms.Padding(0);
-            this.trackSkillPetSpeak.Maximum = 1000;
-            this.trackSkillPetSpeak.Name = "trackSkillPetSpeak";
-            this.trackSkillPetSpeak.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
-            this.trackSkillPetSpeak.Size = new System.Drawing.Size(138, 21);
-            this.trackSkillPetSpeak.TabIndex = 100;
-            this.trackSkillPetSpeak.Tag = "Logic";
-            this.trackSkillPetSpeak.TokenGuid = ((uint)(825507393u));
-            this.trackSkillPetSpeak.TokenProp = ((uint)(0u));
-            this.trackSkillPetSpeak.Value = ((ushort)(0));
-            this.trackSkillPetSpeak.Changed += new System.EventHandler(this.OnPetSkillChanged);
-            // 
-            // trackSkillPetSitUp
-            // 
-            this.trackSkillPetSitUp.Location = new System.Drawing.Point(82, 140);
-            this.trackSkillPetSitUp.Margin = new System.Windows.Forms.Padding(0);
-            this.trackSkillPetSitUp.Maximum = 1000;
-            this.trackSkillPetSitUp.Name = "trackSkillPetSitUp";
-            this.trackSkillPetSitUp.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
-            this.trackSkillPetSitUp.Size = new System.Drawing.Size(138, 21);
-            this.trackSkillPetSitUp.TabIndex = 99;
-            this.trackSkillPetSitUp.Tag = "Creativity";
-            this.trackSkillPetSitUp.TokenGuid = ((uint)(1906766110u));
-            this.trackSkillPetSitUp.TokenProp = ((uint)(0u));
-            this.trackSkillPetSitUp.Value = ((ushort)(0));
-            this.trackSkillPetSitUp.Changed += new System.EventHandler(this.OnPetSkillChanged);
-            // 
-            // trackSkillPetShake
-            // 
-            this.trackSkillPetShake.Location = new System.Drawing.Point(82, 110);
-            this.trackSkillPetShake.Margin = new System.Windows.Forms.Padding(0);
-            this.trackSkillPetShake.Maximum = 1000;
-            this.trackSkillPetShake.Name = "trackSkillPetShake";
-            this.trackSkillPetShake.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
-            this.trackSkillPetShake.Size = new System.Drawing.Size(138, 21);
-            this.trackSkillPetShake.TabIndex = 98;
-            this.trackSkillPetShake.Tag = "Cooking";
-            this.trackSkillPetShake.TokenGuid = ((uint)(4046217132u));
-            this.trackSkillPetShake.TokenProp = ((uint)(0u));
-            this.trackSkillPetShake.Value = ((ushort)(0));
-            this.trackSkillPetShake.Changed += new System.EventHandler(this.OnPetSkillChanged);
-            // 
-            // trackSkillPetRollOver
-            // 
-            this.trackSkillPetRollOver.Location = new System.Drawing.Point(82, 80);
-            this.trackSkillPetRollOver.Margin = new System.Windows.Forms.Padding(0);
-            this.trackSkillPetRollOver.Maximum = 1000;
-            this.trackSkillPetRollOver.Name = "trackSkillPetRollOver";
-            this.trackSkillPetRollOver.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
-            this.trackSkillPetRollOver.Size = new System.Drawing.Size(138, 21);
-            this.trackSkillPetRollOver.TabIndex = 97;
-            this.trackSkillPetRollOver.Tag = "Cleaning";
-            this.trackSkillPetRollOver.TokenGuid = ((uint)(2980508008u));
-            this.trackSkillPetRollOver.TokenProp = ((uint)(0u));
-            this.trackSkillPetRollOver.Value = ((ushort)(0));
-            this.trackSkillPetRollOver.Changed += new System.EventHandler(this.OnPetSkillChanged);
-            // 
-            // trackSkillPetPlayDead
-            // 
-            this.trackSkillPetPlayDead.Location = new System.Drawing.Point(82, 50);
-            this.trackSkillPetPlayDead.Margin = new System.Windows.Forms.Padding(0);
-            this.trackSkillPetPlayDead.Maximum = 1000;
-            this.trackSkillPetPlayDead.Name = "trackSkillPetPlayDead";
-            this.trackSkillPetPlayDead.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
-            this.trackSkillPetPlayDead.Size = new System.Drawing.Size(138, 21);
-            this.trackSkillPetPlayDead.TabIndex = 96;
-            this.trackSkillPetPlayDead.Tag = "Charisma";
-            this.trackSkillPetPlayDead.TokenGuid = ((uint)(1362464868u));
-            this.trackSkillPetPlayDead.TokenProp = ((uint)(0u));
-            this.trackSkillPetPlayDead.Value = ((ushort)(0));
-            this.trackSkillPetPlayDead.Changed += new System.EventHandler(this.OnPetSkillChanged);
-            // 
-            // trackSkillPetComeHere
-            // 
-            this.trackSkillPetComeHere.Location = new System.Drawing.Point(82, 20);
-            this.trackSkillPetComeHere.Margin = new System.Windows.Forms.Padding(0);
-            this.trackSkillPetComeHere.Maximum = 1000;
-            this.trackSkillPetComeHere.Name = "trackSkillPetComeHere";
-            this.trackSkillPetComeHere.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
-            this.trackSkillPetComeHere.Size = new System.Drawing.Size(138, 21);
-            this.trackSkillPetComeHere.TabIndex = 95;
-            this.trackSkillPetComeHere.Tag = "Body";
-            this.trackSkillPetComeHere.TokenGuid = ((uint)(3510116837u));
-            this.trackSkillPetComeHere.TokenProp = ((uint)(0u));
-            this.trackSkillPetComeHere.Value = ((ushort)(0));
-            this.trackSkillPetComeHere.Changed += new System.EventHandler(this.OnPetSkillChanged);
-            // 
-            // lblSkillPetUseToilet
-            // 
-            this.lblSkillPetUseToilet.AutoSize = true;
-            this.lblSkillPetUseToilet.Location = new System.Drawing.Point(13, 235);
-            this.lblSkillPetUseToilet.Name = "lblSkillPetUseToilet";
-            this.lblSkillPetUseToilet.Size = new System.Drawing.Size(65, 15);
-            this.lblSkillPetUseToilet.TabIndex = 52;
-            this.lblSkillPetUseToilet.Text = "Use Toilet:";
-            // 
-            // lblSkillPetStay
-            // 
-            this.lblSkillPetStay.AutoSize = true;
-            this.lblSkillPetStay.Location = new System.Drawing.Point(45, 205);
-            this.lblSkillPetStay.Name = "lblSkillPetStay";
-            this.lblSkillPetStay.Size = new System.Drawing.Size(33, 15);
-            this.lblSkillPetStay.TabIndex = 51;
-            this.lblSkillPetStay.Text = "Stay:";
-            // 
-            // lblSkillPetSpeak
-            // 
-            this.lblSkillPetSpeak.AutoSize = true;
-            this.lblSkillPetSpeak.Location = new System.Drawing.Point(33, 175);
-            this.lblSkillPetSpeak.Name = "lblSkillPetSpeak";
-            this.lblSkillPetSpeak.Size = new System.Drawing.Size(45, 15);
-            this.lblSkillPetSpeak.TabIndex = 50;
-            this.lblSkillPetSpeak.Tag = "";
-            this.lblSkillPetSpeak.Text = "Speak:";
-            // 
-            // lblSkillPetSitUp
-            // 
-            this.lblSkillPetSitUp.AutoSize = true;
-            this.lblSkillPetSitUp.Location = new System.Drawing.Point(35, 145);
-            this.lblSkillPetSitUp.Name = "lblSkillPetSitUp";
-            this.lblSkillPetSitUp.Size = new System.Drawing.Size(43, 15);
-            this.lblSkillPetSitUp.TabIndex = 49;
-            this.lblSkillPetSitUp.Tag = "";
-            this.lblSkillPetSitUp.Text = "Sit Up:";
-            // 
-            // lblSkillPetShake
-            // 
-            this.lblSkillPetShake.AutoSize = true;
-            this.lblSkillPetShake.Location = new System.Drawing.Point(33, 115);
-            this.lblSkillPetShake.Name = "lblSkillPetShake";
-            this.lblSkillPetShake.Size = new System.Drawing.Size(45, 15);
-            this.lblSkillPetShake.TabIndex = 48;
-            this.lblSkillPetShake.Text = "Shake:";
-            // 
-            // lblSkillPetRollOver
-            // 
-            this.lblSkillPetRollOver.AutoSize = true;
-            this.lblSkillPetRollOver.Location = new System.Drawing.Point(18, 85);
-            this.lblSkillPetRollOver.Name = "lblSkillPetRollOver";
-            this.lblSkillPetRollOver.Size = new System.Drawing.Size(60, 15);
-            this.lblSkillPetRollOver.TabIndex = 47;
-            this.lblSkillPetRollOver.Text = "Roll Over:";
-            // 
-            // lblSkillPetPlayDead
-            // 
-            this.lblSkillPetPlayDead.AutoSize = true;
-            this.lblSkillPetPlayDead.Location = new System.Drawing.Point(12, 55);
-            this.lblSkillPetPlayDead.Name = "lblSkillPetPlayDead";
-            this.lblSkillPetPlayDead.Size = new System.Drawing.Size(66, 15);
-            this.lblSkillPetPlayDead.TabIndex = 46;
-            this.lblSkillPetPlayDead.Text = "Play Dead:";
-            // 
-            // lblSkillPetComeHere
-            // 
-            this.lblSkillPetComeHere.AutoSize = true;
-            this.lblSkillPetComeHere.Location = new System.Drawing.Point(7, 25);
-            this.lblSkillPetComeHere.Name = "lblSkillPetComeHere";
-            this.lblSkillPetComeHere.Size = new System.Drawing.Size(73, 15);
-            this.lblSkillPetComeHere.TabIndex = 0;
-            this.lblSkillPetComeHere.Text = "Come Here:";
             // 
             // grpSkillsLife
             // 
@@ -4438,7 +4304,7 @@ namespace FamilyManager
             this.grpSkillsLife.Controls.Add(this.lblSkillLifeFireSafety);
             this.grpSkillsLife.Controls.Add(this.lblSkillLifeCounselling);
             this.grpSkillsLife.Controls.Add(this.lblSkillLifeAngerMgmt);
-            this.grpSkillsLife.Location = new System.Drawing.Point(715, 8);
+            this.grpSkillsLife.Location = new System.Drawing.Point(960, 8);
             this.grpSkillsLife.Name = "grpSkillsLife";
             this.grpSkillsLife.Size = new System.Drawing.Size(235, 265);
             this.grpSkillsLife.TabIndex = 83;
@@ -4704,6 +4570,10 @@ namespace FamilyManager
             // 
             // grpSkillsHidden
             // 
+            this.grpSkillsHidden.Controls.Add(this.trackSkillHiddenHulaDance);
+            this.grpSkillsHidden.Controls.Add(this.trackSkillHiddenSlapDance);
+            this.grpSkillsHidden.Controls.Add(this.lblSkillHiddenHulaDance);
+            this.grpSkillsHidden.Controls.Add(this.lblSkillHiddenSlapDance);
             this.grpSkillsHidden.Controls.Add(this.trackSkillHiddenFireDance);
             this.grpSkillsHidden.Controls.Add(this.lblSkillHiddenFireDance);
             this.grpSkillsHidden.Controls.Add(this.trackSkillHiddenBreakDance);
@@ -4720,10 +4590,58 @@ namespace FamilyManager
             this.grpSkillsHidden.Controls.Add(this.lblSkillHiddenDance);
             this.grpSkillsHidden.Location = new System.Drawing.Point(470, 8);
             this.grpSkillsHidden.Name = "grpSkillsHidden";
-            this.grpSkillsHidden.Size = new System.Drawing.Size(235, 265);
+            this.grpSkillsHidden.Size = new System.Drawing.Size(450, 265);
             this.grpSkillsHidden.TabIndex = 82;
             this.grpSkillsHidden.TabStop = false;
             this.grpSkillsHidden.Text = "Hidden Skills";
+            // 
+            // trackSkillHiddenHulaDance
+            // 
+            this.trackSkillHiddenHulaDance.Location = new System.Drawing.Point(87, 110);
+            this.trackSkillHiddenHulaDance.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillHiddenHulaDance.Maximum = 1000;
+            this.trackSkillHiddenHulaDance.Name = "trackSkillHiddenHulaDance";
+            this.trackSkillHiddenHulaDance.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillHiddenHulaDance.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillHiddenHulaDance.TabIndex = 117;
+            this.trackSkillHiddenHulaDance.Tag = "Hula Dance";
+            this.trackSkillHiddenHulaDance.TokenGuid = ((uint)(318019858u));
+            this.trackSkillHiddenHulaDance.TokenProp = ((uint)(1u));
+            this.trackSkillHiddenHulaDance.Value = ((ushort)(0));
+            this.trackSkillHiddenHulaDance.Changed += new System.EventHandler(this.OnHiddenSkillChanged);
+            // 
+            // trackSkillHiddenSlapDance
+            // 
+            this.trackSkillHiddenSlapDance.Location = new System.Drawing.Point(302, 50);
+            this.trackSkillHiddenSlapDance.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillHiddenSlapDance.Maximum = 300;
+            this.trackSkillHiddenSlapDance.Name = "trackSkillHiddenSlapDance";
+            this.trackSkillHiddenSlapDance.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillHiddenSlapDance.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillHiddenSlapDance.TabIndex = 116;
+            this.trackSkillHiddenSlapDance.Tag = "Slap Dance";
+            this.trackSkillHiddenSlapDance.TokenGuid = ((uint)(2469119413u));
+            this.trackSkillHiddenSlapDance.TokenProp = ((uint)(1u));
+            this.trackSkillHiddenSlapDance.Value = ((ushort)(0));
+            this.trackSkillHiddenSlapDance.Changed += new System.EventHandler(this.OnHiddenSkillChanged);
+            // 
+            // lblSkillHiddenHulaDance
+            // 
+            this.lblSkillHiddenHulaDance.AutoSize = true;
+            this.lblSkillHiddenHulaDance.Location = new System.Drawing.Point(10, 115);
+            this.lblSkillHiddenHulaDance.Name = "lblSkillHiddenHulaDance";
+            this.lblSkillHiddenHulaDance.Size = new System.Drawing.Size(75, 15);
+            this.lblSkillHiddenHulaDance.TabIndex = 114;
+            this.lblSkillHiddenHulaDance.Text = "Hula Dance:";
+            // 
+            // lblSkillHiddenSlapDance
+            // 
+            this.lblSkillHiddenSlapDance.AutoSize = true;
+            this.lblSkillHiddenSlapDance.Location = new System.Drawing.Point(226, 55);
+            this.lblSkillHiddenSlapDance.Name = "lblSkillHiddenSlapDance";
+            this.lblSkillHiddenSlapDance.Size = new System.Drawing.Size(74, 15);
+            this.lblSkillHiddenSlapDance.TabIndex = 115;
+            this.lblSkillHiddenSlapDance.Text = "Slap Dance:";
             // 
             // trackSkillHiddenFireDance
             // 
@@ -4775,7 +4693,7 @@ namespace FamilyManager
             // 
             // trackSkillHiddenTaiChi
             // 
-            this.trackSkillHiddenTaiChi.Location = new System.Drawing.Point(87, 200);
+            this.trackSkillHiddenTaiChi.Location = new System.Drawing.Point(302, 110);
             this.trackSkillHiddenTaiChi.Margin = new System.Windows.Forms.Padding(0);
             this.trackSkillHiddenTaiChi.Maximum = 72;
             this.trackSkillHiddenTaiChi.Name = "trackSkillHiddenTaiChi";
@@ -4790,7 +4708,7 @@ namespace FamilyManager
             // 
             // trackSkillHiddenStudy
             // 
-            this.trackSkillHiddenStudy.Location = new System.Drawing.Point(87, 170);
+            this.trackSkillHiddenStudy.Location = new System.Drawing.Point(302, 80);
             this.trackSkillHiddenStudy.Margin = new System.Windows.Forms.Padding(0);
             this.trackSkillHiddenStudy.Maximum = 50;
             this.trackSkillHiddenStudy.Name = "trackSkillHiddenStudy";
@@ -4805,7 +4723,7 @@ namespace FamilyManager
             // 
             // trackSkillHiddenPool
             // 
-            this.trackSkillHiddenPool.Location = new System.Drawing.Point(87, 140);
+            this.trackSkillHiddenPool.Location = new System.Drawing.Point(302, 20);
             this.trackSkillHiddenPool.Margin = new System.Windows.Forms.Padding(0);
             this.trackSkillHiddenPool.Maximum = 100;
             this.trackSkillHiddenPool.Name = "trackSkillHiddenPool";
@@ -4820,7 +4738,7 @@ namespace FamilyManager
             // 
             // trackSkillHiddenMeditate
             // 
-            this.trackSkillHiddenMeditate.Location = new System.Drawing.Point(87, 110);
+            this.trackSkillHiddenMeditate.Location = new System.Drawing.Point(87, 140);
             this.trackSkillHiddenMeditate.Margin = new System.Windows.Forms.Padding(0);
             this.trackSkillHiddenMeditate.Maximum = 500;
             this.trackSkillHiddenMeditate.Name = "trackSkillHiddenMeditate";
@@ -4851,7 +4769,7 @@ namespace FamilyManager
             // lblSkillHiddenTaiChi
             // 
             this.lblSkillHiddenTaiChi.AutoSize = true;
-            this.lblSkillHiddenTaiChi.Location = new System.Drawing.Point(37, 205);
+            this.lblSkillHiddenTaiChi.Location = new System.Drawing.Point(252, 115);
             this.lblSkillHiddenTaiChi.Name = "lblSkillHiddenTaiChi";
             this.lblSkillHiddenTaiChi.Size = new System.Drawing.Size(48, 15);
             this.lblSkillHiddenTaiChi.TabIndex = 51;
@@ -4860,7 +4778,7 @@ namespace FamilyManager
             // lblSkillHiddenStudy
             // 
             this.lblSkillHiddenStudy.AutoSize = true;
-            this.lblSkillHiddenStudy.Location = new System.Drawing.Point(45, 175);
+            this.lblSkillHiddenStudy.Location = new System.Drawing.Point(260, 85);
             this.lblSkillHiddenStudy.Name = "lblSkillHiddenStudy";
             this.lblSkillHiddenStudy.Size = new System.Drawing.Size(40, 15);
             this.lblSkillHiddenStudy.TabIndex = 48;
@@ -4869,7 +4787,7 @@ namespace FamilyManager
             // lblSkillHiddenPool
             // 
             this.lblSkillHiddenPool.AutoSize = true;
-            this.lblSkillHiddenPool.Location = new System.Drawing.Point(24, 145);
+            this.lblSkillHiddenPool.Location = new System.Drawing.Point(239, 25);
             this.lblSkillHiddenPool.Name = "lblSkillHiddenPool";
             this.lblSkillHiddenPool.Size = new System.Drawing.Size(61, 15);
             this.lblSkillHiddenPool.TabIndex = 47;
@@ -4878,7 +4796,7 @@ namespace FamilyManager
             // lblSkillHiddenMeditate
             // 
             this.lblSkillHiddenMeditate.AutoSize = true;
-            this.lblSkillHiddenMeditate.Location = new System.Drawing.Point(27, 115);
+            this.lblSkillHiddenMeditate.Location = new System.Drawing.Point(27, 145);
             this.lblSkillHiddenMeditate.Name = "lblSkillHiddenMeditate";
             this.lblSkillHiddenMeditate.Size = new System.Drawing.Size(58, 15);
             this.lblSkillHiddenMeditate.TabIndex = 46;
@@ -5111,6 +5029,225 @@ namespace FamilyManager
             this.lblSkillBody.Size = new System.Drawing.Size(37, 15);
             this.lblSkillBody.TabIndex = 0;
             this.lblSkillBody.Text = "Body:";
+            // 
+            // grpSkillsPet
+            // 
+            this.grpSkillsPet.Controls.Add(this.trackSkillPetUseToilet);
+            this.grpSkillsPet.Controls.Add(this.trackSkillPetStay);
+            this.grpSkillsPet.Controls.Add(this.trackSkillPetSpeak);
+            this.grpSkillsPet.Controls.Add(this.trackSkillPetSitUp);
+            this.grpSkillsPet.Controls.Add(this.trackSkillPetShake);
+            this.grpSkillsPet.Controls.Add(this.trackSkillPetRollOver);
+            this.grpSkillsPet.Controls.Add(this.trackSkillPetPlayDead);
+            this.grpSkillsPet.Controls.Add(this.trackSkillPetComeHere);
+            this.grpSkillsPet.Controls.Add(this.lblSkillPetUseToilet);
+            this.grpSkillsPet.Controls.Add(this.lblSkillPetStay);
+            this.grpSkillsPet.Controls.Add(this.lblSkillPetSpeak);
+            this.grpSkillsPet.Controls.Add(this.lblSkillPetSitUp);
+            this.grpSkillsPet.Controls.Add(this.lblSkillPetShake);
+            this.grpSkillsPet.Controls.Add(this.lblSkillPetRollOver);
+            this.grpSkillsPet.Controls.Add(this.lblSkillPetPlayDead);
+            this.grpSkillsPet.Controls.Add(this.lblSkillPetComeHere);
+            this.grpSkillsPet.Location = new System.Drawing.Point(0, 8);
+            this.grpSkillsPet.Name = "grpSkillsPet";
+            this.grpSkillsPet.Size = new System.Drawing.Size(230, 265);
+            this.grpSkillsPet.TabIndex = 103;
+            this.grpSkillsPet.TabStop = false;
+            this.grpSkillsPet.Text = "Pet Skills";
+            // 
+            // trackSkillPetUseToilet
+            // 
+            this.trackSkillPetUseToilet.Location = new System.Drawing.Point(82, 230);
+            this.trackSkillPetUseToilet.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillPetUseToilet.Maximum = 1000;
+            this.trackSkillPetUseToilet.Name = "trackSkillPetUseToilet";
+            this.trackSkillPetUseToilet.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillPetUseToilet.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillPetUseToilet.TabIndex = 102;
+            this.trackSkillPetUseToilet.Tag = "Romance";
+            this.trackSkillPetUseToilet.TokenGuid = ((uint)(1907296382u));
+            this.trackSkillPetUseToilet.TokenProp = ((uint)(0u));
+            this.trackSkillPetUseToilet.Value = ((ushort)(0));
+            this.trackSkillPetUseToilet.Changed += new System.EventHandler(this.OnPetSkillChanged);
+            // 
+            // trackSkillPetStay
+            // 
+            this.trackSkillPetStay.Location = new System.Drawing.Point(82, 200);
+            this.trackSkillPetStay.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillPetStay.Maximum = 1000;
+            this.trackSkillPetStay.Name = "trackSkillPetStay";
+            this.trackSkillPetStay.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillPetStay.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillPetStay.TabIndex = 101;
+            this.trackSkillPetStay.Tag = "Mechanical";
+            this.trackSkillPetStay.TokenGuid = ((uint)(2974183285u));
+            this.trackSkillPetStay.TokenProp = ((uint)(0u));
+            this.trackSkillPetStay.Value = ((ushort)(0));
+            this.trackSkillPetStay.Changed += new System.EventHandler(this.OnPetSkillChanged);
+            // 
+            // trackSkillPetSpeak
+            // 
+            this.trackSkillPetSpeak.Location = new System.Drawing.Point(82, 170);
+            this.trackSkillPetSpeak.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillPetSpeak.Maximum = 1000;
+            this.trackSkillPetSpeak.Name = "trackSkillPetSpeak";
+            this.trackSkillPetSpeak.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillPetSpeak.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillPetSpeak.TabIndex = 100;
+            this.trackSkillPetSpeak.Tag = "Logic";
+            this.trackSkillPetSpeak.TokenGuid = ((uint)(825507393u));
+            this.trackSkillPetSpeak.TokenProp = ((uint)(0u));
+            this.trackSkillPetSpeak.Value = ((ushort)(0));
+            this.trackSkillPetSpeak.Changed += new System.EventHandler(this.OnPetSkillChanged);
+            // 
+            // trackSkillPetSitUp
+            // 
+            this.trackSkillPetSitUp.Location = new System.Drawing.Point(82, 140);
+            this.trackSkillPetSitUp.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillPetSitUp.Maximum = 1000;
+            this.trackSkillPetSitUp.Name = "trackSkillPetSitUp";
+            this.trackSkillPetSitUp.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillPetSitUp.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillPetSitUp.TabIndex = 99;
+            this.trackSkillPetSitUp.Tag = "Creativity";
+            this.trackSkillPetSitUp.TokenGuid = ((uint)(1906766110u));
+            this.trackSkillPetSitUp.TokenProp = ((uint)(0u));
+            this.trackSkillPetSitUp.Value = ((ushort)(0));
+            this.trackSkillPetSitUp.Changed += new System.EventHandler(this.OnPetSkillChanged);
+            // 
+            // trackSkillPetShake
+            // 
+            this.trackSkillPetShake.Location = new System.Drawing.Point(82, 110);
+            this.trackSkillPetShake.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillPetShake.Maximum = 1000;
+            this.trackSkillPetShake.Name = "trackSkillPetShake";
+            this.trackSkillPetShake.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillPetShake.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillPetShake.TabIndex = 98;
+            this.trackSkillPetShake.Tag = "Cooking";
+            this.trackSkillPetShake.TokenGuid = ((uint)(4046217132u));
+            this.trackSkillPetShake.TokenProp = ((uint)(0u));
+            this.trackSkillPetShake.Value = ((ushort)(0));
+            this.trackSkillPetShake.Changed += new System.EventHandler(this.OnPetSkillChanged);
+            // 
+            // trackSkillPetRollOver
+            // 
+            this.trackSkillPetRollOver.Location = new System.Drawing.Point(82, 80);
+            this.trackSkillPetRollOver.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillPetRollOver.Maximum = 1000;
+            this.trackSkillPetRollOver.Name = "trackSkillPetRollOver";
+            this.trackSkillPetRollOver.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillPetRollOver.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillPetRollOver.TabIndex = 97;
+            this.trackSkillPetRollOver.Tag = "Cleaning";
+            this.trackSkillPetRollOver.TokenGuid = ((uint)(2980508008u));
+            this.trackSkillPetRollOver.TokenProp = ((uint)(0u));
+            this.trackSkillPetRollOver.Value = ((ushort)(0));
+            this.trackSkillPetRollOver.Changed += new System.EventHandler(this.OnPetSkillChanged);
+            // 
+            // trackSkillPetPlayDead
+            // 
+            this.trackSkillPetPlayDead.Location = new System.Drawing.Point(82, 50);
+            this.trackSkillPetPlayDead.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillPetPlayDead.Maximum = 1000;
+            this.trackSkillPetPlayDead.Name = "trackSkillPetPlayDead";
+            this.trackSkillPetPlayDead.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillPetPlayDead.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillPetPlayDead.TabIndex = 96;
+            this.trackSkillPetPlayDead.Tag = "Charisma";
+            this.trackSkillPetPlayDead.TokenGuid = ((uint)(1362464868u));
+            this.trackSkillPetPlayDead.TokenProp = ((uint)(0u));
+            this.trackSkillPetPlayDead.Value = ((ushort)(0));
+            this.trackSkillPetPlayDead.Changed += new System.EventHandler(this.OnPetSkillChanged);
+            // 
+            // trackSkillPetComeHere
+            // 
+            this.trackSkillPetComeHere.Location = new System.Drawing.Point(82, 20);
+            this.trackSkillPetComeHere.Margin = new System.Windows.Forms.Padding(0);
+            this.trackSkillPetComeHere.Maximum = 1000;
+            this.trackSkillPetComeHere.Name = "trackSkillPetComeHere";
+            this.trackSkillPetComeHere.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.NONE;
+            this.trackSkillPetComeHere.Size = new System.Drawing.Size(138, 21);
+            this.trackSkillPetComeHere.TabIndex = 95;
+            this.trackSkillPetComeHere.Tag = "Body";
+            this.trackSkillPetComeHere.TokenGuid = ((uint)(3510116837u));
+            this.trackSkillPetComeHere.TokenProp = ((uint)(0u));
+            this.trackSkillPetComeHere.Value = ((ushort)(0));
+            this.trackSkillPetComeHere.Changed += new System.EventHandler(this.OnPetSkillChanged);
+            // 
+            // lblSkillPetUseToilet
+            // 
+            this.lblSkillPetUseToilet.AutoSize = true;
+            this.lblSkillPetUseToilet.Location = new System.Drawing.Point(13, 235);
+            this.lblSkillPetUseToilet.Name = "lblSkillPetUseToilet";
+            this.lblSkillPetUseToilet.Size = new System.Drawing.Size(65, 15);
+            this.lblSkillPetUseToilet.TabIndex = 52;
+            this.lblSkillPetUseToilet.Text = "Use Toilet:";
+            // 
+            // lblSkillPetStay
+            // 
+            this.lblSkillPetStay.AutoSize = true;
+            this.lblSkillPetStay.Location = new System.Drawing.Point(45, 205);
+            this.lblSkillPetStay.Name = "lblSkillPetStay";
+            this.lblSkillPetStay.Size = new System.Drawing.Size(33, 15);
+            this.lblSkillPetStay.TabIndex = 51;
+            this.lblSkillPetStay.Text = "Stay:";
+            // 
+            // lblSkillPetSpeak
+            // 
+            this.lblSkillPetSpeak.AutoSize = true;
+            this.lblSkillPetSpeak.Location = new System.Drawing.Point(33, 175);
+            this.lblSkillPetSpeak.Name = "lblSkillPetSpeak";
+            this.lblSkillPetSpeak.Size = new System.Drawing.Size(45, 15);
+            this.lblSkillPetSpeak.TabIndex = 50;
+            this.lblSkillPetSpeak.Tag = "";
+            this.lblSkillPetSpeak.Text = "Speak:";
+            // 
+            // lblSkillPetSitUp
+            // 
+            this.lblSkillPetSitUp.AutoSize = true;
+            this.lblSkillPetSitUp.Location = new System.Drawing.Point(35, 145);
+            this.lblSkillPetSitUp.Name = "lblSkillPetSitUp";
+            this.lblSkillPetSitUp.Size = new System.Drawing.Size(43, 15);
+            this.lblSkillPetSitUp.TabIndex = 49;
+            this.lblSkillPetSitUp.Tag = "";
+            this.lblSkillPetSitUp.Text = "Sit Up:";
+            // 
+            // lblSkillPetShake
+            // 
+            this.lblSkillPetShake.AutoSize = true;
+            this.lblSkillPetShake.Location = new System.Drawing.Point(33, 115);
+            this.lblSkillPetShake.Name = "lblSkillPetShake";
+            this.lblSkillPetShake.Size = new System.Drawing.Size(45, 15);
+            this.lblSkillPetShake.TabIndex = 48;
+            this.lblSkillPetShake.Text = "Shake:";
+            // 
+            // lblSkillPetRollOver
+            // 
+            this.lblSkillPetRollOver.AutoSize = true;
+            this.lblSkillPetRollOver.Location = new System.Drawing.Point(18, 85);
+            this.lblSkillPetRollOver.Name = "lblSkillPetRollOver";
+            this.lblSkillPetRollOver.Size = new System.Drawing.Size(60, 15);
+            this.lblSkillPetRollOver.TabIndex = 47;
+            this.lblSkillPetRollOver.Text = "Roll Over:";
+            // 
+            // lblSkillPetPlayDead
+            // 
+            this.lblSkillPetPlayDead.AutoSize = true;
+            this.lblSkillPetPlayDead.Location = new System.Drawing.Point(12, 55);
+            this.lblSkillPetPlayDead.Name = "lblSkillPetPlayDead";
+            this.lblSkillPetPlayDead.Size = new System.Drawing.Size(66, 15);
+            this.lblSkillPetPlayDead.TabIndex = 46;
+            this.lblSkillPetPlayDead.Text = "Play Dead:";
+            // 
+            // lblSkillPetComeHere
+            // 
+            this.lblSkillPetComeHere.AutoSize = true;
+            this.lblSkillPetComeHere.Location = new System.Drawing.Point(7, 25);
+            this.lblSkillPetComeHere.Name = "lblSkillPetComeHere";
+            this.lblSkillPetComeHere.Size = new System.Drawing.Size(73, 15);
+            this.lblSkillPetComeHere.TabIndex = 0;
+            this.lblSkillPetComeHere.Text = "Come Here:";
             // 
             // tabInterests
             // 
@@ -6138,16 +6275,913 @@ namespace FamilyManager
             this.lblIntCrime.TabIndex = 46;
             this.lblIntCrime.Text = "Crime:";
             // 
-            // thumbBox
+            // tabVacations
             // 
-            this.thumbBox.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.thumbBox.Location = new System.Drawing.Point(10, 57);
-            this.thumbBox.Name = "thumbBox";
-            this.thumbBox.Size = new System.Drawing.Size(128, 128);
-            this.thumbBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.thumbBox.TabIndex = 25;
-            this.thumbBox.TabStop = false;
-            this.thumbBox.Visible = false;
+            this.tabVacations.Controls.Add(this.imageVacationsSim);
+            this.tabVacations.Controls.Add(this.grpVacationsTours);
+            this.tabVacations.Controls.Add(this.grpVacationsMountain);
+            this.tabVacations.Controls.Add(this.grpVacationsFarEast);
+            this.tabVacations.Controls.Add(this.grpVacationsIsland);
+            this.tabVacations.Controls.Add(this.grpVacationsGeneral);
+            this.tabVacations.Location = new System.Drawing.Point(4, 4);
+            this.tabVacations.Margin = new System.Windows.Forms.Padding(0);
+            this.tabVacations.Name = "tabVacations";
+            this.tabVacations.Size = new System.Drawing.Size(1276, 281);
+            this.tabVacations.TabIndex = 8;
+            this.tabVacations.Text = "Vacations";
+            this.tabVacations.UseVisualStyleBackColor = true;
+            // 
+            // imageVacationsSim
+            // 
+            this.imageVacationsSim.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.imageVacationsSim.Location = new System.Drawing.Point(1085, 15);
+            this.imageVacationsSim.Name = "imageVacationsSim";
+            this.imageVacationsSim.Size = new System.Drawing.Size(192, 192);
+            this.imageVacationsSim.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.imageVacationsSim.TabIndex = 53;
+            this.imageVacationsSim.TabStop = false;
+            // 
+            // grpVacationsTours
+            // 
+            this.grpVacationsTours.Controls.Add(this.label11);
+            this.grpVacationsTours.Controls.Add(this.label10);
+            this.grpVacationsTours.Controls.Add(this.label9);
+            this.grpVacationsTours.Controls.Add(this.btnTourIsland3);
+            this.grpVacationsTours.Controls.Add(this.btnTourIsland1);
+            this.grpVacationsTours.Controls.Add(this.btnTourIsland2);
+            this.grpVacationsTours.Controls.Add(this.btnTourFarEast3);
+            this.grpVacationsTours.Controls.Add(this.btnTourFarEast1);
+            this.grpVacationsTours.Controls.Add(this.btnTourFarEast2);
+            this.grpVacationsTours.Controls.Add(this.btnTourMountain3);
+            this.grpVacationsTours.Controls.Add(this.btnTourMountain1);
+            this.grpVacationsTours.Controls.Add(this.btnTourMountain2);
+            this.grpVacationsTours.Location = new System.Drawing.Point(821, 8);
+            this.grpVacationsTours.Name = "grpVacationsTours";
+            this.grpVacationsTours.Size = new System.Drawing.Size(260, 202);
+            this.grpVacationsTours.TabIndex = 51;
+            this.grpVacationsTours.TabStop = false;
+            this.grpVacationsTours.Text = "Tours";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(23, 36);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(43, 15);
+            this.label11.TabIndex = 47;
+            this.label11.Text = "Island:";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(11, 99);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(55, 15);
+            this.label10.TabIndex = 46;
+            this.label10.Text = "Far East:";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(4, 162);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(62, 15);
+            this.label9.TabIndex = 45;
+            this.label9.Text = "Mountain:";
+            // 
+            // btnTourIsland3
+            // 
+            this.btnTourIsland3.Image = global::FamilyManager.Properties.Resources.Tour_Parasailing;
+            this.btnTourIsland3.Location = new System.Drawing.Point(195, 13);
+            this.btnTourIsland3.Margin = new System.Windows.Forms.Padding(0);
+            this.btnTourIsland3.Name = "btnTourIsland3";
+            this.btnTourIsland3.Selected = false;
+            this.btnTourIsland3.Size = new System.Drawing.Size(59, 60);
+            this.btnTourIsland3.TabIndex = 8;
+            this.btnTourIsland3.TokenGuid = ((uint)(4083373016u));
+            this.toolTip.SetToolTip(this.btnTourIsland3, "Parasailing Tour ($300)");
+            this.btnTourIsland3.VacationImage = global::FamilyManager.Properties.Resources.Island_Holiday;
+            this.btnTourIsland3.Click += new System.EventHandler(this.OnVacationTourButtonClicked);
+            // 
+            // btnTourIsland1
+            // 
+            this.btnTourIsland1.Image = global::FamilyManager.Properties.Resources.Tour_GlassBottomBoat;
+            this.btnTourIsland1.Location = new System.Drawing.Point(67, 13);
+            this.btnTourIsland1.Margin = new System.Windows.Forms.Padding(0);
+            this.btnTourIsland1.Name = "btnTourIsland1";
+            this.btnTourIsland1.Selected = false;
+            this.btnTourIsland1.Size = new System.Drawing.Size(60, 60);
+            this.btnTourIsland1.TabIndex = 35;
+            this.btnTourIsland1.TokenGuid = ((uint)(325276596u));
+            this.toolTip.SetToolTip(this.btnTourIsland1, "Glass Bottom Boat Tour ($100)");
+            this.btnTourIsland1.VacationImage = global::FamilyManager.Properties.Resources.Island_Holiday;
+            this.btnTourIsland1.Click += new System.EventHandler(this.OnVacationTourButtonClicked);
+            // 
+            // btnTourIsland2
+            // 
+            this.btnTourIsland2.Image = global::FamilyManager.Properties.Resources.Tour_Helicopter;
+            this.btnTourIsland2.Location = new System.Drawing.Point(131, 13);
+            this.btnTourIsland2.Margin = new System.Windows.Forms.Padding(0);
+            this.btnTourIsland2.Name = "btnTourIsland2";
+            this.btnTourIsland2.Selected = false;
+            this.btnTourIsland2.Size = new System.Drawing.Size(60, 60);
+            this.btnTourIsland2.TabIndex = 36;
+            this.btnTourIsland2.TokenGuid = ((uint)(1399018439u));
+            this.toolTip.SetToolTip(this.btnTourIsland2, "Helicopter Tour ($200)");
+            this.btnTourIsland2.VacationImage = global::FamilyManager.Properties.Resources.Island_Holiday;
+            this.btnTourIsland2.Click += new System.EventHandler(this.OnVacationTourButtonClicked);
+            // 
+            // btnTourFarEast3
+            // 
+            this.btnTourFarEast3.Image = global::FamilyManager.Properties.Resources.Tour_Bamboo;
+            this.btnTourFarEast3.Location = new System.Drawing.Point(195, 76);
+            this.btnTourFarEast3.Margin = new System.Windows.Forms.Padding(0);
+            this.btnTourFarEast3.Name = "btnTourFarEast3";
+            this.btnTourFarEast3.Selected = false;
+            this.btnTourFarEast3.Size = new System.Drawing.Size(60, 60);
+            this.btnTourFarEast3.TabIndex = 38;
+            this.btnTourFarEast3.TokenGuid = ((uint)(3009631248u));
+            this.toolTip.SetToolTip(this.btnTourFarEast3, "Bamboo Forest Tour ($300)");
+            this.btnTourFarEast3.VacationImage = global::FamilyManager.Properties.Resources.FarEast_Holiday;
+            this.btnTourFarEast3.Click += new System.EventHandler(this.OnVacationTourButtonClicked);
+            // 
+            // btnTourFarEast1
+            // 
+            this.btnTourFarEast1.Image = global::FamilyManager.Properties.Resources.Tour_Historic;
+            this.btnTourFarEast1.Location = new System.Drawing.Point(67, 76);
+            this.btnTourFarEast1.Margin = new System.Windows.Forms.Padding(0);
+            this.btnTourFarEast1.Name = "btnTourFarEast1";
+            this.btnTourFarEast1.Selected = false;
+            this.btnTourFarEast1.Size = new System.Drawing.Size(60, 60);
+            this.btnTourFarEast1.TabIndex = 39;
+            this.btnTourFarEast1.TokenGuid = ((uint)(325276660u));
+            this.toolTip.SetToolTip(this.btnTourFarEast1, "Historic Walking Tour ($100)");
+            this.btnTourFarEast1.VacationImage = global::FamilyManager.Properties.Resources.FarEast_Holiday;
+            this.btnTourFarEast1.Click += new System.EventHandler(this.OnVacationTourButtonClicked);
+            // 
+            // btnTourFarEast2
+            // 
+            this.btnTourFarEast2.Image = global::FamilyManager.Properties.Resources.Tour_RiverBoat;
+            this.btnTourFarEast2.Location = new System.Drawing.Point(131, 76);
+            this.btnTourFarEast2.Margin = new System.Windows.Forms.Padding(0);
+            this.btnTourFarEast2.Name = "btnTourFarEast2";
+            this.btnTourFarEast2.Selected = false;
+            this.btnTourFarEast2.Size = new System.Drawing.Size(60, 60);
+            this.btnTourFarEast2.TabIndex = 40;
+            this.btnTourFarEast2.TokenGuid = ((uint)(2472760325u));
+            this.toolTip.SetToolTip(this.btnTourFarEast2, "River Boat Tour ($200)");
+            this.btnTourFarEast2.VacationImage = global::FamilyManager.Properties.Resources.FarEast_Holiday;
+            this.btnTourFarEast2.Click += new System.EventHandler(this.OnVacationTourButtonClicked);
+            // 
+            // btnTourMountain3
+            // 
+            this.btnTourMountain3.Image = global::FamilyManager.Properties.Resources.Tour_NatureTrail;
+            this.btnTourMountain3.Location = new System.Drawing.Point(195, 139);
+            this.btnTourMountain3.Margin = new System.Windows.Forms.Padding(0);
+            this.btnTourMountain3.Name = "btnTourMountain3";
+            this.btnTourMountain3.Selected = false;
+            this.btnTourMountain3.Size = new System.Drawing.Size(60, 60);
+            this.btnTourMountain3.TabIndex = 42;
+            this.btnTourMountain3.TokenGuid = ((uint)(325276478u));
+            this.toolTip.SetToolTip(this.btnTourMountain3, "Nature Trail Tour ($300)");
+            this.btnTourMountain3.VacationImage = global::FamilyManager.Properties.Resources.Mountain_Holiday;
+            this.btnTourMountain3.Click += new System.EventHandler(this.OnVacationTourButtonClicked);
+            // 
+            // btnTourMountain1
+            // 
+            this.btnTourMountain1.Image = global::FamilyManager.Properties.Resources.Tour_Logging;
+            this.btnTourMountain1.Location = new System.Drawing.Point(67, 139);
+            this.btnTourMountain1.Margin = new System.Windows.Forms.Padding(0);
+            this.btnTourMountain1.Name = "btnTourMountain1";
+            this.btnTourMountain1.Selected = false;
+            this.btnTourMountain1.Size = new System.Drawing.Size(60, 60);
+            this.btnTourMountain1.TabIndex = 43;
+            this.btnTourMountain1.TokenGuid = ((uint)(3546501896u));
+            this.toolTip.SetToolTip(this.btnTourMountain1, "Logging Expedition Tour ($100)");
+            this.btnTourMountain1.VacationImage = global::FamilyManager.Properties.Resources.Mountain_Holiday;
+            this.btnTourMountain1.Click += new System.EventHandler(this.OnVacationTourButtonClicked);
+            // 
+            // btnTourMountain2
+            // 
+            this.btnTourMountain2.Image = global::FamilyManager.Properties.Resources.Tour_BirdWatching;
+            this.btnTourMountain2.Location = new System.Drawing.Point(131, 139);
+            this.btnTourMountain2.Margin = new System.Windows.Forms.Padding(0);
+            this.btnTourMountain2.Name = "btnTourMountain2";
+            this.btnTourMountain2.Selected = false;
+            this.btnTourMountain2.Size = new System.Drawing.Size(60, 60);
+            this.btnTourMountain2.TabIndex = 44;
+            this.btnTourMountain2.TokenGuid = ((uint)(1399018275u));
+            this.toolTip.SetToolTip(this.btnTourMountain2, "Bird Watching Tour ($200)");
+            this.btnTourMountain2.VacationImage = global::FamilyManager.Properties.Resources.Mountain_Holiday;
+            this.btnTourMountain2.Click += new System.EventHandler(this.OnVacationTourButtonClicked);
+            // 
+            // grpVacationsMountain
+            // 
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountSecretLot);
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountHoliday);
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountGesture);
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountFood);
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountDeepTissueMassage);
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountSlapDance);
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountMetBigfoot);
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountSleptTent);
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountTreeRings);
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountAxeThrow);
+            this.grpVacationsMountain.Controls.Add(this.btnVacMountWonLogRolling);
+            this.grpVacationsMountain.Location = new System.Drawing.Point(617, 8);
+            this.grpVacationsMountain.Name = "grpVacationsMountain";
+            this.grpVacationsMountain.Size = new System.Drawing.Size(200, 265);
+            this.grpVacationsMountain.TabIndex = 51;
+            this.grpVacationsMountain.TabStop = false;
+            this.grpVacationsMountain.Text = "Mountain";
+            // 
+            // btnVacMountSecretLot
+            // 
+            this.btnVacMountSecretLot.Image = global::FamilyManager.Properties.Resources.SecretLot_Bigfoot;
+            this.btnVacMountSecretLot.Location = new System.Drawing.Point(135, 202);
+            this.btnVacMountSecretLot.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountSecretLot.Name = "btnVacMountSecretLot";
+            this.btnVacMountSecretLot.Selected = false;
+            this.btnVacMountSecretLot.Size = new System.Drawing.Size(60, 60);
+            this.btnVacMountSecretLot.TabIndex = 50;
+            this.btnVacMountSecretLot.TokenGuid = ((uint)(3546500362u));
+            this.toolTip.SetToolTip(this.btnVacMountSecretLot, "Discovered bigfoot\'s secret lot (Discover a vacation secret)");
+            this.btnVacMountSecretLot.Click += new System.EventHandler(this.OnVacationSecretLotButtonClicked);
+            // 
+            // btnVacMountHoliday
+            // 
+            this.btnVacMountHoliday.Image = global::FamilyManager.Properties.Resources.Mountain_Holiday;
+            this.btnVacMountHoliday.Location = new System.Drawing.Point(7, 13);
+            this.btnVacMountHoliday.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountHoliday.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnMountainVacation;
+            this.btnVacMountHoliday.Name = "btnVacMountHoliday";
+            this.btnVacMountHoliday.Selected = false;
+            this.btnVacMountHoliday.Size = new System.Drawing.Size(59, 60);
+            this.btnVacMountHoliday.TabIndex = 8;
+            this.toolTip.SetToolTip(this.btnVacMountHoliday, "Went on a mountain vacation (Explore the wilderness)");
+            this.btnVacMountHoliday.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacMountGesture
+            // 
+            this.btnVacMountGesture.Image = global::FamilyManager.Properties.Resources.Mountain_Gesture;
+            this.btnVacMountGesture.Location = new System.Drawing.Point(71, 13);
+            this.btnVacMountGesture.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountGesture.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntChestPound;
+            this.btnVacMountGesture.Name = "btnVacMountGesture";
+            this.btnVacMountGesture.Selected = false;
+            this.btnVacMountGesture.Size = new System.Drawing.Size(60, 60);
+            this.btnVacMountGesture.TabIndex = 35;
+            this.toolTip.SetToolTip(this.btnVacMountGesture, "Learnt to chest pound (Pound your chest like a true mountaineer)");
+            this.btnVacMountGesture.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacMountFood
+            // 
+            this.btnVacMountFood.Image = global::FamilyManager.Properties.Resources.Mountain_Flapjacks;
+            this.btnVacMountFood.Location = new System.Drawing.Point(135, 13);
+            this.btnVacMountFood.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountFood.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.AteFlapjacks;
+            this.btnVacMountFood.Name = "btnVacMountFood";
+            this.btnVacMountFood.Selected = false;
+            this.btnVacMountFood.Size = new System.Drawing.Size(60, 60);
+            this.btnVacMountFood.TabIndex = 36;
+            this.toolTip.SetToolTip(this.btnVacMountFood, "Ate flapjacks (Enjoy a hearty mountain meal)");
+            this.btnVacMountFood.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacMountDeepTissueMassage
+            // 
+            this.btnVacMountDeepTissueMassage.Image = global::FamilyManager.Properties.Resources.Mountain_DeepTissueMassage;
+            this.btnVacMountDeepTissueMassage.Location = new System.Drawing.Point(7, 76);
+            this.btnVacMountDeepTissueMassage.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountDeepTissueMassage.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntDeepTissueMassage;
+            this.btnVacMountDeepTissueMassage.Name = "btnVacMountDeepTissueMassage";
+            this.btnVacMountDeepTissueMassage.Selected = false;
+            this.btnVacMountDeepTissueMassage.Size = new System.Drawing.Size(60, 60);
+            this.btnVacMountDeepTissueMassage.TabIndex = 38;
+            this.toolTip.SetToolTip(this.btnVacMountDeepTissueMassage, "Learnt deep tissue massage (Learn to work out tension the mountain way)");
+            this.btnVacMountDeepTissueMassage.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacMountSlapDance
+            // 
+            this.btnVacMountSlapDance.Image = global::FamilyManager.Properties.Resources.Mountain_SlapDance;
+            this.btnVacMountSlapDance.Location = new System.Drawing.Point(71, 76);
+            this.btnVacMountSlapDance.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountSlapDance.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntSlapDance;
+            this.btnVacMountSlapDance.Name = "btnVacMountSlapDance";
+            this.btnVacMountSlapDance.Selected = false;
+            this.btnVacMountSlapDance.Size = new System.Drawing.Size(60, 60);
+            this.btnVacMountSlapDance.TabIndex = 39;
+            this.toolTip.SetToolTip(this.btnVacMountSlapDance, "Learnt to slap dance (Learn to dance like the mountain men)");
+            this.btnVacMountSlapDance.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacMountMetBigfoot
+            // 
+            this.btnVacMountMetBigfoot.Image = global::FamilyManager.Properties.Resources.Mountain_MetBigFoot;
+            this.btnVacMountMetBigfoot.Location = new System.Drawing.Point(135, 76);
+            this.btnVacMountMetBigfoot.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountMetBigfoot.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.BefriendedBigFoot;
+            this.btnVacMountMetBigfoot.Name = "btnVacMountMetBigfoot";
+            this.btnVacMountMetBigfoot.Selected = false;
+            this.btnVacMountMetBigfoot.Size = new System.Drawing.Size(60, 60);
+            this.btnVacMountMetBigfoot.TabIndex = 40;
+            this.toolTip.SetToolTip(this.btnVacMountMetBigfoot, "Befriended Bigfoot (Make a furry friend)");
+            this.btnVacMountMetBigfoot.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacMountSleptTent
+            // 
+            this.btnVacMountSleptTent.Image = global::FamilyManager.Properties.Resources.Mountain_Tent;
+            this.btnVacMountSleptTent.Location = new System.Drawing.Point(7, 139);
+            this.btnVacMountSleptTent.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountSleptTent.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.SleptInTent;
+            this.btnVacMountSleptTent.Name = "btnVacMountSleptTent";
+            this.btnVacMountSleptTent.Selected = false;
+            this.btnVacMountSleptTent.Size = new System.Drawing.Size(60, 60);
+            this.btnVacMountSleptTent.TabIndex = 42;
+            this.toolTip.SetToolTip(this.btnVacMountSleptTent, "Slept in a tent (Sleep under the stars)");
+            this.btnVacMountSleptTent.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacMountTreeRings
+            // 
+            this.btnVacMountTreeRings.Image = global::FamilyManager.Properties.Resources.Mountain_TreeRingDisplay;
+            this.btnVacMountTreeRings.Location = new System.Drawing.Point(71, 139);
+            this.btnVacMountTreeRings.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountTreeRings.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.ExaminedTreeRings;
+            this.btnVacMountTreeRings.Name = "btnVacMountTreeRings";
+            this.btnVacMountTreeRings.Selected = false;
+            this.btnVacMountTreeRings.Size = new System.Drawing.Size(60, 60);
+            this.btnVacMountTreeRings.TabIndex = 43;
+            this.toolTip.SetToolTip(this.btnVacMountTreeRings, "Examined the tree ring display (Tree rings tell an interesting tale)");
+            this.btnVacMountTreeRings.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacMountAxeThrow
+            // 
+            this.btnVacMountAxeThrow.Image = global::FamilyManager.Properties.Resources.Mountain_AxeThrowing;
+            this.btnVacMountAxeThrow.Location = new System.Drawing.Point(7, 202);
+            this.btnVacMountAxeThrow.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountAxeThrow.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.AxeThrowingBullseye;
+            this.btnVacMountAxeThrow.Name = "btnVacMountAxeThrow";
+            this.btnVacMountAxeThrow.Selected = false;
+            this.btnVacMountAxeThrow.Size = new System.Drawing.Size(60, 60);
+            this.btnVacMountAxeThrow.TabIndex = 46;
+            this.toolTip.SetToolTip(this.btnVacMountAxeThrow, "Got a bull\'s-eye at axe throwing (Hit that target)");
+            this.btnVacMountAxeThrow.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacMountWonLogRolling
+            // 
+            this.btnVacMountWonLogRolling.Image = global::FamilyManager.Properties.Resources.Mountain_WonLogRolling;
+            this.btnVacMountWonLogRolling.Location = new System.Drawing.Point(71, 202);
+            this.btnVacMountWonLogRolling.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacMountWonLogRolling.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WonLogRolling;
+            this.btnVacMountWonLogRolling.Name = "btnVacMountWonLogRolling";
+            this.btnVacMountWonLogRolling.Selected = false;
+            this.btnVacMountWonLogRolling.Size = new System.Drawing.Size(60, 60);
+            this.btnVacMountWonLogRolling.TabIndex = 47;
+            this.toolTip.SetToolTip(this.btnVacMountWonLogRolling, "Won at log rolling (Stay on the log and win!)");
+            this.btnVacMountWonLogRolling.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // grpVacationsFarEast
+            // 
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastSecretLot);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastHoliday);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastGesture);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastFood);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastAccupressureMassage);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastTaiChi);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastDragonLegend);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastDrankTea);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastMahjong);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastLuckyShrine);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastZenGarden);
+            this.grpVacationsFarEast.Controls.Add(this.btnVacEastTeleport);
+            this.grpVacationsFarEast.Location = new System.Drawing.Point(413, 8);
+            this.grpVacationsFarEast.Name = "grpVacationsFarEast";
+            this.grpVacationsFarEast.Size = new System.Drawing.Size(200, 265);
+            this.grpVacationsFarEast.TabIndex = 50;
+            this.grpVacationsFarEast.TabStop = false;
+            this.grpVacationsFarEast.Text = "Far East";
+            // 
+            // btnVacEastSecretLot
+            // 
+            this.btnVacEastSecretLot.Image = global::FamilyManager.Properties.Resources.SecretLot_Hermit;
+            this.btnVacEastSecretLot.Location = new System.Drawing.Point(135, 202);
+            this.btnVacEastSecretLot.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastSecretLot.Name = "btnVacEastSecretLot";
+            this.btnVacEastSecretLot.Selected = false;
+            this.btnVacEastSecretLot.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastSecretLot.TabIndex = 49;
+            this.btnVacEastSecretLot.TokenGuid = ((uint)(325274857u));
+            this.toolTip.SetToolTip(this.btnVacEastSecretLot, "Discovered the hermit\'s secret lot (Discover a vacation secret)");
+            this.btnVacEastSecretLot.Click += new System.EventHandler(this.OnVacationSecretLotButtonClicked);
+            // 
+            // btnVacEastHoliday
+            // 
+            this.btnVacEastHoliday.Image = global::FamilyManager.Properties.Resources.FarEast_Holiday;
+            this.btnVacEastHoliday.Location = new System.Drawing.Point(7, 13);
+            this.btnVacEastHoliday.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastHoliday.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnFarEastVacation;
+            this.btnVacEastHoliday.Name = "btnVacEastHoliday";
+            this.btnVacEastHoliday.Selected = false;
+            this.btnVacEastHoliday.Size = new System.Drawing.Size(59, 60);
+            this.btnVacEastHoliday.TabIndex = 8;
+            this.toolTip.SetToolTip(this.btnVacEastHoliday, "Went on a Far East vacation (Immerse yourself in tradition and culture)");
+            this.btnVacEastHoliday.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacEastGesture
+            // 
+            this.btnVacEastGesture.Image = global::FamilyManager.Properties.Resources.FarEast_Gesture;
+            this.btnVacEastGesture.Location = new System.Drawing.Point(71, 13);
+            this.btnVacEastGesture.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastGesture.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntToBow;
+            this.btnVacEastGesture.Name = "btnVacEastGesture";
+            this.btnVacEastGesture.Selected = false;
+            this.btnVacEastGesture.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastGesture.TabIndex = 35;
+            this.toolTip.SetToolTip(this.btnVacEastGesture, "Learnt to bow (Take a bow)");
+            this.btnVacEastGesture.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacEastFood
+            // 
+            this.btnVacEastFood.Image = global::FamilyManager.Properties.Resources.FarEast_Chirashi;
+            this.btnVacEastFood.Location = new System.Drawing.Point(135, 13);
+            this.btnVacEastFood.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastFood.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.AteChirashi;
+            this.btnVacEastFood.Name = "btnVacEastFood";
+            this.btnVacEastFood.Selected = false;
+            this.btnVacEastFood.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastFood.TabIndex = 36;
+            this.toolTip.SetToolTip(this.btnVacEastFood, "Ate chirashi (Try a fishy eastern delicacy)");
+            this.btnVacEastFood.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacEastAccupressureMassage
+            // 
+            this.btnVacEastAccupressureMassage.Image = global::FamilyManager.Properties.Resources.FarEast_AcupressureMassage;
+            this.btnVacEastAccupressureMassage.Location = new System.Drawing.Point(7, 76);
+            this.btnVacEastAccupressureMassage.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastAccupressureMassage.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntAccupressureMassage;
+            this.btnVacEastAccupressureMassage.Name = "btnVacEastAccupressureMassage";
+            this.btnVacEastAccupressureMassage.Selected = false;
+            this.btnVacEastAccupressureMassage.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastAccupressureMassage.TabIndex = 38;
+            this.toolTip.SetToolTip(this.btnVacEastAccupressureMassage, "Learnt acupressure massage (Learn the ancient massage of the Far East)");
+            this.btnVacEastAccupressureMassage.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacEastTaiChi
+            // 
+            this.btnVacEastTaiChi.Image = global::FamilyManager.Properties.Resources.FarEast_TaiChi;
+            this.btnVacEastTaiChi.Location = new System.Drawing.Point(71, 76);
+            this.btnVacEastTaiChi.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastTaiChi.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntTaiChi;
+            this.btnVacEastTaiChi.Name = "btnVacEastTaiChi";
+            this.btnVacEastTaiChi.Selected = false;
+            this.btnVacEastTaiChi.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastTaiChi.TabIndex = 39;
+            this.toolTip.SetToolTip(this.btnVacEastTaiChi, "Learnt Tai Chi (Join in ancient exercise)");
+            this.btnVacEastTaiChi.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacEastDragonLegend
+            // 
+            this.btnVacEastDragonLegend.Image = global::FamilyManager.Properties.Resources.FarEast_DragonLegend;
+            this.btnVacEastDragonLegend.Location = new System.Drawing.Point(135, 76);
+            this.btnVacEastDragonLegend.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastDragonLegend.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntDragonLegend;
+            this.btnVacEastDragonLegend.Name = "btnVacEastDragonLegend";
+            this.btnVacEastDragonLegend.Selected = false;
+            this.btnVacEastDragonLegend.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastDragonLegend.TabIndex = 40;
+            this.toolTip.SetToolTip(this.btnVacEastDragonLegend, "Learnt the dragon legend (Learn a Far Eastern tale)");
+            this.btnVacEastDragonLegend.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacEastDrankTea
+            // 
+            this.btnVacEastDrankTea.Image = global::FamilyManager.Properties.Resources.FarEast_DrankTea;
+            this.btnVacEastDrankTea.Location = new System.Drawing.Point(7, 139);
+            this.btnVacEastDrankTea.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastDrankTea.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.DrankTea;
+            this.btnVacEastDrankTea.Name = "btnVacEastDrankTea";
+            this.btnVacEastDrankTea.Selected = false;
+            this.btnVacEastDrankTea.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastDrankTea.TabIndex = 42;
+            this.toolTip.SetToolTip(this.btnVacEastDrankTea, "Drank tea (Enjoy a warm cup of tea)");
+            this.btnVacEastDrankTea.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacEastMahjong
+            // 
+            this.btnVacEastMahjong.Image = global::FamilyManager.Properties.Resources.FarEast_MahJong;
+            this.btnVacEastMahjong.Location = new System.Drawing.Point(71, 139);
+            this.btnVacEastMahjong.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastMahjong.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WonMahjong;
+            this.btnVacEastMahjong.Name = "btnVacEastMahjong";
+            this.btnVacEastMahjong.Selected = false;
+            this.btnVacEastMahjong.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastMahjong.TabIndex = 43;
+            this.toolTip.SetToolTip(this.btnVacEastMahjong, "Won at mahjong (Use those tiles and win!)");
+            this.btnVacEastMahjong.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacEastLuckyShrine
+            // 
+            this.btnVacEastLuckyShrine.Image = global::FamilyManager.Properties.Resources.FarEast_LuckyShrine;
+            this.btnVacEastLuckyShrine.Location = new System.Drawing.Point(135, 139);
+            this.btnVacEastLuckyShrine.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastLuckyShrine.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WishedAtLuckyShrine;
+            this.btnVacEastLuckyShrine.Name = "btnVacEastLuckyShrine";
+            this.btnVacEastLuckyShrine.Selected = false;
+            this.btnVacEastLuckyShrine.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastLuckyShrine.TabIndex = 44;
+            this.toolTip.SetToolTip(this.btnVacEastLuckyShrine, "Wished at the lucky shrine (Make a wish!)");
+            this.btnVacEastLuckyShrine.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacEastZenGarden
+            // 
+            this.btnVacEastZenGarden.Image = global::FamilyManager.Properties.Resources.FarEast_ZenGarden;
+            this.btnVacEastZenGarden.Location = new System.Drawing.Point(7, 202);
+            this.btnVacEastZenGarden.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastZenGarden.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.RakedZenGarden;
+            this.btnVacEastZenGarden.Name = "btnVacEastZenGarden";
+            this.btnVacEastZenGarden.Selected = false;
+            this.btnVacEastZenGarden.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastZenGarden.TabIndex = 46;
+            this.toolTip.SetToolTip(this.btnVacEastZenGarden, "Raked a Zen garden (Landscape the Zen way)");
+            this.btnVacEastZenGarden.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacEastTeleport
+            // 
+            this.btnVacEastTeleport.Image = global::FamilyManager.Properties.Resources.FarEast_Teleport;
+            this.btnVacEastTeleport.Location = new System.Drawing.Point(71, 202);
+            this.btnVacEastTeleport.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacEastTeleport.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntTeleport;
+            this.btnVacEastTeleport.Name = "btnVacEastTeleport";
+            this.btnVacEastTeleport.Selected = false;
+            this.btnVacEastTeleport.Size = new System.Drawing.Size(60, 60);
+            this.btnVacEastTeleport.TabIndex = 47;
+            this.toolTip.SetToolTip(this.btnVacEastTeleport, "Learnt to teleport (Travel like a ninja!)");
+            this.btnVacEastTeleport.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // grpVacationsIsland
+            // 
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleSecretLot);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleHoliday);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleGesture);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleFood);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleStoneMassage);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleHulaDance);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleVoodooDoll);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIslePirateShip);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleSeaShanty);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleMonkeyRuins);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleBeachTreasure);
+            this.grpVacationsIsland.Controls.Add(this.btnVacIsleFireDance);
+            this.grpVacationsIsland.Location = new System.Drawing.Point(209, 8);
+            this.grpVacationsIsland.Name = "grpVacationsIsland";
+            this.grpVacationsIsland.Size = new System.Drawing.Size(200, 265);
+            this.grpVacationsIsland.TabIndex = 49;
+            this.grpVacationsIsland.TabStop = false;
+            this.grpVacationsIsland.Text = "Island";
+            // 
+            // btnVacIsleSecretLot
+            // 
+            this.btnVacIsleSecretLot.Image = global::FamilyManager.Properties.Resources.SecretLot_WitchDoctor;
+            this.btnVacIsleSecretLot.Location = new System.Drawing.Point(135, 202);
+            this.btnVacIsleSecretLot.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleSecretLot.Name = "btnVacIsleSecretLot";
+            this.btnVacIsleSecretLot.Selected = false;
+            this.btnVacIsleSecretLot.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIsleSecretLot.TabIndex = 48;
+            this.btnVacIsleSecretLot.TokenGuid = ((uint)(2472758572u));
+            this.toolTip.SetToolTip(this.btnVacIsleSecretLot, "Discovered the witchdoctor\'s  secret lot (Discover a vacation secret)");
+            this.btnVacIsleSecretLot.Click += new System.EventHandler(this.OnVacationSecretLotButtonClicked);
+            // 
+            // btnVacIsleHoliday
+            // 
+            this.btnVacIsleHoliday.Image = global::FamilyManager.Properties.Resources.Island_Holiday;
+            this.btnVacIsleHoliday.Location = new System.Drawing.Point(7, 13);
+            this.btnVacIsleHoliday.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleHoliday.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnVacIsleHoliday.Name = "btnVacIsleHoliday";
+            this.btnVacIsleHoliday.Selected = false;
+            this.btnVacIsleHoliday.Size = new System.Drawing.Size(59, 60);
+            this.btnVacIsleHoliday.TabIndex = 8;
+            this.toolTip.SetToolTip(this.btnVacIsleHoliday, "Went on an island vacation (Escape to an island paradise)");
+            this.btnVacIsleHoliday.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacIsleGesture
+            // 
+            this.btnVacIsleGesture.Image = global::FamilyManager.Properties.Resources.Island_Gesture;
+            this.btnVacIsleGesture.Location = new System.Drawing.Point(71, 13);
+            this.btnVacIsleGesture.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleGesture.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntHangLoose;
+            this.btnVacIsleGesture.Name = "btnVacIsleGesture";
+            this.btnVacIsleGesture.Selected = false;
+            this.btnVacIsleGesture.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIsleGesture.TabIndex = 35;
+            this.toolTip.SetToolTip(this.btnVacIsleGesture, "Learnt to hang loose (Hang loose with the locals)");
+            this.btnVacIsleGesture.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacIsleFood
+            // 
+            this.btnVacIsleFood.Image = global::FamilyManager.Properties.Resources.Island_PinappleSurprise;
+            this.btnVacIsleFood.Location = new System.Drawing.Point(135, 13);
+            this.btnVacIsleFood.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleFood.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.AtePinappleSurprise;
+            this.btnVacIsleFood.Name = "btnVacIsleFood";
+            this.btnVacIsleFood.Selected = false;
+            this.btnVacIsleFood.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIsleFood.TabIndex = 36;
+            this.toolTip.SetToolTip(this.btnVacIsleFood, "Ate pineapple surprise (Try a fruity island treat)");
+            this.btnVacIsleFood.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacIsleStoneMassage
+            // 
+            this.btnVacIsleStoneMassage.Image = global::FamilyManager.Properties.Resources.Island_StoneMassage;
+            this.btnVacIsleStoneMassage.Location = new System.Drawing.Point(7, 76);
+            this.btnVacIsleStoneMassage.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleStoneMassage.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntHotStoneMassage;
+            this.btnVacIsleStoneMassage.Name = "btnVacIsleStoneMassage";
+            this.btnVacIsleStoneMassage.Selected = false;
+            this.btnVacIsleStoneMassage.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIsleStoneMassage.TabIndex = 38;
+            this.toolTip.SetToolTip(this.btnVacIsleStoneMassage, "Learnt hot stone massage (Learn to spread relaxation with heat)");
+            this.btnVacIsleStoneMassage.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacIsleHulaDance
+            // 
+            this.btnVacIsleHulaDance.Image = global::FamilyManager.Properties.Resources.Island_HulaDance;
+            this.btnVacIsleHulaDance.Location = new System.Drawing.Point(71, 76);
+            this.btnVacIsleHulaDance.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleHulaDance.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntHulaDance;
+            this.btnVacIsleHulaDance.Name = "btnVacIsleHulaDance";
+            this.btnVacIsleHulaDance.Selected = false;
+            this.btnVacIsleHulaDance.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIsleHulaDance.TabIndex = 39;
+            this.toolTip.SetToolTip(this.btnVacIsleHulaDance, "Learnt to hula dance (Shake that grass skirt on the beach)");
+            this.btnVacIsleHulaDance.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacIsleVoodooDoll
+            // 
+            this.btnVacIsleVoodooDoll.Image = global::FamilyManager.Properties.Resources.Island_VoodooDoll;
+            this.btnVacIsleVoodooDoll.Location = new System.Drawing.Point(135, 76);
+            this.btnVacIsleVoodooDoll.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleVoodooDoll.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.GotVoodooDoll;
+            this.btnVacIsleVoodooDoll.Name = "btnVacIsleVoodooDoll";
+            this.btnVacIsleVoodooDoll.Selected = false;
+            this.btnVacIsleVoodooDoll.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIsleVoodooDoll.TabIndex = 40;
+            this.toolTip.SetToolTip(this.btnVacIsleVoodooDoll, "Got a voodoo doll (Find an island secret)");
+            this.btnVacIsleVoodooDoll.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacIslePirateShip
+            // 
+            this.btnVacIslePirateShip.Image = global::FamilyManager.Properties.Resources.Island_PirateShip;
+            this.btnVacIslePirateShip.Location = new System.Drawing.Point(7, 139);
+            this.btnVacIslePirateShip.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIslePirateShip.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.PlayedOnPirateShip;
+            this.btnVacIslePirateShip.Name = "btnVacIslePirateShip";
+            this.btnVacIslePirateShip.Selected = false;
+            this.btnVacIslePirateShip.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIslePirateShip.TabIndex = 42;
+            this.toolTip.SetToolTip(this.btnVacIslePirateShip, "Played on the pirate ship (Fence and navigate at a beach)");
+            this.btnVacIslePirateShip.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacIsleSeaShanty
+            // 
+            this.btnVacIsleSeaShanty.Image = global::FamilyManager.Properties.Resources.Island_PirateShanty;
+            this.btnVacIsleSeaShanty.Location = new System.Drawing.Point(71, 139);
+            this.btnVacIsleSeaShanty.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleSeaShanty.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntSeaShanty;
+            this.btnVacIsleSeaShanty.Name = "btnVacIsleSeaShanty";
+            this.btnVacIsleSeaShanty.Selected = false;
+            this.btnVacIsleSeaShanty.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIsleSeaShanty.TabIndex = 43;
+            this.toolTip.SetToolTip(this.btnVacIsleSeaShanty, "Learnt a sea shanty (A singing pirate?)");
+            this.btnVacIsleSeaShanty.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacIsleMonkeyRuins
+            // 
+            this.btnVacIsleMonkeyRuins.Image = global::FamilyManager.Properties.Resources.Island_MonkeyRuins;
+            this.btnVacIsleMonkeyRuins.Location = new System.Drawing.Point(135, 139);
+            this.btnVacIsleMonkeyRuins.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleMonkeyRuins.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.MadeOfferingAtMonkeyRuins;
+            this.btnVacIsleMonkeyRuins.Name = "btnVacIsleMonkeyRuins";
+            this.btnVacIsleMonkeyRuins.Selected = false;
+            this.btnVacIsleMonkeyRuins.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIsleMonkeyRuins.TabIndex = 44;
+            this.toolTip.SetToolTip(this.btnVacIsleMonkeyRuins, "Made an offering at the monkey ruins (Pay a homage to an ancient civilization)");
+            this.btnVacIsleMonkeyRuins.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacIsleBeachTreasure
+            // 
+            this.btnVacIsleBeachTreasure.Image = global::FamilyManager.Properties.Resources.Island_Shell;
+            this.btnVacIsleBeachTreasure.Location = new System.Drawing.Point(7, 202);
+            this.btnVacIsleBeachTreasure.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleBeachTreasure.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.FoundBeachTreasure;
+            this.btnVacIsleBeachTreasure.Name = "btnVacIsleBeachTreasure";
+            this.btnVacIsleBeachTreasure.Selected = false;
+            this.btnVacIsleBeachTreasure.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIsleBeachTreasure.TabIndex = 46;
+            this.toolTip.SetToolTip(this.btnVacIsleBeachTreasure, "Found a beach treasure (What can you find in the sand?)");
+            this.btnVacIsleBeachTreasure.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacIsleFireDance
+            // 
+            this.btnVacIsleFireDance.Image = global::FamilyManager.Properties.Resources.Island_FireDance;
+            this.btnVacIsleFireDance.Location = new System.Drawing.Point(71, 202);
+            this.btnVacIsleFireDance.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacIsleFireDance.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.LearntFireDance;
+            this.btnVacIsleFireDance.Name = "btnVacIsleFireDance";
+            this.btnVacIsleFireDance.Selected = false;
+            this.btnVacIsleFireDance.Size = new System.Drawing.Size(60, 60);
+            this.btnVacIsleFireDance.TabIndex = 47;
+            this.toolTip.SetToolTip(this.btnVacIsleFireDance, "Learnt to fire dance (Dance with the fire loving locals)");
+            this.btnVacIsleFireDance.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // grpVacationsGeneral
+            // 
+            this.grpVacationsGeneral.Controls.Add(this.imgVacTourAll);
+            this.grpVacationsGeneral.Controls.Add(this.imgVacTourFive);
+            this.grpVacationsGeneral.Controls.Add(this.imgVacTour);
+            this.grpVacationsGeneral.Controls.Add(this.imgVacSecretLotAll);
+            this.grpVacationsGeneral.Controls.Add(this.imgVacSecretLot);
+            this.grpVacationsGeneral.Controls.Add(this.imgVacAllGestures);
+            this.grpVacationsGeneral.Controls.Add(this.btnVacGenPlane);
+            this.grpVacationsGeneral.Controls.Add(this.btnVacGenPlaneThree);
+            this.grpVacationsGeneral.Controls.Add(this.btnVacGenPlaneFive);
+            this.grpVacationsGeneral.Controls.Add(this.btnVacGenSecretMap);
+            this.grpVacationsGeneral.Controls.Add(this.btnVacGenRoomService);
+            this.grpVacationsGeneral.Controls.Add(this.btnVacGenTreasureChest);
+            this.grpVacationsGeneral.Controls.Add(this.btnVacGenPhotoAlbum);
+            this.grpVacationsGeneral.Location = new System.Drawing.Point(5, 8);
+            this.grpVacationsGeneral.Name = "grpVacationsGeneral";
+            this.grpVacationsGeneral.Size = new System.Drawing.Size(200, 265);
+            this.grpVacationsGeneral.TabIndex = 7;
+            this.grpVacationsGeneral.TabStop = false;
+            this.grpVacationsGeneral.Text = "General";
+            // 
+            // imgVacTourAll
+            // 
+            this.imgVacTourAll.BackColor = System.Drawing.Color.LightGray;
+            this.imgVacTourAll.BackgroundImage = global::FamilyManager.Properties.Resources.Vacation_TourAll;
+            this.imgVacTourAll.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.imgVacTourAll.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.imgVacTourAll.Location = new System.Drawing.Point(165, 229);
+            this.imgVacTourAll.Name = "imgVacTourAll";
+            this.imgVacTourAll.Size = new System.Drawing.Size(30, 30);
+            this.imgVacTourAll.TabIndex = 54;
+            this.imgVacTourAll.TabStop = false;
+            this.toolTip.SetToolTip(this.imgVacTourAll, "Went on all of the tours (Be guided to all the local sights)");
+            // 
+            // imgVacTourFive
+            // 
+            this.imgVacTourFive.BackColor = System.Drawing.Color.LightGray;
+            this.imgVacTourFive.BackgroundImage = global::FamilyManager.Properties.Resources.Vacation_TourFive;
+            this.imgVacTourFive.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.imgVacTourFive.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.imgVacTourFive.Location = new System.Drawing.Point(133, 229);
+            this.imgVacTourFive.Name = "imgVacTourFive";
+            this.imgVacTourFive.Size = new System.Drawing.Size(30, 30);
+            this.imgVacTourFive.TabIndex = 53;
+            this.imgVacTourFive.TabStop = false;
+            this.toolTip.SetToolTip(this.imgVacTourFive, "Went on five tours (Follow the guide to five new sights)");
+            // 
+            // imgVacTour
+            // 
+            this.imgVacTour.BackColor = System.Drawing.Color.LightGray;
+            this.imgVacTour.BackgroundImage = global::FamilyManager.Properties.Resources.Vacation_Tour;
+            this.imgVacTour.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.imgVacTour.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.imgVacTour.Location = new System.Drawing.Point(101, 229);
+            this.imgVacTour.Name = "imgVacTour";
+            this.imgVacTour.Size = new System.Drawing.Size(30, 30);
+            this.imgVacTour.TabIndex = 52;
+            this.imgVacTour.TabStop = false;
+            this.toolTip.SetToolTip(this.imgVacTour, "Went on a tour (Check out local sights)");
+            // 
+            // imgVacSecretLotAll
+            // 
+            this.imgVacSecretLotAll.BackColor = System.Drawing.Color.LightGray;
+            this.imgVacSecretLotAll.BackgroundImage = global::FamilyManager.Properties.Resources.Vacation_SecretLotAll;
+            this.imgVacSecretLotAll.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.imgVacSecretLotAll.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.imgVacSecretLotAll.Location = new System.Drawing.Point(69, 229);
+            this.imgVacSecretLotAll.Name = "imgVacSecretLotAll";
+            this.imgVacSecretLotAll.Size = new System.Drawing.Size(30, 30);
+            this.imgVacSecretLotAll.TabIndex = 51;
+            this.imgVacSecretLotAll.TabStop = false;
+            this.toolTip.SetToolTip(this.imgVacSecretLotAll, "Discovered all of the secret lots (Uncover all the vacation secrets)");
+            // 
+            // imgVacSecretLot
+            // 
+            this.imgVacSecretLot.BackColor = System.Drawing.Color.LightGray;
+            this.imgVacSecretLot.BackgroundImage = global::FamilyManager.Properties.Resources.Vacation_SecretLot;
+            this.imgVacSecretLot.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.imgVacSecretLot.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.imgVacSecretLot.Location = new System.Drawing.Point(37, 229);
+            this.imgVacSecretLot.Name = "imgVacSecretLot";
+            this.imgVacSecretLot.Size = new System.Drawing.Size(30, 30);
+            this.imgVacSecretLot.TabIndex = 50;
+            this.imgVacSecretLot.TabStop = false;
+            this.toolTip.SetToolTip(this.imgVacSecretLot, "Discovered a secret lot (Discover a vacation secret)");
+            // 
+            // imgVacAllGestures
+            // 
+            this.imgVacAllGestures.BackColor = System.Drawing.Color.LightGray;
+            this.imgVacAllGestures.BackgroundImage = global::FamilyManager.Properties.Resources.Vacation_AllGestures;
+            this.imgVacAllGestures.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.imgVacAllGestures.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.imgVacAllGestures.Location = new System.Drawing.Point(5, 229);
+            this.imgVacAllGestures.Name = "imgVacAllGestures";
+            this.imgVacAllGestures.Size = new System.Drawing.Size(30, 30);
+            this.imgVacAllGestures.TabIndex = 49;
+            this.imgVacAllGestures.TabStop = false;
+            this.toolTip.SetToolTip(this.imgVacAllGestures, "Learned all of the gestures (Learn the local ways)");
+            // 
+            // btnVacGenPlane
+            // 
+            this.btnVacGenPlane.Image = global::FamilyManager.Properties.Resources.Vacation_Plane;
+            this.btnVacGenPlane.Location = new System.Drawing.Point(7, 13);
+            this.btnVacGenPlane.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacGenPlane.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.GoodVacation;
+            this.btnVacGenPlane.Name = "btnVacGenPlane";
+            this.btnVacGenPlane.Selected = false;
+            this.btnVacGenPlane.Size = new System.Drawing.Size(59, 60);
+            this.btnVacGenPlane.TabIndex = 8;
+            this.toolTip.SetToolTip(this.btnVacGenPlane, "Had a good vacation (Enjoy your trip)");
+            this.btnVacGenPlane.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacGenPlaneThree
+            // 
+            this.btnVacGenPlaneThree.Image = ((System.Drawing.Image)(resources.GetObject("btnVacGenPlaneThree.Image")));
+            this.btnVacGenPlaneThree.Location = new System.Drawing.Point(71, 13);
+            this.btnVacGenPlaneThree.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacGenPlaneThree.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.ThreeGoodVacations;
+            this.btnVacGenPlaneThree.Name = "btnVacGenPlaneThree";
+            this.btnVacGenPlaneThree.Selected = false;
+            this.btnVacGenPlaneThree.Size = new System.Drawing.Size(60, 60);
+            this.btnVacGenPlaneThree.TabIndex = 35;
+            this.toolTip.SetToolTip(this.btnVacGenPlaneThree, "Had three good vacations (Third time\'s the charm)");
+            this.btnVacGenPlaneThree.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacGenPlaneFive
+            // 
+            this.btnVacGenPlaneFive.Image = global::FamilyManager.Properties.Resources.Vacation_PlaneFive;
+            this.btnVacGenPlaneFive.Location = new System.Drawing.Point(135, 13);
+            this.btnVacGenPlaneFive.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacGenPlaneFive.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.FiveGoodVacations;
+            this.btnVacGenPlaneFive.Name = "btnVacGenPlaneFive";
+            this.btnVacGenPlaneFive.Selected = false;
+            this.btnVacGenPlaneFive.Size = new System.Drawing.Size(60, 60);
+            this.btnVacGenPlaneFive.TabIndex = 36;
+            this.toolTip.SetToolTip(this.btnVacGenPlaneFive, "Had five good vacations (Become a frequent traveler)");
+            this.btnVacGenPlaneFive.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacGenSecretMap
+            // 
+            this.btnVacGenSecretMap.Image = global::FamilyManager.Properties.Resources.Vacation_SecretMap;
+            this.btnVacGenSecretMap.Location = new System.Drawing.Point(7, 76);
+            this.btnVacGenSecretMap.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacGenSecretMap.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.FoundSecretMap;
+            this.btnVacGenSecretMap.Name = "btnVacGenSecretMap";
+            this.btnVacGenSecretMap.Selected = false;
+            this.btnVacGenSecretMap.Size = new System.Drawing.Size(60, 60);
+            this.btnVacGenSecretMap.TabIndex = 42;
+            this.toolTip.SetToolTip(this.btnVacGenSecretMap, "Found a secret map (Find a lead to hidden secrets)");
+            this.btnVacGenSecretMap.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacGenRoomService
+            // 
+            this.btnVacGenRoomService.Image = global::FamilyManager.Properties.Resources.Vacation_RoomService;
+            this.btnVacGenRoomService.Location = new System.Drawing.Point(7, 139);
+            this.btnVacGenRoomService.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacGenRoomService.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.OrderedRoomService;
+            this.btnVacGenRoomService.Name = "btnVacGenRoomService";
+            this.btnVacGenRoomService.Selected = false;
+            this.btnVacGenRoomService.Size = new System.Drawing.Size(60, 60);
+            this.btnVacGenRoomService.TabIndex = 46;
+            this.toolTip.SetToolTip(this.btnVacGenRoomService, "Ordered room service (Enjoy a meal delivered right to your room)");
+            this.btnVacGenRoomService.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacGenTreasureChest
+            // 
+            this.btnVacGenTreasureChest.Image = global::FamilyManager.Properties.Resources.Vacation_TreasureChest;
+            this.btnVacGenTreasureChest.Location = new System.Drawing.Point(71, 76);
+            this.btnVacGenTreasureChest.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacGenTreasureChest.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.DugUpTreasureChest;
+            this.btnVacGenTreasureChest.Name = "btnVacGenTreasureChest";
+            this.btnVacGenTreasureChest.Selected = false;
+            this.btnVacGenTreasureChest.Size = new System.Drawing.Size(60, 60);
+            this.btnVacGenTreasureChest.TabIndex = 47;
+            this.toolTip.SetToolTip(this.btnVacGenTreasureChest, "Dug up a treasure chest (Find the buried treasure!)");
+            this.btnVacGenTreasureChest.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
+            // 
+            // btnVacGenPhotoAlbum
+            // 
+            this.btnVacGenPhotoAlbum.Image = global::FamilyManager.Properties.Resources.Vacation_PhotoAlbum;
+            this.btnVacGenPhotoAlbum.Location = new System.Drawing.Point(71, 139);
+            this.btnVacGenPhotoAlbum.Margin = new System.Windows.Forms.Padding(0);
+            this.btnVacGenPhotoAlbum.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.OrderedPhotoAlbum;
+            this.btnVacGenPhotoAlbum.Name = "btnVacGenPhotoAlbum";
+            this.btnVacGenPhotoAlbum.Selected = false;
+            this.btnVacGenPhotoAlbum.Size = new System.Drawing.Size(60, 60);
+            this.btnVacGenPhotoAlbum.TabIndex = 48;
+            this.toolTip.SetToolTip(this.btnVacGenPhotoAlbum, "Ordered a photo album (Get an album to share with your friends)");
+            this.btnVacGenPhotoAlbum.Click += new System.EventHandler(this.OnVacationMementoButtonClicked);
             // 
             // btnSave
             // 
@@ -6190,6 +7224,17 @@ namespace FamilyManager
             this.openJewelboxFileDialog.DereferenceLinks = false;
             this.openJewelboxFileDialog.Filter = "Family Manager Jewel Box files|*.fmj|All files|*.*";
             this.openJewelboxFileDialog.Title = "Load Jewellery Items";
+            // 
+            // thumbBox
+            // 
+            this.thumbBox.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.thumbBox.Location = new System.Drawing.Point(10, 57);
+            this.thumbBox.Name = "thumbBox";
+            this.thumbBox.Size = new System.Drawing.Size(128, 128);
+            this.thumbBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.thumbBox.TabIndex = 25;
+            this.thumbBox.TabStop = false;
+            this.thumbBox.Visible = false;
             // 
             // FamilyManagerForm
             // 
@@ -6254,9 +7299,9 @@ namespace FamilyManager
             this.grpModifiers.PerformLayout();
             this.grpBenefits.ResumeLayout(false);
             this.grpBenefits.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.imageAspirationsSim)).EndInit();
             this.grpAspiration.ResumeLayout(false);
             this.grpAspiration.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.imageAspirationsSim)).EndInit();
             this.tabCareer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.imageCareerSim)).EndInit();
             this.grpJob.ResumeLayout(false);
@@ -6266,8 +7311,6 @@ namespace FamilyManager
             this.grpSchool.ResumeLayout(false);
             this.grpSchool.PerformLayout();
             this.tabSkills.ResumeLayout(false);
-            this.grpSkillsPet.ResumeLayout(false);
-            this.grpSkillsPet.PerformLayout();
             this.grpSkillsLife.ResumeLayout(false);
             this.grpSkillsLife.PerformLayout();
             this.grpSkillsToddler.ResumeLayout(false);
@@ -6276,6 +7319,8 @@ namespace FamilyManager
             this.grpSkillsHidden.PerformLayout();
             this.grpSkillsGeneral.ResumeLayout(false);
             this.grpSkillsGeneral.PerformLayout();
+            this.grpSkillsPet.ResumeLayout(false);
+            this.grpSkillsPet.PerformLayout();
             this.tabInterests.ResumeLayout(false);
             this.grpBadges.ResumeLayout(false);
             this.grpBadges.PerformLayout();
@@ -6283,6 +7328,20 @@ namespace FamilyManager
             this.grpHobbies.PerformLayout();
             this.grpInterests.ResumeLayout(false);
             this.grpInterests.PerformLayout();
+            this.tabVacations.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.imageVacationsSim)).EndInit();
+            this.grpVacationsTours.ResumeLayout(false);
+            this.grpVacationsTours.PerformLayout();
+            this.grpVacationsMountain.ResumeLayout(false);
+            this.grpVacationsFarEast.ResumeLayout(false);
+            this.grpVacationsIsland.ResumeLayout(false);
+            this.grpVacationsGeneral.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacTourAll)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacTourFive)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacTour)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacSecretLotAll)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacSecretLot)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.imgVacAllGestures)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -6781,5 +7840,76 @@ namespace FamilyManager
         private System.Windows.Forms.DataGridViewTextBoxColumn colCensusFamilyID;
         private System.Windows.Forms.CheckBox ckbUniSecretSoc;
         private System.Windows.Forms.Label lblUniSecretSoc;
+        private System.Windows.Forms.TabPage tabVacations;
+        private System.Windows.Forms.GroupBox grpVacationsGeneral;
+        private Sims2Tools.Controls.VacationButton btnVacGenPlane;
+        private Sims2Tools.Controls.VacationButton btnVacGenPlaneThree;
+        private Sims2Tools.Controls.VacationButton btnVacGenPlaneFive;
+        private Sims2Tools.Controls.VacationButton btnVacGenSecretMap;
+        private Sims2Tools.Controls.VacationButton btnVacGenRoomService;
+        private Sims2Tools.Controls.VacationButton btnVacGenTreasureChest;
+        private Sims2Tools.Controls.VacationButton btnVacGenPhotoAlbum;
+        private System.Windows.Forms.GroupBox grpVacationsMountain;
+        private Sims2Tools.Controls.VacationButton btnVacMountHoliday;
+        private Sims2Tools.Controls.VacationButton btnVacMountGesture;
+        private Sims2Tools.Controls.VacationButton btnVacMountFood;
+        private Sims2Tools.Controls.VacationButton btnVacMountDeepTissueMassage;
+        private Sims2Tools.Controls.VacationButton btnVacMountSlapDance;
+        private Sims2Tools.Controls.VacationButton btnVacMountMetBigfoot;
+        private Sims2Tools.Controls.VacationButton btnVacMountSleptTent;
+        private Sims2Tools.Controls.VacationButton btnVacMountTreeRings;
+        private Sims2Tools.Controls.VacationButton btnVacMountAxeThrow;
+        private Sims2Tools.Controls.VacationButton btnVacMountWonLogRolling;
+        private System.Windows.Forms.GroupBox grpVacationsFarEast;
+        private Sims2Tools.Controls.VacationButton btnVacEastHoliday;
+        private Sims2Tools.Controls.VacationButton btnVacEastGesture;
+        private Sims2Tools.Controls.VacationButton btnVacEastFood;
+        private Sims2Tools.Controls.VacationButton btnVacEastAccupressureMassage;
+        private Sims2Tools.Controls.VacationButton btnVacEastTaiChi;
+        private Sims2Tools.Controls.VacationButton btnVacEastDragonLegend;
+        private Sims2Tools.Controls.VacationButton btnVacEastDrankTea;
+        private Sims2Tools.Controls.VacationButton btnVacEastMahjong;
+        private Sims2Tools.Controls.VacationButton btnVacEastLuckyShrine;
+        private Sims2Tools.Controls.VacationButton btnVacEastZenGarden;
+        private Sims2Tools.Controls.VacationButton btnVacEastTeleport;
+        private System.Windows.Forms.GroupBox grpVacationsIsland;
+        private Sims2Tools.Controls.VacationButton btnVacIsleHoliday;
+        private Sims2Tools.Controls.VacationButton btnVacIsleGesture;
+        private Sims2Tools.Controls.VacationButton btnVacIsleFood;
+        private Sims2Tools.Controls.VacationButton btnVacIsleStoneMassage;
+        private Sims2Tools.Controls.VacationButton btnVacIsleHulaDance;
+        private Sims2Tools.Controls.VacationButton btnVacIsleVoodooDoll;
+        private Sims2Tools.Controls.VacationButton btnVacIslePirateShip;
+        private Sims2Tools.Controls.VacationButton btnVacIsleSeaShanty;
+        private Sims2Tools.Controls.VacationButton btnVacIsleMonkeyRuins;
+        private Sims2Tools.Controls.VacationButton btnVacIsleBeachTreasure;
+        private Sims2Tools.Controls.VacationButton btnVacIsleFireDance;
+        private System.Windows.Forms.GroupBox grpVacationsTours;
+        private Sims2Tools.Controls.TourButton btnTourIsland3;
+        private Sims2Tools.Controls.TourButton btnTourIsland1;
+        private Sims2Tools.Controls.TourButton btnTourIsland2;
+        private Sims2Tools.Controls.TourButton btnTourFarEast3;
+        private Sims2Tools.Controls.TourButton btnTourFarEast1;
+        private Sims2Tools.Controls.TourButton btnTourFarEast2;
+        private Sims2Tools.Controls.TourButton btnTourMountain3;
+        private Sims2Tools.Controls.TourButton btnTourMountain1;
+        private Sims2Tools.Controls.TourButton btnTourMountain2;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.PictureBox imageVacationsSim;
+        private Sims2Tools.Controls.SecretLotButton btnVacMountSecretLot;
+        private Sims2Tools.Controls.SecretLotButton btnVacEastSecretLot;
+        private Sims2Tools.Controls.SecretLotButton btnVacIsleSecretLot;
+        private System.Windows.Forms.PictureBox imgVacAllGestures;
+        private System.Windows.Forms.PictureBox imgVacTourAll;
+        private System.Windows.Forms.PictureBox imgVacTourFive;
+        private System.Windows.Forms.PictureBox imgVacTour;
+        private System.Windows.Forms.PictureBox imgVacSecretLotAll;
+        private System.Windows.Forms.PictureBox imgVacSecretLot;
+        private Sims2Tools.Controls.SkillTracker trackSkillHiddenHulaDance;
+        private Sims2Tools.Controls.SkillTracker trackSkillHiddenSlapDance;
+        private System.Windows.Forms.Label lblSkillHiddenHulaDance;
+        private System.Windows.Forms.Label lblSkillHiddenSlapDance;
     }
 }

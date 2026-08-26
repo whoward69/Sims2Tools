@@ -306,6 +306,38 @@
   <metadata name="menuContextSafe.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>1123, 17</value>
   </metadata>
+  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>1444, 17</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="btnVacGenPlaneThree.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        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
+        AElFTkSuQmCC
+</value>
+  </data>
   <metadata name="saveAsFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>129, 17</value>
   </metadata>
@@ -321,10 +353,6 @@
   <metadata name="openJewelboxFileDialog.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>193, 54</value>
   </metadata>
-  <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>1444, 17</value>
-  </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAEAKioAAAEAIAAIHQAAFgAAACgAAAAqAAAAVAAAAAEAIAAAAAAAkBsAAMMOAADDDgAAAAAAAAAA

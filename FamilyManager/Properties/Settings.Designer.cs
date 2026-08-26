@@ -12,7 +12,7 @@ namespace FamilyManager.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "18.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -188,6 +188,54 @@ namespace FamilyManager.Properties {
             }
             set {
                 this["MaxSkillFireDance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int MaxSkillHulaDance {
+            get {
+                return ((int)(this["MaxSkillHulaDance"]));
+            }
+            set {
+                this["MaxSkillHulaDance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int MaxSkillSlapDance {
+            get {
+                return ((int)(this["MaxSkillSlapDance"]));
+            }
+            set {
+                this["MaxSkillSlapDance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public ushort MinSkillForGreeting {
+            get {
+                return ((ushort)(this["MinSkillForGreeting"]));
+            }
+            set {
+                this["MinSkillForGreeting"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        public ushort MinSkillForSeaShanty {
+            get {
+                return ((ushort)(this["MinSkillForSeaShanty"]));
+            }
+            set {
+                this["MinSkillForSeaShanty"] = value;
             }
         }
     }

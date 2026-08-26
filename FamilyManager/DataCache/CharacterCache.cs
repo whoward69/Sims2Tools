@@ -175,8 +175,8 @@ namespace FamilyManager.Caching
         #region Info (Life Stage)
         public uint AgeCode => AgeHelper.CpfAgeCode((LifeSections)GetSdscValue(SdscIndex.PersonAge));
 
-        public bool IsHuman => (sdsc == null) || sdsc.IsHuman;
-        public bool IsPet => (sdsc != null) && sdsc.IsPet;
+        public bool IsHuman => (GetSdsc() == null) || sdsc.IsHuman;
+        public bool IsPet => !IsHuman;
 
         public bool IsToddlerOrOlder => (GetSdscValue(SdscIndex.PersonAge) >= (int)LifeSections.Toddler) && IsHuman;
         public bool IsChildOrOlder => (GetSdscValue(SdscIndex.PersonAge) >= (int)LifeSections.Child) && IsHuman;
@@ -1028,6 +1028,215 @@ namespace FamilyManager.Caching
         }
         #endregion
 
+        #region Info (Vacations)
+        public bool HasMemento(Mementos memento) => GetSdsc().HasMemento(memento);
+        public void SetMemento(Mementos memento, bool value)
+        {
+            if (value == HasMemento(memento)) return;
+
+            if (sdsc != null && sdscPackagePath != null)
+            {
+                sdsc.SetMemento(memento, value);
+
+                using (CacheableDbpfFile package = CharacterCache.cache.OpenForUpdate(sdscPackagePath))
+                {
+                    package.Commit(sdsc);
+
+                    package.Close();
+                }
+            }
+
+            // Update associated token (if any)
+            switch (memento)
+            {
+                case Mementos.GoodVacation:
+                    if (value)
+                    {
+                        UpdateGoodVacationCountToken(1, 2);
+                    }
+                    else
+                    {
+                        UpdateGoodVacationCountToken(0, 0);
+                    }
+                    break;
+                case Mementos.ThreeGoodVacations:
+                    if (value)
+                    {
+                        UpdateGoodVacationCountToken(3, 4);
+                    }
+                    else
+                    {
+                        UpdateGoodVacationCountToken(0, 2);
+                    }
+                    break;
+                case Mementos.FiveGoodVacations:
+                    if (value)
+                    {
+                        UpdateGoodVacationCountToken(5, ushort.MaxValue);
+                    }
+                    else
+                    {
+                        UpdateGoodVacationCountToken(0, 4);
+                    }
+                    break;
+
+                case Mementos.WentOnIslandVacation:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_TRAVEL_ISLAND, value, false, 0, new ushort[0]);
+                    break;
+                case Mementos.WentOnFarEastVacation:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_TRAVEL_FAREAST, value, false, 0, new ushort[0]);
+                    break;
+                case Mementos.WentOnMountainVacation:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_TRAVEL_MOUNTAIN, value, false, 0, new ushort[0]);
+                    break;
+
+                case Mementos.LearntHangLoose:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_GREET_LEARNT_ISLAND, value, true, 0, new ushort[] { Properties.Settings.Default.MinSkillForGreeting });
+                    break;
+                case Mementos.LearntChestPound:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_GREET_LEARNT_MOUNTAIN, value, true, 0, new ushort[] { Properties.Settings.Default.MinSkillForGreeting });
+                    break;
+                case Mementos.LearntToBow:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_GREET_LEARNT_FAREAST, value, true, 0, new ushort[] { Properties.Settings.Default.MinSkillForGreeting });
+                    break;
+                case Mementos.LearntAllGestures:
+                    break;
+
+                case Mementos.LearntAccupressureMassage:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_MASSAGE_LEARNT_ACCUPRESSURE, value, false, 0, new ushort[0]);
+                    break;
+                case Mementos.LearntDeepTissueMassage:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_MASSAGE_LEARNT_DEEPTISSUE, value, false, 0, new ushort[0]);
+                    break;
+                case Mementos.LearntHotStoneMassage:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_MASSAGE_LEARNT_HOTSTONE, value, false, 0, new ushort[0]);
+                    break;
+
+                case Mementos.AteFlapjacks:
+                    CharacterCache.AddOrRemoveFoodsEatenToken(sdsc, (TypeGUID)0xD36839FC, value, true);
+                    break;
+                case Mementos.AtePinappleSurprise:
+                    CharacterCache.AddOrRemoveFoodsEatenToken(sdsc, (TypeGUID)0x336855F4, value, true);
+                    break;
+                case Mementos.AteChirashi:
+                    CharacterCache.AddOrRemoveFoodsEatenToken(sdsc, (TypeGUID)0x536832DB, value, true);
+                    break;
+
+                case Mementos.LearntSeaShanty:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_MISC_LEARNT_SEASHANTY, value, true, 0, new ushort[] { Properties.Settings.Default.MinSkillForSeaShanty });
+                    break;
+                case Mementos.LearntTeleport:
+                    CharacterCache.AddOrRemoveSimInvTokenValue(sdsc, Personal.TOKEN_BV_MISC_LEARNT_TELEPORT, value, false, 0, new ushort[0]);
+                    break;
+
+                // Tokens relate to the specific tour taken
+                case Mementos.WentOnTour:
+                case Mementos.WentOnFiveTours:
+                case Mementos.WentOnAllTours:
+                    break;
+
+                // Tokens relate to the specific secret lot visited
+                case Mementos.VisitedSecretLot:
+                case Mementos.VisitedAllSecretLots:
+                    break;
+
+                // Mementos awarded when a certain level is reached in the associated skill
+                case Mementos.LearntFireDance:
+                case Mementos.LearntHulaDance:
+                case Mementos.LearntSlapDance:
+                case Mementos.LearntTaiChi:
+
+                // Memento is awarded at the time, no token created
+                case Mementos.AxeThrowingBullseye:
+                case Mementos.BefriendedBigFoot:
+                case Mementos.DrankTea:
+                case Mementos.DugUpTreasureChest:
+                case Mementos.ExaminedTreeRings:
+                case Mementos.FoundBeachTreasure:
+                case Mementos.FoundSecretMap:
+                case Mementos.GotVoodooDoll:
+                case Mementos.LearntDragonLegend:
+                case Mementos.MadeOfferingAtMonkeyRuins:
+                case Mementos.OrderedPhotoAlbum:
+                case Mementos.OrderedRoomService:
+                case Mementos.PlayedOnPirateShip:
+                case Mementos.RakedZenGarden:
+                case Mementos.SleptInTent:
+                case Mementos.WishedAtLuckyShrine:
+                case Mementos.WonLogRolling:
+                case Mementos.WonMahjong:
+                    break;
+            }
+        }
+
+        private void UpdateGoodVacationCountToken(ushort min, ushort max)
+        {
+            NgbhInventoryToken token = CharacterCache.GetSimInvToken(sdsc, Personal.TOKEN_BV_VACATION_COUNT);
+
+            if (token != null)
+            {
+                ushort currentCount = token.GetValue(0);
+                ushort newCount = Math.Max(min, Math.Min(max, currentCount));
+
+                if (newCount != 0)
+                {
+                    CharacterCache.SetSimInvTokenValue(sdsc, Personal.TOKEN_BV_VACATION_COUNT, 0, newCount);
+                }
+                else
+                {
+                    CharacterCache.RemoveSimInvToken(sdsc, Personal.TOKEN_BV_VACATION_COUNT);
+                }
+            }
+            else
+            {
+                if (max != 0)
+                {
+                    CharacterCache.AddSimInvTokenValue(sdsc, Personal.TOKEN_BV_VACATION_COUNT, true, 0, new ushort[] { min });
+                }
+            }
+        }
+
+        public bool HasBeenOnTour(uint token)
+        {
+            return (CharacterCache.GetSimInvToken(sdsc, (TypeGUID)token) != null);
+        }
+
+        public void SetBeenOnTour(uint token, bool value)
+        {
+            if (value)
+            {
+                if (!HasBeenOnTour(token))
+                {
+                    CharacterCache.AddSimInvTokenValue(sdsc, (TypeGUID)token, false, 0, new ushort[0]);
+                }
+            }
+            else
+            {
+                CharacterCache.RemoveSimInvToken(sdsc, (TypeGUID)token);
+            }
+        }
+
+        public bool HasVisitedSecretLot(uint token)
+        {
+            return (CharacterCache.GetSimInvToken(sdsc, (TypeGUID)token) != null);
+        }
+
+        public void SetVisitedSecretLot(uint token, bool value)
+        {
+            if (value)
+            {
+                if (!HasVisitedSecretLot(token))
+                {
+                    CharacterCache.AddSimInvTokenValue(sdsc, (TypeGUID)token, false, 0, new ushort[0]);
+                }
+            }
+            else
+            {
+                CharacterCache.RemoveSimInvToken(sdsc, (TypeGUID)token);
+            }
+        }
+        #endregion
+
         #region Sdsc Accessors
         public void SetSdscDetails(string sdscPackagePath, TypeInstanceID sdscId)
         {
@@ -1101,6 +1310,8 @@ namespace FamilyManager.Caching
 
             return sdsc;
         }
+
+        public TypeInstanceID SdscInstanceID => (sdsc != null) ? sdsc.InstanceID : DBPFData.INSTANCE_NULL;
         #endregion
 
         #region Scor (Neighbour Data Tables) Accessors 
@@ -1520,6 +1731,48 @@ namespace FamilyManager.Caching
             }
 
             return (token != null);
+        }
+
+        internal static void AddOrRemoveSimInvTokenValue(Sdsc sdsc, TypeGUID guid, bool addToken, bool isCounted, ushort flags, ushort[] values)
+        {
+            if (addToken)
+            {
+                AddSimInvTokenValue(sdsc, guid, isCounted, flags, values);
+            }
+            else
+            {
+                RemoveSimInvToken(sdsc, guid);
+            }
+        }
+
+        internal static void AddOrRemoveFoodsEatenToken(Sdsc sdsc, TypeGUID foodGuid, bool addToken, bool isGood)
+        {
+            if (sdsc != null)
+            {
+                Ngbh ngbh = GetNgbh();
+
+                if (ngbh != null)
+                {
+                    if (addToken)
+                    {
+                        AddOrRemoveFoodsEatenToken(sdsc, foodGuid, false, isGood);
+
+                        ngbh.SimInventory(sdsc.SimInstance).AddToken(Personal.TOKEN_FOOD_EATEN, false, 0, new ushort[] { 0, foodGuid.LoWord, foodGuid.HiWord, (ushort)(isGood ? 1 : 0) });
+                    }
+                    else
+                    {
+                        NgbhSimInventory simInventory = ngbh.SimInventory(sdsc.SimInstance);
+
+                        foreach (NgbhInventoryToken token in simInventory.FindTokensByGuid(Personal.TOKEN_FOOD_EATEN))
+                        {
+                            if (token.GetProperty(2) == foodGuid.LoWord && token.GetProperty(3) == foodGuid.HiWord)
+                            {
+                                simInventory.RemoveToken(token);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         internal static NgbhInventoryToken AddSimInvTokenValue(Sdsc sdsc, TypeGUID guid, bool isCounted, ushort flags, ushort[] values)

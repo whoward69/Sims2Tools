@@ -54,7 +54,8 @@ namespace FamilyManager
         TabAspiration,      // Must be the first member tab (or will need to recode stuff)
         TabCareer,
         TabSkills,
-        TabInterests
+        TabInterests,
+        TabVacations
     }
 
     public partial class FamilyManagerForm : Form
@@ -120,18 +121,26 @@ namespace FamilyManager
 
             tabPages.SelectedIndex = (int)TabPageIndex.TabFamily;
 
-            trackSkillToddlerWalk.Maximum = Properties.Settings.Default.MaxSkillWalk;
-            trackSkillToddlerTalk.Maximum = Properties.Settings.Default.MaxSkillTalk;
-            trackSkillToddlerRhyming.Maximum = Properties.Settings.Default.MaxSkillRhyming;
-            trackSkillToddlerPotty.Maximum = Properties.Settings.Default.MaxSkillPotty;
+            {
+                ignoreSkillsChanges = true;
 
-            trackSkillHiddenBreakDance.Maximum = Properties.Settings.Default.MaxSkillBreakDance;
-            trackSkillHiddenDance.Maximum = Properties.Settings.Default.MaxSkillDance;
-            trackSkillHiddenFireDance.Maximum = Properties.Settings.Default.MaxSkillFireDance;
-            trackSkillHiddenMeditate.Maximum = Properties.Settings.Default.MaxSkillMeditate;
-            trackSkillHiddenPool.Maximum = Properties.Settings.Default.MaxSkillPool;
-            trackSkillHiddenStudy.Maximum = Properties.Settings.Default.MaxSkillStudy;
-            trackSkillHiddenTaiChi.Maximum = Properties.Settings.Default.MaxSkillTaiChi;
+                trackSkillToddlerWalk.Maximum = Properties.Settings.Default.MaxSkillWalk;
+                trackSkillToddlerTalk.Maximum = Properties.Settings.Default.MaxSkillTalk;
+                trackSkillToddlerRhyming.Maximum = Properties.Settings.Default.MaxSkillRhyming;
+                trackSkillToddlerPotty.Maximum = Properties.Settings.Default.MaxSkillPotty;
+
+                trackSkillHiddenBreakDance.Maximum = Properties.Settings.Default.MaxSkillBreakDance;
+                trackSkillHiddenDance.Maximum = Properties.Settings.Default.MaxSkillDance;
+                trackSkillHiddenFireDance.Maximum = Properties.Settings.Default.MaxSkillFireDance;
+                trackSkillHiddenHulaDance.Maximum = Properties.Settings.Default.MaxSkillHulaDance;
+                trackSkillHiddenMeditate.Maximum = Properties.Settings.Default.MaxSkillMeditate;
+                trackSkillHiddenPool.Maximum = Properties.Settings.Default.MaxSkillPool;
+                trackSkillHiddenSlapDance.Maximum = Properties.Settings.Default.MaxSkillSlapDance;
+                trackSkillHiddenStudy.Maximum = Properties.Settings.Default.MaxSkillStudy;
+                trackSkillHiddenTaiChi.Maximum = Properties.Settings.Default.MaxSkillTaiChi;
+
+                ignoreSkillsChanges = false;
+            }
 
             FamilyDbpfData.SetCache(packageCache);
             CharacterCache.SetCache(packageCache);
@@ -172,6 +181,58 @@ namespace FamilyManager
             toolTip.SetToolTip(btnAspWork2.InnerButton, superpowerTooltips[9][2]);
             toolTip.SetToolTip(btnAspWork3.InnerButton, superpowerTooltips[9][3]);
             toolTip.SetToolTip(btnAspWork4.InnerButton, superpowerTooltips[9][4]);
+
+            foreach (Control control in grpVacationsGeneral.Controls)
+            {
+                if (control is VacationButton button)
+                {
+                    toolTip.SetToolTip(button.InnerButton, toolTip.GetToolTip(button));
+                }
+            }
+
+            foreach (Control control in grpVacationsIsland.Controls)
+            {
+                if (control is VacationButton button)
+                {
+                    toolTip.SetToolTip(button.InnerButton, toolTip.GetToolTip(button));
+                }
+                else if (control is SecretLotButton secretButton)
+                {
+                    toolTip.SetToolTip(secretButton.InnerButton, toolTip.GetToolTip(secretButton));
+                }
+            }
+
+            foreach (Control control in grpVacationsFarEast.Controls)
+            {
+                if (control is VacationButton button)
+                {
+                    toolTip.SetToolTip(button.InnerButton, toolTip.GetToolTip(button));
+                }
+                else if (control is SecretLotButton secretButton)
+                {
+                    toolTip.SetToolTip(secretButton.InnerButton, toolTip.GetToolTip(secretButton));
+                }
+            }
+
+            foreach (Control control in grpVacationsMountain.Controls)
+            {
+                if (control is VacationButton button)
+                {
+                    toolTip.SetToolTip(button.InnerButton, toolTip.GetToolTip(button));
+                }
+                else if (control is SecretLotButton secretButton)
+                {
+                    toolTip.SetToolTip(secretButton.InnerButton, toolTip.GetToolTip(secretButton));
+                }
+            }
+
+            foreach (Control control in grpVacationsTours.Controls)
+            {
+                if (control is TourButton button)
+                {
+                    toolTip.SetToolTip(button.InnerButton, toolTip.GetToolTip(button));
+                }
+            }
         }
 
         public void TidyUp()
@@ -1934,8 +1995,8 @@ namespace FamilyManager
         }
 
         private bool ignoreCareerChanges = false;
-        private bool ignoreInterestsChanges = false;
         private bool ignoreSkillsChanges = false;
+        private bool ignoreInterestsChanges = false;
 
         private void ClearCareerTab()
         {
@@ -2173,6 +2234,7 @@ namespace FamilyManager
                 ignoreSkillsChanges = true;
 
                 { // General Skills
+                    grpSkillsGeneral.Visible = !currentMemberData.IsPet;
                     grpSkillsGeneral.Enabled = currentMemberData.IsToddlerOrOlder;
 
                     if (grpSkillsGeneral.Enabled)
@@ -2198,6 +2260,7 @@ namespace FamilyManager
                 }
 
                 { // Toddler Skills
+                    grpSkillsToddler.Visible = !currentMemberData.IsPet;
                     grpSkillsToddler.Enabled = currentMemberData.IsToddlerOrOlder;
 
                     if (grpSkillsToddler.Enabled)
@@ -2223,6 +2286,7 @@ namespace FamilyManager
                 }
 
                 { // Hidden Skills
+                    grpSkillsHidden.Visible = !currentMemberData.IsPet;
                     grpSkillsHidden.Enabled = currentMemberData.IsChildOrOlder;
 
                     if (grpSkillsHidden.Enabled)
@@ -2248,6 +2312,7 @@ namespace FamilyManager
                 }
 
                 { // Life Skills
+                    grpSkillsLife.Visible = !currentMemberData.IsPet;
                     grpSkillsLife.Enabled = currentMemberData.IsChildOrOlder;
 
                     if (grpSkillsLife.Enabled)
@@ -2273,6 +2338,7 @@ namespace FamilyManager
                 }
 
                 { // Pet Skills
+                    grpSkillsPet.Visible = currentMemberData.IsPet;
                     grpSkillsPet.Enabled = currentMemberData.IsPet;
 
                     if (grpSkillsPet.Enabled)
@@ -2438,6 +2504,144 @@ namespace FamilyManager
             }
         }
 
+        private bool ignoreVacationsChanges = false;
+        private void ClearVacationsTab()
+        {
+            SetCurrentMember(null);
+
+            ignoreVacationsChanges = true;
+
+            foreach (Control control in grpVacationsGeneral.Controls)
+            {
+                if (control is VacationButton button)
+                {
+                    button.Selected = false;
+                }
+            }
+
+            foreach (Control control in grpVacationsIsland.Controls)
+            {
+                if (control is VacationButton button)
+                {
+                    button.Selected = false;
+                }
+            }
+
+            foreach (Control control in grpVacationsFarEast.Controls)
+            {
+                if (control is VacationButton button)
+                {
+                    button.Selected = false;
+                }
+            }
+
+            foreach (Control control in grpVacationsMountain.Controls)
+            {
+                if (control is VacationButton button)
+                {
+                    button.Selected = false;
+                }
+            }
+
+            foreach (Control control in grpVacationsTours.Controls)
+            {
+                if (control is TourButton button)
+                {
+                    button.Selected = false;
+                }
+            }
+
+            ignoreVacationsChanges = false;
+        }
+
+        private void DoWork_FillVacationsTab()
+        {
+            if (gridFamilyMembers.SelectedRows.Count == 1)
+            {
+                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+
+                imageVacationsSim.Image = currentMemberData.Thumbnail(currentMemberData.AgeCode);
+
+                ignoreVacationsChanges = true;
+
+                { // General Mementos
+                    foreach (Control control in grpVacationsGeneral.Controls)
+                    {
+                        if (control is VacationButton button)
+                        {
+                            button.Selected = currentMemberData.HasMemento(button.Memento);
+                        }
+                    }
+
+                    UpdateReadonlyMementos();
+                }
+
+                { // Island Mementos
+                    foreach (Control control in grpVacationsIsland.Controls)
+                    {
+                        if (control is VacationButton button)
+                        {
+                            button.Selected = currentMemberData.HasMemento(button.Memento);
+                        }
+                    }
+
+                    btnVacIsleSecretLot.Selected = currentMemberData.HasVisitedSecretLot(btnVacIsleSecretLot.TokenGuid);
+                }
+
+                { // Far East Mementos
+                    foreach (Control control in grpVacationsFarEast.Controls)
+                    {
+                        if (control is VacationButton button)
+                        {
+                            button.Selected = currentMemberData.HasMemento(button.Memento);
+                        }
+                    }
+
+                    btnVacEastSecretLot.Selected = currentMemberData.HasVisitedSecretLot(btnVacEastSecretLot.TokenGuid);
+                }
+
+                { // Mountain Mementos
+                    foreach (Control control in grpVacationsMountain.Controls)
+                    {
+                        if (control is VacationButton button)
+                        {
+                            button.Selected = currentMemberData.HasMemento(button.Memento);
+                        }
+                    }
+
+                    btnVacMountSecretLot.Selected = currentMemberData.HasVisitedSecretLot(btnVacMountSecretLot.TokenGuid);
+                }
+
+                { // Tours
+                    foreach (Control control in grpVacationsTours.Controls)
+                    {
+                        if (control is TourButton button)
+                        {
+                            button.Selected = currentMemberData.HasBeenOnTour(button.TokenGuid);
+                        }
+                    }
+                }
+
+                ignoreVacationsChanges = false;
+            }
+            else
+            {
+                ClearVacationsTab();
+            }
+        }
+
+        private void UpdateReadonlyMementos()
+        {
+            imgVacAllGestures.BackColor = (currentMemberData.HasMemento(Mementos.LearntAllGestures) ? Color.CadetBlue : Color.LightGray);
+
+            imgVacSecretLot.BackColor = (currentMemberData.HasMemento(Mementos.VisitedSecretLot) ? Color.CadetBlue : Color.LightGray);
+            imgVacSecretLotAll.BackColor = (currentMemberData.HasMemento(Mementos.VisitedAllSecretLots) ? Color.CadetBlue : Color.LightGray);
+
+            imgVacTour.BackColor = (currentMemberData.HasMemento(Mementos.WentOnTour) ? Color.CadetBlue : Color.LightGray);
+            imgVacTourFive.BackColor = (currentMemberData.HasMemento(Mementos.WentOnFiveTours) ? Color.CadetBlue : Color.LightGray);
+            imgVacTourAll.BackColor = (currentMemberData.HasMemento(Mementos.WentOnAllTours) ? Color.CadetBlue : Color.LightGray);
+        }
+
         private void EnableJobGroup(bool enabled)
         {
             grpJob.Enabled = enabled;
@@ -2560,6 +2764,7 @@ namespace FamilyManager
                 tabPages.TabPages.Remove(tabCareer);
                 tabPages.TabPages.Remove(tabSkills);
                 tabPages.TabPages.Remove(tabInterests);
+                tabPages.TabPages.Remove(tabVacations);
             }
             else
             {
@@ -2581,6 +2786,7 @@ namespace FamilyManager
                 if (!tabPages.TabPages.Contains(tabCareer)) tabPages.TabPages.Add(tabCareer);
                 if (!tabPages.TabPages.Contains(tabSkills)) tabPages.TabPages.Add(tabSkills);
                 if (!tabPages.TabPages.Contains(tabInterests)) tabPages.TabPages.Add(tabInterests);
+                if (!tabPages.TabPages.Contains(tabVacations)) tabPages.TabPages.Add(tabVacations);
 
                 panelFamily.Enabled = !currentFamily.IsNPCFamily;
 
@@ -3044,6 +3250,7 @@ namespace FamilyManager
         private bool IsCareerTabActive => IsTabActive(TabPageIndex.TabCareer);
         private bool IsSkillsTabActive => IsTabActive(TabPageIndex.TabSkills);
         private bool IsInterestsTabActive => IsTabActive(TabPageIndex.TabInterests);
+        private bool IsVacationsTabActive => IsTabActive(TabPageIndex.TabVacations);
 
         private bool IsTabActive(TabPageIndex index)
         {
@@ -3114,6 +3321,10 @@ namespace FamilyManager
                 else if (IsInterestsTabActive)
                 {
                     DoWork_FillInterestsTab();
+                }
+                else if (IsVacationsTabActive)
+                {
+                    DoWork_FillVacationsTab();
                 }
 
                 lastActiveTab = tabPages.SelectedIndex;
@@ -4504,7 +4715,16 @@ namespace FamilyManager
                         {
                             if (row.Cells["colData"].Value is CharacterData data)
                             {
-                                e.ToolTipText = data.PackageName;
+#if DEBUG
+                                if (currentMemberData != null)
+                                {
+                                    e.ToolTipText = $"{data.PackageName} ({currentMemberData.SdscInstanceID})";
+                                }
+                                else
+#endif
+                                {
+                                    e.ToolTipText = data.PackageName;
+                                }
                             }
                         }
                     }
@@ -4669,6 +4889,10 @@ namespace FamilyManager
             else if (IsInterestsTabActive)
             {
                 DoWork_FillInterestsTab();
+            }
+            else if (IsVacationsTabActive)
+            {
+                DoWork_FillVacationsTab();
             }
 
             UpdateFormState();
@@ -5971,6 +6195,111 @@ namespace FamilyManager
                     }
                 }
             }
+        }
+
+        private void OnVacationMementoButtonClicked(object sender, EventArgs e)
+        {
+            if (ignoreVacationsChanges) return;
+
+            VacationButton button = (sender as Control).Parent as VacationButton;
+
+            // Flip the state of this button
+            button.Selected = !button.Selected;
+
+            // Some buttons update others
+            if (button == btnVacGenPlane)
+            {
+                if (!button.Selected)
+                {
+                    SetGoodVacationButton(btnVacGenPlaneFive, false);
+                    SetGoodVacationButton(btnVacGenPlaneThree, false);
+                }
+            }
+            else if (button == btnVacGenPlaneThree)
+            {
+                if (button.Selected)
+                {
+                    SetGoodVacationButton(btnVacGenPlane, true);
+                }
+                else
+                {
+                    SetGoodVacationButton(btnVacGenPlaneFive, false);
+                }
+            }
+            else if (button == btnVacGenPlaneFive)
+            {
+                if (button.Selected)
+                {
+                    SetGoodVacationButton(btnVacGenPlane, true);
+                    SetGoodVacationButton(btnVacGenPlaneThree, true);
+                }
+            }
+
+            if (button == btnVacIsleGesture || button == btnVacEastGesture || button == btnVacMountGesture)
+            {
+                currentMemberData.SetMemento(Mementos.LearntAllGestures, (btnVacIsleGesture.Selected && btnVacEastGesture.Selected && btnVacMountGesture.Selected));
+
+                UpdateReadonlyMementos();
+            }
+
+            currentMemberData.SetMemento(button.Memento, button.Selected);
+            UpdateSaveState();
+        }
+
+        private void SetGoodVacationButton(VacationButton button, bool value)
+        {
+            if (button.Selected == value) return;
+
+            button.Selected = value;
+            currentMemberData.SetMemento(button.Memento, button.Selected);
+        }
+
+        private void OnVacationTourButtonClicked(object sender, EventArgs e)
+        {
+            if (ignoreVacationsChanges) return;
+
+            TourButton button = (sender as Control).Parent as TourButton;
+
+            // Flip the state of this button
+            button.Selected = !button.Selected;
+
+            currentMemberData.SetBeenOnTour(button.TokenGuid, button.Selected);
+
+            int tourCount = 0;
+            foreach (Control control in grpVacationsTours.Controls)
+            {
+                if (control is TourButton btn)
+                {
+                    if (btn.Selected) ++tourCount;
+                }
+            }
+
+            // Update mementos based on number of tours taken
+            currentMemberData.SetMemento(Mementos.WentOnTour, (tourCount >= 1));
+            currentMemberData.SetMemento(Mementos.WentOnFiveTours, (tourCount >= 5));
+            currentMemberData.SetMemento(Mementos.WentOnAllTours, (tourCount == 9));
+
+            UpdateReadonlyMementos();
+            UpdateSaveState();
+        }
+
+        private void OnVacationSecretLotButtonClicked(object sender, EventArgs e)
+        {
+            if (ignoreVacationsChanges) return;
+
+            SecretLotButton button = (sender as Control).Parent as SecretLotButton;
+
+            // Flip the state of this button
+            button.Selected = !button.Selected;
+
+            currentMemberData.SetVisitedSecretLot(button.TokenGuid, button.Selected);
+
+            // Update mementos based on number of secret lots found
+            currentMemberData.SetMemento(Mementos.VisitedSecretLot, (btnVacIsleSecretLot.Selected || btnVacEastSecretLot.Selected || btnVacMountSecretLot.Selected));
+            currentMemberData.SetMemento(Mementos.VisitedAllSecretLots, (btnVacIsleSecretLot.Selected && btnVacEastSecretLot.Selected && btnVacMountSecretLot.Selected));
+
+            UpdateReadonlyMementos();
+            UpdateSaveState();
         }
     }
 }

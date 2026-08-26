@@ -250,4 +250,175 @@
   <data name="Asp_Work_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Asp_Work_4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="FarEast_AcupressureMassage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_AcupressureMassage.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FarEast_Chirashi" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_Chirashi.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FarEast_DragonLegend" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_DragonLegend.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FarEast_DrankTea" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_DrankTea.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FarEast_Gesture" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_Gesture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FarEast_Holiday" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_Holiday.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FarEast_LuckyShrine" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_LuckyShrine.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FarEast_MahJong" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_MahJong.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FarEast_TaiChi" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_TaiChi.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FarEast_Teleport" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_Teleport.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FarEast_ZenGarden" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FarEast_ZenGarden.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_FireDance" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_FireDance.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_Gesture" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_Gesture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_Holiday" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_Holiday.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_HulaDance" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_HulaDance.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_MonkeyRuins" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_MonkeyRuins.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_PinappleSurprise" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_PinappleSurprise.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_PirateShanty" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_PirateChantey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_PirateShip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_PirateShip.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_Shell" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_Shell.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_StoneMassage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_StoneMassage.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Island_VoodooDoll" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Island_VoodooDoll.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mountain_AxeThrowing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mountain_AxeThrowing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mountain_DeepTissueMassage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mountain_DeepTissueMassage.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mountain_Flapjacks" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mountain_Flapjacks.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mountain_Gesture" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mountain_Gesture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mountain_Holiday" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mountain_Holiday.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mountain_MetBigFoot" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mountain_MetBigFoot.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mountain_SlapDance" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mountain_SlapDance.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mountain_Tent" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mountain_Tent.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mountain_TreeRingDisplay" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mountain_TreeRingDisplay.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Mountain_WonLogRolling" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Mountain_WonLogRolling.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SecretLot_Bigfoot" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\SecretLot_Bigfoot.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SecretLot_Hermit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\SecretLot_Hermit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SecretLot_WitchDoctor" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\SecretLot_WitchDoctor.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tour_Bamboo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tour_Bamboo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tour_BirdWatching" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tour_BirdWatching.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tour_GlassBottomBoat" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tour_GlassBottomBoat.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tour_Helicopter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tour_Helicopter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tour_Historic" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tour_Historic.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tour_Logging" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tour_Logging.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tour_NatureTrail" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tour_NatureTrail.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tour_Parasailing" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tour_Parasailing.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Tour_RiverBoat" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Tour_RiverBoat.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_AllGestures" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_AllGestures.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_PhotoAlbum" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_PhotoAlbum.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_Plane" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_Plane.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_PlaneFive" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_PlaneFive.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_PlaneThree" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_PlaneThree.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_RoomService" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_RoomService.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_SecretLot" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_SecretLot.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_SecretLotAll" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_SecretLotAll.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_SecretMap" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_SecretMap.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_Tour" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_Tour.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_TourAll" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_TourAll.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_TourFive" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_TourFive.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Vacation_TreasureChest" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Vacation_TreasureChest.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
