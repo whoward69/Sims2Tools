@@ -12,6 +12,7 @@
 using Sims2Tools;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BHAV;
+using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -50,17 +51,9 @@ namespace BhavFinder
                 uint opcodeFrom = 0xffff;
                 uint opcodeTo = 0xffff;
 
-                if (comboOpCode.Text.IndexOf(":") == -1)
+                if (comboOpCode.Text.IndexOf(":") != -1)
                 {
-                    Match m = HexOpCodeRegex.Match(comboOpCode.Text);
-
-                    if (m.Success)
-                    {
-                        opcodeFrom = opcodeTo = Convert.ToUInt32(m.Value, 16);
-                    }
-                }
-                else
-                {
+                    // From:To range, eg 0x071F:0x0723
                     Match mFrom = HexOpCodeRegex.Match(comboOpCode.Text.Substring(0, comboOpCode.Text.IndexOf(":")));
                     Match mTo = HexOpCodeRegex.Match(comboOpCode.Text.Substring(comboOpCode.Text.IndexOf(":") + 1));
 
@@ -68,6 +61,16 @@ namespace BhavFinder
                     {
                         opcodeFrom = Convert.ToUInt32(mFrom.Value, 16);
                         opcodeTo = Convert.ToUInt32(mTo.Value, 16);
+                    }
+                }
+                else
+                {
+                    Match m = HexOpCodeRegex.Match(comboOpCode.Text);
+
+                    if (m.Success)
+                    {
+                        // Single opcode, eg 0x0033 or 0x0717
+                        opcodeFrom = opcodeTo = Convert.ToUInt32(m.Value, 16);
                     }
                 }
 
@@ -101,9 +104,38 @@ namespace BhavFinder
 
                     filter.InstFilter = new OpCodeFilter(opcodeFrom, opcodeTo, version);
                 }
+                else if (IsAdvancedMode)
+                {
+                    // We have something that could be a RegEx
+                    Regex re = null;
+
+                    try
+                    {
+                        re = new Regex(comboOpCode.Text.ToUpper());
+                    }
+                    catch (Exception) { }
+
+                    if (re != null)
+                    {
+                        if (comboOpCode.Text.StartsWith("0x2"))
+                        {
+                            if (comboOpCodeInGroup.Text.Length > 0)
+                            {
+                                Match g = HexGroupRegex.Match(comboOpCodeInGroup.Text);
+
+                                if (g.Success)
+                                {
+                                    filter = new SemiGlobalsFilter((TypeGroupID)Convert.ToUInt32(g.Value, 16), filter);
+                                }
+                            }
+                        }
+
+                        filter.InstFilter = new OpCodeRegexFilter(re);
+                    }
+                }
             }
 
-            for (int i = 0; i <= 15; ++i)
+            for (int i = 0; i < 16; ++i)
             {
                 if (operands[i].Text.Length > 0 && Hex2Regex.IsMatch(operands[i].Text))
                 {
@@ -268,6 +300,22 @@ namespace BhavFinder
             public override bool Wanted(TypeGroupID group, Instruction inst)
             {
                 return (inst.OpCode >= opcodeFrom && inst.OpCode <= opcodeTo && (version == -1 || inst.NodeVersion == version));
+            }
+        }
+
+        private class OpCodeRegexFilter : InstructionFilter
+        {
+            readonly Regex re;
+
+            public OpCodeRegexFilter(Regex re)
+            {
+                this.re = re;
+            }
+
+            public override bool Wanted(TypeGroupID group, Instruction inst)
+            {
+                string opCode = Helper.Hex4PrefixString((uint)inst.OpCode).ToUpper();
+                return re.IsMatch(opCode);
             }
         }
 

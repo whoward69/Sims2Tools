@@ -14,6 +14,9 @@ namespace Sims2Tools.DBPF.InventoryTokens
 {
     public class Personal
     {
+        // Food tokens
+        public static readonly TypeGUID TOKEN_FOOD_EATEN = (TypeGUID)0x2E016316;
+
         // University tokens
         public static readonly TypeGUID TOKEN_UNI_SECRET_SOCIETY = (TypeGUID)0x8EAE367E;
         public static readonly TypeGUID TOKEN_UNI_GPA = (TypeGUID)0xAE82B295;
@@ -33,5 +36,22 @@ namespace Sims2Tools.DBPF.InventoryTokens
         public static readonly TypeGUID TOKEN_ASP_KNOWLEDGE = (TypeGUID)0x6C92F4CF;
         public static readonly TypeGUID TOKEN_ASP_POPULARITY = (TypeGUID)0x8C92F4BC;
         public static readonly TypeGUID TOKEN_ASP_ROMANCE = (TypeGUID)0x6C92F4F3;
+
+        // Bon Voyage tokens
+        public static readonly TypeGUID TOKEN_BV_VACATION_COUNT = (TypeGUID)0xF38C73E0;
+        public static readonly TypeGUID TOKEN_BV_TRAVEL_ISLAND = (TypeGUID)0x53219060;
+        public static readonly TypeGUID TOKEN_BV_TRAVEL_FAREAST = (TypeGUID)0x13219011;
+        public static readonly TypeGUID TOKEN_BV_TRAVEL_MOUNTAIN = (TypeGUID)0x73219021;
+        public static readonly TypeGUID TOKEN_BV_GREET_LEARNT_ISLAND = (TypeGUID)0x1322849B;
+        public static readonly TypeGUID TOKEN_BV_GREET_LEARNT_FAREAST = (TypeGUID)0x93228484;
+        public static readonly TypeGUID TOKEN_BV_GREET_LEARNT_MOUNTAIN = (TypeGUID)0x73228492;
+        public static readonly TypeGUID TOKEN_BV_SECRET_BIGFOOT = (TypeGUID)0xD3634D0A;
+        public static readonly TypeGUID TOKEN_BV_SECRET_HERMIT = (TypeGUID)0x13634CE9;
+        public static readonly TypeGUID TOKEN_BV_SECRET_WITCHDOCTOR = (TypeGUID)0x93634D2C;
+        public static readonly TypeGUID TOKEN_BV_MASSAGE_LEARNT_HOTSTONE = (TypeGUID)0x32E9E44C;
+        public static readonly TypeGUID TOKEN_BV_MASSAGE_LEARNT_ACCUPRESSURE = (TypeGUID)0x52E9E443;
+        public static readonly TypeGUID TOKEN_BV_MASSAGE_LEARNT_DEEPTISSUE = (TypeGUID)0x92D3596F;
+        public static readonly TypeGUID TOKEN_BV_MISC_LEARNT_SEASHANTY = (TypeGUID)0x130D8CA1;
+        public static readonly TypeGUID TOKEN_BV_MISC_LEARNT_TELEPORT = (TypeGUID)0x531FE710;
     }
 }

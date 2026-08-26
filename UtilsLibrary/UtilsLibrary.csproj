@@ -87,6 +87,24 @@
     <Compile Include="Controls\BenefitButton.Designer.cs">
       <DependentUpon>BenefitButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\VacationButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\VacationButton.Designer.cs">
+      <DependentUpon>VacationButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TourButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TourButton.Designer.cs">
+      <DependentUpon>TourButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SecretLotButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SecretLotButton.Designer.cs">
+      <DependentUpon>SecretLotButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ControlHelper.cs" />
     <Compile Include="Controls\GraphicHelper.cs" />
     <Compile Include="Controls\InterestTracker.cs">
@@ -244,6 +262,15 @@
     <Compile Include="Win32\WndProcRetHook.cs" />
     <EmbeddedResource Include="Controls\BenefitButton.resx">
       <DependentUpon>BenefitButton.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\VacationButton.resx">
+      <DependentUpon>VacationButton.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TourButton.resx">
+      <DependentUpon>TourButton.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SecretLotButton.resx">
+      <DependentUpon>SecretLotButton.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\InterestTracker.resx">
       <DependentUpon>InterestTracker.cs</DependentUpon>

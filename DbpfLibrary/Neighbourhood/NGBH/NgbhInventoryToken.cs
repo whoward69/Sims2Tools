@@ -82,6 +82,14 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
         }
 
         /// <summary>
+        /// Get the one based property value on the token
+        /// </summary>
+        public ushort GetProperty(int prop)
+        {
+            return GetValue(prop - 1);
+        }
+
+        /// <summary>
         /// Set the zero based data value on the token
         /// </summary>
         public void SetValue(int index, ushort value)

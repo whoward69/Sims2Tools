@@ -12,30 +12,108 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
+using System;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 {
+    public enum Mementos : uint
+    {
+        WentOnIslandVacation = 0,
+        LearntHangLoose,
+        LearntHulaDance,
+        LearntHotStoneMassage,
+        LearntFireDance,
+        LearntSeaShanty,
+        GotVoodooDoll,
+        WentOnMountainVacation,
+        LearntChestPound,
+        LearntSlapDance,
+        LearntDeepTissueMassage,
+        BefriendedBigFoot,
+        WentOnFarEastVacation,
+        LearntToBow,
+        LearntTaiChi,
+        LearntTeleport,
+        LearntDragonLegend,
+        LearntAccupressureMassage,
+        GoodVacation,
+        ThreeGoodVacations,
+        FiveGoodVacations,
+        VisitedSecretLot,
+        VisitedAllSecretLots,
+        WentOnTour,
+        WonLogRolling,
+        WishedAtLuckyShrine,
+        LearntAllGestures,
+        AxeThrowingBullseye,
+        PlayedOnPirateShip,
+        DugUpTreasureChest,
+        FoundSecretMap,
+        RakedZenGarden,
+        MadeOfferingAtMonkeyRuins,
+        SleptInTent,
+        FoundBeachTreasure,
+        WonMahjong,
+        DrankTea,
+        ExaminedTreeRings,
+        WentOnAllTours,
+        WentOnFiveTours,
+        AteFlapjacks,
+        AtePinappleSurprise,
+        AteChirashi,
+        OrderedRoomService,
+        OrderedPhotoAlbum
+    }
+
     internal class SdscVoyage : SdscData
     {
+        private bool _isDirty = false;
+
+        internal bool IsDirty => _isDirty;
+        internal void SetClean() => _isDirty = false;
+
         internal SdscVoyage() : base() { }
         internal SdscVoyage(ushort[] data) : base(data) { }
 
-        private ulong memories = 0;
+        private ulong mementoFlags = 0;
 
-        public ulong Memories => memories;
+        public ulong MementoFlags => mementoFlags;
 
-        internal void UnserializeMemories(DbpfReader reader)
+        public bool HasMemento(Mementos memento)
+        {
+            ulong flagMask = (ulong)Math.Pow(2.0, (double)memento);
+
+            return ((mementoFlags & flagMask) != 0);
+        }
+
+        public void SetMemento(Mementos memento, bool value)
+        {
+            ulong flagMask = (ulong)Math.Pow(2.0, (double)memento);
+
+            if (value)
+            {
+                mementoFlags |= flagMask;
+            }
+            else
+            {
+                mementoFlags &= ~flagMask;
+            }
+
+            _isDirty = true;
+        }
+
+        internal void UnserializeMementos(DbpfReader reader)
         {
             if (reader.Position <= reader.Length - 8)
             {
-                memories = reader.ReadUInt64();
+                mementoFlags = reader.ReadUInt64();
             }
         }
 
-        internal void SerializeMemories(DbpfWriter writer)
+        internal void SerializeMementos(DbpfWriter writer)
         {
-            writer.WriteUInt64(memories);
+            writer.WriteUInt64(mementoFlags);
         }
 
         protected override void AddXml(XmlElement parent)
@@ -43,7 +121,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             if (valid)
             {
                 parent.SetAttribute("daysLeft", data[(int)SdscIndex.TimeLeftOnVacation].ToString());
-                parent.SetAttribute("memories", Helper.Hex8PrefixString((uint)((memories >> 0x20) & 0xFFFFFFFF)) + Helper.Hex8String((uint)(memories & 0xFFFFFFFF)));
+                parent.SetAttribute("memories", Helper.Hex8PrefixString((uint)((mementoFlags >> 0x20) & 0xFFFFFFFF)) + Helper.Hex8String((uint)(mementoFlags & 0xFFFFFFFF)));
             }
         }
     }

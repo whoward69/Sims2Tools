@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -38,23 +39,29 @@ namespace BhavFinder
     {
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private static readonly Color colourOperandIndex = Color.FromName(Properties.Settings.Default.OperandIndexColour);
         private readonly SortedDictionary<string, string> localObjectsByGroupID = new SortedDictionary<string, string>();
 
         private MruList MyMruList;
         private Updater MyUpdater;
 
-        private readonly TextBox[] operands = new TextBox[16];
-        private readonly TextBox[] masks = new TextBox[16];
+        private readonly Label[] operandLabels;
+        private readonly TextBox[] operands;
+        private readonly TextBox[] masks;
 
         private readonly Regex Hex2Regex = new Regex(@"^([0-9A-F][0-9A-F]?)$");
-        private readonly Regex HexGroupRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)");
-        private readonly Regex HexGUIDRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)");
+        private readonly Regex HexGroupRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)$");
+        private readonly Regex HexGUIDRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)$");
         private readonly Regex HexOpCodeRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)");
-        private readonly Regex HexInstanceRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)");
+        private readonly Regex HexInstanceRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)$");
+
+        private readonly Regex SimPeOperandsRegex = new Regex(@"^([0-9A-Fa-f][0-9A-Fa-f]){16}$");
 
         private readonly BhavFinderData bhavFoundData = new BhavFinderData();
 
         private readonly CommonOpenFileDialog selectPathDialog;
+
+        public bool IsAdvancedMode => Sims2ToolsLib.AllAdvancedMode || menuItemAdvanced.Checked;
 
         public BhavFinderForm()
         {
@@ -63,41 +70,29 @@ namespace BhavFinder
             InitializeComponent();
             this.Text = BhavFinderApp.AppTitle;
 
-            operands[0] = textOperand0;
-            operands[1] = textOperand1;
-            operands[2] = textOperand2;
-            operands[3] = textOperand3;
-            operands[4] = textOperand4;
-            operands[5] = textOperand5;
-            operands[6] = textOperand6;
-            operands[7] = textOperand7;
-            operands[8] = textOperand8;
-            operands[9] = textOperand9;
-            operands[10] = textOperand10;
-            operands[11] = textOperand11;
-            operands[12] = textOperand12;
-            operands[13] = textOperand13;
-            operands[14] = textOperand14;
-            operands[15] = textOperand15;
+            operandLabels = new Label[]
+            {
+                lblOperand0, lblOperand2, lblOperand4, lblOperand6, lblOperand8, lblOperand10, lblOperand12, lblOperand14
+            };
+
+            foreach (Label opLabel in operandLabels)
+            {
+                opLabel.ForeColor = colourOperandIndex;
+            }
+
+            operands = new TextBox[]
+            {
+                textOperand0, textOperand1 ,textOperand2 ,textOperand3 ,textOperand4 ,textOperand5 ,textOperand6 ,textOperand7,
+                textOperand8, textOperand9 ,textOperand10 ,textOperand11 ,textOperand12 ,textOperand13 ,textOperand14 ,textOperand15
+            };
 
             ClearOperands();
 
-            masks[0] = textMask0;
-            masks[1] = textMask1;
-            masks[2] = textMask2;
-            masks[3] = textMask3;
-            masks[4] = textMask4;
-            masks[5] = textMask5;
-            masks[6] = textMask6;
-            masks[7] = textMask7;
-            masks[8] = textMask8;
-            masks[9] = textMask9;
-            masks[10] = textMask10;
-            masks[11] = textMask11;
-            masks[12] = textMask12;
-            masks[13] = textMask13;
-            masks[14] = textMask14;
-            masks[15] = textMask15;
+            masks = new TextBox[]
+            {
+                textMask0, textMask1 ,textMask2 ,textMask3 ,textMask4 ,textMask5 ,textMask6 ,textMask7,
+                textMask8, textMask9 ,textMask10 ,textMask11 ,textMask12 ,textMask13 ,textMask14 ,textMask15
+            };
 
             ResetMasks();
 
@@ -145,21 +140,19 @@ namespace BhavFinder
 
         private void ClearOperands()
         {
-            foreach (TextBox operand in operands)
+            for (int i = 0; i < operands.Length; ++i)
             {
-                operand.Text = "";
-                toolTipOperands.SetToolTip(operand, "");
+                operands[i].Text = "";
+                toolTipOperands.SetToolTip(operands[i], $"[{i}]");
             }
         }
 
         private void ResetMasks()
         {
-            string strDefaultMask = "FF";
-
-            foreach (TextBox mask in masks)
+            for (int i = 0; i < masks.Length; ++i)
             {
-                mask.Text = strDefaultMask;
-                toolTipOperands.SetToolTip(mask, "Binary: 1111 1111");
+                masks[i].Text = "FF";
+                toolTipOperands.SetToolTip(masks[i], "Binary: 1111 1111");
             }
         }
 
@@ -171,7 +164,7 @@ namespace BhavFinder
 
             if (comboOpCode.Text.Length > 0)
             {
-                if (comboOpCode.Text.IndexOf(":") != -1)
+                if (!IsAdvancedMode && comboOpCode.Text.IndexOf(":") != -1)
                 {
                     string opCodeFrom = comboOpCode.Text.Substring(0, comboOpCode.Text.IndexOf(":"));
                     string opCodeTo = comboOpCode.Text.Substring(comboOpCode.Text.IndexOf(":") + 1);
@@ -222,21 +215,23 @@ namespace BhavFinder
         {
             TextBox tb = (TextBox)sender;
 
+            int index = Array.IndexOf(operands, tb);
+
             if (tb.Text.Length > 0)
             {
                 if (!Hex2Regex.IsMatch(tb.Text))
                 {
                     tb.Text = "";
-                    toolTipOperands.SetToolTip(tb, "");
+                    toolTipOperands.SetToolTip(tb, $"[{index}]");
                 }
                 else
                 {
-                    toolTipOperands.SetToolTip(tb, $"Decimal: {Convert.ToUInt32(tb.Text, 16)}");
+                    toolTipOperands.SetToolTip(tb, $"[{index}] Decimal: {Convert.ToUInt32(tb.Text, 16)}");
                 }
             }
             else
             {
-                toolTipOperands.SetToolTip(tb, "");
+                toolTipOperands.SetToolTip(tb, $"[{index}]");
             }
         }
 
@@ -307,8 +302,10 @@ namespace BhavFinder
             }
         }
 
-        private void OnKeyPress_HexRangeOnly(object sender, KeyPressEventArgs e)
+        private void OnKeyPress_OpCode(object sender, KeyPressEventArgs e)
         {
+            if (IsAdvancedMode) return;
+
             if (e.KeyChar >= 'a' && e.KeyChar <= 'f')
             {
                 e.KeyChar = (char)(e.KeyChar - 'a' + 'A');
@@ -440,6 +437,10 @@ namespace BhavFinder
                     if (m.Success)
                     {
                         lblOpCodeInGroup.Visible = comboOpCodeInGroup.Visible = (Convert.ToUInt32(m.Groups[2].Value, 16) >= 0x2000);
+                    }
+                    else if (IsAdvancedMode)
+                    {
+                        lblOpCodeInGroup.Visible = comboOpCodeInGroup.Visible = cb.Text.StartsWith("0x2");
                     }
                     else
                     {
@@ -594,6 +595,8 @@ namespace BhavFinder
             checkShowNames.Checked = bool.Parse(RegistryTools.GetSetting(BhavFinderApp.RegistryKey, checkShowNames.Name, checkShowNames.Checked.ToString()).ToString());
             OnSwitchGroupChanged(checkShowNames, null);
 
+            menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(BhavFinderApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
+
             menuItemRestoreFilters.Checked = ((int)RegistryTools.GetSetting(BhavFinderApp.RegistryKey + @"\Options", menuItemRestoreFilters.Name, 0) != 0);
 
             if (menuItemRestoreFilters.Checked) LoadFilters();
@@ -655,6 +658,8 @@ namespace BhavFinder
                 RegistryTools.SaveSetting(BhavFinderApp.RegistryKey, textFilePath.Name, textFilePath.Text);
                 RegistryTools.SaveSetting(BhavFinderApp.RegistryKey, checkShowNames.Name, checkShowNames.Checked.ToString());
 
+                RegistryTools.SaveSetting(BhavFinderApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
+
                 RegistryTools.SaveSetting(BhavFinderApp.RegistryKey + @"\Options", menuItemRestoreFilters.Name, menuItemRestoreFilters.Checked ? 1 : 0);
 
                 SaveFilters();
@@ -673,9 +678,14 @@ namespace BhavFinder
             textLocals.Text = (string)RegistryTools.GetSetting(regKey, textLocals.Name, "");
 
             comboOpCode.SelectedIndex = (int)RegistryTools.GetSetting(regKey, comboOpCode.Name, -1);
+            if (comboOpCode.SelectedIndex == -1)
+            {
+                comboOpCode.Text = (string)RegistryTools.GetSetting(regKey, $"{comboOpCode.Name}_text", "");
+            }
+
             comboVersion.SelectedIndex = (int)RegistryTools.GetSetting(regKey, comboVersion.Name, -1);
 
-            for (int i = 0; i <= 15; ++i)
+            for (int i = 0; i < 16; ++i)
             {
                 operands[i].Text = (string)RegistryTools.GetSetting(regKey, operands[i].Name, "");
                 masks[i].Text = (string)RegistryTools.GetSetting(regKey, masks[i].Name, "");
@@ -700,9 +710,11 @@ namespace BhavFinder
             RegistryTools.SaveSetting(regKey, textLocals.Name, textLocals.Text);
 
             RegistryTools.SaveSetting(regKey, comboOpCode.Name, comboOpCode.SelectedIndex);
+            RegistryTools.SaveSetting(regKey, $"{comboOpCode.Name}_text", comboOpCode.Text);
+
             RegistryTools.SaveSetting(regKey, comboVersion.Name, comboVersion.SelectedIndex);
 
-            for (int i = 0; i <= 15; ++i)
+            for (int i = 0; i < 16; ++i)
             {
                 RegistryTools.SaveSetting(regKey, operands[i].Name, operands[i].Text);
                 RegistryTools.SaveSetting(regKey, masks[i].Name, masks[i].Text);
@@ -722,6 +734,26 @@ namespace BhavFinder
             this.gridFoundBhavs.Columns["colBhavGroupInstance"].Visible = !checkShowNames.Checked;
             this.gridFoundBhavs.Columns["colBhavGroupName"].Visible = checkShowNames.Checked;
         }
+
+        #region Mode Menu Actions
+        private void OnModeOpening(object sender, EventArgs e)
+        {
+            menuItemAdvanced.Enabled = !Sims2ToolsLib.AllAdvancedMode;
+            if (Sims2ToolsLib.AllAdvancedMode) menuItemAdvanced.Checked = true;
+        }
+
+        private void OnAdvancedModeChanged(object sender, EventArgs e)
+        {
+            if (IsAdvancedMode)
+            {
+                lblOpCode.Text = "OpCode (regex):";
+            }
+            else
+            {
+                lblOpCode.Text = "OpCode:";
+            }
+        }
+        #endregion
 
         private void OnGoClicked(object sender, EventArgs e)
         {
@@ -1025,6 +1057,7 @@ namespace BhavFinder
         private void OnContextMenuOperandsOpening(object sender, CancelEventArgs e)
         {
             menuItemPasteGUID.Enabled = Clipboard.ContainsText() && HexGUIDRegex.IsMatch(Clipboard.GetText(TextDataFormat.Text));
+            menuItemPasteSimPeOperands.Enabled = Clipboard.ContainsText() && SimPeOperandsRegex.IsMatch(Clipboard.GetText(TextDataFormat.Text));
         }
 
         private void OnPasteGuidClicked(object sender, EventArgs e)
@@ -1044,6 +1077,20 @@ namespace BhavFinder
                         operands[index++].Text = Helper.Hex2String(GUID % 256);
                         GUID /= 256;
                     }
+                }
+            }
+        }
+
+        private void OnPasteSimPeOperandsClicked(object sender, EventArgs e)
+        {
+            if (Clipboard.ContainsText())
+            {
+                string simPeOperands = Clipboard.GetText(TextDataFormat.Text);
+
+                for (int i = 0; i < 16; ++i)
+                {
+                    operands[i].Text = simPeOperands.Substring(0, 2).ToUpper();
+                    simPeOperands = simPeOperands.Substring(2);
                 }
             }
         }

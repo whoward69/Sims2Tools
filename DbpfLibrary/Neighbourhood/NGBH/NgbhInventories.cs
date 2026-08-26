@@ -245,6 +245,18 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             }
         }
 
+        public void RemoveToken(NgbhInventoryToken token)
+        {
+            if (specialTokens.Remove(token))
+            {
+                _isDirty = true;
+            }
+            else if (standardTokens.Remove(token))
+            {
+                _isDirty = true;
+            }
+        }
+
         public XmlElement AddXml(XmlElement parent)
         {
             if (specialTokens.Count + standardTokens.Count > 0)

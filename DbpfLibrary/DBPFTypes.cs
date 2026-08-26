@@ -42,6 +42,9 @@ namespace Sims2Tools.DBPF
         public static uint operator %(TypeGUID lhs, int rhs) => (uint)(lhs.guid % rhs);
         public static TypeGUID operator /(TypeGUID lhs, int rhs) => new TypeGUID((uint)(lhs.guid / rhs));
 
+        public ushort LoWord => (ushort)(guid & 0x0000FFFF);
+        public ushort HiWord => (ushort)((guid & 0xFFFF0000) >> 16);
+
         public static bool operator ==(TypeGUID lhs, TypeGUID rhs) => (lhs.guid == rhs.guid);
         public static bool operator !=(TypeGUID lhs, TypeGUID rhs) => (lhs.guid != rhs.guid);
         public bool Equals(TypeGUID other) => (this.guid == other.guid);

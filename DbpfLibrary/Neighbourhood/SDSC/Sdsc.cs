@@ -71,6 +71,23 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         //
         private byte unknown4 = 0;
 
+        public override bool IsDirty
+        {
+            get
+            {
+                if (base.IsDirty) return true;
+
+                return voyage.IsDirty;
+            }
+        }
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            voyage.SetClean();
+        }
+
 
         public SDescVersions Version => (SDescVersions)version;
         public ushort SimInstance => simInstance;
@@ -86,7 +103,9 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         public bool IsDog => nightlife.IsDog;
 
 
-        public ulong BvMemories => voyage.Memories;
+        public ulong BvMemories => voyage.MementoFlags;
+        public bool HasMemento(Mementos memento) => voyage.HasMemento(memento);
+        public void SetMemento(Mementos memento, bool value) => voyage.SetMemento(memento, value);
 
 
         public Sdsc(DBPFEntry entry, DbpfReader reader) : base(entry)
@@ -264,7 +283,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
                 voyage = new SdscVoyage(data);
 
                 // Read the BV memories
-                voyage.UnserializeMemories(reader);
+                voyage.UnserializeMementos(reader);
             }
 
             if (version >= SDescVersions.Freetime)
@@ -301,7 +320,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
 
             if (version >= SDescVersions.Voyage)
             {
-                voyage.SerializeMemories(writer);
+                voyage.SerializeMementos(writer);
             }
         }
 

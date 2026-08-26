@@ -5,5 +5,8 @@
     <Setting Name="MruSize" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">8</Value>
     </Setting>
+    <Setting Name="OperandIndexColour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Teal</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
