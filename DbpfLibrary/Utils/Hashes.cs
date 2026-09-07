@@ -94,6 +94,13 @@ namespace Sims2Tools.DBPF.Utils
             return ToUInt(rt);
         }
 
+        public static uint CollectionHash(TypeGUID guid)
+        {
+            byte[] rt = crc32.ComputeHash(Helper.ToBytes(Helper.Hex8String(guid.AsUInt()).ToLower()));
+
+            return ToUInt(rt);
+        }
+
         public static uint ThumbnailHash(TypeGroupID groupId, string cresname)
         {
             return ToUInt(crc32.ComputeHash(Encoding.ASCII.GetBytes($"{groupId.AsUInt()}{cresname}".Trim().ToLower())));

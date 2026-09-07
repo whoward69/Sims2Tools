@@ -107,6 +107,13 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             Unserialize(reader);
         }
 
+        public IReadOnlyCollection<NgbhFamilyInventory> FamilyInventories => familyInventories.Values;
+
+        public NgbhFamilyInventory FamilyInventory(uint ownerId)
+        {
+            return familyInventories.ContainsKey(ownerId) ? familyInventories[ownerId] : null;
+        }
+
         public IReadOnlyCollection<NgbhSimInventory> SimInventories => simInventories.Values;
 
         public NgbhSimInventory SimInventory(uint ownerId)

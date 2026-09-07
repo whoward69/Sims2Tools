@@ -346,18 +346,16 @@ namespace Sims2Tools.DBPF.Images.IMG
                     }
                     catch (Exception)
                     {
-                        byte[] data2 = new byte[imageData.Length];
-                        Array.Copy(imageData, 0x40, data2, 0, imageData.Length - 0x40);
-
                         try
                         {
-                            image = BuildImage(data2);
+                            byte[] imageDataNoHeader = new byte[imageData.Length - 0x40];
+                            Array.Copy(imageData, 0x40, imageDataNoHeader, 0, imageData.Length - 0x40);
+
+                            image = BuildImage(imageDataNoHeader);
                         }
                         catch (Exception ex)
                         {
                             imageData = null;
-
-                            // May need to try TgaLoader stuff here
 
                             logger.Error(ex.Message);
                             logger.Info(ex.StackTrace);
@@ -448,20 +446,34 @@ namespace Sims2Tools.DBPF.Images.IMG
 
         private Image BuildImage(byte[] imgData)
         {
-            // See https://stackoverflow.com/questions/3801275/how-to-convert-image-to-byte-array/16576471#16576471
-            Bitmap bm = (Bitmap)imageConverter.ConvertFrom(imgData);
-
-            if (IsJpeg(imgData))
+            try
             {
-                bm = ApplyAlfa(bm, ExtractAlfa(imgData));
-            }
+                // See https://stackoverflow.com/questions/3801275/how-to-convert-image-to-byte-array/16576471#16576471
+                Bitmap bm = (Bitmap)imageConverter.ConvertFrom(imgData);
 
-            if (bm != null && (bm.HorizontalResolution != (int)bm.HorizontalResolution || bm.VerticalResolution != (int)bm.VerticalResolution))
+                if (IsJpeg(imgData))
+                {
+                    bm = ApplyAlfa(bm, ExtractAlfa(imgData));
+                }
+
+                if (bm != null && (bm.HorizontalResolution != (int)bm.HorizontalResolution || bm.VerticalResolution != (int)bm.VerticalResolution))
+                {
+                    bm.SetResolution((int)(bm.HorizontalResolution + 0.5f), (int)(bm.VerticalResolution + 0.5f));
+                }
+
+                return bm;
+            }
+            catch (Exception ex)
             {
-                bm.SetResolution((int)(bm.HorizontalResolution + 0.5f), (int)(bm.VerticalResolution + 0.5f));
+                try
+                {
+                    return TgaLoader.LoadTGA(imgData);
+                }
+                catch (Exception)
+                {
+                    throw ex;
+                }
             }
-
-            return bm;
         }
 
         public override XmlElement AddXml(XmlElement parent)

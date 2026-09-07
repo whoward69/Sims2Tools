@@ -119,7 +119,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
     public class GmdcGroups : IEnumerable
     {
-        private readonly ArrayList list = new ArrayList();
+        private readonly ArrayList list = new ArrayList(); // TODO - DBPF Library - replace with List<GmdcGroup>
 
         public int Length => list.Count;
 

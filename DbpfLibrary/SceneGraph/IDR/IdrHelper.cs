@@ -11,19 +11,18 @@
  */
 
 using Sims2Tools.DBPF.CPF;
-using Sims2Tools.DBPF.SceneGraph.IDR;
 
-namespace Sims2Tools.DBPF.SceneGraph.BINX
+namespace Sims2Tools.DBPF.SceneGraph.IDR
 {
-    public class BinxHelper
+    public class IdrHelper
     {
-        public static DBPFKey GetKey(string name, Binx binx, Idr idr)
+        public static DBPFKey GetKey(string name, Cpf cpf, Idr idr)
         {
             DBPFKey key = null;
 
             if (idr != null)
             {
-                CpfItem idx = binx.GetItem($"{name}idx");
+                CpfItem idx = cpf.GetItem($"{name}idx");
 
                 if (idx != null)
                 {
@@ -33,9 +32,9 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
 
             if (key == null)
             {
-                CpfItem restypeid = binx.GetItem($"{name}restypeid");
-                CpfItem groupid = binx.GetItem($"{name}groupid");
-                CpfItem id = binx.GetItem($"{name}id");
+                CpfItem restypeid = cpf.GetItem($"{name}restypeid");
+                CpfItem groupid = cpf.GetItem($"{name}groupid");
+                CpfItem id = cpf.GetItem($"{name}id");
 
                 if (restypeid != null && groupid != null && id != null)
                 {
@@ -46,9 +45,9 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
             return key;
         }
 
-        public static DBPFKey ObjectKey(Binx binx, Idr idr) => GetKey("object", binx, idr);
-        public static DBPFKey StringSetKey(Binx binx, Idr idr) => GetKey("stringset", binx, idr);
-        public static DBPFKey IconKey(Binx binx, Idr idr) => GetKey("icon", binx, idr);
-        public static DBPFKey BinKey(Binx binx, Idr idr) => GetKey("bin", binx, idr);
+        public static DBPFKey ObjectKey(Cpf cpf, Idr idr) => GetKey("object", cpf, idr);
+        public static DBPFKey StringSetKey(Cpf cpf, Idr idr) => GetKey("stringset", cpf, idr);
+        public static DBPFKey IconKey(Cpf cpf, Idr idr) => GetKey("icon", cpf, idr);
+        public static DBPFKey BinKey(Cpf cpf, Idr idr) => GetKey("bin", cpf, idr);
     }
 }

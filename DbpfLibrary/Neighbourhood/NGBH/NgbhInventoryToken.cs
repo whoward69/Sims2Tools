@@ -132,6 +132,12 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
             _isDirty = true;
         }
 
+        public void ReplaceProperties(ushort[] props)
+        {
+            data = props;
+            _isDirty = true;
+        }
+
         internal void Unserialize(DbpfReader reader)
         {
 #if DEBUG

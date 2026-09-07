@@ -50,6 +50,11 @@ namespace Sims2Tools.DBPF.CPF
             get { return this.GetItem("hairtone")?.StringValue; }
         }
 
+        public int SortIndex
+        {
+            get { CpfItem item = this.GetItem("sortindex"); return item != null ? item.IntegerValue : 0; }
+        }
+
         public override bool IsDirty
         {
             get

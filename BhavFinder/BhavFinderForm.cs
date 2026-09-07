@@ -9,6 +9,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using BhavFinder.Filters;
 using CsvHelper;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
@@ -50,10 +51,10 @@ namespace BhavFinder
         private readonly TextBox[] masks;
 
         private readonly Regex Hex2Regex = new Regex(@"^([0-9A-F][0-9A-F]?)$");
-        private readonly Regex HexGroupRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)$");
+        private readonly Regex HexGroupRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)");
         private readonly Regex HexGUIDRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)$");
         private readonly Regex HexOpCodeRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)");
-        private readonly Regex HexInstanceRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)$");
+        private readonly Regex HexInstanceRegex = new Regex(@"^(0[xX])?([0-9A-Fa-f]+)");
 
         private readonly Regex SimPeOperandsRegex = new Regex(@"^([0-9A-Fa-f][0-9A-Fa-f]){16}$");
 
@@ -755,6 +756,12 @@ namespace BhavFinder
         }
         #endregion
 
+        #region GO Button
+        private string usingRegex;
+        private TypeInstanceID usingInstance;
+        private static Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexLocal = null;
+        private static Dictionary<int, HashSet<TypeGroupID>> strLookupByIndexGlobal = null;
+
         private void OnGoClicked(object sender, EventArgs e)
         {
             if (bhavFinderWorker.IsBusy)
@@ -958,6 +965,7 @@ namespace BhavFinder
 
             btnGO.Text = "FIND &BHAVs";
         }
+        #endregion
 
         private Dictionary<int, HashSet<TypeGroupID>> BuildStrLookupTable(string packagePath, TypeInstanceID instanceID, string regex, bool ignoreCase)
         {
@@ -1128,5 +1136,188 @@ namespace BhavFinder
                 lblProgress.Visible = false;
             }
         }
+
+        #region Filters
+        private BhavFilter GetFilters()
+        {
+            BhavFilter filter = GetNameAndParamsAndLocalsFilter();
+
+            AddGroupFilter(filter);
+
+            filter = AddOpCodeFilter(filter);
+
+            AddOperandAndMaskFilters(filter);
+
+            AddIndexIntoStrFilter(filter);
+
+            return filter;
+        }
+
+        private BhavFilter GetNameAndParamsAndLocalsFilter()
+        {
+            int paramCount = -1;
+            if (!string.IsNullOrWhiteSpace(textParams.Text)) Int32.TryParse(textParams.Text, out paramCount);
+
+            int localCount = -1;
+            if (!string.IsNullOrWhiteSpace(textParams.Text)) Int32.TryParse(textLocals.Text, out localCount);
+
+            return new DetailsFilter(textNameRegex.Text, !checkNameCaseSensitive.Checked, paramCount, localCount);
+        }
+
+        private BhavFilter AddOpCodeFilter(BhavFilter filter)
+        {
+            BhavFilter newFilter = filter;
+
+            if (comboOpCode.Text.Length > 0)
+            {
+                uint opcodeFrom = 0xffff;
+                uint opcodeTo = 0xffff;
+
+                if (comboOpCode.Text.IndexOf(":") != -1)
+                {
+                    // From:To range, eg 0x071F:0x0723
+                    Match mFrom = HexOpCodeRegex.Match(comboOpCode.Text.Substring(0, comboOpCode.Text.IndexOf(":")));
+                    Match mTo = HexOpCodeRegex.Match(comboOpCode.Text.Substring(comboOpCode.Text.IndexOf(":") + 1));
+
+                    if (mFrom.Success && mTo.Success)
+                    {
+                        opcodeFrom = Convert.ToUInt32(mFrom.Value, 16);
+                        opcodeTo = Convert.ToUInt32(mTo.Value, 16);
+                    }
+                }
+                else
+                {
+                    Match m = HexOpCodeRegex.Match(comboOpCode.Text);
+
+                    if (m.Success)
+                    {
+                        // Single opcode, eg 0x0033 or 0x0717
+                        opcodeFrom = opcodeTo = Convert.ToUInt32(m.Value, 16);
+                    }
+                }
+
+                if (opcodeFrom != 0xffff && opcodeTo != 0xffff)
+                {
+                    if (opcodeFrom >= 0x2000)
+                    {
+                        newFilter = AddSemiGlobalsFilter(filter);
+                    }
+
+                    newFilter.InstFilter = new OpCodeFilter(opcodeFrom, opcodeTo, GetVersionRestriction());
+                }
+                else if (IsAdvancedMode)
+                {
+                    // We have something that could be a RegEx
+                    Regex re = null;
+
+                    try
+                    {
+                        re = new Regex(comboOpCode.Text.ToUpper());
+                    }
+                    catch (Exception) { }
+
+                    if (re != null)
+                    {
+                        if (comboOpCode.Text.StartsWith("0x2"))
+                        {
+                            newFilter = AddSemiGlobalsFilter(filter);
+                        }
+
+                        newFilter.InstFilter = new OpCodeRegexFilter(re);
+                    }
+                }
+            }
+
+            return newFilter;
+        }
+
+        private int GetVersionRestriction()
+        {
+            int version = -1;
+
+            if (comboVersion.Text.Length > 0)
+            {
+                Match v = HexOpCodeRegex.Match(comboVersion.Text);
+
+                if (v.Success)
+                {
+                    version = Convert.ToInt16(v.Value, 16);
+                }
+            }
+
+            return version;
+        }
+
+        private void AddGroupFilter(BhavFilter filter)
+        {
+            if (comboBhavInGroup.Text.Length > 0)
+            {
+                Match m = HexGroupRegex.Match(comboBhavInGroup.Text);
+
+                if (m.Success)
+                {
+                    filter.InnerFilter = new GroupFilter((TypeGroupID)Convert.ToUInt32(m.Value, 16));
+                }
+            }
+        }
+
+        private BhavFilter AddSemiGlobalsFilter(BhavFilter filter)
+        {
+            BhavFilter newFilter = filter;
+
+            if (comboOpCodeInGroup.Text.Length > 0)
+            {
+                Match g = HexGroupRegex.Match(comboOpCodeInGroup.Text);
+
+                if (g.Success)
+                {
+                    newFilter = new SemiGlobalsFilter((TypeGroupID)Convert.ToUInt32(g.Value, 16), filter);
+                }
+            }
+
+            return newFilter;
+        }
+
+        private void AddOperandAndMaskFilters(BhavFilter filter)
+        {
+            for (int i = 0; i < 16; ++i)
+            {
+                if (operands[i].Text.Length > 0 && Hex2Regex.IsMatch(operands[i].Text))
+                {
+                    ushort value = Convert.ToUInt16(operands[i].Text, 16);
+                    ushort mask = 0xFF;
+
+                    if (masks[i].Text.Length > 0 && Hex2Regex.IsMatch(masks[i].Text))
+                    {
+                        mask = Convert.ToUInt16(masks[i].Text, 16);
+                    }
+
+                    InstructionFilter operandFilter = new OperandFilter(i, value, mask);
+
+                    if (filter.InstFilter != null)
+                    {
+                        operandFilter.InnerFilter = filter.InstFilter;
+                    }
+
+                    filter.InstFilter = operandFilter;
+                }
+            }
+        }
+
+        private void AddIndexIntoStrFilter(BhavFilter filter)
+        {
+            if (strLookupByIndexGlobal != null)
+            {
+                InstructionFilter strFilter = new StrIndexFilter(Convert.ToInt32(comboUsingOperand.Text, 10), strLookupByIndexGlobal, strLookupByIndexLocal);
+
+                if (filter.InstFilter != null)
+                {
+                    strFilter.InnerFilter = filter.InstFilter;
+                }
+
+                filter.InstFilter = strFilter;
+            }
+        }
+        #endregion
     }
 }

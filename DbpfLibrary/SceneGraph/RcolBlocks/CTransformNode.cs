@@ -204,7 +204,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         }
     }
 
-    public class TransformNodeItems : ArrayList
+    public class TransformNodeItems : ArrayList // TODO - DBPF Library - replace with List<>
     {
         public new TransformNodeItem this[int index]
         {

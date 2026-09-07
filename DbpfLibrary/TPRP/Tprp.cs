@@ -13,6 +13,7 @@
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -20,7 +21,7 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.TPRP
 {
-    public class Tprp : DBPFResource
+    public class Tprp : DBPFResource, IDbpfScriptable
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x54505250;
@@ -213,6 +214,45 @@ namespace Sims2Tools.DBPF.TPRP
             Debug.Assert((writer.Position - writeStart) == FileSize);
 #endif
         }
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            if (item.Equals("filename"))
+            {
+                return KeyName.Equals(sv);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("filename"))
+            {
+                SetKeyName(sv);
+                return true;
+            }
+
+            return DbpfScriptable.IsTGIRAssignment(this, item, sv);
+        }
+
+        public ScriptValue Value(string item)
+        {
+            if (item.Equals("filename"))
+            {
+                return new ScriptValue(KeyName);
+            }
+
+            return DbpfScriptable.TGIRValue(this, item);
+        }
+
+        public IDbpfScriptable Indexed(int index, bool clone)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
 
         public override XmlElement AddXml(XmlElement parent)
         {

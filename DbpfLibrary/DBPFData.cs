@@ -356,7 +356,7 @@ namespace Sims2Tools.DBPF
         {
             foreach (KeyValuePair<TypeTypeID, string> kvPair in AllTypeNames)
             {
-                if (kvPair.Value.Equals(name.ToUpper()))
+                if (kvPair.Value.Equals(name, System.StringComparison.OrdinalIgnoreCase))
                 {
                     return kvPair.Key;
                 }

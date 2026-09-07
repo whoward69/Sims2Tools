@@ -100,7 +100,7 @@
     <Compile Include="Neighbourhood\SDSC\SdscIndex.cs" />
     <Compile Include="Neighbourhood\XNGB\Xngb.cs" />
     <Compile Include="SceneGraph\AGED\Aged.cs" />
-    <Compile Include="SceneGraph\BINX\BinxHelper.cs" />
+    <Compile Include="SceneGraph\IDR\IdrHelper.cs" />
     <Compile Include="SceneGraph\RcolBlocks\CAnimResourceConst.cs" />
     <Compile Include="SceneGraph\RcolBlocks\CAnimResourceConst_Blocks.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\MipMap.cs" />

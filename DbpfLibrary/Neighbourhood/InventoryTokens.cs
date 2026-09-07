@@ -12,8 +12,26 @@
 
 namespace Sims2Tools.DBPF.InventoryTokens
 {
+    public class Family
+    {
+        // Magazine subscription tokens
+        public static readonly TypeGUID TOKEN_MAGAZINE_ART = (TypeGUID)0x53E4573C;
+        public static readonly TypeGUID TOKEN_MAGAZINE_ENGINEERING = (TypeGUID)0x13E457A2;
+        public static readonly TypeGUID TOKEN_MAGAZINE_FITNESS = (TypeGUID)0xB3E457B8;
+        public static readonly TypeGUID TOKEN_MAGAZINE_FOOD = (TypeGUID)0x13E457BF;
+        public static readonly TypeGUID TOKEN_MAGAZINE_GAMES = (TypeGUID)0x13E457C5;
+        public static readonly TypeGUID TOKEN_MAGAZINE_LITERATURE = (TypeGUID)0xF3E457CD;
+        public static readonly TypeGUID TOKEN_MAGAZINE_MUSIC = (TypeGUID)0xD3E457D5;
+        public static readonly TypeGUID TOKEN_MAGAZINE_NATURE = (TypeGUID)0xD3E457DC;
+        public static readonly TypeGUID TOKEN_MAGAZINE_SCIENCE = (TypeGUID)0xB3E457E4;
+        public static readonly TypeGUID TOKEN_MAGAZINE_SPORTS = (TypeGUID)0xD3E457F5;
+    }
+
     public class Personal
     {
+        // Misc tokens
+        public static readonly TypeGUID TOKEN_PERSONAL_WEALTH = (TypeGUID)0x2CEB51AC;
+
         // Food tokens
         public static readonly TypeGUID TOKEN_FOOD_EATEN = (TypeGUID)0x2E016316;
 
@@ -53,5 +71,8 @@ namespace Sims2Tools.DBPF.InventoryTokens
         public static readonly TypeGUID TOKEN_BV_MASSAGE_LEARNT_DEEPTISSUE = (TypeGUID)0x92D3596F;
         public static readonly TypeGUID TOKEN_BV_MISC_LEARNT_SEASHANTY = (TypeGUID)0x130D8CA1;
         public static readonly TypeGUID TOKEN_BV_MISC_LEARNT_TELEPORT = (TypeGUID)0x531FE710;
+
+        // Hobby tokens
+        public static readonly TypeGUID TOKEN_HOBBY_MEMBERSHIP = (TypeGUID)0x53F9DF4E;
     }
 }

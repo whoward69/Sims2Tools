@@ -96,6 +96,7 @@ namespace Sims2Tools.Controls
                 }
             }
         }
+
         private SdscIndex sdscIndex = SdscIndex.NONE;
 
         [Browsable(true)]
@@ -157,7 +158,7 @@ namespace Sims2Tools.Controls
             if (internalChange) return;
 
             internalChange = true;
-            textBox.Value = trackBar.Value / 100;
+            textBox.Value = trackBar.Value / 100.0;
             internalChange = false;
         }
 
@@ -166,7 +167,7 @@ namespace Sims2Tools.Controls
             if (internalChange) return;
 
             internalChange = true;
-            trackBar.Value = (int)(textBox.Value * 100);
+            trackBar.Value = (int)(textBox.Value * 100.0);
             internalChange = false;
         }
     }

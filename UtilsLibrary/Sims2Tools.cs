@@ -140,6 +140,18 @@ namespace Sims2Tools
             }
         }
 
+        public static string Sims2CollectionsPath
+        {
+            get
+            {
+                string collectionsPath = Sims2HomePath;
+
+                if (!string.IsNullOrWhiteSpace(collectionsPath)) collectionsPath = $"{collectionsPath}\\Collections";
+
+                return collectionsPath;
+            }
+        }
+
         public static string Sims2SavedSimsPath
         {
             get

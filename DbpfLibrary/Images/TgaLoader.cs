@@ -11,18 +11,21 @@
  */
 
 using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 
 namespace Sims2Tools.DBPF.Images
 {
     class TgaLoader
     {
-        struct TgaColorMap
+        private struct TgaColorMap
         {
             public ushort FirstEntryIndex;
             public ushort Length;
             public byte EntrySize;
 
-            public void Read(System.IO.BinaryReader br)
+            public void Read(BinaryReader br)
             {
                 FirstEntryIndex = br.ReadUInt16();
                 Length = br.ReadUInt16();
@@ -30,7 +33,7 @@ namespace Sims2Tools.DBPF.Images
             }
         }
 
-        struct TgaImageSpec
+        private struct TgaImageSpec
         {
             public ushort XOrigin;
             public ushort YOrigin;
@@ -39,7 +42,7 @@ namespace Sims2Tools.DBPF.Images
             public byte PixelDepth;
             public byte Descriptor;
 
-            public void Read(System.IO.BinaryReader br)
+            public void Read(BinaryReader br)
             {
                 XOrigin = br.ReadUInt16();
                 YOrigin = br.ReadUInt16();
@@ -74,7 +77,7 @@ namespace Sims2Tools.DBPF.Images
             }
         }
 
-        struct TgaHeader
+        private struct TgaHeader
         {
             public byte IdLength;
             public byte ColorMapType;
@@ -83,7 +86,7 @@ namespace Sims2Tools.DBPF.Images
             public TgaColorMap ColorMap;
             public TgaImageSpec ImageSpec;
 
-            public void Read(System.IO.BinaryReader br)
+            public void Read(BinaryReader br)
             {
                 this.IdLength = br.ReadByte();
                 this.ColorMapType = br.ReadByte();
@@ -103,7 +106,7 @@ namespace Sims2Tools.DBPF.Images
             }
         }
 
-        struct TgaCD
+        private struct TgaCD
         {
             public uint RMask, GMask, BMask, AMask;
             public byte RShift, GShift, BShift, AShift;
@@ -111,8 +114,7 @@ namespace Sims2Tools.DBPF.Images
             public bool NeedNoConvert;
         }
 
-        static uint UnpackColor(
-            uint sourceColor, ref TgaCD cd)
+        private static uint UnpackColor(uint sourceColor, ref TgaCD cd)
         {
             uint rpermute = (sourceColor << cd.RShift) | (sourceColor >> (32 - cd.RShift));
             uint gpermute = (sourceColor << cd.GShift) | (sourceColor >> (32 - cd.GShift));
@@ -133,12 +135,7 @@ namespace Sims2Tools.DBPF.Images
             return result;
         }
 
-        static unsafe void DecodeLine(
-            System.Drawing.Imaging.BitmapData b,
-            int line,
-            int byp,
-            byte[] data,
-            ref TgaCD cd)
+        private static unsafe void DecodeLine(BitmapData b, int line, int byp, byte[] data, ref TgaCD cd)
         {
             if (cd.NeedNoConvert)
             {
@@ -177,9 +174,7 @@ namespace Sims2Tools.DBPF.Images
             }
         }
 
-        static void DecodeRle(
-            System.Drawing.Imaging.BitmapData b,
-            int byp, TgaCD cd, System.IO.BinaryReader br, bool bottomUp)
+        private static void DecodeRle(BitmapData b, int byp, TgaCD cd, BinaryReader br, bool bottomUp)
         {
             try
             {
@@ -237,14 +232,12 @@ namespace Sims2Tools.DBPF.Images
 
                 }
             }
-            catch (System.IO.EndOfStreamException)
+            catch (EndOfStreamException)
             {
             }
         }
 
-        static void DecodePlain(
-            System.Drawing.Imaging.BitmapData b,
-            int byp, TgaCD cd, System.IO.BinaryReader br, bool bottomUp)
+        private static void DecodePlain(BitmapData b, int byp, TgaCD cd, BinaryReader br, bool bottomUp)
         {
             int w = b.Width;
             byte[] linebuffer = new byte[w * byp];
@@ -260,14 +253,9 @@ namespace Sims2Tools.DBPF.Images
             }
         }
 
-
-        static void DecodeStandard8(
-            System.Drawing.Imaging.BitmapData b,
-            TgaHeader hdr,
-            System.IO.BinaryReader br)
+        private static void DecodeStandard8(BitmapData b, TgaHeader hdr, BinaryReader br)
         {
-            // i must convert the input stream to a sequence of uint values
-            // which I then unpack.
+            // i must convert the input stream to a sequence of uint values which I then unpack.
             TgaCD cd = new TgaCD
             {
                 RMask = 0x000000ff,  // from 0xF800
@@ -287,11 +275,9 @@ namespace Sims2Tools.DBPF.Images
                 DecodePlain(b, 1, cd, br, hdr.ImageSpec.BottomUp);
         }
 
-        static void DecodeSpecial16(
-            System.Drawing.Imaging.BitmapData b, TgaHeader hdr, System.IO.BinaryReader br)
+        private static void DecodeSpecial16(BitmapData b, TgaHeader hdr, BinaryReader br)
         {
-            // i must convert the input stream to a sequence of uint values
-            // which I then unpack.
+            // i must convert the input stream to a sequence of uint values which I then unpack.
             TgaCD cd = new TgaCD
             {
                 RMask = 0x00f00000,
@@ -311,14 +297,9 @@ namespace Sims2Tools.DBPF.Images
                 DecodePlain(b, 2, cd, br, hdr.ImageSpec.BottomUp);
         }
 
-
-        static void DecodeStandard16(
-            System.Drawing.Imaging.BitmapData b,
-            TgaHeader hdr,
-            System.IO.BinaryReader br)
+        private static void DecodeStandard16(BitmapData b, TgaHeader hdr, BinaryReader br)
         {
-            // i must convert the input stream to a sequence of uint values
-            // which I then unpack.
+            // i must convert the input stream to a sequence of uint values which I then unpack.
             TgaCD cd = new TgaCD
             {
                 RMask = 0x00f80000,  // from 0xF800
@@ -338,12 +319,9 @@ namespace Sims2Tools.DBPF.Images
                 DecodePlain(b, 2, cd, br, hdr.ImageSpec.BottomUp);
         }
 
-
-        static void DecodeSpecial24(System.Drawing.Imaging.BitmapData b,
-            TgaHeader hdr, System.IO.BinaryReader br)
+        private static void DecodeSpecial24(BitmapData b, TgaHeader hdr, BinaryReader br)
         {
-            // i must convert the input stream to a sequence of uint values
-            // which I then unpack.
+            // i must convert the input stream to a sequence of uint values which I then unpack.
             TgaCD cd = new TgaCD
             {
                 RMask = 0x00f80000,
@@ -363,11 +341,9 @@ namespace Sims2Tools.DBPF.Images
                 DecodePlain(b, 3, cd, br, hdr.ImageSpec.BottomUp);
         }
 
-        static void DecodeStandard24(System.Drawing.Imaging.BitmapData b,
-            TgaHeader hdr, System.IO.BinaryReader br)
+        private static void DecodeStandard24(BitmapData b, TgaHeader hdr, BinaryReader br)
         {
-            // i must convert the input stream to a sequence of uint values
-            // which I then unpack.
+            // i must convert the input stream to a sequence of uint values which I then unpack.
             TgaCD cd = new TgaCD
             {
                 RMask = 0x00ff0000,
@@ -387,11 +363,9 @@ namespace Sims2Tools.DBPF.Images
                 DecodePlain(b, 3, cd, br, hdr.ImageSpec.BottomUp);
         }
 
-        static void DecodeStandard32(System.Drawing.Imaging.BitmapData b,
-            TgaHeader hdr, System.IO.BinaryReader br)
+        private static void DecodeStandard32(BitmapData b, TgaHeader hdr, BinaryReader br)
         {
-            // i must convert the input stream to a sequence of uint values
-            // which I then unpack.
+            // i must convert the input stream to a sequence of uint values which I then unpack.
             TgaCD cd = new TgaCD
             {
                 RMask = 0x00ff0000,
@@ -412,29 +386,9 @@ namespace Sims2Tools.DBPF.Images
                 DecodePlain(b, 4, cd, br, hdr.ImageSpec.BottomUp);
         }
 
-
-        public static System.Drawing.Size GetTGASize(string filename)
+        public static Bitmap LoadTGA(byte[] buffer)
         {
-            System.IO.FileStream f = System.IO.File.OpenRead(filename);
-
-            System.IO.BinaryReader br = new System.IO.BinaryReader(f);
-
-            TgaHeader header = new TgaHeader();
-            header.Read(br);
-            br.Close();
-
-            return new System.Drawing.Size(header.ImageSpec.Width, header.ImageSpec.Height);
-
-        }
-
-        public static System.Drawing.Bitmap LoadTGA(System.IO.Stream source)
-        {
-            byte[] buffer = new byte[source.Length];
-            source.Read(buffer, 0, buffer.Length);
-
-            System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer);
-
-            System.IO.BinaryReader br = new System.IO.BinaryReader(ms);
+            BinaryReader br = new BinaryReader(new MemoryStream(buffer));
 
             TgaHeader header = new TgaHeader();
             header.Read(br);
@@ -448,18 +402,12 @@ namespace Sims2Tools.DBPF.Images
             if (header.ImageSpec.AlphaBits > 8)
                 throw new ArgumentException("Not a supported tga file.");
 
-            if (header.ImageSpec.Width > 4096 ||
-                header.ImageSpec.Height > 4096)
+            if (header.ImageSpec.Width > 4096 || header.ImageSpec.Height > 4096)
                 throw new ArgumentException("Image too large.");
 
+            Bitmap b = new Bitmap(header.ImageSpec.Width, header.ImageSpec.Height, PixelFormat.Format32bppArgb);
 
-
-            System.Drawing.Bitmap b = new System.Drawing.Bitmap(
-                header.ImageSpec.Width, header.ImageSpec.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            System.Drawing.Imaging.BitmapData bd = b.LockBits(new System.Drawing.Rectangle(0, 0, b.Width, b.Height),
-                System.Drawing.Imaging.ImageLockMode.WriteOnly,
-                System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+            BitmapData bd = b.LockBits(new Rectangle(0, 0, b.Width, b.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
             switch (header.ImageSpec.PixelDepth)
             {
                 case 8:
@@ -488,28 +436,43 @@ namespace Sims2Tools.DBPF.Images
                     b.Dispose();
                     return null;
             }
+
             b.UnlockBits(bd);
             br.Close();
+
             return b;
         }
 
-        public static System.Drawing.Bitmap LoadTGA(string filename)
+        /* public static Size GetTGASize(string filename)
+        {
+            FileStream f = File.OpenRead(filename);
+            BinaryReader br = new BinaryReader(f);
+
+            TgaHeader header = new TgaHeader();
+            header.Read(br);
+            br.Close();
+
+            return new Size(header.ImageSpec.Width, header.ImageSpec.Height);
+
+        }*/
+
+        /* public static Bitmap LoadTGA(string filename)
         {
             try
             {
-                using (System.IO.FileStream f = System.IO.File.OpenRead(filename))
+                using (FileStream f = File.OpenRead(filename))
                 {
                     return LoadTGA(f);
                 }
             }
-            catch (System.IO.DirectoryNotFoundException)
+            catch (DirectoryNotFoundException)
             {
-                return null;    // file not found
+                return null;
             }
-            catch (System.IO.FileNotFoundException)
+            catch (FileNotFoundException)
             {
-                return null; // file not found
+                return null;
             }
-        }
+        } */
     }
 }

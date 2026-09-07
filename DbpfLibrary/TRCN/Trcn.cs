@@ -156,11 +156,22 @@ namespace Sims2Tools.DBPF.TRCN
 
         public bool Assignment(string item, ScriptValue sv)
         {
+            if (item.Equals("filename"))
+            {
+                SetKeyName(sv);
+                return true;
+            }
+
             return DbpfScriptable.IsTGIRAssignment(this, item, sv);
         }
 
         public ScriptValue Value(string item)
         {
+            if (item.Equals("filename"))
+            {
+                return new ScriptValue(KeyName);
+            }
+
             return DbpfScriptable.TGIRValue(this, item);
         }
 

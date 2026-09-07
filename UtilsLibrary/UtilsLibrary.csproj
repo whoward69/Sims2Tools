@@ -87,6 +87,12 @@
     <Compile Include="Controls\BenefitButton.Designer.cs">
       <DependentUpon>BenefitButton.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\HobbyLotButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\HobbyLotButton.Designer.cs">
+      <DependentUpon>HobbyLotButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\VacationButton.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -262,6 +268,9 @@
     <Compile Include="Win32\WndProcRetHook.cs" />
     <EmbeddedResource Include="Controls\BenefitButton.resx">
       <DependentUpon>BenefitButton.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\HobbyLotButton.resx">
+      <DependentUpon>HobbyLotButton.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\VacationButton.resx">
       <DependentUpon>VacationButton.cs</DependentUpon>

@@ -202,8 +202,6 @@ namespace Sims2Tools.DBPF.Neighbourhood.NGBH
 
         public void RemoveTokensByGuid(TypeGUID guid, int prop, ushort value)
         {
-            List<NgbhInventoryToken>.Enumerator enumerator = specialTokens.GetEnumerator();
-
             foreach (NgbhInventoryToken item in specialTokens.ToArray()) // Using .ToArray() so we don't try to remove from what we're iterating over!
             {
                 if (item.Guid == guid)

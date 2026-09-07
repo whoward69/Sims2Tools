@@ -143,7 +143,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
     }
 
-    public class GmdcModels : ArrayList
+    public class GmdcModels : ArrayList // TODO - DBPF Library - replace with List<>
     {
         public new GmdcModel this[int index]
         {
@@ -173,7 +173,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
     }
 
-    public class GmdcNamePairs : ArrayList
+    public class GmdcNamePairs : ArrayList // TODO - DBPF Library - replace with List<>
     {
         public new GmdcNamePair this[int index]
         {

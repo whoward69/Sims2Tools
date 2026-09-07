@@ -63,6 +63,26 @@ namespace Sims2Tools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Hobby_MembershipCard_Disabled {
+            get {
+                object obj = ResourceManager.GetObject("Hobby_MembershipCard_Disabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Hobby_MembershipCard_Enabled {
+            get {
+                object obj = ResourceManager.GetObject("Hobby_MembershipCard_Enabled", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Vacation_SecretLot {
             get {
                 object obj = ResourceManager.GetObject("Vacation_SecretLot", resourceCulture);

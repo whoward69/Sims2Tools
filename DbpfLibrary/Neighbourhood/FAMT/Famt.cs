@@ -26,7 +26,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMT
         public const string NAME = "FAMT";
 
 
-        ArrayList sims;
+        ArrayList sims; // TODO - DBPF Library - replace with List<>
 
         public FamilyTieSim[] Sims
         {
@@ -58,7 +58,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMT
             uint id = reader.ReadUInt32();
             if (id != 0x00000001) throw new Exception("Format is not recognized!");
             int count = reader.ReadInt32();
-            sims = new ArrayList(count);
+            sims = new ArrayList(count); // TODO - DBPF Library - replace with List<>
 
             for (int i = 0; i < count; i++)
             {

@@ -33,12 +33,12 @@ namespace Sims2Tools.DBPF.TTAB
         protected long readStart, readEnd, writeStart, writeEnd;
 #endif
 
-        private uint[] header;
+        private uint[] headerZ;
         private byte[] footer;
 
         private readonly List<TtabItem> items = new List<TtabItem>();
 
-        public uint Format => header[1];
+        public uint Format => headerZ[1];
 
         public override bool IsDirty
         {
@@ -82,14 +82,14 @@ namespace Sims2Tools.DBPF.TTAB
 
             this._keyName = Helper.ToString(reader.ReadBytes(0x40));
 
-            this.header = new uint[3];
-            this.header[0] = reader.ReadUInt32();
+            this.headerZ = new uint[3];
+            this.headerZ[0] = reader.ReadUInt32();
 
-            if (this.header[0] != 0xFFFFFFFF)
-                throw new Exception($"Unexpected data in TTAB header.  Read {Helper.Hex8PrefixString(this.header[0])}.  Expected 0xFFFFFFFF.");
+            if (this.headerZ[0] != 0xFFFFFFFF)
+                throw new Exception($"Unexpected data in TTAB header.  Read {Helper.Hex8PrefixString(this.headerZ[0])}.  Expected 0xFFFFFFFF.");
 
-            this.header[1] = reader.ReadUInt32();
-            this.header[2] = reader.ReadUInt32();
+            this.headerZ[1] = reader.ReadUInt32();
+            this.headerZ[2] = reader.ReadUInt32();
 
             ushort num = reader.ReadUInt16();
             while (this.items.Count < num)
@@ -128,9 +128,9 @@ namespace Sims2Tools.DBPF.TTAB
 
             writer.WriteBytes(Encoding.ASCII.GetBytes(KeyName), 0x40);
 
-            writer.WriteUInt32(header[0]);
-            writer.WriteUInt32(header[1]);
-            writer.WriteUInt32(header[2]);
+            writer.WriteUInt32(headerZ[0]);
+            writer.WriteUInt32(headerZ[1]);
+            writer.WriteUInt32(headerZ[2]);
 
             writer.WriteUInt16((ushort)items.Count);
             foreach (TtabItem item in items)

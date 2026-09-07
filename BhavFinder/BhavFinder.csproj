@@ -96,6 +96,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BhavFinderFilters.cs" />
     <Compile Include="BhavFinderData.cs" />
     <Compile Include="BhavFinderApp.cs" />
     <Compile Include="BhavFinderForm.cs">
@@ -103,10 +104,6 @@
     </Compile>
     <Compile Include="BhavFinderForm.Designer.cs">
       <DependentUpon>BhavFinderForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BhavFinderForm.Filters.cs">
-      <DependentUpon>BhavFinderForm.cs</DependentUpon>
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="BhavFinderForm.resx">
