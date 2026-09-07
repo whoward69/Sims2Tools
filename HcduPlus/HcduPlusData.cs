@@ -53,9 +53,9 @@ namespace HcduPlus
 
         public void Add(ConflictPair cp)
         {
-            foreach (ConflictDetail data in cp.Details)
+            foreach (ConflictDetail detail in cp.Details)
             {
-                this.Rows.Add(DBPFData.TypeName(data.Type), data.Group.ToString(), data.Instance.ToShortString(), data.Name, $"{cp.PackageA} --> {cp.PackageB}");
+                this.Rows.Add(DBPFData.TypeName(detail.Key.TypeID), detail.Key.GroupID, detail.Key.InstanceID.ToShortString(), detail.Name, $"{cp.PackageA} --> {cp.PackageB}");
             }
         }
     }

@@ -17,16 +17,12 @@ namespace HcduPlus.Conflict
 {
     public class ConflictDetail
     {
-        public TypeTypeID Type { get; }
-        public TypeGroupID Group { get; }
-        public TypeInstanceID Instance { get; }
+        public DBPFKey Key { get; }
         public string Name { get; }
 
-        public ConflictDetail(TypeTypeID type, TypeGroupID group, TypeInstanceID instance, string name)
+        public ConflictDetail(DBPFKey key, string name)
         {
-            Type = type;
-            Group = group;
-            Instance = instance;
+            Key = key;
             Name = name;
         }
     }
@@ -46,9 +42,9 @@ namespace HcduPlus.Conflict
             this.Details = new List<ConflictDetail>();
         }
 
-        public void AddTGI(TypeTypeID type, TypeGroupID group, TypeInstanceID instance, string name)
+        public void AddKey(DBPFKey key, string name)
         {
-            Details.Add(new ConflictDetail(type, group, instance, name));
+            Details.Add(new ConflictDetail(key, name));
         }
 
         public string DetailText(string prefix = "")
@@ -57,7 +53,7 @@ namespace HcduPlus.Conflict
 
             foreach (ConflictDetail detail in Details)
             {
-                s += $"\n{prefix}{DBPFData.TypeName(detail.Type)}: {detail.Instance.ToShortString()} - {detail.Name} ({detail.Group})";
+                s += $"\n{prefix}{DBPFData.TypeName(detail.Key.TypeID)}: {detail.Key.InstanceID.ToShortString()} - {detail.Name} ({detail.Key.GroupID})";
             }
 
             return s.Substring(1);

@@ -38,7 +38,6 @@ using Sims2Tools.DBPF.TRCN;
 using Sims2Tools.DBPF.TTAB;
 using Sims2Tools.DBPF.TTAS;
 using Sims2Tools.DBPF.UI;
-using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.VERS;
 using Sims2Tools.Dialogs;
 using Sims2Tools.Files;
@@ -296,54 +295,50 @@ namespace HcduPlus
 
             foreach (TypeTypeID typeId in scanDataStore.SeenResourcesGetTypes())
             {
+                foreach (TypeGroupID groupId in scanDataStore.SeenResourcesGetGroupsForType(typeId))
                 {
-                    foreach (TypeGroupID groupId in scanDataStore.SeenResourcesGetGroupsForType(typeId))
+                    foreach (DBPFKey key in scanDataStore.SeenResourcesGetKeysForTypeAndGroup(typeId, groupId))
                     {
+                        List<string> scanPackages = scanDataStore.SeenResourcesGetPackages(key);
+                        if (scanPackages != null)
                         {
-                            foreach (TypeInstanceID instanceId in scanDataStore.SeenResourcesGetInstancesForTypeAndGroup(typeId, groupId))
+                            List<string> modsPackages = modsDataStore.SeenResourcesGetPackages(key);
+                            if (modsPackages != null)
                             {
-                                List<string> scanPackages = scanDataStore.SeenResourcesGetPackages(typeId, groupId, instanceId);
-                                if (scanPackages != null)
+                                scanPackages.Insert(0, modsPackages[modsPackages.Count - 1]);
+                            }
+
+                            if (scanPackages.Count > 1)
+                            {
+                                for (int i = 0; i < scanPackages.Count - 1; ++i)
                                 {
-                                    List<string> modsPackages = modsDataStore.SeenResourcesGetPackages(typeId, groupId, instanceId);
-                                    if (modsPackages != null)
+                                    // It would be better not to store these in the first place, but the overhead is minimal.
+                                    if (!(
+                                        // Ignore HomeCrafter string conflicts?
+                                        (typeId == Str.TYPE && key.InstanceID == (TypeInstanceID)0x0000007B && menuItemHomeCrafterConflicts.Checked) ||
+                                        // Ignore Store Version string conflicts?
+                                        (typeId == Str.TYPE && key.InstanceID == (TypeInstanceID)0xFF648785 && menuItemStoreVersionConflicts.Checked) ||
+                                        // Ignore Castaways string conflicts?
+                                        (typeId == Str.TYPE && key.InstanceID == (TypeInstanceID)0x00000001 && groupId == (TypeGroupID)0x7FC078F3 && menuItemCastawaysConflicts.Checked)
+                                        ))
                                     {
-                                        scanPackages.Insert(0, modsPackages[modsPackages.Count - 1]);
-                                    }
-
-                                    if (scanPackages.Count > 1)
-                                    {
-                                        for (int i = 0; i < scanPackages.Count - 1; ++i)
+                                        // Ignore internal conflicts?
+                                        if (!(scanPackages[i].Equals(scanPackages[i + 1]) && menuItemInternalConflicts.Checked))
                                         {
-                                            // It would be better not to store these in the first place, but the overhead is minimal.
-                                            if (!(
-                                                // Ignore HomeCrafter string conflicts?
-                                                (typeId == Str.TYPE && instanceId == (TypeInstanceID)0x0000007B && menuItemHomeCrafterConflicts.Checked) ||
-                                                // Ignore Store Version string conflicts?
-                                                (typeId == Str.TYPE && instanceId == (TypeInstanceID)0xFF648785 && menuItemStoreVersionConflicts.Checked) ||
-                                                // Ignore Castaways string conflicts?
-                                                (typeId == Str.TYPE && instanceId == (TypeInstanceID)0x00000001 && groupId == (TypeGroupID)0x7FC078F3 && menuItemCastawaysConflicts.Checked)
-                                                ))
+                                            ConflictPair cpNew = new ConflictPair(scanPackages[i], scanPackages[i + 1]);
+
+                                            // Ignore known conflicts
+                                            if (menuItemIncludeKnownConflicts.Checked || !knownConflicts.IsKnown(cpNew))
                                             {
-                                                // Ignore internal conflicts?
-                                                if (!(scanPackages[i].Equals(scanPackages[i + 1]) && menuItemInternalConflicts.Checked))
+                                                if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
                                                 {
-                                                    ConflictPair cpNew = new ConflictPair(scanPackages[i], scanPackages[i + 1]);
+                                                    allCurrentConflicts.Add(cpNew);
+                                                    cpData = cpNew;
 
-                                                    // Ignore known conflicts
-                                                    if (menuItemIncludeKnownConflicts.Checked || !knownConflicts.IsKnown(cpNew))
-                                                    {
-                                                        if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
-                                                        {
-                                                            allCurrentConflicts.Add(cpNew);
-                                                            cpData = cpNew;
-
-                                                            worker.ReportProgress((int)((done / total) * 100.0), cpNew);
-                                                        }
-
-                                                        cpData.AddTGI(typeId, groupId, instanceId, scanDataStore.NamesByTgiGet(Hashes.TGIHash(instanceId, typeId, groupId)));
-                                                    }
+                                                    worker.ReportProgress((int)((done / total) * 100.0), cpNew);
                                                 }
+
+                                                cpData.AddKey(key, scanDataStore.NamesByKeyGet(key));
                                             }
                                         }
                                     }
@@ -391,10 +386,11 @@ namespace HcduPlus
                                             worker.ReportProgress((int)((done / total) * 100.0), cpNew);
                                         }
 
-                                        TypeGroupID group = (TypeGroupID)Convert.ToUInt32(scanPackages[i].Substring(4, 8), 16);
-                                        TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(scanPackages[i].Substring(15, 8), 16);
+                                        TypeGroupID groupId = (TypeGroupID)Convert.ToUInt32(scanPackages[i].Substring(4, 8), 16);
+                                        TypeInstanceID instanceId = (TypeInstanceID)Convert.ToUInt32(scanPackages[i].Substring(15, 8), 16);
+                                        DBPFKey key = new DBPFKey(Objd.TYPE, groupId, instanceId, DBPFData.RESOURCE_NULL);
 
-                                        cpData.AddTGI(Objd.TYPE, group, instance, scanDataStore.NamesByTgiGet(Hashes.TGIHash(instance, Objd.TYPE, group)));
+                                        cpData.AddKey(key, scanDataStore.NamesByKeyGet(key));
                                     }
                                 }
                             }
@@ -415,10 +411,11 @@ namespace HcduPlus
                                         worker.ReportProgress((int)((done / total) * 100.0), cpNew);
                                     }
 
-                                    TypeGroupID group = (TypeGroupID)Convert.ToUInt32(scanPackages[0].Substring(4, 8), 16);
-                                    TypeInstanceID instance = (TypeInstanceID)Convert.ToUInt32(scanPackages[0].Substring(15, 8), 16);
+                                    TypeGroupID groupId = (TypeGroupID)Convert.ToUInt32(scanPackages[0].Substring(4, 8), 16);
+                                    TypeInstanceID instanceId = (TypeInstanceID)Convert.ToUInt32(scanPackages[0].Substring(15, 8), 16);
+                                    DBPFKey key = new DBPFKey(Objd.TYPE, groupId, instanceId, DBPFData.RESOURCE_NULL);
 
-                                    cpData.AddTGI(Objd.TYPE, group, instance, scanDataStore.NamesByTgiGet(Hashes.TGIHash(instance, Objd.TYPE, group)));
+                                    cpData.AddKey(key, scanDataStore.NamesByKeyGet(key));
                                 }
                             }
                         }
@@ -549,29 +546,29 @@ namespace HcduPlus
 
                         dataStore.SeenGuidsAdd(objd.Guid, entry, fileIndex);
 
-                        dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
+                        dataStore.NamesByKeyAdd(entry, package.GetFilenameByEntry(entry));
                     }
 
                     if (entry.GroupID != DBPFData.GROUP_LOCAL)
                     {
                         dataStore.SeenResourcesAdd(entry, fileIndex);
 
-                        if (!dataStore.NamesByTgiContains(entry))
+                        if (!dataStore.NamesByKeyContains(entry))
                         {
                             if (DBPFData.IsKnownSgType(entry.TypeID))
                             {
                                 if (menuItemOptionSgNames.Checked)
                                 {
-                                    dataStore.NamesByTgiAdd(entry, package.GetResourceByEntry(entry)?.KeyName ?? "[unknown]");
+                                    dataStore.NamesByKeyAdd(entry, package.GetResourceByEntry(entry)?.KeyName ?? "[unknown]");
                                 }
                                 else
                                 {
-                                    dataStore.NamesByTgiAdd(entry, "[not loaded]");
+                                    dataStore.NamesByKeyAdd(entry, "[not loaded]");
                                 }
                             }
                             else
                             {
-                                dataStore.NamesByTgiAdd(entry, package.GetFilenameByEntry(entry));
+                                dataStore.NamesByKeyAdd(entry, package.GetFilenameByEntry(entry));
                             }
                         }
                     }
