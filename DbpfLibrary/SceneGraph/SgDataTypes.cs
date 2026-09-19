@@ -130,7 +130,7 @@ namespace Sims2Tools.DBPF.SceneGraph
             }
         }
 
-        public SgResource(DBPFEntry entry) : base(entry)
+        public SgResource(DBPFKey key) : base(key)
         {
         }
 
@@ -159,7 +159,7 @@ namespace Sims2Tools.DBPF.SceneGraph
         public string SgHash => sgHash;
         public string SgName => sgName;
 
-        public SgCpf(DBPFEntry entry) : base(entry)
+        public SgCpf(DBPFKey key) : base(key)
         {
             sgHash = SgHelper.SgHash(this);
             sgName = SgHelper.SgName(this);
@@ -181,7 +181,7 @@ namespace Sims2Tools.DBPF.SceneGraph
 
         public override string KeyName => Name ?? base.KeyName;
 
-        public SgRefCpf(DBPFEntry entry) : base(entry)
+        public SgRefCpf(DBPFKey key) : base(key)
         {
             sgResourceList.Add(SgHelper.SgHash(Idr.TYPE, this.GroupID, this.ResourceID, this.InstanceID));
         }

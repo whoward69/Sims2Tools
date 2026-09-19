@@ -499,8 +499,6 @@ namespace Sims2Tools.Controls
                 return;
             }
 
-            System.Diagnostics.Debug.WriteLine("Redraw " + Size + ", " + tw + ", " + tc + ", " + style);
-
             GraphicHelper.SetGraphicsMode(g, true);
             GraphicHelper.SetGraphicsMode(gsel, true);
             g.FillRectangle(new SolidBrush(base.BackColor), 0, 0, Width, Height);

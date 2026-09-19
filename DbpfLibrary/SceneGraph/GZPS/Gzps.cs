@@ -24,7 +24,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
         public static readonly TypeTypeID TYPE = (TypeTypeID)0xEBCF3E27;
         public const string NAME = "GZPS";
 
-        public Gzps(DBPFEntry entry) : base(entry)
+        public Gzps(DBPFKey key) : base(key)
         {
         }
 
@@ -37,7 +37,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GZPS
 
         public Gzps Duplicate(DBPFKey dbpfKey, string newName)
         {
-            Gzps newGzps = new Gzps(new DBPFEntry(dbpfKey));
+            Gzps newGzps = new Gzps(dbpfKey);
 
             foreach (string itemName in GetItemNames())
             {

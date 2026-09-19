@@ -254,10 +254,6 @@ namespace Sims2Tools.Controls
         ///<summary>initializes the FloodFill operation</summary>
         public override void FloodFill(Bitmap bmp, Point pt)
         {
-            //int ctr=0;//timeGetTime();
-
-            //Debug.WriteLine("*******Flood Fill******");
-
             //get the color's int value, and convert it from RGBA to BGRA format (as GDI+ uses BGRA)
             m_fillcolor = ColorTranslator.ToWin32(m_fillcolorcolor);
             m_fillcolor = BGRA(GetB(m_fillcolor), GetG(m_fillcolor), GetR(m_fillcolor), GetA(m_fillcolor));
@@ -309,9 +305,6 @@ namespace Sims2Tools.Controls
             }
 
             bmp.UnlockBits(bmpData);
-
-            //m_TimeBenchmark=timeGetTime()-ctr;
-
         }
 
         //***********

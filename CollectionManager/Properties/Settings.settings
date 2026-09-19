@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CollectionManager.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="MruSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">8</Value>
+    </Setting>
+    <Setting Name="ThumbnailBackground" Type="System.String" Scope="User">
+      <Value Profile="(Default)">WhiteSmoke</Value>
+    </Setting>
+    <Setting Name="MaxIconWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">56</Value>
+    </Setting>
+    <Setting Name="MaxIconHeight" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">44</Value>
+    </Setting>
+    <Setting Name="DragBackground" Type="System.String" Scope="User">
+      <Value Profile="(Default)">LightGray</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

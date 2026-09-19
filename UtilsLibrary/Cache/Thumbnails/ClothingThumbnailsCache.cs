@@ -1,18 +1,17 @@
 ﻿/*
- * Family Manager - a utility for manipulating family closets
+ * Sims2Tools - a toolkit for manipulating The Sims 2 DBPF files
  *
  * William Howard - 2020-2026
  *
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.Utils;
 using System.Drawing;
 
-namespace Sims2Tools.Cache
+namespace Sims2Tools.Cache.Thumbnails
 {
     public class ClothingThumbnailsCache
     {

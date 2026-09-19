@@ -33,6 +33,10 @@ namespace Sims2Tools.DBPF.CPF
         private List<CpfItem> items;
 
         public string Name => this.GetItem("name")?.StringValue;
+        public TypeGUID Guid
+        {
+            get { CpfItem item = this.GetItem("guid"); return item != null ? (TypeGUID)item.UIntegerValue : DBPFData.GUID_NULL; }
+        }
         public uint Category
         {
             get { CpfItem item = this.GetItem("category"); return item != null ? item.UIntegerValue : 0; }
@@ -50,10 +54,16 @@ namespace Sims2Tools.DBPF.CPF
             get { return this.GetItem("hairtone")?.StringValue; }
         }
 
+        public uint StringIndex
+        {
+            get { CpfItem item = this.GetItem("stringindex"); return item != null ? item.UIntegerValue : 0; }
+        }
+
         public int SortIndex
         {
             get { CpfItem item = this.GetItem("sortindex"); return item != null ? item.IntegerValue : 0; }
         }
+
 
         public override bool IsDirty
         {
@@ -80,7 +90,7 @@ namespace Sims2Tools.DBPF.CPF
             }
         }
 
-        public Cpf(DBPFEntry entry) : base(entry)
+        public Cpf(DBPFKey key) : base(key)
         {
             version = DefaultVersion;
             items = new List<CpfItem>();

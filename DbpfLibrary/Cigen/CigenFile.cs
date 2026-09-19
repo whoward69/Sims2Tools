@@ -41,7 +41,9 @@ namespace Sims2Tools.DBPF.Cigen
 
         public bool IsAvailable => (cigenPackage != null);
 
-        // Do NOT call this unless you are CigenCache!!!
+        /// <summary>
+        /// Do NOT call this unless you are CigenCache!!!
+        /// </summary>
         public static CigenFile GetCigenFile(string cigenPath)
         {
             return new CigenFile(cigenPath);

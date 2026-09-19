@@ -12,6 +12,7 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.GZPS;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.SceneGraph.COLL
@@ -23,9 +24,17 @@ namespace Sims2Tools.DBPF.SceneGraph.COLL
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x6C4F359D;
         public const string NAME = "COLL";
 
+        public static TypeTypeID COLLITEM_OBJD = (TypeTypeID)0x69DA3F9F;
+        public static TypeTypeID COLLITEM_XOBJ = (TypeTypeID)0xE9DA450E;
+        public static TypeTypeID COLLITEM_GZPS = Gzps.TYPE;
+
         public override string KeyName
         {
             get => "Collection";
+        }
+
+        public Coll(DBPFKey key) : base(key)
+        {
         }
 
         public Coll(DBPFEntry entry, DbpfReader reader) : base(entry, reader)

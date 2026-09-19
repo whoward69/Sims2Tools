@@ -26,18 +26,19 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
 
         public override string KeyName => "Binary Index";
 
-        public Binx(DBPFEntry entry) : base(entry)
+        public Binx(DBPFKey key) : base(key)
         {
         }
 
         public Binx(DBPFEntry entry, DbpfReader reader) : base(entry, reader)
         {
-            if (GetItem("objectidx") != null) sgIdrIndexes.Add(ObjectIdx);
+            CpfItem objectItem = GetItem("objectidx");
+            if (objectItem != null) sgIdrIndexes.Add(objectItem.UIntegerValue);
         }
 
         public Binx Duplicate(DBPFKey dbpfKey)
         {
-            Binx newBinx = new Binx(new DBPFEntry(dbpfKey));
+            Binx newBinx = new Binx(dbpfKey);
 
             foreach (string itemName in GetItemNames())
             {
@@ -48,14 +49,6 @@ namespace Sims2Tools.DBPF.SceneGraph.BINX
 
             return newBinx;
         }
-
-        public uint ObjectIdx => GetItem("objectidx").UIntegerValue;
-        public uint IconIdx => GetItem("iconidx").UIntegerValue;
-
-        public uint StringSetIdx => GetItem("stringsetidx").UIntegerValue;
-        public uint StringIndex => GetItem("stringindex").UIntegerValue;
-
-        public int SortIndex => GetItem("sortindex").IntegerValue;
 
         public override XmlElement AddXml(XmlElement parent)
         {

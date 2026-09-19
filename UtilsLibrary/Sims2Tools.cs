@@ -253,7 +253,7 @@ namespace Sims2Tools
             set => RegistryTools.SetPath(RegistryKey, Sims2DdsUtilsPathKey, value);
         }
 
-        public static bool IsRunningOnWindows => RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
+        public static bool IsRunningOnWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         public static bool IsNotRunningOnWindows => !IsRunningOnWindows;
     }
 }

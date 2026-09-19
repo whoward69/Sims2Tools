@@ -71,16 +71,23 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\ObjectThumbnailsCache.cs" />
-    <Compile Include="Cache\Thumbnails\BuildThumbnailsCache.cs" />
-    <Compile Include="Cache\Thumbnails\BuyThumbnailsCache.cs" />
-    <Compile Include="Cache\Thumbnails\HoodThumbnailsCache.cs" />
-    <Compile Include="Cache\Thumbnails\CasThumbnailsCache.cs" />
-    <Compile Include="Cache\Thumbnails\CigenCache.cs" />
+    <Compile Include="Cache\Career\CareerCache.cs" />
+    <Compile Include="Cache\Hood\CharacterCache.cs" />
+    <Compile Include="Cache\Hood\HoodData.cs" />
+    <Compile Include="Cache\DataCache.cs" />
+    <Compile Include="Cache\Objects\ObjectsCache.cs" />
+    <Compile Include="Cache\Outfits\OutfitCache.cs" />
+    <Compile Include="Cache\Thumbnails\ObjectThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\GameCaches\BuildThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\GameCaches\BuyThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\GameCaches\HoodThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\GameCaches\CasThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\GameCaches\CigenCache.cs" />
     <Compile Include="Cache\GameDataCache.cs" />
     <Compile Include="Cache\PackageCache.cs" />
     <Compile Include="Cache\SceneGraphCache.cs" />
-    <Compile Include="Cache\ClothingThumbnailsCache.cs" />
+    <Compile Include="Cache\Thumbnails\ClothingThumbnailsCache.cs" />
+    <Compile Include="Clipboard\ClipboardHelper.cs" />
     <Compile Include="Controls\BenefitButton.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -220,6 +227,7 @@
     <Compile Include="Dialogs\SearchReplaceDialog.Designer.cs">
       <DependentUpon>SearchReplaceDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="DragDrop\DragDropHelper.cs" />
     <Compile Include="Exporter\Exporter.cs" />
     <Compile Include="Exporter\IExporter.cs" />
     <Compile Include="Exporter\Extractor.cs" />
@@ -227,6 +235,7 @@
     <Compile Include="Helpers\ColourHelper.cs" />
     <Compile Include="Helpers\HoodHelpers.cs" />
     <Compile Include="Helpers\CpfHelper.cs" />
+    <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="IO\PjseStringFileReader.cs" />
     <Compile Include="IO\Sims2Directory.cs" />
     <Compile Include="NamedValue\NamedValue.cs" />

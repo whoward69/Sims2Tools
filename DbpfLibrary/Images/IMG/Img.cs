@@ -427,7 +427,11 @@ namespace Sims2Tools.DBPF.Images.IMG
             }
         }
 
-        public Img(DBPFEntry entry, DbpfReader reader) : base(entry)
+        public Img(DBPFKey key) : base(key)
+        {
+        }
+
+        public Img(DBPFEntry entry, DbpfReader reader) : this(entry)
         {
             Unserialize(reader);
         }

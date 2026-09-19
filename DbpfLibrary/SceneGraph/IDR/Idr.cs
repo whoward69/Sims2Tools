@@ -35,7 +35,7 @@ namespace Sims2Tools.DBPF.SceneGraph.IDR
 
         public override string KeyName => "3D ID Referencing File";
 
-        public Idr(DBPFEntry entry, int expectedItems = 0) : base(entry)
+        public Idr(DBPFKey key, int expectedItems = 0) : base(key)
         {
             items = new List<DBPFScriptableKey>(expectedItems);
         }

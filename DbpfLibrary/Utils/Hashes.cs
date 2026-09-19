@@ -96,7 +96,15 @@ namespace Sims2Tools.DBPF.Utils
 
         public static uint CollectionHash(TypeGUID guid)
         {
-            byte[] rt = crc32.ComputeHash(Helper.ToBytes(Helper.Hex8String(guid.AsUInt()).ToLower()));
+            // For the GUID 0x01234567, hash just the 1234567 part, ie, not the leading zero(s)
+            string guidStr = Helper.Hex8String(guid.AsUInt()).ToLower();
+
+            while (guidStr.Length > 1 && guidStr.StartsWith("0"))
+            {
+                guidStr = guidStr.Substring(1);
+            }
+
+            byte[] rt = crc32.ComputeHash(Helper.ToBytes(guidStr));
 
             return ToUInt(rt);
         }

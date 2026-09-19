@@ -3,48 +3,50 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.5.11626.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfLibrary", "DbpfLibrary\DbpfLibrary.csproj", "{FBECABCD-0403-4B7E-9992-01562A62DB83}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilsLibrary", "UtilsLibrary\UtilsLibrary.csproj", "{04C2A4A9-5CA5-4097-8375-8D54BEAD71EE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfViewer", "DbpfViewer\DbpfViewer.csproj", "{66ABC881-4829-48CB-B6D9-EA325DB01358}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BhavFinder", "BhavFinder\BhavFinder.csproj", "{860B2845-3332-4CBA-AA37-2AB93554D66B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HcduPlus", "HcduPlus\HcduPlus.csproj", "{8E32A47E-B9F5-43C9-9EE7-2429CB236B24}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatCausedThis", "WhatCausedThis\WhatCausedThis.csproj", "{8E32A47E-B9F5-43C9-9EE7-2429CB236B26}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HoodExporter", "HoodExporter\HoodExporter.csproj", "{B5E323DC-9FF6-4AE2-9CEB-D79CFAB3D577}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SgChecker", "SgChecker\SgChecker.csproj", "{8E32A47E-B9F5-43C9-9EE7-2429CB236B25}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogWatcher", "LogWatcher\LogWatcher.csproj", "{513AF3AA-F743-4071-9FCF-FD24A7C198F4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectRelocator", "ObjectRelocator\ObjectRelocator.csproj", "{592AFB75-61A8-40FC-9DED-59DF26F55542}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BsokEditor", "BsokEditor\BsokEditor.csproj", "{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutfitOrganiser", "OutfitOrganiser\OutfitOrganiser.csproj", "{B614D104-69D7-4C7F-9AF7-19DB3CE7991D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoryWizard", "RepositoryWizard\RepositoryWizard.csproj", "{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D62FD9B0-C57C-4CB0-8E7B-038FCD3FFE52}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfLister", "DbpfLister\DbpfLister.csproj", "{E5E6301D-439B-458B-A79E-C8C0D7F38162}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfLibrary", "DbpfLibrary\DbpfLibrary.csproj", "{FBECABCD-0403-4B7E-9992-01562A62DB83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilsLibrary", "UtilsLibrary\UtilsLibrary.csproj", "{04C2A4A9-5CA5-4097-8375-8D54BEAD71EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilsGraphicsLibrary", "UtilsGraphicsLibrary\UtilsGraphicsLibrary.csproj", "{3C083FC2-13A8-48E6-8559-4FF69067A4DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BhavFinder", "BhavFinder\BhavFinder.csproj", "{860B2845-3332-4CBA-AA37-2AB93554D66B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BsokEditor", "BsokEditor\BsokEditor.csproj", "{2B221155-B4DD-48A7-94F9-DFDCF1139FF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CollectionManager", "CollectionManager\CollectionManager.csproj", "{8E32A47E-B9F5-43C9-9EE7-2429CB236B27}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfCompare", "DbpfCompare\DbpfCompare.csproj", "{A641F533-2E97-4CAC-90A4-E36D02135529}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SceneGraphPlus", "SceneGraphPlus\SceneGraphPlus.csproj", "{1D189581-0CD4-4EC7-A22F-91FD82A9122B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfLister", "DbpfLister\DbpfLister.csproj", "{E5E6301D-439B-458B-A79E-C8C0D7F38162}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfScripter", "DbpfScripter\DbpfScripter.csproj", "{8C914166-4907-48FE-9E7E-4F56691688B3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbpfViewer", "DbpfViewer\DbpfViewer.csproj", "{66ABC881-4829-48CB-B6D9-EA325DB01358}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FamilyManager", "FamilyManager\FamilyManager.csproj", "{592AFB75-61A8-40FC-9DED-59DF26F55543}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilsGraphicsLibrary", "UtilsGraphicsLibrary\UtilsGraphicsLibrary.csproj", "{3C083FC2-13A8-48E6-8559-4FF69067A4DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HcduPlus", "HcduPlus\HcduPlus.csproj", "{8E32A47E-B9F5-43C9-9EE7-2429CB236B24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HoodExporter", "HoodExporter\HoodExporter.csproj", "{B5E323DC-9FF6-4AE2-9CEB-D79CFAB3D577}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogWatcher", "LogWatcher\LogWatcher.csproj", "{513AF3AA-F743-4071-9FCF-FD24A7C198F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectRelocator", "ObjectRelocator\ObjectRelocator.csproj", "{592AFB75-61A8-40FC-9DED-59DF26F55542}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutfitOrganiser", "OutfitOrganiser\OutfitOrganiser.csproj", "{B614D104-69D7-4C7F-9AF7-19DB3CE7991D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoryWizard", "RepositoryWizard\RepositoryWizard.csproj", "{49CE1FEA-15A3-4A15-9EF7-A7E0D6C0BFEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SceneGraphPlus", "SceneGraphPlus\SceneGraphPlus.csproj", "{1D189581-0CD4-4EC7-A22F-91FD82A9122B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SgChecker", "SgChecker\SgChecker.csproj", "{8E32A47E-B9F5-43C9-9EE7-2429CB236B25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhatCausedThis", "WhatCausedThis\WhatCausedThis.csproj", "{8E32A47E-B9F5-43C9-9EE7-2429CB236B26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -110,6 +112,14 @@ Global
 		{B5E323DC-9FF6-4AE2-9CEB-D79CFAB3D577}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B5E323DC-9FF6-4AE2-9CEB-D79CFAB3D577}.Release|x64.ActiveCfg = Release|Any CPU
 		{B5E323DC-9FF6-4AE2-9CEB-D79CFAB3D577}.Release|x64.Build.0 = Release|Any CPU
+		{8E32A47E-B9F5-43C9-9EE7-2429CB236B27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E32A47E-B9F5-43C9-9EE7-2429CB236B27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E32A47E-B9F5-43C9-9EE7-2429CB236B27}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8E32A47E-B9F5-43C9-9EE7-2429CB236B27}.Debug|x64.Build.0 = Debug|Any CPU
+		{8E32A47E-B9F5-43C9-9EE7-2429CB236B27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E32A47E-B9F5-43C9-9EE7-2429CB236B27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E32A47E-B9F5-43C9-9EE7-2429CB236B27}.Release|x64.ActiveCfg = Release|Any CPU
+		{8E32A47E-B9F5-43C9-9EE7-2429CB236B27}.Release|x64.Build.0 = Release|Any CPU
 		{8E32A47E-B9F5-43C9-9EE7-2429CB236B25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E32A47E-B9F5-43C9-9EE7-2429CB236B25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E32A47E-B9F5-43C9-9EE7-2429CB236B25}.Debug|x64.ActiveCfg = Debug|Any CPU

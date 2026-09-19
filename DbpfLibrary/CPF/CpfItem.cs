@@ -47,6 +47,30 @@ namespace Sims2Tools.DBPF.CPF
             this.datatype = datatype;
         }
 
+        public CpfItem(string name, string value) : this(name)
+        {
+            datatype = MetaData.DataTypes.dtString;
+            StringValue = value;
+        }
+
+        public CpfItem(string name, int value) : this(name)
+        {
+            datatype = MetaData.DataTypes.dtInteger;
+            IntegerValue = value;
+        }
+
+        public CpfItem(string name, uint value) : this(name)
+        {
+            datatype = MetaData.DataTypes.dtUInteger;
+            UIntegerValue = value;
+        }
+
+        public CpfItem(string name, float value) : this(name)
+        {
+            datatype = MetaData.DataTypes.dtSingle;
+            SingleValue = value;
+        }
+
         public CpfItem(DbpfReader reader) : this()
         {
             Unserialize(reader);
