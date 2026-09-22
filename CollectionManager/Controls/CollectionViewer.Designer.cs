@@ -38,6 +38,10 @@ namespace CollectionManager.Controls
         {
             this.components = new System.ComponentModel.Container();
             this.pictCollIcon = new System.Windows.Forms.PictureBox();
+            this.menuContextIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuItemIconContextChangeIcon = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemIconContextClipboardCopyTo = new System.Windows.Forms.ToolStripMenuItem();
             this.textCollName = new System.Windows.Forms.TextBox();
             this.comboCollType = new System.Windows.Forms.ComboBox();
             this.textCollSort = new System.Windows.Forms.TextBox();
@@ -62,7 +66,10 @@ namespace CollectionManager.Controls
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.panelViewer = new System.Windows.Forms.Panel();
             this.btnSave = new System.Windows.Forms.Button();
+            this.toolTipViewer = new System.Windows.Forms.ToolTip(this.components);
+            this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.pictCollIcon)).BeginInit();
+            this.menuContextIcon.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridCollItems)).BeginInit();
             this.menuContextCollItems.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).BeginInit();
@@ -72,6 +79,7 @@ namespace CollectionManager.Controls
             // pictCollIcon
             // 
             this.pictCollIcon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.pictCollIcon.ContextMenuStrip = this.menuContextIcon;
             this.pictCollIcon.Location = new System.Drawing.Point(3, 3);
             this.pictCollIcon.Name = "pictCollIcon";
             this.pictCollIcon.Size = new System.Drawing.Size(28, 22);
@@ -79,6 +87,34 @@ namespace CollectionManager.Controls
             this.pictCollIcon.TabStop = false;
             this.pictCollIcon.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop_Icon);
             this.pictCollIcon.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter_Icon);
+            // 
+            // menuContextIcon
+            // 
+            this.menuContextIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemIconContextChangeIcon,
+            this.toolStripSeparator3,
+            this.menuItemIconContextClipboardCopyTo});
+            this.menuContextIcon.Name = "menuContextIcon";
+            this.menuContextIcon.Size = new System.Drawing.Size(174, 54);
+            // 
+            // menuItemIconContextChangeIcon
+            // 
+            this.menuItemIconContextChangeIcon.Name = "menuItemIconContextChangeIcon";
+            this.menuItemIconContextChangeIcon.Size = new System.Drawing.Size(173, 22);
+            this.menuItemIconContextChangeIcon.Text = "Change Icon";
+            this.menuItemIconContextChangeIcon.Click += new System.EventHandler(this.OnIconContext_ChangeIcon);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(170, 6);
+            // 
+            // menuItemIconContextClipboardCopyTo
+            // 
+            this.menuItemIconContextClipboardCopyTo.Name = "menuItemIconContextClipboardCopyTo";
+            this.menuItemIconContextClipboardCopyTo.Size = new System.Drawing.Size(173, 22);
+            this.menuItemIconContextClipboardCopyTo.Text = "Copy To Clipboard";
+            this.menuItemIconContextClipboardCopyTo.Click += new System.EventHandler(this.OnIconContext_ClipboardCopyTo);
             // 
             // textCollName
             // 
@@ -313,8 +349,14 @@ namespace CollectionManager.Controls
             this.btnSave.Size = new System.Drawing.Size(50, 20);
             this.btnSave.TabIndex = 26;
             this.btnSave.Text = "Save";
+            this.toolTipViewer.SetToolTip(this.btnSave, "Shift-click for Save All, Ctrl-click for Save As");
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.OnSaveClicked);
+            // 
+            // saveAsFileDialog
+            // 
+            this.saveAsFileDialog.Filter = "DBPF Package|*.package";
+            this.saveAsFileDialog.Title = "Save As ...";
             // 
             // CollectionViewer
             // 
@@ -325,6 +367,7 @@ namespace CollectionManager.Controls
             this.Size = new System.Drawing.Size(600, 350);
             this.Resize += new System.EventHandler(this.OnResize);
             ((System.ComponentModel.ISupportInitialize)(this.pictCollIcon)).EndInit();
+            this.menuContextIcon.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridCollItems)).EndInit();
             this.menuContextCollItems.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.thumbBox)).EndInit();
@@ -361,5 +404,11 @@ namespace CollectionManager.Controls
         private System.Windows.Forms.DataGridViewTextBoxColumn colBinxKey;
         private System.Windows.Forms.DataGridViewTextBoxColumn colKey;
         private System.Windows.Forms.DataGridViewTextBoxColumn colData;
+        private System.Windows.Forms.ContextMenuStrip menuContextIcon;
+        private System.Windows.Forms.ToolStripMenuItem menuItemIconContextClipboardCopyTo;
+        private System.Windows.Forms.ToolTip toolTipViewer;
+        private System.Windows.Forms.SaveFileDialog saveAsFileDialog;
+        private System.Windows.Forms.ToolStripMenuItem menuItemIconContextChangeIcon;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
     }
 }

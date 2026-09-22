@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.XOBJ;
+using Sims2Tools.Dialogs;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;
@@ -449,7 +450,7 @@ namespace Sims2Tools.Cache.Objects
                         cache.Remove(xobj.Guid);
                     }
 
-                    Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry)); // TODO - this could be old format
+                    Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
                     Str str = (Str)package.GetResourceByKey(IdrHelper.StringSetKey(xobj, idr));
 
                     ObjectData data = new ObjectData(xobj, str, packagePath);

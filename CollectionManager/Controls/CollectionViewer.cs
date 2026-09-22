@@ -168,7 +168,7 @@ namespace CollectionManager.Controls
 
             selectFileDialog = new OpenFileDialog
             {
-                Filter = "Image Files(*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.jpeg;*.png|All files(*.*)|*.*"
+                Filter = "Image Files(*.bmp;*.jpg;*.png;*.gif;*.tif)|*.bmp;*.jpg;*.jpeg;*.png;*.gif;*.tif;*.tiff|All files(*.*)|*.*"
             };
         }
         #endregion
@@ -209,34 +209,94 @@ namespace CollectionManager.Controls
         {
             ignoreChanges = true;
 
-            if (_needsUpdate_CollName || _needsUpdate_SortValue) UpdateColl();
+            CommitNeededChanges();
 
             try
             {
+                Coll coll = null;
+                Str str = null;
+                Img img = null;
+
+                string packageName;
+
                 using (CacheableDbpfFile package = packageCache.OpenForReadOnly(collectionFilePath))
                 {
+                    packageName = package.PackageName;
+
                     collectionKey = GetCollKey(package);
-                    Coll coll = GetCollResource(package, collectionKey, out Idr idrForColl);
 
-                    textCollName.Text = GetStrResource(package, coll, idrForColl).LanguageItems(MetaData.Languages.Default)?[coll.GetItem("stringindex").IntegerValue].Title;
+                    if (collectionKey != null)
+                    {
+                        coll = GetCollResource(package, collectionKey, out Idr idrForColl);
+                        str = GetStrResource(package, coll, idrForColl);
+                        img = GetImgResource(package, coll, idrForColl);
+                    }
 
-                    pictCollIcon.BackgroundImage = GetImgResource(package, coll, idrForColl).Image;
+                    _isDirty = package.IsDirty;
 
+                    package.Close();
+                }
+
+                if (collectionKey != null)
+                {
+                    if (str == null || img == null)
+                    {
+                        if (RepairPrehashes())
+                        {
+                            MsgBox.Show($"{packageName} has been repaired.\r\n(It was probably renamed manually.)", "Collection Repaired", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            using (CacheableDbpfFile package = packageCache.OpenForReadOnly(collectionFilePath))
+                            {
+                                coll = GetCollResource(package, collectionKey, out Idr idrForColl);
+                                str = GetStrResource(package, coll, idrForColl);
+                                img = GetImgResource(package, coll, idrForColl);
+
+                                package.Close();
+                            }
+
+                            _isDirty = true;
+                        }
+                        else
+                        {
+                            MsgBox.Show($"{packageName} appears to be broken.\r\nIt was probably renamed manually.", "Collection Load Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        }
+                    }
+
+                    // Collection name and sort value
+                    textCollName.Text = str?.LanguageItems(MetaData.Languages.Default)?[coll.GetItem("stringindex").IntegerValue].Title;
+                    textCollSort.Text = coll.SortIndex.ToString();
+
+                    // Collection icon
+                    pictCollIcon.BackgroundImage = img?.Image;
+
+                    using (CacheableDbpfFile package = packageCache.OpenForReadOnly(collectionFilePath))
+                    {
+                        // Collection items
+                        ReloadCollItems(package);
+
+                        package.Close();
+                    }
+
+                    // Collection type - do this AFTER the collection items
                     string collType = coll.GetItem("type").StringValue;
 
                     if (!string.IsNullOrWhiteSpace(collType))
                     {
-                        comboCollType.Items.Clear();
+                        if (gridCollItems.Rows.Count > 0)
+                        {
+                            // Collection has items, so restrict what its type can be changed to
+                            comboCollType.Items.Clear();
 
-                        if (collType.Equals("clothing"))
-                        {
-                            comboCollType.Items.Add(new StringNamedValue("Clothing", "clothing"));
-                        }
-                        else
-                        {
-                            comboCollType.Items.Add(new StringNamedValue("Residential Lots", "collection"));
-                            comboCollType.Items.Add(new StringNamedValue("Community Lots", "communitylotcollection"));
-                            comboCollType.Items.Add(new StringNamedValue("Any Lots", "lotcollection"));
+                            if (collType.Equals("clothing"))
+                            {
+                                comboCollType.Items.Add(new StringNamedValue("Clothing", "clothing"));
+                            }
+                            else
+                            {
+                                comboCollType.Items.Add(new StringNamedValue("Residential Lots", "collection"));
+                                comboCollType.Items.Add(new StringNamedValue("Community Lots", "communitylotcollection"));
+                                comboCollType.Items.Add(new StringNamedValue("Any Lots", "lotcollection"));
+                            }
                         }
 
                         foreach (object o in comboCollType.Items)
@@ -248,12 +308,6 @@ namespace CollectionManager.Controls
                             }
                         }
                     }
-
-                    textCollSort.Text = coll.SortIndex.ToString();
-
-                    ReloadCollItems(package);
-
-                    package.Close();
                 }
             }
             catch (IOException ex)
@@ -369,10 +423,21 @@ namespace CollectionManager.Controls
         private DBPFKey GetCollKey(CacheableDbpfFile package)
         {
             List<DBPFEntry> collEntries = package.GetEntriesByType(Coll.TYPE);
-            Trace.Assert(collEntries.Count > 0, $"COLL is missing from collection {package.PackageName}");
-            Trace.Assert(collEntries.Count == 1, $"Multiple COLLs found in collection {package.PackageName}");
 
-            return new DBPFKey(collEntries[0]);
+            if (collEntries.Count == 0)
+            {
+                MsgBox.Show($"{package.PackageName} does not contain a COLL resource", "Collection Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            else if (collEntries.Count == 1)
+            {
+                return new DBPFKey(collEntries[0]);
+            }
+            else
+            {
+                MsgBox.Show($"{package.PackageName} contains multiple COLL resources", "Collection Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+
+            return null;
         }
 
         private Coll GetCollResource(CacheableDbpfFile package, DBPFKey collKey, out Idr idrForColl)
@@ -397,8 +462,6 @@ namespace CollectionManager.Controls
                 str = (Str)package.GetResourceByKey(strKey);
             }
 
-            Trace.Assert(str != null, $"STR# is missing from collection {package.PackageName}");
-
             return str;
         }
 
@@ -415,7 +478,6 @@ namespace CollectionManager.Controls
                 img = (Img)package.GetResourceByKey(imgKey);
             }
 
-            Trace.Assert(img != null, $"IMG is missing from collection {package.PackageName}");
             return img;
         }
         #endregion
@@ -493,6 +555,45 @@ namespace CollectionManager.Controls
         #endregion
 
         #region Controls Changed
+        public void CommitNeededChanges()
+        {
+            if (_needsUpdate_CollName || _needsUpdate_SortValue)
+            {
+                using (CacheableDbpfFile package = packageCache.OpenForUpdate(collectionFilePath))
+                {
+                    Coll coll = GetCollResource(package, collectionKey, out Idr idrForColl);
+
+                    if (_needsUpdate_CollName)
+                    {
+                        Str str = GetStrResource(package, coll, idrForColl);
+
+                        List<StrItem> items = str.LanguageItems(MetaData.Languages.Default);
+                        int index = coll.GetItem("stringindex").IntegerValue;
+
+                        if (items != null && items.Count > index)
+                        {
+                            items[index].Title = textCollName.Text;
+                            _needsUpdate_CollName = false;
+                            _isDirty = true;
+
+                            package.Commit(str);
+                        }
+                    }
+
+                    if (_needsUpdate_SortValue)
+                    {
+                        coll.GetOrAddItem("sortindex", MetaData.DataTypes.dtInteger).IntegerValue = CollectionSort;
+                        _needsUpdate_SortValue = false;
+                        _isDirty = true;
+
+                        package.Commit(coll);
+                    }
+
+                    package.Close();
+                }
+            }
+        }
+
         private void OnCollNameChanged(object sender, EventArgs e)
         {
             if (ignoreChanges) return;
@@ -501,42 +602,6 @@ namespace CollectionManager.Controls
             _needsUpdate_CollName = true;
 
             UpdateSaveState();
-        }
-
-        private void UpdateColl()
-        {
-            using (CacheableDbpfFile package = packageCache.OpenForUpdate(collectionFilePath))
-            {
-                Coll coll = GetCollResource(package, collectionKey, out Idr idrForColl);
-
-                if (_needsUpdate_CollName)
-                {
-                    Str str = GetStrResource(package, coll, idrForColl);
-
-                    List<StrItem> items = str.LanguageItems(MetaData.Languages.Default);
-                    int index = coll.GetItem("stringindex").IntegerValue;
-
-                    if (items != null && items.Count > index)
-                    {
-                        items[index].Title = textCollName.Text;
-                        _needsUpdate_CollName = false;
-                        _isDirty = true;
-
-                        package.Commit(str);
-                    }
-                }
-
-                if (_needsUpdate_SortValue)
-                {
-                    coll.GetOrAddItem("sortindex", MetaData.DataTypes.dtInteger).IntegerValue = CollectionSort;
-                    _needsUpdate_SortValue = false;
-                    _isDirty = true;
-
-                    package.Commit(coll);
-                }
-
-                package.Close();
-            }
         }
 
         private void OnCollSortValueChanged(object sender, EventArgs e)
@@ -579,13 +644,115 @@ namespace CollectionManager.Controls
         }
         #endregion
 
+        #region Icon Update
+        private void OnIconContext_ChangeIcon(object sender, EventArgs e)
+        {
+            ChangeIcon();
+        }
+
+        #endregion
+
         #region Menu Helpers
+        public void SaveAsCollection(bool autoBackup)
+        {
+            if (saveAsFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                if (!string.IsNullOrWhiteSpace(saveAsFileDialog.FileName))
+                {
+                    string packageFile = saveAsFileDialog.FileName;
+
+                    if (packageFile != null && File.Exists(packageFile))
+                    {
+                        if (autoBackup)
+                        {
+                            if (File.Exists($"{packageFile}.bak"))
+                            {
+                                try
+                                {
+                                    Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile($"{packageFile}.bak", Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                                }
+                                catch (Exception)
+                                {
+                                    MsgBox.Show($"Error trying to remove {packageFile}.bak, you should delete this file manually.", "Package Save As Error!");
+                                    return;
+                                }
+                            }
+
+                            try
+                            {
+                                File.Move(packageFile, $"{packageFile}.bak");
+                            }
+                            catch (Exception)
+                            {
+                                MsgBox.Show($"Error trying to backup {packageFile}, possibly open in SimPe.", "Package Save As Error!");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(packageFile, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                            }
+                            catch (Exception)
+                            {
+                                MsgBox.Show($"Error trying to remove {packageFile}, possibly open in SimPe.", "Package Save As Error!");
+                                return;
+                            }
+                        }
+                    }
+
+                    CommitNeededChanges();
+                    ResolvePrehashes(false);
+
+                    using (CacheableDbpfFile package = packageCache.OpenForReadOnly(CollectionFilePath))
+                    {
+                        if (package.SaveAs(packageFile) == null)
+                        {
+                            MsgBox.Show($"Error trying to save {package.PackageName}, file is probably open in SimPe!\n\nChanges are in the associated .temp file.", "Package Save Error!");
+                        }
+
+                        // Do NOT use SetClean() here, as it doesn't decache the open package file
+                        _isDirty = false;
+                        packageCache.SetClean(package);
+
+                        package.Close();
+                        collectionFilePath = packageFile;
+                    }
+
+                    UpdateSaveState();
+
+                    {
+                        // Update the tab/window name
+                        Control parentCtrl = Parent;
+
+                        while (parentCtrl != null)
+                        {
+                            if (parentCtrl is CollectionViewerTab)
+                            {
+                                parentCtrl.Text = TabName;
+                                break;
+                            }
+                            else if (parentCtrl is CollectionViewerForm)
+                            {
+                                parentCtrl.Text = $"{CollectionManagerApp.AppTitle} - {TabName}";
+                                break;
+                            }
+
+                            parentCtrl = parentCtrl.Parent;
+                        }
+                    }
+
+                    return;
+                }
+            }
+
+            return;
+        }
+
         public void SaveCollection(bool autoBackup)
         {
-            if (_needsUpdate_CollName || _needsUpdate_SortValue)
-            {
-                UpdateColl();
-            }
+            CommitNeededChanges();
 
             using (CacheableDbpfFile package = packageCache.OpenForReadOnly(CollectionFilePath))
             {
@@ -622,26 +789,42 @@ namespace CollectionManager.Controls
         {
             try
             {
-                Image image = Image.FromFile(imagePath);
-
-                if (image.Width != 28 || image.Height != 22)
+                using (Image image = Image.FromFile(imagePath))
                 {
-                    image = ImageHelper.ResizeImage(image, 28, 22);
-                }
+                    if (image.Width > Properties.Settings.Default.MaxIconWidth)
+                    {
+                        MsgBox.Show("The selected image is too wide", "Icon Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        return;
+                    }
+                    else if (image.Height > Properties.Settings.Default.MaxIconHeight)
+                    {
+                        MsgBox.Show("The selected image is too tall", "Icon Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        return;
+                    }
 
-                pictCollIcon.BackgroundImage = image;
+                    Image iconImage = image;
 
-                using (CacheableDbpfFile package = packageCache.OpenForUpdate(collectionFilePath))
-                {
-                    Coll coll = GetCollResource(package, collectionKey, out Idr idrForColl);
+                    if (iconImage.Width != 28 || iconImage.Height != 22)
+                    {
+                        iconImage = ImageHelper.ResizeImage(iconImage, 28, 22);
+                    }
 
-                    Img img = GetImgResource(package, coll, idrForColl);
+                    Image collIcon = new Bitmap(iconImage);
 
-                    img.Image = image;
-                    _isDirty = true;
+                    pictCollIcon.BackgroundImage = collIcon;
 
-                    package.Commit(img);
-                    package.Close();
+                    using (CacheableDbpfFile package = packageCache.OpenForUpdate(collectionFilePath))
+                    {
+                        Coll coll = GetCollResource(package, collectionKey, out Idr idrForColl);
+
+                        Img img = GetImgResource(package, coll, idrForColl);
+
+                        img.Image = collIcon;
+                        _isDirty = true;
+
+                        package.Commit(img);
+                        package.Close();
+                    }
                 }
             }
             catch (Exception)
@@ -660,11 +843,11 @@ namespace CollectionManager.Controls
                 return false;
             }
 
-            TextEntryDialog rename = new TextEntryDialog("Collection Package Rename", "Please enter a new name for the collection package", new FileInfo(collectionFilePath).Name);
+            FileEntryDialog rename = new FileEntryDialog("Collection Package Rename", "Please enter a new name for the collection package", new FileInfo(collectionFilePath).Name, ".package");
 
-            if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.TextEntry))
+            if (rename.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(rename.FileEntry))
             {
-                return RenameCollectionTo(rename.TextEntry);
+                return RenameCollectionTo(rename.FileEntry);
             }
 
             return false;
@@ -690,57 +873,7 @@ namespace CollectionManager.Controls
                 {
                     try
                     {
-                        if (isPreHashed)
-                        {
-                            using (CacheableDbpfFile package = packageCache.OpenForReadOnly(collectionFilePath))
-                            {
-                                uint preHashGroup = Hashes.GroupIDHash(package.PackageNameNoExtn).AsUInt();
-
-                                Coll coll = GetCollResource(package, collectionKey, out Idr idrForColl);
-
-                                // For each entry ending "groupid" in the COLL resource, if the value is the pre - hashed value, change it to 0xFFFFFFFF(4294967295)
-                                {
-                                    PatchPreHashGroups(coll, preHashGroup);
-
-                                    package.Commit(coll);
-                                }
-
-                                // For each entry in each 3IDR resource, if the group id is the pre-hashed value, change it to 0xFFFFFFFF
-                                {
-                                    if (idrForColl != null)
-                                    {
-                                        for (uint index = 0; index < idrForColl.ItemCount; ++index)
-                                        {
-                                            DBPFKey key = idrForColl.GetItem(index);
-
-                                            if (key.GroupID.AsUInt() == preHashGroup)
-                                            {
-                                                idrForColl.SetItem(index, new DBPFKey(key.TypeID, DBPFData.GROUP_NULL, key.InstanceID, key.ResourceID));
-                                            }
-                                        }
-
-                                        package.Commit(idrForColl);
-                                    }
-                                }
-
-                                // For each entry ending "groupid" in each BINX resource, if the value is the pre - hashed value, change it to 0xFFFFFFFF(4294967295)
-                                {
-                                    foreach (DBPFEntry entry in package.GetEntriesByType(Binx.TYPE))
-                                    {
-                                        Binx binx = (Binx)package.GetResourceByEntry(entry);
-                                        PatchPreHashGroups(binx, preHashGroup);
-
-                                        package.Commit(binx);
-                                    }
-                                }
-
-                                if (package.IsDirty) package.Update(false);
-
-                                package.Close();
-                            }
-
-                            isPreHashed = false;
-                        }
+                        ResolvePrehashes(true);
 
                         Microsoft.VisualBasic.FileIO.FileSystem.RenameFile(fiOld.FullName, fiNew.Name);
                         collectionFilePath = fiNew.FullName;
@@ -752,6 +885,127 @@ namespace CollectionManager.Controls
             }
 
             return false;
+        }
+
+        private bool RepairPrehashes()
+        {
+            bool repairable = false;
+            uint preHashGroup;
+
+            using (CacheableDbpfFile package = packageCache.OpenForReadOnly(collectionFilePath))
+            {
+                Coll coll = GetCollResource(package, collectionKey, out Idr idrForColl);
+                DBPFKey strKey = IdrHelper.StringSetKey(coll, idrForColl);
+                DBPFKey imgKey = IdrHelper.IconKey(coll, idrForColl);
+
+                repairable = (strKey.GroupID != DBPFData.GROUP_LOCAL && strKey.GroupID == imgKey.GroupID);
+                preHashGroup = strKey.GroupID.AsUInt();
+
+                package.Close();
+            }
+
+            if (repairable)
+            {
+                using (CacheableDbpfFile package = packageCache.OpenForUpdate(collectionFilePath))
+                {
+                    Coll coll = GetCollResource(package, collectionKey, out Idr idrForColl);
+
+                    // For each entry ending "groupid" in the COLL resource, if the value is the pre - hashed value, change it to 0xFFFFFFFF(4294967295)
+                    {
+                        PatchPreHashGroups(coll, preHashGroup);
+
+                        package.Commit(coll);
+                    }
+
+                    // For each entry in each 3IDR resource, if the group id is the pre-hashed value, change it to 0xFFFFFFFF
+                    {
+                        if (idrForColl != null)
+                        {
+                            for (uint index = 0; index < idrForColl.ItemCount; ++index)
+                            {
+                                DBPFKey key = idrForColl.GetItem(index);
+
+                                if (key.GroupID.AsUInt() == preHashGroup)
+                                {
+                                    idrForColl.SetItem(index, new DBPFKey(key.TypeID, DBPFData.GROUP_NULL, key.InstanceID, key.ResourceID));
+                                }
+                            }
+
+                            package.Commit(idrForColl);
+                        }
+                    }
+
+                    // For each entry ending "groupid" in each BINX resource, if the value is the pre - hashed value, change it to 0xFFFFFFFF(4294967295)
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Binx.TYPE))
+                        {
+                            Binx binx = (Binx)package.GetResourceByEntry(entry);
+                            PatchPreHashGroups(binx, preHashGroup);
+
+                            package.Commit(binx);
+                        }
+                    }
+
+                    package.Close();
+                }
+            }
+
+            return repairable;
+        }
+
+        private void ResolvePrehashes(bool doUpdate)
+        {
+            if (isPreHashed)
+            {
+                using (CacheableDbpfFile package = packageCache.OpenForReadOnly(collectionFilePath))
+                {
+                    uint preHashGroup = Hashes.GroupIDHash(package.PackageNameNoExtn).AsUInt();
+
+                    Coll coll = GetCollResource(package, collectionKey, out Idr idrForColl);
+
+                    // For each entry ending "groupid" in the COLL resource, if the value is the pre - hashed value, change it to 0xFFFFFFFF(4294967295)
+                    {
+                        PatchPreHashGroups(coll, preHashGroup);
+
+                        package.Commit(coll);
+                    }
+
+                    // For each entry in each 3IDR resource, if the group id is the pre-hashed value, change it to 0xFFFFFFFF
+                    {
+                        if (idrForColl != null)
+                        {
+                            for (uint index = 0; index < idrForColl.ItemCount; ++index)
+                            {
+                                DBPFKey key = idrForColl.GetItem(index);
+
+                                if (key.GroupID.AsUInt() == preHashGroup)
+                                {
+                                    idrForColl.SetItem(index, new DBPFKey(key.TypeID, DBPFData.GROUP_NULL, key.InstanceID, key.ResourceID));
+                                }
+                            }
+
+                            package.Commit(idrForColl);
+                        }
+                    }
+
+                    // For each entry ending "groupid" in each BINX resource, if the value is the pre - hashed value, change it to 0xFFFFFFFF(4294967295)
+                    {
+                        foreach (DBPFEntry entry in package.GetEntriesByType(Binx.TYPE))
+                        {
+                            Binx binx = (Binx)package.GetResourceByEntry(entry);
+                            PatchPreHashGroups(binx, preHashGroup);
+
+                            package.Commit(binx);
+                        }
+                    }
+
+                    if (doUpdate && package.IsDirty) package.Update(false);
+
+                    package.Close();
+                }
+
+                isPreHashed = false;
+            }
         }
 
         private void PatchPreHashGroups(Cpf cpf, uint preHashGroup)
@@ -862,20 +1116,41 @@ namespace CollectionManager.Controls
 
         private bool ClipboardIsUsable()
         {
-            return ClipboardHelper.ContainsCollItems(collectionKey) || ClipboardContainsPackageFiles();
+            return ClipboardContainsCollItems() || ClipboardContainsPackageFiles();
         }
 
         private bool ClipboardContainsPackageFiles()
         {
-            if (ClipboardHelper.ContainsFileList)
+            try
             {
-                foreach (string path in ClipboardHelper.FileList)
+                if (ClipboardHelper.ContainsFileList)
                 {
-                    if (path.EndsWith(".package"))
+                    foreach (string path in ClipboardHelper.FileList)
                     {
-                        return true;
+                        if (path.EndsWith(".package"))
+                        {
+                            return true;
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                logger.Debug(e.Message);
+            }
+
+            return false;
+        }
+
+        private bool ClipboardContainsCollItems()
+        {
+            try
+            {
+                return ClipboardHelper.ContainsCollItems(collectionKey);
+            }
+            catch (Exception e)
+            {
+                logger.Debug(e.Message);
             }
 
             return false;
@@ -1263,6 +1538,11 @@ namespace CollectionManager.Controls
         #endregion
 
         #region Copy To Clipboard
+        private void OnIconContext_ClipboardCopyTo(object sender, EventArgs e)
+        {
+            Clipboard.SetImage(pictCollIcon.BackgroundImage);
+        }
+
         private void OnCollItemsContext_ClipboardCopyTo(object sender, EventArgs e)
         {
             ClipboardCollListItems collListItems = new ClipboardCollListItems(collectionKey);
@@ -1284,11 +1564,11 @@ namespace CollectionManager.Controls
         #region Paste From Clipboard
         private void OnCollItemsContext_ClipboardPasteBefore(object sender, EventArgs e)
         {
-            if (ClipboardHelper.ContainsFileList)
+            if (ClipboardContainsPackageFiles())
             {
                 AddItems(ClipboardHelper.FileList, 0);
             }
-            else if (ClipboardHelper.ContainsCollItems(collectionKey))
+            else if (ClipboardContainsCollItems())
             {
                 AddItems(ClipboardHelper.CollItems, 0);
             }
@@ -1296,11 +1576,11 @@ namespace CollectionManager.Controls
 
         private void OnCollItemsContext_ClipboardPasteAfter(object sender, EventArgs e)
         {
-            if (ClipboardHelper.ContainsFileList)
+            if (ClipboardContainsPackageFiles())
             {
                 AddItems(ClipboardHelper.FileList, 1);
             }
-            else if (ClipboardHelper.ContainsCollItems(collectionKey))
+            else if (ClipboardContainsCollItems())
             {
                 AddItems(ClipboardHelper.CollItems, 1);
             }
@@ -1310,7 +1590,7 @@ namespace CollectionManager.Controls
         #region Drag And Drop (Icons)
         private void OnDragEnter_Icon(object sender, DragEventArgs e)
         {
-            Regex rePackageName = new Regex(@"\.(png|jpg|jpeg|bmp)$");
+            Regex reImageName = new Regex(@"\.(png|jpg|jpeg|bmp|gif|tif|tiff)$");
 
             DataObject data = e.Data as DataObject;
 
@@ -1320,15 +1600,17 @@ namespace CollectionManager.Controls
 
                 if (rawFiles != null && rawFiles.Length == 1)
                 {
-                    if (!rePackageName.Match(Path.GetFileName(rawFiles[0])).Success)
+                    if (!reImageName.Match(Path.GetFileName(rawFiles[0])).Success)
                     {
                         return;
                     }
 
-                    Image img = Image.FromFile(rawFiles[0]);
-                    if (img.Width > Properties.Settings.Default.MaxIconWidth || img.Height > Properties.Settings.Default.MaxIconHeight)
+                    using (Image img = Image.FromFile(rawFiles[0]))
                     {
-                        return;
+                        if (img.Width > Properties.Settings.Default.MaxIconWidth || img.Height > Properties.Settings.Default.MaxIconHeight)
+                        {
+                            return;
+                        }
                     }
 
                     e.Effect = DragDropEffects.Copy;
@@ -1668,8 +1950,19 @@ namespace CollectionManager.Controls
         #region Save Button
         private void OnSaveClicked(object sender, EventArgs e)
         {
-            // This is a bugger as we need the state of the main form's Auto-Backup menu item!
-            GetMainForm().SaveCollection(this);
+            if (Form.ModifierKeys == Keys.Control)
+            {
+                GetMainForm().SaveAsCollection(this);
+            }
+            else if (Form.ModifierKeys == Keys.Shift)
+            {
+                GetMainForm().SaveAllCollection();
+            }
+            else
+            {
+                // This is a bugger as we need the state of the main form's Auto-Backup menu item!
+                GetMainForm().SaveCollection(this);
+            }
         }
         #endregion
     }

@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
-namespace Sims2Tools
+namespace Sims2Tools.Dialogs
 {
     public partial class CreatorConfigDialog : Form
     {

@@ -9,7 +9,7 @@
 using Sims2Tools.Controls;
 using System.Windows.Forms;
 
-namespace Sims2Tools
+namespace Sims2Tools.Dialogs
 {
     public partial class TreePickerDialog : PickerDialog
     {

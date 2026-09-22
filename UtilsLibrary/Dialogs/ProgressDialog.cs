@@ -11,7 +11,7 @@ using System;
 using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace Sims2Tools
+namespace Sims2Tools.Dialogs
 {
     // See - https://www.codeproject.com/Articles/160219/ProgressForm-A-simple-form-linked-to-a-BackgroundW
     public partial class ProgressDialog : Form

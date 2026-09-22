@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.Utils;
+using Sims2Tools.Dialogs;
 using Sims2Tools.Utils.Persistence;
 using System;
 using System.Collections.Generic;

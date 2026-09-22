@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.Dialogs;
 using System;
 using System.Collections;
 using System.Collections.Generic;

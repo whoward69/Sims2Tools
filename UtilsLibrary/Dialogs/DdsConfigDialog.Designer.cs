@@ -8,7 +8,7 @@
  
 using Microsoft.WindowsAPICodePack.Dialogs;
 
-namespace Sims2Tools
+namespace Sims2Tools.Dialogs
 {
     partial class DdsConfigDialog
     {

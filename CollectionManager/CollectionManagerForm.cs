@@ -64,9 +64,9 @@ namespace CollectionManager
 
                 foreach (TabPage tab in tabControl.TabPages)
                 {
-                    CollectionViewer viewer = (tab as CollectionViewerTab).CollectionViewer;
+                    CollectionViewer collectionViewer = (tab as CollectionViewerTab).CollectionViewer;
 
-                    if (viewer.IsDirty)
+                    if (collectionViewer.IsDirty)
                     {
                         anyDirty = true;
                         break;
@@ -77,9 +77,9 @@ namespace CollectionManager
                 {
                     foreach (Form form in formsByPath.Values)
                     {
-                        CollectionViewer viewer = (form as CollectionViewerForm).CollectionViewer;
+                        CollectionViewer collectionViewer = (form as CollectionViewerForm).CollectionViewer;
 
-                        if (viewer.IsDirty)
+                        if (collectionViewer.IsDirty)
                         {
                             anyDirty = true;
                             break;
@@ -274,6 +274,8 @@ namespace CollectionManager
             if (Form.ModifierKeys == Keys.Control) openInTab = false;
             else if (Form.ModifierKeys == Keys.Shift) openInTab = true;
 
+            if (tabControl.TabPages.Count == 0) openInTab = true;
+
             NewCollection(openInTab);
         }
 
@@ -289,7 +291,13 @@ namespace CollectionManager
         {
             if (tabControl.SelectedTab != null)
             {
-                RenameCollection((tabControl.SelectedTab as CollectionViewerTab).CollectionViewer);
+                CollectionViewer collectionViewer = (tabControl.SelectedTab as CollectionViewerTab).CollectionViewer;
+
+                if (RenameCollection(collectionViewer))
+                {
+                    tabControl.SelectedTab.Text = collectionViewer.TabName;
+                    this.Text = $"{CollectionManagerApp.AppTitle} - {tabControl.SelectedTab.Text}";
+                }
             }
         }
 
@@ -313,18 +321,28 @@ namespace CollectionManager
 
         private void OnReorder_OrderTabsBySort(object sender, EventArgs e)
         {
-            SortedDictionary<int, TabPage> sortedTabs = new SortedDictionary<int, TabPage>();
+            SortedDictionary<int, List<TabPage>> sortedTabs = new SortedDictionary<int, List<TabPage>>();
 
             foreach (TabPage tab in tabControl.TabPages)
             {
-                sortedTabs.Add((tab as CollectionViewerTab).CollectionViewer.CollectionSort, tab);
+                CollectionViewer collectionViewer = (tab as CollectionViewerTab).CollectionViewer;
+
+                if (!sortedTabs.ContainsKey(collectionViewer.CollectionSort))
+                {
+                    sortedTabs.Add(collectionViewer.CollectionSort, new List<TabPage>());
+                }
+
+                sortedTabs[collectionViewer.CollectionSort].Add(tab);
             }
 
             tabControl.TabPages.Clear();
 
-            foreach (TabPage tab in sortedTabs.Values)
+            foreach (List<TabPage> tabs in sortedTabs.Values)
             {
-                tabControl.TabPages.Add(tab);
+                foreach (TabPage tab in tabs)
+                {
+                    tabControl.TabPages.Add(tab);
+                }
             }
         }
 
@@ -347,7 +365,7 @@ namespace CollectionManager
             ToolStripMenuItem menuItemCloseAll = new ToolStripMenuItem
             {
                 Size = new Size(216, 22),
-                Text = "Close &All"
+                Text = "Close &All Windows"
             };
 
             menuItemCloseAll.Click += new EventHandler(this.OnWindowCloseAllClicked);
@@ -377,9 +395,9 @@ namespace CollectionManager
 
             foreach (CollectionViewerForm form in formsByPath.Values)
             {
-                CollectionViewer viewer = form.CollectionViewer;
+                CollectionViewer collectionViewer = form.CollectionViewer;
 
-                if (viewer.IsDirty)
+                if (collectionViewer.IsDirty)
                 {
                     anyWindowsDirty = true;
                     break;
@@ -397,11 +415,11 @@ namespace CollectionManager
             List<CollectionViewerForm> forms = new List<CollectionViewerForm>(formsByPath.Values);
             foreach (CollectionViewerForm form in forms)
             {
-                CollectionViewer viewer = form.CollectionViewer;
+                CollectionViewer collectionViewer = form.CollectionViewer;
 
-                if (viewer.IsDirty)
+                if (collectionViewer.IsDirty)
                 {
-                    viewer.SetClean();
+                    collectionViewer.SetClean();
                 }
 
                 form.Close();
@@ -652,21 +670,21 @@ namespace CollectionManager
         {
             foreach (TabPage tab in tabControl.TabPages)
             {
-                CollectionViewer viewer = (tab as CollectionViewerTab).CollectionViewer;
+                CollectionViewer collectionViewer = (tab as CollectionViewerTab).CollectionViewer;
 
-                if (viewer.IsObjectCollection)
+                if (collectionViewer.IsObjectCollection)
                 {
-                    viewer.Reload();
+                    collectionViewer.Reload();
                 }
             }
 
             foreach (CollectionViewerForm form in formsByPath.Values)
             {
-                CollectionViewer viewer = form.CollectionViewer;
+                CollectionViewer collectionViewer = form.CollectionViewer;
 
-                if (viewer.IsObjectCollection)
+                if (collectionViewer.IsObjectCollection)
                 {
-                    viewer.Reload();
+                    collectionViewer.Reload();
                 }
             }
         }
@@ -675,21 +693,21 @@ namespace CollectionManager
         {
             foreach (TabPage tab in tabControl.TabPages)
             {
-                CollectionViewer viewer = (tab as CollectionViewerTab).CollectionViewer;
+                CollectionViewer collectionViewer = (tab as CollectionViewerTab).CollectionViewer;
 
-                if (viewer.IsClothingCollection)
+                if (collectionViewer.IsClothingCollection)
                 {
-                    viewer.Reload();
+                    collectionViewer.Reload();
                 }
             }
 
             foreach (CollectionViewerForm form in formsByPath.Values)
             {
-                CollectionViewer viewer = form.CollectionViewer;
+                CollectionViewer collectionViewer = form.CollectionViewer;
 
-                if (viewer.IsClothingCollection)
+                if (collectionViewer.IsClothingCollection)
                 {
-                    viewer.Reload();
+                    collectionViewer.Reload();
                 }
             }
         }
@@ -710,7 +728,7 @@ namespace CollectionManager
 
         private void OnDoubleClick(object sender, EventArgs e)
         {
-            OnTab_RenamePackage(sender, e);
+            OnCollection_RenamePackage(sender, e);
         }
 
         private void OnTabControlMouseClick(object sender, MouseEventArgs e)
@@ -749,8 +767,11 @@ namespace CollectionManager
         {
             if (tabControl.SelectedTab != null)
             {
-                CollectionViewer viewer = (tabControl.SelectedTab.Controls[0] as CollectionViewer);
-                string collectionFilePath = viewer.CollectionFilePath;
+                CollectionViewer collectionViewer = (tabControl.SelectedTab.Controls[0] as CollectionViewer);
+
+                collectionViewer.CommitNeededChanges();
+
+                string collectionFilePath = collectionViewer.CollectionFilePath;
 
                 tabControl.TabPages.Remove(tabControl.SelectedTab);
 
@@ -771,62 +792,6 @@ namespace CollectionManager
             ChangeIcon((tabControl.SelectedTab as CollectionViewerTab).CollectionViewer);
         }
 
-        private void OnTab_RenamePackage(object sender, EventArgs e)
-        {
-            if (tabControl.SelectedTab is CollectionViewerTab collectionTab)
-            {
-                FileInfo fiOld = new FileInfo(collectionTab.CollectionFilePath);
-
-                Rectangle tabRect = tabControl.GetTabRect(tabControl.SelectedIndex);
-                Rectangle textRect = this.RectangleToClient(tabControl.RectangleToScreen(tabRect));
-
-                TextBox textBox = new TextBox()
-                {
-                    Left = textRect.Left,
-                    Top = textRect.Top,
-                    Width = textRect.Width,
-                    Height = textRect.Height,
-                    Text = collectionTab.Text,
-                    BorderStyle = BorderStyle.FixedSingle,
-                    Font = tabControl.Font
-                };
-
-                textBox.KeyDown += delegate (object obj, KeyEventArgs args)
-                {
-                    if (args.KeyCode == Keys.Enter)
-                    {
-                        collectionTab.Focus();
-                    }
-                };
-
-                textBox.Leave += delegate
-                {
-                    string newName = textBox.Text;
-
-                    textBox.Dispose();
-                    textBox = null;
-
-                    if ((tabControl.SelectedTab as CollectionViewerTab).CollectionViewer.RenameCollectionTo(newName))
-                    {
-                        tabControl.SelectedTab.Text = (tabControl.SelectedTab as CollectionViewerTab).CollectionViewer.TabName;
-                        MyMruList.RemoveFile(fiOld.FullName);
-                    }
-                };
-
-                this.Controls.Add(textBox);
-                textBox.BringToFront();
-                textBox.Focus();
-
-                string text = textBox.Text;
-                int pos = text.LastIndexOf(".");
-                if (pos != -1)
-                {
-                    textBox.SelectionStart = 0;
-                    textBox.SelectionLength = pos;
-                }
-            }
-        }
-
         private void OnTab_Delete(object sender, EventArgs e)
         {
             if (tabControl.SelectedTab != null)
@@ -843,43 +808,30 @@ namespace CollectionManager
             SaveCollection((tabControl.SelectedTab as CollectionViewerTab).CollectionViewer);
         }
 
+        private void OnTab_SaveAs(object sender, EventArgs e)
+        {
+            SaveAsCollection((tabControl.SelectedTab as CollectionViewerTab).CollectionViewer);
+        }
+
         private void OnTab_SaveAll(object sender, EventArgs e)
         {
-            foreach (TabPage tab in tabControl.TabPages)
-            {
-                CollectionViewer viewer = (tab as CollectionViewerTab).CollectionViewer;
-
-                if (viewer.IsDirty)
-                {
-                    SaveCollection(viewer);
-                }
-            }
-
-            foreach (CollectionViewerForm form in formsByPath.Values)
-            {
-                CollectionViewer viewer = form.CollectionViewer;
-
-                if (viewer.IsDirty)
-                {
-                    SaveCollection(viewer);
-                }
-            }
+            SaveAllCollection();
         }
 
         private void OnTab_Close(object sender, EventArgs e)
         {
             if (tabControl.SelectedTab != null)
             {
-                CollectionViewer viewer = (tabControl.SelectedTab as CollectionViewerTab).CollectionViewer;
+                CollectionViewer collectionViewer = (tabControl.SelectedTab as CollectionViewerTab).CollectionViewer;
 
-                if (viewer.IsDirty)
+                if (collectionViewer.IsDirty)
                 {
                     if (MsgBox.Show($"There are unsaved changes, do you really want to close the tab?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                     {
                         return;
                     }
 
-                    viewer.SetClean();
+                    collectionViewer.SetClean();
                 }
 
                 tabControl.TabPages.Remove(tabControl.SelectedTab);
@@ -892,9 +844,9 @@ namespace CollectionManager
 
             foreach (TabPage tab in tabControl.TabPages)
             {
-                CollectionViewer viewer = (tab as CollectionViewerTab).CollectionViewer;
+                CollectionViewer collectionViewer = (tab as CollectionViewerTab).CollectionViewer;
 
-                if (viewer.IsDirty)
+                if (collectionViewer.IsDirty)
                 {
                     anyTabsDirty = true;
                     break;
@@ -911,11 +863,11 @@ namespace CollectionManager
 
             foreach (TabPage tab in tabControl.TabPages)
             {
-                CollectionViewer viewer = (tab as CollectionViewerTab).CollectionViewer;
+                CollectionViewer collectionViewer = (tab as CollectionViewerTab).CollectionViewer;
 
-                if (viewer.IsDirty)
+                if (collectionViewer.IsDirty)
                 {
-                    viewer.SetClean();
+                    collectionViewer.SetClean();
                 }
             }
 
@@ -1070,6 +1022,34 @@ namespace CollectionManager
         public void SaveCollection(CollectionViewer collectionViewer)
         {
             collectionViewer.SaveCollection(menuItemAutoBackup.Checked);
+        }
+
+        public void SaveAsCollection(CollectionViewer collectionViewer)
+        {
+            collectionViewer.SaveAsCollection(menuItemAutoBackup.Checked);
+        }
+
+        public void SaveAllCollection()
+        {
+            foreach (TabPage tab in tabControl.TabPages)
+            {
+                CollectionViewer collectionViewer = (tab as CollectionViewerTab).CollectionViewer;
+
+                if (collectionViewer.IsDirty)
+                {
+                    SaveCollection(collectionViewer);
+                }
+            }
+
+            foreach (CollectionViewerForm form in formsByPath.Values)
+            {
+                CollectionViewer collectionViewer = form.CollectionViewer;
+
+                if (collectionViewer.IsDirty)
+                {
+                    SaveCollection(collectionViewer);
+                }
+            }
         }
 
         public void ChangeIcon(CollectionViewer collectionViewer)

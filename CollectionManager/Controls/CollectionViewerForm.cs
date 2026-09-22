@@ -21,8 +21,9 @@ namespace CollectionManager.Controls
         internal CollectionManagerForm ManagerForm => managerForm;
 
         private readonly CollectionViewer collectionViewer;
-
         public CollectionViewer CollectionViewer => collectionViewer;
+
+        private bool beingDocked = false;
 
         public CollectionViewerForm(CollectionManagerForm managerForm, string collectionFilePath)
         {
@@ -47,7 +48,7 @@ namespace CollectionManager.Controls
 
         private void OnFormClosing(object sender, FormClosingEventArgs e)
         {
-            if (collectionViewer.IsDirty)
+            if (!beingDocked && collectionViewer.IsDirty)
             {
                 if (MsgBox.Show($"There are unsaved changes, do you really want to close this window?", "Unsaved Changes", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2) == DialogResult.No)
                 {
@@ -65,11 +66,16 @@ namespace CollectionManager.Controls
         private void OnWindow_Opening(object sender, EventArgs e)
         {
             menuItemViewerSave.Enabled = collectionViewer.IsDirty;
+            menuItemViewerSaveAll.Enabled = managerForm.IsAnyDirty;
         }
 
         private void OnWindow_Dock(object sender, System.EventArgs e)
         {
+            collectionViewer.CommitNeededChanges();
+
             managerForm?.NotifyDock(this);
+
+            beingDocked = true;
             this.Close();
         }
 
@@ -81,6 +87,16 @@ namespace CollectionManager.Controls
         private void OnWindow_Save(object sender, EventArgs e)
         {
             managerForm.SaveCollection(collectionViewer);
+        }
+
+        private void OnWindow_SaveAs(object sender, EventArgs e)
+        {
+            managerForm.SaveAsCollection(collectionViewer);
+        }
+
+        private void OnWindow_SaveAll(object sender, EventArgs e)
+        {
+            managerForm.SaveAllCollection();
         }
 
         private void OnWindow_Close(object sender, System.EventArgs e)
@@ -97,7 +113,10 @@ namespace CollectionManager.Controls
 
         private void OnCollection_RenamePackage(object sender, EventArgs e)
         {
-            managerForm.RenameCollection(collectionViewer);
+            if (managerForm.RenameCollection(collectionViewer))
+            {
+                this.Text = $"{CollectionManagerApp.AppTitle} - {collectionViewer.TabName}";
+            }
         }
 
         private void OnCollection_Delete(object sender, EventArgs e)

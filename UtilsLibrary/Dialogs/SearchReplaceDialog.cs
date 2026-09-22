@@ -9,7 +9,7 @@
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace Sims2Tools
+namespace Sims2Tools.Dialogs
 {
     public partial class SearchReplaceDialog : Form
     {

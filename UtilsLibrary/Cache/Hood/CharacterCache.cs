@@ -18,6 +18,7 @@ using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DbpfCache;
+using Sims2Tools.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

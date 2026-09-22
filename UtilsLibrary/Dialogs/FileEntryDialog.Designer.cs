@@ -10,7 +10,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Sims2Tools.Dialogs
 {
-    partial class TreePickerDialog
+    partial class FileEntryDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -38,11 +38,11 @@ namespace Sims2Tools.Dialogs
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TreePickerDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FileEntryDialog));
             this.lblPrompt = new System.Windows.Forms.Label();
+            this.fileEntry = new System.Windows.Forms.TextBox();
             this.btnOK = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.treePicker = new System.Windows.Forms.TreeView();
             this.SuspendLayout();
             // 
             // lblPrompt
@@ -54,56 +54,53 @@ namespace Sims2Tools.Dialogs
             this.lblPrompt.TabIndex = 0;
             this.lblPrompt.Text = "Text Prompt:";
             // 
+            // fileEntry
+            // 
+            this.fileEntry.Location = new System.Drawing.Point(13, 37);
+            this.fileEntry.Name = "fileEntry";
+            this.fileEntry.Size = new System.Drawing.Size(527, 21);
+            this.fileEntry.TabIndex = 1;
+            // 
             // btnOK
             // 
-            this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnOK.Location = new System.Drawing.Point(397, 272);
+            this.btnOK.Location = new System.Drawing.Point(397, 72);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(143, 30);
-            this.btnOK.TabIndex = 3;
+            this.btnOK.TabIndex = 5;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
             // 
             // btnCancel
             // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(248, 272);
+            this.btnCancel.Location = new System.Drawing.Point(248, 72);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(143, 30);
-            this.btnCancel.TabIndex = 2;
+            this.btnCancel.TabIndex = 6;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             // 
-            // treePicker
-            // 
-            this.treePicker.Location = new System.Drawing.Point(13, 37);
-            this.treePicker.Name = "treePicker";
-            this.treePicker.Size = new System.Drawing.Size(527, 229);
-            this.treePicker.TabIndex = 1;
-            // 
-            // Sims2ToolsTreePickerDialog
+            // Sims2ToolsFileEntryDialog
             // 
             this.AcceptButton = this.btnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(552, 314);
+            this.ClientSize = new System.Drawing.Size(552, 114);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.lblPrompt);
+            this.Controls.Add(this.fileEntry);
             this.Controls.Add(this.btnOK);
-            this.Controls.Add(this.treePicker);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Sims2ToolsTreePickerDialog";
+            this.Name = "Sims2ToolsFileEntryDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Select Value";
-            this.Load += new System.EventHandler(this.OnLoad);
+            this.Text = "Change Text";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -112,8 +109,8 @@ namespace Sims2Tools.Dialogs
         #endregion
 
         private System.Windows.Forms.Label lblPrompt;
+        private System.Windows.Forms.TextBox fileEntry;
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.TreeView treePicker;
     }
 }

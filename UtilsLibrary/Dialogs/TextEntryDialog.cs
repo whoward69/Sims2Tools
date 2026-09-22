@@ -8,7 +8,7 @@
 
 using System.Windows.Forms;
 
-namespace Sims2Tools
+namespace Sims2Tools.Dialogs
 {
     public partial class TextEntryDialog : Form
     {

@@ -36,6 +36,7 @@
             this.meuItemNewCollection = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemViewerSave = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemViewerSaveAs = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemViewerClose = new System.Windows.Forms.ToolStripMenuItem();
             this.collectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,6 +46,7 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.meuItemCollectionDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.panelForm = new System.Windows.Forms.Panel();
+            this.menuItemViewerSaveAll = new System.Windows.Forms.ToolStripMenuItem();
             this.menuCollectionViewerForm.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -67,6 +69,8 @@
             this.meuItemNewCollection,
             this.toolStripSeparator1,
             this.menuItemViewerSave,
+            this.menuItemViewerSaveAs,
+            this.menuItemViewerSaveAll,
             this.toolStripSeparator5,
             this.menuItemViewerClose});
             this.menuViewerWindow.Name = "menuViewerWindow";
@@ -77,47 +81,54 @@
             // menuItemViewerDock
             // 
             this.menuItemViewerDock.Name = "menuItemViewerDock";
-            this.menuItemViewerDock.Size = new System.Drawing.Size(180, 22);
+            this.menuItemViewerDock.Size = new System.Drawing.Size(196, 22);
             this.menuItemViewerDock.Text = "&Dock";
             this.menuItemViewerDock.Click += new System.EventHandler(this.OnWindow_Dock);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(193, 6);
             // 
             // meuItemNewCollection
             // 
             this.meuItemNewCollection.Name = "meuItemNewCollection";
             this.meuItemNewCollection.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.meuItemNewCollection.Size = new System.Drawing.Size(180, 22);
+            this.meuItemNewCollection.Size = new System.Drawing.Size(196, 22);
             this.meuItemNewCollection.Text = "New...";
             this.meuItemNewCollection.Click += new System.EventHandler(this.OnWindow_New);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(193, 6);
             // 
             // menuItemViewerSave
             // 
             this.menuItemViewerSave.Name = "menuItemViewerSave";
             this.menuItemViewerSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.menuItemViewerSave.Size = new System.Drawing.Size(180, 22);
+            this.menuItemViewerSave.Size = new System.Drawing.Size(196, 22);
             this.menuItemViewerSave.Text = "&Save";
             this.menuItemViewerSave.Click += new System.EventHandler(this.OnWindow_Save);
+            // 
+            // menuItemViewerSaveAs
+            // 
+            this.menuItemViewerSaveAs.Name = "menuItemViewerSaveAs";
+            this.menuItemViewerSaveAs.Size = new System.Drawing.Size(196, 22);
+            this.menuItemViewerSaveAs.Text = "Save As...";
+            this.menuItemViewerSaveAs.Click += new System.EventHandler(this.OnWindow_SaveAs);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(193, 6);
             // 
             // menuItemViewerClose
             // 
             this.menuItemViewerClose.Name = "menuItemViewerClose";
             this.menuItemViewerClose.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F4)));
-            this.menuItemViewerClose.Size = new System.Drawing.Size(180, 22);
-            this.menuItemViewerClose.Text = "&Close";
+            this.menuItemViewerClose.Size = new System.Drawing.Size(196, 22);
+            this.menuItemViewerClose.Text = "&Close Window";
             this.menuItemViewerClose.Click += new System.EventHandler(this.OnWindow_Close);
             // 
             // collectionToolStripMenuItem
@@ -171,6 +182,13 @@
             this.panelForm.Size = new System.Drawing.Size(584, 287);
             this.panelForm.TabIndex = 2;
             // 
+            // menuItemViewerSaveAll
+            // 
+            this.menuItemViewerSaveAll.Name = "menuItemViewerSaveAll";
+            this.menuItemViewerSaveAll.Size = new System.Drawing.Size(196, 22);
+            this.menuItemViewerSaveAll.Text = "Save All";
+            this.menuItemViewerSaveAll.Click += new System.EventHandler(this.OnWindow_SaveAll);
+            // 
             // CollectionViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -208,5 +226,7 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem meuItemNewCollection;
+        private System.Windows.Forms.ToolStripMenuItem menuItemViewerSaveAs;
+        private System.Windows.Forms.ToolStripMenuItem menuItemViewerSaveAll;
     }
 }

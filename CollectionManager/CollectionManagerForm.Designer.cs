@@ -45,6 +45,7 @@ namespace CollectionManager
             this.menuItemNewCollection = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemSaveTab = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemSaveAsTab = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSaveAllTab = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemCloseTab = new System.Windows.Forms.ToolStripMenuItem();
@@ -72,14 +73,14 @@ namespace CollectionManager
             this.menuItemReorderSetSortByOrder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuWindows = new System.Windows.Forms.ToolStripMenuItem();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOpenIn = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOpenInTab = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemOpenInWindow = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMouseDrop = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMouseDropBefore = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMouseDropAfter = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMouseDropInternal = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMouseDropExternal = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemOpenIn = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemOpenInTab = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemOpenInWindow = new System.Windows.Forms.ToolStripMenuItem();
             this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCachingUpdateMaxisObjects = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCachingUpdateCustomObjects = new System.Windows.Forms.ToolStripMenuItem();
@@ -95,6 +96,7 @@ namespace CollectionManager
             this.menuItemTabContextFloat = new System.Windows.Forms.ToolStripMenuItem();
             this.sep1ContextMenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemTabContextSave = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemTabContextSaveAs = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemTabContextSaveAll = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator13 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemTabContextChangeIcon = new System.Windows.Forms.ToolStripMenuItem();
@@ -135,6 +137,7 @@ namespace CollectionManager
             this.menuItemNewCollection,
             this.toolStripSeparator1,
             this.menuItemSaveTab,
+            this.menuItemSaveAsTab,
             this.menuItemSaveAllTab,
             this.toolStripSeparator14,
             this.menuItemCloseTab,
@@ -183,6 +186,13 @@ namespace CollectionManager
             this.menuItemSaveTab.Size = new System.Drawing.Size(227, 22);
             this.menuItemSaveTab.Text = "&Save";
             this.menuItemSaveTab.Click += new System.EventHandler(this.OnTab_Save);
+            // 
+            // menuItemSaveAsTab
+            // 
+            this.menuItemSaveAsTab.Name = "menuItemSaveAsTab";
+            this.menuItemSaveAsTab.Size = new System.Drawing.Size(227, 22);
+            this.menuItemSaveAsTab.Text = "Save As...";
+            this.menuItemSaveAsTab.Click += new System.EventHandler(this.OnTab_SaveAs);
             // 
             // menuItemSaveAllTab
             // 
@@ -377,11 +387,34 @@ namespace CollectionManager
             // menuOptions
             // 
             this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemMouseDrop,
-            this.menuItemOpenIn});
+            this.menuItemOpenIn,
+            this.menuItemMouseDrop});
             this.menuOptions.Name = "menuOptions";
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
+            // 
+            // menuItemOpenIn
+            // 
+            this.menuItemOpenIn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemOpenInTab,
+            this.menuItemOpenInWindow});
+            this.menuItemOpenIn.Name = "menuItemOpenIn";
+            this.menuItemOpenIn.Size = new System.Drawing.Size(148, 22);
+            this.menuItemOpenIn.Text = "Open In...";
+            // 
+            // menuItemOpenInTab
+            // 
+            this.menuItemOpenInTab.Name = "menuItemOpenInTab";
+            this.menuItemOpenInTab.Size = new System.Drawing.Size(118, 22);
+            this.menuItemOpenInTab.Text = "Tab";
+            this.menuItemOpenInTab.Click += new System.EventHandler(this.OnOpenInClicked);
+            // 
+            // menuItemOpenInWindow
+            // 
+            this.menuItemOpenInWindow.Name = "menuItemOpenInWindow";
+            this.menuItemOpenInWindow.Size = new System.Drawing.Size(118, 22);
+            this.menuItemOpenInWindow.Text = "Window";
+            this.menuItemOpenInWindow.Click += new System.EventHandler(this.OnOpenInClicked);
             // 
             // menuItemMouseDrop
             // 
@@ -421,29 +454,6 @@ namespace CollectionManager
             this.menuItemMouseDropExternal.Size = new System.Drawing.Size(115, 22);
             this.menuItemMouseDropExternal.Text = "&External";
             this.menuItemMouseDropExternal.Click += new System.EventHandler(this.OnMouseDropClicked);
-            // 
-            // menuItemOpenIn
-            // 
-            this.menuItemOpenIn.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemOpenInTab,
-            this.menuItemOpenInWindow});
-            this.menuItemOpenIn.Name = "menuItemOpenIn";
-            this.menuItemOpenIn.Size = new System.Drawing.Size(148, 22);
-            this.menuItemOpenIn.Text = "Open In...";
-            // 
-            // menuItemOpenInTab
-            // 
-            this.menuItemOpenInTab.Name = "menuItemOpenInTab";
-            this.menuItemOpenInTab.Size = new System.Drawing.Size(118, 22);
-            this.menuItemOpenInTab.Text = "Tab";
-            this.menuItemOpenInTab.Click += new System.EventHandler(this.OnOpenInClicked);
-            // 
-            // menuItemOpenInWindow
-            // 
-            this.menuItemOpenInWindow.Name = "menuItemOpenInWindow";
-            this.menuItemOpenInWindow.Size = new System.Drawing.Size(118, 22);
-            this.menuItemOpenInWindow.Text = "Window";
-            this.menuItemOpenInWindow.Click += new System.EventHandler(this.OnOpenInClicked);
             // 
             // menuCaching
             // 
@@ -536,6 +546,7 @@ namespace CollectionManager
             this.menuItemTabContextFloat,
             this.sep1ContextMenuItem,
             this.menuItemTabContextSave,
+            this.menuItemTabContextSaveAs,
             this.menuItemTabContextSaveAll,
             this.toolStripSeparator13,
             this.menuItemTabContextChangeIcon,
@@ -547,88 +558,96 @@ namespace CollectionManager
             this.menuItemTabContextClose,
             this.menuItemTabContextCloseAll});
             this.menuContextTab.Name = "menuContextTab";
-            this.menuContextTab.Size = new System.Drawing.Size(174, 210);
+            this.menuContextTab.Size = new System.Drawing.Size(181, 254);
             this.menuContextTab.Text = "Tab Options";
             this.menuContextTab.Opening += new System.ComponentModel.CancelEventHandler(this.OnTab_Opening);
             // 
             // menuItemTabContextFloat
             // 
             this.menuItemTabContextFloat.Name = "menuItemTabContextFloat";
-            this.menuItemTabContextFloat.Size = new System.Drawing.Size(173, 22);
+            this.menuItemTabContextFloat.Size = new System.Drawing.Size(180, 22);
             this.menuItemTabContextFloat.Text = "&Float";
             this.menuItemTabContextFloat.Click += new System.EventHandler(this.OnTab_Float);
             // 
             // sep1ContextMenuItem
             // 
             this.sep1ContextMenuItem.Name = "sep1ContextMenuItem";
-            this.sep1ContextMenuItem.Size = new System.Drawing.Size(170, 6);
+            this.sep1ContextMenuItem.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemTabContextSave
             // 
             this.menuItemTabContextSave.Name = "menuItemTabContextSave";
-            this.menuItemTabContextSave.Size = new System.Drawing.Size(173, 22);
+            this.menuItemTabContextSave.Size = new System.Drawing.Size(180, 22);
             this.menuItemTabContextSave.Text = "&Save";
             this.menuItemTabContextSave.Click += new System.EventHandler(this.OnTab_Save);
+            // 
+            // menuItemTabContextSaveAs
+            // 
+            this.menuItemTabContextSaveAs.Name = "menuItemTabContextSaveAs";
+            this.menuItemTabContextSaveAs.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextSaveAs.Text = "Save As...";
+            this.menuItemTabContextSaveAs.Click += new System.EventHandler(this.OnTab_SaveAs);
             // 
             // menuItemTabContextSaveAll
             // 
             this.menuItemTabContextSaveAll.Name = "menuItemTabContextSaveAll";
-            this.menuItemTabContextSaveAll.Size = new System.Drawing.Size(173, 22);
+            this.menuItemTabContextSaveAll.Size = new System.Drawing.Size(180, 22);
             this.menuItemTabContextSaveAll.Text = "Save All";
+            this.menuItemTabContextSaveAll.Click += new System.EventHandler(this.OnTab_SaveAll);
             // 
             // toolStripSeparator13
             // 
             this.toolStripSeparator13.Name = "toolStripSeparator13";
-            this.toolStripSeparator13.Size = new System.Drawing.Size(170, 6);
+            this.toolStripSeparator13.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemTabContextChangeIcon
             // 
             this.menuItemTabContextChangeIcon.Name = "menuItemTabContextChangeIcon";
-            this.menuItemTabContextChangeIcon.Size = new System.Drawing.Size(173, 22);
+            this.menuItemTabContextChangeIcon.Size = new System.Drawing.Size(180, 22);
             this.menuItemTabContextChangeIcon.Text = "Change &Icon...";
             this.menuItemTabContextChangeIcon.Click += new System.EventHandler(this.OnTab_ChangeIcon);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(170, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemTabContextRenamePackage
             // 
             this.menuItemTabContextRenamePackage.Name = "menuItemTabContextRenamePackage";
-            this.menuItemTabContextRenamePackage.Size = new System.Drawing.Size(173, 22);
+            this.menuItemTabContextRenamePackage.Size = new System.Drawing.Size(180, 22);
             this.menuItemTabContextRenamePackage.Text = "&Rename Package...";
-            this.menuItemTabContextRenamePackage.Click += new System.EventHandler(this.OnTab_RenamePackage);
+            this.menuItemTabContextRenamePackage.Click += new System.EventHandler(this.OnCollection_RenamePackage);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(170, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemTabContextDelete
             // 
             this.menuItemTabContextDelete.Name = "menuItemTabContextDelete";
-            this.menuItemTabContextDelete.Size = new System.Drawing.Size(173, 22);
+            this.menuItemTabContextDelete.Size = new System.Drawing.Size(180, 22);
             this.menuItemTabContextDelete.Text = "Delete";
             this.menuItemTabContextDelete.Click += new System.EventHandler(this.OnTab_Delete);
             // 
             // toolStripSeparator10
             // 
             this.toolStripSeparator10.Name = "toolStripSeparator10";
-            this.toolStripSeparator10.Size = new System.Drawing.Size(170, 6);
+            this.toolStripSeparator10.Size = new System.Drawing.Size(177, 6);
             // 
             // menuItemTabContextClose
             // 
             this.menuItemTabContextClose.Name = "menuItemTabContextClose";
-            this.menuItemTabContextClose.Size = new System.Drawing.Size(173, 22);
-            this.menuItemTabContextClose.Text = "&Close";
+            this.menuItemTabContextClose.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextClose.Text = "&Close Tab";
             this.menuItemTabContextClose.Click += new System.EventHandler(this.OnTab_Close);
             // 
             // menuItemTabContextCloseAll
             // 
             this.menuItemTabContextCloseAll.Name = "menuItemTabContextCloseAll";
-            this.menuItemTabContextCloseAll.Size = new System.Drawing.Size(173, 22);
-            this.menuItemTabContextCloseAll.Text = "Close &All";
+            this.menuItemTabContextCloseAll.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextCloseAll.Text = "Close &All Tabs";
             this.menuItemTabContextCloseAll.Click += new System.EventHandler(this.OnTab_CloseAll);
             // 
             // CollectionManagerForm
@@ -724,5 +743,7 @@ namespace CollectionManager
         private System.Windows.Forms.ToolStripMenuItem menuItemOpenInWindow;
         private System.Windows.Forms.ToolStripMenuItem menuWindows;
         private System.Windows.Forms.ToolStripMenuItem menuItemNewCollection;
+        private System.Windows.Forms.ToolStripMenuItem menuItemSaveAsTab;
+        private System.Windows.Forms.ToolStripMenuItem menuItemTabContextSaveAs;
     }
 }
