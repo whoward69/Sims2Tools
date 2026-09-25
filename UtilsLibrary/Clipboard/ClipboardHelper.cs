@@ -6,21 +6,30 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
-// For your own sanity, do not use either of the following
-// using System.Windows;
-// using System.Windows.Forms;
-
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DragDrop;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+// For your own sanity, do not use either of the following
+// using System.Windows;
+// using System.Windows.Forms;
 
 namespace Sims2Tools.Clipboard
 {
+    public enum Sim2ToolsAppCodes : uint
+    {
+        None = 0,
+        BSOKEditor = 1,
+        ObjectRelocator = 2,
+        OutfitOrganiser = 3
+    }
+
     public class ClipboardHelper
     {
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public static bool ContainsFileList => System.Windows.Clipboard.ContainsFileDropList();
         public static StringCollection FileList => System.Windows.Clipboard.GetFileDropList();
 
@@ -30,21 +39,26 @@ namespace Sims2Tools.Clipboard
         {
             if (System.Windows.Clipboard.ContainsData(CollItemsListLabel))
             {
+                logger.Debug("Clipboard: Found TransferData");
                 TransferData clipTransferData = (TransferData)System.Windows.Clipboard.GetData(ClipboardHelper.CollItemsListLabel);
 
-                return !targetCollKey.Equals(clipTransferData.CollectionKey);
+                bool usable = !targetCollKey.Equals(clipTransferData.CollectionKey);
+
+                if (usable) logger.Debug("Clipboard: Originating from a different COLL");
+
+                return usable;
             }
 
             return false;
         }
-        public static List<DBPFKey> CollItems
+        public static AbstractCollListItems CollListItems
         {
             get
             {
-                ClipboardCollListItems clipCollListItems = new ClipboardCollListItems();
+                ClipboardCollListItems clipCollListItems = new ClipboardCollListItems(Sim2ToolsAppCodes.None);
                 clipCollListItems.ReadFromClipboard();
 
-                return clipCollListItems.CollItems;
+                return clipCollListItems;
             }
         }
     }
@@ -83,7 +97,7 @@ namespace Sims2Tools.Clipboard
 
     public class ClipboardCollListItems : AbstractCollListItems
     {
-        public ClipboardCollListItems() : this(new DBPFKey(Coll.TYPE, DBPFData.GROUP_NULL, DBPFData.INSTANCE_NULL, DBPFData.RESOURCE_NULL))
+        public ClipboardCollListItems(Sim2ToolsAppCodes appCode) : this(new DBPFKey(Coll.TYPE, DBPFData.GROUP_NULL, DBPFData.INSTANCE_NULL, (TypeResourceID)(uint)appCode))
         {
         }
 
@@ -122,7 +136,7 @@ namespace Sims2Tools.Clipboard
 
     public class DropCollListItems : AbstractCollListItems
     {
-        public DropCollListItems() : this(new DBPFKey(Coll.TYPE, DBPFData.GROUP_NULL, DBPFData.INSTANCE_NULL, DBPFData.RESOURCE_NULL))
+        public DropCollListItems(Sim2ToolsAppCodes appCode) : this(new DBPFKey(Coll.TYPE, DBPFData.GROUP_NULL, DBPFData.INSTANCE_NULL, (TypeResourceID)(uint)appCode))
         { 
         }
 

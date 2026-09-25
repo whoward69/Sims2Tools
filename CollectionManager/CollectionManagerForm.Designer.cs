@@ -558,95 +558,95 @@ namespace CollectionManager
             this.menuItemTabContextClose,
             this.menuItemTabContextCloseAll});
             this.menuContextTab.Name = "menuContextTab";
-            this.menuContextTab.Size = new System.Drawing.Size(181, 254);
+            this.menuContextTab.Size = new System.Drawing.Size(174, 232);
             this.menuContextTab.Text = "Tab Options";
             this.menuContextTab.Opening += new System.ComponentModel.CancelEventHandler(this.OnTab_Opening);
             // 
             // menuItemTabContextFloat
             // 
             this.menuItemTabContextFloat.Name = "menuItemTabContextFloat";
-            this.menuItemTabContextFloat.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextFloat.Size = new System.Drawing.Size(173, 22);
             this.menuItemTabContextFloat.Text = "&Float";
             this.menuItemTabContextFloat.Click += new System.EventHandler(this.OnTab_Float);
             // 
             // sep1ContextMenuItem
             // 
             this.sep1ContextMenuItem.Name = "sep1ContextMenuItem";
-            this.sep1ContextMenuItem.Size = new System.Drawing.Size(177, 6);
+            this.sep1ContextMenuItem.Size = new System.Drawing.Size(170, 6);
             // 
             // menuItemTabContextSave
             // 
             this.menuItemTabContextSave.Name = "menuItemTabContextSave";
-            this.menuItemTabContextSave.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextSave.Size = new System.Drawing.Size(173, 22);
             this.menuItemTabContextSave.Text = "&Save";
             this.menuItemTabContextSave.Click += new System.EventHandler(this.OnTab_Save);
             // 
             // menuItemTabContextSaveAs
             // 
             this.menuItemTabContextSaveAs.Name = "menuItemTabContextSaveAs";
-            this.menuItemTabContextSaveAs.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextSaveAs.Size = new System.Drawing.Size(173, 22);
             this.menuItemTabContextSaveAs.Text = "Save As...";
             this.menuItemTabContextSaveAs.Click += new System.EventHandler(this.OnTab_SaveAs);
             // 
             // menuItemTabContextSaveAll
             // 
             this.menuItemTabContextSaveAll.Name = "menuItemTabContextSaveAll";
-            this.menuItemTabContextSaveAll.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextSaveAll.Size = new System.Drawing.Size(173, 22);
             this.menuItemTabContextSaveAll.Text = "Save All";
             this.menuItemTabContextSaveAll.Click += new System.EventHandler(this.OnTab_SaveAll);
             // 
             // toolStripSeparator13
             // 
             this.toolStripSeparator13.Name = "toolStripSeparator13";
-            this.toolStripSeparator13.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator13.Size = new System.Drawing.Size(170, 6);
             // 
             // menuItemTabContextChangeIcon
             // 
             this.menuItemTabContextChangeIcon.Name = "menuItemTabContextChangeIcon";
-            this.menuItemTabContextChangeIcon.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextChangeIcon.Size = new System.Drawing.Size(173, 22);
             this.menuItemTabContextChangeIcon.Text = "Change &Icon...";
             this.menuItemTabContextChangeIcon.Click += new System.EventHandler(this.OnTab_ChangeIcon);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(170, 6);
             // 
             // menuItemTabContextRenamePackage
             // 
             this.menuItemTabContextRenamePackage.Name = "menuItemTabContextRenamePackage";
-            this.menuItemTabContextRenamePackage.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextRenamePackage.Size = new System.Drawing.Size(173, 22);
             this.menuItemTabContextRenamePackage.Text = "&Rename Package...";
             this.menuItemTabContextRenamePackage.Click += new System.EventHandler(this.OnCollection_RenamePackage);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(170, 6);
             // 
             // menuItemTabContextDelete
             // 
             this.menuItemTabContextDelete.Name = "menuItemTabContextDelete";
-            this.menuItemTabContextDelete.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextDelete.Size = new System.Drawing.Size(173, 22);
             this.menuItemTabContextDelete.Text = "Delete";
             this.menuItemTabContextDelete.Click += new System.EventHandler(this.OnTab_Delete);
             // 
             // toolStripSeparator10
             // 
             this.toolStripSeparator10.Name = "toolStripSeparator10";
-            this.toolStripSeparator10.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator10.Size = new System.Drawing.Size(170, 6);
             // 
             // menuItemTabContextClose
             // 
             this.menuItemTabContextClose.Name = "menuItemTabContextClose";
-            this.menuItemTabContextClose.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextClose.Size = new System.Drawing.Size(173, 22);
             this.menuItemTabContextClose.Text = "&Close Tab";
             this.menuItemTabContextClose.Click += new System.EventHandler(this.OnTab_Close);
             // 
             // menuItemTabContextCloseAll
             // 
             this.menuItemTabContextCloseAll.Name = "menuItemTabContextCloseAll";
-            this.menuItemTabContextCloseAll.Size = new System.Drawing.Size(180, 22);
+            this.menuItemTabContextCloseAll.Size = new System.Drawing.Size(173, 22);
             this.menuItemTabContextCloseAll.Text = "Close &All Tabs";
             this.menuItemTabContextCloseAll.Click += new System.EventHandler(this.OnTab_CloseAll);
             // 

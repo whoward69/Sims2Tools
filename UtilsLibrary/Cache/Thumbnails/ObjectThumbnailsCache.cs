@@ -19,6 +19,7 @@ using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DBPF.XROF;
 using Sims2Tools.DbpfCache;
+using System;
 using System.Drawing;
 using System.IO;
 using static Sims2Tools.DBPF.Data.MetaData;
@@ -56,33 +57,51 @@ namespace Sims2Tools.Cache.Thumbnails
             return thumb;
         }
 
-        private Image GetObjectThumbnail(CacheableDbpfFile package, Objd objd)
+        public static DBPFKey GetObjectThumbnailKey(string packagePath, Objd objd, Str models)
         {
-            Image thumb = null;
+            DBPFKey thumbKey = null;
 
-            Str str = (Str)package.GetResourceByTGIR(Hashes.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
-
-            if (str != null)
+            if (models != null)
             {
-                int modelIndex = objd.GetRawData(ObjdIndex.DefaultGraphic);
-                string cresname = str.LanguageItems(Languages.Default)[modelIndex].Title;
-                TypeGroupID groupId = objd.GroupID;
-
-                if (groupId == DBPFData.GROUP_LOCAL)
+                try
                 {
-                    FileInfo fi = new FileInfo(package.PackagePath);
-                    groupId = Hashes.GroupIDHash(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
+                    int modelIndex = objd.GetRawData(ObjdIndex.DefaultGraphic);
+                    string cresname = models.LanguageItems(Languages.Default)[modelIndex].Title;
+                    TypeGroupID groupId = objd.GroupID;
+
+                    if (groupId == DBPFData.GROUP_LOCAL)
+                    {
+                        FileInfo fi = new FileInfo(packagePath);
+                        groupId = Hashes.GroupIDHash(fi.Name.Substring(0, fi.Name.Length - fi.Extension.Length));
+                    }
+
+                    TypeInstanceID thumbInstanceID = (TypeInstanceID)Hashes.ThumbnailHash(groupId, cresname);
+                    TypeResourceID thumbResourceID = (TypeResourceID)groupId.AsUInt();
+                    thumbKey = new DBPFKey(Thub.TYPES[(int)Thub.ThubTypeIndex.Object], DBPFData.GROUP_LOCAL, thumbInstanceID, thumbResourceID);
                 }
-
-                TypeInstanceID thumbInstanceID = (TypeInstanceID)Hashes.ThumbnailHash(groupId, cresname);
-                TypeResourceID thumbResourceID = (TypeResourceID)groupId.AsUInt();
-                DBPFKey thumbKey = new DBPFKey(Thub.TYPES[(int)Thub.ThubTypeIndex.Object], DBPFData.GROUP_LOCAL, thumbInstanceID, thumbResourceID);
-
-                thumb = buyCache.GetThumbnail(thumbKey) ??
-                        buildCache.GetThumbnail(thumbKey);
+                catch (Exception)
+                {
+                }
             }
 
-            return thumb;
+            return thumbKey;
+        }
+
+        public Image GetObjectThumbnail(DBPFKey thumbKey)
+        {
+            if (thumbKey != null)
+            {
+                return buyCache.GetThumbnail(thumbKey) ?? buildCache.GetThumbnail(thumbKey);
+            }
+
+            return null;
+        }
+
+        private Image GetObjectThumbnail(CacheableDbpfFile package, Objd objd)
+        {
+            Str models = (Str)package.GetResourceByTGIR(Hashes.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
+
+            return GetObjectThumbnail(GetObjectThumbnailKey(package.PackagePath, objd, models));
         }
 
         private Image GetBuildThumbnail(Cpf cpf)

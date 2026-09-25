@@ -82,5 +82,17 @@ namespace CollectionManager.Properties {
                 this["DragBackground"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int ThumbnailTimerDelayMilliSec {
+            get {
+                return ((int)(this["ThumbnailTimerDelayMilliSec"]));
+            }
+            set {
+                this["ThumbnailTimerDelayMilliSec"] = value;
+            }
+        }
     }
 }

@@ -17,10 +17,10 @@ namespace CollectionManager
         public static readonly string AppName = "Collection Manager";
 
         public static readonly int AppVersionMajor = 0;
-        public static readonly int AppVersionMinor = 3;
+        public static readonly int AppVersionMinor = 5;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 4;
+        private static readonly int AppVersionDebug = 0;
 #endif
 
         private static readonly string AppVersionType = "a"; // a - alpha, b - beta, r - release

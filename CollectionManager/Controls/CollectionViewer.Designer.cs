@@ -68,6 +68,7 @@ namespace CollectionManager.Controls
             this.btnSave = new System.Windows.Forms.Button();
             this.toolTipViewer = new System.Windows.Forms.ToolTip(this.components);
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.timerThumbnail = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictCollIcon)).BeginInit();
             this.menuContextIcon.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridCollItems)).BeginInit();
@@ -181,11 +182,11 @@ namespace CollectionManager.Controls
             this.gridCollItems.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridCollItems.Size = new System.Drawing.Size(594, 305);
             this.gridCollItems.TabIndex = 6;
-            this.gridCollItems.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OnCellMouseDown);
-            this.gridCollItems.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
-            this.gridCollItems.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
-            this.gridCollItems.CellMouseMove += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OnCellMouseMove);
-            this.gridCollItems.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OnCellMouseUp);
+            this.gridCollItems.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OnCellMouseDown_GridCollItems);
+            this.gridCollItems.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter_GridCollItems);
+            this.gridCollItems.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave_GridCollItems);
+            this.gridCollItems.CellMouseMove += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OnCellMouseMove_GridCollItems);
+            this.gridCollItems.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OnCellMouseUp_GridCollItems);
             this.gridCollItems.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop_GridCollItems);
             this.gridCollItems.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter_GridCollItems);
             // 
@@ -349,7 +350,6 @@ namespace CollectionManager.Controls
             this.btnSave.Size = new System.Drawing.Size(50, 20);
             this.btnSave.TabIndex = 26;
             this.btnSave.Text = "Save";
-            this.toolTipViewer.SetToolTip(this.btnSave, "Shift-click for Save All, Ctrl-click for Save As");
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.OnSaveClicked);
             // 
@@ -357,6 +357,11 @@ namespace CollectionManager.Controls
             // 
             this.saveAsFileDialog.Filter = "DBPF Package|*.package";
             this.saveAsFileDialog.Title = "Save As ...";
+            // 
+            // timerThumbnail
+            // 
+            this.timerThumbnail.Interval = 500;
+            this.timerThumbnail.Tick += new System.EventHandler(this.OnTimerTick_Thumbnail);
             // 
             // CollectionViewer
             // 
@@ -410,5 +415,6 @@ namespace CollectionManager.Controls
         private System.Windows.Forms.SaveFileDialog saveAsFileDialog;
         private System.Windows.Forms.ToolStripMenuItem menuItemIconContextChangeIcon;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.Timer timerThumbnail;
     }
 }

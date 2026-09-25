@@ -17,5 +17,8 @@
     <Setting Name="DragBackground" Type="System.String" Scope="User">
       <Value Profile="(Default)">LightGray</Value>
     </Setting>
+    <Setting Name="ThumbnailTimerDelayMilliSec" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

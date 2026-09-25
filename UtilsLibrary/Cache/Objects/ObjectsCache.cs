@@ -6,6 +6,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CTSS;
 using Sims2Tools.DBPF.OBJD;
@@ -30,7 +31,6 @@ namespace Sims2Tools.Cache.Objects
         private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly DBPFKey resKey;
-        private readonly string resPackagePath;
 
         private readonly TypeGUID resGuid;
         private uint resGuidHash;
@@ -39,8 +39,9 @@ namespace Sims2Tools.Cache.Objects
         private readonly string resTitle = null;
         private readonly string resDesc = null;
 
+        private readonly DBPFKey thumbKey = null;
+
         public DBPFKey ResKey => resKey;
-        public string ResPackagePath => resPackagePath;
 
         public TypeGUID ResGuid => resGuid;
         public uint ResGuidHash => resGuidHash;
@@ -49,7 +50,9 @@ namespace Sims2Tools.Cache.Objects
         public string ResTitle => resTitle;
         public string ResDesc => resDesc;
 
-        public ObjectData(Objd objd, Str str, string packagePath) : this(str, packagePath)
+        public DBPFKey ThumbKey => thumbKey;
+
+        public ObjectData(string packagePath, Objd objd, Ctss ctss, Str models) : this(ctss)
         {
             resKey = new DBPFKey(objd);
 
@@ -57,9 +60,11 @@ namespace Sims2Tools.Cache.Objects
             CalcGuidHash();
 
             resName = objd.KeyName;
+
+            thumbKey = ObjectThumbnailsCache.GetObjectThumbnailKey(packagePath, objd, models);
         }
 
-        public ObjectData(Xobj xobj, Str str, string packagePath) : this(str, packagePath)
+        public ObjectData(Xobj xobj, Str str) : this(str)
         {
             resKey = new DBPFKey(xobj);
 
@@ -69,10 +74,8 @@ namespace Sims2Tools.Cache.Objects
             resName = xobj.Name;
         }
 
-        private ObjectData(Str str, string packagePath)
+        private ObjectData(Str str)
         {
-            resPackagePath = packagePath;
-
             List<StrItem> defLang = str?.LanguageItems(DBPF.Data.MetaData.Languages.Default);
             if (defLang != null)
             {
@@ -95,27 +98,40 @@ namespace Sims2Tools.Cache.Objects
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("version", 1);
+            info.AddValue("version", 2);
 
             info.AddValue("resKeyT", resKey.TypeID.AsUInt());
             info.AddValue("resKeyG", resKey.GroupID.AsUInt());
             info.AddValue("resKeyR", resKey.ResourceID.AsUInt());
             info.AddValue("resKeyI", resKey.InstanceID.AsUInt());
-            info.AddValue("resPackagePath", resPackagePath);
 
             info.AddValue("resName", resName);
             info.AddValue("resGuid", resGuid.AsUInt());
 
             info.AddValue("resTitle", resTitle);
             info.AddValue("resDesc", resDesc);
+
+            if (thumbKey != null)
+            {
+                info.AddValue("thumbKeyT", thumbKey.TypeID.AsUInt());
+                info.AddValue("thumbKeyG", thumbKey.GroupID.AsUInt());
+                info.AddValue("thumbKeyR", thumbKey.ResourceID.AsUInt());
+                info.AddValue("thumbKeyI", thumbKey.InstanceID.AsUInt());
+            }
+            else
+            {
+                info.AddValue("thumbKeyT", 0);
+                info.AddValue("thumbKeyG", 0);
+                info.AddValue("thumbKeyR", 0);
+                info.AddValue("thumbKeyI", 0);
+            }
         }
 
         protected ObjectData(SerializationInfo info, StreamingContext context)
         {
-            // int version = info.GetInt32("version");
+            int version = info.GetInt32("version");
 
             resKey = new DBPFKey((TypeTypeID)info.GetUInt32("resKeyT"), (TypeGroupID)info.GetUInt32("resKeyG"), (TypeInstanceID)info.GetUInt32("resKeyI"), (TypeResourceID)info.GetUInt32("resKeyR"));
-            resPackagePath = info.GetString("resPackagePath");
 
             resName = info.GetString("resName");
             resGuid = (TypeGUID)info.GetUInt32("resGuid");
@@ -123,6 +139,16 @@ namespace Sims2Tools.Cache.Objects
 
             resTitle = info.GetString("resTitle");
             resDesc = info.GetString("resDesc");
+
+            if (version >= 2)
+            {
+                uint thumbType = info.GetUInt32("thumbKeyT");
+
+                if (thumbType != 0)
+                {
+                    thumbKey = new DBPFKey((TypeTypeID)thumbType, (TypeGroupID)info.GetUInt32("thumbKeyG"), (TypeInstanceID)info.GetUInt32("thumbKeyI"), (TypeResourceID)info.GetUInt32("thumbKeyR"));
+                }
+            }
         }
     }
 
@@ -290,12 +316,14 @@ namespace Sims2Tools.Cache.Objects
         {
             Dictionary<TypeGUID, ObjectData> cache = new Dictionary<TypeGUID, ObjectData>();
 
-            double progress = 0.0;
-            double delta = 100.0 / Sims2ToolsLib.Sims2PathsInReverseLoadOrder.Length;
+            double mainProgress = 0.0;
+            double mainDelta = 100.0 / Sims2ToolsLib.Sims2PathsInReverseLoadOrder.Length;
 
             string lastPackagePath = null;
 
+#if !DEBUG
             try
+#endif
             {
                 foreach (string pathKey in Sims2ToolsLib.Sims2PathsInReverseLoadOrder)
                 {
@@ -303,7 +331,12 @@ namespace Sims2Tools.Cache.Objects
 
                     if (Directory.Exists(baseFolder))
                     {
-                        foreach (string packagePath in Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories))
+                        string[] files = Directory.GetFiles(baseFolder, "*.package", SearchOption.AllDirectories);
+
+                        double loopProgress = mainProgress;
+                        double loopDelta = mainDelta / files.Length;
+
+                        foreach (string packagePath in files)
                         {
                             lastPackagePath = packagePath;
 
@@ -312,11 +345,16 @@ namespace Sims2Tools.Cache.Objects
                                 break;
                             }
 
-                            sender.SetProgress((int)progress, $"{pathKey}: {packagePath.Substring(baseFolder.Length + 1)}");
+                            sender.SetProgress((int)loopProgress, $"{pathKey}: {packagePath.Substring(baseFolder.Length + 1)}");
 
                             using (DBPFFile package = new DBPFFile(packagePath))
                             {
-                                foreach (DBPFEntry entry in package.GetEntriesByType(Objd.TYPE))
+                                List<DBPFEntry> entries = package.GetEntriesByType(Objd.TYPE);
+
+                                double objdDelta = 100.0 / entries.Count;
+                                double objdProgress = objdDelta;
+
+                                foreach (DBPFEntry entry in entries)
                                 {
                                     if (sender.CancellationPending)
                                     {
@@ -325,15 +363,20 @@ namespace Sims2Tools.Cache.Objects
 
                                     Objd objd = (Objd)package.GetResourceByEntry(entry);
 
+                                    sender.SetSubProgress((int)objdProgress);
+
                                     if (cache.ContainsKey(objd.Guid))
                                     {
                                         continue;
                                     }
 
                                     Ctss ctss = (Ctss)package.GetResourceByKey(new DBPFKey(Ctss.TYPE, entry.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
+                                    Str models = (Str)package.GetResourceByTGIR(Hashes.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
 
-                                    ObjectData data = new ObjectData(objd, ctss, packagePath);
+                                    ObjectData data = new ObjectData(package.PackagePath, objd, ctss, models);
                                     cache.Add(data.ResGuid, data);
+
+                                    objdProgress += objdDelta;
                                 }
 
                                 foreach (DBPFEntry entry in package.GetEntriesByType(Xobj.TYPE))
@@ -353,22 +396,26 @@ namespace Sims2Tools.Cache.Objects
                                     Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
                                     Str str = (Str)package.GetResourceByKey(IdrHelper.StringSetKey(xobj, idr));
 
-                                    ObjectData data = new ObjectData(xobj, str, packagePath);
+                                    ObjectData data = new ObjectData(xobj, str);
                                     cache.Add(data.ResGuid, data);
                                 }
 
                                 package.Close();
                             }
+
+                            loopProgress += loopDelta;
                         }
                     }
 
-                    progress += delta;
+                    mainProgress += mainDelta;
                 }
             }
+#if !DEBUG
             catch (Exception)
             {
                 errorPackagePath = lastPackagePath;
             }
+#endif
 
             return cache;
         }
@@ -394,7 +441,9 @@ namespace Sims2Tools.Cache.Objects
 
             string lastPackagePath = null;
 
+#if !DEBUG
             try
+#endif
             {
                 foreach (string packagePath in downloadPaths)
                 {
@@ -412,10 +461,12 @@ namespace Sims2Tools.Cache.Objects
                     progress += delta;
                 }
             }
+#if !DEBUG
             catch (Exception)
             {
                 errorPackagePath = lastPackagePath;
             }
+#endif
 
             return cache;
         }
@@ -435,8 +486,9 @@ namespace Sims2Tools.Cache.Objects
                     }
 
                     Ctss ctss = (Ctss)package.GetResourceByKey(new DBPFKey(Ctss.TYPE, entry.GroupID, (TypeInstanceID)objd.GetRawData(ObjdIndex.CatalogueStringsId), DBPFData.RESOURCE_NULL));
+                    Str models = (Str)package.GetResourceByTGIR(Hashes.TGIRHash((TypeInstanceID)0x00000085, DBPFData.RESOURCE_NULL, Str.TYPE, objd.GroupID));
 
-                    ObjectData data = new ObjectData(objd, ctss, packagePath);
+                    ObjectData data = new ObjectData(package.PackagePath, objd, ctss, models);
                     cache.Add(data.ResGuid, data);
                 }
 
@@ -453,7 +505,7 @@ namespace Sims2Tools.Cache.Objects
                     Idr idr = (Idr)package.GetResourceByKey(new DBPFKey(Idr.TYPE, entry));
                     Str str = (Str)package.GetResourceByKey(IdrHelper.StringSetKey(xobj, idr));
 
-                    ObjectData data = new ObjectData(xobj, str, packagePath);
+                    ObjectData data = new ObjectData(xobj, str);
                     cache.Add(data.ResGuid, data);
                 }
 

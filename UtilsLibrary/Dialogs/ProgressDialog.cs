@@ -56,6 +56,11 @@ namespace Sims2Tools.Dialogs
             backgroundWorker.ReportProgress(Math.Min(100, Math.Max(0, percent)), status);
         }
 
+        public void SetSubProgress(int percent)
+        {
+            backgroundWorker.ReportProgress(-Math.Min(100, Math.Max(0, percent)));
+        }
+
         private void OnLoad(object sender, EventArgs e)
         {
             Result = null;
@@ -84,10 +89,23 @@ namespace Sims2Tools.Dialogs
 
         private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            progressBar.Value = Math.Min(e.ProgressPercentage, 100);
+            if (e.ProgressPercentage >= 0)
+            {
+                progressBar.Value = Math.Min(e.ProgressPercentage, 100);
 
-            if (e.UserState != null && !backgroundWorker.CancellationPending)
-                progressBar.CustomText = e.UserState.ToString();
+                if (e.UserState != null && !backgroundWorker.CancellationPending)
+                {
+                    progressBar.CustomText = e.UserState.ToString();
+                }
+
+                progressSubBar.Visible = false;
+            }
+            else
+            {
+                progressSubBar.Value = Math.Min(-e.ProgressPercentage, 100);
+
+                progressSubBar.Visible = true;
+            }
         }
 
         private void BackgroundWorker_Completed(object sender, RunWorkerCompletedEventArgs e)

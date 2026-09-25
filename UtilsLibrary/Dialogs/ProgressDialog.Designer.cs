@@ -40,6 +40,7 @@ namespace Sims2Tools.Dialogs
             this.btnProgressCancel = new System.Windows.Forms.Button();
             this.progressBar = new Sims2Tools.Controls.TextProgressBar();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.progressSubBar = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // btnProgressCancel
@@ -74,17 +75,26 @@ namespace Sims2Tools.Dialogs
             this.backgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundWorker_ProgressChanged);
             this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundWorker_Completed);
             // 
-            // Sims2ToolsProgressDialog
+            // progressSubBar
+            // 
+            this.progressSubBar.Location = new System.Drawing.Point(44, 60);
+            this.progressSubBar.Name = "progressSubBar";
+            this.progressSubBar.Size = new System.Drawing.Size(519, 10);
+            this.progressSubBar.TabIndex = 3;
+            this.progressSubBar.Visible = false;
+            // 
+            // ProgressDialog
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
             this.ClientSize = new System.Drawing.Size(606, 135);
+            this.Controls.Add(this.progressSubBar);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.btnProgressCancel);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "Sims2ToolsProgressDialog";
+            this.Name = "ProgressDialog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Progress";
             this.Load += new System.EventHandler(this.OnLoad);
@@ -97,5 +107,6 @@ namespace Sims2Tools.Dialogs
         private System.Windows.Forms.Button btnProgressCancel;
         private Controls.TextProgressBar progressBar;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
+        private System.Windows.Forms.ProgressBar progressSubBar;
     }
 }

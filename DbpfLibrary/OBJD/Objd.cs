@@ -178,10 +178,12 @@ namespace Sims2Tools.DBPF.OBJD
                 int nameLen = reader.ReadInt32();
                 string name = Helper.ToString(reader.ReadBytes(nameLen));
 
+                /*
                 if (!name.Substring(0, Math.Min(KeyName.Length, name.Length)).Equals(KeyName))
                 {
                     logger.Debug($"{name} differs from {KeyName}");
                 }
+                */
             }
             else
             {
