@@ -281,7 +281,7 @@ namespace RepositoryWizard
 
         public Binx CloneBinx(TypeGroupID newGroupID)
         {
-            Binx cloneBinx = new Binx(new DBPFEntry(binx.TypeID, newGroupID, binx.InstanceID, binx.ResourceID));
+            Binx cloneBinx = new Binx(new DBPFKey(binx.TypeID, newGroupID, binx.InstanceID, binx.ResourceID));
 
             cloneBinx.AddItems(binx.CloneItems());
 
@@ -303,7 +303,7 @@ namespace RepositoryWizard
 
             if (cpf is Gzps)
             {
-                cloneCpf = new Gzps(new DBPFEntry(cpf.TypeID, newGroupID, cpf.InstanceID, cpf.ResourceID));
+                cloneCpf = new Gzps(new DBPFKey(cpf.TypeID, newGroupID, cpf.InstanceID, cpf.ResourceID));
             }
 
             cloneCpf?.AddItems(cpf.CloneItems());

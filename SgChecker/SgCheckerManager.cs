@@ -107,6 +107,8 @@ namespace SgChecker
                                     else if (neededKey.TypeID == (TypeTypeID)0x69DA3F9F || neededKey.TypeID == (TypeTypeID)0xE9DA450E)
                                     {
                                         // Don't know what these are, but they are common in "collections of objects"
+                                        // 0x69DA3F9F is an "OBJD GUID reference" (with the GUID in the instance)
+                                        // 0xE9DA450E is probably some way to reference XOBJ/XFNC (but doesn't seem to be by guid or TGI)
                                     }
                                     else
                                     {

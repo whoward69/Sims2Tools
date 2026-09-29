@@ -76,6 +76,7 @@ namespace DbpfLister
             // btnCopy
             // 
             this.btnCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCopy.Enabled = false;
             this.btnCopy.Location = new System.Drawing.Point(620, 409);
             this.btnCopy.Name = "btnCopy";
             this.btnCopy.Size = new System.Drawing.Size(81, 29);

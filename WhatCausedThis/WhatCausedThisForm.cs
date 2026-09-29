@@ -17,6 +17,7 @@ using Sims2Tools.DBPF.NREF;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.Dialogs;
+using Sims2Tools.DragDrop;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -466,9 +467,7 @@ namespace WhatCausedThis
 
         private void TextErrorText_DragEnter(object sender, DragEventArgs e)
         {
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -484,9 +483,7 @@ namespace WhatCausedThis
 
         private void TextErrorText_DragDrop(object sender, DragEventArgs e)
         {
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 

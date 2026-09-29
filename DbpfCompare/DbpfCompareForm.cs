@@ -7,7 +7,6 @@
  */
 
 using DbpfCompare.Controls;
-using Sims2Tools;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.BCON;
@@ -50,6 +49,7 @@ using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DBPF.XROF;
 using Sims2Tools.DBPF.XWNT;
 using Sims2Tools.Dialogs;
+using Sims2Tools.DragDrop;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -547,9 +547,7 @@ namespace DbpfCompare
 
             Regex rePackageName = new Regex(@"\.((package((\.V[1-9][0-9]*)?\.bak)?)|(bak|temp))$");
 
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -570,9 +568,7 @@ namespace DbpfCompare
         {
             if (IsDirty) return;
 
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 

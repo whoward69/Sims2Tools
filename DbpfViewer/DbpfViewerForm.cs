@@ -28,6 +28,7 @@ using Sims2Tools.DBPF.TTAS;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DBPF.VERS;
 using Sims2Tools.Dialogs;
+using Sims2Tools.DragDrop;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -927,9 +928,7 @@ namespace DbpfViewer
 
         private void OnDragEnter(object sender, DragEventArgs e)
         {
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -956,9 +955,7 @@ namespace DbpfViewer
 
         private void OnDragDrop(object sender, DragEventArgs e)
         {
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 

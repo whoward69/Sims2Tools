@@ -12,7 +12,7 @@
 #region Usings
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
-using Sims2Tools.Cache;
+using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
@@ -36,6 +36,7 @@ using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
+using Sims2Tools.DragDrop;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.NamedValue;
 using Sims2Tools.Utils.Persistence;
@@ -2885,12 +2886,12 @@ namespace RepositoryWizard
             idr.SetItem(gzps.GetItem("shapekeyidx").UIntegerValue, clothingMesh.ShpeKey);
 
             // Change GZPS ref to new GZPS
-            idr.SetItem(binx.ObjectIdx, new DBPFKey(gzps));
+            idr.SetItem(binx.GetItem("objectidx").UIntegerValue, new DBPFKey(gzps));
 
             // Change STR# ref to new STR# (optional)
             if (str != null)
             {
-                idr.SetItem(binx.StringSetIdx, new DBPFKey(str));
+                idr.SetItem(binx.GetItem("stringsetidx").UIntegerValue, new DBPFKey(str));
             }
 
             dbpfPackage.Commit(idr);
@@ -3307,9 +3308,7 @@ namespace RepositoryWizard
         {
             if (rootFolder == null)
             {
-                DataObject data = e.Data as DataObject;
-
-                if (data.ContainsFileDropList())
+                if (DragDropHelper.ContainsDragFileList(e.Data))
                 {
                     string[] folders = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -3328,9 +3327,7 @@ namespace RepositoryWizard
         {
             if (rootFolder == null)
             {
-                DataObject data = e.Data as DataObject;
-
-                if (data.ContainsFileDropList())
+                if (DragDropHelper.ContainsDragFileList(e.Data))
                 {
                     string[] folders = (string[])e.Data.GetData(DataFormats.FileDrop);
 
