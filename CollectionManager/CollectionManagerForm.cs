@@ -24,6 +24,7 @@ using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
+using Sims2Tools.DragDrop;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -469,6 +470,9 @@ namespace CollectionManager
 
         public int GetMouseDropOffset(bool upwards)
         {
+            // Always after unless in Advanced Mode
+            if (!IsAdvancedMode) return 1;
+
             if (upwards)
             {
                 if (menuItemMouseDropAfter.Checked) return 1;
@@ -502,6 +506,8 @@ namespace CollectionManager
 
             menuItemCachingUpdateMaxisClothes.Text = DataCache.CacheExists(DataCache.CacheClothesPath, DataCache.MaxisClothingFilename) ? "Update Maxis Clothing Cache" : "Create Maxis Clothing Cache";
             menuItemCachingUpdateCustomClothes.Text = DataCache.CacheExists(DataCache.CacheClothesPath, DataCache.CustomClothingFilename) ? "Update Custom Clothing Cache" : "Create Custom Clothing Cache";
+
+            toolStripSeparatorRemoveThumbnailsCache.Visible = menuItemCachingRemoveThumbnails.Visible = IsAdvancedMode;
         }
 
         private void OnCachingUpdateMaxisObjects(object sender, EventArgs e)
@@ -773,17 +779,20 @@ namespace CollectionManager
 
                 string collectionFilePath = collectionViewer.CollectionFilePath;
 
-                tabControl.TabPages.Remove(tabControl.SelectedTab);
-
                 CollectionViewerForm floatForm = new CollectionViewerForm(this, collectionFilePath);
 
-                formsByPath.Add(collectionFilePath, floatForm);
-                pathsByForm.Add(floatForm, collectionFilePath);
+                if (floatForm.IsValid)
+                {
+                    tabControl.TabPages.Remove(tabControl.SelectedTab);
 
-                menuWindows.Enabled = (formsByPath.Count > 0);
+                    formsByPath.Add(collectionFilePath, floatForm);
+                    pathsByForm.Add(floatForm, collectionFilePath);
 
-                floatForm.Show();
-                floatForm.Location = new Point(this.Location.X + 60, this.Location.Y + 100);
+                    menuWindows.Enabled = (formsByPath.Count > 0);
+
+                    floatForm.Show();
+                    floatForm.Location = new Point(this.Location.X + 60, this.Location.Y + 100);
+                }
             }
         }
 
@@ -907,7 +916,9 @@ namespace CollectionManager
 
             if (canOpen)
             {
-                CreateViewer(inTab || tabControl.TabCount == 0, collectionFilePath, sequence);
+                bool isValid = CreateViewer(inTab || tabControl.TabCount == 0, collectionFilePath, sequence);
+
+                if (!isValid) canOpen = false;
             }
 
             return canOpen;
@@ -993,30 +1004,46 @@ namespace CollectionManager
             }
         }
 
-        private void CreateViewer(bool inTab, string collectionFilePath, int sequence)
+        private bool CreateViewer(bool inTab, string collectionFilePath, int sequence)
         {
+            bool isValid;
+
             if (inTab)
             {
-                tabControl.Controls.Add(new CollectionViewerTab(collectionFilePath));
-                tabControl.SelectedIndex = tabControl.TabCount - 1;
+                CollectionViewerTab collViewerTab = new CollectionViewerTab(collectionFilePath);
+
+                if (collViewerTab.IsValid)
+                {
+                    tabControl.Controls.Add(collViewerTab);
+                    tabControl.SelectedIndex = tabControl.TabCount - 1;
+                }
+
+                isValid = collViewerTab.IsValid;
             }
             else
             {
                 CollectionViewerForm floatForm = new CollectionViewerForm(this, collectionFilePath);
 
-                formsByPath.Add(collectionFilePath, floatForm);
-                pathsByForm.Add(floatForm, collectionFilePath);
+                if (floatForm.IsValid)
+                {
+                    formsByPath.Add(collectionFilePath, floatForm);
+                    pathsByForm.Add(floatForm, collectionFilePath);
 
-                floatForm.Show();
+                    floatForm.Show();
 
-                Point location = new Point(this.Location.X + 60, this.Location.Y + 100);
-                int xOffset = ((sequence % 10) * 40) + ((sequence / 10) * 40);
-                int yOffset = ((sequence % 10) * 40);
-                location.Offset(xOffset, yOffset);
-                floatForm.Location = location;
+                    Point location = new Point(this.Location.X + 60, this.Location.Y + 100);
+                    int xOffset = ((sequence % 10) * 40) + ((sequence / 10) * 40);
+                    int yOffset = ((sequence % 10) * 40);
+                    location.Offset(xOffset, yOffset);
+                    floatForm.Location = location;
+                }
+
+                isValid = floatForm.IsValid;
             }
 
             menuWindows.Enabled = (formsByPath.Count > 0);
+
+            return isValid;
         }
 
         public void SaveCollection(CollectionViewer collectionViewer)
@@ -1071,7 +1098,7 @@ namespace CollectionManager
         #region Drag And Drop
         private void OnDragEnter_TabControl(object sender, DragEventArgs e)
         {
-            if (e.Data is DataObject data && data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -1098,9 +1125,7 @@ namespace CollectionManager
 
         private void OnDragDrop_TabControl(object sender, DragEventArgs e)
         {
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 

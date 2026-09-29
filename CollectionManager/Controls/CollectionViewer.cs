@@ -34,6 +34,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -96,6 +97,9 @@ namespace CollectionManager.Controls
 
         private readonly OpenFileDialog selectFileDialog;
 
+        private bool isValid = false;
+        public bool IsValid => isValid;
+
         private bool isPreHashed = false;
         private bool needsFullReindex = false;
 
@@ -115,7 +119,7 @@ namespace CollectionManager.Controls
 
                 if (value != null)
                 {
-                    Reload();
+                    isValid = Reload();
                 }
             }
         }
@@ -156,7 +160,9 @@ namespace CollectionManager.Controls
 
             if (Sims2ToolsLib.IsRunningOnWindows)
             {
-                gridCollItems.MouseDown += new MouseEventHandler(this.OnMouseDown_CollItemsGrid);
+                this.gridCollItems.CellMouseDown += new DataGridViewCellMouseEventHandler(this.OnCellMouseDown_GridCollItems);
+                this.gridCollItems.CellMouseUp += new DataGridViewCellMouseEventHandler(this.OnCellMouseUp_GridCollItems);
+                this.gridCollItems.MouseUp += new MouseEventHandler(this.OnMouseUp_GridCollItems);
             }
 
             gridCollItems.DataSource = dataCollItems;
@@ -207,40 +213,48 @@ namespace CollectionManager.Controls
 
         #region Collection Loading
         private bool ignoreChanges = false;
-        public void Reload()
+        public bool Reload()
         {
-            ignoreChanges = true;
-
-            CommitNeededChanges();
-
             try
             {
-                Coll coll = null;
-                Str str = null;
-                Img img = null;
+                ignoreChanges = true;
 
-                string packageName;
+                CommitNeededChanges();
 
-                using (CacheableDbpfFile package = packageCache.OpenForReadOnly(collectionFilePath))
+                try
                 {
-                    packageName = package.PackageName;
+                    Coll coll = null;
+                    Str str = null;
+                    Img img = null;
 
-                    collectionKey = GetCollKey(package);
+                    string packageName;
 
-                    if (collectionKey != null)
+                    using (CacheableDbpfFile package = packageCache.OpenForReadOnly(collectionFilePath))
                     {
-                        coll = GetCollResource(package, collectionKey, out Idr idrForColl);
-                        str = GetStrResource(package, coll, idrForColl);
-                        img = GetImgResource(package, coll, idrForColl);
+                        packageName = package.PackageName;
+
+                        collectionKey = GetCollKey(package);
+
+                        if (collectionKey != null)
+                        {
+                            coll = GetCollResource(package, collectionKey, out Idr idrForColl);
+                            str = GetStrResource(package, coll, idrForColl);
+                            img = GetImgResource(package, coll, idrForColl);
+                        }
+
+                        _isDirty = package.IsDirty;
+
+                        package.Close();
                     }
 
-                    _isDirty = package.IsDirty;
+                    string type = coll?.GetItem("type")?.StringValue;
 
-                    package.Close();
-                }
+                    if (type == null || !(type.Equals("collection") || type.Equals("communitylotcollection") || type.Equals("lotcollection") || type.Equals("clothing")))
+                    {
+                        MsgBox.Show($"{packageName} doesn't appear to contain a collection.", "Collection Load Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        return false;
+                    }
 
-                if (collectionKey != null)
-                {
                     if (str == null || img == null)
                     {
                         if (RepairPrehashes())
@@ -261,6 +275,7 @@ namespace CollectionManager.Controls
                         else
                         {
                             MsgBox.Show($"{packageName} appears to be broken.\r\nIt was probably renamed manually.", "Collection Load Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            return false;
                         }
                     }
 
@@ -311,16 +326,20 @@ namespace CollectionManager.Controls
                         }
                     }
                 }
+                catch (IOException ex)
+                {
+                    logger.Error(ex.Message);
+                    logger.Info(ex.StackTrace);
+                }
+
+                UpdateSaveState();
             }
-            catch (IOException ex)
+            finally
             {
-                logger.Error(ex.Message);
-                logger.Info(ex.StackTrace);
+                ignoreChanges = false;
             }
 
-            UpdateSaveState();
-
-            ignoreChanges = false;
+            return true;
         }
 
         private void ReloadCollItems(CacheableDbpfFile package)
@@ -1062,65 +1081,73 @@ namespace CollectionManager.Controls
 
         private void OnCollItems_Opening(object sender, CancelEventArgs e)
         {
-            if (gridCollItems.Rows.Count < 1)
+            // We hijack shift-right-click and ctrl-right-click, so only open the context menu on a normal right-click
+            if (Form.ModifierKeys == Keys.None)
             {
-                menuItemCollContextClipboardAfter.Text = "Paste From Clipboard";
-                menuItemCollContextClipboardAfter.Enabled = ClipboardIsUsable();
+                if (gridCollItems.Rows.Count < 1)
+                {
+                    menuItemCollContextClipboardAfter.Text = "Paste From Clipboard";
+                    menuItemCollContextClipboardAfter.Enabled = ClipboardIsUsable();
 
-                menuItemCollContextClipboardBefore.Visible = false;
+                    menuItemCollContextClipboardBefore.Visible = false;
 
-                menuItemCollContextClipboardCopyTo.Enabled = false;
+                    menuItemCollContextClipboardCopyTo.Enabled = false;
 
-                menuItemCollContextBefore.Enabled = menuItemCollContextAfter.Enabled = false;
-                menuItemCollContextDelete.Enabled = false;
+                    menuItemCollContextBefore.Enabled = menuItemCollContextAfter.Enabled = false;
+                    menuItemCollContextDelete.Enabled = false;
+                }
+                else
+                {
+                    // Bail early if the mouse is not over any row
+                    if (mouseRowIndex == -1)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+
+                    // Figure out what was right-clicked over
+                    bool overSelected = false;
+                    bool anySelected = false;
+                    foreach (DataGridViewRow mouseRow in gridCollItems.SelectedRows)
+                    {
+                        if (mouseRowIndex == mouseRow.Index)
+                        {
+                            overSelected = true;
+                        }
+
+                        anySelected = true;
+                    }
+
+                    // Some rows have to be selected
+                    {
+                        menuItemCollContextClipboardCopyTo.Enabled = anySelected;
+                    }
+
+                    // Mouse has to be over any row
+                    {
+                        menuItemCollContextClipboardAfter.Text = "Paste From Clipboard AFTER";
+                        menuItemCollContextClipboardAfter.Enabled = ClipboardIsUsable();
+
+                        menuItemCollContextClipboardBefore.Visible = true;
+                        menuItemCollContextClipboardBefore.Enabled = menuItemCollContextClipboardAfter.Enabled;
+                    }
+
+                    // Mouse has to be over a selected row
+                    {
+                        menuItemCollContextClipboardCopyTo.Enabled = overSelected;
+
+                        menuItemCollContextDelete.Enabled = overSelected;
+                    }
+
+                    // Mouse has to NOT be over a selected row
+                    {
+                        menuItemCollContextAfter.Enabled = menuItemCollContextBefore.Enabled = !overSelected && anySelected;
+                    }
+                }
             }
             else
             {
-                // Bail early if the mouse is not over any row
-                if (mouseRowIndex == -1)
-                {
-                    e.Cancel = true;
-                    return;
-                }
-
-                // Figure out what was right-clicked over
-                bool overSelected = false;
-                bool anySelected = false;
-                foreach (DataGridViewRow mouseRow in gridCollItems.SelectedRows)
-                {
-                    if (mouseRowIndex == mouseRow.Index)
-                    {
-                        overSelected = true;
-                    }
-
-                    anySelected = true;
-                }
-
-                // Some rows have to be selected
-                {
-                    menuItemCollContextClipboardCopyTo.Enabled = anySelected;
-                }
-
-                // Mouse has to be over any row
-                {
-                    menuItemCollContextClipboardAfter.Text = "Paste From Clipboard AFTER";
-                    menuItemCollContextClipboardAfter.Enabled = ClipboardIsUsable();
-
-                    menuItemCollContextClipboardBefore.Visible = true;
-                    menuItemCollContextClipboardBefore.Enabled = menuItemCollContextClipboardAfter.Enabled;
-                }
-
-                // Mouse has to be over a selected row
-                {
-                    menuItemCollContextClipboardCopyTo.Enabled = overSelected;
-
-                    menuItemCollContextDelete.Enabled = overSelected;
-                }
-
-                // Mouse has to NOT be over a selected row
-                {
-                    menuItemCollContextAfter.Enabled = menuItemCollContextBefore.Enabled = !overSelected && anySelected;
-                }
+                e.Cancel = true;
             }
         }
 
@@ -1405,16 +1432,55 @@ namespace CollectionManager.Controls
         #endregion
 
         #region Reorder Rows (by drag and drop)
-        // TODO - Collection Manager - items drag-and-drop - check all this logic
-        private bool isLeftMouseDown = false;
-        private Point leftButtonDownAt;
+        private bool isRightMouseDown = false;
+        private Point buttonDownAt;
+        private bool isDragging = false;
         private int dragRowIndex = -1;
         private Label dragLabel = null;
 
         private void OnCellMouseDown_GridCollItems(object sender, DataGridViewCellMouseEventArgs e)
         {
-            isLeftMouseDown = ((e.Button & MouseButtons.Left) == MouseButtons.Left);
-            if (isLeftMouseDown) leftButtonDownAt = e.Location;
+            isRightMouseDown = ((e.Button & MouseButtons.Right) == MouseButtons.Right);
+
+            buttonDownAt = e.Location;
+        }
+
+        private void OnCellMouseUp_GridCollItems(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            // Dragging to reorder items within the collection
+            if (dragLabel != null)
+            {
+                if (e.RowIndex >= 0 && dragRowIndex >= 0)
+                {
+                    DBPFKey inViewItemKey = (gridCollItems.Rows[e.RowIndex].Cells["colItemKey"].Value as DBPFKey);
+
+                    MoveDraggedRows(e.RowIndex);
+
+                    BringIntoView(inViewItemKey);
+                }
+                else
+                {
+                    UnhighlightDragRows();
+                }
+
+                dragLabel?.Dispose();
+                dragLabel = null;
+            }
+
+            isRightMouseDown = isDragging = false;
+        }
+
+        private void OnMouseUp_GridCollItems(object sender, MouseEventArgs e)
+        {
+            if (dragLabel != null)
+            {
+                UnhighlightDragRows();
+
+                dragLabel?.Dispose();
+                dragLabel = null;
+            }
+
+            isRightMouseDown = isDragging = false;
         }
 
         private void OnCellMouseMove_GridCollItems(object sender, DataGridViewCellMouseEventArgs e)
@@ -1433,33 +1499,56 @@ namespace CollectionManager.Controls
             // Bail early if not over an item
             if (e.ColumnIndex < 0 || e.RowIndex < 0) return;
 
-            // Is this the start of a drag operation?
-            if (isLeftMouseDown && dragLabel == null)
+            if (dragLabel == null)
             {
-                int xDelta = Math.Abs(e.Location.X - leftButtonDownAt.X);
-                int yDelta = Math.Abs(e.Location.Y - leftButtonDownAt.Y);
+                // Has the mouse moved far enough to count?
+                int xDelta = Math.Abs(e.Location.X - buttonDownAt.X);
+                int yDelta = Math.Abs(e.Location.Y - buttonDownAt.Y);
 
                 if (xDelta >= System.Windows.SystemParameters.MinimumHorizontalDragDistance || yDelta >= System.Windows.SystemParameters.MinimumVerticalDragDistance)
                 {
-                    dragRowIndex = e.RowIndex;
-
-                    GetSelectedRows();
-                    PreDragRows();
-
-                    dragLabel = new Label
+                    if (!isDragging && isRightMouseDown && ((Form.ModifierKeys & Keys.Control) == Keys.Control))
                     {
-                        Parent = gridCollItems,
-                        AutoSize = true,
-                        Text = gridCollItems[2, e.RowIndex].Value.ToString()
-                    };
+                        // Is this the start of a ctrl-right-drag to copy operation?
+                        DropCollListItems dropListItems = new DropCollListItems(collectionKey);
 
-                    if (moveRowLow != moveRowHigh)
-                    {
-                        int others = moveRowHigh - moveRowLow;
-                        dragLabel.Text += $" + {others} other{(others == 1 ? "" : "s")}";
+                        foreach (DataGridViewRow selectedRow in gridCollItems.SelectedRows)
+                        {
+                            DBPFKey itemKey = selectedRow.Cells["colItemKey"].Value as DBPFKey;
+
+                            dropListItems.AddItem(selectedRow.Index, itemKey);
+                        }
+
+                        DoDragDrop(dropListItems.GetDragData(), DragDropEffects.Copy);
+                        isDragging = true;
                     }
+                    else if (dragLabel == null && isRightMouseDown && ((Form.ModifierKeys & Keys.Shift) == Keys.Shift))
+                    {
+                        // Is this the start of a drag to move operation?
+                        dragRowIndex = e.RowIndex;
 
-                    thumbBox.Visible = false;
+                        GetSelectedRows();
+
+                        if (dragRowIndex >= moveRowLow && dragRowIndex <= moveRowHigh)
+                        {
+                            PreDragRows();
+
+                            dragLabel = new Label
+                            {
+                                Parent = gridCollItems,
+                                AutoSize = true,
+                                Text = gridCollItems[2, e.RowIndex].Value.ToString()
+                            };
+
+                            if (moveRowLow != moveRowHigh)
+                            {
+                                int others = moveRowHigh - moveRowLow;
+                                dragLabel.Text += $" + {others} other{(others == 1 ? "" : "s")}";
+                            }
+
+                            thumbBox.Visible = false;
+                        }
+                    }
                 }
             }
 
@@ -1467,34 +1556,7 @@ namespace CollectionManager.Controls
             {
                 Rectangle r = gridCollItems.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
                 dragLabel.Location = new Point(r.Left + e.Location.X, r.Bottom);
-
-                // TODO - Collection Manager - do we really need this?
-                // HighlightDragRows();
             }
-        }
-
-        private void OnCellMouseUp_GridCollItems(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            // Dragging to reorder items within the collection
-            if (dragLabel != null)
-            {
-                if (e.RowIndex >= 0)
-                {
-                    if (dragRowIndex >= 0)
-                    {
-                        DBPFKey inViewItemKey = (gridCollItems.Rows[e.RowIndex].Cells["colItemKey"].Value as DBPFKey);
-
-                        MoveDraggedRows(e.RowIndex);
-
-                        BringIntoView(inViewItemKey);
-                    }
-                }
-
-                dragLabel?.Dispose();
-                dragLabel = null;
-            }
-
-            isLeftMouseDown = false;
         }
 
         private void MoveRow(int fromIndex, int toIndex)
@@ -1658,9 +1720,7 @@ namespace CollectionManager.Controls
         {
             Regex reImageName = new Regex(@"\.(png|jpg|jpeg|bmp|gif|tif|tiff)$");
 
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -1686,9 +1746,7 @@ namespace CollectionManager.Controls
 
         private void OnDragDrop_Icon(object sender, DragEventArgs e)
         {
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -1701,27 +1759,6 @@ namespace CollectionManager.Controls
         #endregion
 
         #region Drag Drop (Collection Items)
-        // TODO - Collection Manager - why do we use both MouseDown and CellMouseDown events?
-        private void OnMouseDown_CollItemsGrid(object sender, MouseEventArgs e)
-        {
-            // TODO - Collection Manager - items drag-and-drop
-            return;
-
-            if (e.Button == MouseButtons.Left)
-            {
-                DropCollListItems dropListItems = new DropCollListItems(collectionKey);
-
-                foreach (DataGridViewRow selectedRow in gridCollItems.SelectedRows)
-                {
-                    DBPFKey itemKey = selectedRow.Cells["colItemKey"].Value as DBPFKey;
-
-                    dropListItems.AddItem(selectedRow.Index, itemKey);
-                }
-
-                DoDragDrop(dropListItems.GetDragData(), DragDropEffects.Copy);
-            }
-        }
-
         private void OnDragEnter_GridCollItems(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DragDropHelper.DragItemListLabel, false))
@@ -1785,9 +1822,7 @@ namespace CollectionManager.Controls
             }
             else
             {
-                DataObject data = e.Data as DataObject;
-
-                if (data.ContainsFileDropList())
+                if (DragDropHelper.ContainsDragFileList(e.Data))
                 {
                     logger.Debug($"DragDrop: Dragging .package files");
                     string[] fileList = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -1815,6 +1850,11 @@ namespace CollectionManager.Controls
             }
         }
 
+        private void OnDragLeave_GridCollItems(object sender, EventArgs e)
+        {
+            isDragging = false;
+        }
+
         private void OnDragDrop_GridCollItems(object sender, DragEventArgs e)
         {
             IDataObject dataObject = e.Data;
@@ -1825,30 +1865,37 @@ namespace CollectionManager.Controls
 
             DBPFKey inViewItemKey = (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
 
-            if (DragDropHelper.ContainsDragItemList(dataObject))
+            try
             {
-                DropCollListItems dropListItems = new DropCollListItems(dataObject);
+                Cursor.Current = Cursors.WaitCursor;
 
-                AddItems(dropListItems, GetMainForm().GetMouseDropOffset(false));
-
-                BringIntoView(inViewItemKey);
-            }
-            else
-            {
-                DataObject data = e.Data as DataObject;
-
-                if (data.ContainsFileDropList())
+                if (DragDropHelper.ContainsDragItemList(dataObject))
                 {
-                    logger.Debug($"DragDrop: Dropping .package files");
-                    string[] fileList = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    DropCollListItems dropListItems = new DropCollListItems(dataObject);
 
-                    if (fileList != null)
+                    AddItems(dropListItems, GetMainForm().GetMouseDropOffset(false));
+
+                    BringIntoView(inViewItemKey);
+                }
+                else
+                {
+                    if (DragDropHelper.ContainsDragFileList(e.Data))
                     {
-                        AddItems(fileList, GetMainForm().GetMouseDropOffset(false));
+                        logger.Debug($"DragDrop: Dropping .package files");
+                        string[] fileList = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                        BringIntoView(inViewItemKey);
+                        if (fileList != null)
+                        {
+                            AddItems(fileList, GetMainForm().GetMouseDropOffset(false));
+
+                            BringIntoView(inViewItemKey);
+                        }
                     }
                 }
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
             }
         }
 
@@ -1905,8 +1952,6 @@ namespace CollectionManager.Controls
                 uint instanceID = GetNextIdrInstance(collPackage);
 
                 int startRowIndex = (mouseRowIndex == -1) ? 0 : (mouseRowIndex + targetOffset);
-                // TODO - Collection Manager - already fixed a bug in this line
-                // int sortindex = startRowIndex + 1;
                 int sortindex = startRowIndex;
 
                 if (!IsClothingCollection && !IsObjectCollection)
@@ -1939,8 +1984,6 @@ namespace CollectionManager.Controls
 
                 if (added)
                 {
-                    // TODO - Collection Manager - already fixed a bug in this line with "from index"
-                    // ReindexRows(startRowIndex + targetOffset, gridCollItems.Rows.Count - 1, sortindex);
                     ReindexRows(startRowIndex, gridCollItems.Rows.Count - 1, sortindex);
                 }
 
@@ -2009,8 +2052,6 @@ namespace CollectionManager.Controls
 
                 if (added)
                 {
-                    // TODO - Collection Manager - already fixed a bug in this line with "from index"
-                    // ReindexRows(startRowIndex + targetOffset, gridCollItems.Rows.Count - 1, sortindex);
                     ReindexRows(startRowIndex, gridCollItems.Rows.Count - 1, sortindex);
                 }
 

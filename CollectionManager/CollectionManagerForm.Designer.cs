@@ -87,7 +87,7 @@ namespace CollectionManager
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemCachingUpdateMaxisClothes = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCachingUpdateCustomClothes = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparatorRemoveThumbnailsCache = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemCachingRemoveThumbnails = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.selectFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -463,7 +463,7 @@ namespace CollectionManager
             this.toolStripSeparator4,
             this.menuItemCachingUpdateMaxisClothes,
             this.menuItemCachingUpdateCustomClothes,
-            this.toolStripSeparator7,
+            this.toolStripSeparatorRemoveThumbnailsCache,
             this.menuItemCachingRemoveThumbnails});
             this.menuCaching.Name = "menuCaching";
             this.menuCaching.Size = new System.Drawing.Size(63, 20);
@@ -503,10 +503,10 @@ namespace CollectionManager
             this.menuItemCachingUpdateCustomClothes.Text = "Update Custom Clothing Cache";
             this.menuItemCachingUpdateCustomClothes.Click += new System.EventHandler(this.OnCachingUpdateCustomOutfits);
             // 
-            // toolStripSeparator7
+            // toolStripSeparatorRemoveThumbnailsCache
             // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(239, 6);
+            this.toolStripSeparatorRemoveThumbnailsCache.Name = "toolStripSeparatorRemoveThumbnailsCache";
+            this.toolStripSeparatorRemoveThumbnailsCache.Size = new System.Drawing.Size(239, 6);
             // 
             // menuItemCachingRemoveThumbnails
             // 
@@ -702,7 +702,7 @@ namespace CollectionManager
         private System.Windows.Forms.ToolStripMenuItem menuCaching;
         private System.Windows.Forms.ToolStripMenuItem menuItemCachingUpdateMaxisClothes;
         private System.Windows.Forms.ToolStripMenuItem menuItemCachingUpdateCustomClothes;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorRemoveThumbnailsCache;
         private System.Windows.Forms.ToolStripMenuItem menuItemCachingRemoveThumbnails;
         private System.Windows.Forms.ToolStripMenuItem menuItemCachingUpdateMaxisObjects;
         private System.Windows.Forms.ToolStripMenuItem menuItemCachingUpdateCustomObjects;

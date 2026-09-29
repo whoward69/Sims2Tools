@@ -37,6 +37,7 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemViewerSave = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemViewerSaveAs = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemViewerSaveAll = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemViewerClose = new System.Windows.Forms.ToolStripMenuItem();
             this.collectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,7 +47,6 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.meuItemCollectionDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.panelForm = new System.Windows.Forms.Panel();
-            this.menuItemViewerSaveAll = new System.Windows.Forms.ToolStripMenuItem();
             this.menuCollectionViewerForm.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -118,6 +118,13 @@
             this.menuItemViewerSaveAs.Text = "Save As...";
             this.menuItemViewerSaveAs.Click += new System.EventHandler(this.OnWindow_SaveAs);
             // 
+            // menuItemViewerSaveAll
+            // 
+            this.menuItemViewerSaveAll.Name = "menuItemViewerSaveAll";
+            this.menuItemViewerSaveAll.Size = new System.Drawing.Size(196, 22);
+            this.menuItemViewerSaveAll.Text = "Save All";
+            this.menuItemViewerSaveAll.Click += new System.EventHandler(this.OnWindow_SaveAll);
+            // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
@@ -146,31 +153,31 @@
             // meuItemCollectionChangeIcon
             // 
             this.meuItemCollectionChangeIcon.Name = "meuItemCollectionChangeIcon";
-            this.meuItemCollectionChangeIcon.Size = new System.Drawing.Size(164, 22);
+            this.meuItemCollectionChangeIcon.Size = new System.Drawing.Size(180, 22);
             this.meuItemCollectionChangeIcon.Text = "Change Icon...";
             this.meuItemCollectionChangeIcon.Click += new System.EventHandler(this.OnCollection_ChangeIcon);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(161, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
             // 
             // meuItemCollectionRenamePackage
             // 
             this.meuItemCollectionRenamePackage.Name = "meuItemCollectionRenamePackage";
-            this.meuItemCollectionRenamePackage.Size = new System.Drawing.Size(164, 22);
+            this.meuItemCollectionRenamePackage.Size = new System.Drawing.Size(180, 22);
             this.meuItemCollectionRenamePackage.Text = "Rename Package";
             this.meuItemCollectionRenamePackage.Click += new System.EventHandler(this.OnCollection_RenamePackage);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(161, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
             // 
             // meuItemCollectionDelete
             // 
             this.meuItemCollectionDelete.Name = "meuItemCollectionDelete";
-            this.meuItemCollectionDelete.Size = new System.Drawing.Size(164, 22);
+            this.meuItemCollectionDelete.Size = new System.Drawing.Size(180, 22);
             this.meuItemCollectionDelete.Text = "Delete";
             this.meuItemCollectionDelete.Click += new System.EventHandler(this.OnCollection_Delete);
             // 
@@ -181,13 +188,6 @@
             this.panelForm.Name = "panelForm";
             this.panelForm.Size = new System.Drawing.Size(584, 287);
             this.panelForm.TabIndex = 2;
-            // 
-            // menuItemViewerSaveAll
-            // 
-            this.menuItemViewerSaveAll.Name = "menuItemViewerSaveAll";
-            this.menuItemViewerSaveAll.Size = new System.Drawing.Size(196, 22);
-            this.menuItemViewerSaveAll.Text = "Save All";
-            this.menuItemViewerSaveAll.Click += new System.EventHandler(this.OnWindow_SaveAll);
             // 
             // CollectionViewerForm
             // 

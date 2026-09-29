@@ -23,6 +23,8 @@ namespace CollectionManager.Controls
         private readonly CollectionViewer collectionViewer;
         public CollectionViewer CollectionViewer => collectionViewer;
 
+        public bool IsValid => collectionViewer.IsValid;
+
         private bool beingDocked = false;
 
         public CollectionViewerForm(CollectionManagerForm managerForm, string collectionFilePath)

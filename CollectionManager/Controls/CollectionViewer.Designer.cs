@@ -182,13 +182,12 @@ namespace CollectionManager.Controls
             this.gridCollItems.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridCollItems.Size = new System.Drawing.Size(594, 305);
             this.gridCollItems.TabIndex = 6;
-            this.gridCollItems.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OnCellMouseDown_GridCollItems);
             this.gridCollItems.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter_GridCollItems);
             this.gridCollItems.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave_GridCollItems);
             this.gridCollItems.CellMouseMove += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OnCellMouseMove_GridCollItems);
-            this.gridCollItems.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OnCellMouseUp_GridCollItems);
             this.gridCollItems.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDragDrop_GridCollItems);
             this.gridCollItems.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDragEnter_GridCollItems);
+            this.gridCollItems.DragLeave += new System.EventHandler(this.OnDragLeave_GridCollItems);
             // 
             // colSort
             // 
