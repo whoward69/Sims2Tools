@@ -6,6 +6,7 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using Sims2Tools.Cache.Hood;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.Images.IMG;
 using Sims2Tools.DBPF.Images.JPG;
@@ -13,6 +14,7 @@ using Sims2Tools.DBPF.Neighbourhood;
 using Sims2Tools.DBPF.Neighbourhood.FAMI;
 using Sims2Tools.DBPF.Neighbourhood.IDNO;
 using Sims2Tools.DBPF.Neighbourhood.LTXT;
+using Sims2Tools.DBPF.Neighbourhood.NGBH;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
 using Sims2Tools.DBPF.Utils;
@@ -63,12 +65,14 @@ namespace FamilyManager
     }
 
     [System.ComponentModel.DesignerCategory("")]
-    public class FamilyGridData : DataTable
+    public class MemberGridData : DataTable
     {
-        public FamilyGridData()
+        public MemberGridData()
         {
             // Must match the order in the DataGridView control
             this.Columns.Add(new DataColumn("FirstName", typeof(string)));
+
+            this.Columns.Add(new DataColumn("PlasticSurgery", typeof(string)));
             this.Columns.Add(new DataColumn("SplitFile", typeof(string)));
 
             this.Columns.Add(new DataColumn("Gender", typeof(string)));
@@ -76,12 +80,13 @@ namespace FamilyManager
             this.Columns.Add(new DataColumn("Age", typeof(string)));
             this.Columns.Add(new DataColumn("AgeCode", typeof(string)));
             this.Columns.Add(new DataColumn("DaysLeft", typeof(int)));
+            this.Columns.Add(new DataColumn("Earnings", typeof(int)));
 
             this.Columns.Add(new DataColumn("GenderHex", typeof(uint)));
             this.Columns.Add(new DataColumn("AgeHex", typeof(uint)));
 
             this.Columns.Add(new DataColumn("Thumbnail", typeof(object)));
-            this.Columns.Add(new DataColumn("Data", typeof(object)));
+            this.Columns.Add(new DataColumn("MemberInfo", typeof(object)));
         }
     }
 
@@ -126,19 +131,17 @@ namespace FamilyManager
 
     public class HoodTreeNode : TreeNode
     {
-        private readonly string packagePath;
-        private readonly string hoodBaseFolder;
-        private readonly string hoodSubFolder;
+        private readonly HoodData hoodData;
 
-        public string PackagePath => packagePath;
-        public string HoodBaseFolder => hoodBaseFolder;
-        public string HoodSubFolder => hoodSubFolder;
+        public HoodData HoodData => hoodData;
 
-        public HoodTreeNode(string packagePath, string hoodBaseFolder, string hoodSubFolder, string hoodName) : base(hoodName)
+        public string PackagePath => hoodData.PackagePath;
+        public string HoodBaseFolder => hoodData.BaseFolder;
+        public string HoodSubFolder => hoodData.SubFolder;
+
+        public HoodTreeNode(string packagePath, string baseFolder, string subFolder, string name) : base(name)
         {
-            this.packagePath = packagePath;
-            this.hoodBaseFolder = hoodBaseFolder;
-            this.hoodSubFolder = hoodSubFolder;
+            hoodData = new HoodData(packagePath, baseFolder, subFolder);
         }
     }
 
@@ -536,6 +539,70 @@ namespace FamilyManager
         public ReadOnlyCollection<uint> FamilyMembers
         {
             get => new List<uint>(familyMembers).AsReadOnly();
+        }
+
+        public bool HasMagazineSub(string token)
+        {
+            Ngbh ngbh = GetNgbh();
+
+            if (ngbh != null)
+            {
+                NgbhFamilyInventory famInv = ngbh.FamilyInventory(fami.InstanceID.AsUInt());
+
+                if (famInv != null)
+                {
+                    ReadOnlyCollection<NgbhInventoryToken> tokens = famInv.FindTokensByGuid(new ScriptValue(token));
+
+                    return (tokens.Count == 1);
+                }
+            }
+
+            return false;
+        }
+
+        public void SetHasMagazineSub(string token, bool value)
+        {
+            if (HasMagazineSub(token) != value)
+            {
+                using (CacheableDbpfFile hoodPackage = packageCache.OpenForUpdate(famiPackagePath))
+                {
+                    Ngbh ngbh = (Ngbh)hoodPackage.GetResourceByKey(new DBPFKey(Ngbh.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000001, DBPFData.RESOURCE_NULL));
+
+                    NgbhFamilyInventory famInv = ngbh.FamilyInventory(fami.InstanceID.AsUInt());
+
+                    if (famInv != null)
+                    {
+                        if (value)
+                        {
+                            famInv.AddToken(new ScriptValue(token), false, 0, new ushort[0]);
+                        }
+                        else
+                        {
+                            famInv.RemoveTokensByGuid(new ScriptValue(token));
+                        }
+
+                        hoodPackage.Commit(ngbh);
+                    }
+
+                    hoodPackage.Close();
+                }
+            }
+        }
+
+        private Ngbh currentNgbh = null;
+        private Ngbh GetNgbh()
+        {
+            if (currentNgbh == null)
+            {
+                using (CacheableDbpfFile hoodPackage = packageCache.OpenForReadOnly(famiPackagePath))
+                {
+                    currentNgbh = (Ngbh)hoodPackage.GetResourceByKey(new DBPFKey(Ngbh.TYPE, DBPFData.GROUP_LOCAL, (TypeInstanceID)0x00000001, DBPFData.RESOURCE_NULL));
+
+                    hoodPackage.Close();
+                }
+            }
+
+            return currentNgbh;
         }
     }
 

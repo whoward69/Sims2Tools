@@ -17,10 +17,10 @@ namespace FamilyManager
         public static readonly string AppName = "Family Manager";
 
         public static readonly int AppVersionMajor = 1;
-        public static readonly int AppVersionMinor = 5;
+        public static readonly int AppVersionMinor = 6;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 0;
+        private static readonly int AppVersionDebug = 1;
 #endif
 
         private static readonly string AppVersionType = "b"; // a - alpha, b - beta, r - release

@@ -137,7 +137,7 @@ namespace Sims2Tools.Clipboard
     public class DropCollListItems : AbstractCollListItems
     {
         public DropCollListItems(Sim2ToolsAppCodes appCode) : this(new DBPFKey(Coll.TYPE, DBPFData.GROUP_NULL, DBPFData.INSTANCE_NULL, (TypeResourceID)(uint)appCode))
-        { 
+        {
         }
 
         public DropCollListItems(DBPFKey collKey)
@@ -147,7 +147,7 @@ namespace Sims2Tools.Clipboard
 
         public DropCollListItems(System.Windows.Forms.IDataObject dataObject)
         {
-            TransferData dropTransferData = DragDropHelper.GetObjectData<TransferData> (dataObject, DragDropHelper.DragItemListLabel);
+            TransferData dropTransferData = DragDropHelper.GetObjectData<TransferData>(dataObject, DragDropHelper.DragItemListLabel);
 
             CollKey = dropTransferData.CollectionKey;
 

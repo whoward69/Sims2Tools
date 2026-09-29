@@ -10,7 +10,6 @@ using Sims2Tools.Controls;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
-using Sims2Tools.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -138,10 +138,13 @@
   <metadata name="colDaysLeft.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <metadata name="colEarnings.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <metadata name="colThumbnail.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="colData.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="colMemberInfo.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="menuContextMembers.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -306,10 +309,98 @@
   <metadata name="menuContextSafe.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>1123, 17</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="btnHobbyLotTinker.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnHobbyLotSport.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnHobbyLotSecret.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnHobbyLotMusic.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnHobbyLotGames.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnHobbyLotFitness.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnHobbyLotFilm.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnHobbyLotNature.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnHobbyLotArts.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnHobbyLotScience.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
+  <data name="btnHobbyLotCuisine.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAANCAYAAACgu+4kAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        cgAADnIB6yf3TQAAAAd0SU1FB+oJAw4yOdxFrqgAAAB6SURBVDhPpZKxDQAhCACdy8KCZSxdwYLSgiWc
+        0w/mJS95DcbiTAC5gNHlnN0N/YgxNu+9mRBCSyk1EXBSm3fUWrvELOAGfWfEU6BH/ebHmlvBimsBEdlW
+        +IObAUAmKKXIWibBW+t1RJzexSzQHAlWTILTn8hwjwhueABuIFCRknOf7wAAAABJRU5ErkJggg==
+</value>
+  </data>
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>1444, 17</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="btnVacGenPlaneThree.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6/NlyAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO

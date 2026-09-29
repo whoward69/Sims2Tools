@@ -58,6 +58,8 @@ namespace FamilyManager
             this.menuItemAutoBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.menuOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemUseCodes = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparatorPlasticSurgery = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemShowPlasticSurgery = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparatorSplitFiles = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemShowSplitFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemHighlightSplitFiles = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,16 +94,18 @@ namespace FamilyManager
             this.imageFamily = new System.Windows.Forms.PictureBox();
             this.gridFamilyMembers = new System.Windows.Forms.DataGridView();
             this.colFirstName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colPlasticSurgery = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colSplitFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colGender = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colGenderCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAge = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAgeCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colDaysLeft = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colEarnings = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colGenderHex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colAgeHex = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colThumbnail = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colData = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMemberInfo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuContextMembers = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuContextMemberChangeSimName = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextMemberChangeFamilyName = new System.Windows.Forms.ToolStripMenuItem();
@@ -109,7 +113,10 @@ namespace FamilyManager
             this.menuContextMemberFilterAll = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextMemberFilterSelected = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextMemberFilterThis = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuContextMemberSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuContextMemberSeparatorPlasticSurgery = new System.Windows.Forms.ToolStripSeparator();
+            this.menuContextMemberRemovePlasticSurgery = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextMemberGeneticPlasticSurgery = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuContextMemberSeparatorSplitFiles = new System.Windows.Forms.ToolStripSeparator();
             this.menuContextMemberMergeSplitFiles = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPages = new System.Windows.Forms.TabControl();
             this.tabCensus = new System.Windows.Forms.TabPage();
@@ -138,8 +145,8 @@ namespace FamilyManager
             this.menuContextJewelboxMoveToSafe = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator12 = new System.Windows.Forms.ToolStripSeparator();
             this.menuContextJewelboxDelete = new System.Windows.Forms.ToolStripMenuItem();
-            this.tabFamily = new System.Windows.Forms.TabPage();
-            this.panelFamily = new System.Windows.Forms.Panel();
+            this.tabHousehold = new System.Windows.Forms.TabPage();
+            this.panelHousehold = new System.Windows.Forms.Panel();
             this.ckbFamilyNameSelected = new System.Windows.Forms.CheckBox();
             this.ckbFamilyNameSame = new System.Windows.Forms.CheckBox();
             this.ckbFamilyNameAll = new System.Windows.Forms.CheckBox();
@@ -156,6 +163,18 @@ namespace FamilyManager
             this.lblWriteUp = new System.Windows.Forms.Label();
             this.textFamilyMoney = new System.Windows.Forms.TextBox();
             this.lblMoney = new System.Windows.Forms.Label();
+            this.tabFamily = new System.Windows.Forms.TabPage();
+            this.grpMagazineSubs = new System.Windows.Forms.GroupBox();
+            this.ckbMagSubSports = new System.Windows.Forms.CheckBox();
+            this.ckbMagSubScience = new System.Windows.Forms.CheckBox();
+            this.ckbMagSubNature = new System.Windows.Forms.CheckBox();
+            this.ckbMagSubMusic = new System.Windows.Forms.CheckBox();
+            this.ckbMagSubLiterature = new System.Windows.Forms.CheckBox();
+            this.ckbMagSubGames = new System.Windows.Forms.CheckBox();
+            this.ckbMagSubFood = new System.Windows.Forms.CheckBox();
+            this.ckbMagSubFitness = new System.Windows.Forms.CheckBox();
+            this.ckbMagSubEngineering = new System.Windows.Forms.CheckBox();
+            this.ckbMagSubArts = new System.Windows.Forms.CheckBox();
             this.tabCloset = new System.Windows.Forms.TabPage();
             this.splitClosetLeftRight = new System.Windows.Forms.SplitContainer();
             this.gridSuitcase = new System.Windows.Forms.DataGridView();
@@ -467,6 +486,17 @@ namespace FamilyManager
             this.lblBadgeCosmetics = new System.Windows.Forms.Label();
             this.lblBadgeCashier = new System.Windows.Forms.Label();
             this.grpHobbies = new System.Windows.Forms.GroupBox();
+            this.btnHobbyLotTinker = new Sims2Tools.Controls.HobbyLotButton();
+            this.btnHobbyLotSport = new Sims2Tools.Controls.HobbyLotButton();
+            this.btnHobbyLotSecret = new Sims2Tools.Controls.HobbyLotButton();
+            this.btnHobbyLotMusic = new Sims2Tools.Controls.HobbyLotButton();
+            this.btnHobbyLotGames = new Sims2Tools.Controls.HobbyLotButton();
+            this.btnHobbyLotFitness = new Sims2Tools.Controls.HobbyLotButton();
+            this.btnHobbyLotFilm = new Sims2Tools.Controls.HobbyLotButton();
+            this.btnHobbyLotNature = new Sims2Tools.Controls.HobbyLotButton();
+            this.btnHobbyLotArts = new Sims2Tools.Controls.HobbyLotButton();
+            this.btnHobbyLotScience = new Sims2Tools.Controls.HobbyLotButton();
+            this.btnHobbyLotCuisine = new Sims2Tools.Controls.HobbyLotButton();
             this.trackHobbySport = new Sims2Tools.Controls.InterestTracker();
             this.trackHobbySecret = new Sims2Tools.Controls.InterestTracker();
             this.trackHobbyScience = new Sims2Tools.Controls.InterestTracker();
@@ -619,9 +649,11 @@ namespace FamilyManager
             this.tabCensus.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridCensus)).BeginInit();
             this.menuContextJewelbox.SuspendLayout();
-            this.tabFamily.SuspendLayout();
-            this.panelFamily.SuspendLayout();
+            this.tabHousehold.SuspendLayout();
+            this.panelHousehold.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imageHouse)).BeginInit();
+            this.tabFamily.SuspendLayout();
+            this.grpMagazineSubs.SuspendLayout();
             this.tabCloset.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitClosetLeftRight)).BeginInit();
             this.splitClosetLeftRight.Panel1.SuspendLayout();
@@ -788,6 +820,8 @@ namespace FamilyManager
             // 
             this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemUseCodes,
+            this.toolStripSeparatorPlasticSurgery,
+            this.menuItemShowPlasticSurgery,
             this.toolStripSeparatorSplitFiles,
             this.menuItemShowSplitFiles,
             this.menuItemHighlightSplitFiles,
@@ -811,6 +845,19 @@ namespace FamilyManager
             this.menuItemUseCodes.Size = new System.Drawing.Size(230, 22);
             this.menuItemUseCodes.Text = "Use Gender/Age Codes";
             this.menuItemUseCodes.Click += new System.EventHandler(this.OnUseCodesClicked);
+            // 
+            // toolStripSeparatorPlasticSurgery
+            // 
+            this.toolStripSeparatorPlasticSurgery.Name = "toolStripSeparatorPlasticSurgery";
+            this.toolStripSeparatorPlasticSurgery.Size = new System.Drawing.Size(227, 6);
+            // 
+            // menuItemShowPlasticSurgery
+            // 
+            this.menuItemShowPlasticSurgery.CheckOnClick = true;
+            this.menuItemShowPlasticSurgery.Name = "menuItemShowPlasticSurgery";
+            this.menuItemShowPlasticSurgery.Size = new System.Drawing.Size(230, 22);
+            this.menuItemShowPlasticSurgery.Text = "Show Plastic Surgery";
+            this.menuItemShowPlasticSurgery.Click += new System.EventHandler(this.OnShowPlasticSurgeryClicked);
             // 
             // toolStripSeparatorSplitFiles
             // 
@@ -1102,16 +1149,18 @@ namespace FamilyManager
             this.gridFamilyMembers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridFamilyMembers.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colFirstName,
+            this.colPlasticSurgery,
             this.colSplitFile,
             this.colGender,
             this.colGenderCode,
             this.colAge,
             this.colAgeCode,
             this.colDaysLeft,
+            this.colEarnings,
             this.colGenderHex,
             this.colAgeHex,
             this.colThumbnail,
-            this.colData});
+            this.colMemberInfo});
             this.gridFamilyMembers.ContextMenuStrip = this.menuContextMembers;
             this.gridFamilyMembers.Location = new System.Drawing.Point(0, 50);
             this.gridFamilyMembers.Name = "gridFamilyMembers";
@@ -1135,10 +1184,22 @@ namespace FamilyManager
             this.colFirstName.Name = "colFirstName";
             this.colFirstName.ReadOnly = true;
             // 
+            // colPlasticSurgery
+            // 
+            this.colPlasticSurgery.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colPlasticSurgery.DataPropertyName = "PlasticSurgery";
+            this.colPlasticSurgery.FillWeight = 50F;
+            this.colPlasticSurgery.HeaderText = "Surgery";
+            this.colPlasticSurgery.Name = "colPlasticSurgery";
+            this.colPlasticSurgery.ReadOnly = true;
+            this.colPlasticSurgery.ToolTipText = "Sim has had plastic surgery";
+            this.colPlasticSurgery.Width = 74;
+            // 
             // colSplitFile
             // 
             this.colSplitFile.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.colSplitFile.DataPropertyName = "SplitFile";
+            this.colSplitFile.FillWeight = 50F;
             this.colSplitFile.HeaderText = "Split";
             this.colSplitFile.Name = "colSplitFile";
             this.colSplitFile.ReadOnly = true;
@@ -1162,6 +1223,7 @@ namespace FamilyManager
             this.colGenderCode.HeaderText = "⚥";
             this.colGenderCode.Name = "colGenderCode";
             this.colGenderCode.ReadOnly = true;
+            this.colGenderCode.ToolTipText = "Gender";
             this.colGenderCode.Visible = false;
             // 
             // colAge
@@ -1185,12 +1247,24 @@ namespace FamilyManager
             // 
             // colDaysLeft
             // 
-            this.colDaysLeft.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colDaysLeft.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
             this.colDaysLeft.DataPropertyName = "DaysLeft";
             this.colDaysLeft.FillWeight = 75F;
             this.colDaysLeft.HeaderText = "Left";
             this.colDaysLeft.Name = "colDaysLeft";
             this.colDaysLeft.ReadOnly = true;
+            this.colDaysLeft.ToolTipText = "Days left in life stage";
+            this.colDaysLeft.Width = 52;
+            // 
+            // colEarnings
+            // 
+            this.colEarnings.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.colEarnings.DataPropertyName = "Earnings";
+            this.colEarnings.HeaderText = "$";
+            this.colEarnings.Name = "colEarnings";
+            this.colEarnings.ReadOnly = true;
+            this.colEarnings.ToolTipText = "Earnings";
+            this.colEarnings.Width = 39;
             // 
             // colGenderHex
             // 
@@ -1216,13 +1290,13 @@ namespace FamilyManager
             this.colThumbnail.ReadOnly = true;
             this.colThumbnail.Visible = false;
             // 
-            // colData
+            // colMemberInfo
             // 
-            this.colData.DataPropertyName = "Data";
-            this.colData.HeaderText = "Data";
-            this.colData.Name = "colData";
-            this.colData.ReadOnly = true;
-            this.colData.Visible = false;
+            this.colMemberInfo.DataPropertyName = "MemberInfo";
+            this.colMemberInfo.HeaderText = "Member Info";
+            this.colMemberInfo.Name = "colMemberInfo";
+            this.colMemberInfo.ReadOnly = true;
+            this.colMemberInfo.Visible = false;
             // 
             // menuContextMembers
             // 
@@ -1233,63 +1307,85 @@ namespace FamilyManager
             this.menuContextMemberFilterAll,
             this.menuContextMemberFilterSelected,
             this.menuContextMemberFilterThis,
-            this.menuContextMemberSeparator1,
+            this.menuContextMemberSeparatorPlasticSurgery,
+            this.menuContextMemberRemovePlasticSurgery,
+            this.menuContextMemberGeneticPlasticSurgery,
+            this.menuContextMemberSeparatorSplitFiles,
             this.menuContextMemberMergeSplitFiles});
             this.menuContextMembers.Name = "menuContextMembers";
-            this.menuContextMembers.Size = new System.Drawing.Size(223, 164);
+            this.menuContextMembers.Size = new System.Drawing.Size(227, 214);
             this.menuContextMembers.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMembersOpening);
             // 
             // menuContextMemberChangeSimName
             // 
             this.menuContextMemberChangeSimName.Name = "menuContextMemberChangeSimName";
-            this.menuContextMemberChangeSimName.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberChangeSimName.Size = new System.Drawing.Size(226, 22);
             this.menuContextMemberChangeSimName.Text = "Change This Sim\'s &Name";
             this.menuContextMemberChangeSimName.Click += new System.EventHandler(this.OnChangeSimNameClicked);
             // 
             // menuContextMemberChangeFamilyName
             // 
             this.menuContextMemberChangeFamilyName.Name = "menuContextMemberChangeFamilyName";
-            this.menuContextMemberChangeFamilyName.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberChangeFamilyName.Size = new System.Drawing.Size(226, 22);
             this.menuContextMemberChangeFamilyName.Text = "Change &Family Name";
             this.menuContextMemberChangeFamilyName.Click += new System.EventHandler(this.OnChangeFamilyNameClicked);
             // 
             // menuContextMemberChangeDays
             // 
             this.menuContextMemberChangeDays.Name = "menuContextMemberChangeDays";
-            this.menuContextMemberChangeDays.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberChangeDays.Size = new System.Drawing.Size(226, 22);
             this.menuContextMemberChangeDays.Text = "Add/Remove &Days";
             this.menuContextMemberChangeDays.Click += new System.EventHandler(this.OnChangeDaysClicked);
             // 
             // menuContextMemberFilterAll
             // 
             this.menuContextMemberFilterAll.Name = "menuContextMemberFilterAll";
-            this.menuContextMemberFilterAll.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberFilterAll.Size = new System.Drawing.Size(226, 22);
             this.menuContextMemberFilterAll.Text = "Show &All";
             this.menuContextMemberFilterAll.Click += new System.EventHandler(this.OnShowAllClicked);
             // 
             // menuContextMemberFilterSelected
             // 
             this.menuContextMemberFilterSelected.Name = "menuContextMemberFilterSelected";
-            this.menuContextMemberFilterSelected.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberFilterSelected.Size = new System.Drawing.Size(226, 22);
             this.menuContextMemberFilterSelected.Text = "Show only for &Selected Sims";
             this.menuContextMemberFilterSelected.Click += new System.EventHandler(this.OnShowSelectedSimsClicked);
             // 
             // menuContextMemberFilterThis
             // 
             this.menuContextMemberFilterThis.Name = "menuContextMemberFilterThis";
-            this.menuContextMemberFilterThis.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberFilterThis.Size = new System.Drawing.Size(226, 22);
             this.menuContextMemberFilterThis.Text = "Show only for &This Sim";
             this.menuContextMemberFilterThis.Click += new System.EventHandler(this.OnShowThisSimClicked);
             // 
-            // menuContextMemberSeparator1
+            // menuContextMemberSeparatorPlasticSurgery
             // 
-            this.menuContextMemberSeparator1.Name = "menuContextMemberSeparator1";
-            this.menuContextMemberSeparator1.Size = new System.Drawing.Size(219, 6);
+            this.menuContextMemberSeparatorPlasticSurgery.Name = "menuContextMemberSeparatorPlasticSurgery";
+            this.menuContextMemberSeparatorPlasticSurgery.Size = new System.Drawing.Size(223, 6);
+            // 
+            // menuContextMemberRemovePlasticSurgery
+            // 
+            this.menuContextMemberRemovePlasticSurgery.Name = "menuContextMemberRemovePlasticSurgery";
+            this.menuContextMemberRemovePlasticSurgery.Size = new System.Drawing.Size(226, 22);
+            this.menuContextMemberRemovePlasticSurgery.Text = "Remove Plastic Surgery";
+            this.menuContextMemberRemovePlasticSurgery.Click += new System.EventHandler(this.OnRemovePlasticSurgeryClicked);
+            // 
+            // menuContextMemberGeneticPlasticSurgery
+            // 
+            this.menuContextMemberGeneticPlasticSurgery.Name = "menuContextMemberGeneticPlasticSurgery";
+            this.menuContextMemberGeneticPlasticSurgery.Size = new System.Drawing.Size(226, 22);
+            this.menuContextMemberGeneticPlasticSurgery.Text = "Make Plastic Surgery Genetic";
+            this.menuContextMemberGeneticPlasticSurgery.Click += new System.EventHandler(this.OnGeneticPlasticSurgeryClicked);
+            // 
+            // menuContextMemberSeparatorSplitFiles
+            // 
+            this.menuContextMemberSeparatorSplitFiles.Name = "menuContextMemberSeparatorSplitFiles";
+            this.menuContextMemberSeparatorSplitFiles.Size = new System.Drawing.Size(223, 6);
             // 
             // menuContextMemberMergeSplitFiles
             // 
             this.menuContextMemberMergeSplitFiles.Name = "menuContextMemberMergeSplitFiles";
-            this.menuContextMemberMergeSplitFiles.Size = new System.Drawing.Size(222, 22);
+            this.menuContextMemberMergeSplitFiles.Size = new System.Drawing.Size(226, 22);
             this.menuContextMemberMergeSplitFiles.Text = "Merge Split Files";
             this.menuContextMemberMergeSplitFiles.Click += new System.EventHandler(this.OnMergeSplitFilesClicked);
             // 
@@ -1297,6 +1393,7 @@ namespace FamilyManager
             // 
             this.tabPages.Alignment = System.Windows.Forms.TabAlignment.Bottom;
             this.tabPages.Controls.Add(this.tabCensus);
+            this.tabPages.Controls.Add(this.tabHousehold);
             this.tabPages.Controls.Add(this.tabFamily);
             this.tabPages.Controls.Add(this.tabCloset);
             this.tabPages.Controls.Add(this.tabSafe);
@@ -1372,7 +1469,7 @@ namespace FamilyManager
             this.gridCensus.ReadOnly = true;
             this.gridCensus.RowHeadersVisible = false;
             this.gridCensus.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridCensus.Size = new System.Drawing.Size(1273, 175);
+            this.gridCensus.Size = new System.Drawing.Size(1273, 141);
             this.gridCensus.TabIndex = 3;
             this.gridCensus.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCensusGridDoubleClick);
             // 
@@ -1595,42 +1692,42 @@ namespace FamilyManager
             this.menuContextJewelboxDelete.Text = "Delete Selected";
             this.menuContextJewelboxDelete.Click += new System.EventHandler(this.OnDeleteFromJewelboxClicked);
             // 
-            // tabFamily
+            // tabHousehold
             // 
-            this.tabFamily.Controls.Add(this.panelFamily);
-            this.tabFamily.Location = new System.Drawing.Point(4, 4);
-            this.tabFamily.Margin = new System.Windows.Forms.Padding(0);
-            this.tabFamily.Name = "tabFamily";
-            this.tabFamily.Size = new System.Drawing.Size(1276, 283);
-            this.tabFamily.TabIndex = 1;
-            this.tabFamily.Text = "Household";
-            this.tabFamily.UseVisualStyleBackColor = true;
+            this.tabHousehold.Controls.Add(this.panelHousehold);
+            this.tabHousehold.Location = new System.Drawing.Point(4, 4);
+            this.tabHousehold.Margin = new System.Windows.Forms.Padding(0);
+            this.tabHousehold.Name = "tabHousehold";
+            this.tabHousehold.Size = new System.Drawing.Size(1276, 283);
+            this.tabHousehold.TabIndex = 1;
+            this.tabHousehold.Text = "Household";
+            this.tabHousehold.UseVisualStyleBackColor = true;
             // 
-            // panelFamily
+            // panelHousehold
             // 
-            this.panelFamily.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.panelHousehold.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.panelFamily.Controls.Add(this.ckbFamilyNameSelected);
-            this.panelFamily.Controls.Add(this.ckbFamilyNameSame);
-            this.panelFamily.Controls.Add(this.ckbFamilyNameAll);
-            this.panelFamily.Controls.Add(this.textAddressDesc);
-            this.panelFamily.Controls.Add(this.ckbMoneyLock);
-            this.panelFamily.Controls.Add(this.textBusinessMoney);
-            this.panelFamily.Controls.Add(this.lblBusinessMoney);
-            this.panelFamily.Controls.Add(this.imageHouse);
-            this.panelFamily.Controls.Add(this.textFamilyName);
-            this.panelFamily.Controls.Add(this.lblFamName);
-            this.panelFamily.Controls.Add(this.lblAddress);
-            this.panelFamily.Controls.Add(this.textFamilyWriteUp);
-            this.panelFamily.Controls.Add(this.textAddressName);
-            this.panelFamily.Controls.Add(this.lblWriteUp);
-            this.panelFamily.Controls.Add(this.textFamilyMoney);
-            this.panelFamily.Controls.Add(this.lblMoney);
-            this.panelFamily.Location = new System.Drawing.Point(-1, 0);
-            this.panelFamily.Name = "panelFamily";
-            this.panelFamily.Size = new System.Drawing.Size(1277, 233);
-            this.panelFamily.TabIndex = 13;
+            this.panelHousehold.Controls.Add(this.ckbFamilyNameSelected);
+            this.panelHousehold.Controls.Add(this.ckbFamilyNameSame);
+            this.panelHousehold.Controls.Add(this.ckbFamilyNameAll);
+            this.panelHousehold.Controls.Add(this.textAddressDesc);
+            this.panelHousehold.Controls.Add(this.ckbMoneyLock);
+            this.panelHousehold.Controls.Add(this.textBusinessMoney);
+            this.panelHousehold.Controls.Add(this.lblBusinessMoney);
+            this.panelHousehold.Controls.Add(this.imageHouse);
+            this.panelHousehold.Controls.Add(this.textFamilyName);
+            this.panelHousehold.Controls.Add(this.lblFamName);
+            this.panelHousehold.Controls.Add(this.lblAddress);
+            this.panelHousehold.Controls.Add(this.textFamilyWriteUp);
+            this.panelHousehold.Controls.Add(this.textAddressName);
+            this.panelHousehold.Controls.Add(this.lblWriteUp);
+            this.panelHousehold.Controls.Add(this.textFamilyMoney);
+            this.panelHousehold.Controls.Add(this.lblMoney);
+            this.panelHousehold.Location = new System.Drawing.Point(-1, 0);
+            this.panelHousehold.Name = "panelHousehold";
+            this.panelHousehold.Size = new System.Drawing.Size(1277, 231);
+            this.panelHousehold.TabIndex = 13;
             // 
             // ckbFamilyNameSelected
             // 
@@ -1757,6 +1854,7 @@ namespace FamilyManager
             this.textFamilyWriteUp.Location = new System.Drawing.Point(79, 88);
             this.textFamilyWriteUp.Multiline = true;
             this.textFamilyWriteUp.Name = "textFamilyWriteUp";
+            this.textFamilyWriteUp.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textFamilyWriteUp.Size = new System.Drawing.Size(319, 89);
             this.textFamilyWriteUp.TabIndex = 20;
             this.textFamilyWriteUp.TextChanged += new System.EventHandler(this.OnTextChanged);
@@ -1804,13 +1902,163 @@ namespace FamilyManager
             this.lblMoney.TabIndex = 21;
             this.lblMoney.Text = "Money:";
             // 
+            // tabFamily
+            // 
+            this.tabFamily.Controls.Add(this.grpMagazineSubs);
+            this.tabFamily.Location = new System.Drawing.Point(4, 4);
+            this.tabFamily.Margin = new System.Windows.Forms.Padding(0);
+            this.tabFamily.Name = "tabFamily";
+            this.tabFamily.Size = new System.Drawing.Size(1276, 283);
+            this.tabFamily.TabIndex = 1;
+            this.tabFamily.Text = "Family";
+            this.tabFamily.UseVisualStyleBackColor = true;
+            // 
+            // grpMagazineSubs
+            // 
+            this.grpMagazineSubs.Controls.Add(this.ckbMagSubSports);
+            this.grpMagazineSubs.Controls.Add(this.ckbMagSubScience);
+            this.grpMagazineSubs.Controls.Add(this.ckbMagSubNature);
+            this.grpMagazineSubs.Controls.Add(this.ckbMagSubMusic);
+            this.grpMagazineSubs.Controls.Add(this.ckbMagSubLiterature);
+            this.grpMagazineSubs.Controls.Add(this.ckbMagSubGames);
+            this.grpMagazineSubs.Controls.Add(this.ckbMagSubFood);
+            this.grpMagazineSubs.Controls.Add(this.ckbMagSubFitness);
+            this.grpMagazineSubs.Controls.Add(this.ckbMagSubEngineering);
+            this.grpMagazineSubs.Controls.Add(this.ckbMagSubArts);
+            this.grpMagazineSubs.Location = new System.Drawing.Point(5, 8);
+            this.grpMagazineSubs.Name = "grpMagazineSubs";
+            this.grpMagazineSubs.Size = new System.Drawing.Size(250, 265);
+            this.grpMagazineSubs.TabIndex = 1;
+            this.grpMagazineSubs.TabStop = false;
+            this.grpMagazineSubs.Text = "Magazine Subscriptions";
+            // 
+            // ckbMagSubSports
+            // 
+            this.ckbMagSubSports.AutoSize = true;
+            this.ckbMagSubSports.Location = new System.Drawing.Point(140, 100);
+            this.ckbMagSubSports.Name = "ckbMagSubSports";
+            this.ckbMagSubSports.Size = new System.Drawing.Size(61, 19);
+            this.ckbMagSubSports.TabIndex = 9;
+            this.ckbMagSubSports.Tag = "0xD3E457F5";
+            this.ckbMagSubSports.Text = "Sports";
+            this.ckbMagSubSports.UseVisualStyleBackColor = true;
+            this.ckbMagSubSports.Click += new System.EventHandler(this.OnFamilyMagazineSubscriptionClicked);
+            // 
+            // ckbMagSubScience
+            // 
+            this.ckbMagSubScience.AutoSize = true;
+            this.ckbMagSubScience.Location = new System.Drawing.Point(140, 75);
+            this.ckbMagSubScience.Name = "ckbMagSubScience";
+            this.ckbMagSubScience.Size = new System.Drawing.Size(70, 19);
+            this.ckbMagSubScience.TabIndex = 8;
+            this.ckbMagSubScience.Tag = "0xB3E457E4";
+            this.ckbMagSubScience.Text = "Science";
+            this.ckbMagSubScience.UseVisualStyleBackColor = true;
+            this.ckbMagSubScience.Click += new System.EventHandler(this.OnFamilyMagazineSubscriptionClicked);
+            // 
+            // ckbMagSubNature
+            // 
+            this.ckbMagSubNature.AutoSize = true;
+            this.ckbMagSubNature.Location = new System.Drawing.Point(140, 50);
+            this.ckbMagSubNature.Name = "ckbMagSubNature";
+            this.ckbMagSubNature.Size = new System.Drawing.Size(63, 19);
+            this.ckbMagSubNature.TabIndex = 7;
+            this.ckbMagSubNature.Tag = "0xD3E457DC";
+            this.ckbMagSubNature.Text = "Nature";
+            this.ckbMagSubNature.UseVisualStyleBackColor = true;
+            this.ckbMagSubNature.Click += new System.EventHandler(this.OnFamilyMagazineSubscriptionClicked);
+            // 
+            // ckbMagSubMusic
+            // 
+            this.ckbMagSubMusic.AutoSize = true;
+            this.ckbMagSubMusic.Location = new System.Drawing.Point(140, 25);
+            this.ckbMagSubMusic.Name = "ckbMagSubMusic";
+            this.ckbMagSubMusic.Size = new System.Drawing.Size(109, 19);
+            this.ckbMagSubMusic.TabIndex = 6;
+            this.ckbMagSubMusic.Tag = "0xD3E457D5";
+            this.ckbMagSubMusic.Text = "Music && Dance";
+            this.ckbMagSubMusic.UseVisualStyleBackColor = true;
+            this.ckbMagSubMusic.Click += new System.EventHandler(this.OnFamilyMagazineSubscriptionClicked);
+            // 
+            // ckbMagSubLiterature
+            // 
+            this.ckbMagSubLiterature.AutoSize = true;
+            this.ckbMagSubLiterature.Location = new System.Drawing.Point(16, 75);
+            this.ckbMagSubLiterature.Name = "ckbMagSubLiterature";
+            this.ckbMagSubLiterature.Size = new System.Drawing.Size(116, 19);
+            this.ckbMagSubLiterature.TabIndex = 5;
+            this.ckbMagSubLiterature.Tag = "0xF3E457CD";
+            this.ckbMagSubLiterature.Text = "Film && Literature";
+            this.ckbMagSubLiterature.UseVisualStyleBackColor = true;
+            this.ckbMagSubLiterature.Click += new System.EventHandler(this.OnFamilyMagazineSubscriptionClicked);
+            // 
+            // ckbMagSubGames
+            // 
+            this.ckbMagSubGames.AutoSize = true;
+            this.ckbMagSubGames.Location = new System.Drawing.Point(16, 125);
+            this.ckbMagSubGames.Name = "ckbMagSubGames";
+            this.ckbMagSubGames.Size = new System.Drawing.Size(66, 19);
+            this.ckbMagSubGames.TabIndex = 4;
+            this.ckbMagSubGames.Tag = "0x13E457C5";
+            this.ckbMagSubGames.Text = "Games";
+            this.ckbMagSubGames.UseVisualStyleBackColor = true;
+            this.ckbMagSubGames.Click += new System.EventHandler(this.OnFamilyMagazineSubscriptionClicked);
+            // 
+            // ckbMagSubFood
+            // 
+            this.ckbMagSubFood.AutoSize = true;
+            this.ckbMagSubFood.Location = new System.Drawing.Point(16, 50);
+            this.ckbMagSubFood.Name = "ckbMagSubFood";
+            this.ckbMagSubFood.Size = new System.Drawing.Size(67, 19);
+            this.ckbMagSubFood.TabIndex = 3;
+            this.ckbMagSubFood.Tag = "0x13E457BF";
+            this.ckbMagSubFood.Text = "Cuisine";
+            this.ckbMagSubFood.UseVisualStyleBackColor = true;
+            this.ckbMagSubFood.Click += new System.EventHandler(this.OnFamilyMagazineSubscriptionClicked);
+            // 
+            // ckbMagSubFitness
+            // 
+            this.ckbMagSubFitness.AutoSize = true;
+            this.ckbMagSubFitness.Location = new System.Drawing.Point(16, 100);
+            this.ckbMagSubFitness.Name = "ckbMagSubFitness";
+            this.ckbMagSubFitness.Size = new System.Drawing.Size(65, 19);
+            this.ckbMagSubFitness.TabIndex = 2;
+            this.ckbMagSubFitness.Tag = "0xB3E457B8";
+            this.ckbMagSubFitness.Text = "Fitness";
+            this.ckbMagSubFitness.UseVisualStyleBackColor = true;
+            this.ckbMagSubFitness.Click += new System.EventHandler(this.OnFamilyMagazineSubscriptionClicked);
+            // 
+            // ckbMagSubEngineering
+            // 
+            this.ckbMagSubEngineering.AutoSize = true;
+            this.ckbMagSubEngineering.Location = new System.Drawing.Point(140, 125);
+            this.ckbMagSubEngineering.Name = "ckbMagSubEngineering";
+            this.ckbMagSubEngineering.Size = new System.Drawing.Size(77, 19);
+            this.ckbMagSubEngineering.TabIndex = 1;
+            this.ckbMagSubEngineering.Tag = "0x13E457A2";
+            this.ckbMagSubEngineering.Text = "Tinkering";
+            this.ckbMagSubEngineering.UseVisualStyleBackColor = true;
+            this.ckbMagSubEngineering.Click += new System.EventHandler(this.OnFamilyMagazineSubscriptionClicked);
+            // 
+            // ckbMagSubArts
+            // 
+            this.ckbMagSubArts.AutoSize = true;
+            this.ckbMagSubArts.Location = new System.Drawing.Point(16, 25);
+            this.ckbMagSubArts.Name = "ckbMagSubArts";
+            this.ckbMagSubArts.Size = new System.Drawing.Size(91, 19);
+            this.ckbMagSubArts.TabIndex = 0;
+            this.ckbMagSubArts.Tag = "0x53E4573C";
+            this.ckbMagSubArts.Text = "Arts && Crafts";
+            this.ckbMagSubArts.UseVisualStyleBackColor = true;
+            this.ckbMagSubArts.Click += new System.EventHandler(this.OnFamilyMagazineSubscriptionClicked);
+            // 
             // tabCloset
             // 
             this.tabCloset.Controls.Add(this.splitClosetLeftRight);
             this.tabCloset.Location = new System.Drawing.Point(4, 4);
             this.tabCloset.Margin = new System.Windows.Forms.Padding(0);
             this.tabCloset.Name = "tabCloset";
-            this.tabCloset.Size = new System.Drawing.Size(1276, 283);
+            this.tabCloset.Size = new System.Drawing.Size(1276, 281);
             this.tabCloset.TabIndex = 0;
             this.tabCloset.Text = "Closet";
             this.tabCloset.UseVisualStyleBackColor = true;
@@ -1842,7 +2090,7 @@ namespace FamilyManager
             this.splitClosetLeftRight.Panel2.Controls.Add(this.btnClosetDelete);
             this.splitClosetLeftRight.Panel2.Controls.Add(this.btnClosetShowAll);
             this.splitClosetLeftRight.Panel2MinSize = 300;
-            this.splitClosetLeftRight.Size = new System.Drawing.Size(1280, 272);
+            this.splitClosetLeftRight.Size = new System.Drawing.Size(1280, 268);
             this.splitClosetLeftRight.SplitterDistance = 500;
             this.splitClosetLeftRight.TabIndex = 0;
             this.splitClosetLeftRight.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.OnSplitterMoved);
@@ -1886,7 +2134,7 @@ namespace FamilyManager
             this.gridSuitcase.ReadOnly = true;
             this.gridSuitcase.RowHeadersVisible = false;
             this.gridSuitcase.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridSuitcase.Size = new System.Drawing.Size(497, 237);
+            this.gridSuitcase.Size = new System.Drawing.Size(497, 233);
             this.gridSuitcase.TabIndex = 2;
             this.gridSuitcase.MultiSelectChanged += new System.EventHandler(this.OnOutfitGridSelectionChanged);
             this.gridSuitcase.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -2041,7 +2289,7 @@ namespace FamilyManager
             // btnSuitcaseEmpty
             // 
             this.btnSuitcaseEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseEmpty.Location = new System.Drawing.Point(3, 243);
+            this.btnSuitcaseEmpty.Location = new System.Drawing.Point(3, 239);
             this.btnSuitcaseEmpty.Name = "btnSuitcaseEmpty";
             this.btnSuitcaseEmpty.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseEmpty.TabIndex = 29;
@@ -2052,7 +2300,7 @@ namespace FamilyManager
             // btnSuitcaseSave
             // 
             this.btnSuitcaseSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseSave.Location = new System.Drawing.Point(79, 243);
+            this.btnSuitcaseSave.Location = new System.Drawing.Point(79, 239);
             this.btnSuitcaseSave.Name = "btnSuitcaseSave";
             this.btnSuitcaseSave.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseSave.TabIndex = 32;
@@ -2063,7 +2311,7 @@ namespace FamilyManager
             // btnSuitcaseLoad
             // 
             this.btnSuitcaseLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseLoad.Location = new System.Drawing.Point(155, 243);
+            this.btnSuitcaseLoad.Location = new System.Drawing.Point(155, 239);
             this.btnSuitcaseLoad.Name = "btnSuitcaseLoad";
             this.btnSuitcaseLoad.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseLoad.TabIndex = 33;
@@ -2074,7 +2322,7 @@ namespace FamilyManager
             // btnSuitcaseCopy
             // 
             this.btnSuitcaseCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseCopy.Location = new System.Drawing.Point(231, 243);
+            this.btnSuitcaseCopy.Location = new System.Drawing.Point(231, 239);
             this.btnSuitcaseCopy.Name = "btnSuitcaseCopy";
             this.btnSuitcaseCopy.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseCopy.TabIndex = 30;
@@ -2085,7 +2333,7 @@ namespace FamilyManager
             // btnSuitcaseMove
             // 
             this.btnSuitcaseMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSuitcaseMove.Location = new System.Drawing.Point(307, 243);
+            this.btnSuitcaseMove.Location = new System.Drawing.Point(307, 239);
             this.btnSuitcaseMove.Name = "btnSuitcaseMove";
             this.btnSuitcaseMove.Size = new System.Drawing.Size(70, 26);
             this.btnSuitcaseMove.TabIndex = 31;
@@ -2137,7 +2385,7 @@ namespace FamilyManager
             this.gridFamilyCloset.ReadOnly = true;
             this.gridFamilyCloset.RowHeadersVisible = false;
             this.gridFamilyCloset.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.gridFamilyCloset.Size = new System.Drawing.Size(773, 239);
+            this.gridFamilyCloset.Size = new System.Drawing.Size(773, 235);
             this.gridFamilyCloset.TabIndex = 1;
             this.gridFamilyCloset.MultiSelectChanged += new System.EventHandler(this.OnOutfitGridSelectionChanged);
             this.gridFamilyCloset.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
@@ -2322,7 +2570,7 @@ namespace FamilyManager
             // btnClosetCopy
             // 
             this.btnClosetCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetCopy.Location = new System.Drawing.Point(0, 245);
+            this.btnClosetCopy.Location = new System.Drawing.Point(0, 241);
             this.btnClosetCopy.Name = "btnClosetCopy";
             this.btnClosetCopy.Size = new System.Drawing.Size(88, 26);
             this.btnClosetCopy.TabIndex = 26;
@@ -2333,7 +2581,7 @@ namespace FamilyManager
             // btnClosetMove
             // 
             this.btnClosetMove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetMove.Location = new System.Drawing.Point(94, 245);
+            this.btnClosetMove.Location = new System.Drawing.Point(94, 241);
             this.btnClosetMove.Name = "btnClosetMove";
             this.btnClosetMove.Size = new System.Drawing.Size(88, 26);
             this.btnClosetMove.TabIndex = 27;
@@ -2344,7 +2592,7 @@ namespace FamilyManager
             // btnClosetDelete
             // 
             this.btnClosetDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetDelete.Location = new System.Drawing.Point(188, 245);
+            this.btnClosetDelete.Location = new System.Drawing.Point(188, 241);
             this.btnClosetDelete.Name = "btnClosetDelete";
             this.btnClosetDelete.Size = new System.Drawing.Size(88, 26);
             this.btnClosetDelete.TabIndex = 28;
@@ -2355,7 +2603,7 @@ namespace FamilyManager
             // btnClosetShowAll
             // 
             this.btnClosetShowAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClosetShowAll.Location = new System.Drawing.Point(292, 245);
+            this.btnClosetShowAll.Location = new System.Drawing.Point(292, 241);
             this.btnClosetShowAll.Name = "btnClosetShowAll";
             this.btnClosetShowAll.Size = new System.Drawing.Size(88, 25);
             this.btnClosetShowAll.TabIndex = 29;
@@ -4304,7 +4552,7 @@ namespace FamilyManager
             this.grpSkillsLife.Controls.Add(this.lblSkillLifeFireSafety);
             this.grpSkillsLife.Controls.Add(this.lblSkillLifeCounselling);
             this.grpSkillsLife.Controls.Add(this.lblSkillLifeAngerMgmt);
-            this.grpSkillsLife.Location = new System.Drawing.Point(960, 8);
+            this.grpSkillsLife.Location = new System.Drawing.Point(930, 8);
             this.grpSkillsLife.Name = "grpSkillsLife";
             this.grpSkillsLife.Size = new System.Drawing.Size(235, 265);
             this.grpSkillsLife.TabIndex = 83;
@@ -5286,16 +5534,16 @@ namespace FamilyManager
             this.grpBadges.Controls.Add(this.lblBadgeGardening);
             this.grpBadges.Controls.Add(this.lblBadgeCosmetics);
             this.grpBadges.Controls.Add(this.lblBadgeCashier);
-            this.grpBadges.Location = new System.Drawing.Point(840, 8);
+            this.grpBadges.Location = new System.Drawing.Point(855, 8);
             this.grpBadges.Name = "grpBadges";
-            this.grpBadges.Size = new System.Drawing.Size(430, 265);
+            this.grpBadges.Size = new System.Drawing.Size(420, 265);
             this.grpBadges.TabIndex = 82;
             this.grpBadges.TabStop = false;
             this.grpBadges.Text = "Badges";
             // 
             // trackBadgeStocking
             // 
-            this.trackBadgeStocking.Location = new System.Drawing.Point(282, 110);
+            this.trackBadgeStocking.Location = new System.Drawing.Point(277, 110);
             this.trackBadgeStocking.Margin = new System.Windows.Forms.Padding(0);
             this.trackBadgeStocking.Name = "trackBadgeStocking";
             this.trackBadgeStocking.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eSport;
@@ -5321,7 +5569,7 @@ namespace FamilyManager
             // 
             // trackBadgeSewing
             // 
-            this.trackBadgeSewing.Location = new System.Drawing.Point(282, 80);
+            this.trackBadgeSewing.Location = new System.Drawing.Point(277, 80);
             this.trackBadgeSewing.Margin = new System.Windows.Forms.Padding(0);
             this.trackBadgeSewing.Name = "trackBadgeSewing";
             this.trackBadgeSewing.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eUnused;
@@ -5335,7 +5583,7 @@ namespace FamilyManager
             // lblBadgeToyMaking
             // 
             this.lblBadgeToyMaking.AutoSize = true;
-            this.lblBadgeToyMaking.Location = new System.Drawing.Point(245, 145);
+            this.lblBadgeToyMaking.Location = new System.Drawing.Point(240, 145);
             this.lblBadgeToyMaking.Name = "lblBadgeToyMaking";
             this.lblBadgeToyMaking.Size = new System.Drawing.Size(35, 15);
             this.lblBadgeToyMaking.TabIndex = 79;
@@ -5344,7 +5592,7 @@ namespace FamilyManager
             // 
             // trackBadgeSales
             // 
-            this.trackBadgeSales.Location = new System.Drawing.Point(282, 50);
+            this.trackBadgeSales.Location = new System.Drawing.Point(277, 50);
             this.trackBadgeSales.Margin = new System.Windows.Forms.Padding(0);
             this.trackBadgeSales.Name = "trackBadgeSales";
             this.trackBadgeSales.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eScience;
@@ -5370,7 +5618,7 @@ namespace FamilyManager
             // 
             // trackBadgeRobotery
             // 
-            this.trackBadgeRobotery.Location = new System.Drawing.Point(282, 20);
+            this.trackBadgeRobotery.Location = new System.Drawing.Point(277, 20);
             this.trackBadgeRobotery.Margin = new System.Windows.Forms.Padding(0);
             this.trackBadgeRobotery.Name = "trackBadgeRobotery";
             this.trackBadgeRobotery.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eNature;
@@ -5383,7 +5631,7 @@ namespace FamilyManager
             // 
             // trackBadgeToyMaking
             // 
-            this.trackBadgeToyMaking.Location = new System.Drawing.Point(282, 140);
+            this.trackBadgeToyMaking.Location = new System.Drawing.Point(277, 140);
             this.trackBadgeToyMaking.Margin = new System.Windows.Forms.Padding(0);
             this.trackBadgeToyMaking.Name = "trackBadgeToyMaking";
             this.trackBadgeToyMaking.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eTinkering;
@@ -5397,7 +5645,7 @@ namespace FamilyManager
             // lblBadgeStocking
             // 
             this.lblBadgeStocking.AutoSize = true;
-            this.lblBadgeStocking.Location = new System.Drawing.Point(223, 115);
+            this.lblBadgeStocking.Location = new System.Drawing.Point(218, 115);
             this.lblBadgeStocking.Name = "lblBadgeStocking";
             this.lblBadgeStocking.Size = new System.Drawing.Size(57, 15);
             this.lblBadgeStocking.TabIndex = 78;
@@ -5419,7 +5667,7 @@ namespace FamilyManager
             // lblBadgeSewing
             // 
             this.lblBadgeSewing.AutoSize = true;
-            this.lblBadgeSewing.Location = new System.Drawing.Point(229, 85);
+            this.lblBadgeSewing.Location = new System.Drawing.Point(224, 85);
             this.lblBadgeSewing.Name = "lblBadgeSewing";
             this.lblBadgeSewing.Size = new System.Drawing.Size(51, 15);
             this.lblBadgeSewing.TabIndex = 77;
@@ -5441,7 +5689,7 @@ namespace FamilyManager
             // lblBadgeSales
             // 
             this.lblBadgeSales.AutoSize = true;
-            this.lblBadgeSales.Location = new System.Drawing.Point(239, 55);
+            this.lblBadgeSales.Location = new System.Drawing.Point(234, 55);
             this.lblBadgeSales.Name = "lblBadgeSales";
             this.lblBadgeSales.Size = new System.Drawing.Size(41, 15);
             this.lblBadgeSales.TabIndex = 76;
@@ -5476,7 +5724,7 @@ namespace FamilyManager
             // lblBadgeRobotery
             // 
             this.lblBadgeRobotery.AutoSize = true;
-            this.lblBadgeRobotery.Location = new System.Drawing.Point(222, 25);
+            this.lblBadgeRobotery.Location = new System.Drawing.Point(217, 25);
             this.lblBadgeRobotery.Name = "lblBadgeRobotery";
             this.lblBadgeRobotery.Size = new System.Drawing.Size(58, 15);
             this.lblBadgeRobotery.TabIndex = 75;
@@ -5540,6 +5788,17 @@ namespace FamilyManager
             // 
             // grpHobbies
             // 
+            this.grpHobbies.Controls.Add(this.btnHobbyLotTinker);
+            this.grpHobbies.Controls.Add(this.btnHobbyLotSport);
+            this.grpHobbies.Controls.Add(this.btnHobbyLotSecret);
+            this.grpHobbies.Controls.Add(this.btnHobbyLotMusic);
+            this.grpHobbies.Controls.Add(this.btnHobbyLotGames);
+            this.grpHobbies.Controls.Add(this.btnHobbyLotFitness);
+            this.grpHobbies.Controls.Add(this.btnHobbyLotFilm);
+            this.grpHobbies.Controls.Add(this.btnHobbyLotNature);
+            this.grpHobbies.Controls.Add(this.btnHobbyLotArts);
+            this.grpHobbies.Controls.Add(this.btnHobbyLotScience);
+            this.grpHobbies.Controls.Add(this.btnHobbyLotCuisine);
             this.grpHobbies.Controls.Add(this.trackHobbySport);
             this.grpHobbies.Controls.Add(this.trackHobbySecret);
             this.grpHobbies.Controls.Add(this.trackHobbyScience);
@@ -5564,16 +5823,170 @@ namespace FamilyManager
             this.grpHobbies.Controls.Add(this.lblHobbyNature);
             this.grpHobbies.Controls.Add(this.lblHobbyTinker);
             this.grpHobbies.Controls.Add(this.lblHobbyCuisine);
-            this.grpHobbies.Location = new System.Drawing.Point(420, 8);
+            this.grpHobbies.Location = new System.Drawing.Point(405, 8);
             this.grpHobbies.Name = "grpHobbies";
-            this.grpHobbies.Size = new System.Drawing.Size(410, 265);
+            this.grpHobbies.Size = new System.Drawing.Size(445, 265);
             this.grpHobbies.TabIndex = 81;
             this.grpHobbies.TabStop = false;
             this.grpHobbies.Text = "Hobbies";
             // 
+            // btnHobbyLotTinker
+            // 
+            this.btnHobbyLotTinker.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotTinker.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotTinker.Image")));
+            this.btnHobbyLotTinker.Location = new System.Drawing.Point(420, 142);
+            this.btnHobbyLotTinker.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotTinker.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotTinker.Name = "btnHobbyLotTinker";
+            this.btnHobbyLotTinker.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eTinkering;
+            this.btnHobbyLotTinker.Selected = false;
+            this.btnHobbyLotTinker.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotTinker.TabIndex = 103;
+            this.btnHobbyLotTinker.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
+            // btnHobbyLotSport
+            // 
+            this.btnHobbyLotSport.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotSport.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotSport.Image")));
+            this.btnHobbyLotSport.Location = new System.Drawing.Point(420, 112);
+            this.btnHobbyLotSport.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotSport.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotSport.Name = "btnHobbyLotSport";
+            this.btnHobbyLotSport.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eSport;
+            this.btnHobbyLotSport.Selected = false;
+            this.btnHobbyLotSport.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotSport.TabIndex = 102;
+            this.btnHobbyLotSport.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
+            // btnHobbyLotSecret
+            // 
+            this.btnHobbyLotSecret.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotSecret.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotSecret.Image")));
+            this.btnHobbyLotSecret.Location = new System.Drawing.Point(420, 82);
+            this.btnHobbyLotSecret.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotSecret.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotSecret.Name = "btnHobbyLotSecret";
+            this.btnHobbyLotSecret.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eUnused;
+            this.btnHobbyLotSecret.Selected = false;
+            this.btnHobbyLotSecret.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotSecret.TabIndex = 101;
+            this.btnHobbyLotSecret.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
+            // btnHobbyLotMusic
+            // 
+            this.btnHobbyLotMusic.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotMusic.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotMusic.Image")));
+            this.btnHobbyLotMusic.Location = new System.Drawing.Point(196, 172);
+            this.btnHobbyLotMusic.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotMusic.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotMusic.Name = "btnHobbyLotMusic";
+            this.btnHobbyLotMusic.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eMusic;
+            this.btnHobbyLotMusic.Selected = false;
+            this.btnHobbyLotMusic.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotMusic.TabIndex = 100;
+            this.btnHobbyLotMusic.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
+            // btnHobbyLotGames
+            // 
+            this.btnHobbyLotGames.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotGames.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotGames.Image")));
+            this.btnHobbyLotGames.Location = new System.Drawing.Point(196, 142);
+            this.btnHobbyLotGames.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotGames.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotGames.Name = "btnHobbyLotGames";
+            this.btnHobbyLotGames.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eGames;
+            this.btnHobbyLotGames.Selected = false;
+            this.btnHobbyLotGames.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotGames.TabIndex = 99;
+            this.btnHobbyLotGames.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
+            // btnHobbyLotFitness
+            // 
+            this.btnHobbyLotFitness.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotFitness.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotFitness.Image")));
+            this.btnHobbyLotFitness.Location = new System.Drawing.Point(196, 112);
+            this.btnHobbyLotFitness.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotFitness.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotFitness.Name = "btnHobbyLotFitness";
+            this.btnHobbyLotFitness.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eFitness;
+            this.btnHobbyLotFitness.Selected = false;
+            this.btnHobbyLotFitness.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotFitness.TabIndex = 98;
+            this.btnHobbyLotFitness.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
+            // btnHobbyLotFilm
+            // 
+            this.btnHobbyLotFilm.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotFilm.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotFilm.Image")));
+            this.btnHobbyLotFilm.Location = new System.Drawing.Point(196, 82);
+            this.btnHobbyLotFilm.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotFilm.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotFilm.Name = "btnHobbyLotFilm";
+            this.btnHobbyLotFilm.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eFilmLit;
+            this.btnHobbyLotFilm.Selected = false;
+            this.btnHobbyLotFilm.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotFilm.TabIndex = 97;
+            this.btnHobbyLotFilm.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
+            // btnHobbyLotNature
+            // 
+            this.btnHobbyLotNature.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotNature.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotNature.Image")));
+            this.btnHobbyLotNature.Location = new System.Drawing.Point(420, 22);
+            this.btnHobbyLotNature.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotNature.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotNature.Name = "btnHobbyLotNature";
+            this.btnHobbyLotNature.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eNature;
+            this.btnHobbyLotNature.Selected = false;
+            this.btnHobbyLotNature.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotNature.TabIndex = 96;
+            this.btnHobbyLotNature.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
+            // btnHobbyLotArts
+            // 
+            this.btnHobbyLotArts.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotArts.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotArts.Image")));
+            this.btnHobbyLotArts.Location = new System.Drawing.Point(196, 22);
+            this.btnHobbyLotArts.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotArts.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotArts.Name = "btnHobbyLotArts";
+            this.btnHobbyLotArts.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eArts;
+            this.btnHobbyLotArts.Selected = false;
+            this.btnHobbyLotArts.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotArts.TabIndex = 95;
+            this.btnHobbyLotArts.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
+            // btnHobbyLotScience
+            // 
+            this.btnHobbyLotScience.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotScience.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotScience.Image")));
+            this.btnHobbyLotScience.Location = new System.Drawing.Point(420, 52);
+            this.btnHobbyLotScience.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotScience.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotScience.Name = "btnHobbyLotScience";
+            this.btnHobbyLotScience.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eScience;
+            this.btnHobbyLotScience.Selected = false;
+            this.btnHobbyLotScience.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotScience.TabIndex = 94;
+            this.btnHobbyLotScience.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
+            // btnHobbyLotCuisine
+            // 
+            this.btnHobbyLotCuisine.BackColor = System.Drawing.Color.Transparent;
+            this.btnHobbyLotCuisine.Image = ((System.Drawing.Image)(resources.GetObject("btnHobbyLotCuisine.Image")));
+            this.btnHobbyLotCuisine.Location = new System.Drawing.Point(196, 52);
+            this.btnHobbyLotCuisine.Margin = new System.Windows.Forms.Padding(0);
+            this.btnHobbyLotCuisine.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
+            this.btnHobbyLotCuisine.Name = "btnHobbyLotCuisine";
+            this.btnHobbyLotCuisine.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eCuisine;
+            this.btnHobbyLotCuisine.Selected = false;
+            this.btnHobbyLotCuisine.Size = new System.Drawing.Size(21, 17);
+            this.btnHobbyLotCuisine.TabIndex = 93;
+            this.btnHobbyLotCuisine.Click += new System.EventHandler(this.OnHobbyLotClicked);
+            // 
             // trackHobbySport
             // 
-            this.trackHobbySport.Location = new System.Drawing.Point(262, 110);
+            this.trackHobbySport.Location = new System.Drawing.Point(279, 110);
             this.trackHobbySport.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbySport.Name = "trackHobbySport";
             this.trackHobbySport.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eSport;
@@ -5586,7 +5999,7 @@ namespace FamilyManager
             // 
             // trackHobbySecret
             // 
-            this.trackHobbySecret.Location = new System.Drawing.Point(262, 80);
+            this.trackHobbySecret.Location = new System.Drawing.Point(279, 80);
             this.trackHobbySecret.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbySecret.Name = "trackHobbySecret";
             this.trackHobbySecret.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eUnused;
@@ -5599,7 +6012,7 @@ namespace FamilyManager
             // 
             // trackHobbyScience
             // 
-            this.trackHobbyScience.Location = new System.Drawing.Point(262, 50);
+            this.trackHobbyScience.Location = new System.Drawing.Point(279, 50);
             this.trackHobbyScience.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbyScience.Name = "trackHobbyScience";
             this.trackHobbyScience.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eScience;
@@ -5612,7 +6025,7 @@ namespace FamilyManager
             // 
             // trackHobbyMusic
             // 
-            this.trackHobbyMusic.Location = new System.Drawing.Point(60, 170);
+            this.trackHobbyMusic.Location = new System.Drawing.Point(55, 170);
             this.trackHobbyMusic.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbyMusic.Name = "trackHobbyMusic";
             this.trackHobbyMusic.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eMusic;
@@ -5625,7 +6038,7 @@ namespace FamilyManager
             // 
             // trackHobbyGames
             // 
-            this.trackHobbyGames.Location = new System.Drawing.Point(60, 140);
+            this.trackHobbyGames.Location = new System.Drawing.Point(55, 140);
             this.trackHobbyGames.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbyGames.Name = "trackHobbyGames";
             this.trackHobbyGames.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eGames;
@@ -5638,7 +6051,7 @@ namespace FamilyManager
             // 
             // trackHobbyFitness
             // 
-            this.trackHobbyFitness.Location = new System.Drawing.Point(60, 110);
+            this.trackHobbyFitness.Location = new System.Drawing.Point(55, 110);
             this.trackHobbyFitness.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbyFitness.Name = "trackHobbyFitness";
             this.trackHobbyFitness.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eFitness;
@@ -5651,7 +6064,7 @@ namespace FamilyManager
             // 
             // trackHobbyFilm
             // 
-            this.trackHobbyFilm.Location = new System.Drawing.Point(60, 80);
+            this.trackHobbyFilm.Location = new System.Drawing.Point(55, 80);
             this.trackHobbyFilm.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbyFilm.Name = "trackHobbyFilm";
             this.trackHobbyFilm.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eFilmLit;
@@ -5664,7 +6077,7 @@ namespace FamilyManager
             // 
             // trackHobbyArts
             // 
-            this.trackHobbyArts.Location = new System.Drawing.Point(60, 20);
+            this.trackHobbyArts.Location = new System.Drawing.Point(55, 20);
             this.trackHobbyArts.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbyArts.Name = "trackHobbyArts";
             this.trackHobbyArts.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eArts;
@@ -5677,7 +6090,7 @@ namespace FamilyManager
             // 
             // trackHobbyNature
             // 
-            this.trackHobbyNature.Location = new System.Drawing.Point(262, 20);
+            this.trackHobbyNature.Location = new System.Drawing.Point(279, 20);
             this.trackHobbyNature.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbyNature.Name = "trackHobbyNature";
             this.trackHobbyNature.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eNature;
@@ -5690,7 +6103,7 @@ namespace FamilyManager
             // 
             // trackHobbyCuisine
             // 
-            this.trackHobbyCuisine.Location = new System.Drawing.Point(60, 50);
+            this.trackHobbyCuisine.Location = new System.Drawing.Point(55, 50);
             this.trackHobbyCuisine.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbyCuisine.Name = "trackHobbyCuisine";
             this.trackHobbyCuisine.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eCuisine;
@@ -5703,7 +6116,7 @@ namespace FamilyManager
             // 
             // trackHobbyTinker
             // 
-            this.trackHobbyTinker.Location = new System.Drawing.Point(262, 140);
+            this.trackHobbyTinker.Location = new System.Drawing.Point(279, 140);
             this.trackHobbyTinker.Margin = new System.Windows.Forms.Padding(0);
             this.trackHobbyTinker.Name = "trackHobbyTinker";
             this.trackHobbyTinker.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.eTinkering;
@@ -5717,7 +6130,7 @@ namespace FamilyManager
             // comboHobbyOneTrue
             // 
             this.comboHobbyOneTrue.FormattingEnabled = true;
-            this.comboHobbyOneTrue.Location = new System.Drawing.Point(60, 210);
+            this.comboHobbyOneTrue.Location = new System.Drawing.Point(55, 210);
             this.comboHobbyOneTrue.Name = "comboHobbyOneTrue";
             this.comboHobbyOneTrue.Size = new System.Drawing.Size(138, 23);
             this.comboHobbyOneTrue.TabIndex = 81;
@@ -5727,7 +6140,7 @@ namespace FamilyManager
             // lblHobbyOneTrue
             // 
             this.lblHobbyOneTrue.AutoSize = true;
-            this.lblHobbyOneTrue.Location = new System.Drawing.Point(23, 213);
+            this.lblHobbyOneTrue.Location = new System.Drawing.Point(18, 213);
             this.lblHobbyOneTrue.Name = "lblHobbyOneTrue";
             this.lblHobbyOneTrue.Size = new System.Drawing.Size(35, 15);
             this.lblHobbyOneTrue.TabIndex = 80;
@@ -5736,7 +6149,7 @@ namespace FamilyManager
             // lblHobbyScience
             // 
             this.lblHobbyScience.AutoSize = true;
-            this.lblHobbyScience.Location = new System.Drawing.Point(206, 55);
+            this.lblHobbyScience.Location = new System.Drawing.Point(223, 55);
             this.lblHobbyScience.Name = "lblHobbyScience";
             this.lblHobbyScience.Size = new System.Drawing.Size(54, 15);
             this.lblHobbyScience.TabIndex = 79;
@@ -5745,7 +6158,7 @@ namespace FamilyManager
             // lblHobbyMusic
             // 
             this.lblHobbyMusic.AutoSize = true;
-            this.lblHobbyMusic.Location = new System.Drawing.Point(15, 175);
+            this.lblHobbyMusic.Location = new System.Drawing.Point(10, 175);
             this.lblHobbyMusic.Name = "lblHobbyMusic";
             this.lblHobbyMusic.Size = new System.Drawing.Size(43, 15);
             this.lblHobbyMusic.TabIndex = 78;
@@ -5754,7 +6167,7 @@ namespace FamilyManager
             // lblHobbyFilm
             // 
             this.lblHobbyFilm.AutoSize = true;
-            this.lblHobbyFilm.Location = new System.Drawing.Point(24, 85);
+            this.lblHobbyFilm.Location = new System.Drawing.Point(19, 85);
             this.lblHobbyFilm.Name = "lblHobbyFilm";
             this.lblHobbyFilm.Size = new System.Drawing.Size(34, 15);
             this.lblHobbyFilm.TabIndex = 77;
@@ -5763,7 +6176,7 @@ namespace FamilyManager
             // lblHobbySport
             // 
             this.lblHobbySport.AutoSize = true;
-            this.lblHobbySport.Location = new System.Drawing.Point(215, 115);
+            this.lblHobbySport.Location = new System.Drawing.Point(232, 115);
             this.lblHobbySport.Name = "lblHobbySport";
             this.lblHobbySport.Size = new System.Drawing.Size(45, 15);
             this.lblHobbySport.TabIndex = 76;
@@ -5772,7 +6185,7 @@ namespace FamilyManager
             // lblHobbyArts
             // 
             this.lblHobbyArts.AutoSize = true;
-            this.lblHobbyArts.Location = new System.Drawing.Point(28, 25);
+            this.lblHobbyArts.Location = new System.Drawing.Point(23, 25);
             this.lblHobbyArts.Name = "lblHobbyArts";
             this.lblHobbyArts.Size = new System.Drawing.Size(30, 15);
             this.lblHobbyArts.TabIndex = 75;
@@ -5781,7 +6194,7 @@ namespace FamilyManager
             // lblHobbySecret
             // 
             this.lblHobbySecret.AutoSize = true;
-            this.lblHobbySecret.Location = new System.Drawing.Point(215, 85);
+            this.lblHobbySecret.Location = new System.Drawing.Point(232, 85);
             this.lblHobbySecret.Name = "lblHobbySecret";
             this.lblHobbySecret.Size = new System.Drawing.Size(45, 15);
             this.lblHobbySecret.TabIndex = 53;
@@ -5790,7 +6203,7 @@ namespace FamilyManager
             // lblHobbyGames
             // 
             this.lblHobbyGames.AutoSize = true;
-            this.lblHobbyGames.Location = new System.Drawing.Point(8, 145);
+            this.lblHobbyGames.Location = new System.Drawing.Point(3, 145);
             this.lblHobbyGames.Name = "lblHobbyGames";
             this.lblHobbyGames.Size = new System.Drawing.Size(50, 15);
             this.lblHobbyGames.TabIndex = 52;
@@ -5799,7 +6212,7 @@ namespace FamilyManager
             // lblHobbyFitness
             // 
             this.lblHobbyFitness.AutoSize = true;
-            this.lblHobbyFitness.Location = new System.Drawing.Point(9, 115);
+            this.lblHobbyFitness.Location = new System.Drawing.Point(4, 115);
             this.lblHobbyFitness.Name = "lblHobbyFitness";
             this.lblHobbyFitness.Size = new System.Drawing.Size(49, 15);
             this.lblHobbyFitness.TabIndex = 51;
@@ -5808,7 +6221,7 @@ namespace FamilyManager
             // lblHobbyNature
             // 
             this.lblHobbyNature.AutoSize = true;
-            this.lblHobbyNature.Location = new System.Drawing.Point(213, 25);
+            this.lblHobbyNature.Location = new System.Drawing.Point(230, 25);
             this.lblHobbyNature.Name = "lblHobbyNature";
             this.lblHobbyNature.Size = new System.Drawing.Size(47, 15);
             this.lblHobbyNature.TabIndex = 50;
@@ -5817,7 +6230,7 @@ namespace FamilyManager
             // lblHobbyTinker
             // 
             this.lblHobbyTinker.AutoSize = true;
-            this.lblHobbyTinker.Location = new System.Drawing.Point(216, 145);
+            this.lblHobbyTinker.Location = new System.Drawing.Point(233, 145);
             this.lblHobbyTinker.Name = "lblHobbyTinker";
             this.lblHobbyTinker.Size = new System.Drawing.Size(44, 15);
             this.lblHobbyTinker.TabIndex = 49;
@@ -5826,7 +6239,7 @@ namespace FamilyManager
             // lblHobbyCuisine
             // 
             this.lblHobbyCuisine.AutoSize = true;
-            this.lblHobbyCuisine.Location = new System.Drawing.Point(7, 55);
+            this.lblHobbyCuisine.Location = new System.Drawing.Point(2, 55);
             this.lblHobbyCuisine.Name = "lblHobbyCuisine";
             this.lblHobbyCuisine.Size = new System.Drawing.Size(51, 15);
             this.lblHobbyCuisine.TabIndex = 48;
@@ -5872,14 +6285,14 @@ namespace FamilyManager
             this.grpInterests.Controls.Add(this.lblIntCrime);
             this.grpInterests.Location = new System.Drawing.Point(0, 8);
             this.grpInterests.Name = "grpInterests";
-            this.grpInterests.Size = new System.Drawing.Size(410, 265);
+            this.grpInterests.Size = new System.Drawing.Size(400, 265);
             this.grpInterests.TabIndex = 0;
             this.grpInterests.TabStop = false;
             this.grpInterests.Text = "Interests";
             // 
             // trackIntWork
             // 
-            this.trackIntWork.Location = new System.Drawing.Point(262, 236);
+            this.trackIntWork.Location = new System.Drawing.Point(257, 236);
             this.trackIntWork.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntWork.Name = "trackIntWork";
             this.trackIntWork.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iWork;
@@ -5892,7 +6305,7 @@ namespace FamilyManager
             // 
             // trackIntWeather
             // 
-            this.trackIntWeather.Location = new System.Drawing.Point(262, 209);
+            this.trackIntWeather.Location = new System.Drawing.Point(257, 209);
             this.trackIntWeather.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntWeather.Name = "trackIntWeather";
             this.trackIntWeather.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iWeather;
@@ -5905,7 +6318,7 @@ namespace FamilyManager
             // 
             // trackIntTravel
             // 
-            this.trackIntTravel.Location = new System.Drawing.Point(262, 182);
+            this.trackIntTravel.Location = new System.Drawing.Point(257, 182);
             this.trackIntTravel.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntTravel.Name = "trackIntTravel";
             this.trackIntTravel.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iTravel;
@@ -5918,7 +6331,7 @@ namespace FamilyManager
             // 
             // trackIntToys
             // 
-            this.trackIntToys.Location = new System.Drawing.Point(262, 153);
+            this.trackIntToys.Location = new System.Drawing.Point(257, 153);
             this.trackIntToys.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntToys.Name = "trackIntToys";
             this.trackIntToys.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iToys;
@@ -5931,7 +6344,7 @@ namespace FamilyManager
             // 
             // trackIntSports
             // 
-            this.trackIntSports.Location = new System.Drawing.Point(262, 128);
+            this.trackIntSports.Location = new System.Drawing.Point(257, 128);
             this.trackIntSports.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntSports.Name = "trackIntSports";
             this.trackIntSports.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iSports;
@@ -5944,7 +6357,7 @@ namespace FamilyManager
             // 
             // trackIntSciFi
             // 
-            this.trackIntSciFi.Location = new System.Drawing.Point(262, 101);
+            this.trackIntSciFi.Location = new System.Drawing.Point(257, 101);
             this.trackIntSciFi.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntSciFi.Name = "trackIntSciFi";
             this.trackIntSciFi.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iSciFi;
@@ -5957,7 +6370,7 @@ namespace FamilyManager
             // 
             // trackIntSchool
             // 
-            this.trackIntSchool.Location = new System.Drawing.Point(262, 74);
+            this.trackIntSchool.Location = new System.Drawing.Point(257, 74);
             this.trackIntSchool.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntSchool.Name = "trackIntSchool";
             this.trackIntSchool.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iSchool;
@@ -5970,7 +6383,7 @@ namespace FamilyManager
             // 
             // trackIntParanormal
             // 
-            this.trackIntParanormal.Location = new System.Drawing.Point(262, 20);
+            this.trackIntParanormal.Location = new System.Drawing.Point(257, 20);
             this.trackIntParanormal.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntParanormal.Name = "trackIntParanormal";
             this.trackIntParanormal.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iParanormal;
@@ -5983,7 +6396,7 @@ namespace FamilyManager
             // 
             // trackIntPolitics
             // 
-            this.trackIntPolitics.Location = new System.Drawing.Point(262, 47);
+            this.trackIntPolitics.Location = new System.Drawing.Point(257, 47);
             this.trackIntPolitics.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntPolitics.Name = "trackIntPolitics";
             this.trackIntPolitics.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iPolitics;
@@ -5996,7 +6409,7 @@ namespace FamilyManager
             // 
             // trackIntMoney
             // 
-            this.trackIntMoney.Location = new System.Drawing.Point(62, 236);
+            this.trackIntMoney.Location = new System.Drawing.Point(57, 236);
             this.trackIntMoney.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntMoney.Name = "trackIntMoney";
             this.trackIntMoney.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iMoney;
@@ -6009,7 +6422,7 @@ namespace FamilyManager
             // 
             // trackIntHealth
             // 
-            this.trackIntHealth.Location = new System.Drawing.Point(62, 209);
+            this.trackIntHealth.Location = new System.Drawing.Point(57, 209);
             this.trackIntHealth.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntHealth.Name = "trackIntHealth";
             this.trackIntHealth.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iHealth;
@@ -6022,7 +6435,7 @@ namespace FamilyManager
             // 
             // trackIntFood
             // 
-            this.trackIntFood.Location = new System.Drawing.Point(62, 182);
+            this.trackIntFood.Location = new System.Drawing.Point(57, 182);
             this.trackIntFood.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntFood.Name = "trackIntFood";
             this.trackIntFood.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iFood;
@@ -6036,7 +6449,7 @@ namespace FamilyManager
             // lblIntAnimals
             // 
             this.lblIntAnimals.AutoSize = true;
-            this.lblIntAnimals.Location = new System.Drawing.Point(6, 25);
+            this.lblIntAnimals.Location = new System.Drawing.Point(1, 25);
             this.lblIntAnimals.Name = "lblIntAnimals";
             this.lblIntAnimals.Size = new System.Drawing.Size(54, 15);
             this.lblIntAnimals.TabIndex = 99;
@@ -6044,7 +6457,7 @@ namespace FamilyManager
             // 
             // trackIntFashion
             // 
-            this.trackIntFashion.Location = new System.Drawing.Point(62, 153);
+            this.trackIntFashion.Location = new System.Drawing.Point(57, 153);
             this.trackIntFashion.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntFashion.Name = "trackIntFashion";
             this.trackIntFashion.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iFashion;
@@ -6058,7 +6471,7 @@ namespace FamilyManager
             // lblIntWork
             // 
             this.lblIntWork.AutoSize = true;
-            this.lblIntWork.Location = new System.Drawing.Point(222, 241);
+            this.lblIntWork.Location = new System.Drawing.Point(217, 241);
             this.lblIntWork.Name = "lblIntWork";
             this.lblIntWork.Size = new System.Drawing.Size(38, 15);
             this.lblIntWork.TabIndex = 80;
@@ -6066,7 +6479,7 @@ namespace FamilyManager
             // 
             // trackIntEnvironment
             // 
-            this.trackIntEnvironment.Location = new System.Drawing.Point(62, 128);
+            this.trackIntEnvironment.Location = new System.Drawing.Point(57, 128);
             this.trackIntEnvironment.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntEnvironment.Name = "trackIntEnvironment";
             this.trackIntEnvironment.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iEnvironment;
@@ -6080,7 +6493,7 @@ namespace FamilyManager
             // lblIntWeather
             // 
             this.lblIntWeather.AutoSize = true;
-            this.lblIntWeather.Location = new System.Drawing.Point(204, 214);
+            this.lblIntWeather.Location = new System.Drawing.Point(199, 214);
             this.lblIntWeather.Name = "lblIntWeather";
             this.lblIntWeather.Size = new System.Drawing.Size(56, 15);
             this.lblIntWeather.TabIndex = 79;
@@ -6088,7 +6501,7 @@ namespace FamilyManager
             // 
             // trackIntEntertainment
             // 
-            this.trackIntEntertainment.Location = new System.Drawing.Point(62, 101);
+            this.trackIntEntertainment.Location = new System.Drawing.Point(57, 101);
             this.trackIntEntertainment.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntEntertainment.Name = "trackIntEntertainment";
             this.trackIntEntertainment.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iEntertainment;
@@ -6102,7 +6515,7 @@ namespace FamilyManager
             // lblIntTravel
             // 
             this.lblIntTravel.AutoSize = true;
-            this.lblIntTravel.Location = new System.Drawing.Point(217, 187);
+            this.lblIntTravel.Location = new System.Drawing.Point(212, 187);
             this.lblIntTravel.Name = "lblIntTravel";
             this.lblIntTravel.Size = new System.Drawing.Size(43, 15);
             this.lblIntTravel.TabIndex = 78;
@@ -6110,7 +6523,7 @@ namespace FamilyManager
             // 
             // trackIntCulture
             // 
-            this.trackIntCulture.Location = new System.Drawing.Point(62, 74);
+            this.trackIntCulture.Location = new System.Drawing.Point(57, 74);
             this.trackIntCulture.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntCulture.Name = "trackIntCulture";
             this.trackIntCulture.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iCulture;
@@ -6124,7 +6537,7 @@ namespace FamilyManager
             // lblIntToys
             // 
             this.lblIntToys.AutoSize = true;
-            this.lblIntToys.Location = new System.Drawing.Point(225, 160);
+            this.lblIntToys.Location = new System.Drawing.Point(220, 160);
             this.lblIntToys.Name = "lblIntToys";
             this.lblIntToys.Size = new System.Drawing.Size(35, 15);
             this.lblIntToys.TabIndex = 77;
@@ -6132,7 +6545,7 @@ namespace FamilyManager
             // 
             // trackIntAnimals
             // 
-            this.trackIntAnimals.Location = new System.Drawing.Point(62, 20);
+            this.trackIntAnimals.Location = new System.Drawing.Point(57, 20);
             this.trackIntAnimals.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntAnimals.Name = "trackIntAnimals";
             this.trackIntAnimals.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iAnimals;
@@ -6145,7 +6558,7 @@ namespace FamilyManager
             // 
             // trackIntCrime
             // 
-            this.trackIntCrime.Location = new System.Drawing.Point(62, 47);
+            this.trackIntCrime.Location = new System.Drawing.Point(57, 47);
             this.trackIntCrime.Margin = new System.Windows.Forms.Padding(0);
             this.trackIntCrime.Name = "trackIntCrime";
             this.trackIntCrime.SdscIndex = Sims2Tools.DBPF.Neighbourhood.SDSC.SdscIndex.iCrime;
@@ -6159,7 +6572,7 @@ namespace FamilyManager
             // lblIntSports
             // 
             this.lblIntSports.AutoSize = true;
-            this.lblIntSports.Location = new System.Drawing.Point(215, 133);
+            this.lblIntSports.Location = new System.Drawing.Point(210, 133);
             this.lblIntSports.Name = "lblIntSports";
             this.lblIntSports.Size = new System.Drawing.Size(45, 15);
             this.lblIntSports.TabIndex = 76;
@@ -6168,7 +6581,7 @@ namespace FamilyManager
             // lblIntSciFi
             // 
             this.lblIntSciFi.AutoSize = true;
-            this.lblIntSciFi.Location = new System.Drawing.Point(219, 106);
+            this.lblIntSciFi.Location = new System.Drawing.Point(214, 106);
             this.lblIntSciFi.Name = "lblIntSciFi";
             this.lblIntSciFi.Size = new System.Drawing.Size(41, 15);
             this.lblIntSciFi.TabIndex = 75;
@@ -6178,7 +6591,7 @@ namespace FamilyManager
             // lblIntSchool
             // 
             this.lblIntSchool.AutoSize = true;
-            this.lblIntSchool.Location = new System.Drawing.Point(212, 79);
+            this.lblIntSchool.Location = new System.Drawing.Point(207, 79);
             this.lblIntSchool.Name = "lblIntSchool";
             this.lblIntSchool.Size = new System.Drawing.Size(48, 15);
             this.lblIntSchool.TabIndex = 74;
@@ -6187,7 +6600,7 @@ namespace FamilyManager
             // lblIntPolitics
             // 
             this.lblIntPolitics.AutoSize = true;
-            this.lblIntPolitics.Location = new System.Drawing.Point(211, 52);
+            this.lblIntPolitics.Location = new System.Drawing.Point(206, 52);
             this.lblIntPolitics.Name = "lblIntPolitics";
             this.lblIntPolitics.Size = new System.Drawing.Size(49, 15);
             this.lblIntPolitics.TabIndex = 73;
@@ -6196,7 +6609,7 @@ namespace FamilyManager
             // lblIntParanormal
             // 
             this.lblIntParanormal.AutoSize = true;
-            this.lblIntParanormal.Location = new System.Drawing.Point(224, 25);
+            this.lblIntParanormal.Location = new System.Drawing.Point(219, 25);
             this.lblIntParanormal.Name = "lblIntParanormal";
             this.lblIntParanormal.Size = new System.Drawing.Size(36, 15);
             this.lblIntParanormal.TabIndex = 54;
@@ -6205,7 +6618,7 @@ namespace FamilyManager
             // lblIntMoney
             // 
             this.lblIntMoney.AutoSize = true;
-            this.lblIntMoney.Location = new System.Drawing.Point(13, 241);
+            this.lblIntMoney.Location = new System.Drawing.Point(8, 241);
             this.lblIntMoney.Name = "lblIntMoney";
             this.lblIntMoney.Size = new System.Drawing.Size(47, 15);
             this.lblIntMoney.TabIndex = 53;
@@ -6214,7 +6627,7 @@ namespace FamilyManager
             // lblIntHealth
             // 
             this.lblIntHealth.AutoSize = true;
-            this.lblIntHealth.Location = new System.Drawing.Point(14, 214);
+            this.lblIntHealth.Location = new System.Drawing.Point(9, 214);
             this.lblIntHealth.Name = "lblIntHealth";
             this.lblIntHealth.Size = new System.Drawing.Size(46, 15);
             this.lblIntHealth.TabIndex = 52;
@@ -6223,7 +6636,7 @@ namespace FamilyManager
             // lblIntFood
             // 
             this.lblIntFood.AutoSize = true;
-            this.lblIntFood.Location = new System.Drawing.Point(22, 187);
+            this.lblIntFood.Location = new System.Drawing.Point(17, 187);
             this.lblIntFood.Name = "lblIntFood";
             this.lblIntFood.Size = new System.Drawing.Size(38, 15);
             this.lblIntFood.TabIndex = 51;
@@ -6233,7 +6646,7 @@ namespace FamilyManager
             // lblIntFashion
             // 
             this.lblIntFashion.AutoSize = true;
-            this.lblIntFashion.Location = new System.Drawing.Point(6, 160);
+            this.lblIntFashion.Location = new System.Drawing.Point(1, 160);
             this.lblIntFashion.Name = "lblIntFashion";
             this.lblIntFashion.Size = new System.Drawing.Size(54, 15);
             this.lblIntFashion.TabIndex = 50;
@@ -6242,7 +6655,7 @@ namespace FamilyManager
             // lblIntEnvironment
             // 
             this.lblIntEnvironment.AutoSize = true;
-            this.lblIntEnvironment.Location = new System.Drawing.Point(9, 133);
+            this.lblIntEnvironment.Location = new System.Drawing.Point(4, 133);
             this.lblIntEnvironment.Name = "lblIntEnvironment";
             this.lblIntEnvironment.Size = new System.Drawing.Size(51, 15);
             this.lblIntEnvironment.TabIndex = 49;
@@ -6251,7 +6664,7 @@ namespace FamilyManager
             // lblIntEntertainment
             // 
             this.lblIntEntertainment.AutoSize = true;
-            this.lblIntEntertainment.Location = new System.Drawing.Point(32, 106);
+            this.lblIntEntertainment.Location = new System.Drawing.Point(27, 106);
             this.lblIntEntertainment.Name = "lblIntEntertainment";
             this.lblIntEntertainment.Size = new System.Drawing.Size(28, 15);
             this.lblIntEntertainment.TabIndex = 48;
@@ -6260,7 +6673,7 @@ namespace FamilyManager
             // lblIntCulture
             // 
             this.lblIntCulture.AutoSize = true;
-            this.lblIntCulture.Location = new System.Drawing.Point(11, 79);
+            this.lblIntCulture.Location = new System.Drawing.Point(6, 79);
             this.lblIntCulture.Name = "lblIntCulture";
             this.lblIntCulture.Size = new System.Drawing.Size(49, 15);
             this.lblIntCulture.TabIndex = 47;
@@ -6269,7 +6682,7 @@ namespace FamilyManager
             // lblIntCrime
             // 
             this.lblIntCrime.AutoSize = true;
-            this.lblIntCrime.Location = new System.Drawing.Point(17, 52);
+            this.lblIntCrime.Location = new System.Drawing.Point(12, 52);
             this.lblIntCrime.Name = "lblIntCrime";
             this.lblIntCrime.Size = new System.Drawing.Size(43, 15);
             this.lblIntCrime.TabIndex = 46;
@@ -6286,7 +6699,7 @@ namespace FamilyManager
             this.tabVacations.Location = new System.Drawing.Point(4, 4);
             this.tabVacations.Margin = new System.Windows.Forms.Padding(0);
             this.tabVacations.Name = "tabVacations";
-            this.tabVacations.Size = new System.Drawing.Size(1276, 281);
+            this.tabVacations.Size = new System.Drawing.Size(1276, 283);
             this.tabVacations.TabIndex = 8;
             this.tabVacations.Text = "Vacations";
             this.tabVacations.UseVisualStyleBackColor = true;
@@ -7110,7 +7523,7 @@ namespace FamilyManager
             this.btnVacGenPlaneThree.Image = ((System.Drawing.Image)(resources.GetObject("btnVacGenPlaneThree.Image")));
             this.btnVacGenPlaneThree.Location = new System.Drawing.Point(71, 13);
             this.btnVacGenPlaneThree.Margin = new System.Windows.Forms.Padding(0);
-            this.btnVacGenPlaneThree.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.ThreeGoodVacations;
+            this.btnVacGenPlaneThree.Memento = Sims2Tools.DBPF.Neighbourhood.SDSC.Mementos.WentOnIslandVacation;
             this.btnVacGenPlaneThree.Name = "btnVacGenPlaneThree";
             this.btnVacGenPlaneThree.Selected = false;
             this.btnVacGenPlaneThree.Size = new System.Drawing.Size(60, 60);
@@ -7271,10 +7684,13 @@ namespace FamilyManager
             this.tabCensus.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridCensus)).EndInit();
             this.menuContextJewelbox.ResumeLayout(false);
-            this.tabFamily.ResumeLayout(false);
-            this.panelFamily.ResumeLayout(false);
-            this.panelFamily.PerformLayout();
+            this.tabHousehold.ResumeLayout(false);
+            this.panelHousehold.ResumeLayout(false);
+            this.panelHousehold.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imageHouse)).EndInit();
+            this.tabFamily.ResumeLayout(false);
+            this.grpMagazineSubs.ResumeLayout(false);
+            this.grpMagazineSubs.PerformLayout();
             this.tabCloset.ResumeLayout(false);
             this.splitClosetLeftRight.Panel1.ResumeLayout(false);
             this.splitClosetLeftRight.Panel2.ResumeLayout(false);
@@ -7437,6 +7853,7 @@ namespace FamilyManager
         private System.Windows.Forms.Button btnSuitcaseMove;
         private System.Windows.Forms.ToolStripMenuItem menuContextMemberFilterAll;
         private System.Windows.Forms.ToolStripMenuItem menuContextMemberFilterThis;
+        private System.Windows.Forms.TabPage tabHousehold;
         private System.Windows.Forms.TabPage tabFamily;
         private System.Windows.Forms.Label lblMoney;
         private System.Windows.Forms.TextBox textFamilyMoney;
@@ -7447,7 +7864,7 @@ namespace FamilyManager
         private System.Windows.Forms.Label lblWriteUp;
         private System.Windows.Forms.TextBox textFamilyName;
         private System.Windows.Forms.Label lblFamName;
-        private System.Windows.Forms.Panel panelFamily;
+        private System.Windows.Forms.Panel panelHousehold;
         private System.Windows.Forms.ToolStripMenuItem menuLanguage;
         private System.Windows.Forms.TextBox textBusinessMoney;
         private System.Windows.Forms.Label lblBusinessMoney;
@@ -7524,22 +7941,11 @@ namespace FamilyManager
         private System.Windows.Forms.ToolStripMenuItem menuContextJewelboxDelete;
         private System.Windows.Forms.ToolStripMenuItem menuContextMemberChangeSimName;
         private System.Windows.Forms.ToolTip toolTip;
-        private System.Windows.Forms.ToolStripSeparator menuContextMemberSeparator1;
+        private System.Windows.Forms.ToolStripSeparator menuContextMemberSeparatorSplitFiles;
         private System.Windows.Forms.ToolStripMenuItem menuContextMemberMergeSplitFiles;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem menuItemIncludeNPCs;
         private System.Windows.Forms.ToolStripMenuItem menuItemOnlyNPCs;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colFirstName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colSplitFile;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colGender;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colGenderCode;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAge;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAgeCode;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colDaysLeft;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colGenderHex;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colAgeHex;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colThumbnail;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colData;
         private System.Windows.Forms.TabPage tabCareer;
         private System.Windows.Forms.TabPage tabSkills;
         private System.Windows.Forms.GroupBox grpJob;
@@ -7911,5 +8317,45 @@ namespace FamilyManager
         private Sims2Tools.Controls.SkillTracker trackSkillHiddenSlapDance;
         private System.Windows.Forms.Label lblSkillHiddenHulaDance;
         private System.Windows.Forms.Label lblSkillHiddenSlapDance;
+        private System.Windows.Forms.ToolStripMenuItem menuContextMemberRemovePlasticSurgery;
+        private System.Windows.Forms.ToolStripMenuItem menuContextMemberGeneticPlasticSurgery;
+        private System.Windows.Forms.ToolStripSeparator menuContextMemberSeparatorPlasticSurgery;
+        private System.Windows.Forms.ToolStripMenuItem menuItemShowPlasticSurgery;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorPlasticSurgery;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotCuisine;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotScience;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotNature;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotArts;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotTinker;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotSport;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotSecret;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotMusic;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotGames;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotFitness;
+        private Sims2Tools.Controls.HobbyLotButton btnHobbyLotFilm;
+        private System.Windows.Forms.GroupBox grpMagazineSubs;
+        private System.Windows.Forms.CheckBox ckbMagSubArts;
+        private System.Windows.Forms.CheckBox ckbMagSubSports;
+        private System.Windows.Forms.CheckBox ckbMagSubNature;
+        private System.Windows.Forms.CheckBox ckbMagSubMusic;
+        private System.Windows.Forms.CheckBox ckbMagSubLiterature;
+        private System.Windows.Forms.CheckBox ckbMagSubGames;
+        private System.Windows.Forms.CheckBox ckbMagSubFood;
+        private System.Windows.Forms.CheckBox ckbMagSubFitness;
+        private System.Windows.Forms.CheckBox ckbMagSubEngineering;
+        private System.Windows.Forms.CheckBox ckbMagSubScience;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colFirstName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colPlasticSurgery;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colSplitFile;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colGender;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colGenderCode;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAge;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAgeCode;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colDaysLeft;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colEarnings;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colGenderHex;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colAgeHex;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colThumbnail;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMemberInfo;
     }
 }

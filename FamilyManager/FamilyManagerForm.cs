@@ -7,10 +7,14 @@
  */
 
 #region Usings
-using FamilyManager.Caching;
+using FamilyManager.Cache;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.Cache;
+using Sims2Tools.Cache.Career;
+using Sims2Tools.Cache.Hood;
+using Sims2Tools.Cache.Outfits;
+using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CTSS;
@@ -48,8 +52,9 @@ namespace FamilyManager
     internal enum TabPageIndex : int
     {
         TabCensus = 0,
-        TabFamily,
-        TabCloset,          // Must be the first family tab (or will need to recode stuff)
+        TabHousehold,
+        TabFamily,          // Must be the first family tab (or will need to recode stuff)
+        TabCloset,
         TabSafe,
         TabAspiration,      // Must be the first member tab (or will need to recode stuff)
         TabCareer,
@@ -77,7 +82,7 @@ namespace FamilyManager
         private readonly ClothingThumbnailsCache clothingThumbnailsCache = new ClothingThumbnailsCache();
 
         private readonly CensusGridData dataCensus = new CensusGridData();
-        private readonly FamilyGridData dataFamilyMembers = new FamilyGridData();
+        private readonly MemberGridData dataFamilyMembers = new MemberGridData();
 
         private readonly OutfitGridData dataFamilyCloset = new OutfitGridData();
         private readonly OutfitGridData dataSuitcase = new OutfitGridData();
@@ -119,7 +124,7 @@ namespace FamilyManager
             InitializeComponent();
             SetTitle();
 
-            tabPages.SelectedIndex = (int)TabPageIndex.TabFamily;
+            tabPages.SelectedIndex = (int)TabPageIndex.TabHousehold;
 
             {
                 ignoreSkillsChanges = true;
@@ -644,6 +649,7 @@ namespace FamilyManager
             splitSafeLeftRight.SplitterDistance = splitTopLeftRight.SplitterDistance;
 
             menuItemUseCodes.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemUseCodes.Name, 0) != 0); OnUseCodesClicked(menuItemUseCodes, null);
+            menuItemShowPlasticSurgery.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemShowPlasticSurgery.Name, 0) != 0); OnShowPlasticSurgeryClicked(menuItemShowPlasticSurgery, null);
             menuItemShowSplitFiles.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemShowSplitFiles.Name, 0) != 0); OnShowSplitFilesClicked(menuItemShowSplitFiles, null);
             menuItemHighlightSplitFiles.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemHighlightSplitFiles.Name, 0) != 0); OnHighlightSplitFilesClicked(menuItemHighlightSplitFiles, null);
             menuItemIncludeNPCs.Checked = ((int)RegistryTools.GetSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemIncludeNPCs.Name, 0) != 0);
@@ -678,7 +684,7 @@ namespace FamilyManager
             MyUpdater = new Updater(FamilyManagerApp.RegistryKey, menuHelp);
             MyUpdater.CheckForUpdates();
 
-            DataCache.InvalidateHoods();
+            DataCache.InvalidateHoodsCache();
 
             LoadSchools();
             LoadSchoolGrades();
@@ -712,7 +718,7 @@ namespace FamilyManager
             if (Form.ModifierKeys == (Keys.Control | Keys.Shift))
             {
                 RegistryTools.RemoveAppSettings(FamilyManagerApp.RegistryKey);
-                DataCache.RemoveAll();
+                DataCache.DeleteFamilyManagerCaches();
             }
             else
             {
@@ -722,6 +728,7 @@ namespace FamilyManager
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey, "splitterLR", splitTopLeftRight.SplitterDistance);
 
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemUseCodes.Name, menuItemUseCodes.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemShowPlasticSurgery.Name, menuItemShowPlasticSurgery.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemShowSplitFiles.Name, menuItemShowSplitFiles.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemHighlightSplitFiles.Name, menuItemHighlightSplitFiles.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(FamilyManagerApp.RegistryKey + @"\Options", menuItemIncludeNPCs.Name, menuItemIncludeNPCs.Checked ? 1 : 0);
@@ -910,7 +917,7 @@ namespace FamilyManager
 
                     filters.ShowAll();
 
-                    DoWork_FillFamilyGrid(hoodNode, familyNode);
+                    DoWork_FillHouseholdGrid(hoodNode, familyNode);
                     DoWork_FillClosetOrSafeGrid(hoodNode, familyNode);
                 }
             }
@@ -959,7 +966,7 @@ namespace FamilyManager
             s.Stop();
         }
 
-        private void DoWork_FillFamilyGrid(HoodTreeNode hoodNode, FamilyTreeNode familyNode)
+        private void DoWork_FillHouseholdGrid(HoodTreeNode hoodNode, FamilyTreeNode familyNode)
         {
             Stopwatch s = new Stopwatch();
             s.Start();
@@ -993,19 +1000,23 @@ namespace FamilyManager
                     {
                         Sdsc sdsc = (Sdsc)hoodPackage.GetResourceByKey(new DBPFKey(Sdsc.TYPE, DBPFData.GROUP_LOCAL, memberId, DBPFData.RESOURCE_NULL));
 
-                        if (sdsc != null && characterCache.TryGetValue(sdsc.SimGuid, out CharacterData data))
+                        if (sdsc != null && characterCache.TryGetValue(sdsc.SimGuid, out CharacterData memberData))
                         {
-                            data.SetSdscDetails(hoodNode.PackagePath, sdsc.InstanceID);
+                            memberData.SetSdscDetails(hoodNode.PackagePath, sdsc.InstanceID);
 
-                            uint genderCode = GenderHelper.CpfGenderCode(sdsc.Gender);
-                            uint ageCode = AgeHelper.CpfAgeCode(sdsc.LifeSection);
+                            CharacterInfo memberInfo = new CharacterInfo(memberData);
 
                             DataRow memberRow = dataFamilyMembers.NewRow();
 
-                            memberRow["Data"] = data;
+                            memberRow["MemberInfo"] = memberInfo;
 
-                            memberRow["FirstName"] = $"{data.GivenName(prefLid)} {data.FamilyName(prefLid)}";
-                            memberRow["SplitFile"] = data.IsSplit ? "Y" : "N";
+                            memberRow["FirstName"] = $"{memberInfo.GivenName(prefLid)} {memberInfo.FamilyName(prefLid)}";
+
+                            memberRow["PlasticSurgery"] = memberInfo.HasPlasticSurgery ? "Y" : "N";
+                            memberRow["SplitFile"] = memberInfo.IsSplit ? "Y" : "N";
+
+                            uint genderCode = GenderHelper.CpfGenderCode(sdsc.Gender);
+                            uint ageCode = AgeHelper.CpfAgeCode(sdsc.LifeSection);
 
                             memberRow["Gender"] = sdsc.Gender.ToString();
                             memberRow["GenderCode"] = sdsc.Gender.ToString().Substring(0, 1);
@@ -1016,10 +1027,11 @@ namespace FamilyManager
                             memberRow["AgeHex"] = ageCode;
 
                             memberRow["DaysLeft"] = sdsc.AgeDaysLeft;
+                            memberRow["Earnings"] = memberInfo.Earnings;
 
                             if (ageCode != 0x0000)
                             {
-                                memberRow["Thumbnail"] = data.Thumbnail(ageCode);
+                                memberRow["Thumbnail"] = memberInfo.Thumbnail(ageCode);
                             }
 
                             dataFamilyMembers.Rows.Add(memberRow);
@@ -1040,6 +1052,17 @@ namespace FamilyManager
 
             logger.Info($"Family loaded in {(s.ElapsedMilliseconds / 1000.0)}s");
             s.Stop();
+        }
+
+        private void DoWork_FillFamilyGrid(HoodTreeNode hoodNode, FamilyTreeNode familyNode)
+        {
+            foreach (Control control in grpMagazineSubs.Controls)
+            {
+                if (control is CheckBox checkBox)
+                {
+                    checkBox.Checked = currentFamily.HasMagazineSub(checkBox.Tag.ToString());
+                }
+            }
         }
 
         private void DoWork_FillClosetOrSafeGrid(HoodTreeNode hoodNode, FamilyTreeNode familyNode)
@@ -1099,7 +1122,7 @@ namespace FamilyManager
                                     closetRow["AgeHex"] = data.ResAge;
 
                                     closetRow["ThumbKey"] = data.ThumbKey;
-                                    closetRow["LocalThumbKey"] = data.LocalThumbKeyZ;
+                                    closetRow["LocalThumbKey"] = data.LocalThumbKey;
                                 }
                                 else
                                 {
@@ -1162,7 +1185,7 @@ namespace FamilyManager
                                     safeRow["AgeHex"] = data.ResAge;
 
                                     safeRow["ThumbKey"] = data.ThumbKey;
-                                    safeRow["LocalThumbKey"] = data.LocalThumbKeyZ;
+                                    safeRow["LocalThumbKey"] = data.LocalThumbKey;
                                 }
                                 else
                                 {
@@ -1469,7 +1492,7 @@ namespace FamilyManager
                                 {
                                     Sdsc sdsc = (Sdsc)hoodPackage.GetResourceByKey(new DBPFKey(Sdsc.TYPE, DBPFData.GROUP_LOCAL, memberId, DBPFData.RESOURCE_NULL));
 
-                                    if (sdsc != null && characterCache.TryGetValue(sdsc.SimGuid, out CharacterData data))
+                                    if (sdsc != null && characterCache.TryGetValue(sdsc.SimGuid, out CharacterData memberData))
                                     {
                                         string code = $"{BuildAgeCodeString(AgeHelper.CpfAgeCode(sdsc.LifeSection))}{sdsc.Gender.ToString().Substring(0, 1).ToUpper()}";
 
@@ -1712,9 +1735,9 @@ namespace FamilyManager
                         {
                             if (ckbFamilyNameSame.Checked)
                             {
-                                CharacterData data = (row.Cells["colData"].Value as CharacterData);
+                                CharacterInfo memberInfo = (row.Cells["colMemberInfo"].Value as CharacterInfo);
 
-                                if (data.FamilyName(prefLid).Equals(currentFamily.FamilyName))
+                                if (memberInfo.FamilyName(prefLid).Equals(currentFamily.FamilyName))
                                 {
                                     ChangeMemberFamilyName(row, textFamilyName.Text);
                                 }
@@ -1731,7 +1754,7 @@ namespace FamilyManager
 
         private void DoAsyncWork_LoadCharacterCache(ProgressDialog sender, DoWorkEventArgs args)
         {
-            characterCache.Load(sender, lastHoodNode);
+            characterCache.Load(sender, lastHoodNode.HoodData);
 
             sender.SetProgress(0, "Caching SDSC References");
             sdscInstanceBySimGuid.Clear();
@@ -1751,64 +1774,64 @@ namespace FamilyManager
         #endregion
 
         #region Member Worker Helpers
-        private CharacterData currentMemberData = null;
+        private CharacterInfo currentMemberInfo = null;
 
         private void UpdateCurrentMember()
         {
-            if (currentMemberData != null && currentMemberData.HasChanges)
+            if (currentMemberInfo != null && currentMemberInfo.HasChanges)
             {
-                if (currentMemberData.HasAspirationChanges)
+                if (currentMemberInfo.HasAspirationChanges)
                 {
-                    currentMemberData.AspirationPrimary = (int)(comboAspirationPrimary.SelectedItem as UintNamedValue).Value;
-                    currentMemberData.AspirationSecondary = (int)(comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
+                    currentMemberInfo.AspirationPrimary = (int)(comboAspirationPrimary.SelectedItem as UintNamedValue).Value;
+                    currentMemberInfo.AspirationSecondary = (int)(comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
                 }
 
-                if (currentMemberData.HasBenefitChanges)
+                if (currentMemberInfo.HasBenefitChanges)
                 {
                     UpdateSuperpowerToken();
                     UpdateMotiveDecayTokens();
                 }
 
-                if (currentMemberData.HasUniversityChanges)
+                if (currentMemberInfo.HasUniversityChanges)
                 {
-                    if (currentMemberData.UniSemester != (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value)
+                    if (currentMemberInfo.UniSemester != (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value)
                     {
-                        currentMemberData.UniSemester = (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value;
-                        currentMemberData.UniInfoFlags &= 0xFFF0;
+                        currentMemberInfo.UniSemester = (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value;
+                        currentMemberInfo.UniInfoFlags &= 0xFFF0;
 
-                        switch (currentMemberData.UniSemester)
+                        switch (currentMemberInfo.UniSemester)
                         {
                             case 1:
                             case 2:
-                                currentMemberData.UniInfoFlags |= 0x0001;
+                                currentMemberInfo.UniInfoFlags |= 0x0001;
                                 break;
                             case 3:
                             case 4:
-                                currentMemberData.UniInfoFlags |= 0x0002;
+                                currentMemberInfo.UniInfoFlags |= 0x0002;
                                 break;
                             case 5:
                             case 6:
-                                currentMemberData.UniInfoFlags |= 0x0004;
+                                currentMemberInfo.UniInfoFlags |= 0x0004;
                                 break;
                             case 7:
                             case 8:
-                                currentMemberData.UniInfoFlags |= 0x0008;
+                                currentMemberInfo.UniInfoFlags |= 0x0008;
                                 break;
                         }
 
-                        currentMemberData.UniSyncGpaToken();
+                        currentMemberInfo.UniSyncGpaToken();
                     }
                 }
 
-                currentMemberData.HasChanges = false;
+                currentMemberInfo.HasChanges = false;
             }
         }
 
-        private void SetCurrentMember(CharacterData data)
+        private void SetCurrentMember(CharacterInfo memberInfo)
         {
             UpdateCurrentMember();
 
-            currentMemberData = data;
+            currentMemberInfo = memberInfo;
         }
 
         bool ignoreAspirationChanges = false;
@@ -1895,33 +1918,33 @@ namespace FamilyManager
         {
             if (gridFamilyMembers.SelectedRows.Count == 1)
             {
-                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colMemberInfo"].Value as CharacterInfo);
 
-                imageAspirationsSim.Image = currentMemberData.Thumbnail(currentMemberData.AgeCode);
+                imageAspirationsSim.Image = currentMemberInfo.Thumbnail(currentMemberInfo.AgeCode);
 
                 ignoreAspirationChanges = true;
 
                 { // Aspiration
-                    grpAspiration.Enabled = currentMemberData.IsToddlerOrOlder;
+                    grpAspiration.Enabled = currentMemberInfo.IsToddlerOrOlder;
 
                     if (grpAspiration.Enabled)
                     {
-                        comboAspirationPrimary.SelectedIndex = currentMemberData.AspirationPrimary;
-                        comboAspirationSecondary.SelectedIndex = currentMemberData.AspirationSecondary;
+                        comboAspirationPrimary.SelectedIndex = currentMemberInfo.AspirationPrimary;
+                        comboAspirationSecondary.SelectedIndex = currentMemberInfo.AspirationSecondary;
 
-                        if (currentMemberData.IsToddler)
+                        if (currentMemberInfo.IsToddler)
                         {
                             textAspirationMeter.Maximum = (uint)(trackAspirationMeter.Maximum = 300);
                         }
-                        else if (currentMemberData.IsChild)
+                        else if (currentMemberInfo.IsChild)
                         {
                             textAspirationMeter.Maximum = (uint)(trackAspirationMeter.Maximum = 600);
                         }
-                        else if (currentMemberData.IsTeen)
+                        else if (currentMemberInfo.IsTeen)
                         {
                             textAspirationMeter.Maximum = (uint)(trackAspirationMeter.Maximum = 900);
                         }
-                        else if (currentMemberData.IsElder)
+                        else if (currentMemberInfo.IsElder)
                         {
                             textAspirationMeter.Maximum = (uint)(trackAspirationMeter.Maximum = 1500);
                         }
@@ -1930,15 +1953,15 @@ namespace FamilyManager
                             textAspirationMeter.Maximum = (uint)(trackAspirationMeter.Maximum = 1200);
                         }
 
-                        trackAspirationMeter.Value = (int)(textAspirationMeter.Value = currentMemberData.AspirationScoreRawDiv10);
+                        trackAspirationMeter.Value = (int)(textAspirationMeter.Value = currentMemberInfo.AspirationScoreRawDiv10);
                         UpdateAspirationMeterColour();
-                        textAspirationScore.Value = currentMemberData.AspirationScore;
+                        textAspirationScore.Value = currentMemberInfo.AspirationScore;
                         textAspirationScore.Enabled = !ckbAspirationLock.Checked;
 
-                        textAspirationPoints.Value = currentMemberData.AspirationPoints;
+                        textAspirationPoints.Value = currentMemberInfo.AspirationPoints;
 
-                        textAspirationLongTerm.Value = currentMemberData.AspirationLongTerm;
-                        ckbAspirationPermaPlat.Checked = currentMemberData.IsPermanentPlatinum;
+                        textAspirationLongTerm.Value = currentMemberInfo.AspirationLongTerm;
+                        ckbAspirationPermaPlat.Checked = currentMemberInfo.IsPermanentPlatinum;
                     }
                     else
                     {
@@ -1947,16 +1970,16 @@ namespace FamilyManager
                 }
 
                 { // Benefits
-                    grpBenefits.Enabled = currentMemberData.IsChildOrOlder;
+                    grpBenefits.Enabled = currentMemberInfo.IsChildOrOlder;
 
                     if (grpBenefits.Enabled)
                     {
-                        textBenefitsUnused.Value = (uint)currentMemberData.SuperpowerPointsUnused;
+                        textBenefitsUnused.Value = (uint)currentMemberInfo.SuperpowerPointsUnused;
 
                         UpdateNeedsBenefits();
                         UpdateWorkBenefits();
 
-                        if (currentMemberData.IsChild)
+                        if (currentMemberInfo.IsChild)
                         {
                             ClearPriAndSecBenefits();
                         }
@@ -1974,7 +1997,7 @@ namespace FamilyManager
                 }
 
                 { // Motive Decay Modifiers
-                    grpModifiers.Enabled = currentMemberData.IsChildOrOlder;
+                    grpModifiers.Enabled = currentMemberInfo.IsChildOrOlder;
 
                     if (grpModifiers.Enabled)
                     {
@@ -2055,22 +2078,22 @@ namespace FamilyManager
         {
             if (gridFamilyMembers.SelectedRows.Count == 1)
             {
-                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colMemberInfo"].Value as CharacterInfo);
 
-                imageCareerSim.Image = currentMemberData.Thumbnail(currentMemberData.AgeCode);
+                imageCareerSim.Image = currentMemberInfo.Thumbnail(currentMemberInfo.AgeCode);
 
                 ignoreCareerChanges = true;
 
                 { // School
-                    grpSchool.Enabled = currentMemberData.IsChildOrOlder;
+                    grpSchool.Enabled = currentMemberInfo.IsChildOrOlder;
 
                     if (grpSchool.Enabled)
                     {
-                        SetCombo(comboSchoolType, currentMemberData.SchoolGuid.AsUInt());
-                        textSchoolGUID.Value = currentMemberData.SchoolGuid.AsUInt();
+                        SetCombo(comboSchoolType, currentMemberInfo.SchoolGuid.AsUInt());
+                        textSchoolGUID.Value = currentMemberInfo.SchoolGuid.AsUInt();
 
                         lblSchoolGrade.Visible = comboSchoolGrade.Visible = true;
-                        SetCombo(comboSchoolGrade, currentMemberData.SchoolGrade);
+                        SetCombo(comboSchoolGrade, currentMemberInfo.SchoolGrade);
                     }
                     else
                     {
@@ -2082,7 +2105,7 @@ namespace FamilyManager
                 }
 
                 { // University
-                    grpUniversity.Enabled = currentMemberData.IsYoungAdultOrOlder;
+                    grpUniversity.Enabled = currentMemberInfo.IsYoungAdultOrOlder;
 
                     if (!grpUniversity.Enabled)
                     {
@@ -2091,8 +2114,8 @@ namespace FamilyManager
                     }
                     else
                     {
-                        SetCombo(comboUniMajor, currentMemberData.UniMajorGuid.AsUInt());
-                        textMajorGUID.Value = currentMemberData.UniMajorGuid.AsUInt();
+                        SetCombo(comboUniMajor, currentMemberInfo.UniMajorGuid.AsUInt());
+                        textMajorGUID.Value = currentMemberInfo.UniMajorGuid.AsUInt();
                     }
 
                     lblUniResult.Visible = comboUniResult.Visible = false;
@@ -2105,53 +2128,53 @@ namespace FamilyManager
                     lblUniStudying.Visible = ckbUniStudying.Visible = false;
                     lblUniSecretSoc.Visible = ckbUniSecretSoc.Visible = false;
 
-                    if (currentMemberData.OnCampus)
+                    if (currentMemberInfo.OnCampus)
                     {
                         grpUniversity.Text = "University (On Campus)";
                         lblUniResult.Visible = comboUniResult.Visible = false;
 
                         lblUniSemester.Visible = comboUniSemester.Visible = true;
-                        SetCombo(comboUniSemester, currentMemberData.UniSemester);
+                        SetCombo(comboUniSemester, currentMemberInfo.UniSemester);
 
                         lblUniGrade.Visible = trackUniGrade.Visible = textUniGrade.Visible = true;
-                        trackUniGrade.Value = currentMemberData.UniCurrentGPA;
-                        textUniGrade.Value = (currentMemberData.UniCurrentGPA / 10.0f);
+                        trackUniGrade.Value = currentMemberInfo.UniCurrentGPA;
+                        textUniGrade.Value = (currentMemberInfo.UniCurrentGPA / 10.0f);
 
                         lblUniEffort.Visible = trackUniEffort.Visible = textUniEffort.Visible = true;
-                        trackUniEffort.Value = currentMemberData.UniEffort;
-                        textUniEffort.Value = currentMemberData.UniEffort;
+                        trackUniEffort.Value = currentMemberInfo.UniEffort;
+                        textUniEffort.Value = currentMemberInfo.UniEffort;
 
                         lblUniTimeLeft.Visible = trackUniTimeLeft.Visible = textUniTimeLeft.Visible = true;
-                        trackUniTimeLeft.Value = (int)Math.Min(careerCache.SemesterLength, currentMemberData.UniTimeLeft);
-                        textUniTimeLeft.Value = Math.Min(careerCache.SemesterLength, currentMemberData.UniTimeLeft);
+                        trackUniTimeLeft.Value = (int)Math.Min(careerCache.SemesterLength, currentMemberInfo.UniTimeLeft);
+                        textUniTimeLeft.Value = Math.Min(careerCache.SemesterLength, currentMemberInfo.UniTimeLeft);
 
                         lblUniInfluence.Visible = textUniInfluence.Visible = true;
-                        textUniInfluence.Value = currentMemberData.UniInfluence;
+                        textUniInfluence.Value = currentMemberInfo.UniInfluence;
 
                         lblUniProbation.Visible = ckbUniProbation.Visible = true;
-                        ckbUniProbation.Checked = currentMemberData.UniProbation;
+                        ckbUniProbation.Checked = currentMemberInfo.UniProbation;
 
                         lblUniStudying.Visible = ckbUniStudying.Visible = true;
-                        ckbUniStudying.Checked = currentMemberData.UniStudying;
+                        ckbUniStudying.Checked = currentMemberInfo.UniStudying;
 
                         lblUniSecretSoc.Visible = ckbUniSecretSoc.Visible = true;
-                        ckbUniSecretSoc.Checked = currentMemberData.UniSecretSociety;
+                        ckbUniSecretSoc.Checked = currentMemberInfo.UniSecretSociety;
                     }
                     else
                     {
                         grpUniversity.Text = "University";
 
-                        lblUniResult.Visible = comboUniResult.Visible = currentMemberData.IsAdultOrOlder;
+                        lblUniResult.Visible = comboUniResult.Visible = currentMemberInfo.IsAdultOrOlder;
 
-                        if (currentMemberData.Graduated)
+                        if (currentMemberInfo.Graduated)
                         {
                             comboUniResult.SelectedIndex = 1;
                         }
-                        else if (currentMemberData.DroppedOut)
+                        else if (currentMemberInfo.DroppedOut)
                         {
                             comboUniResult.SelectedIndex = 2;
                         }
-                        else if (currentMemberData.Expelled)
+                        else if (currentMemberInfo.Expelled)
                         {
                             comboUniResult.SelectedIndex = 3;
                         }
@@ -2165,7 +2188,7 @@ namespace FamilyManager
                 }
 
                 { // Job
-                    EnableJobGroup(currentMemberData.IsTeen || currentMemberData.IsAdultOrOlder || (currentMemberData.IsYoungAdult && menuItemYAsHaveAdultJobs.Checked));
+                    EnableJobGroup(currentMemberInfo.IsTeen || currentMemberInfo.IsAdultOrOlder || (currentMemberInfo.IsYoungAdult && menuItemYAsHaveAdultJobs.Checked));
                 }
 
                 ignoreCareerChanges = false;
@@ -2229,13 +2252,13 @@ namespace FamilyManager
         {
             if (gridFamilyMembers.SelectedRows.Count == 1)
             {
-                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colMemberInfo"].Value as CharacterInfo);
 
                 ignoreSkillsChanges = true;
 
                 { // General Skills
-                    grpSkillsGeneral.Visible = !currentMemberData.IsPet;
-                    grpSkillsGeneral.Enabled = currentMemberData.IsToddlerOrOlder;
+                    grpSkillsGeneral.Visible = !currentMemberInfo.IsPet;
+                    grpSkillsGeneral.Enabled = currentMemberInfo.IsToddlerOrOlder;
 
                     if (grpSkillsGeneral.Enabled)
                     {
@@ -2243,7 +2266,7 @@ namespace FamilyManager
                         {
                             if (control is SkillTracker tracker)
                             {
-                                tracker.Value = currentMemberData.GetSkillValue(tracker.SdscIndex, tracker.Maximum);
+                                tracker.Value = currentMemberInfo.GetSkillValue(tracker.SdscIndex, tracker.Maximum);
                             }
                         }
                     }
@@ -2260,8 +2283,8 @@ namespace FamilyManager
                 }
 
                 { // Toddler Skills
-                    grpSkillsToddler.Visible = !currentMemberData.IsPet;
-                    grpSkillsToddler.Enabled = currentMemberData.IsToddlerOrOlder;
+                    grpSkillsToddler.Visible = !currentMemberInfo.IsPet;
+                    grpSkillsToddler.Enabled = currentMemberInfo.IsToddlerOrOlder;
 
                     if (grpSkillsToddler.Enabled)
                     {
@@ -2269,7 +2292,7 @@ namespace FamilyManager
                         {
                             if (control is SkillTracker tracker)
                             {
-                                tracker.Value = currentMemberData.GetToddlerSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Maximum);
+                                tracker.Value = currentMemberInfo.GetToddlerSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Maximum);
                             }
                         }
                     }
@@ -2286,8 +2309,8 @@ namespace FamilyManager
                 }
 
                 { // Hidden Skills
-                    grpSkillsHidden.Visible = !currentMemberData.IsPet;
-                    grpSkillsHidden.Enabled = currentMemberData.IsChildOrOlder;
+                    grpSkillsHidden.Visible = !currentMemberInfo.IsPet;
+                    grpSkillsHidden.Enabled = currentMemberInfo.IsChildOrOlder;
 
                     if (grpSkillsHidden.Enabled)
                     {
@@ -2295,7 +2318,7 @@ namespace FamilyManager
                         {
                             if (control is SkillTracker tracker)
                             {
-                                tracker.Value = currentMemberData.GetHiddenSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Maximum);
+                                tracker.Value = currentMemberInfo.GetHiddenSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Maximum);
                             }
                         }
                     }
@@ -2312,8 +2335,8 @@ namespace FamilyManager
                 }
 
                 { // Life Skills
-                    grpSkillsLife.Visible = !currentMemberData.IsPet;
-                    grpSkillsLife.Enabled = currentMemberData.IsChildOrOlder;
+                    grpSkillsLife.Visible = !currentMemberInfo.IsPet;
+                    grpSkillsLife.Enabled = currentMemberInfo.IsChildOrOlder;
 
                     if (grpSkillsLife.Enabled)
                     {
@@ -2321,7 +2344,7 @@ namespace FamilyManager
                         {
                             if (control is SkillTracker tracker)
                             {
-                                tracker.Value = currentMemberData.GetLifeSkillValue((TypeGUID)tracker.TokenGuid, tracker.Maximum);
+                                tracker.Value = currentMemberInfo.GetLifeSkillValue((TypeGUID)tracker.TokenGuid, tracker.Maximum);
                             }
                         }
                     }
@@ -2338,8 +2361,8 @@ namespace FamilyManager
                 }
 
                 { // Pet Skills
-                    grpSkillsPet.Visible = currentMemberData.IsPet;
-                    grpSkillsPet.Enabled = currentMemberData.IsPet;
+                    grpSkillsPet.Visible = currentMemberInfo.IsPet;
+                    grpSkillsPet.Enabled = currentMemberInfo.IsPet;
 
                     if (grpSkillsPet.Enabled)
                     {
@@ -2347,11 +2370,11 @@ namespace FamilyManager
                         {
                             if (control is SkillTracker tracker)
                             {
-                                tracker.Value = (ushort)currentMemberData.GetPetSkillValue((TypeGUID)tracker.TokenGuid);
+                                tracker.Value = (ushort)currentMemberInfo.GetPetSkillValue((TypeGUID)tracker.TokenGuid);
                             }
                         }
 
-                        trackSkillPetUseToilet.Enabled = currentMemberData.IsCat;
+                        trackSkillPetUseToilet.Enabled = currentMemberInfo.IsCat;
                         if (!trackSkillPetUseToilet.Enabled)
                         {
                             trackSkillPetUseToilet.Value = SkillTracker.NO_VALUE;
@@ -2397,6 +2420,10 @@ namespace FamilyManager
                 {
                     tracker.Value = InterestTracker.NO_VALUE;
                 }
+                else if (control is HobbyLotButton button)
+                {
+                    button.Selected = false;
+                }
             }
 
             comboHobbyOneTrue.SelectedIndex = -1;
@@ -2416,7 +2443,7 @@ namespace FamilyManager
         {
             if (gridFamilyMembers.SelectedRows.Count == 1)
             {
-                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colMemberInfo"].Value as CharacterInfo);
 
                 ignoreInterestsChanges = true;
 
@@ -2425,25 +2452,29 @@ namespace FamilyManager
                     {
                         if (control is InterestTracker tracker)
                         {
-                            tracker.Value = currentMemberData.GetInterestValue(tracker.SdscIndex);
+                            tracker.Value = currentMemberInfo.GetInterestValue(tracker.SdscIndex);
                         }
                     }
                 }
 
                 { // Hobbies - Requires FreeTime
-                    grpHobbies.Enabled = currentMemberData.HasHobbies;
+                    grpHobbies.Enabled = currentMemberInfo.HasHobbies;
 
-                    if (currentMemberData.HasHobbies)
+                    if (currentMemberInfo.HasHobbies)
                     {
                         foreach (Control control in grpHobbies.Controls)
                         {
                             if (control is InterestTracker tracker)
                             {
-                                tracker.Value = currentMemberData.GetHobbyValue(tracker.SdscIndex);
+                                tracker.Value = currentMemberInfo.GetHobbyValue(tracker.SdscIndex);
+                            }
+                            else if (control is HobbyLotButton button)
+                            {
+                                button.Selected = currentMemberInfo.CanVisitHobbyLot(button.SdscIndex);
                             }
                         }
 
-                        SetCombo(comboHobbyOneTrue, currentMemberData.OneTrueHobby);
+                        SetCombo(comboHobbyOneTrue, currentMemberInfo.OneTrueHobby);
                     }
                     else
                     {
@@ -2453,6 +2484,10 @@ namespace FamilyManager
                             {
                                 tracker.Value = InterestTracker.NO_VALUE;
                             }
+                            else if (control is HobbyLotButton button)
+                            {
+                                button.Selected = false;
+                            }
                         }
 
                         comboHobbyOneTrue.SelectedIndex = -1;
@@ -2460,19 +2495,19 @@ namespace FamilyManager
                 }
 
                 { // Badges - Requires OfB (Seasons and FreeTime)
-                    grpBadges.Enabled = currentMemberData.HasBadges;
+                    grpBadges.Enabled = currentMemberInfo.HasBadges;
 
                     foreach (InterestTracker tracker in new InterestTracker[] { trackBadgeCashier, trackBadgeCosmetics, trackBadgeFlorist, trackBadgeRobotery, trackBadgeSales, trackBadgeStocking, trackBadgeToyMaking })
                     {
-                        tracker.Value = currentMemberData.GetBadgeValue(tracker.TokenGuid);
+                        tracker.Value = currentMemberInfo.GetBadgeValue(tracker.TokenGuid);
                     }
 
                     foreach (InterestTracker tracker in new InterestTracker[] { trackBadgeFishing, trackBadgeGardening })
                     {
-                        if (currentMemberData.HasSeasonsBadges)
+                        if (currentMemberInfo.HasSeasonsBadges)
                         {
                             tracker.Enabled = true;
-                            tracker.Value = currentMemberData.GetBadgeValue(tracker.TokenGuid);
+                            tracker.Value = currentMemberInfo.GetBadgeValue(tracker.TokenGuid);
                         }
                         else
                         {
@@ -2483,10 +2518,10 @@ namespace FamilyManager
 
                     foreach (InterestTracker tracker in new InterestTracker[] { trackBadgePottery, trackBadgeSewing })
                     {
-                        if (currentMemberData.HasFreeTimeBadges)
+                        if (currentMemberInfo.HasFreeTimeBadges)
                         {
                             tracker.Enabled = true;
-                            tracker.Value = currentMemberData.GetBadgeValue(tracker.TokenGuid);
+                            tracker.Value = currentMemberInfo.GetBadgeValue(tracker.TokenGuid);
                         }
                         else
                         {
@@ -2558,9 +2593,9 @@ namespace FamilyManager
         {
             if (gridFamilyMembers.SelectedRows.Count == 1)
             {
-                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colData"].Value as CharacterData);
+                SetCurrentMember(gridFamilyMembers.SelectedRows[0].Cells["colMemberInfo"].Value as CharacterInfo);
 
-                imageVacationsSim.Image = currentMemberData.Thumbnail(currentMemberData.AgeCode);
+                imageVacationsSim.Image = currentMemberInfo.Thumbnail(currentMemberInfo.AgeCode);
 
                 ignoreVacationsChanges = true;
 
@@ -2569,7 +2604,7 @@ namespace FamilyManager
                     {
                         if (control is VacationButton button)
                         {
-                            button.Selected = currentMemberData.HasMemento(button.Memento);
+                            button.Selected = currentMemberInfo.HasMemento(button.Memento);
                         }
                     }
 
@@ -2581,11 +2616,11 @@ namespace FamilyManager
                     {
                         if (control is VacationButton button)
                         {
-                            button.Selected = currentMemberData.HasMemento(button.Memento);
+                            button.Selected = currentMemberInfo.HasMemento(button.Memento);
                         }
                     }
 
-                    btnVacIsleSecretLot.Selected = currentMemberData.HasVisitedSecretLot(btnVacIsleSecretLot.TokenGuid);
+                    btnVacIsleSecretLot.Selected = currentMemberInfo.HasVisitedSecretLot(btnVacIsleSecretLot.TokenGuid);
                 }
 
                 { // Far East Mementos
@@ -2593,11 +2628,11 @@ namespace FamilyManager
                     {
                         if (control is VacationButton button)
                         {
-                            button.Selected = currentMemberData.HasMemento(button.Memento);
+                            button.Selected = currentMemberInfo.HasMemento(button.Memento);
                         }
                     }
 
-                    btnVacEastSecretLot.Selected = currentMemberData.HasVisitedSecretLot(btnVacEastSecretLot.TokenGuid);
+                    btnVacEastSecretLot.Selected = currentMemberInfo.HasVisitedSecretLot(btnVacEastSecretLot.TokenGuid);
                 }
 
                 { // Mountain Mementos
@@ -2605,11 +2640,11 @@ namespace FamilyManager
                     {
                         if (control is VacationButton button)
                         {
-                            button.Selected = currentMemberData.HasMemento(button.Memento);
+                            button.Selected = currentMemberInfo.HasMemento(button.Memento);
                         }
                     }
 
-                    btnVacMountSecretLot.Selected = currentMemberData.HasVisitedSecretLot(btnVacMountSecretLot.TokenGuid);
+                    btnVacMountSecretLot.Selected = currentMemberInfo.HasVisitedSecretLot(btnVacMountSecretLot.TokenGuid);
                 }
 
                 { // Tours
@@ -2617,7 +2652,7 @@ namespace FamilyManager
                     {
                         if (control is TourButton button)
                         {
-                            button.Selected = currentMemberData.HasBeenOnTour(button.TokenGuid);
+                            button.Selected = currentMemberInfo.HasBeenOnTour(button.TokenGuid);
                         }
                     }
                 }
@@ -2632,14 +2667,14 @@ namespace FamilyManager
 
         private void UpdateReadonlyMementos()
         {
-            imgVacAllGestures.BackColor = (currentMemberData.HasMemento(Mementos.LearntAllGestures) ? Color.CadetBlue : Color.LightGray);
+            imgVacAllGestures.BackColor = (currentMemberInfo.HasMemento(Mementos.LearntAllGestures) ? Color.CadetBlue : Color.LightGray);
 
-            imgVacSecretLot.BackColor = (currentMemberData.HasMemento(Mementos.VisitedSecretLot) ? Color.CadetBlue : Color.LightGray);
-            imgVacSecretLotAll.BackColor = (currentMemberData.HasMemento(Mementos.VisitedAllSecretLots) ? Color.CadetBlue : Color.LightGray);
+            imgVacSecretLot.BackColor = (currentMemberInfo.HasMemento(Mementos.VisitedSecretLot) ? Color.CadetBlue : Color.LightGray);
+            imgVacSecretLotAll.BackColor = (currentMemberInfo.HasMemento(Mementos.VisitedAllSecretLots) ? Color.CadetBlue : Color.LightGray);
 
-            imgVacTour.BackColor = (currentMemberData.HasMemento(Mementos.WentOnTour) ? Color.CadetBlue : Color.LightGray);
-            imgVacTourFive.BackColor = (currentMemberData.HasMemento(Mementos.WentOnFiveTours) ? Color.CadetBlue : Color.LightGray);
-            imgVacTourAll.BackColor = (currentMemberData.HasMemento(Mementos.WentOnAllTours) ? Color.CadetBlue : Color.LightGray);
+            imgVacTour.BackColor = (currentMemberInfo.HasMemento(Mementos.WentOnTour) ? Color.CadetBlue : Color.LightGray);
+            imgVacTourFive.BackColor = (currentMemberInfo.HasMemento(Mementos.WentOnFiveTours) ? Color.CadetBlue : Color.LightGray);
+            imgVacTourAll.BackColor = (currentMemberInfo.HasMemento(Mementos.WentOnAllTours) ? Color.CadetBlue : Color.LightGray);
         }
 
         private void EnableJobGroup(bool enabled)
@@ -2665,19 +2700,19 @@ namespace FamilyManager
                 lblJobPerformance.Visible = trackJobPerformance.Visible = textJobPerformance.Visible = true;
                 lblJobPTO.Visible = textJobPTO.Visible = lblJobPTOSummary.Visible = true;
 
-                lblJobPension.Visible = textJobPension.Visible = currentMemberData.IsElder;
-                lblJobRetiredType.Visible = comboJobRetiredType.Visible = textJobRetiredGUID.Visible = currentMemberData.IsElder;
-                lblJobRetiredLevel.Visible = trackJobRetiredLevel.Visible = textJobRetiredLevel.Visible = currentMemberData.IsElder;
+                lblJobPension.Visible = textJobPension.Visible = currentMemberInfo.IsElder;
+                lblJobRetiredType.Visible = comboJobRetiredType.Visible = textJobRetiredGUID.Visible = currentMemberInfo.IsElder;
+                lblJobRetiredLevel.Visible = trackJobRetiredLevel.Visible = textJobRetiredLevel.Visible = currentMemberInfo.IsElder;
 
-                if (currentMemberData.IsTeen)
+                if (currentMemberInfo.IsTeen)
                 {
                     LoadTeenJobs();
                 }
-                else if (currentMemberData.IsElder)
+                else if (currentMemberInfo.IsElder)
                 {
                     LoadElderJobs();
                 }
-                else if (currentMemberData.IsPet)
+                else if (currentMemberInfo.IsPet)
                 {
                     LoadPetJobs();
                 }
@@ -2686,19 +2721,19 @@ namespace FamilyManager
                     LoadAdultJobs();
                 }
 
-                SetCombo(comboJobType, currentMemberData.JobGuid.AsUInt());
-                textJobGUID.Value = currentMemberData.JobGuid.AsUInt();
-                trackJobLevel.Value = currentMemberData.JobLevel;
-                textJobLevel.Value = currentMemberData.JobLevel;
-                trackJobPerformance.Value = currentMemberData.JobPerformance;
-                textJobPerformance.Value = currentMemberData.JobPerformance;
-                textJobPTO.Value = currentMemberData.JobPTO;
+                SetCombo(comboJobType, currentMemberInfo.JobGuid.AsUInt());
+                textJobGUID.Value = currentMemberInfo.JobGuid.AsUInt();
+                trackJobLevel.Value = currentMemberInfo.JobLevel;
+                textJobLevel.Value = currentMemberInfo.JobLevel;
+                trackJobPerformance.Value = currentMemberInfo.JobPerformance;
+                textJobPerformance.Value = currentMemberInfo.JobPerformance;
+                textJobPTO.Value = currentMemberInfo.JobPTO;
                 lblJobPTOSummary.Text = $"({(textJobPTO.Value == 0 ? 0 : Math.Max(0, (textJobPTO.Value - 1) / 100))} days)";
-                textJobPension.Value = currentMemberData.JobPension;
-                SetCombo(comboJobRetiredType, currentMemberData.JobRetiredGuid.AsUInt());
-                textJobRetiredGUID.Value = currentMemberData.JobRetiredGuid.AsUInt();
-                trackJobRetiredLevel.Value = currentMemberData.JobRetiredLevel;
-                textJobRetiredLevel.Value = currentMemberData.JobRetiredLevel;
+                textJobPension.Value = currentMemberInfo.JobPension;
+                SetCombo(comboJobRetiredType, currentMemberInfo.JobRetiredGuid.AsUInt());
+                textJobRetiredGUID.Value = currentMemberInfo.JobRetiredGuid.AsUInt();
+                trackJobRetiredLevel.Value = currentMemberInfo.JobRetiredLevel;
+                textJobRetiredLevel.Value = currentMemberInfo.JobRetiredLevel;
             }
         }
 
@@ -2747,15 +2782,16 @@ namespace FamilyManager
 
             btnSafeShowAll.Enabled = !filters.IsAll;
 
-            panelFamily.Enabled = (currentFamily != null);
+            panelHousehold.Enabled = (currentFamily != null);
 
             if (currentFamily == null)
             {
                 if (!IsCensusTabActive)
                 {
-                    tabPages.SelectedIndex = (int)TabPageIndex.TabFamily;
+                    tabPages.SelectedIndex = (int)TabPageIndex.TabHousehold;
                 }
 
+                tabPages.TabPages.Remove(tabFamily);
                 tabPages.TabPages.Remove(tabCloset);
                 tabPages.TabPages.Remove(tabSafe);
 
@@ -2770,13 +2806,15 @@ namespace FamilyManager
             {
                 if (currentFamily.IsNPCFamily)
                 {
-                    tabPages.SelectedIndex = (int)TabPageIndex.TabFamily;
+                    tabPages.SelectedIndex = (int)TabPageIndex.TabHousehold;
 
+                    tabPages.TabPages.Remove(tabFamily);
                     tabPages.TabPages.Remove(tabCloset);
                     tabPages.TabPages.Remove(tabSafe);
                 }
                 else
                 {
+                    if (!tabPages.TabPages.Contains(tabFamily)) tabPages.TabPages.Insert((int)TabPageIndex.TabFamily, tabFamily);
                     if (!tabPages.TabPages.Contains(tabCloset)) tabPages.TabPages.Insert((int)TabPageIndex.TabCloset, tabCloset);
                     if (!tabPages.TabPages.Contains(tabSafe)) tabPages.TabPages.Insert((int)TabPageIndex.TabSafe, tabSafe);
                 }
@@ -2788,7 +2826,7 @@ namespace FamilyManager
                 if (!tabPages.TabPages.Contains(tabInterests)) tabPages.TabPages.Add(tabInterests);
                 if (!tabPages.TabPages.Contains(tabVacations)) tabPages.TabPages.Add(tabVacations);
 
-                panelFamily.Enabled = !currentFamily.IsNPCFamily;
+                panelHousehold.Enabled = !currentFamily.IsNPCFamily;
 
                 foreach (DataGridViewRow row in gridFamilyMembers.Rows)
                 {
@@ -2805,6 +2843,7 @@ namespace FamilyManager
                 }
             }
 
+            gridFamilyMembers.Columns["colPlasticSurgery"].Visible = (IsAdvancedMode && menuItemShowPlasticSurgery.Checked);
             gridFamilyMembers.Columns["colSplitFile"].Visible = (IsAdvancedMode && menuItemShowSplitFiles.Checked);
 
             UpdateClosetTabState();
@@ -2837,9 +2876,9 @@ namespace FamilyManager
         {
             bool state = packageCache.IsDirty;
 
-            if (currentMemberData != null)
+            if (currentMemberInfo != null)
             {
-                state |= currentMemberData.HasChanges;
+                state |= currentMemberInfo.HasChanges;
             }
 
             menuItemSaveAll.Enabled = btnSave.Enabled = state; ;
@@ -2874,6 +2913,7 @@ namespace FamilyManager
         #region Options Menu Actions
         private void OnOptionsOpening(object sender, EventArgs e)
         {
+            menuItemShowPlasticSurgery.Visible = toolStripSeparatorPlasticSurgery.Visible = IsAdvancedMode;
             menuItemShowSplitFiles.Visible = menuItemHighlightSplitFiles.Visible = toolStripSeparatorSplitFiles.Visible = IsAdvancedMode;
         }
 
@@ -2893,6 +2933,11 @@ namespace FamilyManager
 
             gridJewelbox.Columns["colJewelboxAgeCode"].Visible = gridJewelbox.Columns["colJewelboxGenderCode"].Visible = menuItemUseCodes.Checked;
             gridJewelbox.Columns["colJewelboxAge"].Visible = gridJewelbox.Columns["colJewelboxGender"].Visible = !menuItemUseCodes.Checked;
+        }
+
+        private void OnShowPlasticSurgeryClicked(object sender, EventArgs e)
+        {
+            gridFamilyMembers.Columns["colPlasticSurgery"].Visible = (IsAdvancedMode && menuItemShowPlasticSurgery.Checked);
         }
 
         private void OnShowSplitFilesClicked(object sender, EventArgs e)
@@ -2933,7 +2978,7 @@ namespace FamilyManager
 
         private void OnYAsHaveAdultJobsClicked(object sender, EventArgs e)
         {
-            if (IsCareerTabActive && currentMemberData.IsYoungAdult)
+            if (IsCareerTabActive && currentMemberInfo.IsYoungAdult)
             {
                 ignoreCareerChanges = true;
                 EnableJobGroup(menuItemYAsHaveAdultJobs.Checked);
@@ -3216,7 +3261,7 @@ namespace FamilyManager
                 else
                 {
                     // Update Custom Careers completed
-                    if (currentMemberData != null) UpdateCareerTabState();
+                    if (currentMemberInfo != null) UpdateCareerTabState();
                 }
             }
         }
@@ -3229,7 +3274,7 @@ namespace FamilyManager
 
         private void OnCachingRemoveLocal(object sender, EventArgs e)
         {
-            DataCache.RemoveAll();
+            DataCache.RecreateFamilyManagerCaches();
             UpdateClosetTabState();
             UpdateSafeTabState();
             UpdateCareerTabState();
@@ -3243,6 +3288,7 @@ namespace FamilyManager
 
         #region Tabs
         private bool IsCensusTabActive => IsTabActive(TabPageIndex.TabCensus);
+        private bool IsHouseholdTabActive => IsTabActive(TabPageIndex.TabHousehold);
         private bool IsFamilyTabActive => IsTabActive(TabPageIndex.TabFamily);
         private bool IsClosetTabActive => IsTabActive(TabPageIndex.TabCloset);
         private bool IsSafeTabActive => IsTabActive(TabPageIndex.TabSafe);
@@ -3254,18 +3300,18 @@ namespace FamilyManager
 
         private bool IsTabActive(TabPageIndex index)
         {
-            // We need to allow for removing the closet and safe tab for NPC families
-            if (index == TabPageIndex.TabCensus || index == TabPageIndex.TabFamily)
+            // We need to allow for removing the family, closet and safe tab for NPC families
+            if (index == TabPageIndex.TabCensus || index == TabPageIndex.TabHousehold)
             {
                 return (tabPages.SelectedIndex == (int)index);
             }
-            else if (index == TabPageIndex.TabCloset || index == TabPageIndex.TabSafe)
+            else if (index == TabPageIndex.TabFamily || index == TabPageIndex.TabCloset || index == TabPageIndex.TabSafe)
             {
-                return tabPages.Contains(tabCloset) && (tabPages.SelectedIndex == (int)index);
+                return tabPages.Contains(tabFamily) && (tabPages.SelectedIndex == (int)index);
             }
             else
             {
-                if (!tabPages.Contains(tabCloset)) index -= (TabPageIndex.TabAspiration - TabPageIndex.TabCloset);
+                if (!tabPages.Contains(tabFamily)) index -= (TabPageIndex.TabAspiration - TabPageIndex.TabFamily);
 
                 return (tabPages.SelectedIndex == (int)index);
             }
@@ -3286,7 +3332,14 @@ namespace FamilyManager
             }
             else
             {
-                if (IsClosetTabActive)
+                if (IsFamilyTabActive)
+                {
+                    if (lastFamilyNode != null)
+                    {
+                        DoWork_FillFamilyGrid(lastHoodNode, lastFamilyNode);
+                    }
+                }
+                else if (IsClosetTabActive)
                 {
                     if (gridFamilyCloset.Rows.Count == 0)
                     {
@@ -3411,7 +3464,7 @@ namespace FamilyManager
             {
                 ignoreCareerChanges = true;
                 textSchoolGUID.Value = (comboSchoolType.SelectedItem as UintNamedValue).Value;
-                currentMemberData.SchoolGuid = (TypeGUID)(comboSchoolType.SelectedItem as UintNamedValue).Value;
+                currentMemberInfo.SchoolGuid = (TypeGUID)(comboSchoolType.SelectedItem as UintNamedValue).Value;
                 ignoreCareerChanges = false;
 
                 UpdateSaveState();
@@ -3422,11 +3475,11 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.SchoolGuid.AsUInt() != textSchoolGUID.Value)
+            if (currentMemberInfo.SchoolGuid.AsUInt() != textSchoolGUID.Value)
             {
                 ignoreCareerChanges = true;
                 SetCombo(comboSchoolType, textSchoolGUID.Value);
-                currentMemberData.SchoolGuid = (TypeGUID)(comboSchoolType.SelectedItem as UintNamedValue).Value;
+                currentMemberInfo.SchoolGuid = (TypeGUID)(comboSchoolType.SelectedItem as UintNamedValue).Value;
                 ignoreCareerChanges = false;
 
                 UpdateSaveState();
@@ -3437,9 +3490,9 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.SchoolGrade != (comboSchoolGrade.SelectedItem as UintNamedValue).Value)
+            if (currentMemberInfo.SchoolGrade != (comboSchoolGrade.SelectedItem as UintNamedValue).Value)
             {
-                currentMemberData.SchoolGrade = (comboSchoolGrade.SelectedItem as UintNamedValue).Value;
+                currentMemberInfo.SchoolGrade = (comboSchoolGrade.SelectedItem as UintNamedValue).Value;
 
                 UpdateSaveState();
             }
@@ -3453,7 +3506,7 @@ namespace FamilyManager
             {
                 ignoreCareerChanges = true;
                 textMajorGUID.Value = (comboUniMajor.SelectedItem as UintNamedValue).Value;
-                currentMemberData.UniMajorGuid = (TypeGUID)(comboUniMajor.SelectedItem as UintNamedValue).Value;
+                currentMemberInfo.UniMajorGuid = (TypeGUID)(comboUniMajor.SelectedItem as UintNamedValue).Value;
                 ignoreCareerChanges = false;
 
                 UpdateSaveState();
@@ -3464,11 +3517,11 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.UniMajorGuid.AsUInt() != textMajorGUID.Value)
+            if (currentMemberInfo.UniMajorGuid.AsUInt() != textMajorGUID.Value)
             {
                 ignoreCareerChanges = true;
                 SetCombo(comboUniMajor, textMajorGUID.Value);
-                currentMemberData.UniMajorGuid = (TypeGUID)(comboUniMajor.SelectedItem as UintNamedValue).Value;
+                currentMemberInfo.UniMajorGuid = (TypeGUID)(comboUniMajor.SelectedItem as UintNamedValue).Value;
                 ignoreCareerChanges = false;
 
                 UpdateSaveState();
@@ -3481,7 +3534,7 @@ namespace FamilyManager
 
             lblUniMajor.Enabled = comboUniMajor.Enabled = textMajorGUID.Enabled = (comboUniResult.SelectedIndex != 0);
 
-            ushort flags = (ushort)(currentMemberData.UniInfoFlags & 0xCFBF);
+            ushort flags = (ushort)(currentMemberInfo.UniInfoFlags & 0xCFBF);
 
             if (comboUniResult.SelectedIndex == 0)
             {
@@ -3504,7 +3557,7 @@ namespace FamilyManager
                 flags |= 0x2000;
             }
 
-            currentMemberData.UniInfoFlags = flags;
+            currentMemberInfo.UniInfoFlags = flags;
 
             UpdateSaveState();
         }
@@ -3513,10 +3566,10 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.UniSemester != (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value)
+            if (currentMemberInfo.UniSemester != (ushort)(comboUniSemester.SelectedItem as UintNamedValue).Value)
             {
                 // Delay this update until the user changes Sim (or exits), as we need the current GPA value to update the GPA token
-                currentMemberData.HasUniversityChanges = true;
+                currentMemberInfo.HasUniversityChanges = true;
 
                 UpdateSaveState();
             }
@@ -3535,10 +3588,10 @@ namespace FamilyManager
 
             ushort newGPA = (ushort)(textUniGrade.Value * 10.0f);
 
-            if (currentMemberData.UniCurrentGPA != newGPA)
+            if (currentMemberInfo.UniCurrentGPA != newGPA)
             {
                 ignoreCareerChanges = true;
-                currentMemberData.UniCurrentGPA = newGPA;
+                currentMemberInfo.UniCurrentGPA = newGPA;
                 trackUniGrade.Value = newGPA;
                 ignoreCareerChanges = false;
 
@@ -3557,10 +3610,10 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.UniEffort != (ushort)textUniEffort.Value)
+            if (currentMemberInfo.UniEffort != (ushort)textUniEffort.Value)
             {
                 ignoreCareerChanges = true;
-                currentMemberData.UniEffort = (ushort)textUniEffort.Value;
+                currentMemberInfo.UniEffort = (ushort)textUniEffort.Value;
                 trackUniEffort.Value = (int)textUniEffort.Value;
                 ignoreCareerChanges = false;
 
@@ -3572,9 +3625,9 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            currentMemberData.UniInfoFlags &= 0xFFDF;
+            currentMemberInfo.UniInfoFlags &= 0xFFDF;
 
-            if (ckbUniProbation.Checked) currentMemberData.UniInfoFlags |= 0x0020;
+            if (ckbUniProbation.Checked) currentMemberInfo.UniInfoFlags |= 0x0020;
 
             UpdateSaveState();
         }
@@ -3583,9 +3636,9 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            currentMemberData.UniInfoFlags &= 0xFFEF;
+            currentMemberInfo.UniInfoFlags &= 0xFFEF;
 
-            if (ckbUniStudying.Checked) currentMemberData.UniInfoFlags |= 0x0010;
+            if (ckbUniStudying.Checked) currentMemberInfo.UniInfoFlags |= 0x0010;
 
             UpdateSaveState();
         }
@@ -3601,10 +3654,10 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.UniTimeLeft != (ushort)textUniTimeLeft.Value)
+            if (currentMemberInfo.UniTimeLeft != (ushort)textUniTimeLeft.Value)
             {
                 ignoreCareerChanges = true;
-                currentMemberData.UniTimeLeft = (ushort)textUniTimeLeft.Value;
+                currentMemberInfo.UniTimeLeft = (ushort)textUniTimeLeft.Value;
                 trackUniTimeLeft.Value = (int)textUniTimeLeft.Value;
                 ignoreCareerChanges = false;
 
@@ -3616,9 +3669,9 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.UniInfluence != (ushort)textUniInfluence.Value)
+            if (currentMemberInfo.UniInfluence != (ushort)textUniInfluence.Value)
             {
-                currentMemberData.UniInfluence = (ushort)textUniInfluence.Value;
+                currentMemberInfo.UniInfluence = (ushort)textUniInfluence.Value;
 
                 UpdateSaveState();
             }
@@ -3628,7 +3681,7 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            currentMemberData.UniSecretSociety = ckbUniSecretSoc.Checked;
+            currentMemberInfo.UniSecretSociety = ckbUniSecretSoc.Checked;
 
             UpdateSaveState();
         }
@@ -3637,16 +3690,16 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.JobGuid != (TypeGUID)(comboJobType.SelectedItem as UintNamedValue).Value)
+            if (currentMemberInfo.JobGuid != (TypeGUID)(comboJobType.SelectedItem as UintNamedValue).Value)
             {
                 ignoreCareerChanges = true;
 
                 textJobGUID.Value = (comboJobType.SelectedItem as UintNamedValue).Value;
-                currentMemberData.JobGuid = (TypeGUID)(comboJobType.SelectedItem as UintNamedValue).Value;
+                currentMemberInfo.JobGuid = (TypeGUID)(comboJobType.SelectedItem as UintNamedValue).Value;
 
                 ignoreCareerChanges = false;
 
-                if (!currentMemberData.IsUnemployed)
+                if (!currentMemberInfo.IsUnemployed)
                 {
                     if (trackJobLevel.Value == 0)
                     {
@@ -3666,16 +3719,16 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.JobGuid.AsUInt() != textJobGUID.Value)
+            if (currentMemberInfo.JobGuid.AsUInt() != textJobGUID.Value)
             {
                 ignoreCareerChanges = true;
 
                 SetCombo(comboJobType, textJobGUID.Value);
-                currentMemberData.JobGuid = (TypeGUID)(comboJobType.SelectedItem as UintNamedValue).Value;
+                currentMemberInfo.JobGuid = (TypeGUID)(comboJobType.SelectedItem as UintNamedValue).Value;
 
                 ignoreCareerChanges = false;
 
-                if (!currentMemberData.IsUnemployed)
+                if (!currentMemberInfo.IsUnemployed)
                 {
                     if (trackJobLevel.Value == 0)
                     {
@@ -3702,10 +3755,10 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.JobLevel != (ushort)textJobLevel.Value)
+            if (currentMemberInfo.JobLevel != (ushort)textJobLevel.Value)
             {
                 ignoreCareerChanges = true;
-                currentMemberData.JobLevel = (ushort)textJobLevel.Value;
+                currentMemberInfo.JobLevel = (ushort)textJobLevel.Value;
                 trackJobLevel.Value = (int)textJobLevel.Value;
                 ignoreCareerChanges = false;
 
@@ -3724,10 +3777,10 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.JobPerformance != (ushort)textJobPerformance.Value)
+            if (currentMemberInfo.JobPerformance != (ushort)textJobPerformance.Value)
             {
                 ignoreCareerChanges = true;
-                currentMemberData.JobPerformance = (ushort)textJobPerformance.Value;
+                currentMemberInfo.JobPerformance = (ushort)textJobPerformance.Value;
                 trackJobPerformance.Value = (int)textJobPerformance.Value;
                 ignoreCareerChanges = false;
 
@@ -3739,9 +3792,9 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.JobPTO != (ushort)textJobPTO.Value)
+            if (currentMemberInfo.JobPTO != (ushort)textJobPTO.Value)
             {
-                currentMemberData.JobPTO = (ushort)textJobPTO.Value;
+                currentMemberInfo.JobPTO = (ushort)textJobPTO.Value;
                 lblJobPTOSummary.Text = $"({(textJobPTO.Value == 0 ? 0 : Math.Max(0, (textJobPTO.Value - 1) / 100))} days)";
 
                 UpdateSaveState();
@@ -3752,9 +3805,9 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.JobPension != (ushort)textJobPension.Value)
+            if (currentMemberInfo.JobPension != (ushort)textJobPension.Value)
             {
-                currentMemberData.JobPension = (ushort)textJobPension.Value;
+                currentMemberInfo.JobPension = (ushort)textJobPension.Value;
 
                 UpdateSaveState();
             }
@@ -3764,12 +3817,12 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.JobRetiredGuid != (TypeGUID)(comboJobRetiredType.SelectedItem as UintNamedValue).Value)
+            if (currentMemberInfo.JobRetiredGuid != (TypeGUID)(comboJobRetiredType.SelectedItem as UintNamedValue).Value)
             {
                 ignoreCareerChanges = true;
 
                 textJobRetiredGUID.Value = (comboJobRetiredType.SelectedItem as UintNamedValue).Value;
-                currentMemberData.JobRetiredGuid = (TypeGUID)(comboJobRetiredType.SelectedItem as UintNamedValue).Value;
+                currentMemberInfo.JobRetiredGuid = (TypeGUID)(comboJobRetiredType.SelectedItem as UintNamedValue).Value;
 
                 ignoreCareerChanges = false;
 
@@ -3783,12 +3836,12 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.JobRetiredGuid.AsUInt() != textJobRetiredGUID.Value)
+            if (currentMemberInfo.JobRetiredGuid.AsUInt() != textJobRetiredGUID.Value)
             {
                 ignoreCareerChanges = true;
 
                 SetCombo(comboJobRetiredType, textJobRetiredGUID.Value);
-                currentMemberData.JobRetiredGuid = (TypeGUID)(comboJobRetiredType.SelectedItem as UintNamedValue).Value;
+                currentMemberInfo.JobRetiredGuid = (TypeGUID)(comboJobRetiredType.SelectedItem as UintNamedValue).Value;
 
                 ignoreCareerChanges = false;
 
@@ -3800,7 +3853,7 @@ namespace FamilyManager
 
         private void FixRetiredValues()
         {
-            if (currentMemberData.IsRetiredUnemployed)
+            if (currentMemberInfo.IsRetiredUnemployed)
             {
                 trackJobRetiredLevel.Value = 0;
                 textJobPension.Value = 0;
@@ -3830,10 +3883,10 @@ namespace FamilyManager
         {
             if (ignoreCareerChanges) return;
 
-            if (currentMemberData.JobRetiredLevel != (ushort)textJobRetiredLevel.Value)
+            if (currentMemberInfo.JobRetiredLevel != (ushort)textJobRetiredLevel.Value)
             {
                 ignoreCareerChanges = true;
-                currentMemberData.JobRetiredLevel = (ushort)textJobRetiredLevel.Value;
+                currentMemberInfo.JobRetiredLevel = (ushort)textJobRetiredLevel.Value;
                 trackJobRetiredLevel.Value = (int)textJobRetiredLevel.Value;
                 ignoreCareerChanges = false;
 
@@ -3886,10 +3939,14 @@ namespace FamilyManager
 
             if (IsClosetTabActive || IsSafeTabActive)
             {
-                menuContextMemberChangeSimName.Visible = menuContextMemberChangeFamilyName.Visible = false;
+                menuContextMemberChangeSimName.Visible = false;
                 menuContextMemberChangeDays.Visible = false;
 
-                menuContextMemberSeparator1.Visible = menuContextMemberMergeSplitFiles.Visible = false;
+                menuContextMemberChangeFamilyName.Visible = false;
+
+                menuContextMemberSeparatorPlasticSurgery.Visible = menuContextMemberRemovePlasticSurgery.Visible = menuContextMemberGeneticPlasticSurgery.Visible = false;
+
+                menuContextMemberSeparatorSplitFiles.Visible = menuContextMemberMergeSplitFiles.Visible = false;
 
                 menuContextMemberFilterAll.Visible = true;
                 menuContextMemberFilterAll.Enabled = !filters.IsAll;
@@ -3913,9 +3970,10 @@ namespace FamilyManager
             }
             else
             {
-                // Just assume it's the family tab
-                menuContextMemberChangeSimName.Visible = menuContextMemberChangeFamilyName.Visible = true;
+                menuContextMemberChangeSimName.Visible = true;
                 menuContextMemberChangeDays.Visible = true;
+
+                menuContextMemberChangeFamilyName.Visible = IsHouseholdTabActive;
 
                 menuContextMemberFilterAll.Visible = false;
                 menuContextMemberFilterSelected.Visible = false;
@@ -3924,7 +3982,9 @@ namespace FamilyManager
                 menuContextMemberChangeFamilyName.Enabled = (gridFamilyMembers.SelectedRows.Count > 0);
                 menuContextMemberChangeSimName.Enabled = false;
 
-                menuContextMemberSeparator1.Visible = menuContextMemberMergeSplitFiles.Visible = false;
+                menuContextMemberSeparatorPlasticSurgery.Visible = menuContextMemberRemovePlasticSurgery.Visible = menuContextMemberGeneticPlasticSurgery.Visible = false;
+
+                menuContextMemberSeparatorSplitFiles.Visible = menuContextMemberMergeSplitFiles.Visible = false;
 
                 if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
                 {
@@ -3932,13 +3992,29 @@ namespace FamilyManager
 
                     if (IsAdvancedMode)
                     {
-                        if (!packageCache.IsDirty) // Doing this after doing some edits is not the best idea the user had!
+                        if (menuItemShowSplitFiles.Checked)
                         {
-                            string splitFile = gridFamilyMembers.Rows[mouseLocation.RowIndex].Cells["colSplitFile"].Value as string;
-
-                            if ("Y".Equals(splitFile, StringComparison.OrdinalIgnoreCase))
+                            if (!packageCache.IsDirty) // Doing this after doing some edits is not the best idea the user had!
                             {
-                                menuContextMemberSeparator1.Visible = menuContextMemberMergeSplitFiles.Visible = true;
+                                string splitFile = gridFamilyMembers.Rows[mouseLocation.RowIndex].Cells["colSplitFile"].Value as string;
+
+                                if ("Y".Equals(splitFile, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    menuContextMemberSeparatorSplitFiles.Visible = menuContextMemberMergeSplitFiles.Visible = true;
+                                }
+                            }
+                        }
+
+                        if (menuItemShowPlasticSurgery.Checked)
+                        {
+                            foreach (DataGridViewRow selectedRow in gridFamilyMembers.SelectedRows)
+                            {
+                                CharacterInfo memberInfo = (selectedRow.Cells["colMemberInfo"].Value as CharacterInfo);
+                                if (memberInfo.HasPlasticSurgery)
+                                {
+                                    menuContextMemberSeparatorPlasticSurgery.Visible = menuContextMemberRemovePlasticSurgery.Visible = menuContextMemberGeneticPlasticSurgery.Visible = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -3951,9 +4027,9 @@ namespace FamilyManager
             if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
             {
                 DataGridViewRow row = gridFamilyMembers.Rows[mouseLocation.RowIndex];
-                CharacterData data = (row.Cells["colData"].Value as CharacterData);
+                CharacterInfo memberInfo = (row.Cells["colMemberInfo"].Value as CharacterInfo);
 
-                TextAndTextEntryDialog dialog = new TextAndTextEntryDialog("Change Sim's Name", "New Given Name", data.GivenName(prefLid), "New Family Name", data.FamilyName(prefLid));
+                TextAndTextEntryDialog dialog = new TextAndTextEntryDialog("Change Sim's Name", "New Given Name", memberInfo.GivenName(prefLid), "New Family Name", memberInfo.FamilyName(prefLid));
 
                 if (dialog.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.TextEntry1) && !string.IsNullOrWhiteSpace(dialog.TextEntry2))
                 {
@@ -4002,17 +4078,17 @@ namespace FamilyManager
 
         private void ChangeMemberName(DataGridViewRow row, string newGivenName, string newFamilyName)
         {
-            CharacterData data = (row.Cells["colData"].Value as CharacterData);
-            data?.SetGivenName(prefLid, newGivenName);
-            data?.SetFamilyName(prefLid, newFamilyName);
-            row.Cells["colFirstName"].Value = $"{data.GivenName(prefLid)} {data.FamilyName(prefLid)}";
+            CharacterInfo memberInfo = (row.Cells["colMemberInfo"].Value as CharacterInfo);
+            memberInfo?.SetGivenName(prefLid, newGivenName);
+            memberInfo?.SetFamilyName(prefLid, newFamilyName);
+            row.Cells["colFirstName"].Value = $"{memberInfo.GivenName(prefLid)} {memberInfo.FamilyName(prefLid)}";
         }
 
         private void ChangeMemberFamilyName(DataGridViewRow row, string newFamilyName)
         {
-            CharacterData data = (row.Cells["colData"].Value as CharacterData);
-            data?.SetFamilyName(prefLid, newFamilyName);
-            row.Cells["colFirstName"].Value = $"{data.GivenName(prefLid)} {data.FamilyName(prefLid)}";
+            CharacterInfo memberInfo = (row.Cells["colMemberInfo"].Value as CharacterInfo);
+            memberInfo?.SetFamilyName(prefLid, newFamilyName);
+            row.Cells["colFirstName"].Value = $"{memberInfo.GivenName(prefLid)} {memberInfo.FamilyName(prefLid)}";
         }
 
         private void OnChangeDaysClicked(object sender, EventArgs e)
@@ -4093,9 +4169,33 @@ namespace FamilyManager
                 days = (new Random()).Next(daysLow, daysHigh + 1);
             }
 
-            CharacterData data = (row.Cells["colData"].Value as CharacterData);
-            data?.ChangeDaysLeft(days);
-            row.Cells["colDaysLeft"].Value = data.DaysLeft;
+            CharacterInfo memberInfo = (row.Cells["colMemberInfo"].Value as CharacterInfo);
+            memberInfo?.ChangeDaysLeft(days);
+            row.Cells["colDaysLeft"].Value = memberInfo?.DaysLeft;
+        }
+
+        private void OnRemovePlasticSurgeryClicked(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in gridFamilyMembers.SelectedRows)
+            {
+                CharacterInfo memberInfo = (row.Cells["colMemberInfo"].Value as CharacterInfo);
+                memberInfo.RemovePlasticSurgery();
+                row.Cells["colPlasticSurgery"].Value = "N";
+
+                UpdateSaveState();
+            }
+        }
+
+        private void OnGeneticPlasticSurgeryClicked(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow row in gridFamilyMembers.SelectedRows)
+            {
+                CharacterInfo memberInfo = (row.Cells["colMemberInfo"].Value as CharacterInfo);
+                memberInfo.GeneticPlasticSurgery();
+                row.Cells["colPlasticSurgery"].Value = "N";
+
+                UpdateSaveState();
+            }
         }
 
         private bool confirmBackupBeforeSplit = true;
@@ -4104,9 +4204,9 @@ namespace FamilyManager
             if (!(mouseLocation == null || mouseLocation.RowIndex == -1))
             {
                 DataGridViewRow row = gridFamilyMembers.Rows[mouseLocation.RowIndex];
-                CharacterData characterData = (row.Cells["colData"].Value as CharacterData);
+                CharacterInfo memberInfo = (row.Cells["colMemberInfo"].Value as CharacterInfo);
 
-                if (characterData.IsSplit && "Y".Equals(row.Cells["colSplitFile"].Value as string, StringComparison.OrdinalIgnoreCase))
+                if (memberInfo.IsSplit && "Y".Equals(row.Cells["colSplitFile"].Value as string, StringComparison.OrdinalIgnoreCase))
                 {
                     thumbBox.Visible = false;
 
@@ -4122,15 +4222,15 @@ namespace FamilyManager
                         }
                     }
 
-                    characterData.FixSplit(packageCache);
+                    memberInfo.FixSplit();
                 }
                 else
                 {
-                    logger.Warn($"{characterData.PackageName} does not appear to be split!");
+                    logger.Warn($"{memberInfo.PackageName} does not appear to be split!");
                 }
             }
 
-            DoWork_FillFamilyGrid(lastHoodNode, lastFamilyNode);
+            DoWork_FillHouseholdGrid(lastHoodNode, lastFamilyNode);
             UpdateFormState();
         }
         #endregion
@@ -4713,17 +4813,17 @@ namespace FamilyManager
                     {
                         if (row.Cells[e.ColumnIndex].OwningColumn.Name.Equals("colFirstName"))
                         {
-                            if (row.Cells["colData"].Value is CharacterData data)
+                            if (row.Cells["colMemberInfo"].Value is CharacterInfo memberInfo)
                             {
 #if DEBUG
-                                if (currentMemberData != null)
+                                if (currentMemberInfo != null)
                                 {
-                                    e.ToolTipText = $"{data.PackageName} ({currentMemberData.SdscInstanceID})";
+                                    e.ToolTipText = $"{memberInfo.PackageName} ({currentMemberInfo.SdscInstanceID})";
                                 }
                                 else
 #endif
                                 {
-                                    e.ToolTipText = data.PackageName;
+                                    e.ToolTipText = memberInfo.PackageName;
                                 }
                             }
                         }
@@ -5261,11 +5361,11 @@ namespace FamilyManager
             SimTrackingBar trackBar = sender as SimTrackingBar;
             InterestTracker tracker = trackBar.Parent as InterestTracker;
 
-            toolTip.SetToolTip(trackBar, $"{trackBar.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+            toolTip.SetToolTip(trackBar, $"{tracker.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
 
             if (ignoreInterestsChanges) return;
 
-            currentMemberData.SetInterestValue(tracker.SdscIndex, tracker.Value);
+            currentMemberInfo.SetInterestValue(tracker.SdscIndex, tracker.Value);
             UpdateSaveState();
         }
 
@@ -5274,11 +5374,11 @@ namespace FamilyManager
             SimTrackingBar trackBar = sender as SimTrackingBar;
             InterestTracker tracker = trackBar.Parent as InterestTracker;
 
-            toolTip.SetToolTip(trackBar, $"{trackBar.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
+            toolTip.SetToolTip(trackBar, $"{tracker.Tag}: {trackBar.Value} out of {trackBar.Maximum}");
 
             if (ignoreInterestsChanges) return;
 
-            currentMemberData.SetHobbyValue(tracker.SdscIndex, tracker.Value);
+            currentMemberInfo.SetHobbyValue(tracker.SdscIndex, tracker.Value);
             UpdateSaveState();
         }
 
@@ -5286,8 +5386,22 @@ namespace FamilyManager
         {
             if (ignoreInterestsChanges) return;
 
-            currentMemberData.OneTrueHobby = (ushort)((comboHobbyOneTrue.SelectedItem as UintNamedValue).Value);
+            currentMemberInfo.OneTrueHobby = (ushort)((comboHobbyOneTrue.SelectedItem as UintNamedValue).Value);
             UpdateSaveState();
+        }
+
+        private void OnHobbyLotClicked(object sender, EventArgs e)
+        {
+            if (sender is Button button)
+            {
+                HobbyLotButton lotButton = (HobbyLotButton)button.Parent;
+
+                lotButton.Selected = !lotButton.Selected;
+                grpHobbies.Focus();
+
+                currentMemberInfo.SetCanVisitHobbyLot(lotButton.SdscIndex, lotButton.Selected);
+                UpdateSaveState();
+            }
         }
 
         private void OnBadgeChanged(object sender, EventArgs e)
@@ -5299,7 +5413,7 @@ namespace FamilyManager
 
             if (ignoreInterestsChanges) return;
 
-            currentMemberData.SetBadgeValue((TypeGUID)tracker.TokenGuid, tracker.Value);
+            currentMemberInfo.SetBadgeValue((TypeGUID)tracker.TokenGuid, tracker.Value);
             UpdateSaveState();
         }
 
@@ -5312,7 +5426,7 @@ namespace FamilyManager
 
             if (ignoreSkillsChanges) return;
 
-            currentMemberData.SetSkillValue(tracker.SdscIndex, tracker.Value);
+            currentMemberInfo.SetSkillValue(tracker.SdscIndex, tracker.Value);
             UpdateSaveState();
         }
 
@@ -5325,7 +5439,7 @@ namespace FamilyManager
 
             if (ignoreSkillsChanges) return;
 
-            currentMemberData.SetToddlerSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Value, (tracker.Value == tracker.Maximum));
+            currentMemberInfo.SetToddlerSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Value, (tracker.Value == tracker.Maximum));
             UpdateSaveState();
         }
 
@@ -5338,7 +5452,7 @@ namespace FamilyManager
 
             if (ignoreSkillsChanges) return;
 
-            currentMemberData.SetHiddenSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Value);
+            currentMemberInfo.SetHiddenSkillValue((TypeGUID)tracker.TokenGuid, (int)tracker.TokenProp, tracker.Value);
             UpdateSaveState();
         }
 
@@ -5351,7 +5465,7 @@ namespace FamilyManager
 
             if (ignoreSkillsChanges) return;
 
-            currentMemberData.SetLifeSkillValue((TypeGUID)tracker.TokenGuid, tracker.Value);
+            currentMemberInfo.SetLifeSkillValue((TypeGUID)tracker.TokenGuid, tracker.Value);
             UpdateSaveState();
         }
 
@@ -5364,7 +5478,7 @@ namespace FamilyManager
 
             if (ignoreSkillsChanges) return;
 
-            currentMemberData.SetPetSkillValue((TypeGUID)tracker.TokenGuid, tracker.Value);
+            currentMemberInfo.SetPetSkillValue((TypeGUID)tracker.TokenGuid, tracker.Value);
             UpdateSaveState();
         }
 
@@ -5372,7 +5486,7 @@ namespace FamilyManager
         {
             if (ignoreAspirationChanges) return;
 
-            currentMemberData.HasAspirationChanges = true;
+            currentMemberInfo.HasAspirationChanges = true;
 
             UpdatePrimaryBenefits();
             UpdateMotiveDecayControls();
@@ -5392,7 +5506,7 @@ namespace FamilyManager
                 comboAspirationSecondary.SelectedIndex = 0;
             }
 
-            currentMemberData.HasAspirationChanges = true;
+            currentMemberInfo.HasAspirationChanges = true;
 
             UpdateSecondaryBenefits();
             UpdateMotiveDecayControls();
@@ -5428,7 +5542,7 @@ namespace FamilyManager
                     }
                 }
 
-                currentMemberData.HasBenefitChanges = true;
+                currentMemberInfo.HasBenefitChanges = true;
 
                 UpdateMotiveDecayControls();
                 RecalcUnusedBenefits();
@@ -5440,9 +5554,9 @@ namespace FamilyManager
         {
             if (ignoreAspirationChanges) return;
 
-            if (currentMemberData.SuperpowerPointsUnused != textBenefitsUnused.Value)
+            if (currentMemberInfo.SuperpowerPointsUnused != textBenefitsUnused.Value)
             {
-                currentMemberData.HasBenefitChanges = true;
+                currentMemberInfo.HasBenefitChanges = true;
             }
 
             UpdateSaveState();
@@ -5502,10 +5616,10 @@ namespace FamilyManager
                 toolTip.SetToolTip(btnAspPrimary3.InnerButton, superpowerTooltips[(int)aspPrimaryIndex][3]);
                 toolTip.SetToolTip(btnAspPrimary4.InnerButton, superpowerTooltips[(int)aspPrimaryIndex][4]);
 
-                btnAspPrimary1.Selected = currentMemberData.HasSuperpower(aspPrimaryIndex, 1);
-                btnAspPrimary2.Selected = currentMemberData.HasSuperpower(aspPrimaryIndex, 2);
-                btnAspPrimary3.Selected = currentMemberData.HasSuperpower(aspPrimaryIndex, 3);
-                btnAspPrimary4.Selected = currentMemberData.HasSuperpower(aspPrimaryIndex, 4);
+                btnAspPrimary1.Selected = currentMemberInfo.HasSuperpower(aspPrimaryIndex, 1);
+                btnAspPrimary2.Selected = currentMemberInfo.HasSuperpower(aspPrimaryIndex, 2);
+                btnAspPrimary3.Selected = currentMemberInfo.HasSuperpower(aspPrimaryIndex, 3);
+                btnAspPrimary4.Selected = currentMemberInfo.HasSuperpower(aspPrimaryIndex, 4);
 
                 uint aspSecondaryIndex = (comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
 
@@ -5578,26 +5692,26 @@ namespace FamilyManager
                 toolTip.SetToolTip(btnAspSecondary4.InnerButton, superpowerTooltips[(int)aspSecondaryIndex][3]);
 
                 btnAspSecondary1.Selected = true;
-                btnAspSecondary2.Selected = currentMemberData.HasSuperpower(aspSecondaryIndex, 1);
-                btnAspSecondary3.Selected = currentMemberData.HasSuperpower(aspSecondaryIndex, 2);
-                btnAspSecondary4.Selected = currentMemberData.HasSuperpower(aspSecondaryIndex, 3);
+                btnAspSecondary2.Selected = currentMemberInfo.HasSuperpower(aspSecondaryIndex, 1);
+                btnAspSecondary3.Selected = currentMemberInfo.HasSuperpower(aspSecondaryIndex, 2);
+                btnAspSecondary4.Selected = currentMemberInfo.HasSuperpower(aspSecondaryIndex, 3);
             }
         }
 
         private void UpdateNeedsBenefits()
         {
-            btnAspNeeds1.Selected = currentMemberData.HasSuperpower(8, 1);
-            btnAspNeeds2.Selected = currentMemberData.HasSuperpower(8, 2);
-            btnAspNeeds3.Selected = currentMemberData.HasSuperpower(8, 3);
-            btnAspNeeds4.Selected = currentMemberData.HasSuperpower(8, 4);
+            btnAspNeeds1.Selected = currentMemberInfo.HasSuperpower(8, 1);
+            btnAspNeeds2.Selected = currentMemberInfo.HasSuperpower(8, 2);
+            btnAspNeeds3.Selected = currentMemberInfo.HasSuperpower(8, 3);
+            btnAspNeeds4.Selected = currentMemberInfo.HasSuperpower(8, 4);
         }
 
         private void UpdateWorkBenefits()
         {
-            btnAspWork1.Selected = currentMemberData.HasSuperpower(9, 1);
-            btnAspWork2.Selected = currentMemberData.HasSuperpower(9, 2);
-            btnAspWork3.Selected = currentMemberData.HasSuperpower(9, 3);
-            btnAspWork4.Selected = currentMemberData.HasSuperpower(9, 4);
+            btnAspWork1.Selected = currentMemberInfo.HasSuperpower(9, 1);
+            btnAspWork2.Selected = currentMemberInfo.HasSuperpower(9, 2);
+            btnAspWork3.Selected = currentMemberInfo.HasSuperpower(9, 3);
+            btnAspWork4.Selected = currentMemberInfo.HasSuperpower(9, 4);
         }
 
         private void RecalcUnusedBenefits()
@@ -5612,7 +5726,7 @@ namespace FamilyManager
                 }
             }
 
-            textBenefitsUnused.Value = (uint)Math.Max(0, (currentMemberData.SuperpowerPointsAvailable - benefitsCount));
+            textBenefitsUnused.Value = (uint)Math.Max(0, (currentMemberInfo.SuperpowerPointsAvailable - benefitsCount));
         }
 
         private void UpdateMotiveDecayControls()
@@ -5758,29 +5872,29 @@ namespace FamilyManager
             ushort aspPrimaryMax = 0;
             if (btnAspPrimary1.Selected)
             {
-                currentMemberData.GiveSuperpower(aspPrimaryIndex, 1);
+                currentMemberInfo.GiveSuperpower(aspPrimaryIndex, 1);
                 aspPrimaryMax = 1;
                 ++pointsSpent;
             }
             if (btnAspPrimary2.Selected)
             {
-                currentMemberData.GiveSuperpower(aspPrimaryIndex, 2);
+                currentMemberInfo.GiveSuperpower(aspPrimaryIndex, 2);
                 aspPrimaryMax = 2;
                 ++pointsSpent;
             }
             if (btnAspPrimary3.Selected)
             {
-                currentMemberData.GiveSuperpower(aspPrimaryIndex, 3);
+                currentMemberInfo.GiveSuperpower(aspPrimaryIndex, 3);
                 aspPrimaryMax = 3;
                 ++pointsSpent;
             }
             if (btnAspPrimary4.Selected)
             {
-                currentMemberData.GiveSuperpower(aspPrimaryIndex, 4);
+                currentMemberInfo.GiveSuperpower(aspPrimaryIndex, 4);
                 aspPrimaryMax = 4;
                 ++pointsSpent;
             }
-            currentMemberData.SetSuperpowerCount(6, aspPrimaryMax);
+            currentMemberInfo.SetSuperpowerCount(6, aspPrimaryMax);
 
             uint aspSecondaryIndex = (comboAspirationSecondary.SelectedItem as UintNamedValue).Value;
             ushort aspSecondaryMax = 0;
@@ -5791,85 +5905,85 @@ namespace FamilyManager
             }
             if (btnAspSecondary2.Selected)
             {
-                currentMemberData.GiveSuperpower(aspSecondaryIndex, 1);
+                currentMemberInfo.GiveSuperpower(aspSecondaryIndex, 1);
                 aspSecondaryMax = 2;
                 ++pointsSpent;
             }
             if (btnAspSecondary3.Selected)
             {
-                currentMemberData.GiveSuperpower(aspSecondaryIndex, 2);
+                currentMemberInfo.GiveSuperpower(aspSecondaryIndex, 2);
                 aspSecondaryMax = 3;
                 ++pointsSpent;
             }
             if (btnAspSecondary4.Selected)
             {
-                currentMemberData.GiveSuperpower(aspSecondaryIndex, 3);
+                currentMemberInfo.GiveSuperpower(aspSecondaryIndex, 3);
                 aspSecondaryMax = 4;
                 ++pointsSpent;
             }
-            currentMemberData.SetSuperpowerCount(7, aspSecondaryMax);
+            currentMemberInfo.SetSuperpowerCount(7, aspSecondaryMax);
 
             ushort aspNeedsMax = 0;
             if (btnAspNeeds1.Selected)
             {
-                currentMemberData.GiveSuperpower(8, 1);
+                currentMemberInfo.GiveSuperpower(8, 1);
                 aspNeedsMax = 1;
                 ++pointsSpent;
             }
             if (btnAspNeeds2.Selected)
             {
-                currentMemberData.GiveSuperpower(8, 2);
+                currentMemberInfo.GiveSuperpower(8, 2);
                 aspNeedsMax = 2;
                 ++pointsSpent;
             }
             if (btnAspNeeds3.Selected)
             {
-                currentMemberData.GiveSuperpower(8, 3);
+                currentMemberInfo.GiveSuperpower(8, 3);
                 aspNeedsMax = 3;
                 ++pointsSpent;
             }
             if (btnAspNeeds4.Selected)
             {
-                currentMemberData.GiveSuperpower(8, 4);
+                currentMemberInfo.GiveSuperpower(8, 4);
                 aspNeedsMax = 4;
                 ++pointsSpent;
             }
-            currentMemberData.SetSuperpowerCount(4, aspNeedsMax);
+            currentMemberInfo.SetSuperpowerCount(4, aspNeedsMax);
 
             ushort aspWorkMax = 0;
             if (btnAspWork1.Selected)
             {
-                currentMemberData.GiveSuperpower(9, 1);
+                currentMemberInfo.GiveSuperpower(9, 1);
                 aspWorkMax = 1;
                 ++pointsSpent;
             }
             if (btnAspWork2.Selected)
             {
-                currentMemberData.GiveSuperpower(9, 2);
+                currentMemberInfo.GiveSuperpower(9, 2);
                 aspWorkMax = 2;
                 ++pointsSpent;
             }
             if (btnAspWork3.Selected)
             {
-                currentMemberData.GiveSuperpower(9, 3);
+                currentMemberInfo.GiveSuperpower(9, 3);
                 aspWorkMax = 3;
                 ++pointsSpent;
             }
             if (btnAspWork4.Selected)
             {
-                currentMemberData.GiveSuperpower(9, 4);
+                currentMemberInfo.GiveSuperpower(9, 4);
                 aspWorkMax = 4;
                 ++pointsSpent;
             }
-            currentMemberData.SetSuperpowerCount(5, aspWorkMax);
+            currentMemberInfo.SetSuperpowerCount(5, aspWorkMax);
 
-            currentMemberData.SuperpowerPointsSpent = pointsSpent;
-            currentMemberData.SuperpowerPointsAvailable = (ushort)(pointsSpent + textBenefitsUnused.Value);
+            currentMemberInfo.SuperpowerPointsSpent = pointsSpent;
+            currentMemberInfo.SuperpowerPointsAvailable = (ushort)(pointsSpent + textBenefitsUnused.Value);
         }
 
         private void UpdateMotiveDecayTokens()
         {
-            currentMemberData.RemoveAllMotiveDecayTokens();
+            currentMemberInfo.RemoveAllMotiveDecayTokens();
 
             uint aspPrimaryIndex = (comboAspirationPrimary.SelectedItem as UintNamedValue).Value;
             switch (aspPrimaryIndex)
@@ -5877,43 +5991,43 @@ namespace FamilyManager
                 case 1: // Family
                     if (btnAspPrimary2.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(21, 0, 12, 0, 12, 0, 0, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(21, 0, 12, 0, 12, 0, 0, 0);
                     }
                     break;
                 case 2: // Fortune
                     if (btnAspPrimary2.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(9, 0, 12, 0, 12, 0, 0, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(9, 0, 12, 0, 12, 0, 0, 0);
                     }
                     break;
                 case 3: // Grilled Cheese
                     if (btnAspPrimary2.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(25, 12, 0, 0, 0, 0, 0, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(25, 12, 0, 0, 0, 0, 0, 0);
                     }
                     break;
                 case 4: // Knowledge
                     if (btnAspPrimary1.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(12, 0, 0, 0, 12, 0, 0, 12);
+                        currentMemberInfo.CreateMotiveDecayToken(12, 0, 0, 0, 12, 0, 0, 12);
                     }
                     break;
                 case 5: // Pleasure
                     if (btnAspPrimary2.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(17, 12, 0, 12, 0, 0, 0, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(17, 12, 0, 12, 0, 0, 0, 0);
                     }
                     break;
                 case 6: // Popularity
                     if (btnAspPrimary2.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(1, 12, 0, 12, 0, 0, 0, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(1, 12, 0, 12, 0, 0, 0, 0);
                     }
                     break;
                 case 7: // Romance
                     if (btnAspPrimary2.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(5, 0, 0, 12, 0, 0, 12, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(5, 0, 0, 12, 0, 0, 12, 0);
                     }
                     break;
             }
@@ -5924,43 +6038,43 @@ namespace FamilyManager
                 case 1: // Family
                     if (btnAspSecondary3.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(21, 0, 12, 0, 12, 0, 0, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(21, 0, 12, 0, 12, 0, 0, 0);
                     }
                     break;
                 case 2: // Fortune
                     if (btnAspSecondary3.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(9, 0, 12, 0, 12, 0, 0, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(9, 0, 12, 0, 12, 0, 0, 0);
                     }
                     break;
                 case 3: // Grilled Cheese
                     if (btnAspPrimary3.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(25, 12, 0, 0, 0, 0, 0, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(25, 12, 0, 0, 0, 0, 0, 0);
                     }
                     break;
                 case 4: // Knowledge
                     if (btnAspSecondary2.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(12, 0, 0, 0, 12, 0, 0, 12);
+                        currentMemberInfo.CreateMotiveDecayToken(12, 0, 0, 0, 12, 0, 0, 12);
                     }
                     break;
                 case 5: // Pleasure
                     if (btnAspSecondary3.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(17, 12, 0, 12, 0, 0, 0, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(17, 12, 0, 12, 0, 0, 0, 0);
                     }
                     break;
                 case 6: // Popularity
                     if (btnAspSecondary3.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(1, 12, 0, 12, 0, 0, 0, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(1, 12, 0, 12, 0, 0, 0, 0);
                     }
                     break;
                 case 7: // Romance
                     if (btnAspSecondary3.Selected)
                     {
-                        currentMemberData.CreateMotiveDecayToken(5, 0, 0, 12, 0, 0, 12, 0);
+                        currentMemberInfo.CreateMotiveDecayToken(5, 0, 0, 12, 0, 0, 12, 0);
                     }
                     break;
             }
@@ -5968,19 +6082,19 @@ namespace FamilyManager
             // Needs
             if (btnAspNeeds1.Selected)
             {
-                currentMemberData.CreateMotiveDecayToken(28, 0, 12, 0, 0, 0, 0, 12);
+                currentMemberInfo.CreateMotiveDecayToken(28, 0, 12, 0, 0, 0, 0, 12);
             }
             if (btnAspNeeds2.Selected)
             {
-                currentMemberData.CreateMotiveDecayToken(29, 12, 0, 0, 0, 0, 12, 0);
+                currentMemberInfo.CreateMotiveDecayToken(29, 12, 0, 0, 0, 0, 12, 0);
             }
             if (btnAspNeeds3.Selected)
             {
-                currentMemberData.CreateMotiveDecayToken(30, 0, 0, 0, 12, 12, 0, 0);
+                currentMemberInfo.CreateMotiveDecayToken(30, 0, 0, 0, 12, 12, 0, 0);
             }
             if (btnAspNeeds4.Selected)
             {
-                currentMemberData.CreateMotiveDecayToken(31, 0, 0, 12, 0, 0, 0, 0);
+                currentMemberInfo.CreateMotiveDecayToken(31, 0, 0, 12, 0, 0, 0, 0);
             }
         }
 
@@ -5995,10 +6109,10 @@ namespace FamilyManager
         {
             if (ignoreAspirationChanges) return;
 
-            if (currentMemberData.AspirationScoreRawDiv10 != (ushort)textAspirationMeter.Value)
+            if (currentMemberInfo.AspirationScoreRawDiv10 != (ushort)textAspirationMeter.Value)
             {
                 ignoreAspirationChanges = true;
-                currentMemberData.AspirationScoreRawDiv10 = (ushort)textAspirationMeter.Value;
+                currentMemberInfo.AspirationScoreRawDiv10 = (ushort)textAspirationMeter.Value;
                 trackAspirationMeter.Value = (int)textAspirationMeter.Value;
                 UpdateAspirationMeterColour();
                 ignoreAspirationChanges = false;
@@ -6037,9 +6151,9 @@ namespace FamilyManager
         {
             if (ignoreAspirationChanges) return;
 
-            if (currentMemberData.AspirationPoints != (ushort)textAspirationPoints.Value)
+            if (currentMemberInfo.AspirationPoints != (ushort)textAspirationPoints.Value)
             {
-                currentMemberData.AspirationPoints = (ushort)textAspirationPoints.Value;
+                currentMemberInfo.AspirationPoints = (ushort)textAspirationPoints.Value;
 
                 UpdateSaveState();
             }
@@ -6049,9 +6163,9 @@ namespace FamilyManager
         {
             if (ignoreAspirationChanges) return;
 
-            if (currentMemberData.AspirationScore != (ushort)textAspirationScore.Value)
+            if (currentMemberInfo.AspirationScore != (ushort)textAspirationScore.Value)
             {
-                currentMemberData.AspirationScore = (ushort)textAspirationScore.Value;
+                currentMemberInfo.AspirationScore = (ushort)textAspirationScore.Value;
 
                 UpdateSaveState();
             }
@@ -6073,9 +6187,9 @@ namespace FamilyManager
         {
             if (ignoreAspirationChanges) return;
 
-            if (currentMemberData.AspirationLongTerm != (ushort)textAspirationLongTerm.Value)
+            if (currentMemberInfo.AspirationLongTerm != (ushort)textAspirationLongTerm.Value)
             {
-                currentMemberData.AspirationLongTerm = (ushort)textAspirationLongTerm.Value;
+                currentMemberInfo.AspirationLongTerm = (ushort)textAspirationLongTerm.Value;
 
                 UpdateSaveState();
             }
@@ -6084,9 +6198,9 @@ namespace FamilyManager
         {
             if (ignoreAspirationChanges) return;
 
-            if (ckbAspirationPermaPlat.Checked != currentMemberData.IsPermanentPlatinum)
+            if (ckbAspirationPermaPlat.Checked != currentMemberInfo.IsPermanentPlatinum)
             {
-                currentMemberData.IsPermanentPlatinum = ckbAspirationPermaPlat.Checked;
+                currentMemberInfo.IsPermanentPlatinum = ckbAspirationPermaPlat.Checked;
 
                 if (ckbAspirationPermaPlat.Checked)
                 {
@@ -6098,23 +6212,23 @@ namespace FamilyManager
 
         private uint GetAspirationLimit()
         {
-            if (currentMemberData.IsToddler)
+            if (currentMemberInfo.IsToddler)
             {
                 return 300;
             }
-            else if (currentMemberData.IsChild)
+            else if (currentMemberInfo.IsChild)
             {
                 return 600;
             }
-            else if (currentMemberData.IsTeen)
+            else if (currentMemberInfo.IsTeen)
             {
                 return 900;
             }
-            else if (currentMemberData.IsElder)
+            else if (currentMemberInfo.IsElder)
             {
                 return 1500;
             }
-            else if (!currentMemberData.IsYoungAdultOrOlder)
+            else if (!currentMemberInfo.IsYoungAdultOrOlder)
             {
                 throw new Exception("Can't get aspiration limit");
             }
@@ -6124,7 +6238,7 @@ namespace FamilyManager
 
         private int EstimateCurrentFromRaw()
         {
-            double adultBiasRawScore = ((double)currentMemberData.AspirationScoreRawDiv10) / GetAspirationLimit() * 1200.0;
+            double adultBiasRawScore = ((double)currentMemberInfo.AspirationScoreRawDiv10) / GetAspirationLimit() * 1200.0;
 
             int estimate;
 
@@ -6184,7 +6298,7 @@ namespace FamilyManager
                         {
                             if (familyNode.FamilyId == familyId)
                             {
-                                tabPages.SelectedIndex = (lastActiveTab != -1) ? lastActiveTab : (int)TabPageIndex.TabFamily;
+                                tabPages.SelectedIndex = (lastActiveTab != -1) ? lastActiveTab : (int)TabPageIndex.TabHousehold;
 
                                 treeHoods.SelectedNode = familyNode;
                                 DoWork_FillHoodOrFamilyGrid(familyNode);
@@ -6237,12 +6351,12 @@ namespace FamilyManager
 
             if (button == btnVacIsleGesture || button == btnVacEastGesture || button == btnVacMountGesture)
             {
-                currentMemberData.SetMemento(Mementos.LearntAllGestures, (btnVacIsleGesture.Selected && btnVacEastGesture.Selected && btnVacMountGesture.Selected));
+                currentMemberInfo.SetMemento(Mementos.LearntAllGestures, (btnVacIsleGesture.Selected && btnVacEastGesture.Selected && btnVacMountGesture.Selected));
 
                 UpdateReadonlyMementos();
             }
 
-            currentMemberData.SetMemento(button.Memento, button.Selected);
+            currentMemberInfo.SetMemento(button.Memento, button.Selected);
             UpdateSaveState();
         }
 
@@ -6251,7 +6365,7 @@ namespace FamilyManager
             if (button.Selected == value) return;
 
             button.Selected = value;
-            currentMemberData.SetMemento(button.Memento, button.Selected);
+            currentMemberInfo.SetMemento(button.Memento, button.Selected);
         }
 
         private void OnVacationTourButtonClicked(object sender, EventArgs e)
@@ -6263,7 +6377,7 @@ namespace FamilyManager
             // Flip the state of this button
             button.Selected = !button.Selected;
 
-            currentMemberData.SetBeenOnTour(button.TokenGuid, button.Selected);
+            currentMemberInfo.SetBeenOnTour(button.TokenGuid, button.Selected);
 
             int tourCount = 0;
             foreach (Control control in grpVacationsTours.Controls)
@@ -6275,9 +6389,9 @@ namespace FamilyManager
             }
 
             // Update mementos based on number of tours taken
-            currentMemberData.SetMemento(Mementos.WentOnTour, (tourCount >= 1));
-            currentMemberData.SetMemento(Mementos.WentOnFiveTours, (tourCount >= 5));
-            currentMemberData.SetMemento(Mementos.WentOnAllTours, (tourCount == 9));
+            currentMemberInfo.SetMemento(Mementos.WentOnTour, (tourCount >= 1));
+            currentMemberInfo.SetMemento(Mementos.WentOnFiveTours, (tourCount >= 5));
+            currentMemberInfo.SetMemento(Mementos.WentOnAllTours, (tourCount == 9));
 
             UpdateReadonlyMementos();
             UpdateSaveState();
@@ -6292,14 +6406,24 @@ namespace FamilyManager
             // Flip the state of this button
             button.Selected = !button.Selected;
 
-            currentMemberData.SetVisitedSecretLot(button.TokenGuid, button.Selected);
+            currentMemberInfo.SetVisitedSecretLot(button.TokenGuid, button.Selected);
 
             // Update mementos based on number of secret lots found
-            currentMemberData.SetMemento(Mementos.VisitedSecretLot, (btnVacIsleSecretLot.Selected || btnVacEastSecretLot.Selected || btnVacMountSecretLot.Selected));
-            currentMemberData.SetMemento(Mementos.VisitedAllSecretLots, (btnVacIsleSecretLot.Selected && btnVacEastSecretLot.Selected && btnVacMountSecretLot.Selected));
+            currentMemberInfo.SetMemento(Mementos.VisitedSecretLot, (btnVacIsleSecretLot.Selected || btnVacEastSecretLot.Selected || btnVacMountSecretLot.Selected));
+            currentMemberInfo.SetMemento(Mementos.VisitedAllSecretLots, (btnVacIsleSecretLot.Selected && btnVacEastSecretLot.Selected && btnVacMountSecretLot.Selected));
 
             UpdateReadonlyMementos();
             UpdateSaveState();
+        }
+
+        private void OnFamilyMagazineSubscriptionClicked(object sender, EventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+            {
+                currentFamily.SetHasMagazineSub(checkBox.Tag.ToString(), checkBox.Checked);
+
+                UpdateSaveState();
+            }
         }
     }
 }
