@@ -20,6 +20,8 @@ namespace CollectionManager.Controls
 
         public CollectionViewer CollectionViewer => collectionViewer;
 
+        public bool IsValid => collectionViewer.IsValid;
+
         public string CollectionFilePath
         {
             get => collectionViewer.CollectionFilePath;

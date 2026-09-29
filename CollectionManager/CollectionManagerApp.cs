@@ -16,14 +16,14 @@ namespace CollectionManager
     {
         public static readonly string AppName = "Collection Manager";
 
-        public static readonly int AppVersionMajor = 0;
-        public static readonly int AppVersionMinor = 5;
+        public static readonly int AppVersionMajor = 1;
+        public static readonly int AppVersionMinor = 0;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 0;
 #endif
 
-        private static readonly string AppVersionType = "a"; // a - alpha, b - beta, r - release
+        private static readonly string AppVersionType = "b"; // a - alpha, b - beta, r - release
 
 #if DEBUG
         public static readonly string AppTitle = $"{AppName} V{AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType}";

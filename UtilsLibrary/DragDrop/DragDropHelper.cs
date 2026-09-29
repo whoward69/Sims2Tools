@@ -6,12 +6,12 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using System;
+using System.IO;
+using System.Xml.Serialization;
 // For your own sanity, do not use either of the following
 // using System.Windows;
 // using System.Windows.Forms;
-
-using System.IO;
-using System.Xml.Serialization;
 
 namespace Sims2Tools.DragDrop
 {
@@ -20,11 +20,35 @@ namespace Sims2Tools.DragDrop
         public static readonly string DragItemsLabel = "WH_DragItems";
         public static readonly string DragItemListLabel = "WH_DragItemList";
 
+        public static bool ContainsDragFileList(System.Windows.Forms.IDataObject data)
+        {
+            try
+            {
+                if (data is System.Windows.Forms.DataObject dataObject)
+                {
+                    return dataObject.ContainsFileDropList();
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            return false;
+        }
+
         public static bool ContainsDragItemList(System.Windows.Forms.IDataObject dataObject)
         {
-            string dataType = (string)dataObject.GetData(DragItemsLabel);
+            try
+            {
+                string dataType = (string)dataObject.GetData(DragItemsLabel);
 
-            return (dataType != null && dataType.Equals(DragDropHelper.DragItemListLabel));
+                return (dataType != null && dataType.Equals(DragDropHelper.DragItemListLabel));
+            }
+            catch (Exception)
+            {
+            }
+
+            return false;
         }
 
         internal static System.Windows.Forms.IDataObject SetObjectData<T>(object value, string format) where T : class
