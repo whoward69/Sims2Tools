@@ -78,6 +78,7 @@ namespace LogWatcher.Controls
         private LogXml logXml;
 
         private bool incPropIndex;
+        private bool noMemories;
 
         public bool IncPropIndex
         {
@@ -85,6 +86,17 @@ namespace LogWatcher.Controls
             set
             {
                 incPropIndex = value;
+
+                Reload();
+            }
+        }
+
+        public bool NoMemories
+        {
+            get => noMemories;
+            set
+            {
+                noMemories = value;
 
                 Reload();
             }
@@ -282,8 +294,22 @@ namespace LogWatcher.Controls
                     textBox.Text = "";
                     bool addNL = false;
 
+                    bool skipToken = false;
+
                     foreach (XmlElement child in nodeData.ChildNodes)
                     {
+                        if (child.Name.Equals("tokenGuid"))
+                        {
+                            skipToken = false;
+
+                            if (noMemories && child.InnerText.Contains(" : Memory "))
+                            {
+                                skipToken = true;
+                            }
+                        }
+
+                        if (skipToken) continue;
+
                         if (addNL) textBox.AppendText(Environment.NewLine);
 
                         string colour = child.GetAttribute("colour");

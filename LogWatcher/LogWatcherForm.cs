@@ -9,6 +9,7 @@
 using LogWatcher.Controls;
 using Sims2Tools;
 using Sims2Tools.Dialogs;
+using Sims2Tools.DragDrop;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.Persistence;
 using System;
@@ -62,6 +63,7 @@ namespace LogWatcher
             menuItemAutoClose.Checked = ((int)RegistryTools.GetSetting(LogWatcherApp.RegistryKey + @"\Options", "AutoClose", 0) != 0);
 
             menuItemIncPropIndex.Checked = ((int)RegistryTools.GetSetting(LogWatcherApp.RegistryKey + @"\Settings", "IncPropIndex", 1) != 0);
+            menuItemNoMemories.Checked = ((int)RegistryTools.GetSetting(LogWatcherApp.RegistryKey + @"\Settings", menuItemNoMemories.Name, 0) != 0);
 
             if (Directory.Exists(logsDir))
             {
@@ -163,7 +165,7 @@ namespace LogWatcher
                 }
             }
 
-            tabControl.Controls.Add(new LogTab(this, logFilePath, menuItemIncPropIndex.Checked));
+            tabControl.Controls.Add(new LogTab(this, logFilePath, menuItemIncPropIndex.Checked, menuItemNoMemories.Checked));
             tabControl.SelectedIndex = tabControl.TabCount - 1;
         }
 
@@ -181,9 +183,7 @@ namespace LogWatcher
 
         private void LogWatcher_DragEnter(object sender, DragEventArgs e)
         {
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -210,9 +210,7 @@ namespace LogWatcher
 
         private void LogWatcher_DragDrop(object sender, DragEventArgs e)
         {
-            DataObject data = e.Data as DataObject;
-
-            if (data.ContainsFileDropList())
+            if (DragDropHelper.ContainsDragFileList(e.Data))
             {
                 string[] rawFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -438,6 +436,19 @@ namespace LogWatcher
                 if (tabPage is LogTab logTab)
                 {
                     logTab.IncPropIndex = menuItemIncPropIndex.Checked;
+                }
+            }
+        }
+
+        private void OnNoMemoriesClicked(object sender, EventArgs e)
+        {
+            RegistryTools.SaveSetting(LogWatcherApp.RegistryKey + @"\Settings", menuItemNoMemories.Name, menuItemNoMemories.Checked ? 1 : 0);
+
+            foreach (TabPage tabPage in tabControl.TabPages)
+            {
+                if (tabPage is LogTab logTab)
+                {
+                    logTab.NoMemories = menuItemNoMemories.Checked;
                 }
             }
         }

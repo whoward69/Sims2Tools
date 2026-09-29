@@ -29,7 +29,13 @@ namespace LogWatcher.Controls
             set => logViewer.IncPropIndex = value;
         }
 
-        public LogTab(ISearcher searcher, string logFilePath, bool incPropIndex)
+        public bool NoMemories
+        {
+            get => logViewer.NoMemories;
+            set => logViewer.NoMemories = value;
+        }
+
+        public LogTab(ISearcher searcher, string logFilePath, bool incPropIndex, bool noMemories)
         {
             this.searcher = searcher;
 
@@ -43,7 +49,8 @@ namespace LogWatcher.Controls
                 TabIndex = 0,
 
                 LogFilePath = logFilePath,
-                IncPropIndex = incPropIndex
+                IncPropIndex = incPropIndex,
+                NoMemories = noMemories
             };
 
             this.Location = new System.Drawing.Point(4, 24);
