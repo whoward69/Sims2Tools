@@ -25,9 +25,9 @@ namespace Sims2Tools.Controls
 
         public GuidTextBox()
         {
-            this.Name = "GuidTextBox";
-
             InitializeComponent();
+
+            this.Name = "GuidTextBox";
         }
 
         [Browsable(true)]

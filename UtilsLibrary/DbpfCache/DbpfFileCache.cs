@@ -60,7 +60,7 @@ namespace Sims2Tools.DbpfCache
         public void Remove(DBPFKey key) => package.Remove(key);
 
         public string NextBackupName() => package.NextBackupName();
-        public string SaveAs(string newPackageName) => package.SaveAs(newPackageName);
+        public void SaveAs(string newPackageName) => package.SaveAs(newPackageName);
         public string Update(bool autoBackup) => package.Update(autoBackup);
         public bool RetryUpdateFromTemp() => package.RetryUpdateFromTemp();
 

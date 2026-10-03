@@ -30,7 +30,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXMT
         public const string NAME = "TXMT";
 
 #if !DEBUG
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 #endif
 
         internal static readonly string[] txtrPropKeys = { "stdMatBaseTextureName", "stdMatNormalMapTextureName", "stdMatEnvCubeTextureName" };

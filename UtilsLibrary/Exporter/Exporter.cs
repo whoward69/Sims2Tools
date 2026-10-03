@@ -35,8 +35,17 @@ namespace Sims2Tools.Exporter
         {
             if (exportPackage != null)
             {
-                exportPackage.Update(false);
-                exportPackage.Close();
+                try
+                {
+                    if (exportPackage.Update(false) == null)
+                    {
+                        throw new DbpfException($"Unable to update {exportPackage.PackageName}");
+                    }
+                }
+                finally
+                {
+                    exportPackage.Close();
+                }
             }
 
             foreach (DBPFFile package in openPackages.Values)

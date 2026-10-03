@@ -31,7 +31,7 @@ namespace Sims2Tools.Controls
     [ToolboxBitmapAttribute(typeof(ProgressBar)), DefaultEvent("ChangedValue")]
     public class SimTrackingBar : UserControl
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly Container components = null;
 

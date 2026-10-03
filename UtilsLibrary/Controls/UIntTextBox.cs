@@ -26,9 +26,9 @@ namespace Sims2Tools.Controls
 
         public UIntTextBox()
         {
-            this.Name = "UIntTextBox";
-
             InitializeComponent();
+
+            this.Name = "UIntTextBox";
         }
 
         [Browsable(true)]

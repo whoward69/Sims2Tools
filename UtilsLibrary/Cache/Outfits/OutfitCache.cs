@@ -28,7 +28,7 @@ namespace Sims2Tools.Cache.Outfits
     [Serializable]
     public class CasOutfitData : ISerializable
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly DBPFKey resKey;
         private readonly string resPackagePath;
@@ -156,7 +156,7 @@ namespace Sims2Tools.Cache.Outfits
 
     public class OutfitCache
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private Dictionary<DBPFKey, CasOutfitData> maxisOutfitCache = null;
         private Dictionary<DBPFKey, CasOutfitData> customOutfitCache = null;

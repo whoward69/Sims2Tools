@@ -111,7 +111,7 @@ namespace Sims2Tools.DBPF.Package
     // See also - https://modthesims.info/wiki.php?title=DBPF/Source_Code and https://modthesims.info/wiki.php?title=DBPF
     public class DBPFFile : IDBPFFile, IDisposable
     {
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 
         private static readonly Encoding encoding = new UTF8Encoding(false, true);
         public static Encoding Encoding => encoding;
@@ -220,7 +220,13 @@ namespace Sims2Tools.DBPF.Package
 
         public bool Remove(DBPFKey key) => resourceIndex.Remove(key);
 
-        public string SaveAs(string newFilePath) => Update(false, null, newFilePath);
+        public void SaveAs(string newFilePath)
+        {
+            if (Update(false, null, newFilePath) == null)
+            {
+                throw new DbpfException($"Unable to save {this.PackagePath} as {newFilePath}");
+            }
+        }
 
         public string Update(string subFolder) => Update(false, subFolder, null);
 

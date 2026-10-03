@@ -40,7 +40,7 @@ namespace Sims2Tools
 {
     public class GameData
     {
-        private static readonly DBPF.Logger.IDBPFLogger logger = DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly DBPF.Logger.IDBPFLogger logger = DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         static public readonly string objectsSubPath = "/TSData/Res/Objects/objects.package";
         static public readonly string wantsSubDir = "/TSData/Res/Wants";

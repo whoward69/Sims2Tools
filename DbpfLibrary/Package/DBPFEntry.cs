@@ -15,7 +15,7 @@ namespace Sims2Tools.DBPF.Package
     public class DBPFEntry : DBPFKey // Adding IEquatable<DBPFEntry> here is problematic as it overrides DBPFKey.Equals() and we don't really want all the hassle that comes by doing that!
     {
 #if DEBUG
-        // private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        // private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 #endif
 
         private uint fileOffset;

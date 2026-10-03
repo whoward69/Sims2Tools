@@ -29,7 +29,7 @@ namespace Sims2Tools.DBPF.SceneGraph.GMDC
         public const string NAME = "GMDC";
 
 #if !DEBUG
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 #endif
 
         private readonly CGeometryDataContainer cGeometryDataContainer = null;

@@ -14,7 +14,7 @@ namespace Sims2Tools
 {
     public class SimpeData
     {
-        private static readonly DBPF.Logger.IDBPFLogger logger = DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly DBPF.Logger.IDBPFLogger logger = DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private static readonly Dictionary<string, string> pathSettings = new Dictionary<string, string>();
 

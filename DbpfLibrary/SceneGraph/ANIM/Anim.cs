@@ -26,7 +26,7 @@ namespace Sims2Tools.DBPF.SceneGraph.ANIM
         public const string NAME = "ANIM";
 
 #if !DEBUG
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 #endif
 
         private CAnimResourceConst cAnimData = null;

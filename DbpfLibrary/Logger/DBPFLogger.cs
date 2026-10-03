@@ -32,9 +32,25 @@ namespace Sims2Tools.DBPF.Logger
 
     public class DBPFLoggerFactory
     {
-        public static IDBPFLogger GetLogger(Type type)
+        private static IDBPFLogger logger = null;
+
+        public static void InitLogger(string appName, string appProduct)
         {
-            return new DBPFLogger(type);
+            log4net.Config.XmlConfigurator.Configure();
+
+            logger = new DBPFLogger(appName);
+
+            logger.Info(appProduct);
+        }
+
+        public static IDBPFLogger GetLogger()
+        {
+            if (logger == null)
+            {
+                throw new DbpfException("Logger has not been initialised");
+            }
+
+            return logger;
         }
     }
 
@@ -42,7 +58,12 @@ namespace Sims2Tools.DBPF.Logger
     {
         private readonly log4net.ILog netLogger;
 
-        public DBPFLogger(Type type)
+        internal DBPFLogger(string name)
+        {
+            netLogger = log4net.LogManager.GetLogger(name);
+        }
+
+        internal DBPFLogger(Type type)
         {
             netLogger = log4net.LogManager.GetLogger(type);
         }

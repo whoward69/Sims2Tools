@@ -27,7 +27,7 @@ namespace Sims2Tools.DBPF.OBJD
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x4F424A44;
         public const string NAME = "OBJD";
 
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 
         private ObjdType type;
 

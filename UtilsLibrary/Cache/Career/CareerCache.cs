@@ -52,7 +52,7 @@ namespace Sims2Tools.Cache.Career
     [Serializable]
     public class CareerData : ISerializable
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly TypeGUID guid;
         private readonly string name;
@@ -237,7 +237,7 @@ namespace Sims2Tools.Cache.Career
 
     public class CareerCache : IEnumerable<CareerData>
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private Dictionary<TypeGUID, CareerData> customCareerCache = new Dictionary<TypeGUID, CareerData>();
 

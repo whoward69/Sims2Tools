@@ -34,7 +34,7 @@ namespace Sims2Tools.DBPF.SceneGraph.CRES
         public const string NAME = "CRES";
 
 #if !DEBUG
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 #endif
 
         private readonly CResourceNode cResourceNode = null;

@@ -33,7 +33,7 @@ namespace Sims2Tools.Cache.Hood
     [Serializable]
     public class CharacterData : ISerializable
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly TypeGUID guid;
         private string packagePath;
@@ -586,7 +586,7 @@ namespace Sims2Tools.Cache.Hood
 
     public class CharacterCache
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         internal static DbpfFileCache cache;
         public static void SetCache(DbpfFileCache cache)

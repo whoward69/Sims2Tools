@@ -30,7 +30,7 @@ namespace Sims2Tools.Controls
     [DefaultEvent(nameof(Changed))]
     public partial class InterestTracker : UserControl
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         public static ushort NO_VALUE = ushort.MaxValue;
 

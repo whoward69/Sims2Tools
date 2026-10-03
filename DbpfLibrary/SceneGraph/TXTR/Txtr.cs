@@ -29,7 +29,7 @@ namespace Sims2Tools.DBPF.SceneGraph.TXTR
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x1C4A276C;
         public const string NAME = "TXTR";
 
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 
         private CImageData cImageData = null;
         public CImageData ImageData => cImageData;

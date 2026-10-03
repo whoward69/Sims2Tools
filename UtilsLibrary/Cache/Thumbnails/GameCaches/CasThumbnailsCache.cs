@@ -25,7 +25,7 @@ namespace Sims2Tools.Cache.Thumbnails
      */
     public class CasThumbnailsCache : IDisposable
     {
-        private static readonly DBPF.Logger.IDBPFLogger logger = DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly DBPF.Logger.IDBPFLogger logger = DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private static readonly string cacheBase = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}/Sims2Tools";
         private static readonly string thumbnailsCacheFolderPath = $"{cacheBase}/Thumbnails/.cache";

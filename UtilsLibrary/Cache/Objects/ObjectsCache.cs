@@ -28,7 +28,7 @@ namespace Sims2Tools.Cache.Objects
     [Serializable]
     public class ObjectData : ISerializable
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly DBPFKey resKey;
 
@@ -155,7 +155,7 @@ namespace Sims2Tools.Cache.Objects
 
     public class ObjectsCache
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private Dictionary<TypeGUID, ObjectData> maxisObjectsCache = null;
         private Dictionary<TypeGUID, ObjectData> customObjectsCache = null;

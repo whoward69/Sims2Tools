@@ -31,7 +31,7 @@ namespace Sims2Tools.DBPF.Cigen
 
     public class CigenFile : ICigenFile
     {
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly DBPFFile cigenPackage = null;
 
@@ -88,7 +88,10 @@ namespace Sims2Tools.DBPF.Cigen
 
                 if (cigenPackage.IsDirty)
                 {
-                    cigenPackage.Update(false);
+                    if (cigenPackage.Update(false) == null)
+                    {
+                        throw new DbpfException($"Unable to update {cigenPackage.PackageName}");
+                    }
                 }
             }
         }

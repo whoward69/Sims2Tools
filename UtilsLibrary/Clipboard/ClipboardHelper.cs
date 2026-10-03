@@ -28,7 +28,7 @@ namespace Sims2Tools.Clipboard
 
     public class ClipboardHelper
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         public static bool ContainsFileList => System.Windows.Clipboard.ContainsFileDropList();
         public static StringCollection FileList => System.Windows.Clipboard.GetFileDropList();

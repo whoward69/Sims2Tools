@@ -25,7 +25,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
 {
     public abstract class Rcol : SgResource, IDisposable, IDbpfScriptable
     {
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly static Dictionary<string, Type> BlockClasses = new Dictionary<string, Type>();
 

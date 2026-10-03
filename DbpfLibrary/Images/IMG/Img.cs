@@ -39,7 +39,7 @@ namespace Sims2Tools.DBPF.Images.IMG
         private byte[] rawAlfa;
 #endif
 
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 
         private bool IsJpeg(byte[] imgData)
         {
@@ -366,64 +366,80 @@ namespace Sims2Tools.DBPF.Images.IMG
                 return image;
             }
 
-            set
+            private set
             {
                 image = value;
 
-                using (MemoryStream memoryStream = new MemoryStream())
+                _isDirty = true;
+            }
+        }
+
+        public void SetPngImage(Image value)
+        {
+            Image = value;
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                image.Save(memoryStream, ImageFormat.Png);
+                imageData = memoryStream.ToArray();
+            }
+        }
+
+        public void SetJpgImage(Image value)
+        {
+            Image = value;
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                if (image is Bitmap bm && image.PixelFormat == PixelFormat.Format32bppArgb)
                 {
-                    if (image is Bitmap bm && image.PixelFormat == PixelFormat.Format32bppArgb)
+                    image.Save(memoryStream, ImageFormat.Jpeg);
+                    byte[] jpegData = memoryStream.ToArray();
+
+                    byte[] alfaData = EncodeAlfa(bm);
+
+                    imageData = new byte[jpegData.Length + 2 + 6 + alfaData.Length];
+                    int imageIndex = 0;
+
+                    // Embed the alpha data into the JPEG (in memoryStream)
+
+                    // Copy the first two bytes of the JPEG data
+                    imageData[imageIndex++] = jpegData[0];
+                    imageData[imageIndex++] = jpegData[1];
+
+                    // Create an APP0 segment ...
+                    // ... segment marker
+                    imageData[imageIndex++] = 0xFF;
+                    imageData[imageIndex++] = 0xE0;
+
+                    // ... segment length
+                    int segmentLen = alfaData.Length + 6;
+                    imageData[imageIndex++] = (byte)((segmentLen & 0xFF00) / 256);
+                    imageData[imageIndex++] = (byte)(segmentLen & 0x00FF);
+
+                    // ... segment identifier
+                    imageData[imageIndex++] = (byte)'A';
+                    imageData[imageIndex++] = (byte)'L';
+                    imageData[imageIndex++] = (byte)'F';
+                    imageData[imageIndex++] = (byte)'A';
+
+                    // ... segment data
+                    for (int i = 0; i < alfaData.Length; ++i)
                     {
-                        image.Save(memoryStream, ImageFormat.Jpeg);
-                        byte[] jpegData = memoryStream.ToArray();
-
-                        byte[] alfaData = EncodeAlfa(bm);
-
-                        imageData = new byte[jpegData.Length + 2 + 6 + alfaData.Length];
-                        int imageIndex = 0;
-
-                        // Embed the alpha data into the JPEG (in memoryStream)
-
-                        // Copy the first two bytes of the JPEG data
-                        imageData[imageIndex++] = jpegData[0];
-                        imageData[imageIndex++] = jpegData[1];
-
-                        // Create an APP0 segment ...
-                        // ... segment marker
-                        imageData[imageIndex++] = 0xFF;
-                        imageData[imageIndex++] = 0xE0;
-
-                        // ... segment length
-                        int segmentLen = alfaData.Length + 6;
-                        imageData[imageIndex++] = (byte)((segmentLen & 0xFF00) / 256);
-                        imageData[imageIndex++] = (byte)(segmentLen & 0x00FF);
-
-                        // ... segment identifier
-                        imageData[imageIndex++] = (byte)'A';
-                        imageData[imageIndex++] = (byte)'L';
-                        imageData[imageIndex++] = (byte)'F';
-                        imageData[imageIndex++] = (byte)'A';
-
-                        // ... segment data
-                        for (int i = 0; i < alfaData.Length; ++i)
-                        {
-                            imageData[imageIndex++] = alfaData[i];
-                        }
-
-                        // Copy the rest of the JPEG data
-                        for (int i = 2; i < jpegData.Length; ++i)
-                        {
-                            imageData[imageIndex++] = jpegData[i];
-                        }
+                        imageData[imageIndex++] = alfaData[i];
                     }
-                    else
+
+                    // Copy the rest of the JPEG data
+                    for (int i = 2; i < jpegData.Length; ++i)
                     {
-                        image.Save(memoryStream, ImageFormat.Png);
-                        imageData = memoryStream.ToArray();
+                        imageData[imageIndex++] = jpegData[i];
                     }
                 }
-
-                _isDirty = true;
+                else
+                {
+                    image.Save(memoryStream, ImageFormat.Png);
+                    imageData = memoryStream.ToArray();
+                }
             }
         }
 

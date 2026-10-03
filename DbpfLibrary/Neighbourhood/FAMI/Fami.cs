@@ -22,8 +22,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMI
     public enum FamiCodes : uint
     {
         Default = 0x0000,
-        Lowest = 0X7FDF,
-        Socialites = 0X7FDF,
+        HighestPlayable = 0X7FDE,
+        Socialites,
         Techies,
         Jocks,
         Bohemians,

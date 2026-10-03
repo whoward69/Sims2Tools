@@ -42,7 +42,7 @@ namespace Sims2Tools.DBPF.SceneGraph
     public static class SgHelper
     {
 #if DEBUG
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 #endif
 
 #if DEBUG

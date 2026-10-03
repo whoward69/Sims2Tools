@@ -27,9 +27,9 @@ namespace Sims2Tools.Controls
 
         public DoubleTextBox()
         {
-            this.Name = "DoubleTextBox";
-
             InitializeComponent();
+
+            this.Name = "DoubleTextBox";
         }
 
         [Browsable(true)]

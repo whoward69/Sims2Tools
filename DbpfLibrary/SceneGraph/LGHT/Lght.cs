@@ -21,7 +21,7 @@ namespace Sims2Tools.DBPF.SceneGraph.LGHT
     public abstract class Lght : Rcol
     {
 #if !DEBUG
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 #endif
 
         private readonly AbstractLightRcolBlock cBaseLight = null;

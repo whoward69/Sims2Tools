@@ -21,7 +21,7 @@ namespace Sims2Tools.DBPF.IO
 {
     public class DbpfReader : IDisposable
     {
-        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Logger.IDBPFLogger logger = Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly Stream m_stream;
         private readonly BinaryReader m_reader;
