@@ -13,6 +13,8 @@
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
 using Sims2Tools.Cache;
+using Sims2Tools.Cache.Thumbnails;
+using Sims2Tools.Clipboard;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CLST;
@@ -22,6 +24,7 @@ using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.XFCH;
 using Sims2Tools.DBPF.SceneGraph.XHTN;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XSTN;
@@ -29,6 +32,7 @@ using Sims2Tools.DBPF.SceneGraph.XTOL;
 using Sims2Tools.DBPF.Utils;
 using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
+using Sims2Tools.DragDrop;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.NamedValue;
 using Sims2Tools.Utils.Persistence;
@@ -50,7 +54,7 @@ namespace OutfitOrganiser
 {
     public partial class OutfitOrganiserForm : Form
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly DbpfFileCache packageCache = new DbpfFileCache();
 
@@ -184,14 +188,13 @@ namespace OutfitOrganiser
         #region Constructor and TidyUp
         public OutfitOrganiserForm()
         {
-            logger.Info(OutfitOrganiserApp.AppProduct);
-
             InitializeComponent();
             SetTitle(lastFolder);
 
             if (Sims2ToolsLib.IsRunningOnWindows)
             {
                 gridPackageFiles.MouseDown += new MouseEventHandler(this.OnPkgGrid_MouseDown);
+                gridResources.MouseMove += new MouseEventHandler(this.OnResGrid_MouseMove);
             }
 
             OutfitDbpfData.SetCache(packageCache);
@@ -237,6 +240,7 @@ namespace OutfitOrganiser
 
                 UserConfigLoad(comboGeneticsSkins, "genetics", "skins", "skin");
                 UserConfigLoad(comboGeneticsEyes, "genetics", "eyes", "eye");
+                UserConfigLoad(comboGeneticsFaces, "genetics", "faces", "face");
 
                 dataLoading = false;
             }
@@ -353,6 +357,7 @@ namespace OutfitOrganiser
 
             menuItemGeneticsSkins.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemGeneticsSkins.Name, 0) != 0);
             menuItemGeneticsEyes.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemGeneticsEyes.Name, 0) != 0);
+            menuItemGeneticsFaces.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemGeneticsFaces.Name, 0) != 0);
 
             menuItemShowResTitle.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, 1) != 0); OnShowResTitleClicked(menuItemShowResTitle, null);
             menuItemShowResFilename.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, 1) != 0); OnShowResFilenameClicked(menuItemShowResFilename, null);
@@ -366,6 +371,7 @@ namespace OutfitOrganiser
 
             menuItemRecurse.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemRecurse.Name, 1) != 0);
             menuItemConfirmDelete.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemConfirmDelete.Name, 0) != 0);
+            menuItemDisableDragDrop.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemDisableDragDrop.Name, 0) != 0);
 
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
@@ -416,6 +422,7 @@ namespace OutfitOrganiser
 
                 RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemGeneticsSkins.Name, menuItemGeneticsSkins.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemGeneticsEyes.Name, menuItemGeneticsEyes.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemGeneticsFaces.Name, menuItemGeneticsFaces.Checked ? 1 : 0);
 
                 RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResTitle.Name, menuItemShowResTitle.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Options", menuItemShowResFilename.Name, menuItemShowResFilename.Checked ? 1 : 0);
@@ -429,6 +436,7 @@ namespace OutfitOrganiser
 
                 RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemRecurse.Name, menuItemRecurse.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemConfirmDelete.Name, menuItemConfirmDelete.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemDisableDragDrop.Name, menuItemDisableDragDrop.Checked ? 1 : 0);
 
                 RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
                 RegistryTools.SaveSetting(OutfitOrganiserApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
@@ -468,6 +476,7 @@ namespace OutfitOrganiser
 
             if (menuItemGeneticsSkins.Checked) outfits = $"{outfits}, Skin";
             if (menuItemGeneticsEyes.Checked) outfits = $"{outfits}, Eyes";
+            if (menuItemGeneticsFaces.Checked) outfits = $"{outfits}, Faces";
 
             if (outfits.Length > 0)
             {
@@ -532,7 +541,7 @@ namespace OutfitOrganiser
 
                 if (e.Handled)
                 {
-                    menuItemGeneticsSkins.Checked = menuItemGeneticsEyes.Checked = false;
+                    menuItemGeneticsSkins.Checked = menuItemGeneticsEyes.Checked = menuItemGeneticsFaces.Checked = false;
 
                     SetTitle(lastFolder);
 
@@ -826,6 +835,11 @@ namespace OutfitOrganiser
                     resourceRow["Visible"] = menuItemGeneticsEyes.Checked ? "Yes" : "No";
                     resourceRow["Genetic"] = outfitData.Genetic;
                 }
+                else if (outfitData.IsFaces)
+                {
+                    resourceRow["Visible"] = menuItemGeneticsFaces.Checked ? "Yes" : "No";
+                    resourceRow["Genetic"] = outfitData.Genetic;
+                }
                 else
                 {
                     switch (outfitData.ItemType)
@@ -961,19 +975,34 @@ namespace OutfitOrganiser
             menuItemGenetics.Visible = IsAdvancedMode;
             if (!menuItemGenetics.Visible)
             {
-                menuItemGeneticsSkins.Checked = menuItemGeneticsEyes.Checked = false;
+                menuItemGeneticsSkins.Checked = menuItemGeneticsEyes.Checked = menuItemGeneticsFaces.Checked = false;
             }
 
-            btnMeshes.Enabled = (!(menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked)) && meshCachesLoaded && (gridResources.SelectedRows.Count > 0);
-            btnTownify.Visible = menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked || (menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked) && (gridResources.SelectedRows.Count > 0);
+            btnMeshes.Enabled = (!(menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked || menuItemGeneticsFaces.Checked)) && meshCachesLoaded && (gridResources.SelectedRows.Count > 0);
+            btnTownify.Visible = menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked || menuItemGeneticsFaces.Checked || (menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked) && (gridResources.SelectedRows.Count > 0);
 
-            foreach (DataRow resourceRow in dataResources.Rows)
+            foreach (DataRow dataRow in dataResources.Rows)
             {
-                OutfitDbpfData outfitData = resourceRow["OutfitData"] as OutfitDbpfData;
+                OutfitDbpfData outfitData = dataRow["OutfitData"] as OutfitDbpfData;
+                if (outfitData == null)
+                {
+                    logger.Warn($"OutfitData is null for {dataRow["Title"]} ({dataRow["Filename"]})");
+                }
 
-                resourceRow["Visible"] = (menuItemOutfitAccessory.Checked && outfitData.IsAccessory || menuItemOutfitClothing.Checked && outfitData.IsClothing ||
-                                  menuItemOutfitHair.Checked && outfitData.IsHair || menuItemOutfitMakeUp.Checked && outfitData.IsMakeUp ||
-                                  menuItemGeneticsSkins.Checked && outfitData.IsSkin || menuItemGeneticsEyes.Checked && outfitData.IsEyes) ? "Yes" : "No";
+                bool visible = (outfitData != null);
+
+                if (visible)
+                {
+                    visible = menuItemOutfitAccessory.Checked && outfitData.IsAccessory ||
+                              menuItemOutfitClothing.Checked && outfitData.IsClothing ||
+                              menuItemOutfitHair.Checked && outfitData.IsHair ||
+                              menuItemOutfitMakeUp.Checked && outfitData.IsMakeUp ||
+                              menuItemGeneticsSkins.Checked && outfitData.IsSkin ||
+                              menuItemGeneticsEyes.Checked && outfitData.IsEyes ||
+                              menuItemGeneticsFaces.Checked && outfitData.IsFaces;
+                }
+
+                dataRow["Visible"] = visible ? "Yes" : "No";
             }
 
             foreach (DataGridViewRow packageRow in gridPackageFiles.Rows)
@@ -994,8 +1023,12 @@ namespace OutfitOrganiser
             foreach (DataGridViewRow resourceRow in gridResources.Rows)
             {
                 OutfitDbpfData outfitData = resourceRow.Cells["colOutfitData"].Value as OutfitDbpfData;
+                if (outfitData == null)
+                {
+                    logger.Warn($"OutfitData is null for {resourceRow.Cells["colTitle"]} ({resourceRow.Cells["colFilename"]})");
+                }
 
-                if (outfitData.IsDirty)
+                if (outfitData != null && outfitData.IsDirty)
                 {
                     resourceRow.DefaultCellStyle.BackColor = colourDirtyHighlight;
 
@@ -1024,14 +1057,15 @@ namespace OutfitOrganiser
             gridResources.Columns["colHairtone"].Visible = menuItemOutfitHair.Checked;
             grpHairtone.Visible = menuItemOutfitHair.Checked && !menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitMakeUp.Checked;
 
-            gridResources.Columns["colGenetic"].Visible = menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked;
-            grpGenetics.Visible = menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked;
+            gridResources.Columns["colGenetic"].Visible = menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked || menuItemGeneticsFaces.Checked;
+            grpGenetics.Visible = menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked || menuItemGeneticsFaces.Checked;
             comboGeneticsSkins.Visible = menuItemGeneticsSkins.Checked;
             comboGeneticsEyes.Visible = menuItemGeneticsEyes.Checked;
+            comboGeneticsFaces.Visible = menuItemGeneticsFaces.Checked;
 
             grpGender.Enabled = grpAge.Enabled = grpCategory.Enabled = !grpGenetics.Visible;
 
-            gridResources.Columns["colTownie"].Visible = menuItemOutfitClothing.Checked || menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked;
+            gridResources.Columns["colTownie"].Visible = menuItemOutfitClothing.Checked || menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked || menuItemGeneticsFaces.Checked;
 
             grpMultipleOutfits.Visible = !(grpShoe.Visible || grpAccessories.Visible || grpMakeup.Visible || grpHairtone.Visible || grpGenetics.Visible);
 
@@ -1093,7 +1127,7 @@ namespace OutfitOrganiser
                 menuItem.Checked = true;
             }
 
-            menuItemGeneticsSkins.Checked = menuItemGeneticsEyes.Checked = false;
+            menuItemGeneticsSkins.Checked = menuItemGeneticsEyes.Checked = menuItemGeneticsFaces.Checked = false;
 
             SetTitle(lastFolder);
 
@@ -1106,7 +1140,7 @@ namespace OutfitOrganiser
         {
             ToolStripMenuItem menuItem = (sender as ToolStripMenuItem);
 
-            menuItemGeneticsSkins.Checked = menuItemGeneticsEyes.Checked = false;
+            menuItemGeneticsSkins.Checked = menuItemGeneticsEyes.Checked = menuItemGeneticsFaces.Checked = false;
 
             menuItem.Checked = true;
 
@@ -1407,6 +1441,11 @@ namespace OutfitOrganiser
                     string backupName = masterPackage.Update(menuItemAutoBackup.Checked);
                     masterPackage.Close();
 
+                    if (backupName == null)
+                    {
+                        throw new DbpfException($"Unable to update {masterPackage.PackageName}");
+                    }
+
                     if (PackageRename(masterPackageRow))
                     {
                         if (File.Exists(backupName))
@@ -1567,7 +1606,7 @@ namespace OutfitOrganiser
 
                 menuItemNumericLayer.Visible = true;
 
-                btnTownify.Visible = menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked || (menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked) && (gridResources.SelectedRows.Count > 0);
+                btnTownify.Visible = menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked || menuItemGeneticsFaces.Checked || (menuItemOutfitClothing.Checked && !menuItemOutfitAccessory.Checked && !menuItemOutfitHair.Checked && !menuItemOutfitMakeUp.Checked) && (gridResources.SelectedRows.Count > 0);
             }
             else
             {
@@ -1582,6 +1621,11 @@ namespace OutfitOrganiser
             }
 
             OnNumericLayerClicked(menuItemNumericLayer, null);
+        }
+
+        private void OnRecurseClicked(object sender, EventArgs e)
+        {
+            DoWork_FillPackageGrid(lastFolder);
         }
         #endregion
 
@@ -1639,7 +1683,7 @@ namespace OutfitOrganiser
                     else if (colName.Equals("colGenetic"))
                     {
                         float value = (float)resourceRow.Cells["colGenetic"].Value;
-                        ComboBox comboGenetics = (menuItemGeneticsSkins.Checked) ? comboGeneticsSkins : comboGeneticsEyes;
+                        ComboBox comboGenetics = (menuItemGeneticsSkins.Checked) ? comboGeneticsSkins : ((menuItemGeneticsEyes.Checked) ? comboGeneticsEyes : comboGeneticsFaces);
 
                         foreach (object o in comboGenetics.Items)
                         {
@@ -1758,6 +1802,10 @@ namespace OutfitOrganiser
             {
                 type = "Eyes";
             }
+            else if (outfitData.IsFaces)
+            {
+                type = "Faces";
+            }
             else
             {
                 switch (outfitData.ItemType)
@@ -1802,7 +1850,7 @@ namespace OutfitOrganiser
 
             if ((outfitData.Flags & 0x00000008) == 0x00000000)
             {
-                if (menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked)
+                if (menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked || menuItemGeneticsFaces.Checked)
                 {
                     townie = "Yes";
                 }
@@ -2298,7 +2346,7 @@ namespace OutfitOrganiser
                         resourceRow.Cells["colMakeupBin"].Value = outfitData.Bin;
                     }
 
-                    if (outfitData.IsSkin || outfitData.IsEyes)
+                    if (outfitData.IsSkin || outfitData.IsEyes || outfitData.IsFaces)
                     {
                         resourceRow.Cells["colGenetic"].Value = outfitData.Genetic;
                     }
@@ -2555,6 +2603,7 @@ namespace OutfitOrganiser
             textMakeupBin.Text = "";
             comboGeneticsSkins.Text = "";
             comboGeneticsEyes.Text = "";
+            comboGeneticsFaces.Text = "";
 
             textTooltip.Text = "";
             textSort.Text = "";
@@ -2887,13 +2936,14 @@ namespace OutfitOrganiser
                 {
                     comboGeneticsSkins.Text = "";
                     comboGeneticsEyes.Text = "";
+                    comboGeneticsFaces.Text = "";
                 }
             }
             else
             {
                 cachedGeneticValue = newGeneticValue;
 
-                ComboBox comboGenetics = (menuItemGeneticsSkins.Checked) ? comboGeneticsSkins : comboGeneticsEyes;
+                ComboBox comboGenetics = (menuItemGeneticsSkins.Checked) ? comboGeneticsSkins : ((menuItemGeneticsEyes.Checked) ? comboGeneticsEyes : comboGeneticsFaces);
                 comboGenetics.Text = newGeneticValue.ToString();
 
                 foreach (object o in comboGenetics.Items)
@@ -3011,9 +3061,9 @@ namespace OutfitOrganiser
             }
         }
 
-        private void OnGeneticSkinChanged(object sender, EventArgs e)
+        private void OnGeneticsChanged(object sender, EventArgs e)
         {
-            ComboBox comboGenetics = (menuItemGeneticsSkins.Checked) ? comboGeneticsSkins : comboGeneticsEyes;
+            ComboBox comboGenetics = (menuItemGeneticsSkins.Checked) ? comboGeneticsSkins : ((menuItemGeneticsEyes.Checked) ? comboGeneticsEyes : comboGeneticsFaces);
 
             if (comboGenetics.SelectedIndex != -1)
             {
@@ -3231,7 +3281,7 @@ namespace OutfitOrganiser
         #region Textbox Events
         private void OnKeyPress(object sender, KeyPressEventArgs e)
         {
-            if ((sender == comboGeneticsSkins || sender == comboGeneticsEyes) && e.KeyChar == '.')
+            if ((sender == comboGeneticsSkins || sender == comboGeneticsEyes || sender == comboGeneticsFaces) && e.KeyChar == '.')
             {
                 // Permit decimal point in genetic (decimal) values
             }
@@ -3365,11 +3415,11 @@ namespace OutfitOrganiser
             }
         }
 
-        private void OnGeneticSkinKeyUp(object sender, KeyEventArgs e)
+        private void OnGeneticsKeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                ComboBox comboGenetics = (menuItemGeneticsSkins.Checked) ? comboGeneticsSkins : comboGeneticsEyes;
+                ComboBox comboGenetics = (menuItemGeneticsSkins.Checked) ? comboGeneticsSkins : ((menuItemGeneticsEyes.Checked) ? comboGeneticsEyes : comboGeneticsFaces);
                 float data = 0;
 
                 if (comboGenetics.Text.Length > 0 && !float.TryParse(comboGenetics.Text, out data))
@@ -3438,7 +3488,7 @@ namespace OutfitOrganiser
 
                                             if (res != null)
                                             {
-                                                if (res is Xstn || res is Xtol)
+                                                if (res is Xstn || res is Xtol || res is Xfch)
                                                 {
                                                     thumbnail = ((Img)package.GetResourceByKey(idr.GetItem(binx.GetItem("iconidx").UIntegerValue)))?.Image;
 
@@ -3555,6 +3605,8 @@ namespace OutfitOrganiser
                 return;
             }
 
+            menuContextResCopyToClipboard.Visible = menuSeparatorClipboard.Visible = IsAdvancedMode;
+
             // Mouse has to be over a selected row
             foreach (DataGridViewRow mouseOverResourceRow in gridResources.SelectedRows)
             {
@@ -3563,6 +3615,8 @@ namespace OutfitOrganiser
                     OutfitDbpfData outfitData = mouseOverResourceRow.Cells["colOutfitData"].Value as OutfitDbpfData;
                     Cpf thumbnailOwner = outfitData?.ThumbnailOwner;
                     Image thumbnail = (thumbnailOwner != null) ? GetResourceThumbnail(thumbnailOwner) : outfitData?.Thumbnail;
+
+                    menuContextResCopyToClipboard.Enabled = (gridResources.SelectedRows.Count > 0);
 
                     menuContextResSaveThumb.Enabled = ((gridResources.SelectedRows.Count == 1) && (thumbnail != null));
 
@@ -3668,6 +3722,23 @@ namespace OutfitOrganiser
             UpdateFormState();
         }
 
+        private void OnResCopyToClipboardClicked(object sender, EventArgs e)
+        {
+            ClipboardCollListItems collListItems = new ClipboardCollListItems(Sim2ToolsAppCodes.OutfitOrganiser);
+
+            foreach (DataGridViewRow resourceRow in gridResources.SelectedRows)
+            {
+                OutfitDbpfData outfitData = resourceRow.Cells["colOutfitData"].Value as OutfitDbpfData;
+
+                if (outfitData.ThumbnailOwner is Gzps gzps) // TODO - Outfit Organiser - using ThumbnailOwner here is meh!
+                {
+                    collListItems.AddItem(resourceRow.Index, gzps);
+                }
+            }
+
+            collListItems.PlaceOnClipboard(true);
+        }
+
         private void OnResSaveThumbClicked(object sender, EventArgs e)
         {
             DataGridViewRow selectedResourceRow = gridResources.SelectedRows[0];
@@ -3697,6 +3768,8 @@ namespace OutfitOrganiser
         #region Drag And Drop
         private void OnTreeFolder_ItemDrag(object sender, ItemDragEventArgs e)
         {
+            if (menuItemDisableDragDrop.Checked) return;
+
             // See https://www.c-sharpcorner.com/blogs/perform-drag-and-drop-operation-on-treeview-node-in-c-sharp-net
             if (e.Button == MouseButtons.Left)
             {
@@ -3708,15 +3781,19 @@ namespace OutfitOrganiser
 
         private void OnTreeFolder_DragEnter(object sender, DragEventArgs e)
         {
+            if (menuItemDisableDragDrop.Checked)
+            {
+                e.Effect = DragDropEffects.None;
+                return;
+            }
+
             if (rootFolder != null)
             {
                 e.Effect = e.AllowedEffect;
             }
             else
             {
-                DataObject data = e.Data as DataObject;
-
-                if (data.ContainsFileDropList())
+                if (DragDropHelper.ContainsDragFileList(e.Data))
                 {
                     string[] folders = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -3733,17 +3810,16 @@ namespace OutfitOrganiser
 
         private void OnTreeFolder_DragOver(object sender, DragEventArgs e)
         {
+            if (menuItemDisableDragDrop.Checked) return;
+
             Point targetPoint = treeFolders.PointToClient(new Point(e.X, e.Y));
             treeFolders.SelectedNode = treeFolders.GetNodeAt(targetPoint);
         }
 
-        private void OnRecurseClicked(object sender, EventArgs e)
-        {
-            DoWork_FillPackageGrid(lastFolder);
-        }
-
         private void OnTreeFolder_DragDrop(object sender, DragEventArgs e)
         {
+            if (menuItemDisableDragDrop.Checked) return;
+
             if (rootFolder != null)
             {
                 Point targetPoint = treeFolders.PointToClient(new Point(e.X, e.Y));
@@ -3818,9 +3894,7 @@ namespace OutfitOrganiser
             }
             else
             {
-                DataObject data = e.Data as DataObject;
-
-                if (data.ContainsFileDropList())
+                if (DragDropHelper.ContainsDragFileList(e.Data))
                 {
                     string[] folders = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -3872,6 +3946,26 @@ namespace OutfitOrganiser
                 }
             }
         }
+
+        private void OnResGrid_MouseMove(object sender, MouseEventArgs e)
+        {
+            if ((e.Button & MouseButtons.Right) == MouseButtons.Right && (Form.ModifierKeys & Keys.Control) == Keys.Control)
+            {
+                DropCollListItems dropListItems = new DropCollListItems(Sim2ToolsAppCodes.OutfitOrganiser);
+
+                foreach (DataGridViewRow resourceRow in gridResources.SelectedRows)
+                {
+                    OutfitDbpfData outfitData = resourceRow.Cells["colOutfitData"].Value as OutfitDbpfData;
+
+                    if (outfitData.ThumbnailOwner.TypeID == Gzps.TYPE) // TODO - Outfit Organiser - using ThumbnailOwner here is meh!
+                    {
+                        dropListItems.AddItem(resourceRow.Index, outfitData.ThumbnailOwner);
+                    }
+                }
+
+                DoDragDrop(dropListItems.GetDragData(), DragDropEffects.Copy);
+            }
+        }
         #endregion
 
         #region Save Button
@@ -3884,7 +3978,7 @@ namespace OutfitOrganiser
 
         private void SaveAll()
         {
-            bool forceReload = false;
+            bool forceAnyReload = false;
 
             foreach (DataGridViewRow packageRow in gridPackageFiles.Rows)
             {
@@ -3896,9 +3990,25 @@ namespace OutfitOrganiser
                     {
                         if (package.Update(menuItemAutoBackup.Checked) == null)
                         {
-                            MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!\n\nChanges are in the associated .temp file.", "Package Update Error!");
+                            bool forceThisReload = true;
 
-                            forceReload = true;
+                            bool exitRetryLoop;
+
+                            do
+                            {
+                                MessageBoxButtons buttons = (File.Exists(package.PackagePath) && File.Exists($"{package.PackagePath}.temp")) ? MessageBoxButtons.RetryCancel : MessageBoxButtons.OK;
+
+                                DialogResult result = MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!", "Package Update Error!", buttons);
+                                exitRetryLoop = true;
+
+                                if (result == DialogResult.Retry)
+                                {
+                                    exitRetryLoop = package.RetryUpdateFromTemp();
+                                    forceThisReload = !exitRetryLoop;
+                                }
+                            } while (!exitRetryLoop);
+
+                            forceAnyReload = forceAnyReload || forceThisReload;
                         }
 
                         packageCache.SetClean(package);
@@ -3918,7 +4028,7 @@ namespace OutfitOrganiser
                 }
             }
 
-            if (forceReload)
+            if (forceAnyReload)
             {
                 DoWork_FillResourceGrid(lastFolder);
             }
@@ -3941,7 +4051,7 @@ namespace OutfitOrganiser
                 {
                     outfitData.Flags = (uint)(outfitData.Flags & (~0x00000008));
 
-                    if (!(menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked))
+                    if (!(menuItemGeneticsSkins.Checked || menuItemGeneticsEyes.Checked || menuItemGeneticsFaces.Checked))
                     {
                         outfitData.Creator = "00000000-0000-0000-0000-000000000000";
                         outfitData.Family = "00000000-0000-0000-0000-000000000000";

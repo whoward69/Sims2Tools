@@ -22,7 +22,7 @@ namespace OutfitOrganiser
         public static readonly int AppVersionMinor = 6;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 0;
+        private static readonly int AppVersionDebug = 4;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release
@@ -44,7 +44,7 @@ namespace OutfitOrganiser
         [STAThread]
         static void Main()
         {
-            log4net.Config.XmlConfigurator.Configure();
+            Sims2Tools.DBPF.Logger.DBPFLoggerFactory.InitLogger(AppName, AppProduct);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

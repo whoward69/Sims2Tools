@@ -19,6 +19,7 @@ using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.GZPS;
 using Sims2Tools.DBPF.SceneGraph.IDR;
+using Sims2Tools.DBPF.SceneGraph.XFCH;
 using Sims2Tools.DBPF.SceneGraph.XMOL;
 using Sims2Tools.DBPF.SceneGraph.XSTN;
 using Sims2Tools.DBPF.SceneGraph.XTOL;
@@ -35,7 +36,7 @@ namespace OutfitOrganiser
 {
     public class OutfitDbpfData : IEquatable<OutfitDbpfData>
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private static DbpfFileCache cache;
         public static void SetCache(DbpfFileCache cache)
@@ -61,6 +62,7 @@ namespace OutfitOrganiser
         private readonly bool isMakeUp = false;
         private readonly bool isSkin = false;
         private readonly bool isEyes = false;
+        private readonly bool isFaces = false;
 
         private readonly bool hasShoe = false;
 
@@ -76,6 +78,7 @@ namespace OutfitOrganiser
         public bool IsMakeUp => isMakeUp;
         public bool IsSkin => isSkin;
         public bool IsEyes => isEyes;
+        public bool IsFaces => isFaces;
 
         public bool HasShoe => hasShoe;
 
@@ -119,13 +122,14 @@ namespace OutfitOrganiser
 
             Binx binx = (Binx)package.GetResourceByEntry(binxEntry);
 
-            if (binx != null && binx.GetItem("objectidx") != null)
+            if (binx != null)
             {
                 Idr idrForBinx = (Idr)package.GetResourceByTGIR(Hashes.TGIRHash(binx.InstanceID, binx.ResourceID, Idr.TYPE, binx.GroupID));
+                DBPFKey objectKey = IdrHelper.ObjectKey(binx, idrForBinx);
 
-                if (idrForBinx != null)
+                if (objectKey != null)
                 {
-                    DBPFResource res = package.GetResourceByKey(idrForBinx.GetItem(binx.GetItem("objectidx").UIntegerValue));
+                    DBPFResource res = package.GetResourceByKey(objectKey);
 
                     outfitData = Create(package, binx, idrForBinx, res);
                 }
@@ -145,7 +149,7 @@ namespace OutfitOrganiser
 
             if (binx != null && idrForBinx != null && res != null)
             {
-                if (res is Gzps || res is Xmol || res is Xtol || res is Xstn)
+                if (res is Gzps || res is Xmol || res is Xtol || res is Xstn || res is Xfch)
                 {
                     Cpf cpf = res as Cpf;
                     Idr idrForCpf = idrForBinx;
@@ -194,15 +198,18 @@ namespace OutfitOrganiser
             if (!IsDefaultReplacement)
             {
                 // This could be in a different group/.package
-                DBPFKey key = idrForBinx.GetItem(binx.GetItem("stringsetidx").UIntegerValue);
+                DBPFKey stringsetKey = IdrHelper.StringSetKey(binx, idrForBinx);
 
-                if (key.TypeID == Str.TYPE)
+                if (stringsetKey != null)
                 {
-                    this.str = (Str)package.GetResourceByKey(key);
-                }
-                else
-                {
-                    logger.Warn($"Got {DBPFData.TypeName(key.TypeID)} when expecting STR#");
+                    if (stringsetKey.TypeID == Str.TYPE)
+                    {
+                        this.str = (Str)package.GetResourceByKey(stringsetKey);
+                    }
+                    else
+                    {
+                        logger.Warn($"Got {DBPFData.TypeName(stringsetKey.TypeID)} when expecting STR#");
+                    }
                 }
             }
 
@@ -214,17 +221,18 @@ namespace OutfitOrganiser
             isMakeUp = (itemType == 0x02) && (subtype <= 0x07 && subtype != 0x05);
             isSkin = (cpf is Xstn);
             isEyes = (cpf is Xtol && subtype == 0x03);
+            isFaces = (cpf is Xfch);
 
             hasShoe = (itemType == 0x08 || itemType == 0x10);
         }
 
-        public Cpf ThumbnailOwner => (cpf is Xtol || cpf is Xstn) ? null : cpf;
+        public Cpf ThumbnailOwner => (cpf is Xtol || cpf is Xstn || cpf is Xfch) ? null : cpf;
 
         public Image Thumbnail
         {
             get
             {
-                if (!(cpf is Xtol || cpf is Xstn)) return null;
+                if (!(cpf is Xtol || cpf is Xstn || cpf is Xfch)) return null;
 
                 if (binx == null || idrForBinx == null) return null;
 
@@ -232,11 +240,11 @@ namespace OutfitOrganiser
 
                 using (CacheableDbpfFile package = cache.OpenForReadOnly(packagePath))
                 {
-                    CpfItem iconidx = binx.GetItem("iconidx");
+                    DBPFKey iconKey = IdrHelper.IconKey(binx, idrForBinx);
 
-                    if (iconidx != null)
+                    if (iconKey != null)
                     {
-                        thumbnail = ((Img)package.GetResourceByKey(idrForBinx.GetItem(iconidx.UIntegerValue)))?.Image;
+                        thumbnail = ((Img)package.GetResourceByKey(iconKey))?.Image;
                     }
 
                     package.Close();
@@ -553,10 +561,10 @@ namespace OutfitOrganiser
             {
                 if (binx != null && idrForBinx != null)
                 {
-                    CpfItem binidx = binx.GetItem("binidx");
-                    if (binidx != null)
+                    DBPFKey binKey = IdrHelper.BinKey(binx, idrForBinx);
+
+                    if (binKey != null)
                     {
-                        DBPFKey binKey = idrForBinx.GetItem(binidx.UIntegerValue);
                         return binKey.InstanceID.AsUInt();
                     }
                     else
@@ -777,6 +785,11 @@ namespace OutfitOrganiser
         public bool Equals(OutfitDbpfData other)
         {
             return this.cpf.Equals(other.cpf);
+        }
+
+        public override string ToString()
+        {
+            return cpf.Name;
         }
     }
 }

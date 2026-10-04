@@ -17,10 +17,10 @@ namespace BsokEditor
         public static readonly string AppName = "Bsok Editor";
 
         public static readonly int AppVersionMajor = 2;
-        public static readonly int AppVersionMinor = 6;
+        public static readonly int AppVersionMinor = 7;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 2;
+        private static readonly int AppVersionDebug = 0;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release

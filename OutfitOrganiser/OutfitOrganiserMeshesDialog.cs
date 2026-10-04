@@ -11,6 +11,7 @@
 
 using CsvHelper;
 using Sims2Tools.Cache;
+using Sims2Tools.Cache.Thumbnails;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
 using Sims2Tools.DBPF.Package;
