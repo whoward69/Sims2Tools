@@ -61,7 +61,7 @@ namespace CollectionManager.Controls
             this.menuItemCollContextClipboardCopyTo = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCollContextClipboardBefore = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCollContextClipboardAfter = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparatorSelectUnknown = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemCollContextDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.panelViewer = new System.Windows.Forms.Panel();
@@ -69,6 +69,9 @@ namespace CollectionManager.Controls
             this.toolTipViewer = new System.Windows.Forms.ToolTip(this.components);
             this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.timerThumbnail = new System.Windows.Forms.Timer(this.components);
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemCollContextSelectUnknown = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCollContextSelectDuplicates = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.pictCollIcon)).BeginInit();
             this.menuContextIcon.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridCollItems)).BeginInit();
@@ -256,10 +259,13 @@ namespace CollectionManager.Controls
             this.menuItemCollContextClipboardCopyTo,
             this.menuItemCollContextClipboardBefore,
             this.menuItemCollContextClipboardAfter,
-            this.toolStripSeparator1,
+            this.toolStripSeparatorSelectUnknown,
+            this.menuItemCollContextSelectUnknown,
+            this.menuItemCollContextSelectDuplicates,
+            this.toolStripSeparator4,
             this.menuItemCollContextDelete});
             this.menuContextCollItems.Name = "menuContextCollItems";
-            this.menuContextCollItems.Size = new System.Drawing.Size(233, 148);
+            this.menuContextCollItems.Size = new System.Drawing.Size(233, 220);
             this.menuContextCollItems.Opening += new System.ComponentModel.CancelEventHandler(this.OnCollItems_Opening);
             this.menuContextCollItems.Opened += new System.EventHandler(this.OnCollItemsContext_Opened);
             // 
@@ -303,10 +309,10 @@ namespace CollectionManager.Controls
             this.menuItemCollContextClipboardAfter.Text = "Paste From Clipboards AFTER";
             this.menuItemCollContextClipboardAfter.Click += new System.EventHandler(this.OnCollItemsContext_ClipboardPasteAfter);
             // 
-            // toolStripSeparator1
+            // toolStripSeparatorSelectUnknown
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(229, 6);
+            this.toolStripSeparatorSelectUnknown.Name = "toolStripSeparatorSelectUnknown";
+            this.toolStripSeparatorSelectUnknown.Size = new System.Drawing.Size(229, 6);
             // 
             // menuItemCollContextDelete
             // 
@@ -362,6 +368,25 @@ namespace CollectionManager.Controls
             this.timerThumbnail.Interval = 500;
             this.timerThumbnail.Tick += new System.EventHandler(this.OnTimerTick_Thumbnail);
             // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(229, 6);
+            // 
+            // menuItemCollContextSelectUnknown
+            // 
+            this.menuItemCollContextSelectUnknown.Name = "menuItemCollContextSelectUnknown";
+            this.menuItemCollContextSelectUnknown.Size = new System.Drawing.Size(232, 22);
+            this.menuItemCollContextSelectUnknown.Text = "Select All Unknown";
+            this.menuItemCollContextSelectUnknown.Click += new System.EventHandler(this.OnCollItemsContext_SelectUnknown);
+            // 
+            // menuItemCollContextSelectDuplicates
+            // 
+            this.menuItemCollContextSelectDuplicates.Name = "menuItemCollContextSelectDuplicates";
+            this.menuItemCollContextSelectDuplicates.Size = new System.Drawing.Size(232, 22);
+            this.menuItemCollContextSelectDuplicates.Text = "Select Duplicates";
+            this.menuItemCollContextSelectDuplicates.Click += new System.EventHandler(this.OnCollItemsContext_SelectDuplicates);
+            // 
             // CollectionViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -395,7 +420,7 @@ namespace CollectionManager.Controls
         private System.Windows.Forms.ContextMenuStrip menuContextCollItems;
         private System.Windows.Forms.ToolStripMenuItem menuItemCollContextBefore;
         private System.Windows.Forms.ToolStripMenuItem menuItemCollContextAfter;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorSelectUnknown;
         private System.Windows.Forms.ToolStripMenuItem menuItemCollContextDelete;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem menuItemCollContextClipboardBefore;
@@ -415,5 +440,8 @@ namespace CollectionManager.Controls
         private System.Windows.Forms.ToolStripMenuItem menuItemIconContextChangeIcon;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.Timer timerThumbnail;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCollContextSelectUnknown;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem menuItemCollContextSelectDuplicates;
     }
 }

@@ -94,5 +94,17 @@ namespace CollectionManager.Properties {
                 this["ThumbnailTimerDelayMilliSec"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
+        public int DefaultSortValue {
+            get {
+                return ((int)(this["DefaultSortValue"]));
+            }
+            set {
+                this["DefaultSortValue"] = value;
+            }
+        }
     }
 }

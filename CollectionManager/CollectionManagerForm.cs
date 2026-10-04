@@ -38,7 +38,7 @@ namespace CollectionManager
 {
     public partial class CollectionManagerForm : Form
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         #region Caches
         private readonly DbpfFileCache packageCache = new DbpfFileCache();
@@ -95,8 +95,6 @@ namespace CollectionManager
         #region Constructor and TidyUp
         public CollectionManagerForm()
         {
-            logger.Info(CollectionManagerApp.AppProduct);
-
             InitializeComponent();
             this.Text = CollectionManagerApp.AppTitle;
 
@@ -135,6 +133,8 @@ namespace CollectionManager
 
             menuItemOpenInTab.Checked = ((int)RegistryTools.GetSetting(CollectionManagerApp.RegistryKey + @"\Options", menuItemOpenInTab.Name, 1) != 0);
             menuItemOpenInWindow.Checked = ((int)RegistryTools.GetSetting(CollectionManagerApp.RegistryKey + @"\Options", menuItemOpenInWindow.Name, 0) != 0);
+
+            menuItemShowItemSortValues.Checked = ((int)RegistryTools.GetSetting(CollectionManagerApp.RegistryKey + @"\Options", menuItemShowItemSortValues.Name, 0) != 0); OnShowHideItemSortValues(menuItemShowItemSortValues, null);
 
             tabControl.Visible = true;
 
@@ -179,6 +179,8 @@ namespace CollectionManager
 
             RegistryTools.SaveSetting(CollectionManagerApp.RegistryKey + @"\Options", menuItemOpenInTab.Name, menuItemOpenInTab.Checked ? 1 : 0);
             RegistryTools.SaveSetting(CollectionManagerApp.RegistryKey + @"\Options", menuItemOpenInWindow.Name, menuItemOpenInWindow.Checked ? 1 : 0);
+
+            RegistryTools.SaveSetting(CollectionManagerApp.RegistryKey + @"\Options", menuItemShowItemSortValues.Name, menuItemShowItemSortValues.Checked ? 1 : 0);
 
             TidyUp();
         }
@@ -255,8 +257,20 @@ namespace CollectionManager
 
         private void OnAdvancedModeChanged(object sender, EventArgs e)
         {
-            menuReorder.Visible = IsAdvancedMode;
-            menuItemMouseDrop.Visible = IsAdvancedMode;
+            bool isAdvanced = IsAdvancedMode;
+
+            menuReorder.Visible = isAdvanced;
+            menuItemMouseDrop.Visible = isAdvanced;
+
+            foreach (TabPage tab in tabControl.TabPages)
+            {
+                (tab as CollectionViewerTab).CollectionViewer.IsAdvanced = isAdvanced;
+            }
+
+            foreach (CollectionViewerForm form in formsByPath.Values)
+            {
+                form.CollectionViewer.IsAdvanced = isAdvanced;
+            }
         }
         #endregion
 
@@ -495,6 +509,21 @@ namespace CollectionManager
         {
             menuItemOpenInTab.Checked = menuItemOpenInWindow.Checked = false;
             (sender as ToolStripMenuItem).Checked = true;
+        }
+
+        private void OnShowHideItemSortValues(object sender, EventArgs e)
+        {
+            bool showSortValues = menuItemShowItemSortValues.Checked;
+
+            foreach (TabPage tab in tabControl.TabPages)
+            {
+                (tab as CollectionViewerTab).CollectionViewer.ShowItemSortValues = showSortValues;
+            }
+
+            foreach (CollectionViewerForm form in formsByPath.Values)
+            {
+                form.CollectionViewer.ShowItemSortValues = showSortValues;
+            }
         }
         #endregion
 
@@ -779,7 +808,7 @@ namespace CollectionManager
 
                 string collectionFilePath = collectionViewer.CollectionFilePath;
 
-                CollectionViewerForm floatForm = new CollectionViewerForm(this, collectionFilePath);
+                CollectionViewerForm floatForm = new CollectionViewerForm(this, collectionFilePath, IsAdvancedMode, menuItemShowItemSortValues.Checked);
 
                 if (floatForm.IsValid)
                 {
@@ -954,7 +983,7 @@ namespace CollectionManager
 
                     coll.AddItem(new CpfItem("creatorid", "00000000-0000-0000-0000-000000000000"));
                     coll.AddItem(new CpfItem("flags", (uint)0x00000000));
-                    coll.AddItem(new CpfItem("sortindex", 200));
+                    coll.AddItem(new CpfItem("sortindex", Settings.Default.DefaultSortValue));
                     coll.AddItem(new CpfItem("type", ""));
 
                     coll.AddItem(new CpfItem("iconidx", (uint)0));
@@ -964,7 +993,7 @@ namespace CollectionManager
                     coll.AddItem(new CpfItem("stringindex", (uint)0));
                     idr.AppendItem(new DBPFKey(str));
 
-                    img.Image = Resources.UnknownIcon;
+                    img.SetPngImage(Resources.UnknownIcon);
 
                     str.AppendLanguageItem(MetaData.Languages.Default, new StrItem(MetaData.Languages.Default, CreateNameFromFilename(dialog.TextEntry), ""));
 
@@ -1010,7 +1039,7 @@ namespace CollectionManager
 
             if (inTab)
             {
-                CollectionViewerTab collViewerTab = new CollectionViewerTab(collectionFilePath);
+                CollectionViewerTab collViewerTab = new CollectionViewerTab(collectionFilePath, IsAdvancedMode, menuItemShowItemSortValues.Checked);
 
                 if (collViewerTab.IsValid)
                 {
@@ -1022,7 +1051,7 @@ namespace CollectionManager
             }
             else
             {
-                CollectionViewerForm floatForm = new CollectionViewerForm(this, collectionFilePath);
+                CollectionViewerForm floatForm = new CollectionViewerForm(this, collectionFilePath, IsAdvancedMode, menuItemShowItemSortValues.Checked);
 
                 if (floatForm.IsValid)
                 {

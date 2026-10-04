@@ -14,7 +14,7 @@ namespace CollectionManager.Controls
     [System.ComponentModel.DesignerCategory("")]
     public class CollectionViewerTab : TabPage
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly CollectionViewer collectionViewer;
 
@@ -28,7 +28,7 @@ namespace CollectionManager.Controls
             set { collectionViewer.CollectionFilePath = value; this.Text = collectionViewer.TabName; }
         }
 
-        public CollectionViewerTab(string collectionFilePath)
+        public CollectionViewerTab(string collectionFilePath, bool isAdvanced, bool showSortValues)
         {
             collectionViewer = new CollectionViewer()
             {
@@ -37,7 +37,9 @@ namespace CollectionManager.Controls
                 Size = new Size(450, 200),
                 TabIndex = 0,
 
-                CollectionFilePath = collectionFilePath
+                CollectionFilePath = collectionFilePath,
+                ShowItemSortValues = showSortValues,
+                IsAdvanced = isAdvanced
             };
 
             this.Location = new Point(4, 24);

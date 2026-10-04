@@ -34,7 +34,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -46,7 +45,7 @@ namespace CollectionManager.Controls
 {
     public partial class CollectionViewer : UserControl
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private static readonly Color colourDragBackground = Color.FromName(Properties.Settings.Default.DragBackground);
         private static readonly Color colourThumbnailBackground = Color.FromName(Properties.Settings.Default.ThumbnailBackground);
@@ -100,6 +99,8 @@ namespace CollectionManager.Controls
         private bool isValid = false;
         public bool IsValid => isValid;
 
+        public bool IsAdvanced { get; set; }
+
         private bool isPreHashed = false;
         private bool needsFullReindex = false;
 
@@ -122,6 +123,12 @@ namespace CollectionManager.Controls
                     isValid = Reload();
                 }
             }
+        }
+
+        public bool ShowItemSortValues
+        {
+            get => gridCollItems.Columns["colSort"].Visible;
+            set => gridCollItems.Columns["colSort"].Visible = value;
         }
 
         public bool IsObjectCollection
@@ -249,7 +256,7 @@ namespace CollectionManager.Controls
 
                     string type = coll?.GetItem("type")?.StringValue;
 
-                    if (type == null || !(type.Equals("collection") || type.Equals("communitylotcollection") || type.Equals("lotcollection") || type.Equals("clothing")))
+                    if (type == null || !(type.Equals("") || type.Equals("collection") || type.Equals("communitylotcollection") || type.Equals("lotcollection") || type.Equals("clothing")))
                     {
                         MsgBox.Show($"{packageName} doesn't appear to contain a collection.", "Collection Load Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return false;
@@ -736,17 +743,22 @@ namespace CollectionManager.Controls
 
                     using (CacheableDbpfFile package = packageCache.OpenForReadOnly(CollectionFilePath))
                     {
-                        if (package.SaveAs(packageFile) == null)
+                        try
+                        {
+                            package.SaveAs(packageFile);
+
+                            // Do NOT use SetClean() here, as it doesn't decache the open package file
+                            _isDirty = false;
+                            packageCache.SetClean(package);
+
+                            collectionFilePath = packageFile;
+                        }
+                        catch (DbpfException)
                         {
                             MsgBox.Show($"Error trying to save {package.PackageName}, file is probably open in SimPe!\n\nChanges are in the associated .temp file.", "Package Save Error!");
                         }
 
-                        // Do NOT use SetClean() here, as it doesn't decache the open package file
-                        _isDirty = false;
-                        packageCache.SetClean(package);
-
                         package.Close();
-                        collectionFilePath = packageFile;
                     }
 
                     UpdateSaveState();
@@ -789,7 +801,20 @@ namespace CollectionManager.Controls
                 {
                     if (package.Update(autoBackup) == null)
                     {
-                        MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!\n\nChanges are in the associated .temp file.", "Package Update Error!");
+                        bool exitRetryLoop;
+
+                        do
+                        {
+                            MessageBoxButtons buttons = (File.Exists(package.PackagePath) && File.Exists($"{package.PackagePath}.temp")) ? MessageBoxButtons.RetryCancel : MessageBoxButtons.OK;
+
+                            DialogResult result = MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!", "Package Update Error!", buttons);
+                            exitRetryLoop = true;
+
+                            if (result == DialogResult.Retry)
+                            {
+                                exitRetryLoop = package.RetryUpdateFromTemp();
+                            }
+                        } while (!exitRetryLoop);
                     }
 
                     // Do NOT use SetClean() here, as it doesn't decache the open package file
@@ -806,7 +831,6 @@ namespace CollectionManager.Controls
         public void ChangeIcon()
         {
             selectFileDialog.InitialDirectory = $"{Sims2ToolsLib.Sims2CollectionsPath}\\Icons";
-            selectFileDialog.FileName = "*.png";
 
             if (selectFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -848,7 +872,7 @@ namespace CollectionManager.Controls
 
                         Img img = GetImgResource(package, coll, idrForColl);
 
-                        img.Image = collIcon;
+                        img.SetPngImage(collIcon);
                         _isDirty = true;
 
                         package.Commit(img);
@@ -1028,9 +1052,33 @@ namespace CollectionManager.Controls
                         }
                     }
 
-                    if (doUpdate && package.IsDirty) package.Update(false);
+                    try
+                    {
+                        if (doUpdate && package.IsDirty)
+                        {
+                            if (package.Update(false) == null)
+                            {
+                                bool exitRetryLoop;
 
-                    package.Close();
+                                do
+                                {
+                                    MessageBoxButtons buttons = (File.Exists(package.PackagePath) && File.Exists($"{package.PackagePath}.temp")) ? MessageBoxButtons.RetryCancel : MessageBoxButtons.OK;
+
+                                    DialogResult result = MsgBox.Show($"Error trying to update {package.PackageName}, file is probably open in SimPe!", "Package Update Error!", buttons);
+                                    exitRetryLoop = true;
+
+                                    if (result == DialogResult.Retry)
+                                    {
+                                        exitRetryLoop = package.RetryUpdateFromTemp();
+                                    }
+                                } while (!exitRetryLoop);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        package.Close();
+                    }
                 }
 
                 isPreHashed = false;
@@ -1084,6 +1132,8 @@ namespace CollectionManager.Controls
             // We hijack shift-right-click and ctrl-right-click, so only open the context menu on a normal right-click
             if (Form.ModifierKeys == Keys.None)
             {
+                menuItemCollContextSelectDuplicates.Visible = menuItemCollContextSelectUnknown.Visible = toolStripSeparatorSelectUnknown.Visible = IsAdvanced;
+
                 if (gridCollItems.Rows.Count < 1)
                 {
                     menuItemCollContextClipboardAfter.Text = "Paste From Clipboard";
@@ -1153,7 +1203,6 @@ namespace CollectionManager.Controls
 
         private bool ClipboardIsUsable()
         {
-            logger.Debug("Clipboard: Looking for stuff");
             return ClipboardContainsCollItems() || ClipboardContainsPackageFiles();
         }
 
@@ -1163,12 +1212,10 @@ namespace CollectionManager.Controls
             {
                 if (ClipboardHelper.ContainsFileList)
                 {
-                    logger.Debug("Clipboard: Found a file list");
                     foreach (string path in ClipboardHelper.FileList)
                     {
                         if (path.EndsWith(".package"))
                         {
-                            logger.Debug("Clipboard: Found (at least one) .package file");
                             return true;
                         }
                     }
@@ -1194,6 +1241,41 @@ namespace CollectionManager.Controls
             }
 
             return false;
+        }
+
+        private void OnCollItemsContext_SelectUnknown(object sender, EventArgs e)
+        {
+            gridCollItems.ClearSelection();
+
+            foreach (DataGridViewRow row in gridCollItems.Rows)
+            {
+                if (!(row.Cells["colKey"].Value is DBPFKey))
+                {
+                    row.Selected = true;
+                }
+            }
+        }
+
+        private void OnCollItemsContext_SelectDuplicates(object sender, EventArgs e)
+        {
+            List<DBPFKey> seenItemKeys = new List<DBPFKey>();
+
+            gridCollItems.ClearSelection();
+
+            foreach (DataGridViewRow row in gridCollItems.Rows)
+            {
+                if (row.Cells["colKey"].Value is DBPFKey itemKey)
+                {
+                    if (seenItemKeys.Contains(itemKey))
+                    {
+                        row.Selected = true;
+                    }
+                    else
+                    {
+                        seenItemKeys.Add(itemKey);
+                    }
+                }
+            }
         }
 
         private void OnCollItemsContext_Delete(object sender, EventArgs e)
@@ -1412,7 +1494,7 @@ namespace CollectionManager.Controls
         #region Reorder Rows (by mouse move)
         private void OnCollItemsContext_MoveBefore(object sender, EventArgs e)
         {
-            DBPFKey inViewItemKey = (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
+            DBPFKey inViewItemKey = (mouseRowIndex < 0 || mouseRowIndex >= gridCollItems.Rows.Count) ? null : (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
 
             GetSelectedRows();
             MoveSelectedRowsBefore(mouseRowIndex);
@@ -1422,7 +1504,7 @@ namespace CollectionManager.Controls
 
         private void OnCollItemsContext_MoveAfter(object sender, EventArgs e)
         {
-            DBPFKey inViewItemKey = (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
+            DBPFKey inViewItemKey = (mouseRowIndex < 0 || mouseRowIndex >= gridCollItems.Rows.Count) ? null : (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
 
             GetSelectedRows();
             MoveSelectedRowsAfter(mouseRowIndex);
@@ -1487,7 +1569,7 @@ namespace CollectionManager.Controls
         {
             // Do the thumnail tracking stuff first
             {
-                if (Math.Abs(Cursor.Position.X - lastMouseAt.X) > System.Windows.SystemParameters.MinimumHorizontalDragDistance || 
+                if (Math.Abs(Cursor.Position.X - lastMouseAt.X) > System.Windows.SystemParameters.MinimumHorizontalDragDistance ||
                     Math.Abs(Cursor.Position.Y - lastMouseAt.Y) > System.Windows.SystemParameters.MinimumVerticalDragDistance)
                 {
                     timerThumbnail.Stop();
@@ -1654,7 +1736,6 @@ namespace CollectionManager.Controls
         #region Copy To Clipboard
         private void OnIconContext_ClipboardCopyTo(object sender, EventArgs e)
         {
-            logger.Debug("Clipboard: Placing icon");
             Clipboard.SetImage(pictCollIcon.BackgroundImage);
         }
 
@@ -1672,7 +1753,6 @@ namespace CollectionManager.Controls
                 }
             }
 
-            logger.Debug("Clipboard: Placing items");
             collListItems.PlaceOnClipboard(false);
         }
         #endregion
@@ -1680,7 +1760,7 @@ namespace CollectionManager.Controls
         #region Paste From Clipboard
         private void OnCollItemsContext_ClipboardPasteBefore(object sender, EventArgs e)
         {
-            DBPFKey inViewItemKey = (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
+            DBPFKey inViewItemKey = (mouseRowIndex < 0 || mouseRowIndex >= gridCollItems.Rows.Count) ? null : (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
 
             if (ClipboardContainsPackageFiles())
             {
@@ -1698,7 +1778,7 @@ namespace CollectionManager.Controls
 
         private void OnCollItemsContext_ClipboardPasteAfter(object sender, EventArgs e)
         {
-            DBPFKey inViewItemKey = (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
+            DBPFKey inViewItemKey = (mouseRowIndex < 0 || mouseRowIndex >= gridCollItems.Rows.Count) ? null : (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
 
             if (ClipboardContainsPackageFiles())
             {
@@ -1775,12 +1855,10 @@ namespace CollectionManager.Controls
                     {
                         if (IsObjectCollection)
                         {
-                            logger.Debug($"Can't drag items from {appCode} into an object collection");
                             e.Effect = DragDropEffects.None;
                         }
                         else
                         {
-                            logger.Debug($"Dragging items from {appCode}");
                             e.Effect = DragDropEffects.Copy;
                         }
                     }
@@ -1788,25 +1866,20 @@ namespace CollectionManager.Controls
                     {
                         if (IsClothingCollection)
                         {
-                            logger.Debug($"Can't drag items from {appCode} into a clothing collection");
                             e.Effect = DragDropEffects.None;
                         }
                         else
                         {
-                            logger.Debug($"Dragging items from {appCode}");
                             e.Effect = DragDropEffects.Copy;
                         }
                     }
                     else
                     {
-                        logger.Debug($"Dragging items from {appCode}");
                         e.Effect = DragDropEffects.Copy;
                     }
                 }
                 else
                 {
-                    logger.Debug($"Dragging items from {collKey}");
-
                     if (collectionKey.Equals(dropListItems.CollKey))
                     {
                         // Trying to drag-and-drop WITHIN the same collection, this is not allowed (as the drop is a copy operation that would duplicate entries)
@@ -1824,7 +1897,6 @@ namespace CollectionManager.Controls
             {
                 if (DragDropHelper.ContainsDragFileList(e.Data))
                 {
-                    logger.Debug($"DragDrop: Dragging .package files");
                     string[] fileList = (string[])e.Data.GetData(DataFormats.FileDrop);
 
                     if (fileList != null)
@@ -1861,9 +1933,8 @@ namespace CollectionManager.Controls
 
             Point p = gridCollItems.PointToClient(new Point(e.X, e.Y));
             mouseRowIndex = gridCollItems.HitTest(p.X, p.Y).RowIndex;
-            logger.Debug($"Drop row is {mouseRowIndex}");
 
-            DBPFKey inViewItemKey = (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
+            DBPFKey inViewItemKey = (mouseRowIndex < 0 || mouseRowIndex >= gridCollItems.Rows.Count) ? null : (gridCollItems.Rows[mouseRowIndex].Cells["colItemKey"].Value as DBPFKey);
 
             try
             {
@@ -1881,7 +1952,6 @@ namespace CollectionManager.Controls
                 {
                     if (DragDropHelper.ContainsDragFileList(e.Data))
                     {
-                        logger.Debug($"DragDrop: Dropping .package files");
                         string[] fileList = (string[])e.Data.GetData(DataFormats.FileDrop);
 
                         if (fileList != null)
@@ -1913,34 +1983,16 @@ namespace CollectionManager.Controls
                 {
                     if (IsObjectCollection)
                     {
-                        logger.Debug($"Can't add items from {appCode} into an object collection");
                         return;
-                    }
-                    else
-                    {
-                        logger.Debug($"Adding items from {appCode}");
                     }
                 }
                 else if (appCode == Sim2ToolsAppCodes.ObjectRelocator)
                 {
                     if (IsClothingCollection)
                     {
-                        logger.Debug($"Can't add items from {appCode} into a clothing collection");
                         return;
                     }
-                    else
-                    {
-                        logger.Debug($"Adding items from {appCode}");
-                    }
                 }
-                else
-                {
-                    logger.Debug($"Adding items from {appCode}");
-                }
-            }
-            else
-            {
-                logger.Debug($"Adding items from {collKey}");
             }
 
             List<DBPFKey> items = collListItems.CollItems;
@@ -1951,7 +2003,7 @@ namespace CollectionManager.Controls
 
                 uint instanceID = GetNextIdrInstance(collPackage);
 
-                int startRowIndex = (mouseRowIndex == -1) ? 0 : (mouseRowIndex + targetOffset);
+                int startRowIndex = (mouseRowIndex == -1) ? gridCollItems.Rows.Count : (mouseRowIndex + targetOffset);
                 int sortindex = startRowIndex;
 
                 if (!IsClothingCollection && !IsObjectCollection)
@@ -2016,8 +2068,7 @@ namespace CollectionManager.Controls
 
                 uint instanceID = GetNextIdrInstance(collPackage);
 
-                int startRowIndex = (mouseRowIndex == -1) ? 0 : (mouseRowIndex + targetOffset);
-                logger.Debug($"Start row index = {startRowIndex}");
+                int startRowIndex = (mouseRowIndex == -1) ? gridCollItems.Rows.Count : (mouseRowIndex + targetOffset);
                 int sortindex = startRowIndex;
 
                 foreach (string filepath in filelist)
@@ -2137,8 +2188,6 @@ namespace CollectionManager.Controls
         private bool AddCollItem(CacheableDbpfFile collPackage, DBPFKey collKey, uint instanceID, int sortindex, DBPFKey itemKey)
         {
             if (dataCollItems.Contains(itemKey)) return false;
-
-            logger.Debug($"Adding Item: {itemKey}");
 
             DBPFKey binxKey = new DBPFKey(Binx.TYPE, collKey.GroupID, (TypeInstanceID)instanceID, DBPFData.RESOURCE_NULL);
             Binx binx = new Binx(binxKey);

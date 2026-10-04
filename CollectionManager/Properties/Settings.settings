@@ -20,5 +20,8 @@
     <Setting Name="ThumbnailTimerDelayMilliSec" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">500</Value>
     </Setting>
+    <Setting Name="DefaultSortValue" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">200</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

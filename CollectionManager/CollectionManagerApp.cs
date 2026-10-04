@@ -20,7 +20,7 @@ namespace CollectionManager
         public static readonly int AppVersionMinor = 0;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 0;
+        private static readonly int AppVersionDebug = 5;
 #endif
 
         private static readonly string AppVersionType = "b"; // a - alpha, b - beta, r - release
@@ -42,7 +42,7 @@ namespace CollectionManager
         [STAThread]
         static void Main()
         {
-            log4net.Config.XmlConfigurator.Configure();
+            Sims2Tools.DBPF.Logger.DBPFLoggerFactory.InitLogger(AppName, AppProduct);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

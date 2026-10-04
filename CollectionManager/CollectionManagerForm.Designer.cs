@@ -81,6 +81,8 @@ namespace CollectionManager
             this.menuItemMouseDropAfter = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMouseDropInternal = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMouseDropExternal = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemShowItemSortValues = new System.Windows.Forms.ToolStripMenuItem();
             this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCachingUpdateMaxisObjects = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemCachingUpdateCustomObjects = new System.Windows.Forms.ToolStripMenuItem();
@@ -388,7 +390,9 @@ namespace CollectionManager
             // 
             this.menuOptions.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemOpenIn,
-            this.menuItemMouseDrop});
+            this.menuItemMouseDrop,
+            this.toolStripSeparator6,
+            this.menuItemShowItemSortValues});
             this.menuOptions.Name = "menuOptions";
             this.menuOptions.Size = new System.Drawing.Size(61, 20);
             this.menuOptions.Text = "&Options";
@@ -399,7 +403,7 @@ namespace CollectionManager
             this.menuItemOpenInTab,
             this.menuItemOpenInWindow});
             this.menuItemOpenIn.Name = "menuItemOpenIn";
-            this.menuItemOpenIn.Size = new System.Drawing.Size(148, 22);
+            this.menuItemOpenIn.Size = new System.Drawing.Size(190, 22);
             this.menuItemOpenIn.Text = "Open In...";
             // 
             // menuItemOpenInTab
@@ -424,7 +428,7 @@ namespace CollectionManager
             this.menuItemMouseDropInternal,
             this.menuItemMouseDropExternal});
             this.menuItemMouseDrop.Name = "menuItemMouseDrop";
-            this.menuItemMouseDrop.Size = new System.Drawing.Size(148, 22);
+            this.menuItemMouseDrop.Size = new System.Drawing.Size(190, 22);
             this.menuItemMouseDrop.Text = "&Mouse Drop...";
             // 
             // menuItemMouseDropBefore
@@ -454,6 +458,19 @@ namespace CollectionManager
             this.menuItemMouseDropExternal.Size = new System.Drawing.Size(115, 22);
             this.menuItemMouseDropExternal.Text = "&External";
             this.menuItemMouseDropExternal.Click += new System.EventHandler(this.OnMouseDropClicked);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(187, 6);
+            // 
+            // menuItemShowItemSortValues
+            // 
+            this.menuItemShowItemSortValues.CheckOnClick = true;
+            this.menuItemShowItemSortValues.Name = "menuItemShowItemSortValues";
+            this.menuItemShowItemSortValues.Size = new System.Drawing.Size(190, 22);
+            this.menuItemShowItemSortValues.Text = "Show Item Sort Values";
+            this.menuItemShowItemSortValues.Click += new System.EventHandler(this.OnShowHideItemSortValues);
             // 
             // menuCaching
             // 
@@ -745,5 +762,7 @@ namespace CollectionManager
         private System.Windows.Forms.ToolStripMenuItem menuItemNewCollection;
         private System.Windows.Forms.ToolStripMenuItem menuItemSaveAsTab;
         private System.Windows.Forms.ToolStripMenuItem menuItemTabContextSaveAs;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem menuItemShowItemSortValues;
     }
 }

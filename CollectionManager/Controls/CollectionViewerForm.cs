@@ -15,7 +15,7 @@ namespace CollectionManager.Controls
 {
     public partial class CollectionViewerForm : Form
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly CollectionManagerForm managerForm = null;
         internal CollectionManagerForm ManagerForm => managerForm;
@@ -27,7 +27,7 @@ namespace CollectionManager.Controls
 
         private bool beingDocked = false;
 
-        public CollectionViewerForm(CollectionManagerForm managerForm, string collectionFilePath)
+        public CollectionViewerForm(CollectionManagerForm managerForm, string collectionFilePath, bool isAdvanced, bool showSortValues)
         {
             this.managerForm = managerForm;
 
@@ -41,6 +41,8 @@ namespace CollectionManager.Controls
                 TabIndex = 0,
 
                 CollectionFilePath = collectionFilePath,
+                ShowItemSortValues = showSortValues,
+                IsAdvanced = isAdvanced
             };
 
             panelForm.Controls.Add(collectionViewer);
