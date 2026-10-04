@@ -38,6 +38,7 @@ namespace ObjectRelocator
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ObjectRelocatorForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
@@ -64,6 +65,7 @@ namespace ObjectRelocator
             this.menuItemMakeReplacements = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemConfirmDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemDisableDragDrop = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemFolder = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemDirRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemDirAdd = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,10 +92,13 @@ namespace ObjectRelocator
             this.menuItemHideLocals = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemHideNonLocals = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparatorModels = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemChangeTogether = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemModifyAllModels = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemSeparatorFilters = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemDisableBuildModeSortFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemIncludeSpecialObjects = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCachingRemoveThumbnails = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.splitTopBottom = new System.Windows.Forms.SplitContainer();
             this.splitTopLeftRight = new System.Windows.Forms.SplitContainer();
@@ -102,7 +107,7 @@ namespace ObjectRelocator
             this.colPackageFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackageIcon = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextPackages = new System.Windows.Forms.ContextMenuStrip();
+            this.menuContextPackages = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuContextPkgRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgMove = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextPkgMerge = new System.Windows.Forms.ToolStripMenuItem();
@@ -131,7 +136,7 @@ namespace ObjectRelocator
             this.colRemoveOnPlop = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colShowInCatalog = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colObjectData = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextObjects = new System.Windows.Forms.ContextMenuStrip();
+            this.menuContextObjects = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemContextEditName = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemContextEditTitleDesc = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -147,6 +152,8 @@ namespace ObjectRelocator
             this.menuItemContextRemoveThumbCamera = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemContextMoveFiles = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSeparatorClipboard = new System.Windows.Forms.ToolStripSeparator();
+            this.menuContextCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.panelDecoModeEditor = new System.Windows.Forms.Panel();
             this.grpDecoSort = new System.Windows.Forms.GroupBox();
             this.comboDecoSort = new System.Windows.Forms.ComboBox();
@@ -216,7 +223,7 @@ namespace ObjectRelocator
             this.ckbBuildShowInCatalog = new System.Windows.Forms.CheckBox();
             this.grpBuildPrice = new System.Windows.Forms.GroupBox();
             this.textBuildPrice = new System.Windows.Forms.TextBox();
-            this.menuContextFolders = new System.Windows.Forms.ContextMenuStrip();
+            this.menuContextFolders = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuContextDirRename = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDirAdd = new System.Windows.Forms.ToolStripMenuItem();
             this.menuContextDirMove = new System.Windows.Forms.ToolStripMenuItem();
@@ -226,8 +233,6 @@ namespace ObjectRelocator
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
-            this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemCachingRemoveThumbnails = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
             this.splitTopBottom.Panel1.SuspendLayout();
@@ -380,7 +385,8 @@ namespace ObjectRelocator
             this.menuItemAutoBackup,
             this.menuItemMakeReplacements,
             this.toolStripSeparator5,
-            this.menuItemConfirmDelete});
+            this.menuItemConfirmDelete,
+            this.menuItemDisableDragDrop});
             this.menuMode.Name = "menuMode";
             this.menuMode.Size = new System.Drawing.Size(50, 20);
             this.menuMode.Text = "&Mode";
@@ -464,6 +470,13 @@ namespace ObjectRelocator
             this.menuItemConfirmDelete.Name = "menuItemConfirmDelete";
             this.menuItemConfirmDelete.Size = new System.Drawing.Size(180, 22);
             this.menuItemConfirmDelete.Text = "Confirm &Delete";
+            // 
+            // menuItemDisableDragDrop
+            // 
+            this.menuItemDisableDragDrop.CheckOnClick = true;
+            this.menuItemDisableDragDrop.Name = "menuItemDisableDragDrop";
+            this.menuItemDisableDragDrop.Size = new System.Drawing.Size(180, 22);
+            this.menuItemDisableDragDrop.Text = "Disable Drag\'n\'Drop";
             // 
             // menuItemFolder
             // 
@@ -577,6 +590,7 @@ namespace ObjectRelocator
             this.menuItemHideLocals,
             this.menuItemHideNonLocals,
             this.menuItemSeparatorModels,
+            this.menuItemChangeTogether,
             this.menuItemModifyAllModels,
             this.menuItemSeparatorFilters,
             this.menuItemDisableBuildModeSortFilters,
@@ -683,8 +697,16 @@ namespace ObjectRelocator
             this.menuItemSeparatorModels.Name = "menuItemSeparatorModels";
             this.menuItemSeparatorModels.Size = new System.Drawing.Size(250, 6);
             // 
+            // menuItemChangeTogether
+            // 
+            this.menuItemChangeTogether.CheckOnClick = true;
+            this.menuItemChangeTogether.Name = "menuItemChangeTogether";
+            this.menuItemChangeTogether.Size = new System.Drawing.Size(253, 22);
+            this.menuItemChangeTogether.Text = "Change Name && Title Together";
+            // 
             // menuItemModifyAllModels
             // 
+            this.menuItemModifyAllModels.CheckOnClick = true;
             this.menuItemModifyAllModels.Name = "menuItemModifyAllModels";
             this.menuItemModifyAllModels.Size = new System.Drawing.Size(253, 22);
             this.menuItemModifyAllModels.Text = "Modify All Models (CRES/SHPE)";
@@ -708,6 +730,21 @@ namespace ObjectRelocator
             this.menuItemIncludeSpecialObjects.Size = new System.Drawing.Size(253, 22);
             this.menuItemIncludeSpecialObjects.Text = "Include Buy Mode Special Objects";
             this.menuItemIncludeSpecialObjects.Click += new System.EventHandler(this.OnIncludeSpecialObjectsClicked);
+            // 
+            // menuCaching
+            // 
+            this.menuCaching.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemCachingRemoveThumbnails});
+            this.menuCaching.Name = "menuCaching";
+            this.menuCaching.Size = new System.Drawing.Size(63, 20);
+            this.menuCaching.Text = "&Caching";
+            // 
+            // menuItemCachingRemoveThumbnails
+            // 
+            this.menuItemCachingRemoveThumbnails.Name = "menuItemCachingRemoveThumbnails";
+            this.menuItemCachingRemoveThumbnails.Size = new System.Drawing.Size(219, 22);
+            this.menuItemCachingRemoveThumbnails.Text = "Remove Thumbnails Cache";
+            this.menuItemCachingRemoveThumbnails.Click += new System.EventHandler(this.OnCachingRemoveThumbnails);
             // 
             // toolStripSeparator7
             // 
@@ -1121,9 +1158,11 @@ namespace ObjectRelocator
             this.toolStripSeparatorCamera,
             this.menuItemContextRemoveThumbCamera,
             this.toolStripSeparator6,
-            this.menuItemContextMoveFiles});
+            this.menuItemContextMoveFiles,
+            this.menuSeparatorClipboard,
+            this.menuContextCopyToClipboard});
             this.menuContextObjects.Name = "menuContextGrid";
-            this.menuContextObjects.Size = new System.Drawing.Size(301, 238);
+            this.menuContextObjects.Size = new System.Drawing.Size(301, 288);
             this.menuContextObjects.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextObjects.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             this.menuContextObjects.Opened += new System.EventHandler(this.OnContextMenuOpened);
@@ -1134,7 +1173,7 @@ namespace ObjectRelocator
             this.menuItemContextEditName.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.N)));
             this.menuItemContextEditName.Size = new System.Drawing.Size(300, 22);
-            this.menuItemContextEditName.Text = "Change &OBJD Name";
+            this.menuItemContextEditName.Text = "Change &Name";
             this.menuItemContextEditName.Click += new System.EventHandler(this.OnEditNameClicked);
             // 
             // menuItemContextEditTitleDesc
@@ -1230,6 +1269,18 @@ namespace ObjectRelocator
             this.menuItemContextMoveFiles.Size = new System.Drawing.Size(300, 22);
             this.menuItemContextMoveFiles.Text = "&Move Package Files";
             this.menuItemContextMoveFiles.Click += new System.EventHandler(this.OnMoveFilesClicked);
+            // 
+            // menuSeparatorClipboard
+            // 
+            this.menuSeparatorClipboard.Name = "menuSeparatorClipboard";
+            this.menuSeparatorClipboard.Size = new System.Drawing.Size(297, 6);
+            // 
+            // menuContextCopyToClipboard
+            // 
+            this.menuContextCopyToClipboard.Name = "menuContextCopyToClipboard";
+            this.menuContextCopyToClipboard.Size = new System.Drawing.Size(300, 22);
+            this.menuContextCopyToClipboard.Text = "Copy To Clipboard";
+            this.menuContextCopyToClipboard.Click += new System.EventHandler(this.OnCopyToClipboardClicked);
             // 
             // panelDecoModeEditor
             // 
@@ -2068,21 +2119,6 @@ namespace ObjectRelocator
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
             // 
-            // menuCaching
-            // 
-            this.menuCaching.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemCachingRemoveThumbnails});
-            this.menuCaching.Name = "menuCaching";
-            this.menuCaching.Size = new System.Drawing.Size(63, 20);
-            this.menuCaching.Text = "&Caching";
-            // 
-            // menuItemCachingRemoveThumbnails
-            // 
-            this.menuItemCachingRemoveThumbnails.Name = "menuItemCachingRemoveThumbnails";
-            this.menuItemCachingRemoveThumbnails.Size = new System.Drawing.Size(219, 22);
-            this.menuItemCachingRemoveThumbnails.Text = "Remove Thumbnails Cache";
-            this.menuItemCachingRemoveThumbnails.Click += new System.EventHandler(this.OnCachingRemoveThumbnails);
-            // 
             // ObjectRelocatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -2344,5 +2380,9 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuItemConfirmDelete;
         private System.Windows.Forms.ToolStripMenuItem menuCaching;
         private System.Windows.Forms.ToolStripMenuItem menuItemCachingRemoveThumbnails;
+        private System.Windows.Forms.ToolStripMenuItem menuItemDisableDragDrop;
+        private System.Windows.Forms.ToolStripMenuItem menuItemChangeTogether;
+        private System.Windows.Forms.ToolStripSeparator menuSeparatorClipboard;
+        private System.Windows.Forms.ToolStripMenuItem menuContextCopyToClipboard;
     }
 }

@@ -30,7 +30,7 @@ namespace ObjectRelocator
 {
     public class ObjectDbpfData : IEquatable<ObjectDbpfData>
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private static DbpfFileCache cache;
         public static void SetCache(DbpfFileCache cache)
@@ -158,15 +158,52 @@ namespace ObjectRelocator
 
         public string KeyName
         {
-            get => res.KeyName;
+            get
+            {
+                if (res is Xobj xobj)
+                {
+                    return xobj.GetItem("name")?.StringValue;
+                }
+                else if (res is Xngb xngb)
+                {
+                    return xngb.GetItem("name")?.StringValue;
+                }
+                else if (res is Xfnc xfnc)
+                {
+                    return xfnc.GetItem("name")?.StringValue;
+                }
+                else
+                {
+                    return res.KeyName;
+                }
+            }
             set
             {
-                res.SetKeyName(value);
+                if (res is Xobj xobj)
+                {
+                    xobj.GetItem("name").StringValue = value;
+                    xobj.GetItem("filename").StringValue = value;
+                }
+                else if (res is Xngb xngb)
+                {
+                    xngb.GetItem("name").StringValue = value;
+                }
+                else if (res is Xfnc xfnc)
+                {
+                    xfnc.GetItem("name").StringValue = value;
+                }
+                else
+                {
+                    res.SetKeyName(value);
+                }
+
                 UpdatePackage();
             }
         }
 
         public string Guid => (IsObjd) ? (res as Objd).Guid.ToString() : (IsCpf ? Helper.Hex8PrefixString(GetUIntItem("guid")) : "");
+        public TypeGUID ObjdGuid => (IsObjd) ? (res as Objd).Guid : DBPFData.GUID_NULL;
+        public TypeGUID XobjGuid => (IsXobj) ? (TypeGUID)GetUIntItem("guid") : DBPFData.GUID_NULL;
 
         public bool IsDirty
         {
@@ -466,7 +503,12 @@ namespace ObjectRelocator
 
         public void DefLanguageOnly()
         {
-            strings?.DefLanguageOnly();
+            if (strings != null)
+            {
+                strings.DefLanguageOnly();
+
+                UpdatePackage();
+            }
         }
 
         public bool FindScenegraphResources(bool allCres)

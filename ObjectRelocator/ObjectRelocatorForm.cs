@@ -9,13 +9,15 @@
 #region Usings
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
-using Sims2Tools.Cache;
+using Sims2Tools.Cache.Thumbnails;
+using Sims2Tools.Clipboard;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CLST;
 using Sims2Tools.DBPF.Neighbourhood.XNGB;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
@@ -24,6 +26,7 @@ using Sims2Tools.DBPF.XFNC;
 using Sims2Tools.DBPF.XOBJ;
 using Sims2Tools.DbpfCache;
 using Sims2Tools.Dialogs;
+using Sims2Tools.DragDrop;
 using Sims2Tools.Updates;
 using Sims2Tools.Utils.NamedValue;
 using Sims2Tools.Utils.Persistence;
@@ -43,7 +46,7 @@ namespace ObjectRelocator
 {
     public partial class ObjectRelocatorForm : Form
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private static readonly ushort QuarterTileOn = 0x0023;
         private static readonly ushort QuarterTileOff = 0x0001;
@@ -183,14 +186,13 @@ namespace ObjectRelocator
         #region Constructor and TidyUp
         public ObjectRelocatorForm()
         {
-            logger.Info(ObjectRelocatorApp.AppProduct);
-
             InitializeComponent();
             SetTitle(lastFolder);
 
             if (Sims2ToolsLib.IsRunningOnWindows)
             {
-                gridPackageFiles.MouseDown += new MouseEventHandler(OnPkgGrid_MouseDown);
+                gridPackageFiles.MouseDown += new MouseEventHandler(this.OnPkgGrid_MouseDown);
+                gridResources.MouseMove += new MouseEventHandler(this.OnResGrid_MouseMove);
             }
 
             ObjectDbpfData.SetCache(packageCache);
@@ -243,8 +245,11 @@ namespace ObjectRelocator
             menuItemShowShowInCatalog.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowShowInCatalog.Name, 0) != 0); OnShowHideShowInCatalog(menuItemShowShowInCatalog, null);
             menuItemShowNoDuplicate.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowNoDuplicate.Name, 0) != 0); OnShowHideNoDuplicate(menuItemShowNoDuplicate, null);
 
+            menuItemChangeTogether.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemChangeTogether.Name, 0) != 0);
+
             menuItemRecurse.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, 1) != 0);
             menuItemConfirmDelete.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemConfirmDelete.Name, 0) != 0);
+            menuItemDisableDragDrop.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemDisableDragDrop.Name, 0) != 0);
 
             menuItemAdvanced.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, 0) != 0); OnAdvancedModeChanged(menuItemAdvanced, null);
             menuItemAutoBackup.Checked = ((int)RegistryTools.GetSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, 1) != 0);
@@ -301,8 +306,11 @@ namespace ObjectRelocator
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowShowInCatalog.Name, menuItemShowShowInCatalog.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemShowNoDuplicate.Name, menuItemShowNoDuplicate.Checked ? 1 : 0);
 
+                RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Options", menuItemChangeTogether.Name, menuItemChangeTogether.Checked ? 1 : 0);
+
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemRecurse.Name, menuItemRecurse.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemConfirmDelete.Name, menuItemConfirmDelete.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemDisableDragDrop.Name, menuItemDisableDragDrop.Checked ? 1 : 0);
 
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAdvanced.Name, IsAdvancedMode ? 1 : 0);
                 RegistryTools.SaveSetting(ObjectRelocatorApp.RegistryKey + @"\Mode", menuItemAutoBackup.Name, menuItemAutoBackup.Checked ? 1 : 0);
@@ -1520,6 +1528,11 @@ namespace ObjectRelocator
                     string backupName = masterPackage.Update(menuItemAutoBackup.Checked);
                     masterPackage.Close();
 
+                    if (backupName == null)
+                    {
+                        throw new DbpfException($"Unable to update {masterPackage.PackageName}");
+                    }
+
                     if (PackageRename(masterPackageRow))
                     {
                         if (File.Exists(backupName))
@@ -1712,7 +1725,6 @@ namespace ObjectRelocator
 
             return thumb;
         }
-
         #endregion
 
         #region Folder Tree Management
@@ -3721,6 +3733,8 @@ namespace ObjectRelocator
                 return;
             }
 
+            menuContextCopyToClipboard.Visible = menuSeparatorClipboard.Visible = IsAdvancedMode;
+
             // Mouse has to be over a selected row
             foreach (DataGridViewRow mouseRow in gridResources.SelectedRows)
             {
@@ -3762,6 +3776,8 @@ namespace ObjectRelocator
                     menuItemContextHoodInvisible.Enabled = (gridResources.SelectedRows.Count > 0);
                     menuItemContextRemoveThumbCamera.Enabled = (gridResources.SelectedRows.Count > 0);
 
+                    menuContextCopyToClipboard.Enabled = (gridResources.SelectedRows.Count > 0);
+
                     return;
                 }
             }
@@ -3802,6 +3818,11 @@ namespace ObjectRelocator
                 {
                     selectedObject.KeyName = dialog.TextEntry;
 
+                    if (menuItemChangeTogether.Checked)
+                    {
+                        selectedObject.SetStrItem("Title", dialog.TextEntry);
+                    }
+
                     UpdateGridRow(selectedObject);
 
                     ReselectRows(new List<ObjectDbpfData>(1) { selectedObject });
@@ -3825,6 +3846,8 @@ namespace ObjectRelocator
                         if (Regex.IsMatch(selectedObject.KeyName, lastSearch, lastOptions))
                         {
                             selectedObject.KeyName = Regex.Replace(selectedObject.KeyName, lastSearch, lastReplace, lastOptions);
+
+                            // TODO - Object Reloactor - change together
 
                             UpdateGridRow(selectedObject);
                         }
@@ -3850,6 +3873,11 @@ namespace ObjectRelocator
                 {
                     selectedObject.SetStrItem("Title", dialog.Title);
                     selectedObject.SetStrItem("Description", dialog.Description);
+
+                    if (menuItemChangeTogether.Checked)
+                    {
+                        selectedObject.KeyName = dialog.Title;
+                    }
 
                     UpdateGridRow(selectedObject);
 
@@ -3881,6 +3909,8 @@ namespace ObjectRelocator
                         {
                             selectedObject.SetStrItem("Title", Regex.Replace(selectedObject.Title, lastSearch, lastReplace, lastOptions));
 
+                            // TODO - Object Reloactor - change together
+
                             updated = true;
                         }
 
@@ -3907,10 +3937,7 @@ namespace ObjectRelocator
             {
                 ObjectDbpfData objectData = row.Cells["colObjectData"].Value as ObjectDbpfData;
 
-                if (objectData.IsObjd || objectData.IsXfnc)
-                {
-                    selectedData.Add(objectData);
-                }
+                selectedData.Add(objectData);
             }
 
             foreach (ObjectDbpfData objectData in selectedData)
@@ -3922,10 +3949,13 @@ namespace ObjectRelocator
                         // Clear out the crap from the CTSS resource (probably left behind by "Sims 2 Categorizer")
                         objectData.DefLanguageOnly();
 
-                        // We'll also mark the OBJD as dirty, as that probably also has a bad CLST entry as well!
-                        ushort ctssId = objectData.GetRawData(ObjdIndex.CatalogueStringsId);
-                        objectData.SetRawData(ObjdIndex.CatalogueStringsId, 0); // We have to do this to circumvent the new_data != old_data check
-                        objectData.SetRawData(ObjdIndex.CatalogueStringsId, ctssId);
+                        if (objectData.IsObjd)
+                        {
+                            // We'll also mark the OBJD as dirty, as that probably also has a bad CLST entry as well!
+                            ushort ctssId = objectData.GetRawData(ObjdIndex.CatalogueStringsId);
+                            objectData.SetRawData(ObjdIndex.CatalogueStringsId, 0); // We have to do this to circumvent the new_data != old_data check
+                            objectData.SetRawData(ObjdIndex.CatalogueStringsId, ctssId);
+                        }
 
                         UpdateGridRow(objectData);
                     }
@@ -4100,6 +4130,7 @@ namespace ObjectRelocator
             ReselectRows(selectedData);
         }
 
+        // TODO - Object Relocator - add a "Remove Groundshadow" option
         private void OnMakeRemoveThumbCameraClicked(object sender, EventArgs e)
         {
             List<ObjectDbpfData> selectedData = new List<ObjectDbpfData>();
@@ -4133,11 +4164,43 @@ namespace ObjectRelocator
 
             ReselectRows(selectedData);
         }
+
+        private void OnCopyToClipboardClicked(object sender, EventArgs e)
+        {
+            ClipboardCollListItems collListItems = new ClipboardCollListItems(Sim2ToolsAppCodes.ObjectRelocator);
+
+            foreach (DataGridViewRow resourceRow in gridResources.SelectedRows)
+            {
+                ObjectDbpfData objectData = resourceRow.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                if (objectData.IsObjd)
+                {
+                    collListItems.AddItem(resourceRow.Index, Coll.COLLITEM_OBJD, 0x00, objectData.ObjdGuid.AsUInt());
+                }
+                else if (objectData.IsXobj)
+                {
+                    string type = objectData.GetStrItem("type");
+
+                    if (type.Equals("floor"))
+                    {
+                        collListItems.AddItem(resourceRow.Index, Coll.COLLITEM_XOBJ, 0x01, Hashes.CollectionHash(objectData.XobjGuid));
+                    }
+                    else if (type.Equals("wall"))
+                    {
+                        collListItems.AddItem(resourceRow.Index, Coll.COLLITEM_XOBJ, 0x02, Hashes.CollectionHash(objectData.XobjGuid));
+                    }
+                }
+            }
+
+            collListItems.PlaceOnClipboard(true);
+        }
         #endregion
 
         #region Drag And Drop
         private void OnTreeFolder_ItemDrag(object sender, ItemDragEventArgs e)
         {
+            if (menuItemDisableDragDrop.Checked) return;
+
             // See https://www.c-sharpcorner.com/blogs/perform-drag-and-drop-operation-on-treeview-node-in-c-sharp-net
             if (e.Button == MouseButtons.Left)
             {
@@ -4149,15 +4212,19 @@ namespace ObjectRelocator
 
         private void OnTreeFolder_DragEnter(object sender, DragEventArgs e)
         {
+            if (menuItemDisableDragDrop.Checked)
+            {
+                e.Effect = DragDropEffects.None;
+                return;
+            }
+
             if (rootFolder != null)
             {
                 e.Effect = e.AllowedEffect;
             }
             else
             {
-                DataObject data = e.Data as DataObject;
-
-                if (data.ContainsFileDropList())
+                if (DragDropHelper.ContainsDragFileList(e.Data))
                 {
                     string[] folders = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -4174,12 +4241,16 @@ namespace ObjectRelocator
 
         private void OnTreeFolder_DragOver(object sender, DragEventArgs e)
         {
+            if (menuItemDisableDragDrop.Checked) return;
+
             Point targetPoint = treeFolders.PointToClient(new Point(e.X, e.Y));
             treeFolders.SelectedNode = treeFolders.GetNodeAt(targetPoint);
         }
 
         private void OnTreeFolder_DragDrop(object sender, DragEventArgs e)
         {
+            if (menuItemDisableDragDrop.Checked) return;
+
             if (rootFolder != null)
             {
                 Point targetPoint = treeFolders.PointToClient(new Point(e.X, e.Y));
@@ -4254,9 +4325,7 @@ namespace ObjectRelocator
             }
             else
             {
-                DataObject data = e.Data as DataObject;
-
-                if (data.ContainsFileDropList())
+                if (DragDropHelper.ContainsDragFileList(e.Data))
                 {
                     string[] folders = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -4308,6 +4377,39 @@ namespace ObjectRelocator
                 }
             }
         }
+
+        private void OnResGrid_MouseMove(object sender, MouseEventArgs e)
+        {
+            if ((e.Button & MouseButtons.Right) == MouseButtons.Right && (Form.ModifierKeys & Keys.Control) == Keys.Control)
+            {
+                DropCollListItems dropListItems = new DropCollListItems(Sim2ToolsAppCodes.ObjectRelocator);
+
+                foreach (DataGridViewRow resourceRow in gridResources.SelectedRows)
+                {
+                    ObjectDbpfData objectData = resourceRow.Cells["colObjectData"].Value as ObjectDbpfData;
+
+                    if (objectData.IsObjd)
+                    {
+                        dropListItems.AddItem(resourceRow.Index, Coll.COLLITEM_OBJD, 0x00, objectData.ObjdGuid.AsUInt());
+                    }
+                    else if (objectData.IsXobj)
+                    {
+                        string type = objectData.GetStrItem("type");
+
+                        if (type.Equals("floor"))
+                        {
+                            dropListItems.AddItem(resourceRow.Index, Coll.COLLITEM_XOBJ, 0x01, Hashes.CollectionHash(objectData.XobjGuid));
+                        }
+                        else if (type.Equals("wall"))
+                        {
+                            dropListItems.AddItem(resourceRow.Index, Coll.COLLITEM_XOBJ, 0x02, Hashes.CollectionHash(objectData.XobjGuid));
+                        }
+                    }
+                }
+
+                DoDragDrop(dropListItems.GetDragData(), DragDropEffects.Copy);
+            }
+        }
         #endregion
 
         #region Save Button
@@ -4355,18 +4457,38 @@ namespace ObjectRelocator
             {
                 using (CacheableDbpfFile dbpfPackage = packageCache.OpenForReadOnly(packageFile))
                 {
-                    try
+                    if (dbpfPackage.IsDirty)
                     {
-                        if (dbpfPackage.IsDirty) dbpfPackage.Update(menuItemAutoBackup.Checked);
-                    }
-                    catch (Exception)
-                    {
-                        MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}, file is probably open in SimPe!", "Package Update Error!");
-                    }
+                        bool cleanObjects = true;
 
-                    foreach (ObjectDbpfData editedObject in dirtyObjectsByPackage[packageFile])
-                    {
-                        editedObject.SetClean();
+                        if (dbpfPackage.Update(menuItemAutoBackup.Checked) == null)
+                        {
+                            cleanObjects = false;
+
+                            bool exitRetryLoop;
+
+                            do
+                            {
+                                MessageBoxButtons buttons = (File.Exists(dbpfPackage.PackagePath) && File.Exists($"{dbpfPackage.PackagePath}.temp")) ? MessageBoxButtons.RetryCancel : MessageBoxButtons.OK;
+
+                                DialogResult result = MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}, file is probably open in SimPe!", "Package Update Error!", buttons);
+                                exitRetryLoop = true;
+
+                                if (result == DialogResult.Retry)
+                                {
+                                    exitRetryLoop = dbpfPackage.RetryUpdateFromTemp();
+                                    cleanObjects = exitRetryLoop;
+                                }
+                            } while (!exitRetryLoop);
+                        }
+
+                        if (cleanObjects)
+                        {
+                            foreach (ObjectDbpfData editedObject in dirtyObjectsByPackage[packageFile])
+                            {
+                                editedObject.SetClean();
+                            }
+                        }
                     }
 
                     dbpfPackage.Close();
@@ -4392,13 +4514,22 @@ namespace ObjectRelocator
                     }
                 }
 
-                try
+                if (dbpfPackage.Update(menuItemAutoBackup.Checked) == null)
                 {
-                    dbpfPackage.Update(menuItemAutoBackup.Checked);
-                }
-                catch (Exception)
-                {
-                    MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}", "Package Update Error!");
+                    bool exitRetryLoop;
+
+                    do
+                    {
+                        MessageBoxButtons buttons = (File.Exists(dbpfPackage.PackagePath) && File.Exists($"{dbpfPackage.PackagePath}.temp")) ? MessageBoxButtons.RetryCancel : MessageBoxButtons.OK;
+
+                        DialogResult result = MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}, file is probably open in SimPe!", "Package Update Error!", buttons);
+                        exitRetryLoop = true;
+
+                        if (result == DialogResult.Retry)
+                        {
+                            exitRetryLoop = dbpfPackage.RetryUpdateFromTemp();
+                        }
+                    } while (!exitRetryLoop);
                 }
 
                 foreach (ObjectDbpfData editedObject in editedObjects)

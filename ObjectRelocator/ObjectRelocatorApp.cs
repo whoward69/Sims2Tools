@@ -17,7 +17,7 @@ namespace ObjectRelocator
         public static readonly string AppName = "Object Relocator";
 
         public static readonly int AppVersionMajor = 6;
-        public static readonly int AppVersionMinor = 1;
+        public static readonly int AppVersionMinor = 2;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 4;
@@ -42,7 +42,7 @@ namespace ObjectRelocator
         [STAThread]
         static void Main()
         {
-            log4net.Config.XmlConfigurator.Configure();
+            Sims2Tools.DBPF.Logger.DBPFLoggerFactory.InitLogger(AppName, AppProduct);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
