@@ -9,7 +9,8 @@
 #region Usings
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Sims2Tools;
-using Sims2Tools.Cache;
+using Sims2Tools.Cache.Thumbnails;
+using Sims2Tools.Clipboard;
 using Sims2Tools.Controls;
 using Sims2Tools.DBPF;
 using Sims2Tools.DBPF.CPF;
@@ -40,7 +41,7 @@ namespace BsokEditor
 {
     public partial class BsokEditorForm : Form
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly ClothingThumbnailsCache clothingThumbnailsCache = new ClothingThumbnailsCache();
 
@@ -64,10 +65,13 @@ namespace BsokEditor
         #region Constructor and TidyUp
         public BsokEditorForm()
         {
-            logger.Info(BsokEditorApp.AppProduct);
-
             InitializeComponent();
             this.Text = BsokEditorApp.AppTitle;
+
+            if (Sims2ToolsLib.IsRunningOnWindows)
+            {
+                gridViewResources.MouseMove += new MouseEventHandler(this.OnResGrid_MouseMove);
+            }
 
             selectPathDialog = new CommonOpenFileDialog
             {
@@ -419,7 +423,7 @@ namespace BsokEditor
                                 }
                                 else
                                 {
-                                    Str str = (Str)package.GetResourceByKey(idr.GetItem(binx.StringSetIdx));
+                                    Str str = (Str)package.GetResourceByKey(IdrHelper.StringSetKey(binx, idr));
 
                                     row["Name"] = str?.LanguageItems(MetaData.Languages.Default)?[0]?.Title;
 
@@ -506,7 +510,7 @@ namespace BsokEditor
 
             if (idr == null) return false;
 
-            var res = package.GetResourceByKey(idr.GetItem(binx.ObjectIdx));
+            var res = package.GetResourceByKey(IdrHelper.ObjectKey(binx, idr));
 
             if (res is Gzps || res is Xmol || res is Xtol)
             {
@@ -1573,16 +1577,24 @@ namespace BsokEditor
                 return;
             }
 
+            menuContextCopyToClipboard.Visible = menuSeparatorClipboard.Visible = IsAdvancedMode;
+            menuContextCopyToClipboard.Enabled = (gridViewResources.SelectedRows.Count > 0);
+
+            menuItemContextRowRestore.Enabled = false;
+
             foreach (DataGridViewRow selectedRow in gridViewResources.SelectedRows)
             {
                 if (mouseLocation.RowIndex == selectedRow.Index && (selectedRow.Cells["colResRef"].Value as Cpf).IsDirty)
                 {
-                    return;
+                    menuItemContextRowRestore.Enabled = true;
+                    break;
                 }
             }
 
-            e.Cancel = true;
-            return;
+            if (!IsAdvancedMode && menuItemContextRowRestore.Enabled == false)
+            {
+                e.Cancel = true;
+            }
         }
 
         private void OnContextMenuClosing(object sender, ToolStripDropDownClosingEventArgs e)
@@ -1642,6 +1654,45 @@ namespace BsokEditor
                 }
             }
         }
+
+        private void OnCopyToClipboardClicked(object sender, EventArgs e)
+        {
+            ClipboardCollListItems collListItems = new ClipboardCollListItems(Sim2ToolsAppCodes.BSOKEditor);
+
+            foreach (DataGridViewRow resourceRow in gridViewResources.SelectedRows)
+            {
+                Cpf cpf = resourceRow.Cells["colResRef"].Value as Cpf;
+
+                if (cpf.TypeID == Gzps.TYPE)
+                {
+                    collListItems.AddItem(resourceRow.Index, cpf);
+                }
+            }
+
+            collListItems.PlaceOnClipboard(true);
+        }
+        #endregion
+
+        #region Drag and Drop
+        private void OnResGrid_MouseMove(object sender, MouseEventArgs e)
+        {
+            if ((e.Button & MouseButtons.Right) == MouseButtons.Right && (Form.ModifierKeys & Keys.Control) == Keys.Control)
+            {
+                DropCollListItems dropListItems = new DropCollListItems(Sim2ToolsAppCodes.BSOKEditor);
+
+                foreach (DataGridViewRow resourceRow in gridViewResources.SelectedRows)
+                {
+                    Cpf cpf = resourceRow.Cells["colResRef"].Value as Cpf;
+
+                    if (cpf.TypeID == Gzps.TYPE)
+                    {
+                        dropListItems.AddItem(resourceRow.Index, cpf);
+                    }
+                }
+
+                DoDragDrop(dropListItems.GetDragData(), DragDropEffects.Copy);
+            }
+        }
         #endregion
 
         #region Save Button
@@ -1690,18 +1741,38 @@ namespace BsokEditor
                         editedCpfs.Add(editedCpf);
                     }
 
-                    try
+                    bool cleanCpf = true;
+
+                    if (dbpfPackage.IsDirty)
                     {
-                        if (dbpfPackage.IsDirty) dbpfPackage.Update(menuItemAutoBackup.Checked);
-                    }
-                    catch (Exception)
-                    {
-                        MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}, file is probably open in SimPe!", "Package Update Error!");
+                        if (dbpfPackage.Update(menuItemAutoBackup.Checked) == null)
+                        {
+                            cleanCpf = false;
+
+                            bool exitRetryLoop;
+
+                            do
+                            {
+                                MessageBoxButtons buttons = (File.Exists(dbpfPackage.PackagePath) && File.Exists($"{dbpfPackage.PackagePath}.temp")) ? MessageBoxButtons.RetryCancel : MessageBoxButtons.OK;
+
+                                DialogResult result = MsgBox.Show($"Error trying to update {dbpfPackage.PackageName}, file is probably open in SimPe!", "Package Update Error!", buttons);
+                                exitRetryLoop = true;
+
+                                if (result == DialogResult.Retry)
+                                {
+                                    exitRetryLoop = dbpfPackage.RetryUpdateFromTemp();
+                                    cleanCpf = exitRetryLoop;
+                                }
+                            } while (!exitRetryLoop);
+                        }
                     }
 
-                    foreach (Cpf editedCpf in editedCpfs)
+                    if (cleanCpf)
                     {
-                        editedCpf.SetClean();
+                        foreach (Cpf editedCpf in editedCpfs)
+                        {
+                            editedCpf.SetClean();
+                        }
                     }
 
                     dbpfPackage.Close();

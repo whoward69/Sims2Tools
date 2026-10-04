@@ -38,6 +38,7 @@ namespace BsokEditor
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BsokEditorForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -59,6 +60,8 @@ namespace BsokEditor
             this.menuItemShowGenderAge = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowCategoryShoe = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemShowNakedCategory = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuItemCachingRemoveThumbnails = new System.Windows.Forms.ToolStripMenuItem();
             this.gridViewResources = new System.Windows.Forms.DataGridView();
             this.colVisible = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -71,8 +74,10 @@ namespace BsokEditor
             this.colShoe = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPackagePath = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colResRef = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.menuContextGrid = new System.Windows.Forms.ContextMenuStrip();
+            this.menuContextGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuItemContextRowRestore = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSeparatorClipboard = new System.Windows.Forms.ToolStripSeparator();
+            this.menuContextCopyToClipboard = new System.Windows.Forms.ToolStripMenuItem();
             this.comboBsokGenre = new System.Windows.Forms.ComboBox();
             this.comboGender = new System.Windows.Forms.ComboBox();
             this.btnSave = new System.Windows.Forms.Button();
@@ -106,10 +111,7 @@ namespace BsokEditor
             this.ckbAgeAdults = new System.Windows.Forms.CheckBox();
             this.ckbAgeTeens = new System.Windows.Forms.CheckBox();
             this.ckbAgeChildren = new System.Windows.Forms.CheckBox();
-            this.saveAsFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.thumbBox = new System.Windows.Forms.PictureBox();
-            this.menuCaching = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuItemCachingRemoveThumbnails = new System.Windows.Forms.ToolStripMenuItem();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewResources)).BeginInit();
             this.menuContextGrid.SuspendLayout();
@@ -287,6 +289,21 @@ namespace BsokEditor
             this.menuItemShowNakedCategory.Text = "Show &Naked Categories";
             this.menuItemShowNakedCategory.Click += new System.EventHandler(this.OnShowNakedCategoryClicked);
             // 
+            // menuCaching
+            // 
+            this.menuCaching.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuItemCachingRemoveThumbnails});
+            this.menuCaching.Name = "menuCaching";
+            this.menuCaching.Size = new System.Drawing.Size(63, 20);
+            this.menuCaching.Text = "&Caching";
+            // 
+            // menuItemCachingRemoveThumbnails
+            // 
+            this.menuItemCachingRemoveThumbnails.Name = "menuItemCachingRemoveThumbnails";
+            this.menuItemCachingRemoveThumbnails.Size = new System.Drawing.Size(219, 22);
+            this.menuItemCachingRemoveThumbnails.Text = "Remove Thumbnails Cache";
+            this.menuItemCachingRemoveThumbnails.Click += new System.EventHandler(this.OnCachingRemoveThumbnails);
+            // 
             // gridViewResources
             // 
             this.gridViewResources.AllowUserToAddRows = false;
@@ -419,9 +436,11 @@ namespace BsokEditor
             // menuContextGrid
             // 
             this.menuContextGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemContextRowRestore});
+            this.menuItemContextRowRestore,
+            this.menuSeparatorClipboard,
+            this.menuContextCopyToClipboard});
             this.menuContextGrid.Name = "menuContextGrid";
-            this.menuContextGrid.Size = new System.Drawing.Size(195, 26);
+            this.menuContextGrid.Size = new System.Drawing.Size(195, 54);
             this.menuContextGrid.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextGrid.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             // 
@@ -431,6 +450,18 @@ namespace BsokEditor
             this.menuItemContextRowRestore.Size = new System.Drawing.Size(194, 22);
             this.menuItemContextRowRestore.Text = "Restore Original Values";
             this.menuItemContextRowRestore.Click += new System.EventHandler(this.OnRowRevertClicked);
+            // 
+            // menuSeparatorClipboard
+            // 
+            this.menuSeparatorClipboard.Name = "menuSeparatorClipboard";
+            this.menuSeparatorClipboard.Size = new System.Drawing.Size(191, 6);
+            // 
+            // menuContextCopyToClipboard
+            // 
+            this.menuContextCopyToClipboard.Name = "menuContextCopyToClipboard";
+            this.menuContextCopyToClipboard.Size = new System.Drawing.Size(194, 22);
+            this.menuContextCopyToClipboard.Text = "Copy To Clipboard";
+            this.menuContextCopyToClipboard.Click += new System.EventHandler(this.OnCopyToClipboardClicked);
             // 
             // comboBsokGenre
             // 
@@ -804,11 +835,6 @@ namespace BsokEditor
             this.ckbAgeChildren.UseVisualStyleBackColor = true;
             this.ckbAgeChildren.Click += new System.EventHandler(this.OnAgeChildrenClicked);
             // 
-            // saveAsFileDialog
-            // 
-            this.saveAsFileDialog.Filter = "DBPF Package|*.package";
-            this.saveAsFileDialog.Title = "Save as replacements";
-            // 
             // thumbBox
             // 
             this.thumbBox.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
@@ -819,21 +845,6 @@ namespace BsokEditor
             this.thumbBox.TabIndex = 25;
             this.thumbBox.TabStop = false;
             this.thumbBox.Visible = false;
-            // 
-            // menuCaching
-            // 
-            this.menuCaching.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuItemCachingRemoveThumbnails});
-            this.menuCaching.Name = "menuCaching";
-            this.menuCaching.Size = new System.Drawing.Size(63, 20);
-            this.menuCaching.Text = "&Caching";
-            // 
-            // menuItemCachingRemoveThumbnails
-            // 
-            this.menuItemCachingRemoveThumbnails.Name = "menuItemCachingRemoveThumbnails";
-            this.menuItemCachingRemoveThumbnails.Size = new System.Drawing.Size(219, 22);
-            this.menuItemCachingRemoveThumbnails.Text = "Remove Thumbnails Cache";
-            this.menuItemCachingRemoveThumbnails.Click += new System.EventHandler(this.OnCachingRemoveThumbnails);
             // 
             // BsokEditorForm
             // 
@@ -926,7 +937,6 @@ namespace BsokEditor
         private System.Windows.Forms.ComboBox comboShoe;
         private System.Windows.Forms.ContextMenuStrip menuContextGrid;
         private System.Windows.Forms.ToolStripMenuItem menuItemContextRowRestore;
-        private System.Windows.Forms.SaveFileDialog saveAsFileDialog;
         private System.Windows.Forms.PictureBox thumbBox;
         private System.Windows.Forms.DataGridViewTextBoxColumn colVisible;
         private System.Windows.Forms.DataGridViewTextBoxColumn colType;
@@ -946,5 +956,7 @@ namespace BsokEditor
         private System.Windows.Forms.CheckBox ckbCatSkintone;
         private System.Windows.Forms.ToolStripMenuItem menuCaching;
         private System.Windows.Forms.ToolStripMenuItem menuItemCachingRemoveThumbnails;
+        private System.Windows.Forms.ToolStripSeparator menuSeparatorClipboard;
+        private System.Windows.Forms.ToolStripMenuItem menuContextCopyToClipboard;
     }
 }

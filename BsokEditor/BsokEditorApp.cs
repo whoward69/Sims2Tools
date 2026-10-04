@@ -17,10 +17,10 @@ namespace BsokEditor
         public static readonly string AppName = "Bsok Editor";
 
         public static readonly int AppVersionMajor = 2;
-        public static readonly int AppVersionMinor = 5;
+        public static readonly int AppVersionMinor = 6;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 0;
+        private static readonly int AppVersionDebug = 2;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release
@@ -42,7 +42,7 @@ namespace BsokEditor
         [STAThread]
         static void Main()
         {
-            log4net.Config.XmlConfigurator.Configure();
+            Sims2Tools.DBPF.Logger.DBPFLoggerFactory.InitLogger(AppName, AppProduct);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
