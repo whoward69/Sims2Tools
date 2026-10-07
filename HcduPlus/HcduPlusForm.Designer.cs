@@ -42,10 +42,10 @@ namespace HcduPlus
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HcduPlusForm));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menuFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -93,6 +93,8 @@ namespace HcduPlus
             this.menuItemGuidConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemMaxisGuidConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuItemGroupConflicts = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.menuItemInternalConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemHomeCrafterConflicts = new System.Windows.Forms.ToolStripMenuItem();
             this.menuItemStoreVersionConflicts = new System.Windows.Forms.ToolStripMenuItem();
@@ -124,11 +126,6 @@ namespace HcduPlus
             this.menuItemAddAsKnownConflictWithPath = new System.Windows.Forms.ToolStripMenuItem();
             this.tabByResource = new System.Windows.Forms.TabPage();
             this.gridByResource = new System.Windows.Forms.DataGridView();
-            this.colHcduType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHcduGroup = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHcduInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHcduName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHcduPackages = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabInfo = new System.Windows.Forms.TabPage();
             this.textInfo = new System.Windows.Forms.TextBox();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
@@ -137,6 +134,12 @@ namespace HcduPlus
             this.lblScanPath = new System.Windows.Forms.Label();
             this.checkModsSavedSims = new System.Windows.Forms.CheckBox();
             this.checkScanSavedSims = new System.Windows.Forms.CheckBox();
+            this.colHcduType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHcduGroup = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHcduInstance = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHcduName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colReason = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colHcduPackages = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuMain.SuspendLayout();
             this.tabConflicts.SuspendLayout();
             this.tabByPackage.SuspendLayout();
@@ -513,6 +516,8 @@ namespace HcduPlus
             this.menuItemGuidConflicts,
             this.menuItemMaxisGuidConflicts,
             this.toolStripSeparator2,
+            this.menuItemGroupConflicts,
+            this.toolStripSeparator6,
             this.menuItemInternalConflicts,
             this.menuItemHomeCrafterConflicts,
             this.menuItemStoreVersionConflicts,
@@ -547,6 +552,18 @@ namespace HcduPlus
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(227, 6);
+            // 
+            // menuItemGroupConflicts
+            // 
+            this.menuItemGroupConflicts.CheckOnClick = true;
+            this.menuItemGroupConflicts.Name = "menuItemGroupConflicts";
+            this.menuItemGroupConflicts.Size = new System.Drawing.Size(230, 22);
+            this.menuItemGroupConflicts.Text = "Check For Group Conflicts";
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(227, 6);
             // 
             // menuItemInternalConflicts
             // 
@@ -759,14 +776,14 @@ namespace HcduPlus
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gridByPackage.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByPackage.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByPackage.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.gridByPackage.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridByPackage.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colHcduPackageA,
@@ -777,9 +794,9 @@ namespace HcduPlus
             this.gridByPackage.Name = "gridByPackage";
             this.gridByPackage.ReadOnly = true;
             this.gridByPackage.RowHeadersVisible = false;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByPackage.RowsDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByPackage.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.gridByPackage.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridByPackage.ShowCellErrors = false;
             this.gridByPackage.ShowEditingIcon = false;
@@ -850,29 +867,30 @@ namespace HcduPlus
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.gridByResource.BackgroundColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByResource.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByResource.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.gridByResource.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.gridByResource.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.colHcduType,
             this.colHcduGroup,
             this.colHcduInstance,
             this.colHcduName,
+            this.colReason,
             this.colHcduPackages});
             this.gridByResource.Location = new System.Drawing.Point(0, 0);
             this.gridByResource.MultiSelect = false;
             this.gridByResource.Name = "gridByResource";
             this.gridByResource.ReadOnly = true;
             this.gridByResource.RowHeadersVisible = false;
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.gridByResource.RowsDefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.gridByResource.RowsDefaultCellStyle = dataGridViewCellStyle4;
             this.gridByResource.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.gridByResource.ShowCellErrors = false;
             this.gridByResource.ShowEditingIcon = false;
@@ -880,46 +898,6 @@ namespace HcduPlus
             this.gridByResource.TabIndex = 0;
             this.gridByResource.TabStop = false;
             this.gridByResource.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
-            // 
-            // colHcduType
-            // 
-            this.colHcduType.DataPropertyName = "Type";
-            this.colHcduType.HeaderText = "Type";
-            this.colHcduType.Name = "colHcduType";
-            this.colHcduType.ReadOnly = true;
-            this.colHcduType.Width = 75;
-            // 
-            // colHcduGroup
-            // 
-            this.colHcduGroup.DataPropertyName = "Group";
-            this.colHcduGroup.HeaderText = "Group";
-            this.colHcduGroup.Name = "colHcduGroup";
-            this.colHcduGroup.ReadOnly = true;
-            this.colHcduGroup.Width = 75;
-            // 
-            // colHcduInstance
-            // 
-            this.colHcduInstance.DataPropertyName = "Instance";
-            this.colHcduInstance.HeaderText = "Instance";
-            this.colHcduInstance.Name = "colHcduInstance";
-            this.colHcduInstance.ReadOnly = true;
-            this.colHcduInstance.Width = 75;
-            // 
-            // colHcduName
-            // 
-            this.colHcduName.DataPropertyName = "Name";
-            this.colHcduName.HeaderText = "Name";
-            this.colHcduName.Name = "colHcduName";
-            this.colHcduName.ReadOnly = true;
-            this.colHcduName.Width = 250;
-            // 
-            // colHcduPackages
-            // 
-            this.colHcduPackages.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.colHcduPackages.DataPropertyName = "Packages";
-            this.colHcduPackages.HeaderText = "Packages";
-            this.colHcduPackages.Name = "colHcduPackages";
-            this.colHcduPackages.ReadOnly = true;
             // 
             // tabInfo
             // 
@@ -1005,6 +983,53 @@ namespace HcduPlus
             this.checkScanSavedSims.Text = "Inc SavedSims";
             this.checkScanSavedSims.UseVisualStyleBackColor = true;
             this.checkScanSavedSims.Click += new System.EventHandler(this.OnSavedSimsScan);
+            // 
+            // colHcduType
+            // 
+            this.colHcduType.DataPropertyName = "Type";
+            this.colHcduType.HeaderText = "Type";
+            this.colHcduType.Name = "colHcduType";
+            this.colHcduType.ReadOnly = true;
+            this.colHcduType.Width = 75;
+            // 
+            // colHcduGroup
+            // 
+            this.colHcduGroup.DataPropertyName = "Group";
+            this.colHcduGroup.HeaderText = "Group";
+            this.colHcduGroup.Name = "colHcduGroup";
+            this.colHcduGroup.ReadOnly = true;
+            this.colHcduGroup.Width = 75;
+            // 
+            // colHcduInstance
+            // 
+            this.colHcduInstance.DataPropertyName = "Instance";
+            this.colHcduInstance.HeaderText = "Instance";
+            this.colHcduInstance.Name = "colHcduInstance";
+            this.colHcduInstance.ReadOnly = true;
+            this.colHcduInstance.Width = 75;
+            // 
+            // colHcduName
+            // 
+            this.colHcduName.DataPropertyName = "Name";
+            this.colHcduName.HeaderText = "Name";
+            this.colHcduName.Name = "colHcduName";
+            this.colHcduName.ReadOnly = true;
+            this.colHcduName.Width = 250;
+            // 
+            // colReason
+            // 
+            this.colReason.DataPropertyName = "Reason";
+            this.colReason.HeaderText = "Reason";
+            this.colReason.Name = "colReason";
+            this.colReason.ReadOnly = true;
+            // 
+            // colHcduPackages
+            // 
+            this.colHcduPackages.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.colHcduPackages.DataPropertyName = "Packages";
+            this.colHcduPackages.HeaderText = "Packages";
+            this.colHcduPackages.Name = "colHcduPackages";
+            this.colHcduPackages.ReadOnly = true;
             // 
             // HcduPlusForm
             // 
@@ -1117,11 +1142,6 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackageA;
         private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackageB;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduType;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduGroup;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduInstance;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackages;
         private System.Windows.Forms.CheckBox checkModsSavedSims;
         private System.Windows.Forms.CheckBox checkScanSavedSims;
         private System.Windows.Forms.ToolStripMenuItem menuOptions;
@@ -1139,6 +1159,14 @@ namespace HcduPlus
         private System.Windows.Forms.ToolStripMenuItem menuItemMesh;
         private System.Windows.Forms.ToolStripMenuItem menuMode;
         private System.Windows.Forms.ToolStripMenuItem menuItemAdvanced;
+        private System.Windows.Forms.ToolStripMenuItem menuItemGroupConflicts;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduType;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduGroup;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduInstance;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colReason;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colHcduPackages;
     }
 }
 

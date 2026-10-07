@@ -56,7 +56,7 @@ namespace HcduPlus
 {
     public partial class HcduPlusForm : Form
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly HcduPlusDataByPackage dataByPackage = new HcduPlusDataByPackage();
         private readonly HcduPlusDataByResource dataByResource = new HcduPlusDataByResource();
@@ -84,8 +84,6 @@ namespace HcduPlus
 
         public HcduPlusForm()
         {
-            logger.Info(HcduPlusApp.AppProduct);
-
             InitializeComponent();
             this.Text = HcduPlusApp.AppTitle;
 
@@ -338,7 +336,7 @@ namespace HcduPlus
                                                     worker.ReportProgress((int)((done / total) * 100.0), cpNew);
                                                 }
 
-                                                cpData.AddKey(key, scanDataStore.NamesByKeyGet(key));
+                                                cpData.AddKey(key, scanDataStore.NamesByKeyGet(key), null);
                                             }
                                         }
                                     }
@@ -349,7 +347,7 @@ namespace HcduPlus
                 }
             }
 
-            if (menuItemGuidConflicts.Checked)
+            if (menuItemGuidConflicts.Enabled && menuItemGuidConflicts.Checked)
             {
                 foreach (TypeGUID guid in scanDataStore.SeenGuidsGetGuids())
                 {
@@ -390,7 +388,7 @@ namespace HcduPlus
                                         TypeInstanceID instanceId = (TypeInstanceID)Convert.ToUInt32(scanPackages[i].Substring(15, 8), 16);
                                         DBPFKey key = new DBPFKey(Objd.TYPE, groupId, instanceId, DBPFData.RESOURCE_NULL);
 
-                                        cpData.AddKey(key, scanDataStore.NamesByKeyGet(key));
+                                        cpData.AddKey(key, scanDataStore.NamesByKeyGet(key), "Guid");
                                     }
                                 }
                             }
@@ -415,7 +413,57 @@ namespace HcduPlus
                                     TypeInstanceID instanceId = (TypeInstanceID)Convert.ToUInt32(scanPackages[0].Substring(15, 8), 16);
                                     DBPFKey key = new DBPFKey(Objd.TYPE, groupId, instanceId, DBPFData.RESOURCE_NULL);
 
-                                    cpData.AddKey(key, scanDataStore.NamesByKeyGet(key));
+                                    cpData.AddKey(key, scanDataStore.NamesByKeyGet(key), "Maxis Guid");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (menuItemGroupConflicts.Enabled && menuItemGroupConflicts.Checked)
+            {
+                foreach (TypeGroupID groupId in scanDataStore.SeenGroupsGetGroups())
+                {
+                    List<string> scanPackages = scanDataStore.SeenGroupsGetPackages(groupId);
+                    if (scanPackages != null)
+                    {
+                        List<string> modsPackages = modsDataStore.SeenGroupsGetPackages(groupId);
+                        if (modsPackages != null)
+                        {
+                            scanPackages.Insert(0, modsPackages[modsPackages.Count - 1]);
+                        }
+
+                        if (scanPackages.Count > 1)
+                        {
+                            for (int i = 0; i < scanPackages.Count - 1; ++i)
+                            {
+                                // These have a prefix of "##0xGGGGGGGG-0xIIIIIIII!"
+                                string thisScanPackage = scanPackages[i].Substring(24);
+                                string nextScanPackage = scanPackages[i + 1].Substring(24);
+
+                                // Ignore internal conflicts?
+                                if (!(thisScanPackage.Equals(nextScanPackage) && menuItemInternalConflicts.Checked))
+                                {
+                                    ConflictPair cpNew = new ConflictPair(thisScanPackage, nextScanPackage);
+
+                                    // Ignore known conflicts
+                                    if (menuItemIncludeKnownConflicts.Checked || !knownConflicts.IsKnown(cpNew))
+                                    {
+                                        if (!allCurrentConflicts.TryGetValue(cpNew, out ConflictPair cpData))
+                                        {
+                                            allCurrentConflicts.Add(cpNew);
+                                            cpData = cpNew;
+
+                                            worker.ReportProgress((int)((done / total) * 100.0), cpNew);
+                                        }
+
+                                        TypeGroupID conflictGroupId = (TypeGroupID)Convert.ToUInt32(scanPackages[i].Substring(4, 8), 16);
+                                        TypeInstanceID conflictInstanceId = (TypeInstanceID)Convert.ToUInt32(scanPackages[i].Substring(15, 8), 16);
+                                        DBPFKey key = new DBPFKey(Objd.TYPE, conflictGroupId, conflictInstanceId, DBPFData.RESOURCE_NULL);
+
+                                        cpData.AddKey(key, scanDataStore.NamesByKeyGet(key), "Group/Filename");
+                                    }
                                 }
                             }
                         }
@@ -426,7 +474,7 @@ namespace HcduPlus
             e.Result = allCurrentConflicts.Count;
         }
 
-        private int ProcessFolder(BackgroundWorker worker, System.ComponentModel.DoWorkEventArgs args,
+        private int ProcessFolder(BackgroundWorker worker, DoWorkEventArgs args,
             string folder, List<string> files, string prefix, float total, int done, IDataStore dataStore)
         {
             dataStore.SetFiles(folder, files);
@@ -540,13 +588,23 @@ namespace HcduPlus
 
                     ++countTypes[type];
 
-                    if (type == Objd.TYPE && menuItemGuidConflicts.Checked)
+                    if (type == Objd.TYPE)
                     {
-                        Objd objd = (Objd)package.GetResourceByEntry(entry);
+                        if (menuItemGuidConflicts.Enabled && menuItemGuidConflicts.Checked)
+                        {
+                            Objd objd = (Objd)package.GetResourceByEntry(entry);
 
-                        dataStore.SeenGuidsAdd(objd.Guid, entry, fileIndex);
+                            dataStore.SeenGuidsAdd(objd.Guid, entry, fileIndex);
 
-                        dataStore.NamesByKeyAdd(entry, package.GetFilenameByEntry(entry));
+                            dataStore.NamesByKeyAdd(entry, package.GetFilenameByEntry(entry));
+                        }
+
+                        if (menuItemGroupConflicts.Enabled && menuItemGroupConflicts.Checked)
+                        {
+                            dataStore.SeenGroupsAdd(package.PackageNameNoExtn, entry, fileIndex);
+
+                            dataStore.NamesByKeyAdd(entry, package.GetFilenameByEntry(entry));
+                        }
                     }
 
                     if (entry.GroupID != DBPFData.GROUP_LOCAL)
@@ -732,6 +790,7 @@ namespace HcduPlus
 
                 menuItemGuidConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, 1) != 0);
                 menuItemMaxisGuidConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemMaxisGuidConflicts.Name, 1) != 0);
+                menuItemGroupConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGroupConflicts.Name, 0) != 0);
                 menuItemInternalConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, 1) != 0);
                 menuItemHomeCrafterConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, 1) != 0);
                 menuItemStoreVersionConflicts.Checked = ((int)RegistryTools.GetSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, 1) != 0);
@@ -788,6 +847,7 @@ namespace HcduPlus
 
                 RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGuidConflicts.Name, menuItemGuidConflicts.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemMaxisGuidConflicts.Name, menuItemMaxisGuidConflicts.Checked ? 1 : 0);
+                RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemGroupConflicts.Name, menuItemGroupConflicts.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemInternalConflicts.Name, menuItemInternalConflicts.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemHomeCrafterConflicts.Name, menuItemHomeCrafterConflicts.Checked ? 1 : 0);
                 RegistryTools.SaveSetting(HcduPlusApp.RegistryKey + @"\Options", menuItemStoreVersionConflicts.Name, menuItemStoreVersionConflicts.Checked ? 1 : 0);
@@ -1022,6 +1082,7 @@ namespace HcduPlus
         {
             menuItemGuidConflicts.Enabled = menuItemObjd.Checked;
             menuItemMaxisGuidConflicts.Enabled = menuItemObjd.Checked;
+            menuItemGroupConflicts.Enabled = menuItemObjd.Checked;
         }
 
         private void OnAllClicked(object sender, EventArgs e)

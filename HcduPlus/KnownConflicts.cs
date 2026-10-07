@@ -46,7 +46,7 @@ namespace HcduPlus.Conflict
     [System.ComponentModel.DesignerCategory("")]
     public class KnownConflicts : DataTable
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private readonly string KnownRegistryKey = HcduPlusApp.RegistryKey + @"\KnownConflicts";
 

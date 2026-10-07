@@ -10,6 +10,7 @@
  */
 
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.Utils;
 using System.Collections.Generic;
 
 namespace HcduPlus.DataStore
@@ -33,6 +34,12 @@ namespace HcduPlus.DataStore
         IEnumerable<TypeGUID> SeenGuidsGetGuids();
         List<string> SeenGuidsGetPackages(TypeGUID guid);
         void SeenGuidsAdd(TypeGUID guid, DBPFKey key, int fileIndex);
+        #endregion
+
+        #region SeenGroups
+        IEnumerable<TypeGroupID> SeenGroupsGetGroups();
+        List<string> SeenGroupsGetPackages(TypeGroupID groupId);
+        void SeenGroupsAdd(string packageNameNoExtn, DBPFKey key, int fileIndex);
         #endregion
 
         #region NamesByKey
@@ -66,6 +73,7 @@ namespace HcduPlus.DataStore
 
         private readonly Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<DBPFKey, List<int>>>> seenResources = new Dictionary<TypeTypeID, Dictionary<TypeGroupID, Dictionary<DBPFKey, List<int>>>>();
         private readonly Dictionary<TypeGUID, List<KeyIndexPair>> seenGuids = new Dictionary<TypeGUID, List<KeyIndexPair>>();
+        private readonly Dictionary<TypeGroupID, List<KeyIndexPair>> seenGroups = new Dictionary<TypeGroupID, List<KeyIndexPair>>();
         private readonly Dictionary<DBPFKey, string> namesByKey = new Dictionary<DBPFKey, string>();
 
 
@@ -197,6 +205,50 @@ namespace HcduPlus.DataStore
             {
                 packages = new List<KeyIndexPair>();
                 seenGuids.Add(guid, packages);
+            }
+
+            packages.Add(new KeyIndexPair(key, fileIndex));
+        }
+        #endregion
+
+
+        #region SeenGroups
+        public IEnumerable<TypeGroupID> SeenGroupsGetGroups()
+        {
+            return seenGroups.Keys;
+        }
+
+        public List<string> SeenGroupsGetPackages(TypeGroupID groupId)
+        {
+            if (seenGroups.TryGetValue(groupId, out List<KeyIndexPair> pairs))
+            {
+                List<string> packages = new List<string>(pairs.Count);
+
+                foreach (KeyIndexPair pair in pairs)
+                {
+                    string packageName = $"##{pair.Key.GroupID}-{pair.Key.InstanceID}!{prefix}{files[pair.FileIndex].Substring(folder.Length + 1)}";
+                    packages.Add(packageName);
+                }
+
+                return packages;
+            }
+
+            return null;
+        }
+
+        public void SeenGroupsAdd(string packageNameNoExtn, DBPFKey key, int fileIndex)
+        {
+            TypeGroupID groupId = key.GroupID;
+
+            if (groupId == DBPFData.GROUP_LOCAL)
+            {
+                groupId = Hashes.GroupIDHash(packageNameNoExtn);
+            }
+
+            if (!seenGroups.TryGetValue(groupId, out List<KeyIndexPair> packages))
+            {
+                packages = new List<KeyIndexPair>();
+                seenGroups.Add(groupId, packages);
             }
 
             packages.Add(new KeyIndexPair(key, fileIndex));

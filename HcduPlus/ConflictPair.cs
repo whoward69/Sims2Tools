@@ -19,11 +19,13 @@ namespace HcduPlus.Conflict
     {
         public DBPFKey Key { get; }
         public string Name { get; }
+        public string Reason { get; }
 
-        public ConflictDetail(DBPFKey key, string name)
+        public ConflictDetail(DBPFKey key, string name, string reason)
         {
             Key = key;
             Name = name;
+            Reason = reason;
         }
     }
 
@@ -42,9 +44,9 @@ namespace HcduPlus.Conflict
             this.Details = new List<ConflictDetail>();
         }
 
-        public void AddKey(DBPFKey key, string name)
+        public void AddKey(DBPFKey key, string name, string reason)
         {
-            Details.Add(new ConflictDetail(key, name));
+            Details.Add(new ConflictDetail(key, name, reason));
         }
 
         public string DetailText(string prefix = "")
@@ -54,6 +56,11 @@ namespace HcduPlus.Conflict
             foreach (ConflictDetail detail in Details)
             {
                 s += $"\n{prefix}{DBPFData.TypeName(detail.Key.TypeID)}: {detail.Key.InstanceID.ToShortString()} - {detail.Name} ({detail.Key.GroupID})";
+
+                if (detail.Reason != null)
+                {
+                    s += $" - {detail.Reason}";
+                }
             }
 
             return s.Substring(1);

@@ -19,7 +19,7 @@ namespace HcduPlus
         public static readonly string AppName = "HCDU Plus";
 
         public static readonly int AppVersionMajor = 5;
-        public static readonly int AppVersionMinor = 0;
+        public static readonly int AppVersionMinor = 1;
 
 #if DEBUG
         private static readonly int AppVersionDebug = 1;
@@ -44,7 +44,7 @@ namespace HcduPlus
         [STAThread]
         static void Main()
         {
-            log4net.Config.XmlConfigurator.Configure();
+            Sims2Tools.DBPF.Logger.DBPFLoggerFactory.InitLogger(AppName, AppProduct);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

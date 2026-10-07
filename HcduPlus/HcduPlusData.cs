@@ -36,26 +36,21 @@ namespace HcduPlus
     [System.ComponentModel.DesignerCategory("")]
     class HcduPlusDataByResource : DataTable
     {
-        private readonly DataColumn colType = new DataColumn("Type", typeof(string));
-        private readonly DataColumn colGroup = new DataColumn("Group", typeof(string));
-        private readonly DataColumn colInstance = new DataColumn("Instance", typeof(string));
-        private readonly DataColumn colName = new DataColumn("Name", typeof(string));
-        private readonly DataColumn colPackages = new DataColumn("Packages", typeof(string));
-
         public HcduPlusDataByResource()
         {
-            this.Columns.Add(colType);
-            this.Columns.Add(colGroup);
-            this.Columns.Add(colInstance);
-            this.Columns.Add(colName);
-            this.Columns.Add(colPackages);
+            this.Columns.Add(new DataColumn("Type", typeof(string)));
+            this.Columns.Add(new DataColumn("Group", typeof(string)));
+            this.Columns.Add(new DataColumn("Instance", typeof(string)));
+            this.Columns.Add(new DataColumn("Name", typeof(string)));
+            this.Columns.Add(new DataColumn("Reason", typeof(string)));
+            this.Columns.Add(new DataColumn("Packages", typeof(string)));
         }
 
         public void Add(ConflictPair cp)
         {
             foreach (ConflictDetail detail in cp.Details)
             {
-                this.Rows.Add(DBPFData.TypeName(detail.Key.TypeID), detail.Key.GroupID, detail.Key.InstanceID.ToShortString(), detail.Name, $"{cp.PackageA} --> {cp.PackageB}");
+                this.Rows.Add(DBPFData.TypeName(detail.Key.TypeID), detail.Key.GroupID, detail.Key.InstanceID.ToShortString(), detail.Name, detail.Reason, $"{cp.PackageA} --> {cp.PackageB}");
             }
         }
     }
