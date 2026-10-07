@@ -25,7 +25,10 @@ namespace Sims2Tools.DBPF.BCON
 
         public void SetClean() => _isDirty = false;
 
-        public BconItem(short value) => this.value = value;
+        public BconItem(short value)
+        {
+            this.value = value;
+        }
 
         public static implicit operator BconItem(short i) => new BconItem(i);
 
@@ -60,7 +63,7 @@ namespace Sims2Tools.DBPF.BCON
             throw new NotImplementedException();
         }
 
-        public IDbpfScriptable Indexed(int index, bool clone)
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
             throw new NotImplementedException();
         }

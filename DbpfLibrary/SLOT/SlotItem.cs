@@ -27,49 +27,58 @@ namespace Sims2Tools.DBPF.SLOT
         Target = 4
     }
 
-    public class SlotItem
+    public class SlotItem : IDbpfScriptable
     {
-        readonly uint version;
+        private bool _isDirty = false;
+        public bool IsDirty => _isDirty;
+        public void SetDirty() => _isDirty = true;
+
+        public void SetClean() => _isDirty = false;
+
+        private readonly uint version;
 
         // See https://modthesims.info/wiki.php?title=534C4F54 for possible explanations
         // All versions
-        SlotItemType type;
-        float unknownf1;
-        float unknownf2;
-        float unknownf3;
-        int unknowni1;
-        int unknowni2;
-        int unknowni3;
-        int unknowni4;
-        int unknowni5;
+        private SlotItemType type = SlotItemType.Container;
+        private float unknownf1 = 0;
+        private float unknownf2 = 0;
+        private float unknownf3 = 0;
+        private int unknowni1 = 0;
+        private int unknowni2 = 0;
+        private int unknowni3 = 0;
+        private int unknowni4 = 0;
+        private int unknowni5 = 0;
 
         // Version >=5
-        float unknownf4;
-        float unknownf5;
-        float unknownf6;
-        int unknowni6;
+        private float unknownf4 = 0;
+        private float unknownf5 = 0;
+        private float unknownf6 = 0;
+        private int unknowni6 = 0;
 
         // Version >=6
-        short unknowns1;
-        short unknowns2;
+        private short unknowns1 = 0;
+        private short unknowns2 = 0;
 
         // Version >=7
-        float unknownf7;
+        private float unknownf7 = 0;
 
         // Version >=8
-        int unknowni7;
+        private int unknowni7 = 0;
 
         // Version >=9
-        int unknowni8;
+        private int unknowni8 = 0;
 
         // Version >=10
-        float unknownf8;
+        private float unknownf8 = 0;
 
         // Version >=40
-        int unknowni9;
-        int unknowni10;
+        private int unknowni9 = 0;
+        private int unknowni10 = 0;
 
-        public SlotItem(uint version) => this.version = version;
+        public SlotItem(uint version)
+        {
+            this.version = version;
+        }
 
         public SlotItemType Type => type;
 
@@ -151,6 +160,337 @@ namespace Sims2Tools.DBPF.SLOT
                 unknowni10 = reader.ReadInt32();
             }
         }
+
+        internal uint FileSize
+        {
+            get
+            {
+                uint size = 2 + (3 * 4) + (5 * 4);
+
+                if (version >= 5)
+                {
+                    size += (3 * 4) + 4;
+                }
+
+                if (version >= 6)
+                {
+                    size += (2 * 2);
+                }
+
+                if (version >= 7)
+                {
+                    size += 4;
+                }
+
+                if (version >= 8)
+                {
+                    size += 4;
+                }
+
+                if (version >= 9)
+                {
+                    size += 4;
+                }
+
+                if (version >= 0x10)
+                {
+                    size += 4;
+                }
+
+                if (version >= 0x40)
+                {
+                    size += (2 * 4);
+                }
+
+                return size;
+            }
+        }
+
+        internal void Serialize(DbpfWriter writer)
+        {
+            writer.WriteUInt16((ushort)type);
+
+            writer.WriteSingle(unknownf1);
+            writer.WriteSingle(unknownf2);
+            writer.WriteSingle(unknownf3);
+
+            writer.WriteInt32(unknowni1);
+            writer.WriteInt32(unknowni2);
+            writer.WriteInt32(unknowni3);
+            writer.WriteInt32(unknowni4);
+            writer.WriteInt32(unknowni5);
+
+            if (version >= 5)
+            {
+                writer.WriteSingle(unknownf4);
+                writer.WriteSingle(unknownf5);
+                writer.WriteSingle(unknownf6);
+
+                writer.WriteInt32(unknowni6);
+            }
+
+            if (version >= 6)
+            {
+                writer.WriteInt16(unknowns1);
+                writer.WriteInt16(unknowns2);
+            }
+
+            if (version >= 7)
+            {
+                writer.WriteSingle(unknownf7);
+            }
+
+            if (version >= 8)
+            {
+                writer.WriteInt32(unknowni7);
+            }
+
+            if (version >= 9)
+            {
+                writer.WriteInt32(unknowni8);
+            }
+
+            if (version >= 0x10)
+            {
+                writer.WriteSingle(unknownf8);
+            }
+
+            if (version >= 0x40)
+            {
+                writer.WriteInt32(unknowni9);
+                writer.WriteInt32(unknowni10);
+            }
+        }
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            if (item.Equals("type"))
+            {
+                return Type.ToString().ToLower().Equals(sv);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("f1"))
+            {
+                unknownf1 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("f2"))
+            {
+                unknownf2 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("f3"))
+            {
+                unknownf3 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("f4"))
+            {
+                unknownf4 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("f5"))
+            {
+                unknownf5 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("f6"))
+            {
+                unknownf6 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("f7"))
+            {
+                unknownf7 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("f8"))
+            {
+                unknownf8 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("i1"))
+            {
+                unknowni1 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("i2"))
+            {
+                unknowni2 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("i3"))
+            {
+                unknowni3 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("i4"))
+            {
+                unknowni4 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("i5"))
+            {
+                unknowni5 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("i6"))
+            {
+                unknowni6 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("i7"))
+            {
+                unknowni7 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("i8"))
+            {
+                unknowni8 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("i9"))
+            {
+                unknowni9 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("i10"))
+            {
+                unknowni10 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("s1"))
+            {
+                unknowns1 = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("s2"))
+            {
+                unknowns2 = sv;
+                _isDirty = true;
+                return true;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public ScriptValue Value(string item)
+        {
+            if (item.Equals("f1"))
+            {
+                return new ScriptValue(unknownf1);
+            }
+            else if (item.Equals("f2"))
+            {
+                return new ScriptValue(unknownf2);
+            }
+            else if (item.Equals("f3"))
+            {
+                return new ScriptValue(unknownf3);
+            }
+            else if (item.Equals("f4"))
+            {
+                return new ScriptValue(unknownf4);
+            }
+            else if (item.Equals("f5"))
+            {
+                return new ScriptValue(unknownf5);
+            }
+            else if (item.Equals("f6"))
+            {
+                return new ScriptValue(unknownf6);
+            }
+            else if (item.Equals("f7"))
+            {
+                return new ScriptValue(unknownf7);
+            }
+            else if (item.Equals("f8"))
+            {
+                return new ScriptValue(unknownf8);
+            }
+            else if (item.Equals("i1"))
+            {
+                return new ScriptValue(unknowni1);
+            }
+            else if (item.Equals("i2"))
+            {
+                return new ScriptValue(unknowni2);
+            }
+            else if (item.Equals("i3"))
+            {
+                return new ScriptValue(unknowni3);
+            }
+            else if (item.Equals("i4"))
+            {
+                return new ScriptValue(unknowni4);
+            }
+            else if (item.Equals("i5"))
+            {
+                return new ScriptValue(unknowni5);
+            }
+            else if (item.Equals("i6"))
+            {
+                return new ScriptValue(unknowni6);
+            }
+            else if (item.Equals("i7"))
+            {
+                return new ScriptValue(unknowni7);
+            }
+            else if (item.Equals("i8"))
+            {
+                return new ScriptValue(unknowni8);
+            }
+            else if (item.Equals("i9"))
+            {
+                return new ScriptValue(unknowni9);
+            }
+            else if (item.Equals("i10"))
+            {
+                return new ScriptValue(unknowni10);
+            }
+            else if (item.Equals("s1"))
+            {
+                return new ScriptValue(unknowns1);
+            }
+            else if (item.Equals("s2"))
+            {
+                return new ScriptValue(unknowns2);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
         public XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = parent.OwnerDocument.CreateElement("item");
@@ -204,12 +544,13 @@ namespace Sims2Tools.DBPF.SLOT
                 element.SetAttribute("Int9", I9.ToString());
                 element.SetAttribute("Int10", I10.ToString());
             }
+
             return element;
         }
 
         public string DiffString()
         {
-            return $"{Type}; F1:{F1}; F2:{F2}; F3:{F3}; I1:{I1}; I2:{I2}; I3:{I3}; I4:{I4}; I5:{I5}; F4:{F4}; F5:{F5}; F6:{F6}; S1:{S1}; S2:{S2}; F7:{F7}; I7:{I7}; I8:{I8}; I9:{I9}; I10:{I10}";
+            return $"{Type}; F1:{F1}; F2:{F2}; F3:{F3}; I1:{I1}; I2:{I2}; I3:{I3}; I4:{I4}; I5:{I5}; F4:{F4}; F5:{F5}; F6:{F6}; S1:{S1}; S2:{S2}; F7:{F7}; I7:{I7}; I8:{I8}; F8:{F8}; I9:{I9}; I10:{I10}";
         }
     }
 }

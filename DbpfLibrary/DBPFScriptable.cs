@@ -18,6 +18,11 @@ using System.Diagnostics;
 
 namespace Sims2Tools.DBPF
 {
+    public interface IDbpfRepairable
+    {
+        bool Repair(string item, ScriptValue value);
+    }
+
     public interface IDbpfScriptable
     {
         bool Assert(string item, ScriptValue value);
@@ -26,7 +31,7 @@ namespace Sims2Tools.DBPF
 
         bool Assignment(string item, ScriptValue value);
 
-        IDbpfScriptable Indexed(int index, bool clone);
+        IDbpfScriptable Indexed(ScriptValue sv, bool clone);
     }
 
     public class DbpfScriptable
@@ -112,6 +117,10 @@ namespace Sims2Tools.DBPF
         {
         }
 
+        public ScriptValue(float value) : this(value.ToString())
+        {
+        }
+
         public ScriptValue(string value) : this(value, null)
         {
         }
@@ -129,10 +138,17 @@ namespace Sims2Tools.DBPF
 
             if (value.ToLower().StartsWith("0x"))
             {
-                lVal = Int32.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
-                dVal = lVal;
+                try
+                {
+                    lVal = Int32.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                    dVal = lVal;
 
-                datatype = MetaData.DataTypes.dtUInteger;
+                    datatype = MetaData.DataTypes.dtUInteger;
+                }
+                catch (Exception)
+                {
+                    throw new DbpfException($"'{value}' is not valid hex");
+                }
             }
             else if (long.TryParse(value, out lVal))
             {

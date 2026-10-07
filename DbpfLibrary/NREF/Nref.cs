@@ -77,7 +77,7 @@ namespace Sims2Tools.DBPF.NREF
             return DbpfScriptable.TGIRValue(this, item);
         }
 
-        public IDbpfScriptable Indexed(int index, bool clone)
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
             throw new NotImplementedException();
         }

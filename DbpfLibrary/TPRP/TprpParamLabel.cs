@@ -23,6 +23,10 @@ namespace Sims2Tools.DBPF.TPRP
         public void ReadPData(DbpfReader reader) => this.pData = reader.ReadByte();
         public void WritePData(DbpfWriter writer) => writer.WriteByte(this.pData);
 
+        public TprpParamLabel() : base()
+        {
+        }
+
         public TprpParamLabel(DbpfReader reader) : base(reader)
         {
         }

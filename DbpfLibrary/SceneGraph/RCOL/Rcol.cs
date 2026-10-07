@@ -455,7 +455,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
             return DbpfScriptable.TGIRValue(this, item);
         }
 
-        public virtual IDbpfScriptable Indexed(int index, bool clone)
+        public virtual IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
             throw new NotImplementedException();
         }

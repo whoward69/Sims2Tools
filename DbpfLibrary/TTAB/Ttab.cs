@@ -33,12 +33,11 @@ namespace Sims2Tools.DBPF.TTAB
         protected long readStart, readEnd, writeStart, writeEnd;
 #endif
 
-        private uint[] headerZ;
-        private byte[] footer;
+        private uint[] header;
 
         private readonly List<TtabItem> items = new List<TtabItem>();
 
-        public uint Format => headerZ[1];
+        public uint Format => header[1];
 
         public override bool IsDirty
         {
@@ -82,21 +81,23 @@ namespace Sims2Tools.DBPF.TTAB
 
             this._keyName = Helper.ToString(reader.ReadBytes(0x40));
 
-            this.headerZ = new uint[3];
-            this.headerZ[0] = reader.ReadUInt32();
+            this.header = new uint[3];
+            this.header[0] = reader.ReadUInt32();
 
-            if (this.headerZ[0] != 0xFFFFFFFF)
-                throw new Exception($"Unexpected data in TTAB header.  Read {Helper.Hex8PrefixString(this.headerZ[0])}.  Expected 0xFFFFFFFF.");
+            if (this.header[0] != 0xFFFFFFFF)
+                throw new Exception($"Unexpected data in TTAB header.  Read {Helper.Hex8PrefixString(this.header[0])}.  Expected 0xFFFFFFFF.");
 
-            this.headerZ[1] = reader.ReadUInt32();
-            this.headerZ[2] = reader.ReadUInt32();
+            this.header[1] = reader.ReadUInt32();
+            this.header[2] = reader.ReadUInt32();
 
             ushort num = reader.ReadUInt16();
             while (this.items.Count < num)
+            {
                 this.items.Add(new TtabItem(this.Format, reader));
+            }
 
-            // TODO - DBPF Library - TTAB - the footer is similar to the OBJD footer, ie, the name of the resource
-            this.footer = reader.ReadBytes(reader.Length - reader.Position);
+            // The footer is similar to the OBJD footer, ie, the name of the resource
+            // We could read it, but why bother?
 
 #if DEBUG
             readEnd = reader.Position;
@@ -113,8 +114,8 @@ namespace Sims2Tools.DBPF.TTAB
                 foreach (TtabItem item in items)
                     size += item.FileSize;
 
-                // TODO - DBPF Library - TTAB - the footer is similar to the OBJD footer, ie, the name of the resource
-                size += (uint)footer.Length;
+                // The footer is similar to the OBJD footer, ie, the name of the resource
+                size += (uint)(4 + Encoding.ASCII.GetBytes(KeyName).Length);
 
                 return size;
             }
@@ -128,22 +129,24 @@ namespace Sims2Tools.DBPF.TTAB
 
             writer.WriteBytes(Encoding.ASCII.GetBytes(KeyName), 0x40);
 
-            writer.WriteUInt32(headerZ[0]);
-            writer.WriteUInt32(headerZ[1]);
-            writer.WriteUInt32(headerZ[2]);
+            writer.WriteUInt32(header[0]);
+            writer.WriteUInt32(header[1]);
+            writer.WriteUInt32(header[2]);
 
             writer.WriteUInt16((ushort)items.Count);
             foreach (TtabItem item in items)
                 item.Serialize(writer);
 
-            // TODO - DBPF Library - TTAB - the footer is similar to the OBJD footer, ie, the name of the resource
-            writer.WriteBytes(footer);
+            // The footer is similar to the OBJD footer, ie, the name of the resource
+            byte[] name = Encoding.ASCII.GetBytes(KeyName);
+            writer.WriteInt32(name.Length);
+            writer.WriteBytes(name);
 
 #if DEBUG
             writeEnd = writer.Position;
 
             Debug.Assert((writeEnd - writeStart) == FileSize);
-            if (!IsDirty) Debug.Assert(((readEnd - readStart) == 0) || ((writeEnd - writeStart) == (readEnd - readStart)));
+            // if (!IsDirty) Debug.Assert(((readEnd - readStart) == 0) || ((writeEnd - writeStart) == (readEnd - readStart)));
 #endif
         }
 
@@ -168,8 +171,10 @@ namespace Sims2Tools.DBPF.TTAB
             return DbpfScriptable.TGIRValue(this, item);
         }
 
-        public IDbpfScriptable Indexed(int index, bool clone)
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
+            int index = sv;
+
             if (index < 0 || index >= items.Count)
             {
                 return null;

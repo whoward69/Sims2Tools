@@ -16,6 +16,10 @@ namespace Sims2Tools.DBPF.TPRP
 {
     public class TprpLocalLabel : TprpItem
     {
+        public TprpLocalLabel() : base()
+        {
+        }
+
         public TprpLocalLabel(DbpfReader reader) : base(reader)
         {
         }

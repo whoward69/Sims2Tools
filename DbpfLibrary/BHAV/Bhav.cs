@@ -178,8 +178,9 @@ namespace Sims2Tools.DBPF.BHAV
             return DbpfScriptable.TGIRValue(this, item);
         }
 
-        public IDbpfScriptable Indexed(int index, bool clone)
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
+            int index = sv;
             Trace.Assert(index >= 0 && index < instructions.Count, $"Instruction index {index} out of range");
 
             return instructions[index];

@@ -14,7 +14,6 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Xml;
@@ -31,21 +30,29 @@ namespace Sims2Tools.DBPF.TPRP
 
         private uint[] header;
 
-        private int paramCount;
-        private readonly List<TprpParamLabel> paramLabels = new List<TprpParamLabel>();
+        private readonly TprpItemList paramLabels = new TprpItemList(TprpItemType.Param);
 
-        private int localCount;
-        private readonly List<TprpLocalLabel> localLabels = new List<TprpLocalLabel>();
+        private readonly TprpItemList localLabels = new TprpItemList(TprpItemType.Local);
 
         private uint reserved;
         private uint[] trailer = new uint[2] { 5U, 0U };
+
+        public override bool IsDirty => base.IsDirty || paramLabels.IsDirty || localLabels.IsDirty;
+
+        public override void SetClean()
+        {
+            base.SetClean();
+
+            paramLabels.SetClean();
+            localLabels.SetClean();
+        }
 
         public Tprp(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
             Unserialize(reader);
         }
 
-        public int ParamCount => !this.duff ? this.paramCount : 0;
+        public int ParamCount => !this.duff ? paramLabels.Count : 0;
 
         public string GetParamName(int index)
         {
@@ -57,7 +64,7 @@ namespace Sims2Tools.DBPF.TPRP
             return null;
         }
 
-        public int LocalCount => !this.duff ? this.localCount : 0;
+        public int LocalCount => !this.duff ? localLabels.Count : 0;
 
         public string GetLocalName(int index)
         {
@@ -69,7 +76,6 @@ namespace Sims2Tools.DBPF.TPRP
             return null;
         }
 
-        // TODO - DBPF Library - TPRP - _TEST - Serialize Tprp, check this
         private void CleanUp()
         {
             for (int index = paramLabels.Count - 1; index >= 0; --index)
@@ -89,7 +95,6 @@ namespace Sims2Tools.DBPF.TPRP
             }
         }
 
-        // TODO - DBPF Library - TPRP - _TEST - Unserialize Tprp, check this
         protected void Unserialize(DbpfReader reader)
         {
             this.duff = false;
@@ -109,21 +114,24 @@ namespace Sims2Tools.DBPF.TPRP
             {
                 try
                 {
-                    this.paramCount = reader.ReadInt32();
-                    this.localCount = reader.ReadInt32();
+                    int paramCount = reader.ReadInt32();
+                    int localCount = reader.ReadInt32();
 
-                    // TODO - DBPF Library - TPRP - _TEST - split this into two arrays
-                    for (int index = 0; index < this.paramCount; ++index)
+                    for (int index = 0; index < paramCount; ++index)
+                    {
                         this.paramLabels.Add(new TprpParamLabel(reader));
+                    }
 
-                    for (int index = 0; index < this.localCount; ++index)
+                    for (int index = 0; index < localCount; ++index)
+                    {
                         this.localLabels.Add(new TprpLocalLabel(reader));
+                    }
 
                     this.reserved = reader.ReadUInt32();
 
-                    foreach (TprpParamLabel paramLabel in this.paramLabels)
+                    foreach (TprpItem paramLabel in paramLabels)
                     {
-                        paramLabel.ReadPData(reader);
+                        ((TprpParamLabel)paramLabel).ReadPData(reader);
                     }
 
                     this.trailer = new uint[2];
@@ -137,7 +145,6 @@ namespace Sims2Tools.DBPF.TPRP
             }
         }
 
-        // TODO - DBPF Library - TPRP - _TEST - Serialize Tprp
         public override uint FileSize
         {
             get
@@ -150,12 +157,12 @@ namespace Sims2Tools.DBPF.TPRP
 
                 size += 4 + 4;
 
-                foreach (TprpParamLabel paramLabel in this.paramLabels)
+                foreach (TprpItem paramLabel in paramLabels)
                 {
                     size += paramLabel.FileSize;
                 }
 
-                foreach (TprpLocalLabel localLabel in this.localLabels)
+                foreach (TprpItem localLabel in localLabels)
                 {
                     size += localLabel.FileSize;
                 }
@@ -170,7 +177,6 @@ namespace Sims2Tools.DBPF.TPRP
             }
         }
 
-        // TODO - DBPF Library - TPRP - _TEST - Serialize Tprp
         public override void Serialize(DbpfWriter writer)
         {
             Trace.Assert(duff == false, "Cannot serialize a bad resource");
@@ -187,24 +193,24 @@ namespace Sims2Tools.DBPF.TPRP
             writer.WriteUInt32(this.header[1]);
             writer.WriteUInt32(this.header[2]);
 
-            writer.WriteInt32(this.paramCount);
-            writer.WriteInt32(this.localCount);
+            writer.WriteInt32(paramLabels.Count);
+            writer.WriteInt32(localLabels.Count);
 
-            foreach (TprpParamLabel paramLabel in this.paramLabels)
+            foreach (TprpItem paramLabel in paramLabels)
             {
                 paramLabel.Serialize(writer);
             }
 
-            foreach (TprpLocalLabel localLabel in this.localLabels)
+            foreach (TprpItem localLabel in localLabels)
             {
                 localLabel.Serialize(writer);
             }
 
             writer.WriteUInt32(this.reserved);
 
-            foreach (TprpParamLabel paramLabel in this.paramLabels)
+            foreach (TprpItem paramLabel in paramLabels)
             {
-                paramLabel.WritePData(writer);
+                ((TprpParamLabel)paramLabel).WritePData(writer);
             }
 
             writer.WriteUInt32(this.trailer[0]);
@@ -247,8 +253,29 @@ namespace Sims2Tools.DBPF.TPRP
             return DbpfScriptable.TGIRValue(this, item);
         }
 
-        public IDbpfScriptable Indexed(int index, bool clone)
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
+            int index = sv;
+            string sVal = sv.ToLower();
+
+            if ("params".Equals(sVal) || "param".Equals(sVal))
+            {
+                index = 0;
+            }
+            else if ("locals".Equals(sVal) || "local".Equals(sVal))
+            {
+                index = 1;
+            }
+
+            if (index == 0)
+            {
+                return paramLabels;
+            }
+            else if (index == 1)
+            {
+                return localLabels;
+            }
+
             throw new NotImplementedException();
         }
         #endregion
@@ -263,15 +290,15 @@ namespace Sims2Tools.DBPF.TPRP
             int index = 0;
             for (int i = 0; i < ParamCount; ++i)
             {
-                TprpParamLabel paramLabel = paramLabels[index++];
+                TprpItem paramLabel = paramLabels[index++];
                 XmlElement ele = XmlHelper.CreateTextElement(element, "param", paramLabel.Label);
                 ele.SetAttribute("index", Helper.Hex4PrefixString(i));
-                ele.SetAttribute("data", Helper.Hex2PrefixString(paramLabel.PData));
+                ele.SetAttribute("data", Helper.Hex2PrefixString(((TprpParamLabel)paramLabel).PData));
             }
 
             for (int i = 0; i < LocalCount; ++i)
             {
-                TprpLocalLabel localLabel = localLabels[index++];
+                TprpItem localLabel = localLabels[index++];
                 XmlElement ele = XmlHelper.CreateTextElement(element, "local", localLabel.Label);
                 ele.SetAttribute("index", Helper.Hex4PrefixString(i));
             }

@@ -12,7 +12,7 @@
 
 namespace Sims2Tools.DBPF.OBJF
 {
-    public enum ObjfIndex
+    public enum ObjfIndex : int
     {
         NONE = -1,
         init,

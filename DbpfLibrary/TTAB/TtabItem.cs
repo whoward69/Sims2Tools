@@ -370,7 +370,7 @@ namespace Sims2Tools.DBPF.TTAB
             return null;
         }
 
-        public IDbpfScriptable Indexed(int index, bool clone)
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
             throw new NotImplementedException();
         }

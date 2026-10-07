@@ -54,7 +54,7 @@ namespace Sims2Tools.DBPF.BHAV
             throw new NotImplementedException();
         }
 
-        public IDbpfScriptable Indexed(int index, bool clone)
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
             throw new NotImplementedException();
         }

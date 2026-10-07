@@ -315,8 +315,9 @@ namespace Sims2Tools.DBPF.SceneGraph.GMND
         }
 
         #region IDBPFScriptable
-        public override IDbpfScriptable Indexed(int index, bool clone)
+        public override IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
+            int index = sv;
             Trace.Assert(index >= 0 && index < ReferencedFiles.Count, $"Reference index {index} out of range");
 
             return ReferencedFiles[index];

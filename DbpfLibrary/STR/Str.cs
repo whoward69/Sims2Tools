@@ -22,7 +22,7 @@ using System.Xml;
 
 namespace Sims2Tools.DBPF.STR
 {
-    public class Str : DBPFResource, IDbpfScriptable
+    public class Str : DBPFResource, IDbpfScriptable, IDbpfRepairable
     {
         // See https://modthesims.info/wiki.php?title=List_of_Formats_by_Name
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x53545223;
@@ -121,13 +121,16 @@ namespace Sims2Tools.DBPF.STR
         }
         #endregion
 
-        public void DefLanguageOnly()
+        public void DefLanguageOnly(bool clearDescriptions)
         {
             List<StrItem> defLang = LanguageItems(MetaData.Languages.Default);
 
-            foreach (StrItem item in defLang)
+            if (clearDescriptions)
             {
-                item.Description = "";
+                foreach (StrItem item in defLang)
+                {
+                    item.Description = "";
+                }
             }
 
             languages.Clear();
@@ -304,8 +307,10 @@ namespace Sims2Tools.DBPF.STR
             return DbpfScriptable.TGIRValue(this, item);
         }
 
-        public IDbpfScriptable Indexed(int index, bool clone)
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
+            int index = sv;
+
             if (!languages.ContainsKey(MetaData.Languages.Default))
             {
                 AddLanguage(MetaData.Languages.Default);
@@ -324,6 +329,36 @@ namespace Sims2Tools.DBPF.STR
             }
 
             return defLang[index];
+        }
+        #endregion
+
+
+        #region IDBPFRepairable
+        public bool Repair(string repairItem, ScriptValue repairValue)
+        {
+            if (repairItem.StartsWith("deflang"))
+            {
+                DefLanguageOnly(false);
+                return true;
+            }
+            else if (repairItem.StartsWith("nodesc"))
+            {
+                foreach (List<StrItem> items in languages.Values)
+                {
+                    foreach (StrItem item in items)
+                    {
+                        if (!string.IsNullOrEmpty(item.Description))
+                        {
+                            item.Description = "";
+                            _isDirty = true;
+                        }
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
         }
         #endregion
 

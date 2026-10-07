@@ -12,28 +12,49 @@
 
 using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Utils;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.TPRP
 {
-    public abstract class TprpItem
+    public enum TprpItemType : ushort
     {
+        Param = 0,
+        Local
+    }
+
+    public abstract class TprpItem : IDbpfScriptable
+    {
+        private bool _isDirty = false;
+
+        public bool IsDirty => _isDirty;
+        public void SetDirty() => _isDirty = true;
+
+        public void SetClean() => _isDirty = false;
+
         private string label;
 
-        public string Label
+        public string Label => label;
+
+        public TprpItem()
         {
-            get => this.label;
+            label = "";
         }
 
-        public TprpItem(DbpfReader reader) => this.Unserialize(reader);
+        public TprpItem(DbpfReader reader)
+        {
+            Unserialize(reader);
+        }
 
-        // TODO - DBPF Library - TPRP - _TEST - Unserialize TprpItem, check this
-        protected void Unserialize(DbpfReader reader) => this.label = Helper.ToString(reader.ReadBytes(reader.ReadByte()));
+        protected void Unserialize(DbpfReader reader)
+        {
+            label = Helper.ToString(reader.ReadBytes(reader.ReadByte()));
+        }
 
-        // TODO - DBPF Library - TPRP - _TEST - Serialize TprpItem
         public uint FileSize => (uint)(1 + Helper.ToBytes(label).Length);
 
-        // TODO - DBPF Library - TPRP - _TEST - Serialize TprpItem
         public void Serialize(DbpfWriter writer)
         {
 #if DEBUG
@@ -49,8 +70,131 @@ namespace Sims2Tools.DBPF.TPRP
 #endif
         }
 
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            if (item.Equals("label"))
+            {
+                this.label = sv;
+                _isDirty = true;
+                return true;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public ScriptValue Value(string item)
+        {
+            if (item.Equals("label"))
+            {
+                return new ScriptValue(this.label);
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
         public override string ToString() => this.label;
 
         public static implicit operator string(TprpItem i) => i.label;
+    }
+
+    public class TprpItemList : IEnumerable<TprpItem>, IDbpfScriptable
+    {
+        private readonly TprpItemType type;
+        private readonly List<TprpItem> items = new List<TprpItem>();
+
+        public bool IsDirty
+        {
+            get
+            {
+                foreach (TprpItem item in items)
+                {
+                    if (item.IsDirty) return true;
+                }
+
+                return false;
+            }
+        }
+
+        public void SetClean()
+        {
+            foreach (TprpItem item in items)
+            {
+                item.SetClean();
+            }
+        }
+
+        public TprpItemList(TprpItemType type)
+        {
+            this.type = type;
+        }
+
+        public int Count => items.Count;
+        public TprpItem this[int index] => items[index];
+        public void Add(TprpItem item) => items.Add(item);
+        public void RemoveAt(int index) => items.RemoveAt(index);
+
+        #region IEnumerable
+        public IEnumerator<TprpItem> GetEnumerator() => items.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        #endregion
+
+        #region IDBPFScriptable
+        public bool Assert(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Assignment(string item, ScriptValue sv)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ScriptValue Value(string item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
+        {
+            int index = sv;
+
+            if (index == -1)
+            {
+                index = items.Count;
+            }
+
+            while (index > (items.Count - 1))
+            {
+                TprpItem item;
+
+                if (type == TprpItemType.Param)
+                {
+                    item = new TprpParamLabel();
+                }
+                else
+                {
+                    item = new TprpLocalLabel();
+                }
+
+                item.SetDirty();
+
+                items.Add(item);
+            }
+
+            return items[index];
+        }
+        #endregion
     }
 }

@@ -135,8 +135,10 @@ namespace Sims2Tools.DBPF.BCON
             return DbpfScriptable.TGIRValue(this, item);
         }
 
-        public IDbpfScriptable Indexed(int index, bool clone)
+        public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
+            int index = sv;
+
             if (index == -1)
             {
                 index = items.Count;
