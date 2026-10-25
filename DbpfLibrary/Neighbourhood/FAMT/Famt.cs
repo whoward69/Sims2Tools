@@ -14,7 +14,7 @@ using Sims2Tools.DBPF.IO;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.Utils;
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Sims2Tools.DBPF.Neighbourhood.FAMT
@@ -25,28 +25,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMT
         public static readonly TypeTypeID TYPE = (TypeTypeID)0x8C870743;
         public const string NAME = "FAMT";
 
-
-        ArrayList sims; // TODO - DBPF Library - replace with List<>
-
-        public FamilyTieSim[] Sims
-        {
-            get
-            {
-                FamilyTieSim[] simlist = new FamilyTieSim[sims.Count];
-                sims.CopyTo(simlist);
-                return simlist;
-            }
-            set
-            {
-                sims.Clear();
-                foreach (FamilyTieSim sim in value)
-                {
-                    sims.Add(sim);
-                }
-            }
-        }
-
-
+        private readonly List<FamilyTieSim> sims = new List<FamilyTieSim>();
 
         public Famt(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
@@ -58,7 +37,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMT
             uint id = reader.ReadUInt32();
             if (id != 0x00000001) throw new Exception("Format is not recognized!");
             int count = reader.ReadInt32();
-            sims = new ArrayList(count); // TODO - DBPF Library - replace with List<>
+            sims.Clear();
 
             for (int i = 0; i < count; i++)
             {
@@ -71,8 +50,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMT
                     ushort tinstance = reader.ReadUInt16();
                     items[k] = new FamilyTieItem(type, tinstance, this);
                 }
-                FamilyTieSim simtie = new FamilyTieSim(instance, items, this);
-                sims.Add(simtie);
+
+                sims.Add(new FamilyTieSim(instance, items, this));
 
             }
         }
@@ -81,7 +60,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.FAMT
         {
             XmlElement element = XmlHelper.CreateElement(parent, NAME.ToLower());
 
-            foreach (FamilyTieSim sim in Sims)
+            foreach (FamilyTieSim sim in sims)
             {
                 XmlElement eleSim = parent.OwnerDocument.CreateElement("sim");
                 element.AppendChild(eleSim);

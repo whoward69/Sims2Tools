@@ -12,14 +12,27 @@
 
 using Sims2Tools;
 using Sims2Tools.DBPF;
+using Sims2Tools.DBPF.BCON;
+using Sims2Tools.DBPF.BHAV;
+using Sims2Tools.DBPF.CTSS;
+using Sims2Tools.DBPF.GLOB;
 using Sims2Tools.DBPF.IO;
+using Sims2Tools.DBPF.OBJD;
+using Sims2Tools.DBPF.OBJF;
 using Sims2Tools.DBPF.Package;
+using Sims2Tools.DBPF.SceneGraph.BINX;
 using Sims2Tools.DBPF.SceneGraph.COLL;
 using Sims2Tools.DBPF.SceneGraph.CRES;
 using Sims2Tools.DBPF.SceneGraph.GMDC;
 using Sims2Tools.DBPF.SceneGraph.GMND;
 using Sims2Tools.DBPF.SceneGraph.IDR;
 using Sims2Tools.DBPF.SceneGraph.SHPE;
+using Sims2Tools.DBPF.SLOT;
+using Sims2Tools.DBPF.STR;
+using Sims2Tools.DBPF.TPRP;
+using Sims2Tools.DBPF.TRCN;
+using Sims2Tools.DBPF.TTAB;
+using Sims2Tools.DBPF.TTAS;
 using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
@@ -73,7 +86,7 @@ comment ::= comment BRA <string> KET
 message ::= message BRA <string> KET
 
 -- Initialisers define a named variable/array and its initial value
-initialiser ::= <varDefn> = <varValue>
+initialiser ::= <varDefn> EQUALS <varValue>
 varDefn ::= $<varNameOrArray>
 varValue ::= (<cellRef> | <varRef> | <string> | <hexConstant> | <function>)
 
@@ -116,8 +129,8 @@ tgriAction ::= <tgri> (<conditional>)? [ <subactions> ]
 
 tgri ::= (IDR FOR)? <typeNameScriptable> - <wildGroupId> - <wildResourceId> - <wildInstanceId>
 typeNameAll ::= (<typeNameScriptable> | <typeNameOther>)
-typeNameCreatable ::= (3IDR | COLL | CRES | GMDC | GMND | SHPE)
-typeNameScriptable ::= (<typeNameCreatable> | AGED | ANIM | BCON | BHAV | BINX | CINE | CTSS | GZPS | LAMB | LDIR | LPNT | LSPT | LIFO | MMAT | NREF | OBJD | SDNA | STR | TTAB | TTAS | TRCN | TXMT | TXTR | VERS | XFCH | XFLR | XFNC | XHTN | XMOL | XOBJ | XROF | XSTN | XTOL | XWNT)
+typeNameCreatable ::= (3IDR | BCON | BHAV | BINX | COLL | CRES | CTSS | GLOB | GMDC | GMND | OBJD | OBJF | SHPE | SLOT | STR | TPRP | TRCN | TTAB | TTAS)
+typeNameScriptable ::= (<typeNameCreatable> | AGED | ANIM | CINE | GZPS | LAMB | LDIR | LPNT | LSPT | LIFO | MMAT | NREF | SDNA | TXMT | TXTR | VERS | XFCH | XFLR | XFNC | XHTN | XMOL | XOBJ | XROF | XSTN | XTOL | XWNT)
 typeNameOther ::= {any other resource type name supported by the DBPF Library}
 wildGroupId ::= (<groupId> | STAR)
 wildResourceId ::= (<resourceId> | STAR)
@@ -126,19 +139,24 @@ groupId ::= (<hexConstant8> | macro)
 resourceId ::= (<hexConstant8> | macro)
 instanceId ::= (<hexConstant8> | macro)
 
--- Subactions are either asserts, assignments or indexing
+-- Subactions are either asserts, repairs, assignments or indexing
 subactions ::= (<subaction> | <subaction> <subactions>)
-subaction ::= <assert> | <assignment> | <indexing>
+subaction ::= <assert> | <repair> | <assignment> | <indexing>
 
 -- Asserts confirm that the item has the given value, if not, the script is aborted
 assert ::= assert BRA <assertItem> : <assertValue> KET
 assertItem ::= (tools | version | type | group | resource | instance | filename | opcode)
 assertValue ::= (ddsutils | <typeNameAll> | <hexConstant> | (<char>)+)
 
+-- Repairs request the resource to take some remedial action
+repair ::= repair BRA <repairItem> (: <repairValue>)? KET
+repairItem ::= (defLangOnly | noDescriptions)
+repairValue ::= (<typeNameAll> | <hexConstant> | (<char>)+)
+
 -- Assignments change the value of a property or item within the current resource being edited
 -- Possible properties/items are dependant on the current resource being edited
 -- Where $varName = value would be confused with an index reference, the assign(varRef, value) form can be used
-assignment ::= (<item> = <value> | assign BRA <varRef> , <value> KET)
+assignment ::= (<item> EQUALS <value> | assign BRA <varRef> , <value> KET)
 item ::= (<string> | <name>)		// Where <string> must evaluate to a <name>
 name ::= (type | group | instance | resource | filename | <objdName> | <cpfName> | <strName> | <bconName> | <trcnName> | <bhavName> | <ttabName> | <txtrName> | <txmtName> | <shpeName>)
 objdName ::= (guid | {any objd index name - see ObjdIndex.cs})
@@ -146,7 +164,7 @@ cpfName ::= {any valid cpf property name; if the property does not exist, it wil
 strName ::= (text | title | desc)
 bconName ::= value
 trcnName ::= label
-bhavName ::= operand
+bhavName ::= (opcode | nodeversion | operands | operand)
 ttabName ::= (stringid | action | guardian | flags | flags2)
 txtrName ::= image
 txmtName ::= (matDefDesc | matDefType | {any valid txmt property name})
@@ -171,7 +189,7 @@ fnPath ::= fullpath BRA <param> KET
 fnIf ::= if BRA <condition> , <varValue> , <varValue> KET
 fnLogic ::= (and | or) BRA <param> (, <param>)+ KET
 fnInc ::= (preinc | postinc) BRA <param> KET
-fnCreator ::= (ccname | ccguid) BRA <param> KET
+fnCreator ::= (ccname | ccguid) BRA KET
 param ::= <value>
 tag ::= <varRef>
 
@@ -211,12 +229,13 @@ KET ::= )
 ABRA ::= <
 AKET ::= >
 PLUS ::= +
+EQUALS ::= =
 MINUS ::= -
 DOT ::= .
 STAR ::= *
 digit ::= (0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9)
 char ::= {any valid character for the current context}
-specialChar ::= ( BRA | KET | [ | ] | : | = | ; | ,)
+specialChar ::= ( BRA | KET | [ | ] | : | EQUALS | ; | ,)
 normalChar ::= {any valid character other than the <specialChar>s or space}
  
  */
@@ -386,7 +405,6 @@ namespace DbpfScripter
                     string token = parserState.ReadNextToken();
                     string value;
                     bool conditionValue = true;
-                    bool negateCondition = false;
 
                     if (token != null)
                     {
@@ -408,14 +426,17 @@ namespace DbpfScripter
                             return ReportErrorFalse("Unknown count (expected variable or constant)");
                         }
 
-                        if ("IF".Equals(PeekNextToken()))
+                        string peekToken = PeekNextToken();
+                        if ("IF".Equals(peekToken) || "UNLESS".Equals(peekToken))
                         {
+                            bool negateCondition = "UNLESS".Equals(peekToken);
+
                             parserState.ReadNextToken();
 
                             if ("NOT".Equals(PeekNextToken()))
                             {
                                 parserState.ReadNextToken();
-                                negateCondition = true;
+                                negateCondition = !negateCondition;
                             }
 
                             if (PeekNextToken()[0] == '$')
@@ -426,7 +447,7 @@ namespace DbpfScripter
                             }
                             else
                             {
-                                return ReportErrorFalse($"Expected condition variable for IF, got {PeekNextToken()}");
+                                return ReportErrorFalse($"Expected condition variable for IF/UNLESS, got {PeekNextToken()}");
                             }
                         }
 
@@ -491,7 +512,6 @@ namespace DbpfScripter
                 {
                     string saveVar = null;
                     bool conditionValue = true;
-                    bool negateCondition = false;
 
                     // template.package ($saveNameVar) (IF (NOT) $conditionVar) [ ... ]
                     if (filename.EndsWith(".package"))
@@ -501,8 +521,11 @@ namespace DbpfScripter
                             saveVar = ReadVarDefn();
                         }
 
-                        if ("IF".Equals(PeekNextToken()))
+                        string peekToken = PeekNextToken();
+                        if ("IF".Equals(peekToken) || "UNLESS".Equals(peekToken))
                         {
+                            bool negateCondition = "UNLESS".Equals(peekToken);
+
                             parserState.ReadNextToken();
 
                             if ("NOT".Equals(PeekNextToken()))
@@ -519,7 +542,7 @@ namespace DbpfScripter
                             }
                             else
                             {
-                                return ReportErrorFalse($"Expected condition variable for IF, got {PeekNextToken()}");
+                                return ReportErrorFalse($"Expected condition variable for IF/UNLESS, got {PeekNextToken()}");
                             }
                         }
                     }
@@ -547,7 +570,41 @@ namespace DbpfScripter
                         }
                         else if (filename.EndsWith(".package"))
                         {
-                            processed = ProcessActions(filename, saveVar, iteration);
+                            if (filename.Contains("*"))
+                            {
+                                if (saveVar != null)
+                                {
+                                    return ReportErrorFalse($"Cannot specify a save filename with a wildcard template");
+                                }
+
+                                parserState.StartRepeat($"Wildcard {filename}");
+                                processed = false;
+
+                                foreach (string path in Directory.GetFiles(templatePath, filename, SearchOption.TopDirectoryOnly))
+                                {
+                                    FileInfo fi = new FileInfo(path);
+                                    ReportProgress($"  Processing {fi.Name}");
+
+                                    processed = ProcessActions(fi.Name, null, iteration);
+
+                                    if (!processed) break;
+
+                                    parserState.NextRepeat();
+                                }
+
+                                if (processed && !scriptWorker.CancellationPending)
+                                {
+                                    processed = parserState.EndRepeat();
+
+                                    if (!processed) processed = SkipBlock();
+
+                                    return processed;
+                                }
+                            }
+                            else
+                            {
+                                processed = ProcessActions(filename, saveVar, iteration);
+                            }
                         }
                         else
                         {
@@ -630,7 +687,7 @@ namespace DbpfScripter
             {
                 if (!(filename.Contains("template") || filename.Contains("Template") || filename.Contains("TEMPLATE")))
                 {
-                    if (options.IsTrue("warnNaming")) ReportErrorNull($"File ({filename}) doesn't conform to required naming convention");
+                    if (options.HasTrueValue("warnNaming", true)) ReportErrorNull($"File ({filename}) doesn't conform to required naming convention");
                 }
             }
 
@@ -679,6 +736,7 @@ namespace DbpfScripter
             bool isIdrNeeded = false;
 
             string simpeFilename = null;
+            bool overwriteExisting = true;
 
             string nextToken = PeekNextToken();
             string tgri;
@@ -699,10 +757,12 @@ namespace DbpfScripter
                 parserState.ReadNextToken();
 
                 bool conditionValue = true;
-                bool negateCondition = false;
 
-                if ("IF".Equals(PeekNextToken()))
+                string peekToken = PeekNextToken();
+                if ("IF".Equals(peekToken) || "UNLESS".Equals(peekToken))
                 {
+                    bool negateCondition = "UNLESS".Equals(peekToken);
+
                     parserState.ReadNextToken();
 
                     if ("NOT".Equals(PeekNextToken()))
@@ -719,22 +779,21 @@ namespace DbpfScripter
                     }
                     else
                     {
-                        return ReportErrorFalse($"Expected condition variable for IF, got {PeekNextToken()}");
+                        return ReportErrorFalse($"Expected condition variable for IF/UNLESS, got {PeekNextToken()}");
                     }
                 }
 
-                if ("IDR".Equals(nextToken)) // Do NOT change this to 3IDR, as that will break TGRI processing for 3IDR resources
+                if ("IDR".Equals(peekToken)) // Do NOT change this to 3IDR, as that will break TGRI processing for 3IDR resources
                 {
-                    // TODO - DBPF Scripter - _TEST - extend this to accept DELETE IDR FOR T-G-R-I
                     parserState.ReadNextToken();
 
-                    nextToken = PeekNextToken();
+                    peekToken = PeekNextToken();
 
-                    if ("FOR".Equals(nextToken))
+                    if ("FOR".Equals(peekToken))
                     {
                         parserState.ReadNextToken();
 
-                        /* nextToken = */
+                        /* peekToken = */
                         PeekNextToken();
 
                         isIdrNeeded = true;
@@ -775,7 +834,6 @@ namespace DbpfScripter
 
                         if (isWild)
                         {
-                            // TODO - DBPF Scripter - _TEST - allow for wild cards in T-G-R-I DELETE
                             foreach (DBPFKey key in activePackage.GetEntriesByType(typeId))
                             {
                                 if (!(isWildGroup || key.GroupID == groupId)) continue;
@@ -787,18 +845,33 @@ namespace DbpfScripter
                                     DBPFKey idrKey = new DBPFKey(Idr.TYPE, key);
                                     ReportProgress($"Deleting {idrKey.TGRIString}");
                                     activePackage.Remove(idrKey);
+                                    ++countAssignments; ++countResources;
                                 }
                                 else
                                 {
                                     ReportProgress($"Deleting {key.TGRIString}");
                                     activePackage.Remove(key);
+                                    ++countAssignments; ++countResources;
                                 }
                             }
                         }
                         else
                         {
-                            ReportProgress($"Deleting {tgri}");
-                            activePackage.Remove(new DBPFKey(typeId, groupId, instanceId, resourceId));
+                            DBPFKey key = new DBPFKey(typeId, groupId, instanceId, resourceId);
+
+                            if (isIdrNeeded)
+                            {
+                                DBPFKey idrKey = new DBPFKey(Idr.TYPE, key);
+                                ReportProgress($"Deleting {idrKey.TGRIString}");
+                                activePackage.Remove(idrKey);
+                                ++countAssignments; ++countResources;
+                            }
+                            else
+                            {
+                                ReportProgress($"Deleting {key.TGRIString}");
+                                activePackage.Remove(key);
+                                ++countAssignments; ++countResources;
+                            }
                         }
 
                         return true;
@@ -818,6 +891,36 @@ namespace DbpfScripter
             else if ("CREATE".Equals(nextToken))
             {
                 parserState.ReadNextToken();
+
+                string peekToken = PeekNextToken();
+                if ("IF".Equals(peekToken) || "UNLESS".Equals(peekToken))
+                {
+                    // CREATE FROM               => exists->overwrite;    otherwise create
+                    // CREATE IF NOT EXISTS FROM => exists->use existing; otherwise create
+                    // CREATE UNLESS EXISTS FROM => exists->use existing; otherwise create
+                    // CREATE IF EXISTS FROM     => exists->overwrite;    otherwise create
+                    // CREATE UNLESS NOT FROM    => exists->overwrite;    otherwise create
+
+                    bool foundUnless = "UNLESS".Equals(peekToken);
+
+                    parserState.ReadNextToken();
+
+                    if ("NOT".Equals(PeekNextToken()))
+                    {
+                        parserState.ReadNextToken();
+                        foundUnless = !foundUnless;
+                    }
+
+                    if ("EXISTS".Equals(PeekNextToken()))
+                    {
+                        parserState.ReadNextToken();
+                        overwriteExisting = !foundUnless;
+                    }
+                    else
+                    {
+                        return ReportErrorFalse($"EXISTS expected");
+                    }
+                }
 
                 nextToken = PeekNextToken();
 
@@ -872,10 +975,12 @@ namespace DbpfScripter
             if (tgri != null)
             {
                 bool conditionValue = true;
-                bool negateCondition = false;
 
-                if ("IF".Equals(PeekNextToken()))
+                string peekToken = PeekNextToken();
+                if ("IF".Equals(peekToken) || "UNLESS".Equals(peekToken))
                 {
+                    bool negateCondition = "UNLESS".Equals(peekToken);
+
                     parserState.ReadNextToken();
 
                     if ("NOT".Equals(PeekNextToken()))
@@ -892,7 +997,7 @@ namespace DbpfScripter
                     }
                     else
                     {
-                        return ReportErrorFalse($"Expected condition variable for IF, got {PeekNextToken()}");
+                        return ReportErrorFalse($"Expected condition variable for IF/UNLESS, got {PeekNextToken()}");
                     }
                 }
 
@@ -983,58 +1088,123 @@ namespace DbpfScripter
 
                                 FileInfo fi = new FileInfo($"{templatePath}/{simpeFilename}");
                                 DBPFKey resKey = new DBPFKey(typeId, groupId, instanceId, resourceId);
+                                DBPFEntry resEntry = activePackage.GetEntryByKey(resKey);
 
-                                using (FileStream fs = File.OpenRead(fi.FullName))
+                                if (resEntry != null)
                                 {
-                                    DBPFEntry entry = new DBPFEntry(resKey)
-                                    {
-                                        FileOffset = 0,
-                                        FileSize = (uint)fi.Length
-                                    };
+                                    if (options.HasTrueValue("warnCreate", true)) ReportErrorNull($"CREATE is overwriting {resKey}");
+                                }
 
-                                    DbpfReader reader = DbpfReader.FromStream(fs, fi.Length);
+                                if (resEntry == null || overwriteExisting)
+                                {
+                                    using (FileStream fs = File.OpenRead(fi.FullName))
+                                    {
+                                        DBPFEntry entry = new DBPFEntry(resKey)
+                                        {
+                                            FileOffset = 0,
+                                            FileSize = (uint)fi.Length
+                                        };
 
-                                    DBPFResource res;
+                                        DbpfReader reader = DbpfReader.FromStream(fs, fi.Length);
 
-                                    if (typeId == Coll.TYPE)
-                                    {
-                                        res = new Coll(entry, reader);
-                                    }
-                                    else if (typeId == Idr.TYPE)
-                                    {
-                                        res = new Idr(entry, reader);
-                                    }
-                                    else if (typeId == Cres.TYPE)
-                                    {
-                                        res = new Cres(entry, reader);
-                                    }
-                                    else if (typeId == Shpe.TYPE)
-                                    {
-                                        res = new Shpe(entry, reader);
-                                    }
-                                    else if (typeId == Gmnd.TYPE)
-                                    {
-                                        res = new Gmnd(entry, reader);
-                                    }
-                                    else if (typeId == Gmdc.TYPE)
-                                    {
-                                        res = new Gmdc(entry, reader);
-                                    }
-                                    else
-                                    {
+                                        DBPFResource res;
+
+                                        // If extending this list, update typeNameCreatable and typeNameScriptable in the BNF
+                                        // If extending this list, check if a new extension is needed in IsSimPeFile()
+                                        if (typeId == Bcon.TYPE)
+                                        {
+                                            res = new Bcon(entry, reader);
+                                        }
+                                        else if (typeId == Bhav.TYPE)
+                                        {
+                                            res = new Bhav(entry, reader);
+                                        }
+                                        else if (typeId == Binx.TYPE)
+                                        {
+                                            res = new Binx(entry, reader);
+                                        }
+                                        else if (typeId == Coll.TYPE)
+                                        {
+                                            res = new Coll(entry, reader);
+                                        }
+                                        else if (typeId == Cres.TYPE)
+                                        {
+                                            res = new Cres(entry, reader);
+                                        }
+                                        else if (typeId == Ctss.TYPE)
+                                        {
+                                            res = new Ctss(entry, reader);
+                                        }
+                                        else if (typeId == Glob.TYPE)
+                                        {
+                                            res = new Glob(entry, reader);
+                                        }
+                                        else if (typeId == Gmdc.TYPE)
+                                        {
+                                            res = new Gmdc(entry, reader);
+                                        }
+                                        else if (typeId == Gmnd.TYPE)
+                                        {
+                                            res = new Gmnd(entry, reader);
+                                        }
+                                        else if (typeId == Idr.TYPE)
+                                        {
+                                            res = new Idr(entry, reader);
+                                        }
+                                        else if (typeId == Objd.TYPE)
+                                        {
+                                            res = new Objd(entry, reader);
+                                        }
+                                        else if (typeId == Objf.TYPE)
+                                        {
+                                            res = new Objf(entry, reader);
+                                        }
+                                        else if (typeId == Shpe.TYPE)
+                                        {
+                                            res = new Shpe(entry, reader);
+                                        }
+                                        else if (typeId == Slot.TYPE)
+                                        {
+                                            res = new Slot(entry, reader);
+                                        }
+                                        else if (typeId == Str.TYPE)
+                                        {
+                                            res = new Str(entry, reader);
+                                        }
+                                        else if (typeId == Ttab.TYPE)
+                                        {
+                                            res = new Ttab(entry, reader);
+                                        }
+                                        else if (typeId == Ttas.TYPE)
+                                        {
+                                            res = new Ttas(entry, reader);
+                                        }
+                                        else if (typeId == Tprp.TYPE)
+                                        {
+                                            res = new Tprp(entry, reader);
+                                        }
+                                        else if (typeId == Trcn.TYPE)
+                                        {
+                                            res = new Trcn(entry, reader);
+                                        }
+                                        else
+                                        {
+                                            fs.Close();
+                                            return ReportErrorFalse($"CREATE not supported for {tgriType}");
+                                        }
+
                                         fs.Close();
-                                        return ReportErrorFalse($"CREATE not supported for {tgriType}");
-                                    }
 
-                                    fs.Close();
-
-                                    if (res != null)
-                                    {
-                                        activePackage.Commit(res, true);
-                                    }
-                                    else
-                                    {
-                                        return ReportErrorFalse($"CREATE unable to parse {simpeFilename} as {tgriType}");
+                                        if (res != null)
+                                        {
+                                            activePackage.Commit(res, true);
+                                            ReportProgress($"Creating {res.TGRIString}");
+                                            ++countAssignments;
+                                        }
+                                        else
+                                        {
+                                            return ReportErrorFalse($"CREATE unable to parse {simpeFilename} as {tgriType}");
+                                        }
                                     }
                                 }
 
@@ -1112,6 +1282,10 @@ namespace DbpfScripter
             {
                 return ProcessAssert();
             }
+            else if (token.Equals("repair", StringComparison.OrdinalIgnoreCase))
+            {
+                return ProcessRepair();
+            }
             else if (token.Equals("comment", StringComparison.OrdinalIgnoreCase))
             {
                 return ProcessComment(iteration);
@@ -1124,13 +1298,19 @@ namespace DbpfScripter
             {
                 return ProcessAssign(iteration);
             }
-            else if (IsVariableDefn(token) || reIndex.IsMatch(token))
-            {
-                return ProcessIndexing(iteration);
-            }
             else
             {
-                return ProcessAssignment(iteration);
+                token = parserState.ReadNextToken();
+                string nextToken = parserState.PeekNextToken();
+
+                if (IsVariableDefn(token) || reIndex.IsMatch(token) || "[".Equals(nextToken))
+                {
+                    return ProcessIndexing(iteration, token);
+                }
+                else
+                {
+                    return ProcessAssignment(iteration, token);
+                }
             }
         }
 
@@ -1281,6 +1461,49 @@ namespace DbpfScripter
             return ReportErrorFalse("Invalid ASSERT");
         }
 
+        private bool ProcessRepair()
+        {
+            string token = parserState.ReadNextToken();
+
+            if (token != null && token.Equals("repair") && SkipOpenBracket())
+            {
+                string repairItem = parserState.ReadNextToken();
+
+                if (repairItem != null)
+                {
+                    ScriptValue repairValue = null;
+
+                    if (":".Equals(parserState.PeekNextToken()))
+                    {
+                        SkipColon();
+                        repairValue = new ScriptValue(parserState.ReadNextToken());
+                    }
+
+                    if (SkipCloseBracket())
+                    {
+                        if (currentScriptableObject is IDbpfRepairable repairableObject)
+                        {
+                            bool ok = repairableObject.Repair(repairItem.ToLower(), repairValue);
+
+                            if (!ok)
+                            {
+                                return ReportErrorFalse($"Repair failed, {repairItem}{(repairValue != null ? $":{repairValue}" : "")}");
+                            }
+
+                            ReportDebug($"  Repaired {repairItem}{(repairValue != null ? $":{repairValue}" : "")}");
+                            return ok;
+                        }
+                        else
+                        {
+                            return ReportErrorFalse($"{currentScriptableObject} is not repairable");
+                        }
+                    }
+                }
+            }
+
+            return ReportErrorFalse("Invalid REPAIR");
+        }
+
         private bool ProcessOption()
         {
             string token = parserState.ReadNextToken();
@@ -1327,10 +1550,8 @@ namespace DbpfScripter
             return ReportErrorFalse("Invalid ASSIGN");
         }
 
-        private bool ProcessAssignment(int iteration)
+        private bool ProcessAssignment(int iteration, string item)
         {
-            string item = parserState.ReadNextToken();
-
             if (item != null && SkipEqualsSign())
             {
                 string token = parserState.ReadNextToken();
@@ -1363,9 +1584,8 @@ namespace DbpfScripter
             return ReportErrorFalse("Invalid ASSIGNMENT");
         }
 
-        private bool ProcessIndexing(int iteration)
+        private bool ProcessIndexing(int iteration, string index)
         {
-            string index = parserState.ReadNextToken();
             bool isCloneIndexItem = false;
 
             if ("CLONE".Equals(PeekNextToken()))
@@ -1389,39 +1609,32 @@ namespace DbpfScripter
 
                 ReportDevMode($"Index [{index}]");
 
-                if (reIndex.IsMatch(index))
+                if (index.Equals("+"))
                 {
-                    if (index.Equals("+"))
+                    index = "-1";
+                }
+
+                try
+                {
+                    IDbpfScriptable indexer = currentScriptableObject.Indexed(new ScriptValue(index), isCloneIndexItem);
+
+                    if (indexer != null)
                     {
-                        index = "-1";
-                    }
+                        currentScriptableObject = indexer;
 
-                    try
-                    {
-                        IDbpfScriptable indexer = currentScriptableObject.Indexed(Int32.Parse(index), isCloneIndexItem);
+                        scriptableObjects.Push(currentScriptableObject);
 
-                        if (indexer != null)
-                        {
-                            currentScriptableObject = indexer;
+                        bool result = ProcessSubactions(iteration) && SkipCloseSquareBracket();
 
-                            scriptableObjects.Push(currentScriptableObject);
+                        scriptableObjects.Pop();
+                        currentScriptableObject = scriptableObjects.Peek();
 
-                            bool result = ProcessSubactions(iteration) && SkipCloseSquareBracket();
-
-                            scriptableObjects.Pop();
-                            currentScriptableObject = scriptableObjects.Peek();
-
-                            return result;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        return ReportErrorFalse($"Invalid index {index}");
+                        return result;
                     }
                 }
-                else
+                catch (Exception)
                 {
-                    ReportErrorFalse($"{index} is not a valid index");
+                    return ReportErrorFalse($"Invalid index {index}");
                 }
             }
 
@@ -1469,9 +1682,13 @@ namespace DbpfScripter
             {
                 value = EvaluateFunction(token, iteration);
             }
+            else if (float.TryParse(token, out float _))
+            {
+                value = token;
+            }
             else
             {
-                return ReportErrorNull("Unknown assignment (expected string or variable)");
+                return ReportErrorNull("Unknown assignment (tried string, variable, hex, function, number)");
             }
 
             return value;
@@ -2158,7 +2375,10 @@ namespace DbpfScripter
                 filename = filename.Substring(1, filename.Length - 2);
             }
 
-            if (!File.Exists($"{templatePath}/{filename}")) return ReportErrorNull($"File ({filename}) doesn't exist");
+            if (!filename.Contains("*"))
+            {
+                if (!File.Exists($"{templatePath}/{filename}")) return ReportErrorNull($"File ({filename}) doesn't exist");
+            }
 
             return filename;
         }
@@ -2202,7 +2422,7 @@ namespace DbpfScripter
             {
                 value = EvaluateVariable(ReadVarDefn(), iteration);
             }
-            else if (float.TryParse(nextToken, out float f))
+            else if (float.TryParse(nextToken, out float _))
             {
                 value = parserState.ReadNextToken();
             }

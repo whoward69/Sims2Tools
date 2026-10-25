@@ -10,6 +10,8 @@
  * Permission granted to use this code in any way, except to claim it as your own or sell it
  */
 
+using System;
+
 namespace Sims2Tools.DBPF.Neighbourhood
 {
     public enum GameVersions : uint
@@ -314,6 +316,7 @@ namespace Sims2Tools.DBPF.Neighbourhood
     }
 
     // While it is tempting to fix these typos - Gradparent, Nice - there are transforms that rely on them!
+    [Obsolete("Contains typos, use Srel:FamilyRelationship instead", false)]
     public enum RelationshipTypes : uint
     {
         Unset_Unknown = 0x00,
@@ -349,7 +352,7 @@ namespace Sims2Tools.DBPF.Neighbourhood
         Known = 0x0F,
     }
 
-    public enum UIFlags2Names : byte
+    public enum RelationshipState2Bits : byte
     {
         BestFriendForever = 0x00,
     };

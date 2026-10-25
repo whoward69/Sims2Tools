@@ -8,7 +8,6 @@
 
 using Sims2Tools.Utils.Persistence;
 using System;
-using System.Runtime.InteropServices;
 
 namespace Sims2Tools
 {
@@ -252,8 +251,5 @@ namespace Sims2Tools
             get => RegistryTools.GetPath(RegistryKey, Sims2DdsUtilsPathKey);
             set => RegistryTools.SetPath(RegistryKey, Sims2DdsUtilsPathKey, value);
         }
-
-        public static bool IsRunningOnWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        public static bool IsNotRunningOnWindows => !IsRunningOnWindows;
     }
 }

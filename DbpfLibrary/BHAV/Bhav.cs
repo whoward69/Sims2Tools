@@ -16,7 +16,6 @@ using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Text;
 using System.Xml;
 
@@ -32,8 +31,35 @@ namespace Sims2Tools.DBPF.BHAV
 
         private readonly List<Instruction> instructions = new List<Instruction>();
 
-        private Instruction startInstruction = null;
-        private readonly List<Instruction> unreachableInstructions = new List<Instruction>();
+        public override bool IsDirty
+        {
+            get
+            {
+                if (base.IsDirty || header.IsDirty) return true;
+
+                foreach (Instruction instruction in instructions)
+                {
+                    if (instruction.IsDirty) return true;
+                }
+
+                return false;
+            }
+        }
+
+        public override void SetClean()
+        {
+            base.SetClean();
+            header.SetClean();
+
+            foreach (Instruction instruction in instructions)
+            {
+                instruction.SetClean();
+            }
+        }
+
+        public BhavHeader Header => header;
+
+        public ReadOnlyCollection<Instruction> Instructions => instructions.AsReadOnly();
 
         public Bhav(DBPFEntry entry, DbpfReader reader) : base(entry)
         {
@@ -42,18 +68,14 @@ namespace Sims2Tools.DBPF.BHAV
             Unserialize(reader);
         }
 
-        public BhavHeader Header => this.header;
-
-        public ReadOnlyCollection<Instruction> Instructions => instructions.AsReadOnly();
-
         protected void Unserialize(DbpfReader reader)
         {
             this._keyName = Helper.ToString(reader.ReadBytes(0x40));
 
             this.header.Unserialize(reader);
 
-            int index = 0;
-            while (this.instructions.Count < Header.InstructionCount)
+            ushort index = 0;
+            while (this.instructions.Count < header.InstructionCount)
                 this.instructions.Add(new Instruction(reader, header.Format, index++));
         }
 
@@ -76,6 +98,7 @@ namespace Sims2Tools.DBPF.BHAV
         {
             writer.WriteBytes(Encoding.ASCII.GetBytes(KeyName), 0x40);
 
+            header.SetInstructionCount((ushort)instructions.Count);
             header.Serialize(writer);
 
             foreach (Instruction inst in Instructions)
@@ -83,68 +106,6 @@ namespace Sims2Tools.DBPF.BHAV
                 inst.Serialize(writer);
             }
         }
-
-        #region Reordering
-        public void ReorderInstructionTree()
-        {
-            int nextNumber = 0;
-            unreachableInstructions.Clear();
-
-            if (startInstruction == null) BuildInstructionTree();
-
-            nextNumber = RenumberInstruction(startInstruction, nextNumber);
-
-            foreach (Instruction inst in instructions)
-            {
-                if (inst.NewNumber == -1)
-                {
-                    nextNumber = RenumberInstruction(inst, nextNumber);
-
-                    unreachableInstructions.Add(inst);
-                    inst.NewNumber *= -1; // TODO - DBPF Viewer - test stuff
-                }
-
-                Console.Out.WriteLine($"{inst.OldNumber} -> {inst.NewNumber}"); // TODO - DBPF Viewer - test stuff
-            }
-        }
-
-        private void BuildInstructionTree()
-        {
-            int oldNumber = 0;
-
-            startInstruction = instructions[0];
-            startInstruction.IsReachable = true;
-
-            foreach (Instruction inst in instructions)
-            {
-                inst.OldNumber = oldNumber++;
-                inst.NewNumber = -1;
-
-                Instruction trueInst = inst.IsTrueLinked ? instructions[inst.TrueTarget] : null;
-                Instruction falseInst = inst.IsFalseLinked ? instructions[inst.FalseTarget] : null;
-
-                inst.TrueInstuction = trueInst; if (trueInst != null) trueInst.IsReachable = true;
-                inst.FalseInstuction = falseInst; if (falseInst != null) falseInst.IsReachable = true;
-            }
-        }
-
-        private int RenumberInstruction(Instruction currentInstruction, int nextNumber)
-        {
-            currentInstruction.NewNumber = nextNumber++;
-
-            if (currentInstruction.IsTrueLinked && currentInstruction.TrueInstuction.NewNumber == -1)
-            {
-                nextNumber = RenumberInstruction(currentInstruction.TrueInstuction, nextNumber);
-            }
-
-            if (currentInstruction.IsFalseLinked && currentInstruction.FalseInstuction.NewNumber == -1)
-            {
-                nextNumber = RenumberInstruction(currentInstruction.FalseInstuction, nextNumber);
-            }
-
-            return nextNumber;
-        }
-        #endregion
 
         #region IDBPFScriptable
         public bool Assert(string item, ScriptValue sv)
@@ -181,7 +142,28 @@ namespace Sims2Tools.DBPF.BHAV
         public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
             int index = sv;
-            Trace.Assert(index >= 0 && index < instructions.Count, $"Instruction index {index} out of range");
+
+            if (index == -1)
+            {
+                index = instructions.Count;
+            }
+
+            while (index > (instructions.Count - 1))
+            {
+                Instruction lastInstruction = instructions[instructions.Count - 1];
+                Instruction newInstruction = new Instruction(header.Format, (ushort)instructions.Count)
+                {
+                    OpCode = Instruction.GLOBAL_NOOP,
+                    NodeVersion = 0,
+
+                    TrueTarget = lastInstruction.TrueTarget,
+                    FalseTarget = Instruction.TARGET_ERROR
+                };
+
+                lastInstruction.TrueTarget = newInstruction.Index;
+
+                instructions.Add(newInstruction);
+            }
 
             return instructions[index];
         }
@@ -190,15 +172,15 @@ namespace Sims2Tools.DBPF.BHAV
         public override XmlElement AddXml(XmlElement parent)
         {
             XmlElement element = XmlHelper.CreateResElement(parent, NAME, this);
-            element.SetAttribute("format", Helper.Hex4PrefixString(Header.Format));
-            element.SetAttribute("params", Helper.Hex2PrefixString(Header.ArgCount));
-            element.SetAttribute("locals", Helper.Hex2PrefixString(Header.LocalVarCount));
-            element.SetAttribute("headerFlag", Helper.Hex2PrefixString(Header.HeaderFlag));
-            element.SetAttribute("cacheFlags", Helper.Hex2PrefixString(Header.CacheFlags));
-            element.SetAttribute("treeType", Helper.Hex2PrefixString(Header.TreeType));
-            element.SetAttribute("treeVersion", Helper.Hex4PrefixString(Header.TreeVersion));
+            element.SetAttribute("format", Helper.Hex4PrefixString(header.Format));
+            element.SetAttribute("params", Helper.Hex2PrefixString(header.ParamCount));
+            element.SetAttribute("locals", Helper.Hex2PrefixString(header.LocalCount));
+            element.SetAttribute("headerFlag", Helper.Hex2PrefixString(header.HeaderFlag));
+            element.SetAttribute("cacheFlags", Helper.Hex2PrefixString(header.CacheFlags));
+            element.SetAttribute("treeType", Helper.Hex2PrefixString(header.TreeType));
+            element.SetAttribute("treeVersion", Helper.Hex4PrefixString(header.TreeVersion));
 
-            for (int i = 0; i < Header.InstructionCount; ++i)
+            for (int i = 0; i < instructions.Count; ++i)
             {
                 Instruction item = Instructions[i];
 
@@ -212,7 +194,7 @@ namespace Sims2Tools.DBPF.BHAV
                 XmlElement ops = XmlHelper.CreateElement(inst, "operands");
                 for (int j = 0; j < 16; j++)
                 {
-                    ops.SetAttribute($"operand{j}", Helper.Hex2PrefixString(item.Operands[j]));
+                    ops.SetAttribute($"operand{j}", Helper.Hex2PrefixString((byte)item.Operands[j]));
                 }
             }
 
@@ -221,7 +203,7 @@ namespace Sims2Tools.DBPF.BHAV
 
         public string DiffString()
         {
-            return $"Inst:{header.InstructionCount}; Params{header.ArgCount}; Locals:{header.LocalVarCount}; Format:{Helper.Hex4PrefixString(header.Format)}; TreeType:{Helper.Hex2PrefixString(header.TreeType)}; HeaderFlags:{Helper.Hex2PrefixString(header.HeaderFlag)}; TreeVersion:{Helper.Hex8PrefixString(header.TreeVersion)}; CacheFlags:{Helper.Hex2PrefixString(header.CacheFlags)}";
+            return $"Inst:{instructions.Count}; Params{header.ParamCount}; Locals:{header.LocalCount}; Format:{Helper.Hex4PrefixString(header.Format)}; TreeType:{Helper.Hex2PrefixString(header.TreeType)}; HeaderFlags:{Helper.Hex2PrefixString(header.HeaderFlag)}; TreeVersion:{Helper.Hex8PrefixString(header.TreeVersion)}; CacheFlags:{Helper.Hex2PrefixString(header.CacheFlags)}";
         }
     }
 }

@@ -117,25 +117,33 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
     }
 
-    public class GmdcGroups : IEnumerable
+    public class GmdcGroupList : IEnumerable // TODO - DBPF Library - GMDC - do we need this class?
     {
-        private readonly ArrayList list = new ArrayList(); // TODO - DBPF Library - replace with List<GmdcGroup>
+        private readonly List<GmdcGroup> groups = new List<GmdcGroup>();
 
-        public int Length => list.Count;
+        public int Length => groups.Count;
 
-        public int AddItem(GmdcGroup item)
+        public void AddItem(GmdcGroup item)
         {
-            return list.Add(item);
+            groups.Add(item);
         }
 
-        public bool HasGroup(string group)
+        public bool HasGroup(string groupName)
         {
-            return list.Contains(group);
+            foreach (GmdcGroup group in groups)
+            {
+                if (group.Name.Equals(groupName))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void RenameGroup(string oldName, string newName)
         {
-            foreach (GmdcGroup group in list)
+            foreach (GmdcGroup group in groups)
             {
                 if (group.Name.Equals(oldName))
                 {
@@ -146,7 +154,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
         public IEnumerator GetEnumerator()
         {
-            return list.GetEnumerator();
+            return groups.GetEnumerator();
         }
     }
 }

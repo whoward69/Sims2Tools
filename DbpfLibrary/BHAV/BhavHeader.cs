@@ -17,67 +17,57 @@ namespace Sims2Tools.DBPF.BHAV
     public class BhavHeader
     {
         private ushort format = 0x8007;
-        private ushort count;
+        private ushort instCount;
         private byte type;
-        private byte argc;
-        private byte locals;
+        private byte paramCount;
+        private byte localCount;
         private byte headerflag;
         private uint treeversion;
         private byte cacheflags;
 
-        public ushort Format
+        public ushort Format => this.format;
+        public ushort TreeType => this.type;
+        public ushort HeaderFlag => this.headerflag;
+        public uint TreeVersion => this.treeversion;
+        public ushort CacheFlags => this.cacheflags;
+        public ushort ParamCount => this.paramCount;
+        public ushort LocalCount => this.localCount;
+        public ushort InstructionCount => this.instCount;
+
+        private bool _isDirty = false;
+
+        public bool IsDirty => _isDirty;
+
+        public void SetClean() => _isDirty = false;
+
+        public BhavHeader()
         {
-            get => this.format;
         }
 
-        public ushort TreeType
+        public void SetInstructionCount(ushort count)
         {
-            get => this.type;
-        }
-
-        public ushort HeaderFlag
-        {
-            get => this.headerflag;
-        }
-
-        public uint TreeVersion
-        {
-            get => this.treeversion;
-        }
-
-        public ushort CacheFlags
-        {
-            get => this.cacheflags;
-        }
-
-        public ushort ArgCount
-        {
-            get => this.argc;
-        }
-
-        public ushort LocalVarCount
-        {
-            get => this.locals;
-        }
-
-        public ushort InstructionCount
-        {
-            get => this.count;
+            instCount = count;
+            _isDirty = true;
         }
 
         public void Unserialize(DbpfReader reader)
         {
             format = reader.ReadUInt16();
-            count = reader.ReadUInt16();
+            instCount = reader.ReadUInt16();
             type = reader.ReadByte();
-            argc = reader.ReadByte();
-            locals = reader.ReadByte();
+            paramCount = reader.ReadByte();
+            localCount = reader.ReadByte();
             headerflag = reader.ReadByte();
             treeversion = reader.ReadUInt32();
+
             if (format > 0x8008)
+            {
                 cacheflags = reader.ReadByte();
+            }
             else
+            {
                 cacheflags = 0;
+            }
         }
 
         public uint FileSize => (uint)(2 + 2 + 1 + 1 + 1 + 1 + 4 + (format > 0x8008 ? 1 : 0));
@@ -85,12 +75,13 @@ namespace Sims2Tools.DBPF.BHAV
         public void Serialize(DbpfWriter writer)
         {
             writer.WriteUInt16(format);
-            writer.WriteUInt16(count);
+            writer.WriteUInt16(instCount);
             writer.WriteByte(type);
-            writer.WriteByte(argc);
-            writer.WriteByte(locals);
+            writer.WriteByte(paramCount);
+            writer.WriteByte(localCount);
             writer.WriteByte(headerflag);
             writer.WriteUInt32(treeversion);
+
             if (format > 0x8008) writer.WriteByte(cacheflags);
         }
     }

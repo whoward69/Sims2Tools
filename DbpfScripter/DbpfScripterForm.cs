@@ -26,7 +26,7 @@ namespace DbpfScripter
 {
     public partial class DbpfScripterForm : Form
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
 
         private MruList MyMruList;
         private Updater MyUpdater;
@@ -48,8 +48,6 @@ namespace DbpfScripter
 
         public DbpfScripterForm()
         {
-            logger.Info(DbpfScripterApp.AppProduct);
-
             DdsBuilder.DdsUtilsPath = Sims2ToolsLib.Sims2DdsUtilsPath;
 
             InitializeComponent();

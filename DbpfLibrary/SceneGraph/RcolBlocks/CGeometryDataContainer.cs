@@ -22,21 +22,21 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0xAC4F8687;
         public static string NAME = "cGeometryDataContainer";
 
-        private readonly GmdcElements elements;
-        private readonly GmdcLinks links;
-        private readonly GmdcGroups groups;
+        private readonly GmdcElementList elements;
+        private readonly GmdcLinkList links;
+        private readonly GmdcGroupList groups;
         private readonly GmdcModel model;
-        private readonly GmdcJoints joints;
+        private readonly GmdcJointList joints;
 
-        public GmdcElements Elements => elements;
+        public GmdcElementList Elements => elements;
 
-        public GmdcLinks Links => links;
+        public GmdcLinkList Links => links;
 
-        public GmdcGroups Groups => groups;
+        public GmdcGroupList Groups => groups;
 
         public GmdcModel Model => model;
 
-        public GmdcJoints Joints => joints;
+        public GmdcJointList Joints => joints;
 
         // Needed by reflection to create the class
         public CGeometryDataContainer(Rcol parent) : base(parent)
@@ -45,13 +45,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             BlockID = TYPE;
             BlockName = NAME;
 
-            elements = new GmdcElements();
-            links = new GmdcLinks();
-            groups = new GmdcGroups();
+            elements = new GmdcElementList();
+            links = new GmdcLinkList();
+            groups = new GmdcGroupList();
 
             model = new GmdcModel(this);
 
-            joints = new GmdcJoints();
+            joints = new GmdcJointList();
         }
 
         public bool HasSubset(string subset) => groups.HasGroup(subset);

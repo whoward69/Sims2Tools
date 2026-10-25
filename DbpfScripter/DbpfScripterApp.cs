@@ -16,13 +16,13 @@ namespace DbpfScripter
 {
     static class DbpfScripterApp
     {
-        public static string AppName = "DBPF Scripter";
+        public static readonly string AppName = "DBPF Scripter";
 
-        public static int AppVersionMajor = 1;
-        public static int AppVersionMinor = 8;
+        public static readonly int AppVersionMajor = 1;
+        public static readonly int AppVersionMinor = 9;
 
 #if DEBUG
-        private static readonly int AppVersionDebug = 4;
+        private static readonly int AppVersionDebug = 5;
 #endif
 
         private static readonly string AppVersionType = "r"; // a - alpha, b - beta, r - release
@@ -34,17 +34,17 @@ namespace DbpfScripter
 #endif
 
 #if DEBUG
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}.{AppVersionDebug}{AppVersionType} (debug)";
 #else
-        public static string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
+        public static readonly string AppProduct = $"{AppName} Version {AppVersionMajor}.{AppVersionMinor}{AppVersionType}";
 #endif
 
-        public static string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\DbpfScripter";
+        public static readonly string RegistryKey = Sims2Tools.Sims2ToolsLib.RegistryKey + @"\DbpfScripter";
 
         [STAThread]
         static void Main()
         {
-            log4net.Config.XmlConfigurator.Configure();
+            Sims2Tools.DBPF.Logger.DBPFLoggerFactory.InitLogger(AppName, AppProduct);
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

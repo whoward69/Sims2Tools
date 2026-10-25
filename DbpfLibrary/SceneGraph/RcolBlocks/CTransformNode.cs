@@ -15,7 +15,7 @@ using Sims2Tools.DBPF.SceneGraph.Geometry;
 using Sims2Tools.DBPF.SceneGraph.RCOL;
 using Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks;
 using Sims2Tools.DBPF.Utils;
-using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
@@ -63,26 +63,9 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         private readonly CompositionTreeNode ctn = new CompositionTreeNode();
 
-        private readonly TransformNodeItems items = new TransformNodeItems();
+        private readonly List<TransformNodeItem> items = new List<TransformNodeItem>();
         private readonly VectorTransformation trans = new VectorTransformation(VectorTransformation.TransformOrder.TranslateThenRotate);
         private int unknown;
-
-        public TransformNodeItems Items => items;
-
-        public CompositionTreeNode CompositionTreeNode => ctn;
-
-        public VectorTransformation Transformation => trans;
-        public Vector3f Translation => trans.Translation;
-        public float TransformX => (float)trans.Translation.X;
-        public float TransformY => (float)trans.Translation.Y;
-        public float TransformZ => (float)trans.Translation.Z;
-
-        public Quaternion Rotation => trans.Rotation;
-        public float RotationX => (float)trans.Rotation.X;
-        public float RotationY => (float)trans.Rotation.Y;
-        public float RotationZ => (float)trans.Rotation.Z;
-        public float RotationW => (float)trans.Rotation.W;
-        public int JointReference => unknown;
 
         public override bool IsDirty => base.IsDirty || ctn.IsDirty;
 
@@ -152,7 +135,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 size += DbpfWriter.Length(ogn.BlockName) + 4 + ogn.FileSize;
 
                 size += 4;
-                for (int i = 0; i < items.Length; i++)
+                for (int i = 0; i < items.Count; i++)
                 {
                     size += items[i].FileSize;
                 }
@@ -181,8 +164,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             writer.WriteBlockId(ogn.BlockID);
             ogn.Serialize(writer);
 
-            writer.WriteUInt32((uint)items.Length);
-            for (int i = 0; i < items.Length; i++)
+            writer.WriteUInt32((uint)items.Count);
+            for (int i = 0; i < items.Count; i++)
             {
                 items[i].Serialize(writer);
             }
@@ -201,52 +184,6 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
         public override void Dispose()
         {
-        }
-    }
-
-    public class TransformNodeItems : ArrayList // TODO - DBPF Library - replace with List<>
-    {
-        public new TransformNodeItem this[int index]
-        {
-            get { return ((TransformNodeItem)base[index]); }
-        }
-
-        public TransformNodeItem this[uint index]
-        {
-            get { return ((TransformNodeItem)base[(int)index]); }
-        }
-
-        public int Add(TransformNodeItem item)
-        {
-            return base.Add(item);
-        }
-
-        public void Insert(int index, TransformNodeItem item)
-        {
-            base.Insert(index, item);
-        }
-
-        public void Remove(TransformNodeItem item)
-        {
-            base.Remove(item);
-        }
-
-        public bool Contains(TransformNodeItem item)
-        {
-            return base.Contains(item);
-        }
-
-        public int Length
-        {
-            get { return this.Count; }
-        }
-
-        public override object Clone()
-        {
-            TransformNodeItems list = new TransformNodeItems();
-            foreach (TransformNodeItem item in this) list.Add(item);
-
-            return list;
         }
     }
 }

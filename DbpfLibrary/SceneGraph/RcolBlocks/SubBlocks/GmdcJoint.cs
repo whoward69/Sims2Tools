@@ -89,20 +89,20 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
     }
 
-    public class GmdcJoints : IEnumerable
+    public class GmdcJointList : IEnumerable // TODO - DBPF Library - GMDC - do we need this class?
     {
-        private readonly ArrayList list = new ArrayList(); // TODO - DBPF Library - replace with List<>
+        private readonly List<GmdcJoint> joints = new List<GmdcJoint>();
 
-        public int Length => list.Count;
+        public int Length => joints.Count;
 
-        public int AddItem(GmdcJoint item)
+        public void AddItem(GmdcJoint item)
         {
-            return list.Add(item);
+            joints.Add(item);
         }
 
         public IEnumerator GetEnumerator()
         {
-            return list.GetEnumerator();
+            return joints.GetEnumerator();
         }
     }
 }

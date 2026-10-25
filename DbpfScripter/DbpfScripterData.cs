@@ -74,6 +74,8 @@ namespace DbpfScripter
 
     internal class ParserStateData
     {
+        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
+
         private readonly DbpfScripterWorker myWorker;
         private readonly ScriptReader scriptReader;
 
@@ -191,6 +193,7 @@ namespace DbpfScripter
 
             if (token != null && token.Equals(";")) token = ReadNextToken();
 
+            logger.Debug($"ReadNextToken: {token}");
             return token;
         }
 
@@ -280,14 +283,30 @@ namespace DbpfScripter
             options.Add(option, value);
         }
 
-        public bool IsTrue(string option)
+        /// <summary>
+        /// Returns true if the option is true OTHERWISE returs the def value
+        /// </summary>
+        public bool HasTrueValue(string option, bool def)
         {
             if (options.TryGetValue(option, out ScriptValue value))
             {
                 return value.IsTrue;
             }
 
-            return true;
+            return def;
+        }
+
+        /// <summary>
+        /// Returns true if the option is false OTHERWISE returns the def value
+        /// </summary>
+        public bool HasFalseValue(string option, bool def)
+        {
+            if (options.TryGetValue(option, out ScriptValue value))
+            {
+                return !value.IsFalse;
+            }
+
+            return def;
         }
     }
 }

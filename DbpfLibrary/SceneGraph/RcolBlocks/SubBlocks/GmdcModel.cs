@@ -143,48 +143,12 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
         }
     }
 
-    public class GmdcModels : ArrayList // TODO - DBPF Library - replace with List<>
-    {
-        public new GmdcModel this[int index]
-        {
-            get { return ((GmdcModel)base[index]); }
-            set { base[index] = value; }
-        }
-
-        public GmdcModel this[uint index]
-        {
-            get { return ((GmdcModel)base[(int)index]); }
-            set { base[(int)index] = value; }
-        }
-
-        public int Add(GmdcModel item)
-        {
-            return base.Add(item);
-        }
-
-        public bool Contains(GmdcModel item)
-        {
-            return base.Contains(item);
-        }
-
-        public int Length
-        {
-            get { return this.Count; }
-        }
-    }
-
-    public class GmdcNamePairs : ArrayList // TODO - DBPF Library - replace with List<>
+    public class GmdcNamePairs : ArrayList // TODO - DBPF Library - GMDC - replace with List<>
     {
         public new GmdcNamePair this[int index]
         {
             get { return ((GmdcNamePair)base[index]); }
             set { base[index] = value; }
-        }
-
-        public GmdcNamePair this[uint index]
-        {
-            get { return ((GmdcNamePair)base[(int)index]); }
-            set { base[(int)index] = value; }
         }
 
         public int Add(GmdcNamePair item)

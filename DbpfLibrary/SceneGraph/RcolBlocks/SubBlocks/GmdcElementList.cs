@@ -372,18 +372,11 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
 
     }
 
-    public class GmdcElementValues : ArrayList // TODO - DBPF Library - replace with List<>
+    public class GmdcElementValues : ArrayList // TODO - DBPF Library - GMDC - replace with List<>
     {
         public new GmdcElementValueBase this[int index]
         {
             get { return ((GmdcElementValueBase)base[index]); }
-            // set { base[index] = value; }
-        }
-
-        public GmdcElementValueBase this[uint index]
-        {
-            get { return ((GmdcElementValueBase)base[(int)index]); }
-            // set { base[(int)index] = value; }
         }
 
         public int Add(GmdcElementValueBase item)
@@ -391,49 +384,26 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks.SubBlocks
             return base.Add(item);
         }
 
-        public void Insert(int index, GmdcElementValueBase item)
-        {
-            base.Insert(index, item);
-        }
-
-        public void Remove(GmdcElementValueBase item)
-        {
-            base.Remove(item);
-        }
-
-        public bool Contains(GmdcElementValueBase item)
-        {
-            return base.Contains(item);
-        }
-
         public int Length
         {
             get { return this.Count; }
         }
-
-        public override object Clone()
-        {
-            GmdcElementValues list = new GmdcElementValues();
-            foreach (GmdcElementValueBase item in this) list.Add(item);
-
-            return list;
-        }
     }
 
-    public class GmdcElements : IEnumerable
+    public class GmdcElementList : IEnumerable // TODO - DBPF Library - GMDC - do we need this class?
     {
-        private readonly ArrayList list = new ArrayList(); // TODO - DBPF Library - replace with List<>
+        private readonly List<GmdcElement> elements = new List<GmdcElement>();
 
-        public int Length => list.Count;
+        public int Length => elements.Count;
 
-        public int AddItem(GmdcElement item)
+        public void AddItem(GmdcElement item)
         {
-            return list.Add(item);
+            elements.Add(item);
         }
 
         public IEnumerator GetEnumerator()
         {
-            return list.GetEnumerator();
+            return elements.GetEnumerator();
         }
     }
 }

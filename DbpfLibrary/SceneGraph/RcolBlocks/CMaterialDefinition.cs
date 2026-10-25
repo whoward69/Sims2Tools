@@ -25,20 +25,20 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
         public static readonly TypeBlockID TYPE = (TypeBlockID)0x49596978;
         public static string NAME = "cMaterialDefinition";
 
-        string fldsc;
+        string fileDescription;
         public string FileDescription
         {
-            get => fldsc;
+            get => fileDescription;
 
-            set { fldsc = value; _isDirty = true; }
+            set { fileDescription = value; _isDirty = true; }
         }
 
-        string mattype;
+        string materialType;
         public string MaterialType
         {
-            get => mattype;
+            get => materialType;
 
-            set { mattype = value; _isDirty = true; }
+            set { materialType = value; _isDirty = true; }
         }
 
         private readonly List<string> fileList = new List<string>();
@@ -161,8 +161,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             BlockID = TYPE;
             BlockName = NAME;
 
-            fldsc = "";
-            mattype = "";
+            fileDescription = "";
+            materialType = "";
         }
 
         public override void Unserialize(DbpfReader reader)
@@ -180,8 +180,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             NameResource.BlockName = blkName;
             NameResource.BlockID = blkId;
 
-            fldsc = reader.ReadString();
-            mattype = reader.ReadString();
+            fileDescription = reader.ReadString();
+            materialType = reader.ReadString();
 
             uint propCount = reader.ReadUInt32();
             for (int i = 0; i < propCount; i++)
@@ -202,7 +202,7 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
                 }
             }
 
-            fileListValid = !string.IsNullOrWhiteSpace(fldsc);
+            fileListValid = !string.IsNullOrWhiteSpace(fileDescription);
 
             if (fileListValid)
             {
@@ -240,8 +240,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
 
                 size += DbpfWriter.Length(NameResource.BlockName) + 4 + NameResource.FileSize;
 
-                size += DbpfWriter.Length(fldsc);
-                size += DbpfWriter.Length(mattype);
+                size += DbpfWriter.Length(fileDescription);
+                size += DbpfWriter.Length(materialType);
 
                 size += 4;
                 foreach (MaterialDefinitionProperty mfd in properties)
@@ -274,8 +274,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             writer.WriteBlockId(NameResource.BlockID);
             NameResource.Serialize(writer);
 
-            writer.WriteString(fldsc);
-            writer.WriteString(mattype);
+            writer.WriteString(fileDescription);
+            writer.WriteString(materialType);
 
             writer.WriteUInt32((uint)properties.Count);
             for (int i = 0; i < properties.Count; i++)
@@ -311,8 +311,8 @@ namespace Sims2Tools.DBPF.SceneGraph.RcolBlocks
             newMaterialDef.NameResource.BlockName = this.NameResource.BlockName;
             newMaterialDef.NameResource.FileName = this.NameResource.FileName;
 
-            newMaterialDef.fldsc = this.fldsc;
-            newMaterialDef.mattype = this.mattype;
+            newMaterialDef.fileDescription = this.fileDescription;
+            newMaterialDef.materialType = this.materialType;
 
             for (int i = 0; i < this.properties.Count; i++)
             {

@@ -429,14 +429,13 @@ namespace Sims2Tools.DBPF.SceneGraph.RCOL
                 {
                     string matDefDesc = sv.ToString();
 
-                    // TODO - DBPF Scripter - matDefDesc - needs to auto-prepend the group prefix
-
                     if (matDefDesc.ToLower().EndsWith("_txmt"))
                     {
                         matDefDesc = matDefDesc.Substring(0, matDefDesc.Length - 5);
                     }
 
-                    txmt.MaterialDefinition.FileDescription = matDefDesc;
+                    // Some "things" (eg accessories) require the prefix on the material name, so always add it
+                    txmt.MaterialDefinition.FileDescription = $"##{txmt.GroupID.ToString().ToLower()}!{matDefDesc}";
                 }
 
                 return true;

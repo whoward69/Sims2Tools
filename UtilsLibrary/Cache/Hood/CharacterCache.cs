@@ -14,6 +14,7 @@ using Sims2Tools.DBPF.InventoryTokens;
 using Sims2Tools.DBPF.Neighbourhood.NGBH;
 using Sims2Tools.DBPF.Neighbourhood.SCOR;
 using Sims2Tools.DBPF.Neighbourhood.SDSC;
+using Sims2Tools.DBPF.Neighbourhood.SREL;
 using Sims2Tools.DBPF.OBJD;
 using Sims2Tools.DBPF.Package;
 using Sims2Tools.DBPF.STR;
@@ -822,6 +823,29 @@ namespace Sims2Tools.Cache.Hood
             }
 
             return token;
+        }
+        #endregion
+
+        #region Srel Accessors
+        public static List<Srel> GetRelationships(TypeInstanceID simId)
+        {
+            List<Srel> relationships = new List<Srel>();
+            uint simMask = (simId.AsUInt() & 0x0000FFFF) << 16;
+
+            using (CacheableDbpfFile hoodPackage = CharacterCache.cache.OpenForReadOnly(currentHoodData.PackagePath))
+            {
+                foreach (DBPFEntry entry in hoodPackage.GetEntriesByType(Srel.TYPE))
+                {
+                    if ((entry.InstanceID.AsUInt() & 0xFFFF0000) == simMask)
+                    {
+                        relationships.Add((Srel)hoodPackage.GetResourceByEntry(entry));
+                    }
+                }
+
+                hoodPackage.Close();
+            }
+
+            return relationships;
         }
         #endregion
 

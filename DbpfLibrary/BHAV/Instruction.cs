@@ -15,6 +15,7 @@ using Sims2Tools.DBPF.Utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Sims2Tools.DBPF.BHAV
 {
@@ -24,71 +25,102 @@ namespace Sims2Tools.DBPF.BHAV
         public const ushort TARGET_TRUE = 0xFFFD;
         public const ushort TARGET_FALSE = 0xFFFE;
 
+        public const ushort GLOBAL_NOOP = 0x02F3;
+
         private readonly ushort format; // Owning BHAV format
-        private readonly int index;
+        private readonly ushort index;
 
         private ushort opcode;
+        private byte nodeversion;
+
         private ushort addrTrue;
         private ushort addrFalse;
-        private byte nodeversion;
 
         private readonly List<Operand> operands = new List<Operand>();
 
-        private Instruction trueInstruction = null;
-        private Instruction falseInstruction = null;
-        private bool isReachable = false;
-        private int oldNumber = -1;
-        private int newNumber = -1;
+        public ushort Index => index;
+        public ushort OpCode
+        {
+            get => opcode;
+            set
+            {
+                opcode = value;
+                _isDirty = true;
+            }
+        }
+        public byte NodeVersion
+        {
+            get => nodeversion;
+            set
+            {
+                nodeversion = value;
+                _isDirty = true;
+            }
+        }
 
-        public ushort OpCode => opcode;
-        public int Index => index;
-        public byte NodeVersion => nodeversion;
-        public ushort TrueTarget => addrTrue;
-        public ushort FalseTarget => addrFalse;
-
-        public bool IsTrueLinked => (addrTrue != TARGET_ERROR && addrTrue != TARGET_TRUE && addrTrue != TARGET_FALSE);
-        public bool IsFalseLinked => (addrFalse != TARGET_ERROR && addrFalse != TARGET_TRUE && addrFalse != TARGET_FALSE);
+        public ushort TrueTarget
+        {
+            get => addrTrue;
+            set
+            {
+                addrTrue = value;
+                _isDirty = true;
+            }
+        }
+        public ushort FalseTarget
+        {
+            get => addrFalse;
+            set
+            {
+                addrFalse = value;
+                _isDirty = true;
+            }
+        }
 
         public List<Operand> Operands => this.operands;
 
-        public Instruction TrueInstuction
+        private bool _isDirty = false;
+
+        public bool IsDirty
         {
-            get => trueInstruction;
-            set => trueInstruction = value;
-        }
-        public Instruction FalseInstuction
-        {
-            get => falseInstruction;
-            set => falseInstruction = value;
-        }
-        public bool IsReachable
-        {
-            get => isReachable;
-            set => isReachable = value;
-        }
-        public int NewNumber
-        {
-            get => newNumber;
-            set => newNumber = value;
-        }
-        public int OldNumber
-        {
-            get => oldNumber;
-            set => oldNumber = value;
+            get
+            {
+                if (_isDirty) return true;
+
+                foreach (Operand operand in operands)
+                {
+                    if (operand.IsDirty) return true;
+                }
+
+                return false;
+            }
         }
 
-        public Instruction(DbpfReader reader, ushort format, int index)
+        public void SetClean()
+        {
+            _isDirty = false;
+
+            foreach (Operand operand in operands)
+            {
+                operand.SetClean();
+            }
+        }
+
+        public Instruction(ushort format, ushort index)
         {
             this.format = format;
             this.index = index;
 
-            this.operands = new List<Operand>(16);
+            operands = new List<Operand>(16);
             for (int i = 0; i < 16; ++i)
             {
-                this.operands.Add(new Operand(Byte.MaxValue));
+                operands.Add(new Operand(Byte.MaxValue));
             }
+        }
 
-            this.Unserialize(reader);
+        public Instruction(DbpfReader reader, ushort format, ushort index) : this(format, index)
+        {
+            Unserialize(reader);
         }
 
         private ushort FormatSpecificGetAddr(ushort target)
@@ -209,32 +241,15 @@ namespace Sims2Tools.DBPF.BHAV
             {
                 for (int i = 0; i < 8; ++i)
                 {
-                    writer.WriteByte(operands[i]);
+                    writer.WriteByte((byte)operands[i]);
                 }
             }
             else
             {
                 for (int i = 0; i < 16; ++i)
                 {
-                    writer.WriteByte(operands[i]);
+                    writer.WriteByte((byte)operands[i]);
                 }
-            }
-        }
-
-#pragma warning disable IDE0060 // Remove unused parameter
-        public string GetTarget(int inst, ushort target)
-#pragma warning restore IDE0060 // Remove unused parameter
-        {
-            switch (target)
-            {
-                case TARGET_ERROR:
-                    return "Error";
-                case TARGET_TRUE:
-                    return "True";
-                case TARGET_FALSE:
-                    return "False";
-                default:
-                    return Helper.Hex4PrefixString(target); // Using the absolute target makes using WinDiff/BeyondCompare very hard!
             }
         }
 
@@ -259,7 +274,7 @@ namespace Sims2Tools.DBPF.BHAV
         {
             if (item.Equals("opcode"))
             {
-                return OpCode == sv;
+                return opcode == sv;
             }
 
             throw new NotImplementedException();
@@ -267,16 +282,71 @@ namespace Sims2Tools.DBPF.BHAV
 
         public bool Assignment(string item, ScriptValue sv)
         {
+            if (item.Equals("opcode"))
+            {
+                this.opcode = sv;
+                _isDirty = true;
+                return true;
+            }
+            if (item.Equals("nodeversion"))
+            {
+                this.nodeversion = sv;
+                _isDirty = true;
+                return true;
+            }
+            else if (item.Equals("operands"))
+            {
+                string operandMatch = "([0-9a-f]{2})";
+                Regex reOperand = new Regex(operandMatch);
+                Regex reOperands = new Regex($"^{operandMatch}{{16}}$");
+                Match mOperands = reOperands.Match(sv.ToLower());
+
+                if (mOperands.Success)
+                {
+                    int i = 0;
+                    foreach (Match m in reOperand.Matches(sv.ToLower()))
+                    {
+                        operands[i++].SetValue((byte)(new ScriptValue($"0x{m.Groups[0].Value}")));
+                    }
+
+                    _isDirty = true;
+                    return true;
+                }
+
+                return false;
+            }
+
             throw new NotImplementedException();
         }
 
         public ScriptValue Value(string item)
         {
+            if (item.Equals("opcode"))
+            {
+                return new ScriptValue(this.opcode);
+            }
+            else if (item.Equals("nodeversion"))
+            {
+                return new ScriptValue(this.nodeversion);
+            }
+            else if (item.Equals("operands"))
+            {
+                string opStr = "";
+
+                foreach (Operand operand in operands)
+                {
+                    opStr += Helper.Hex2String((ushort)operand);
+                }
+
+                return new ScriptValue(opStr);
+            }
+
             throw new NotImplementedException();
         }
 
         public IDbpfScriptable Indexed(ScriptValue sv, bool clone)
         {
+            int index = sv;
             Trace.Assert(index >= 0 && index < operands.Count, $"Operand index {index} out of range");
 
             return operands[index];
@@ -285,7 +355,7 @@ namespace Sims2Tools.DBPF.BHAV
 
         public string DiffString()
         {
-            return $"Op:{Helper.Hex4PrefixString(opcode)}; NV:{nodeversion}; Operands:{Helper.Hex2PrefixString(operands[0])},{Helper.Hex2PrefixString(operands[1])},{Helper.Hex2PrefixString(operands[2])},{Helper.Hex2PrefixString(operands[3])},{Helper.Hex2PrefixString(operands[4])},{Helper.Hex2PrefixString(operands[5])},{Helper.Hex2PrefixString(operands[6])},{Helper.Hex2PrefixString(operands[7])},{Helper.Hex2PrefixString(operands[8])},{Helper.Hex2PrefixString(operands[9])},{Helper.Hex2PrefixString(operands[10])},{Helper.Hex2PrefixString(operands[11])},{Helper.Hex2PrefixString(operands[12])},{Helper.Hex2PrefixString(operands[13])},{Helper.Hex2PrefixString(operands[14])},{Helper.Hex2PrefixString(operands[15])}; True:{GetDeltaTarget(index, TrueTarget)}; False:{GetDeltaTarget(index, FalseTarget)}";
+            return $"Op:{Helper.Hex4PrefixString(opcode)}; NV:{nodeversion}; Operands:{Helper.Hex2PrefixString((byte)operands[0])},{Helper.Hex2PrefixString((byte)operands[1])},{Helper.Hex2PrefixString((byte)operands[2])},{Helper.Hex2PrefixString((byte)operands[3])},{Helper.Hex2PrefixString((byte)operands[4])},{Helper.Hex2PrefixString((byte)operands[5])},{Helper.Hex2PrefixString((byte)operands[6])},{Helper.Hex2PrefixString((byte)operands[7])},{Helper.Hex2PrefixString((byte)operands[8])},{Helper.Hex2PrefixString((byte)operands[9])},{Helper.Hex2PrefixString((byte)operands[10])},{Helper.Hex2PrefixString((byte)operands[11])},{Helper.Hex2PrefixString((byte)operands[12])},{Helper.Hex2PrefixString((byte)operands[13])},{Helper.Hex2PrefixString((byte)operands[14])},{Helper.Hex2PrefixString((byte)operands[15])}; True:{GetDeltaTarget(index, TrueTarget)}; False:{GetDeltaTarget(index, FalseTarget)}";
         }
 
         public string DiffString(SortedDictionary<string, string> primNames)
@@ -296,7 +366,7 @@ namespace Sims2Tools.DBPF.BHAV
 
                 if (primNames.ContainsKey(opCode))
                 {
-                    return $"{primNames[opCode]}; NV:{nodeversion}; Operands:{Helper.Hex2PrefixString(operands[0])},{Helper.Hex2PrefixString(operands[1])},{Helper.Hex2PrefixString(operands[2])},{Helper.Hex2PrefixString(operands[3])},{Helper.Hex2PrefixString(operands[4])},{Helper.Hex2PrefixString(operands[5])},{Helper.Hex2PrefixString(operands[6])},{Helper.Hex2PrefixString(operands[7])},{Helper.Hex2PrefixString(operands[8])},{Helper.Hex2PrefixString(operands[9])},{Helper.Hex2PrefixString(operands[10])},{Helper.Hex2PrefixString(operands[11])},{Helper.Hex2PrefixString(operands[12])},{Helper.Hex2PrefixString(operands[13])},{Helper.Hex2PrefixString(operands[14])},{Helper.Hex2PrefixString(operands[15])}; True:{GetDeltaTarget(index, TrueTarget)}; False:{GetDeltaTarget(index, FalseTarget)}";
+                    return $"{primNames[opCode]}; NV:{nodeversion}; Operands:{Helper.Hex2PrefixString((byte)operands[0])},{Helper.Hex2PrefixString((byte)operands[1])},{Helper.Hex2PrefixString((byte)operands[2])},{Helper.Hex2PrefixString((byte)operands[3])},{Helper.Hex2PrefixString((byte)operands[4])},{Helper.Hex2PrefixString((byte)operands[5])},{Helper.Hex2PrefixString((byte)operands[6])},{Helper.Hex2PrefixString((byte)operands[7])},{Helper.Hex2PrefixString((byte)operands[8])},{Helper.Hex2PrefixString((byte)operands[9])},{Helper.Hex2PrefixString((byte)operands[10])},{Helper.Hex2PrefixString((byte)operands[11])},{Helper.Hex2PrefixString((byte)operands[12])},{Helper.Hex2PrefixString((byte)operands[13])},{Helper.Hex2PrefixString((byte)operands[14])},{Helper.Hex2PrefixString((byte)operands[15])}; True:{GetDeltaTarget(index, TrueTarget)}; False:{GetDeltaTarget(index, FalseTarget)}";
                 }
             }
 

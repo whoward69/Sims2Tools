@@ -47,7 +47,11 @@ namespace Sims2Tools.DBPF.Logger
         {
             if (logger == null)
             {
+#if DEBUG
+                InitLogger("Sims2Tools", "Sims2Tools: Logger was NOT initialised!");
+#else
                 throw new DbpfException("Logger has not been initialised");
+#endif
             }
 
             return logger;

@@ -150,7 +150,7 @@ namespace Sims2Tools.Cache.Career
                     if (inst.OpCode == 0x0002)
                     {
                         // My or SO's Category = 
-                        if ((inst.Operands[6] == 0x03 || inst.Operands[6] == 0x04) && inst.Operands[0] == 0x3B && inst.Operands[5] == 0x05)
+                        if (((byte)inst.Operands[6] == 0x03 || (byte)inst.Operands[6] == 0x04) && (byte)inst.Operands[0] == 0x3B && (byte)inst.Operands[5] == 0x05)
                         {
                             // AdultJob = 0x20, TeenElderJob = 0x2E, PetJob = 0x1B/0x9B
                             switch ((byte)inst.Operands[2])

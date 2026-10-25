@@ -132,6 +132,8 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             }
         }
 
+        internal bool IsGhost => ghostFlags.IsGhost;
+
         internal int AgeDaysLeft => data[(int)SdscIndex.AgeDaysLeft];
 
         protected override void AddXml(XmlElement parent)

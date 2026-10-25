@@ -31,6 +31,7 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
             species = (SpeciesType)data[(int)SdscIndex.Species];
         }
 
+        internal SpeciesType Species => species;
         internal bool IsHuman => (species == SpeciesType.Human);
         internal bool IsPet => !IsHuman;
         internal bool IsCat => (species == SpeciesType.Cat);

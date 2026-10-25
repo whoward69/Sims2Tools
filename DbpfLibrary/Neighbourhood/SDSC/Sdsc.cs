@@ -97,10 +97,13 @@ namespace Sims2Tools.DBPF.Neighbourhood.SDSC
         public LifeSections LifeSection => description.LifeSection;
         public int AgeDaysLeft => description.AgeDaysLeft;
 
+        public SpeciesType Species => nightlife.Species;
         public bool IsHuman => nightlife.IsHuman;
         public bool IsPet => nightlife.IsPet;
         public bool IsCat => nightlife.IsCat;
         public bool IsDog => nightlife.IsDog;
+
+        public bool IsGhost => description.IsGhost;
 
 
         public ulong BvMemories => voyage.MementoFlags;

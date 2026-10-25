@@ -216,9 +216,9 @@
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\BoundedNode.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\CompositionTreeNode.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\Extension.cs" />
-    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcElements.cs" />
-    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcGroups.cs" />
-    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcLinks.cs" />
+    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcElementList.cs" />
+    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcGroupList.cs" />
+    <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcLinkList.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcModel.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\GmdcJoint.cs" />
     <Compile Include="SceneGraph\RcolBlocks\SubBlocks\LightT.cs" />

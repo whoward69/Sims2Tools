@@ -18,13 +18,23 @@ namespace Sims2Tools.DBPF.BHAV
     {
         private byte value;
 
-        public static implicit operator byte(Operand op) => op.value;
-        public static implicit operator int(Operand op) => op.value;
-        public static implicit operator uint(Operand op) => op.value;
+        public static explicit operator byte(Operand op) => op.value;
+
+        private bool _isDirty = false;
+
+        public bool IsDirty => _isDirty;
+
+        public void SetClean() => _isDirty = false;
 
         public Operand(byte value)
         {
             this.value = value;
+        }
+
+        public void SetValue(byte value)
+        {
+            this.value = value;
+            _isDirty = true;
         }
 
         #region IDBPFScriptable
@@ -38,6 +48,7 @@ namespace Sims2Tools.DBPF.BHAV
             if (item.Equals("operand"))
             {
                 this.value = sv;
+                _isDirty = true;
                 return true;
             }
 
