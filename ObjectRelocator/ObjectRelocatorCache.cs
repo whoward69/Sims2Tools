@@ -505,7 +505,7 @@ namespace ObjectRelocator
         {
             if (strings != null)
             {
-                strings.DefLanguageOnly();
+                strings.DefLanguageOnly(true);
 
                 UpdatePackage();
             }

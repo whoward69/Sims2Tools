@@ -46,11 +46,11 @@ namespace ObjectRelocator
             this.Columns.Add(new DataColumn("Price", typeof(uint)));
             this.Columns.Add(new DataColumn("Depreciation", typeof(string)));
             this.Columns.Add(new DataColumn("HoodView", typeof(string)));
-            this.Columns.Add(new DataColumn("ShowInCatalog", typeof(string)));
             this.Columns.Add(new DataColumn("Surface", typeof(string)));
             this.Columns.Add(new DataColumn("AllowLot", typeof(string)));
             this.Columns.Add(new DataColumn("AllowRoad", typeof(string)));
             this.Columns.Add(new DataColumn("RemoveOnPlop", typeof(string)));
+            this.Columns.Add(new DataColumn("ShowInCatalog", typeof(string)));
 
             this.Columns.Add(new DataColumn("ObjectData", typeof(object)));
 

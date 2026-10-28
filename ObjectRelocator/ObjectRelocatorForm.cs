@@ -189,12 +189,6 @@ namespace ObjectRelocator
             InitializeComponent();
             SetTitle(lastFolder);
 
-            if (Sims2ToolsLib.IsRunningOnWindows)
-            {
-                gridPackageFiles.MouseDown += new MouseEventHandler(this.OnPkgGrid_MouseDown);
-                gridResources.MouseMove += new MouseEventHandler(this.OnResGrid_MouseMove);
-            }
-
             ObjectDbpfData.SetCache(packageCache);
 
             selectPathDialog = new CommonOpenFileDialog
@@ -4036,7 +4030,7 @@ namespace ObjectRelocator
 
                 foreach (DataGridViewRow selectedRow in gridResources.SelectedRows)
                 {
-                    string fromPackagePath = selectedRow.Cells["colPackagePath"].Value as string;
+                    string fromPackagePath = selectedRow.Cells["colResPackagePath"].Value as string;
                     string toPackagePath = $"{selectPathDialog.FileName}\\{new DirectoryInfo(fromPackagePath).Name}";
 
                     if (!fromPaths.Contains(fromPackagePath))
@@ -4065,8 +4059,7 @@ namespace ObjectRelocator
                     }
                 }
 
-                DoWork_FillResourceGrid(lastFolder, false);
-
+                DoWork_FillPackageGrid(lastFolder);
             }
         }
 
@@ -4218,6 +4211,7 @@ namespace ObjectRelocator
                 return;
             }
 
+            // See https://www.c-sharpcorner.com/blogs/perform-drag-and-drop-operation-on-treeview-node-in-c-sharp-net
             if (rootFolder != null)
             {
                 e.Effect = e.AllowedEffect;

@@ -233,6 +233,7 @@ namespace ObjectRelocator
             this.thumbBox = new System.Windows.Forms.PictureBox();
             this.saveThumbnailDialog = new System.Windows.Forms.SaveFileDialog();
             this.openThumbnailDialog = new System.Windows.Forms.OpenFileDialog();
+            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.menuMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitTopBottom)).BeginInit();
             this.splitTopBottom.Panel1.SuspendLayout();
@@ -378,6 +379,7 @@ namespace ObjectRelocator
             this.menuItemBuyMode,
             this.menuItemBuildMode,
             this.menuItemDecoMode,
+            this.toolStripSeparator8,
             this.menuItemAdvanced,
             this.toolStripSeparator4,
             this.menuItemRecurse,
@@ -834,6 +836,7 @@ namespace ObjectRelocator
             this.gridPackageFiles.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseEnter);
             this.gridPackageFiles.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.OnCellMouseLeave);
             this.gridPackageFiles.SelectionChanged += new System.EventHandler(this.OnPackageSelectionChanged);
+            this.gridPackageFiles.MouseDown += new System.Windows.Forms.MouseEventHandler(this.OnPkgGrid_MouseDown);
             // 
             // colPackageFile
             // 
@@ -960,6 +963,7 @@ namespace ObjectRelocator
             this.gridResources.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.OnToolTipTextNeeded);
             this.gridResources.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnResourceBindingComplete);
             this.gridResources.SelectionChanged += new System.EventHandler(this.OnGridSelectionChanged);
+            this.gridResources.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnResGrid_MouseMove);
             // 
             // colVisible
             // 
@@ -1162,7 +1166,7 @@ namespace ObjectRelocator
             this.menuSeparatorClipboard,
             this.menuContextCopyToClipboard});
             this.menuContextObjects.Name = "menuContextGrid";
-            this.menuContextObjects.Size = new System.Drawing.Size(301, 288);
+            this.menuContextObjects.Size = new System.Drawing.Size(301, 266);
             this.menuContextObjects.Closing += new System.Windows.Forms.ToolStripDropDownClosingEventHandler(this.OnContextMenuClosing);
             this.menuContextObjects.Opening += new System.ComponentModel.CancelEventHandler(this.OnContextMenuOpening);
             this.menuContextObjects.Opened += new System.EventHandler(this.OnContextMenuOpened);
@@ -2119,6 +2123,11 @@ namespace ObjectRelocator
             this.openThumbnailDialog.FilterIndex = 2;
             this.openThumbnailDialog.Title = "Open Thumbnail";
             // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(177, 6);
+            // 
             // ObjectRelocatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -2384,5 +2393,6 @@ namespace ObjectRelocator
         private System.Windows.Forms.ToolStripMenuItem menuItemChangeTogether;
         private System.Windows.Forms.ToolStripSeparator menuSeparatorClipboard;
         private System.Windows.Forms.ToolStripMenuItem menuContextCopyToClipboard;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
     }
 }

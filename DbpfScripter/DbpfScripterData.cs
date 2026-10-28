@@ -74,8 +74,6 @@ namespace DbpfScripter
 
     internal class ParserStateData
     {
-        private static readonly Sims2Tools.DBPF.Logger.IDBPFLogger logger = Sims2Tools.DBPF.Logger.DBPFLoggerFactory.GetLogger();
-
         private readonly DbpfScripterWorker myWorker;
         private readonly ScriptReader scriptReader;
 
@@ -193,7 +191,6 @@ namespace DbpfScripter
 
             if (token != null && token.Equals(";")) token = ReadNextToken();
 
-            logger.Debug($"ReadNextToken: {token}");
             return token;
         }
 
